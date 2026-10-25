@@ -1,0 +1,11 @@
+node_modules/
+.next/
+out/
+dist/
+.vercel/
+.env
+.env*.local
+.qa/
+__pycache__/
+*.pyc
+.DS_Store
