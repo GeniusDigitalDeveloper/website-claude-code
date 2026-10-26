@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 """Gabung index.html + css + js jadi satu fail HTML untuk tampal di mana-mana hosting.
 
-Gambar dimuat dari CDN Pexels (tiada folder assets diperlukan).
-Jalankan: python3 build-single.py  ->  single-file/index.html
+Secara lalai semua gambar dibenamkan (base64) supaya fail berdiri sendiri,
+walaupun hosting menyekat gambar dari laman luar.
+Jalankan: python3 build-single.py          ->  single-file/index.html (gambar dibenamkan)
+          python3 build-single.py --cdn    ->  gambar dimuat dari CDN Pexels (fail kecil)
+Perlu Pillow (pip install pillow) untuk mod lalai.
 """
 import base64
+import io
 import pathlib
 import re
+import sys
 
 ROOT = pathlib.Path(__file__).parent
 
@@ -52,6 +57,24 @@ PEXELS = {
 }
 
 
+CDN = "--cdn" in sys.argv
+# saiz maksimum gambar yang dibenamkan
+EMBED_SIZE = {
+    "hero-plate": (760, 760), "hero-bowl": (480, 480), "about-interior": (560, 684),
+    "about-dates": (400, 400), "gallery-feast": (560, 746), "gallery-chicken": (800, 533),
+}
+
+
+def embedded(name):
+    from PIL import Image
+    size = EMBED_SIZE.get(name) or ((560, 420) if name.startswith("nasi") else (360, 360))
+    im = Image.open(ROOT / "assets/img" / f"{name}.jpg").convert("RGB")
+    im.thumbnail(size)
+    buf = io.BytesIO()
+    im.save(buf, "JPEG", quality=66, optimize=True, progressive=True)
+    return "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
+
+
 def url(name):
     pid, w, h = PEXELS[name]
     return f"https://images.pexels.com/photos/{pid}/pexels-photo-{pid}.jpeg?auto=compress&cs=tinysrgb&fit=crop&w={w}&h={h}"
@@ -63,12 +86,24 @@ data = (ROOT / "js/data.js").read_text()
 app = (ROOT / "js/app.js").read_text()
 logo = (ROOT / "assets/favicon.svg").read_bytes()
 
-# gambar dalam HTML
-html = re.sub(r"assets/img/([a-z0-9-]+)\.jpg", lambda m: url(m.group(1)).replace("&", "&amp;"), html)
+# og:image perlu URL awam; preload tak perlu dalam fail tunggal
+html = html.replace("assets/img/og-image.jpg", url("og-image").replace("&", "&amp;"))
+html = html.replace('  <link rel="preload" as="image" href="assets/img/hero-plate.jpg">\n', "")
+
+if CDN:
+    src = url
+    html = re.sub(r"assets/img/([a-z0-9-]+)\.jpg", lambda m: url(m.group(1)).replace("&", "&amp;"), html)
+    hydrate = ""
+else:
+    # setiap gambar dibenam sekali sahaja dalam JS, kemudian diisi ke <img data-img>
+    src = embedded
+    html = re.sub(r'src="assets/img/([a-z0-9-]+)\.jpg"', r'data-img="\1"', html)
+    hydrate = 'document.querySelectorAll("img[data-img]").forEach((i) => (i.src = PEXELS_IMG[i.dataset.img]));\n'
+
 html = html.replace('href="assets/favicon.svg"', 'href="data:image/svg+xml;base64,' + base64.b64encode(logo).decode() + '"')
 
 # gambar dalam JS
-img_map = "const PEXELS_IMG = {\n" + "".join(f'  "{k}": "{url(k)}",\n' for k in PEXELS) + "};\n"
+img_map = "const PEXELS_IMG = {\n" + "".join(f'  "{k}": "{src(k)}",\n' for k in PEXELS if k != "og-image") + "};\n" + hydrate
 app = app.replace("const imgSrc = (m) => `assets/img/${m.img}.jpg`;", "const imgSrc = (m) => PEXELS_IMG[m.img];")
 assert "PEXELS_IMG[m.img]" in app, "imgSrc tidak dijumpai dalam app.js"
 
@@ -77,6 +112,7 @@ html = html.replace('<link rel="stylesheet" href="css/style.css">', "<style>\n" 
 html = html.replace('<script src="js/data.js"></script>', "<script>\n" + img_map + data + "\n</script>")
 html = html.replace('<script src="js/app.js"></script>', "<script>\n" + app + "\n</script>")
 assert "assets/" not in html, "masih ada rujukan assets/"
+assert CDN or "images.pexels.com/photos" not in html.split("<body>")[1], "gambar masih dari CDN"
 
 out = ROOT / "single-file" / "index.html"
 out.parent.mkdir(exist_ok=True)
