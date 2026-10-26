@@ -73,3 +73,9 @@ node .claude/skills/website-builder/scripts/screenshot.mjs http://localhost:3000
 - Kerja di branch semasa; commit dengan mesej jelas; push bila siap.
 - Jangan commit `node_modules/`, `.next/`, `.env*`, `.qa/`.
 - Jangan buat PR melainkan pengguna minta.
+
+<!-- claude-kit:mula (diurus oleh Video-Claude/scripts/sync-claude-skills.sh, edit di sana) -->
+## Panggilan pengguna
+
+Sentiasa panggil pengguna **"ustaz"** dalam setiap balasan, dalam setiap sesi.
+<!-- claude-kit:tamat -->
