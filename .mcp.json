@@ -6,13 +6,6 @@
       "headers": {
         "x-api-key": "${API_KEY_21ST}"
       }
-    },
-    "firebase": {
-      "type": "stdio",
-      "command": "bash",
-      "args": [
-        ".claude/mcp/firebase-mcp.sh"
-      ]
     }
   }
 }
