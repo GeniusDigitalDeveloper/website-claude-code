@@ -92,3 +92,7 @@ HyperFrames ikut dokumen itu.
 
 Ini tambahan sahaja. Jangan ubah skill, framework atau tools yang sedia ada dalam repo
 ini kerananya, kecuali ustaz minta.
+
+## Firebase
+
+Semua projek/website baharu dihoskan dan disambung ke satu projek Firebase: `website-claude-code-izzul` (lihat `.firebaserc`). Jangan cipta projek Firebase lain melainkan ustaz minta. Untuk setiap website baru: daftar app web baru dalam projek ini, tetapkan `hosting.public` dalam `firebase.json` ke folder `sites/<slug>/` (atau `out/`/`dist/`), dan deploy dengan `npm run deploy`. Kunci web Firebase ialah awam, tetapi jangan commit `.env*` atau token (`FIREBASE_TOKEN`).
