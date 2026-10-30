@@ -41,12 +41,19 @@ Sesi cloud Claude Code dah ada semua ini.
 
 ### d) Sambung Firebase (pilihan)
 
-Pelayan MCP `firebase` (firebase-tools rasmi) dah ada dalam `.mcp.json`, dilancar oleh `.claude/mcp/firebase-mcp.sh`. Ia perlukan kelayakan:
+Pelayan MCP `firebase` (firebase-tools rasmi) dah ada dalam `.mcp.json`, dilancar oleh `.claude/mcp/firebase-mcp.sh`. Ia perlukan kelayakan. Ada dua cara:
 
-1. Buka [Firebase Console](https://console.firebase.google.com) → pilih projek → ⚙️ **Project settings** → **Service accounts** → **Generate new private key**. Fail JSON akan dimuat turun.
-2. Simpan **isi penuh** fail JSON itu sebagai pemboleh ubah persekitaran **`FIREBASE_SERVICE_ACCOUNT`** (cara sama macam `API_KEY_21ST` di atas). Jangan tampal dalam chat dan jangan commit ke repo.
-3. Pilihan: tetapkan **`FIREBASE_PROJECT_ID`** (contoh `nama-projek-123`) supaya projek default terus dipilih.
+**Cara A: akses seluruh akaun (semua projek + boleh cipta projek baru)**
+
+1. Di komputer sendiri, buka terminal (PowerShell/CMD) dan jalankan `npx firebase-tools login:ci`. Kalau tiada Node.js, muat turun Firebase CLI versi standalone dari https://firebase.tools dan jalankan `firebase login:ci`.
+2. Browser akan terbuka. Log masuk dengan akaun Google Firebase anda dan klik **Allow**.
+3. Terminal akan paparkan satu token panjang (bermula `1//...`). Simpan token itu sebagai pemboleh ubah persekitaran **`FIREBASE_TOKEN`** (cara sama macam `API_KEY_21ST` di atas). Jangan tampal dalam chat dan jangan commit.
 4. Mulakan sesi baru dan luluskan pelayan MCP `firebase`.
+
+**Cara B: satu projek sahaja (service account)**
+
+1. Firebase Console → pilih projek → ⚙️ **Project settings** → **Service accounts** → **Generate new private key**.
+2. Simpan isi penuh fail JSON itu sebagai **`FIREBASE_SERVICE_ACCOUNT`**, dan tetapkan **`FIREBASE_PROJECT_ID`** jika perlu.
 
 Di komputer sendiri, boleh juga guna `firebase login` (log masuk Google biasa) tanpa service account.
 

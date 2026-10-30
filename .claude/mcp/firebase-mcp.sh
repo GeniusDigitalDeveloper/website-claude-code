@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Lancar pelayan MCP Firebase (firebase-tools) untuk Claude Code.
 # Kelayakan (pilih satu, simpan sebagai pembolehubah persekitaran, JANGAN commit):
+#   FIREBASE_TOKEN                  — token `firebase login:ci` (akses SEMUA projek akaun)
 #   FIREBASE_SERVICE_ACCOUNT        — isi penuh fail JSON service account
 #   GOOGLE_APPLICATION_CREDENTIALS  — laluan ke fail JSON service account
 # Projek default: FIREBASE_PROJECT_ID atau .firebaserc dalam repo.
