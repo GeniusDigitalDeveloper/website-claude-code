@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ms">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panel Admin Ibnu Yazid</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Work+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+  <!-- Pintu masuk -->
+  <main class="gate" id="gate" hidden>
+    <form class="gate__card" id="gateForm" autocomplete="on">
+      <div class="gate__logo" id="gateLogo" aria-hidden="true"><span>ي</span></div>
+      <h1 id="gateTitle">Log masuk admin</h1>
+      <p class="gate__sub">Gunakan emel dan kata laluan akaun admin Firebase anda.</p>
+      <div class="f">
+        <label for="gateEmail">Emel</label>
+        <input id="gateEmail" type="email" autocomplete="username" required>
+      </div>
+      <div class="f">
+        <label for="gatePass">Kata laluan</label>
+        <div class="pw">
+          <input id="gatePass" type="password" autocomplete="current-password" required>
+          <button type="button" class="pw__eye" id="gateEye" aria-label="Papar kata laluan" aria-pressed="false">
+            <svg class="ico ico--show" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="ico ico--hide" viewBox="0 0 24 24" aria-hidden="true" hidden><path d="M17.9 17.9A10.1 10.1 0 0 1 12 19c-6.4 0-10-7-10-7a18.5 18.5 0 0 1 5.1-5.9M9.9 5.2A9.7 9.7 0 0 1 12 5c6.4 0 10 7 10 7a18.6 18.6 0 0 1-2.2 3.2M1 1l22 22M14.1 14.1a3 3 0 1 1-4.2-4.2"/></svg>
+          </button>
+        </div>
+      </div>
+      <p class="gate__err" id="gateErr" role="alert"></p>
+      <button class="btn btn--primary btn--block" type="submit" id="gateBtn">Log masuk</button>
+    </form>
+  </main>
+
+  <!-- Aplikasi -->
+  <div class="app" id="app" hidden>
+    <aside class="side" id="side">
+      <div class="side__brand"><span class="side__mark" aria-hidden="true">ي</span><div><b>Panel Admin</b><small id="sideName">Ibnu Yazid</small></div></div>
+      <nav class="side__nav" id="nav" aria-label="Seksyen panel"></nav>
+      <button class="side__out" id="logout" type="button">Keluar</button>
+    </aside>
+
+    <div class="stage">
+      <header class="top">
+        <button class="top__menu" id="menuBtn" type="button" aria-label="Buka menu panel"><span></span><span></span><span></span></button>
+        <h1 class="top__title" id="topTitle">Ringkasan</h1>
+        <span class="status" id="status" role="status" aria-live="polite"><i></i><span>Disimpan</span></span>
+        <button class="btn btn--soft btn--sm" id="pvBtn" type="button" aria-pressed="false">
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg><span>Pratonton langsung</span>
+        </button>
+      </header>
+      <main class="main" id="main" tabindex="-1"></main>
+    </div>
+
+    <!-- Pratonton langsung -->
+    <aside class="pv" id="pv" aria-label="Pratonton langsung laman awam" hidden>
+      <div class="pv__bar">
+        <b>Pratonton langsung</b>
+        <div class="pv__dev" role="group" aria-label="Saiz skrin">
+          <button type="button" data-w="1280" aria-pressed="true">Komputer</button>
+          <button type="button" data-w="820" aria-pressed="false">Tablet</button>
+          <button type="button" data-w="390" aria-pressed="false">Telefon</button>
+        </div>
+        <button class="pv__x" id="pvClose" type="button" aria-label="Tutup pratonton"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      </div>
+      <div class="pv__stage" id="pvStage"><iframe id="pvFrame" title="Pratonton laman awam"></iframe></div>
+      <p class="pv__note" id="pvNote"></p>
+    </aside>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <input type="file" id="filePick" hidden>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+  <script src="defaults.js"></script>
+  <script src="core.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="fb.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="ms">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ibnu Yazid | AI Web Developer, Khat Digital &amp; Video AI</title>
+  <meta name="description" content="Ibnu Yazid, AI Web Developer di Kuantan & Tumpat. Khat dan Jawi digital dari RM50, website dan aplikasi dari RM300, setup video AI Claude For Dummies RM99.">
+  <meta name="theme-color" content="#0f766e">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link id="iy-fonts" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400..800&family=Work+Sans:wght@400..700&family=Amiri:wght@700&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <script type="application/ld+json" id="ld-biz"></script>
+  <script type="application/ld+json" id="ld-faq"></script>
+</head>
+<body>
+  <a class="skip-link" href="#utama" data-t="skip">Langkau ke kandungan</a>
+
+  <!-- ================= NAVBAR ================= -->
+  <header class="nav" id="nav">
+    <div class="container nav__inner">
+      <a class="logo" href="#" data-logo aria-label="Ke atas"></a>
+      <nav class="nav__links" id="menu" aria-label="Menu utama">
+        <a href="#perkhidmatan" data-t="nav_services">Perkhidmatan</a>
+        <a href="#proses" data-t="nav_process">Proses</a>
+        <a href="#portfolio" data-t="nav_portfolio">Portfolio</a>
+        <a href="#testimoni" data-t="nav_testi">Testimoni</a>
+        <a href="#harga" data-t="nav_pricing">Harga</a>
+        <a href="#faq" data-t="nav_faq">Soalan Lazim</a>
+        <button class="btn btn--primary nav__cta-mobile" type="button" data-open="m-quote" data-t="cta_quote">Minta Sebut Harga</button>
+      </nav>
+      <button class="lang" id="langBtn" type="button" aria-label="Tukar bahasa">
+        <span class="lang__pill" aria-hidden="true"></span>
+        <span data-lang="ms">BM</span><span data-lang="en">BI</span>
+      </button>
+      <button class="btn btn--primary btn--sm nav__cta" type="button" data-open="m-quote">
+        <span data-t="cta_quote">Minta Sebut Harga</span>
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+      <button class="nav__toggle" id="menuBtn" type="button" aria-label="Buka menu" aria-expanded="false" aria-controls="menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="utama">
+
+    <!-- ================= HERO ================= -->
+    <section class="hero">
+      <div class="hero__mesh" aria-hidden="true">
+        <span class="blob blob--teal"></span>
+        <span class="blob blob--amber"></span>
+        <span class="blob blob--sky"></span>
+      </div>
+      <div class="container hero__grid">
+        <div class="hero__copy">
+          <h1 class="reveal" data-t="hero_title"></h1>
+          <p class="lead reveal" data-t="hero_lead"></p>
+          <div class="hero__actions reveal">
+            <button class="btn btn--primary btn--lg" type="button" data-open="m-quote">
+              <span data-t="cta_quote">Minta Sebut Harga</span>
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+            <button class="btn btn--soft btn--lg" type="button" data-open="m-contact">
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.5 7.3L3 20l1.3-5.3A8.4 8.4 0 1 1 21 11.5Z"/></svg>
+              <span data-t="cta_wa">WhatsApp Saya</span>
+            </button>
+          </div>
+          <ul class="chips reveal" id="mChips"></ul>
+        </div>
+        <div class="stack reveal" id="mHero" aria-label="Perkhidmatan ringkas"></div>
+      </div>
+    </section>
+
+    <div class="ticker" aria-hidden="true" data-section="ticker"><div class="ticker__track" id="mTicker"></div></div>
+
+    <section class="stats-band" aria-label="Harga bermula" data-section="stats">
+      <div class="container stats" id="mStats"></div>
+    </section>
+
+    <section class="section" id="masalah" data-section="problems">
+      <div class="container">
+        <header class="head head--center reveal">
+          <p class="eyebrow" data-t="p_eyebrow"></p>
+          <h2 data-t="p_title"></h2>
+        </header>
+        <div class="ps" id="mProblems"></div>
+      </div>
+    </section>
+
+    <section class="section section--mint" id="perkhidmatan" data-section="services">
+      <div class="container">
+        <header class="head reveal">
+          <p class="eyebrow" data-t="sv_eyebrow"></p>
+          <h2 data-t="sv_title"></h2>
+          <p class="head__sub" data-t="sv_sub"></p>
+        </header>
+        <div class="services" id="mServices"></div>
+      </div>
+    </section>
+
+    <section class="section" id="proses" data-section="process">
+      <div class="container">
+        <header class="head head--center reveal">
+          <p class="eyebrow" data-t="pr_eyebrow"></p>
+          <h2 data-t="pr_title"></h2>
+        </header>
+        <ol class="steps" id="mSteps"></ol>
+      </div>
+    </section>
+
+    <section class="section section--soft" id="portfolio" data-section="portfolio">
+      <div class="container">
+        <header class="head reveal">
+          <p class="eyebrow" data-t="pf_eyebrow"></p>
+          <h2 data-t="pf_title"></h2>
+        </header>
+        <div class="works" id="mWorks"></div>
+      </div>
+    </section>
+
+    <section class="section" id="testimoni" data-section="testimonials">
+      <div class="container">
+        <header class="head head--center reveal">
+          <p class="eyebrow" data-t="t_eyebrow"></p>
+          <h2 data-t="t_title"></h2>
+          <p class="head__sub" data-t="t_hint"></p>
+        </header>
+        <div class="seg reveal" id="mTabs" role="tablist" aria-label="Album testimoni"></div>
+        <div class="album-wrap reveal" id="mAlbums"></div>
+      </div>
+    </section>
+
+    <section class="section section--mint" id="harga" data-section="pricing">
+      <div class="container">
+        <header class="head head--center reveal">
+          <p class="eyebrow" data-t="h_eyebrow"></p>
+          <h2 data-t="h_title"></h2>
+        </header>
+        <div class="plans" id="mPlans"></div>
+      </div>
+    </section>
+
+    <section class="section" id="tentang" data-section="about">
+      <div class="container about">
+        <div class="about__art reveal" aria-hidden="true">
+          <div class="about__frame"><span id="mAboutArt"></span></div>
+          <span class="about__chip about__chip--a" id="mChipA"></span>
+          <span class="about__chip about__chip--b" id="mChipB"></span>
+        </div>
+        <div class="about__copy reveal">
+          <p class="eyebrow" data-t="ab_eyebrow"></p>
+          <h2 data-t="ab_title"></h2>
+          <p data-t="ab_p1"></p>
+          <p data-t="ab_p2"></p>
+          <ul class="values" id="mValues"></ul>
+          <button class="btn btn--primary" type="button" data-open="m-contact" data-t="ab_cta"></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--soft" id="faq" data-section="faq">
+      <div class="container">
+        <header class="head head--center reveal">
+          <p class="eyebrow" data-t="q_eyebrow"></p>
+          <h2 data-t="q_title"></h2>
+        </header>
+        <div class="faq reveal" id="mFaq"></div>
+      </div>
+    </section>
+
+    <section class="section section--tight" id="hubungi" data-section="banner">
+      <div class="container">
+        <div class="banner reveal">
+          <span class="banner__jawi" aria-hidden="true" id="mBannerDeco"></span>
+          <div class="banner__copy">
+            <h2 data-t="c_title"></h2>
+            <p data-t="c_lead"></p>
+          </div>
+          <div class="banner__actions">
+            <button class="btn btn--white btn--lg" type="button" data-open="m-quote">
+              <span data-t="cta_quote">Minta Sebut Harga</span>
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </button>
+            <button class="btn btn--glass btn--lg" type="button" data-open="m-contact">
+              <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.5 7.3L3 20l1.3-5.3A8.4 8.4 0 1 1 21 11.5Z"/></svg>
+              <span id="mBannerPhone">WhatsApp</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__grid">
+        <div class="footer__brand">
+          <p class="logo" data-logo></p>
+          <p class="footer__about" data-t="ft_about"></p>
+        </div>
+        <nav class="footer__col" aria-labelledby="ft-svc">
+          <h3 id="ft-svc" data-t="nav_services"></h3>
+          <ul id="mFootSvc"></ul>
+        </nav>
+        <nav class="footer__col" aria-labelledby="ft-nav">
+          <h3 id="ft-nav" data-t="ft_explore"></h3>
+          <ul>
+            <li><a href="#proses" data-t="nav_process"></a></li>
+            <li><a href="#portfolio" data-t="nav_portfolio"></a></li>
+            <li><a href="#testimoni" data-t="nav_testi"></a></li>
+            <li><a href="#harga" data-t="nav_pricing"></a></li>
+            <li><a href="#faq" data-t="nav_faq"></a></li>
+          </ul>
+        </nav>
+        <div class="footer__col">
+          <h3 data-t="ft_contact"></h3>
+          <ul>
+            <li><a id="mFootWa" href="#" target="_blank" rel="noopener"></a></li>
+            <li><button type="button" data-open="m-quote" data-t="cta_quote"></button></li>
+          </ul>
+          <button class="btn btn--primary btn--sm footer__cta" type="button" data-open="m-contact">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.5 7.3L3 20l1.3-5.3A8.4 8.4 0 1 1 21 11.5Z"/></svg>
+            <span data-t="cta_wa"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="footer__bottom">
+        <p>&copy; <span id="year">2026</span> <span id="mFootName"></span>. <span data-t="ft_rights"></span></p>
+        <section class="visits" aria-labelledby="visits-t" data-section="visits">
+          <h2 id="visits-t" data-t="vs_title"></h2>
+          <div class="visits__grid">
+            <div class="visit"><p class="visit__num" id="visToday" aria-live="polite">&mdash;</p><p class="visit__lbl" data-t="vs_today"></p></div>
+            <div class="visit"><p class="visit__num" id="visTotal" aria-live="polite">&mdash;</p><p class="visit__lbl" data-t="vs_total"></p></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </footer>
+
+  <div class="mbar" id="mbar">
+    <button class="btn btn--primary btn--block" type="button" data-open="m-quote" data-t="cta_quote">Minta Sebut Harga</button>
+  </div>
+
+  <!-- ================= POP-UP ================= -->
+  <dialog class="modal" id="m-quote" aria-labelledby="m-quote-t">
+    <div class="modal__card" tabindex="-1">
+      <button class="modal__x" type="button" data-close aria-label="Tutup" data-t-aria="aria_close"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      <div class="modal__head">
+        <span class="modal__icon" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></span>
+        <div><h2 id="m-quote-t" data-t="fm_title"></h2><p data-t="fm_sub"></p></div>
+      </div>
+      <form class="form" id="form" novalidate>
+        <div class="form__row">
+          <div class="field">
+            <label for="nama" data-t="fm_name"></label>
+            <input id="nama" name="nama" type="text" autocomplete="name" required>
+            <p class="field__err" data-err="nama" role="alert"></p>
+          </div>
+          <div class="field">
+            <label for="telefon" data-t="fm_phone"></label>
+            <input id="telefon" name="telefon" type="tel" inputmode="tel" autocomplete="tel" placeholder="012-3456789" required>
+            <p class="field__err" data-err="telefon" role="alert"></p>
+          </div>
+        </div>
+        <fieldset class="field">
+          <legend data-t="fm_plan"></legend>
+          <div class="pick" id="mPick"></div>
+        </fieldset>
+        <div class="field">
+          <label for="mesej" data-t="fm_msg"></label>
+          <textarea id="mesej" name="mesej" rows="3"></textarea>
+        </div>
+        <button class="btn btn--primary btn--lg btn--block" type="submit">
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.5 7.3L3 20l1.3-5.3A8.4 8.4 0 1 1 21 11.5Z"/></svg>
+          <span data-t="fm_submit"></span>
+        </button>
+        <p class="form__status" id="formStatus" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </dialog>
+
+  <dialog class="modal modal--sm" id="m-contact" aria-labelledby="m-contact-t">
+    <div class="modal__card" tabindex="-1">
+      <button class="modal__x" type="button" data-close aria-label="Tutup" data-t-aria="aria_close"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      <div class="modal__head">
+        <span class="modal__icon modal__icon--wa" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.5 7.3L3 20l1.3-5.3A8.4 8.4 0 1 1 21 11.5Z"/></svg></span>
+        <div><h2 id="m-contact-t" data-t="ct_title"></h2><p data-t="ct_sub"></p></div>
+      </div>
+      <div class="options">
+        <a class="option" id="mOptWa" href="#" target="_blank" rel="noopener">
+          <span class="option__icon option__icon--wa" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.5 7.3L3 20l1.3-5.3A8.4 8.4 0 1 1 21 11.5Z"/></svg></span>
+          <span class="option__text"><b data-t="ct_wa"></b><small data-t="ct_waSub"></small></span>
+          <svg class="ico option__go" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+        </a>
+        <button class="option" type="button" data-open="m-quote">
+          <span class="option__icon" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></span>
+          <span class="option__text"><b data-t="ct_form"></b><small data-t="ct_formSub"></small></span>
+          <svg class="ico option__go" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <button class="option" type="button" id="copyNum">
+          <span class="option__icon option__icon--amber" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span>
+          <span class="option__text"><b id="mCopyNum"></b><small id="copyMsg" data-t="ct_copy"></small></span>
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Butiran perkhidmatan: kandungan diisi dari konfigurasi -->
+  <dialog class="modal" id="m-svc" aria-labelledby="m-svc-t">
+    <div class="modal__card" tabindex="-1" id="mSvc"></div>
+  </dialog>
+
+  <dialog class="lightbox" id="lightbox" aria-label="Gambar testimoni">
+    <button class="modal__x" type="button" data-close aria-label="Tutup" data-t-aria="aria_close"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <img id="lbImg" alt="">
+  </dialog>
+
+  <script src="defaults.js"></script>
+  <script src="core.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="fb.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

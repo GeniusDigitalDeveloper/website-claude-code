@@ -1,0 +1,67 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Admin yang dibenarkan menulis: UID akaun dalam Firebase Authentication.
+    // 1) ibnumohdyazid01@gmail.com   2) izzulmedia01@gmail.com
+    function isAdmin() {
+      return request.auth != null
+          && request.auth.uid in [
+            'A7c8OilGg5d3kUBBAfQfbsirvqR2',
+            'Ky8ziH4OBPaEQDeJFS0LylB81xd2'
+          ];
+    }
+
+    // Kandungan laman: semua orang boleh baca, hanya admin boleh tulis.
+    match /site/{docId} {
+      allow read: if true;
+      allow write: if isAdmin() && docId == 'config';
+    }
+
+    // Gambar galeri (satu dokumen setiap gambar, disimpan sebagai data URL).
+    match /images/{imageId} {
+      allow read: if true;
+      allow create, update: if isAdmin()
+          && request.resource.data.keys().hasOnly(['album', 'data'])
+          && request.resource.data.album is string
+          && request.resource.data.album.size() < 60
+          && request.resource.data.data is string
+          && request.resource.data.data.size() < 900000
+          && request.resource.data.data.matches('data:image/.*');
+      allow delete: if isAdmin();
+    }
+
+    // Statistik pelawat: pelawat hanya boleh tambah tepat 1 pada dokumen 'total' atau 'd-YYYY-MM-DD'.
+    match /stats/{statId} {
+      allow read: if true;
+      allow create: if statId.matches('total|d-[0-9]{4}-[0-9]{2}-[0-9]{2}')
+          && request.resource.data.keys().hasOnly(['count'])
+          && request.resource.data.count == 1;
+      allow update: if statId.matches('total|d-[0-9]{4}-[0-9]{2}-[0-9]{2}')
+          && request.resource.data.keys().hasOnly(['count'])
+          && request.resource.data.count == resource.data.count + 1;
+      allow write: if isAdmin();
+    }
+
+    // Pertanyaan pelanggan: sesiapa boleh hantar (dengan semakan medan), hanya admin boleh baca/ubah/padam.
+    match /leads/{leadId} {
+      allow create: if request.resource.data.keys().hasOnly(['name', 'phone', 'plan', 'message', 'lang', 'status', 'createdAt'])
+          && request.resource.data.name is string
+          && request.resource.data.name.size() >= 2 && request.resource.data.name.size() <= 80
+          && request.resource.data.phone is string
+          && request.resource.data.phone.size() >= 9 && request.resource.data.phone.size() <= 20
+          && request.resource.data.plan is string && request.resource.data.plan.size() <= 100
+          && request.resource.data.message is string && request.resource.data.message.size() <= 1000
+          && request.resource.data.lang in ['ms', 'en']
+          && request.resource.data.status == 'baru'
+          && request.resource.data.createdAt == request.time;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Semua yang lain ditutup.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "site": {
+      ".read": true,
+      ".write": "auth != null && (auth.uid === 'A7c8OilGg5d3kUBBAfQfbsirvqR2' || auth.uid === 'Ky8ziH4OBPaEQDeJFS0LylB81xd2')"
+    },
+
+    "stats": {
+      ".read": true,
+      "$statId": {
+        ".write": "auth != null && (auth.uid === 'A7c8OilGg5d3kUBBAfQfbsirvqR2' || auth.uid === 'Ky8ziH4OBPaEQDeJFS0LylB81xd2')",
+        ".validate": "newData.isNumber() && newData.val() >= 0"
+      }
+    },
+
+    "leads": {
+      ".read": "auth != null && (auth.uid === 'A7c8OilGg5d3kUBBAfQfbsirvqR2' || auth.uid === 'Ky8ziH4OBPaEQDeJFS0LylB81xd2')",
+      "$leadId": {
+        ".write": "(!data.exists() && newData.exists()) || (auth != null && (auth.uid === 'A7c8OilGg5d3kUBBAfQfbsirvqR2' || auth.uid === 'Ky8ziH4OBPaEQDeJFS0LylB81xd2'))",
+        ".validate": "newData.hasChildren(['name', 'phone', 'message', 'status'])",
+        "name": { ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 80" },
+        "phone": { ".validate": "newData.isString() && newData.val().length >= 9 && newData.val().length <= 20" },
+        "plan": { ".validate": "newData.isString() && newData.val().length <= 100" },
+        "message": { ".validate": "newData.isString() && newData.val().length <= 1000" },
+        "status": { ".validate": "newData.isString() && (newData.val() === 'baru' || newData.val() === 'dihubungi' || newData.val() === 'selesai')" },
+        "$other": { ".validate": false }
+      }
+    }
+  }
+}
