@@ -6,6 +6,10 @@
       "headers": {
         "x-api-key": "${API_KEY_21ST}"
       }
+    },
+    "firebase": {
+      "command": "npx",
+      "args": ["-y", "firebase-tools@latest", "mcp"]
     }
   }
 }

@@ -1,0 +1,12 @@
+{
+  "name": "website-claude-code",
+  "private": true,
+  "description": "Kilang website: prompt ringkas jadi website premium, dihoskan di Firebase.",
+  "scripts": {
+    "serve": "firebase emulators:start --only hosting",
+    "deploy": "firebase deploy --only hosting"
+  },
+  "devDependencies": {
+    "firebase-tools": "^15.34.2"
+  }
+}

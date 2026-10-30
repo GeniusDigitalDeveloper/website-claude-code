@@ -9,3 +9,6 @@ dist/
 __pycache__/
 *.pyc
 .DS_Store
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
