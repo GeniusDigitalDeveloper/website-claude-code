@@ -92,3 +92,13 @@ HyperFrames ikut dokumen itu.
 
 Ini tambahan sahaja. Jangan ubah skill, framework atau tools yang sedia ada dalam repo
 ini kerananya, kecuali ustaz minta.
+
+## Firebase — akaun ustaz (izzulmedia01@gmail.com)
+
+Repo ini disambung ke akaun Firebase ustaz. Guna Firebase CLI melalui `npx -y firebase-tools@latest <arahan>`.
+
+- **Log masuk automatik:** kelayakan disimpan sebagai environment secret `FIREBASE_TOKEN` (BUKAN dalam repo). Firebase CLI baca sendiri; tak perlu `firebase login`. Semak dengan `npx -y firebase-tools@latest projects:list`.
+- **Jika `FIREBASE_TOKEN` tiada / tamat:** jalankan `npx -y firebase-tools@latest login --no-localhost`, beri ustaz link `auth.firebase.tools` + Session ID, minta ustaz tampal authorization code (`4/0A...`), kemudian `npx -y firebase-tools@latest login <kod>`.
+- **Projek sedia ada:** `dashboard-guru-4add5`, `qalam-digital-calligraphy`, `qr-me-generator`, `solatcamar`, `temu-havenly-home-4443a`, `temuhavenlyhome`. Tanya ustaz projek mana sebelum ubah apa-apa; untuk sistem baru boleh `projects:create`.
+- **Jangan sesekali** commit token, fail service account JSON atau `.firebaserc` yang ada rahsia. Kunci config web Firebase (apiKey dsb.) boleh masuk kod frontend.
+- Deploy hanya bila ustaz minta.
