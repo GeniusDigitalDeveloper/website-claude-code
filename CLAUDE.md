@@ -96,3 +96,5 @@ ini kerananya, kecuali ustaz minta.
 ## Firebase
 
 Semua projek/website baharu dihoskan dan disambung ke satu projek Firebase: `website-claude-code-izzul` (lihat `.firebaserc`). Jangan cipta projek Firebase lain melainkan ustaz minta. Untuk setiap website baru: daftar app web baru dalam projek ini, tetapkan `hosting.public` dalam `firebase.json` ke folder `sites/<slug>/` (atau `out/`/`dist/`), dan deploy dengan `npm run deploy`. Kunci web Firebase ialah awam, tetapi jangan commit `.env*` atau token (`FIREBASE_TOKEN`).
+
+Kalau ustaz minta guna projek Firebase lain, tunjuk senarai pilihan dulu (projek sedia ada melalui `firebase_list_projects`, atau cipta baharu) dan tanya ustaz mahu yang mana. Jangan tukar senyap-senyap. Selepas ustaz pilih, kemas kini `.firebaserc` sekali dengan seksyen ini.
