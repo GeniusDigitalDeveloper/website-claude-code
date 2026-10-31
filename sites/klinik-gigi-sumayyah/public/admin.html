@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Panel Admin — Klinik Gigi Sumayyah</title>
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+  <!-- Log masuk -->
+  <section class="login" id="loginView" hidden>
+    <form class="login-box" id="loginForm">
+      <img class="login-logo" src="img/logo.svg" alt="" />
+      <h1>Panel Admin</h1>
+      <p>Klinik Gigi Sumayyah — akses staf sahaja.</p>
+      <div class="err" id="loginErr" hidden></div>
+      <div class="field"><label for="lEmail">E-mel</label><input id="lEmail" type="email" required autocomplete="username" /></div>
+      <div class="field"><label for="lPass">Kata laluan</label><input id="lPass" type="password" required autocomplete="current-password" /></div>
+      <button class="btn btn-primary" style="width:100%;min-height:48px" id="loginBtn"><i data-lucide="log-in"></i>Log Masuk</button>
+      <p style="margin:1rem 0 0;font-size:.9rem"><a href="#" id="forgot">Lupa kata laluan?</a></p>
+    </form>
+  </section>
+
+  <!-- Aplikasi -->
+  <div class="app" id="appView" hidden>
+    <aside class="side" aria-label="Menu admin">
+      <div class="side-brand"><img id="sideLogo" src="img/logo.svg" alt="" /><div><strong>Sumayyah Admin</strong><small>Panel pengurusan</small></div></div>
+      <nav id="tabs" style="display:contents"></nav>
+      <div class="side-foot">
+        <div class="who" id="who"></div>
+        <a class="btn" href="./" target="_blank" rel="noopener"><i data-lucide="external-link"></i>Lihat Website</a>
+        <button class="btn" id="logout"><i data-lucide="log-out"></i>Log Keluar</button>
+      </div>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div><h1 id="pageTitle">Papan Pemuka</h1><p id="pageDesc"></p></div>
+        <span class="live">Realtime</span>
+      </div>
+      <div id="page"></div>
+    </main>
+  </div>
+
+  <dialog id="dlg">
+    <form method="dialog" id="dlgForm">
+      <div class="dlg-head"><h2 id="dlgTitle">Edit</h2><button class="btn btn-icon" value="cancel" formnovalidate aria-label="Tutup"><i data-lucide="x"></i></button></div>
+      <div class="dlg-body" id="dlgBody"></div>
+      <div class="dlg-foot"><button class="btn" value="cancel" formnovalidate>Batal</button><button class="btn btn-primary" value="save" id="dlgSave"><i data-lucide="save"></i>Simpan</button></div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/vendor/lucide.min.js"></script>
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>

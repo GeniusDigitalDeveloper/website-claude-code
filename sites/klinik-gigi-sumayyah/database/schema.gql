@@ -1,0 +1,72 @@
+# KLINIK GIGI SUMAYYAH — skema Firebase SQL Connect (Data Connect)
+# Salin ke dataconnect/schema/schema.gql selepas `firebase init dataconnect`.
+
+type TetapanUmum @table {
+  namaKlinik: String!
+  tagline: String
+  logo: String
+  telefon: String
+  whatsapp: String
+  emel: String
+  alamat: String
+  petaEmbed: String
+  facebook: String
+  instagram: String
+  tiktok: String
+  noPendaftaran: String
+  dikemaskini: Timestamp! @default(expr: "request.time")
+}
+
+type WaktuOperasi @table { hari: String!, masa: String!, susunan: Int! @default(value: 0) }
+
+type Hero @table { label: String, tajuk: String!, subtajuk: String, imej: String }
+
+type Banner @table {
+  tajuk: String!
+  teks: String
+  imej: String
+  labelCta: String
+  aktif: Boolean! @default(value: true)
+  susunan: Int! @default(value: 0)
+}
+
+type Perkhidmatan @table {
+  nama: String!
+  kategori: String
+  ikon: String
+  ringkasan: String
+  butiran: String
+  hargaDari: String
+  tempoh: String
+  aktif: Boolean! @default(value: true)
+  susunan: Int! @default(value: 0)
+}
+
+type Pakej @table {
+  nama: String!
+  harga: String!
+  nota: String
+  ciri: [String!]
+  popular: Boolean! @default(value: false)
+  susunan: Int! @default(value: 0)
+}
+
+type Galeri @table { imej: String!, kapsyen: String, kategori: String, susunan: Int! @default(value: 0) }
+
+type Doktor @table { nama: String!, jawatan: String, kelayakan: String, imej: String, susunan: Int! @default(value: 0) }
+
+type Testimoni @table { nama: String!, teks: String!, rating: Int! @default(value: 5), susunan: Int! @default(value: 0) }
+
+type Soalan @table { soalan: String!, jawapan: String!, susunan: Int! @default(value: 0) }
+
+type Tempahan @table {
+  nama: String!
+  telefon: String!
+  emel: String
+  perkhidmatan: String!
+  tarikh: Date!
+  masa: String
+  catatan: String
+  status: String! @default(value: "baru")
+  dicipta: Timestamp! @default(expr: "request.time")
+}

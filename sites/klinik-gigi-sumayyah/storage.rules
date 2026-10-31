@@ -1,0 +1,17 @@
+rules_version = '2';
+// Untuk kegunaan masa depan (Firebase Storage perlukan pelan Blaze).
+// Website ini simpan gambar terus dalam Firestore, jadi Storage tidak wajib.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /awam/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null
+        && request.auth.uid == 'PBq9CMPmd2O8q71us6OAqeaqhdu1'
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

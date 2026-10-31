@@ -1,0 +1,25 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "status": {
+      ".read": true,
+      ".write": "auth != null && auth.uid === 'PBq9CMPmd2O8q71us6OAqeaqhdu1'",
+      "pengumuman": {
+        ".validate": "newData.isString() && newData.val().length <= 300"
+      },
+      "pengumumanAktif": {
+        ".validate": "newData.isBoolean()"
+      },
+      "modOperasi": {
+        ".validate": "newData.isString() && newData.val().matches(/^(auto|buka|tutup)$/)"
+      },
+      "dikemaskini": {
+        ".validate": "newData.isNumber()"
+      },
+      "$other": {
+        ".validate": false
+      }
+    }
+  }
+}

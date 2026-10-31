@@ -1,0 +1,56 @@
+rules_version = '2';
+
+// =====================================================================
+//  KLINIK GIGI SUMAYYAH — Firestore Security Rules
+//  Awam  : BACA kandungan website sahaja + HANTAR tempahan janji temu.
+//  Admin : akaun dengan UID di bawah boleh baca/tulis SEMUA.
+// =====================================================================
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.uid == 'PBq9CMPmd2O8q71us6OAqeaqhdu1';
+    }
+
+    function strOk(field, maxLen) {
+      return request.resource.data[field] is string
+        && request.resource.data[field].size() > 0
+        && request.resource.data[field].size() <= maxLen;
+    }
+
+    // ---- Kandungan awam (dipapar realtime di website) ----
+    match /tetapan/{docId}     { allow read: if true; allow write: if isAdmin(); }
+    match /banner/{docId}      { allow read: if true; allow write: if isAdmin(); }
+    match /perkhidmatan/{docId}{ allow read: if true; allow write: if isAdmin(); }
+    match /pakej/{docId}       { allow read: if true; allow write: if isAdmin(); }
+    match /galeri/{docId}      { allow read: if true; allow write: if isAdmin(); }
+    match /doktor/{docId}      { allow read: if true; allow write: if isAdmin(); }
+    match /testimoni/{docId}   { allow read: if true; allow write: if isAdmin(); }
+    match /soalan/{docId}      { allow read: if true; allow write: if isAdmin(); }
+
+    // ---- Tempahan janji temu ----
+    // Awam boleh CIPTA sahaja (dengan validasi). Tidak boleh baca/ubah/padam.
+    match /tempahan/{docId} {
+      allow create: if (isAdmin() || (
+            request.resource.data.keys().hasOnly(
+              ['nama','telefon','emel','perkhidmatan','tarikh','masa','catatan','status','dicipta'])
+            && strOk('nama', 100)
+            && strOk('telefon', 20)
+            && strOk('perkhidmatan', 120)
+            && strOk('tarikh', 10)
+            && (!('emel' in request.resource.data) || request.resource.data.emel is string && request.resource.data.emel.size() <= 120)
+            && (!('masa' in request.resource.data) || request.resource.data.masa is string && request.resource.data.masa.size() <= 10)
+            && (!('catatan' in request.resource.data) || request.resource.data.catatan is string && request.resource.data.catatan.size() <= 1000)
+            && request.resource.data.status == 'baru'
+            && request.resource.data.dicipta == request.time
+          ));
+      allow read, update, delete: if isAdmin();
+    }
+
+    // ---- Lain-lain: tutup ----
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
