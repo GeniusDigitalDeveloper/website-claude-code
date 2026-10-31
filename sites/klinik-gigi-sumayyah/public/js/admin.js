@@ -1,7 +1,7 @@
 // KLINIK GIGI SUMAYYAH — Panel Admin
-import { db, rtdb, auth, ADMIN_UID } from "./firebase.js?v=20261031b";
-import { DEFAULTS } from "./defaults.js?v=20261031b";
-import { signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+import { db, rtdb, auth, ADMIN_UID } from "./firebase.js?v=20261031c";
+import { DEFAULTS } from "./defaults.js?v=20261031c";
+import { signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail, GoogleAuthProvider, linkWithPopup, reauthenticateWithPopup } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 import { doc, collection, onSnapshot, setDoc, addDoc, updateDoc, deleteDoc, getDocs, writeBatch, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 import { ref, onValue, set } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
 
@@ -335,6 +335,7 @@ const PAGES = {
   hero: { title: "Banner Utama", icon: "image", desc: "Tajuk dan gambar besar di bahagian atas website." },
   status: { title: "Status & Pengumuman", icon: "megaphone", desc: "Jalur pengumuman dan status buka/tutup (Realtime Database)." },
   ...Object.fromEntries(Object.entries(COLS).map(([k, c]) => [k, { title: c.title, icon: c.icon, desc: c.desc, col: k }])),
+  thumbnail: { title: "Thumbnail Share", icon: "share-2", desc: "Gambar yang keluar bila link website dikongsi di WhatsApp, Facebook, Telegram dan lain-lain (saiz tetap 1200 × 630)." },
   seksyen: { title: "Tajuk Seksyen", icon: "heading", desc: "Label, tajuk dan teks pengenalan setiap seksyen website (Perkhidmatan, Pakej, Doktor, Galeri, Testimoni, Soalan Lazim)." },
   lain: { title: "Statistik & Kelebihan", icon: "award", desc: "Nombor statistik dan senarai kelebihan klinik." },
 };
@@ -364,6 +365,7 @@ function renderPage() {
   const page = current, el = $("#page");
   if (page === "doktor") return renderOrgAdmin();
   if (page === "seksyen") return renderSeksyenForm();
+  if (page === "thumbnail") return renderThumbnail();
   if (PAGES[page].col) return renderCollection(page);
   if (page === "dashboard") return renderDashboard();
   if (page === "tempahan") return renderBookings();
@@ -505,6 +507,146 @@ function renderStatus() {
     } catch (err) { fail(err); }
   };
   icons();
+}
+
+/* ---------- Thumbnail share (Open Graph) ----------
+   WhatsApp/Facebook tidak menjalankan JavaScript, jadi gambar mesti fail sebenar di hosting.
+   Panel ini memotong gambar ke 1200x630, kemudian menerbitkannya terus ke Firebase Hosting
+   (gantikan /img/og-thumbnail.jpg dan naikkan nombor ?v= dalam index.html) melalui Hosting REST API. */
+const SITE = "sumayyahdental";
+const OG_W = 1200, OG_H = 630, OG_PATH = "/img/og-thumbnail.jpg";
+const HOSTING = "https://firebasehosting.googleapis.com/v1beta1";
+let ogNew = null; // { dataUrl, blob }
+
+function renderThumbnail() {
+  const cur = `${OG_PATH}?t=${Date.now()}`;
+  $("#page").innerHTML = `
+    <div class="card"><h2><i data-lucide="share-2"></i>Thumbnail semasa</h2>
+      <div class="og-grid">
+        <div class="og-card"><div class="og-img" style="background-image:url('${ogNew ? ogNew.dataUrl : cur}')"></div>
+          <div class="og-meta"><small>SUMAYYAHDENTAL.WEB.APP</small><strong>Sumayyah Dental Clinic</strong><span>Senyuman sihat, keyakinan sepanjang hayat. Tempah temujanji sekarang.</span></div></div>
+        <div>
+          <p style="margin-top:0">${ogNew ? "<b>Pratonton gambar baru</b> — belum diterbitkan." : "Inilah gambar yang keluar bila link website dikongsi."}</p>
+          <p class="icon-help">Gambar apa saja yang dimuat naik akan dipotong di tengah secara automatik ke <b>1200 × 630 piksel</b> (nisbah 1.91:1) — saiz standard WhatsApp, Facebook, Telegram, X dan LinkedIn — supaya paparan sentiasa kekal sama.</p>
+          <input type="file" id="ogFile" accept="image/*" hidden />
+          <div class="card-actions" style="justify-content:flex-start">
+            <button class="btn" id="ogPick"><i data-lucide="upload"></i>Pilih gambar baru</button>
+            <button class="btn btn-primary" id="ogPub" ${ogNew ? "" : "disabled"}><i data-lucide="send"></i>Terbitkan thumbnail</button>
+            ${ogNew ? `<button class="btn" id="ogCancel">Batal</button>` : ""}
+          </div>
+          <div class="og-log" id="ogLog" hidden></div>
+        </div>
+      </div>
+    </div>
+    <div class="notice"><b>Nota:</b> Semasa menerbitkan, tetingkap log masuk Google akan muncul — pilih akaun Google <b>pemilik projek Firebase</b> (${esc(auth.currentUser?.email || "")}) dan benarkan akses "Firebase Hosting". WhatsApp & Facebook menyimpan thumbnail lama dalam cache; untuk Facebook, tekan "Scrape Again" di <a href="https://developers.facebook.com/tools/debug/?q=https%3A%2F%2Fsumayyahdental.web.app%2F" target="_blank" rel="noopener">Facebook Sharing Debugger</a> selepas terbit.</div>`;
+  $("#ogPick").onclick = () => $("#ogFile").click();
+  $("#ogFile").onchange = async (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    try { ogNew = await cropOg(f); renderThumbnail(); } catch (err) { fail(err); }
+  };
+  if ($("#ogCancel")) $("#ogCancel").onclick = () => { ogNew = null; renderThumbnail(); };
+  $("#ogPub").onclick = publishOg;
+  icons();
+}
+
+// Potong "cover" di tengah ke 1200x630, JPEG < 300KB (had WhatsApp)
+async function cropOg(file) {
+  const url = URL.createObjectURL(file);
+  const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error("Fail bukan gambar yang sah.")); i.src = url; });
+  URL.revokeObjectURL(url);
+  const c = document.createElement("canvas");
+  c.width = OG_W; c.height = OG_H;
+  const ctx = c.getContext("2d");
+  ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, OG_W, OG_H);
+  const s = Math.max(OG_W / img.naturalWidth, OG_H / img.naturalHeight);
+  const w = img.naturalWidth * s, h = img.naturalHeight * s;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(img, (OG_W - w) / 2, (OG_H - h) / 2, w, h);
+  for (const q of [0.88, 0.82, 0.76, 0.7, 0.62]) {
+    const blob = await new Promise((r) => c.toBlob(r, "image/jpeg", q));
+    if (blob.size < 300000) return { dataUrl: c.toDataURL("image/jpeg", q), blob };
+  }
+  throw new Error("Gambar terlalu besar.");
+}
+
+async function hostingToken() {
+  const p = new GoogleAuthProvider();
+  p.addScope("https://www.googleapis.com/auth/firebase.hosting");
+  p.setCustomParameters({ login_hint: auth.currentUser.email, prompt: "consent" });
+  const linked = auth.currentUser.providerData.some((x) => x.providerId === "google.com");
+  const res = linked ? await reauthenticateWithPopup(auth.currentUser, p) : await linkWithPopup(auth.currentUser, p);
+  const tok = GoogleAuthProvider.credentialFromResult(res)?.accessToken;
+  if (!tok) throw new Error("Token Google tidak diterima.");
+  return tok;
+}
+
+async function gzipHash(bytes) {
+  const gz = new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream("gzip"))).arrayBuffer());
+  const h = [...new Uint8Array(await crypto.subtle.digest("SHA-256", gz))].map((b) => b.toString(16).padStart(2, "0")).join("");
+  return { gz, h };
+}
+
+async function publishOg() {
+  if (!ogNew) return;
+  const log = $("#ogLog"), btn = $("#ogPub");
+  const say = (m) => { log.hidden = false; log.innerHTML += `<div>${esc(m)}</div>`; };
+  log.innerHTML = "";
+  btn.disabled = true;
+  try {
+    say("1/6 Log masuk Google untuk akses Firebase Hosting...");
+    const token = await hostingToken();
+    const api = async (url, opt = {}) => {
+      const r = await fetch(url, { ...opt, headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", ...(opt.headers || {}) } });
+      if (!r.ok) throw new Error(`${r.status} ${(await r.text()).slice(0, 200)}`);
+      const t = await r.text();
+      return t ? JSON.parse(t) : {};
+    };
+    say("2/6 Membaca versi website semasa...");
+    const rel = await api(`${HOSTING}/sites/${SITE}/releases?pageSize=1`);
+    const srcVer = rel.releases?.[0]?.version;
+    if (!srcVer) throw new Error("Versi semasa tidak dijumpai.");
+    const html = await (await fetch("/index.html", { cache: "no-store" })).text();
+    const v = Date.now();
+    const newHtml = html.replace(/og-thumbnail\.jpg\?v=[\w-]+/g, `og-thumbnail.jpg?v=${v}`);
+    if (newHtml === html) throw new Error("Tag thumbnail tidak dijumpai dalam index.html.");
+
+    say("3/6 Menyalin website semasa...");
+    let op = await api(`${HOSTING}/sites/${SITE}/versions:clone`, { method: "POST", body: JSON.stringify({ sourceVersion: srcVer.name, finalize: false, exclude: { regexes: ["^/index\\.html$", "^/img/og-thumbnail\\.jpg$"] } }) });
+    for (let i = 0; !op.done && i < 60; i++) { await new Promise((r) => setTimeout(r, 2000)); op = await api(`${HOSTING}/${op.name}`); }
+    if (!op.done || op.error) throw new Error("Salinan versi gagal: " + (op.error?.message || "tamat masa"));
+    const ver = op.response.name;
+
+    say("4/6 Memuat naik gambar & index.html...");
+    const img = await gzipHash(new Uint8Array(await ogNew.blob.arrayBuffer()));
+    const idx = await gzipHash(new TextEncoder().encode(newHtml));
+    const pop = await api(`${HOSTING}/${ver}:populateFiles`, { method: "POST", body: JSON.stringify({ files: { [OG_PATH]: img.h, "/index.html": idx.h } }) });
+    for (const f of [img, idx]) {
+      if (!(pop.uploadRequiredHashes || []).includes(f.h)) continue;
+      const r = await fetch(`${pop.uploadUrl}/${f.h}`, { method: "POST", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/octet-stream" }, body: f.gz });
+      if (!r.ok) throw new Error(`Muat naik gagal: ${r.status}`);
+    }
+
+    say("5/6 Memuktamadkan versi...");
+    await api(`${HOSTING}/${ver}?update_mask=status,config`, { method: "PATCH", body: JSON.stringify({ status: "FINALIZED", config: srcVer.config || {} }) });
+
+    say("6/6 Menerbitkan ke https://sumayyahdental.web.app ...");
+    await api(`${HOSTING}/sites/${SITE}/releases?versionName=${encodeURIComponent(ver)}`, { method: "POST", body: JSON.stringify({ message: "Thumbnail share dikemas kini dari panel admin" }) });
+    say("Siap! Thumbnail baru sudah live.");
+    ogNew = null;
+    toast("Thumbnail baru diterbitkan.");
+    setTimeout(renderThumbnail, 2500);
+  } catch (e) {
+    console.error(e);
+    const msg = e.code === "auth/operation-not-allowed" ? "Log masuk Google belum diaktifkan di Firebase Console (Authentication → Sign-in method → Google)."
+      : e.code === "auth/popup-blocked" ? "Popup disekat pelayar. Benarkan popup untuk laman ini dan cuba lagi."
+      : e.code === "auth/credential-already-in-use" ? "Akaun Google ini sudah dipautkan ke akaun lain."
+      : e.code === "auth/user-mismatch" ? "Sila pilih akaun Google yang sama seperti kali pertama."
+      : e.message;
+    say("Gagal: " + msg);
+    toast("Gagal terbitkan thumbnail", true);
+    btn.disabled = false;
+  }
 }
 
 /* ---------- Tajuk seksyen ---------- */

@@ -1,6 +1,6 @@
 // KLINIK GIGI SUMAYYAH — paparan awam (data realtime dari Firestore + Realtime Database)
-import { db, rtdb } from "./firebase.js?v=20261031b";
-import { DEFAULTS } from "./defaults.js?v=20261031b";
+import { db, rtdb } from "./firebase.js?v=20261031c";
+import { DEFAULTS } from "./defaults.js?v=20261031c";
 import { doc, collection, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 import { ref, onValue } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
 
