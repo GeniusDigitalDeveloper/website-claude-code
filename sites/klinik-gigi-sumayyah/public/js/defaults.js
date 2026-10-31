@@ -5,12 +5,12 @@ const U = (id, w = 1200) => `https://images.unsplash.com/${id}?auto=format&fit=c
 
 export const DEFAULTS = {
   umum: {
-    namaKlinik: "Klinik Gigi Sumayyah",
+    namaKlinik: "Sumayyah Dental Clinic",
     tagline: "Senyuman sihat, keyakinan sepanjang hayat",
     logo: "",
     telefon: "03-8888 1234",
     whatsapp: "60123456789",
-    emel: "hello@klinikgigisumayyah.com",
+    emel: "hello@sumayyahdental.com",
     alamat: "No. 12, Jalan Sumayyah 1, Taman Bukit Indah, 43000 Kajang, Selangor",
     petaEmbed: "https://www.google.com/maps?q=Kajang,Selangor&output=embed",
     facebook: "https://facebook.com/",
@@ -25,7 +25,7 @@ export const DEFAULTS = {
     jadual: { buka: "09:00", tutup: "21:00" },
   },
   hero: {
-    label: "Klinik Pergigian Keluarga",
+    label: "Rawatan Pergigian Menyeluruh",
     tajuk: "Senyuman yang sihat bermula di sini",
     subtajuk:
       "Rawatan pergigian menyeluruh untuk seluruh keluarga — dari pemeriksaan rutin hingga braces dan implan — oleh doktor gigi bertauliah dalam suasana tenang dan mesra.",
@@ -92,18 +92,38 @@ export const DEFAULTS = {
     { imej: U("photo-1598256989800-fe5f95da9787"), kapsyen: "Bilik rawatan moden", kategori: "Klinik" },
     { imej: U("photo-1606811841689-23dfddce3e95"), kapsyen: "Penerangan rawatan bersama pesakit", kategori: "Rawatan" },
     { imej: U("photo-1588776814546-1ffcf47267a5"), kapsyen: "Analisis X-ray digital", kategori: "Diagnostik" },
-    { imej: U("photo-1609840114035-3c981b782dfe"), kapsyen: "Clear aligner lutsinar", kategori: "Ortodontik" },
+    { imej: U("photo-1609840114035-3c981b782dfe"), kapsyen: "Clear aligner lutsinar", kategori: "Rawatan" },
     { imej: U("photo-1445527815219-ecbfec67492e"), kapsyen: "Ruang rawatan yang bersih", kategori: "Klinik" },
     { imej: U("photo-1600170311833-c2cf5280ce49"), kapsyen: "Perancangan rawatan digital", kategori: "Diagnostik" },
     { imej: U("photo-1609207825181-52d3214556dd"), kapsyen: "Peralatan steril setiap pesakit", kategori: "Klinik" },
     { imej: U("photo-1468493858157-0da44aaf1d13"), kapsyen: "Model gigi untuk penerangan", kategori: "Rawatan" },
-    { imej: U("photo-1607613009820-a29f7bb81c04"), kapsyen: "Penjagaan gigi harian", kategori: "Tips" },
+    { imej: U("photo-1607613009820-a29f7bb81c04"), kapsyen: "Penjagaan gigi harian", kategori: "Rawatan" },
   ],
+  // peringkat: "ketua" (paling atas) | "pembantu" (bawah ketua) | "staf"
   doktor: [
-    { nama: "Dr. Sumayyah binti Ahmad", jawatan: "Pengasas & Doktor Gigi Utama", kelayakan: "BDS (UM), Ahli MDA", imej: "", susunan: 1 },
-    { nama: "Dr. Nur Aisyah binti Rahman", jawatan: "Doktor Gigi — Ortodontik", kelayakan: "DDS (UKM), Sijil Clear Aligner", imej: "", susunan: 2 },
-    { nama: "Dr. Muhammad Hafiz bin Ismail", jawatan: "Doktor Gigi — Pembedahan Mulut", kelayakan: "BDS (USM), Sijil Implantologi", imej: "", susunan: 3 },
+    { nama: "Dr. Amalin Sumayyah binti Mohd Yazid", jawatan: "CEO, Sumayyah Dental Clinic", kelayakan: "PhD, Al-Azhar, Mesir", imej: "", peringkat: "ketua", susunan: 1 },
+    { nama: "Dr. Nur Aisyah binti Rahman", jawatan: "Ketua Doktor Gigi", kelayakan: "DDS (UKM), Sijil Ortodontik", imej: "", peringkat: "pembantu", susunan: 1 },
+    { nama: "Puan Siti Hajar binti Kamal", jawatan: "Pengurus Klinik", kelayakan: "Ijazah Pengurusan Kesihatan", imej: "", peringkat: "pembantu", susunan: 2 },
+    { nama: "Dr. Muhammad Hafiz bin Ismail", jawatan: "Doktor Gigi", kelayakan: "BDS (USM), Sijil Implantologi", imej: "", peringkat: "staf", susunan: 1 },
+    { nama: "Dr. Farah Izzati binti Azman", jawatan: "Doktor Gigi", kelayakan: "BDS (UM)", imej: "", peringkat: "staf", susunan: 2 },
+    { nama: "Nurul Ain binti Hassan", jawatan: "Pembantu Pembedahan Pergigian", kelayakan: "Sijil DSA", imej: "", peringkat: "staf", susunan: 3 },
+    { nama: "Muhammad Aiman bin Zaki", jawatan: "Pembantu Pembedahan Pergigian", kelayakan: "Sijil DSA", imej: "", peringkat: "staf", susunan: 4 },
+    { nama: "Siti Aminah binti Yusof", jawatan: "Penyambut Tetamu", kelayakan: "Khidmat Pelanggan", imej: "", peringkat: "staf", susunan: 5 },
   ],
+  // Templat carta organisasi: "tiga" = Ketua → Pembantu → Staf, "dua" = Ketua → Staf (pembantu digabung ke barisan staf)
+  organisasi: {
+    template: "tiga",
+    label: { ketua: "Pengurusan Tertinggi", pembantu: "Pembantu Ketua", staf: "Pasukan Klinikal & Staf" },
+  },
+  // Tajuk setiap seksyen (boleh diedit di panel admin)
+  seksyen: {
+    perkhidmatan: { label: "Perkhidmatan", tajuk: "Semua rawatan gigi di bawah satu bumbung", teks: "Pilih kategori, kemudian tekan rawatan untuk lihat butiran, anggaran harga dan tempoh." },
+    pakej: { label: "Pakej & Harga", tajuk: "Pakej berbaloi untuk setiap keluarga", teks: "Harga adalah anggaran permulaan. Kos sebenar bergantung pada keadaan gigi selepas pemeriksaan." },
+    doktor: { label: "Pasukan kami", tajuk: "Kenali doktor & pasukan kami", teks: "Berdaftar dengan Majlis Pergigian Malaysia dan sentiasa mengikuti latihan terkini." },
+    galeri: { label: "Galeri", tajuk: "Lihat suasana klinik kami", teks: "Pilih album, kemudian tekan gambar untuk paparan penuh." },
+    testimoni: { label: "Testimoni", tajuk: "Apa kata pesakit kami", teks: "" },
+    soalan: { label: "Soalan lazim", tajuk: "Ada soalan? Kami ada jawapan.", teks: "Tidak jumpa jawapan yang dicari? Hubungi kami terus melalui WhatsApp." },
+  },
   testimoni: [
     { nama: "Puan Nurul Huda", teks: "Anak saya takut doktor gigi, tapi doktor di sini sangat sabar dan pandai pujuk. Sekarang dia pula yang ajak datang check-up!", rating: 5 },
     { nama: "Encik Firdaus", teks: "Buat root canal dan crown di sini. Langsung tak sakit, harga telus dan diterangkan siap-siap sebelum mula. Sangat recommend.", rating: 5 },
@@ -111,14 +131,14 @@ export const DEFAULTS = {
     { nama: "Encik Rahman", teks: "Klinik bersih, tak payah tunggu lama sebab dah tempah online. Scaling cepat dan kemas.", rating: 5 },
   ],
   soalan: [
-    { soalan: "Perlu buat temujanji atau boleh walk-in?", jawapan: "Walk-in dialu-alukan, tetapi kami sarankan tempah temujanji melalui borang di website atau WhatsApp supaya anda tidak perlu menunggu lama." },
-    { soalan: "Berapa kerap saya perlu buat pemeriksaan gigi?", jawapan: "Setiap 6 bulan sekali untuk pemeriksaan dan scaling. Pesakit dengan masalah gusi mungkin perlu lebih kerap." },
-    { soalan: "Adakah rawatan menyakitkan?", jawapan: "Kebanyakan rawatan dibuat dengan bius setempat dan teknik lembut. Doktor akan sentiasa memastikan anda selesa sepanjang rawatan." },
-    { soalan: "Kaedah pembayaran apa yang diterima?", jawapan: "Tunai, kad debit/kredit, FPX, DuitNow QR dan e-wallet. Pelan ansuran 0% tersedia untuk braces, aligner dan implan." },
-    { soalan: "Adakah klinik menerima panel insurans atau korporat?", jawapan: "Ya, kami menerima beberapa panel insurans dan syarikat. Sila hubungi kami untuk semakan kelayakan panel anda." },
-    { soalan: "Pada umur berapa anak patut mula jumpa doktor gigi?", jawapan: "Seawal gigi pertama tumbuh atau sebelum umur 1 tahun. Lawatan awal membantu anak biasa dengan suasana klinik." },
-    { soalan: "Berapa lama rawatan braces?", jawapan: "Biasanya 18 hingga 24 bulan bergantung pada keadaan gigi. Doktor akan beri anggaran tepat selepas konsultasi dan X-ray." },
-    { soalan: "Bagaimana jika saya mengalami sakit gigi kecemasan?", jawapan: "Hubungi atau WhatsApp kami segera. Kes kecemasan diberi keutamaan pada hari yang sama." },
+    { soalan: "Perlu buat temujanji atau boleh walk-in?", tarikh: "2026-10-31", jawapan: "Walk-in dialu-alukan, tetapi kami sarankan tempah temujanji melalui borang di website atau WhatsApp supaya anda tidak perlu menunggu lama." },
+    { soalan: "Berapa kerap saya perlu buat pemeriksaan gigi?", tarikh: "2026-10-31", jawapan: "Setiap 6 bulan sekali untuk pemeriksaan dan scaling. Pesakit dengan masalah gusi mungkin perlu lebih kerap." },
+    { soalan: "Adakah rawatan menyakitkan?", tarikh: "2026-10-31", jawapan: "Kebanyakan rawatan dibuat dengan bius setempat dan teknik lembut. Doktor akan sentiasa memastikan anda selesa sepanjang rawatan." },
+    { soalan: "Kaedah pembayaran apa yang diterima?", tarikh: "2026-10-31", jawapan: "Tunai, kad debit/kredit, FPX, DuitNow QR dan e-wallet. Pelan ansuran 0% tersedia untuk braces, aligner dan implan." },
+    { soalan: "Adakah klinik menerima panel insurans atau korporat?", tarikh: "2026-10-31", jawapan: "Ya, kami menerima beberapa panel insurans dan syarikat. Sila hubungi kami untuk semakan kelayakan panel anda." },
+    { soalan: "Pada umur berapa anak patut mula jumpa doktor gigi?", tarikh: "2026-10-31", jawapan: "Seawal gigi pertama tumbuh atau sebelum umur 1 tahun. Lawatan awal membantu anak biasa dengan suasana klinik." },
+    { soalan: "Berapa lama rawatan braces?", tarikh: "2026-10-31", jawapan: "Biasanya 18 hingga 24 bulan bergantung pada keadaan gigi. Doktor akan beri anggaran tepat selepas konsultasi dan X-ray." },
+    { soalan: "Bagaimana jika saya mengalami sakit gigi kecemasan?", tarikh: "2026-10-31", jawapan: "Hubungi atau WhatsApp kami segera. Kes kecemasan diberi keutamaan pada hari yang sama." },
   ],
   kelebihan: [
     { ikon: "badge-check", tajuk: "Doktor bertauliah", teks: "Berdaftar dengan Majlis Pergigian Malaysia." },

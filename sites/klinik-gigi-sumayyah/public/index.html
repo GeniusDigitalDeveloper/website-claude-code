@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Klinik Gigi Sumayyah — Klinik Pergigian Keluarga</title>
-  <meta name="description" content="Klinik Gigi Sumayyah: pemeriksaan, scaling, tampalan, cabutan, braces, clear aligner, implan, pemutihan gigi dan rawatan kanak-kanak. Tempah temujanji dalam talian." />
+  <title>Sumayyah Dental Clinic</title>
+  <meta name="description" content="Sumayyah Dental Clinic: pemeriksaan, scaling, tampalan, cabutan, braces, clear aligner, implan, pemutihan gigi dan rawatan kanak-kanak. Tempah temujanji dalam talian." />
   <meta name="theme-color" content="#0e7490" />
-  <meta property="og:title" content="Klinik Gigi Sumayyah" />
+  <meta property="og:title" content="Sumayyah Dental Clinic" />
   <meta property="og:description" content="Senyuman sihat, keyakinan sepanjang hayat. Tempah temujanji sekarang." />
   <link rel="icon" href="img/favicon.svg" type="image/svg+xml" id="favicon" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -26,9 +26,9 @@
   <!-- ================= HEADER ================= -->
   <header class="header" id="header">
     <div class="container">
-      <a href="#utama" class="brand" aria-label="Klinik Gigi Sumayyah — laman utama">
+      <a href="#utama" class="brand" aria-label="Sumayyah Dental Clinic — laman utama">
         <img class="brand-logo default" data-logo src="img/logo.svg" alt="" />
-        <span class="brand-name"><span data-f="namaKlinik">Klinik Gigi Sumayyah</span><small>Klinik Pergigian Keluarga</small></span>
+        <span class="brand-name" data-f="namaKlinik">Sumayyah Dental Clinic</span>
       </a>
       <nav class="nav" aria-label="Navigasi utama">
         <a href="#perkhidmatan">Perkhidmatan</a>
@@ -40,7 +40,6 @@
         <a href="#hubungi">Hubungi</a>
       </nav>
       <div class="header-cta">
-        <span class="open-badge" data-open-badge><span class="dot"></span><span data-open-text>Buka sekarang</span></span>
         <button class="btn btn-primary btn-sm" data-book><i data-lucide="calendar-check"></i>Tempah</button>
         <button class="menu-btn" id="menuBtn" aria-label="Buka menu" aria-expanded="false" aria-controls="drawer"><i data-lucide="menu"></i></button>
       </div>
@@ -52,7 +51,7 @@
     <div class="drawer-backdrop" data-close-drawer></div>
     <aside class="drawer-panel" aria-label="Menu">
       <div class="drawer-top">
-        <span class="brand"><img class="brand-logo default" data-logo src="img/logo.svg" alt="" /><span class="brand-name" data-f="namaKlinik">Klinik Gigi Sumayyah</span></span>
+        <span class="brand"><img class="brand-logo default" data-logo src="img/logo.svg" alt="" /><span class="brand-name" data-f="namaKlinik">Sumayyah Dental Clinic</span></span>
         <button class="menu-btn" style="display:grid" data-close-drawer aria-label="Tutup menu"><i data-lucide="x"></i></button>
       </div>
       <nav>
@@ -75,7 +74,7 @@
       <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
       <div class="container hero-grid">
         <div>
-          <span class="eyebrow reveal"><i data-lucide="sparkles"></i><span data-h="label">Klinik Pergigian Keluarga</span></span>
+          <span class="eyebrow reveal"><i data-lucide="sparkles"></i><span data-h="label">Rawatan Pergigian Menyeluruh</span></span>
           <h1 class="reveal" style="--d:.08s" data-h="tajuk">Senyuman yang sihat bermula di sini</h1>
           <p class="hero-sub reveal" style="--d:.16s" data-h="subtajuk"></p>
           <div class="hero-actions reveal" style="--d:.24s">
@@ -89,7 +88,7 @@
           </div>
         </div>
         <div class="hero-visual reveal" style="--d:.2s">
-          <div class="hero-img-wrap"><img data-h-img src="" alt="Bilik rawatan Klinik Gigi Sumayyah" fetchpriority="high" /></div>
+          <div class="hero-img-wrap"><img data-h-img src="" alt="Bilik rawatan Sumayyah Dental Clinic" fetchpriority="high" /></div>
           <div class="glass-card float-card fc1">
             <div class="ic"><i data-lucide="star"></i></div>
             <div><strong>4.9 / 5 rating</strong><span class="stars" aria-label="5 bintang"><i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i><i data-lucide="star"></i></span></div>
@@ -140,12 +139,15 @@
     <section class="section bg-soft" id="perkhidmatan">
       <div class="container">
         <div class="section-head reveal">
-          <span class="eyebrow"><i data-lucide="stethoscope"></i>Perkhidmatan</span>
-          <h2>Semua rawatan gigi <span class="grad-text">di bawah satu bumbung</span></h2>
-          <p>Tekan mana-mana rawatan untuk lihat butiran, anggaran harga dan tempoh.</p>
+          <span class="eyebrow"><i data-lucide="stethoscope"></i><span data-s="perkhidmatan.label"></span></span>
+          <h2 data-s="perkhidmatan.tajuk"></h2>
+          <p data-s="perkhidmatan.teks"></p>
         </div>
-        <div class="chips reveal" id="svcChips" role="tablist" aria-label="Tapis kategori"></div>
-        <div class="svc-grid" id="svcGrid"></div>
+        <div class="chips reveal" id="svcChips" role="tablist" aria-label="Kategori rawatan"></div>
+        <div class="hs-wrap">
+          <div class="hscroll svc-grid" id="svcGrid"></div>
+          <div class="hs-nav" hidden><button class="hs-btn" data-dir="-1" aria-label="Tatal ke kiri"><i data-lucide="chevron-left"></i></button><button class="hs-btn" data-dir="1" aria-label="Tatal ke kanan"><i data-lucide="chevron-right"></i></button></div>
+        </div>
       </div>
     </section>
 
@@ -169,9 +171,9 @@
     <section class="section bg-soft" id="pakej">
       <div class="container">
         <div class="section-head reveal">
-          <span class="eyebrow"><i data-lucide="tag"></i>Pakej & Harga</span>
-          <h2>Pakej berbaloi untuk <span class="grad-text">setiap keluarga</span></h2>
-          <p>Harga adalah anggaran permulaan. Kos sebenar bergantung pada keadaan gigi selepas pemeriksaan.</p>
+          <span class="eyebrow"><i data-lucide="tag"></i><span data-s="pakej.label"></span></span>
+          <h2 data-s="pakej.tajuk"></h2>
+          <p data-s="pakej.teks"></p>
         </div>
         <div class="price-grid" id="priceGrid"></div>
       </div>
@@ -181,11 +183,11 @@
     <section class="section" id="doktor">
       <div class="container">
         <div class="section-head reveal">
-          <span class="eyebrow"><i data-lucide="user-round"></i>Pasukan kami</span>
-          <h2>Kenali doktor gigi kami</h2>
-          <p>Berdaftar dengan Majlis Pergigian Malaysia dan sentiasa mengikuti latihan terkini.</p>
+          <span class="eyebrow"><i data-lucide="user-round"></i><span data-s="doktor.label"></span></span>
+          <h2 data-s="doktor.tajuk"></h2>
+          <p data-s="doktor.teks"></p>
         </div>
-        <div class="doc-grid" id="docGrid"></div>
+        <div class="org" id="org"></div>
       </div>
     </section>
 
@@ -193,11 +195,15 @@
     <section class="section bg-soft" id="galeri">
       <div class="container">
         <div class="section-head reveal">
-          <span class="eyebrow"><i data-lucide="images"></i>Galeri</span>
-          <h2>Lihat suasana klinik kami</h2>
-          <p>Tekan gambar untuk paparan penuh.</p>
+          <span class="eyebrow"><i data-lucide="images"></i><span data-s="galeri.label"></span></span>
+          <h2 data-s="galeri.tajuk"></h2>
+          <p data-s="galeri.teks"></p>
         </div>
-        <div class="gallery" id="gallery"></div>
+        <div class="chips reveal" id="galChips" role="tablist" aria-label="Album galeri"></div>
+        <div class="hs-wrap">
+          <div class="hscroll gal-grid" id="gallery"></div>
+          <div class="hs-nav" hidden><button class="hs-btn" data-dir="-1" aria-label="Tatal ke kiri"><i data-lucide="chevron-left"></i></button><button class="hs-btn" data-dir="1" aria-label="Tatal ke kanan"><i data-lucide="chevron-right"></i></button></div>
+        </div>
       </div>
     </section>
 
@@ -205,8 +211,9 @@
     <section class="section" id="testimoni">
       <div class="container">
         <div class="section-head reveal">
-          <span class="eyebrow"><i data-lucide="quote"></i>Testimoni</span>
-          <h2>Apa kata pesakit kami</h2>
+          <span class="eyebrow"><i data-lucide="quote"></i><span data-s="testimoni.label"></span></span>
+          <h2 data-s="testimoni.tajuk"></h2>
+          <p data-s="testimoni.teks"></p>
         </div>
         <div class="testi-grid" id="testiGrid"></div>
       </div>
@@ -217,13 +224,13 @@
       <div class="container faq-wrap">
         <div class="faq-side reveal">
           <div class="section-head">
-            <span class="eyebrow"><i data-lucide="circle-help"></i>Soalan lazim</span>
-            <h2>Ada soalan? Kami ada jawapan.</h2>
-            <p>Tidak jumpa jawapan yang dicari? Hubungi kami terus melalui WhatsApp.</p>
-          </div>
+          <span class="eyebrow"><i data-lucide="circle-help"></i><span data-s="soalan.label"></span></span>
+          <h2 data-s="soalan.tajuk"></h2>
+          <p data-s="soalan.teks"></p>
+        </div>
           <a class="btn btn-wa" data-wa target="_blank" rel="noopener"><i data-lucide="message-circle"></i>Tanya di WhatsApp</a>
         </div>
-        <div class="faq-list" id="faqList"></div>
+        <div class="faq-scroll"><div class="faq-list" id="faqList"></div></div>
       </div>
     </section>
 
@@ -268,7 +275,7 @@
   <footer class="footer">
     <div class="container footer-grid">
       <div>
-        <span class="brand" style="margin-bottom:1rem"><img class="brand-logo default" data-logo src="img/logo.svg" alt="" /><span class="brand-name"><span data-f="namaKlinik">Klinik Gigi Sumayyah</span><small data-f="noPendaftaran"></small></span></span>
+        <span class="brand" style="margin-bottom:1rem"><img class="brand-logo default" data-logo src="img/logo.svg" alt="" /><span class="brand-name"><span data-f="namaKlinik">Sumayyah Dental Clinic</span><small data-f="noPendaftaran"></small></span></span>
         <p data-f="tagline"></p>
         <div class="socials">
           <a data-social="facebook" target="_blank" rel="noopener" aria-label="Facebook"><i data-lucide="facebook"></i></a>
@@ -302,7 +309,7 @@
       </div>
     </div>
     <div class="container footer-bottom">
-      <span>© <span id="year"></span> <span data-f="namaKlinik">Klinik Gigi Sumayyah</span>. Hak cipta terpelihara.</span>
+      <span>© <span id="year"></span> <span data-f="namaKlinik">Sumayyah Dental Clinic</span>. Hak cipta terpelihara.</span>
       <span>Maklumat di laman ini bukan pengganti nasihat doktor gigi.</span>
     </div>
   </footer>

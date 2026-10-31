@@ -12,6 +12,8 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const bySusunan = (a, b) => (a.susunan ?? 999) - (b.susunan ?? 999);
 
 const state = {
+  seksyen: DEFAULTS.seksyen,
+  organisasi: DEFAULTS.organisasi,
   umum: { ...DEFAULTS.umum },
   hero: { ...DEFAULTS.hero },
   statistik: DEFAULTS.statistik,
@@ -47,7 +49,7 @@ function renderUmum() {
   if (map && u.petaEmbed && map.getAttribute("src") !== u.petaEmbed) map.src = u.petaEmbed;
   const hrs = (u.waktuOperasi || []).map((w) => `<li><strong>${esc(w.hari)}</strong><span>${esc(w.masa)}</span></li>`).join("");
   $$("[data-hours]").forEach((ul) => (ul.innerHTML = hrs));
-  document.title = `${u.namaKlinik} — Klinik Pergigian Keluarga`;
+  document.title = u.namaKlinik;
   renderOpen();
 }
 
@@ -100,14 +102,24 @@ function autoSlide() {
   if (!reduceMotion) slideTimer = setInterval(() => goSlide(slideIdx + 1), 6000);
 }
 
-let svcFilter = "Semua";
+// Butang tab kategori (tiada "Semua") — kategori pertama dipilih secara lalai
+function chipTabs(box, cats, active, onPick) {
+  box.innerHTML = cats.map((c) => `<button class="chip ${c === active ? "active" : ""}" role="tab" aria-selected="${c === active}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
+  $$(".chip", box).forEach((c) =>
+    c.addEventListener("click", () => {
+      $$(".chip", box).forEach((x) => { x.classList.toggle("active", x === c); x.setAttribute("aria-selected", x === c); });
+      onPick(c.dataset.cat);
+    })
+  );
+}
+
+let svcFilter = "";
 function renderServices() {
   const list = state.perkhidmatan.filter((s) => s.aktif !== false);
-  const cats = ["Semua", ...new Set(list.map((s) => s.kategori).filter(Boolean))];
-  if (!cats.includes(svcFilter)) svcFilter = "Semua";
-  $("#svcChips").innerHTML = cats.map((c) => `<button class="chip ${c === svcFilter ? "active" : ""}" role="tab" aria-selected="${c === svcFilter}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
+  const cats = [...new Set(list.map((s) => s.kategori || "Lain-lain"))];
+  if (!cats.includes(svcFilter)) svcFilter = cats[0] || "";
   $("#svcGrid").innerHTML = list
-    .map((s, i) => `<button class="svc-card reveal ${svcFilter !== "Semua" && s.kategori !== svcFilter ? "hide" : ""}" style="--d:${(i % 4) * 0.06}s" data-svc="${i}" data-cat="${esc(s.kategori)}">
+    .map((s, i) => `<button class="svc-card ${(s.kategori || "Lain-lain") !== svcFilter ? "hide" : ""}" data-svc="${i}" data-cat="${esc(s.kategori || "Lain-lain")}">
       <span class="svc-tag">${esc(s.kategori)}</span>
       <span class="ic"><i data-lucide="${esc(s.ikon || "smile")}"></i></span>
       <h3>${esc(s.nama)}</h3><p>${esc(s.ringkasan)}</p>
@@ -115,13 +127,12 @@ function renderServices() {
     </button>`)
     .join("");
   $$("#svcGrid [data-svc]").forEach((b) => b.addEventListener("click", () => openService(list[+b.dataset.svc])));
-  $$("#svcChips .chip").forEach((c) =>
-    c.addEventListener("click", () => {
-      svcFilter = c.dataset.cat;
-      $$("#svcChips .chip").forEach((x) => { x.classList.toggle("active", x === c); x.setAttribute("aria-selected", x === c); });
-      $$("#svcGrid .svc-card").forEach((card) => card.classList.toggle("hide", svcFilter !== "Semua" && card.dataset.cat !== svcFilter));
-    })
-  );
+  chipTabs($("#svcChips"), cats, svcFilter, (cat) => {
+    svcFilter = cat;
+    $$("#svcGrid .svc-card").forEach((card) => card.classList.toggle("hide", card.dataset.cat !== cat));
+    resetScroll($("#svcGrid"));
+  });
+  resetScroll($("#svcGrid"));
   $("#bSvc").innerHTML = `<option value="">— Pilih rawatan —</option>` + list.map((s) => `<option>${esc(s.nama)}</option>`).join("") + `<option>Lain-lain / Tidak pasti</option>`;
   $("#footSvc").innerHTML = list.slice(0, 6).map((s) => `<li><a href="#perkhidmatan">${esc(s.nama)}</a></li>`).join("");
 }
@@ -138,27 +149,47 @@ function renderPakej() {
     .join("");
 }
 
+// Peringkat carta organisasi. Rekod lama tanpa "peringkat" diteka dari jawatan.
+const tierOf = (d) => d.peringkat || (/\b(ceo|pengasas|ketua pegawai|pengarah)\b/i.test(d.jawatan || "") ? "ketua" : "staf");
 function renderDoktor() {
-  $("#doktor").hidden = state.doktor.length === 0;
-  $("#docGrid").innerHTML = [...state.doktor].sort(bySusunan)
-    .map((d, i) => {
-      const initial = esc((d.nama || "?").replace(/^Dr\.?\s*/i, "").charAt(0));
-      return `<article class="doc-card reveal" style="--d:${i * 0.08}s">
-        <div class="doc-photo">${d.imej ? `<img src="${esc(d.imej)}" alt="${esc(d.nama)}" loading="lazy" />` : `<span class="doc-initial" aria-hidden="true">${initial}</span>`}</div>
-        <div class="doc-body"><h3>${esc(d.nama)}</h3><div class="doc-role">${esc(d.jawatan)}</div><p class="doc-qual">${esc(d.kelayakan)}</p></div>
-      </article>`;
-    })
+  const org = { ...DEFAULTS.organisasi, ...(state.organisasi || {}) };
+  const label = { ...DEFAULTS.organisasi.label, ...(org.label || {}) };
+  const all = [...state.doktor].sort(bySusunan);
+  $("#doktor").hidden = all.length === 0;
+  const pick = (t) => all.filter((d) => tierOf(d) === t);
+  const tiers = org.template === "dua"
+    ? [["ketua", pick("ketua")], ["staf", [...pick("pembantu"), ...pick("staf")]]]
+    : [["ketua", pick("ketua")], ["pembantu", pick("pembantu")], ["staf", pick("staf")]];
+  const card = (d, t) => {
+    const initial = esc((d.nama || "?").replace(/^(Dr\.?|Puan|Encik|Cik|Tuan)\s*/i, "").charAt(0));
+    return `<article class="org-card ${t === "ketua" ? "ketua" : ""}">
+      ${t === "ketua" ? `<span class="org-badge"><i data-lucide="crown"></i>KETUA</span>` : ""}
+      <div class="org-photo">${d.imej ? `<img src="${esc(d.imej)}" alt="${esc(d.nama)}" loading="lazy" />` : `<span aria-hidden="true">${initial}</span>`}</div>
+      <h3>${esc(d.nama)}</h3><div class="org-role">${esc(d.jawatan)}</div>${d.kelayakan ? `<div class="org-qual">${esc(d.kelayakan)}</div>` : ""}
+    </article>`;
+  };
+  $("#org").innerHTML = tiers.filter(([, list]) => list.length)
+    .map(([t, list], i) => `<div class="org-tier reveal" style="--d:${i * 0.12}s"><span class="org-label">${esc(label[t])}</span><div class="org-row">${list.map((d) => card(d, t)).join("")}</div></div>`)
     .join("");
 }
 
-let galList = [], lbIdx = 0;
+let galList = [], galAlbum = "", lbIdx = 0;
 function renderGaleri() {
-  galList = [...state.galeri].sort(bySusunan);
-  $("#galeri").hidden = galList.length === 0;
-  $("#gallery").innerHTML = galList
-    .map((g, i) => `<button class="g-item reveal" data-g="${i}" aria-label="Buka gambar: ${esc(g.kapsyen)}"><img src="${esc(g.imej)}" alt="${esc(g.kapsyen)}" loading="lazy" /><span class="g-cap">${esc(g.kapsyen)}<i data-lucide="eye"></i></span></button>`)
-    .join("");
-  $$("#gallery [data-g]").forEach((b) => b.addEventListener("click", () => openLightbox(+b.dataset.g)));
+  const all = [...state.galeri].sort(bySusunan);
+  $("#galeri").hidden = all.length === 0;
+  const albums = [...new Set(all.map((g) => g.kategori || "Lain-lain"))];
+  if (!albums.includes(galAlbum)) galAlbum = albums[0] || "";
+  const draw = () => {
+    galList = all.filter((g) => (g.kategori || "Lain-lain") === galAlbum);
+    $("#gallery").innerHTML = galList
+      .map((g, i) => `<button class="g-item" data-g="${i}" aria-label="Buka gambar: ${esc(g.kapsyen)}"><img src="${esc(g.imej)}" alt="${esc(g.kapsyen)}" loading="lazy" /><span class="g-cap">${esc(g.kapsyen)}<i data-lucide="eye"></i></span></button>`)
+      .join("");
+    $$("#gallery [data-g]").forEach((b) => b.addEventListener("click", () => openLightbox(+b.dataset.g)));
+    icons();
+    resetScroll($("#gallery"));
+  };
+  chipTabs($("#galChips"), albums, galAlbum, (a) => { galAlbum = a; draw(); });
+  draw();
 }
 
 function renderTestimoni() {
@@ -174,11 +205,12 @@ function renderTestimoni() {
     .join("");
 }
 
+const fmtTarikh = (t) => { const d = new Date(t + "T00:00:00"); return isNaN(d) ? t : d.toLocaleDateString("ms-MY", { day: "numeric", month: "long", year: "numeric" }); };
 function renderFaq() {
   $("#faqList").innerHTML = [...state.soalan].sort(bySusunan)
     .map((f, i) => `<div class="faq reveal ${i === 0 ? "open" : ""}" style="--d:${i * 0.04}s">
       <button class="faq-q" aria-expanded="${i === 0}" aria-controls="faq${i}">${esc(f.soalan)}<span class="ic"><i data-lucide="chevron-down"></i></span></button>
-      <div class="faq-a" id="faq${i}" role="region"><div><p>${esc(f.jawapan)}</p></div></div></div>`)
+      <div class="faq-a" id="faq${i}" role="region"><div><p>${esc(f.jawapan)}</p>${f.tarikh ? `<span class="faq-date"><i data-lucide="calendar"></i>Dikemaskini: ${esc(fmtTarikh(f.tarikh))}</span>` : ""}</div></div></div>`)
     .join("");
   $$("#faqList .faq-q").forEach((q) =>
     q.addEventListener("click", () => {
@@ -228,8 +260,35 @@ function renderAnnounce() {
   $("#announce").classList.toggle("show", !!show);
 }
 
+function renderSeksyen() {
+  const sek = state.seksyen || {};
+  $$("[data-s]").forEach((el) => {
+    const [k, f] = el.dataset.s.split(".");
+    const v = (sek[k] && sek[k][f]) ?? DEFAULTS.seksyen[k]?.[f] ?? "";
+    el.textContent = v;
+    el.hidden = !v;
+  });
+}
+
+// Skrol mendatar: butang kiri/kanan muncul hanya bila kandungan melebihi 2 baris
+function updateHs(sc) {
+  const nav = sc.parentElement.querySelector(".hs-nav");
+  if (!nav) return;
+  const over = sc.scrollWidth - sc.clientWidth > 4;
+  nav.hidden = !over;
+  const [prev, next] = $$(".hs-btn", nav);
+  prev.disabled = sc.scrollLeft <= 4;
+  next.disabled = sc.scrollLeft >= sc.scrollWidth - sc.clientWidth - 4;
+}
+function resetScroll(sc) { sc.scrollLeft = 0; requestAnimationFrame(() => updateHs(sc)); }
+$$(".hscroll").forEach((sc) => {
+  sc.addEventListener("scroll", () => updateHs(sc), { passive: true });
+  $$(".hs-btn", sc.parentElement).forEach((b) => b.addEventListener("click", () => sc.scrollBy({ left: +b.dataset.dir * sc.clientWidth * 0.9, behavior: reduceMotion ? "auto" : "smooth" })));
+  new ResizeObserver(() => updateHs(sc)).observe(sc);
+});
+
 /* ---------------- Render semua ---------------- */
-const renderers = { umum: renderUmum, hero: renderHero, statistik: renderStats, kelebihan: renderWhy, banner: renderBanner, perkhidmatan: renderServices, pakej: renderPakej, galeri: renderGaleri, doktor: renderDoktor, testimoni: renderTestimoni, soalan: renderFaq };
+const renderers = { seksyen: renderSeksyen, umum: renderUmum, hero: renderHero, statistik: renderStats, kelebihan: renderWhy, banner: renderBanner, perkhidmatan: renderServices, pakej: renderPakej, galeri: renderGaleri, doktor: renderDoktor, testimoni: renderTestimoni, soalan: renderFaq };
 function render(key) {
   (key ? [renderers[key]] : Object.values(renderers)).forEach((fn) => fn());
   icons();
@@ -243,12 +302,14 @@ function listen() {
     if (snap.exists()) state.umum = { ...DEFAULTS.umum, ...snap.data() };
     render("umum");
   }, (e) => console.warn("umum:", e.code));
-  for (const [key, docId] of [["hero", "hero"], ["statistik", "statistik"], ["kelebihan", "kelebihan"]]) {
+  for (const [key, docId] of [["hero", "hero"], ["statistik", "statistik"], ["kelebihan", "kelebihan"], ["seksyen", "seksyen"], ["organisasi", "organisasi"]]) {
     onSnapshot(doc(db, "tetapan", docId), (snap) => {
       if (!snap.exists()) return;
       const d = snap.data();
-      state[key] = key === "hero" ? { ...DEFAULTS.hero, ...d } : d.senarai || [];
-      render(key);
+      if (key === "hero") state.hero = { ...DEFAULTS.hero, ...d };
+      else if (key === "seksyen" || key === "organisasi") state[key] = d;
+      else state[key] = d.senarai || [];
+      render(key === "organisasi" ? "doktor" : key);
     }, (e) => console.warn(key, e.code));
   }
   for (const col of ["banner", "perkhidmatan", "pakej", "galeri", "doktor", "testimoni", "soalan"]) {
@@ -256,6 +317,8 @@ function listen() {
       // Selagi admin belum "Isi Data Contoh", koleksi kosong guna kandungan contoh.
       if (snap.empty && !state.seeded) return;
       state[col] = snap.docs.map((d) => ({ id: d.id, ...d.data() })).sort(bySusunan);
+      // Sebelum data contoh diisi: kekalkan pasukan contoh di bawah ketua yang admin sudah tambah
+      if (col === "doktor" && !state.seeded) state.doktor = [...state.doktor, ...DEFAULTS.doktor.filter((d) => d.peringkat !== "ketua")];
       render(col);
     }, (e) => console.warn(col, e.code));
   }

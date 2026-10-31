@@ -1,4 +1,4 @@
-# Klinik Gigi Sumayyah — Website + Panel Admin
+# Sumayyah Dental Clinic — Website + Panel Admin
 
 Website statik (HTML/CSS/JS) disambung ke projek Firebase **SumayyahDental** (`sumayyahdental`).
 Semua kandungan diedit dari panel admin dan muncul **serta-merta** (realtime) di website awam.

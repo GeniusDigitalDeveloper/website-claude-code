@@ -72,8 +72,8 @@ const COLS = {
       { k: "nama", l: "Nama", req: 1 },
       { k: "jawatan", l: "Jawatan" },
       { k: "kelayakan", l: "Kelayakan" },
+      { k: "peringkat", l: "Kedudukan dalam carta", t: "select", opts: [["ketua", "Ketua (paling atas, cth: CEO)"], ["pembantu", "Pembantu ketua"], ["staf", "Staf"]], def: "staf" },
       { k: "imej", l: "Foto (kosongkan untuk guna huruf awal)", t: "image", max: 700 },
-      { k: "susunan", l: "Susunan", t: "number" },
     ],
     card: (d) => ({ img: d.imej, icon: "user-round", title: d.nama, sub: d.jawatan }),
   },
@@ -82,10 +82,10 @@ const COLS = {
     fields: [
       { k: "imej", l: "Gambar", t: "image", max: 1600, req: 1 },
       { k: "kapsyen", l: "Kapsyen" },
-      { k: "kategori", l: "Kategori" },
+      { k: "kategori", l: "Album", ph: "cth: Klinik / Rawatan / Sebelum & Selepas", list: "albumList", req: 1 },
       { k: "susunan", l: "Susunan", t: "number" },
     ],
-    card: (d) => ({ img: d.imej, title: d.kapsyen || "(tiada kapsyen)", sub: d.kategori }),
+    card: (d) => ({ img: d.imej, title: d.kapsyen || "(tiada kapsyen)", pill: [d.kategori || "Lain-lain"] }),
     bulk: true,
   },
   testimoni: {
@@ -103,9 +103,10 @@ const COLS = {
     fields: [
       { k: "soalan", l: "Soalan", req: 1 },
       { k: "jawapan", l: "Jawapan", t: "textarea", req: 1 },
-      { k: "susunan", l: "Susunan", t: "number" },
+      { k: "tarikh", l: "Tarikh (dipapar sebagai 'Dikemaskini')", t: "date", half: 1 },
+      { k: "susunan", l: "Susunan", t: "number", half: 1 },
     ],
-    card: (d) => ({ icon: "circle-help", title: d.soalan, sub: d.jawapan }),
+    card: (d) => ({ icon: "circle-help", title: d.soalan, sub: d.jawapan, pill: d.tarikh ? [d.tarikh] : null }),
   },
 };
 
@@ -148,6 +149,8 @@ function fieldHTML(f, data) {
   const help = f.help ? `<small>${esc(f.help)}</small>` : "";
   const wrap = (inner) => `<div class="field" data-k="${f.k}" data-t="${f.t || "text"}" ${f.half ? 'data-half' : ""}>${inner}${help}</div>`;
   switch (f.t) {
+    case "select":
+      return wrap(`<label for="${id}">${esc(f.l)}</label><select id="${id}">${f.opts.map(([k, l]) => `<option value="${esc(k)}" ${k === v ? "selected" : ""}>${esc(l)}</option>`).join("")}</select>`);
     case "textarea":
       return wrap(`<label for="${id}">${esc(f.l)}</label><textarea id="${id}" ${f.req ? "required" : ""}>${esc(v)}</textarea>`);
     case "bool":
@@ -291,11 +294,11 @@ async function compress(file, maxDim = 1400, alpha = false) {
 /* =========================================================
    Dialog tambah/edit item koleksi
    ========================================================= */
-function openEditor(col, item) {
+function openEditor(col, item, preset) {
   const cfg = COLS[col];
   $("#dlgTitle").textContent = (item ? "Edit " : "Tambah ") + cfg.title;
-  const data = item || { susunan: (cache[col]?.length || 0) + 1 };
-  $("#dlgBody").innerHTML = formHTML(cfg.fields, data) + (col === "perkhidmatan" ? `<datalist id="katList">${[...new Set((cache.perkhidmatan || []).map((s) => s.kategori).filter(Boolean))].map((k) => `<option>${esc(k)}</option>`).join("")}</datalist>` : "");
+  const data = item || { susunan: (cache[col]?.length || 0) + 1, ...(preset || {}) };
+  $("#dlgBody").innerHTML = formHTML(cfg.fields, data) + (col === "galeri" ? `<datalist id="albumList">${[...new Set((cache.galeri || []).map((g) => g.kategori).filter(Boolean))].map((k) => `<option>${esc(k)}</option>`).join("")}</datalist>` : "") + (col === "perkhidmatan" ? `<datalist id="katList">${[...new Set((cache.perkhidmatan || []).map((s) => s.kategori).filter(Boolean))].map((k) => `<option>${esc(k)}</option>`).join("")}</datalist>` : "");
   icons();
   const dlg = $("#dlg");
   dlg.showModal();
@@ -308,7 +311,7 @@ function openEditor(col, item) {
     btn.disabled = true;
     try {
       if (item) await updateDoc(doc(db, col, item.id), val);
-      else await addDoc(collection(db, col), val);
+      else await addDoc(collection(db, col), { ...(preset || {}), ...val });
       dlg.close();
       toast("Disimpan — website dikemas kini serta-merta.");
     } catch (err) { fail(err); }
@@ -332,6 +335,7 @@ const PAGES = {
   hero: { title: "Banner Utama", icon: "image", desc: "Tajuk dan gambar besar di bahagian atas website." },
   status: { title: "Status & Pengumuman", icon: "megaphone", desc: "Jalur pengumuman dan status buka/tutup (Realtime Database)." },
   ...Object.fromEntries(Object.entries(COLS).map(([k, c]) => [k, { title: c.title, icon: c.icon, desc: c.desc, col: k }])),
+  seksyen: { title: "Tajuk Seksyen", icon: "heading", desc: "Label, tajuk dan teks pengenalan setiap seksyen website (Perkhidmatan, Pakej, Doktor, Galeri, Testimoni, Soalan Lazim)." },
   lain: { title: "Statistik & Kelebihan", icon: "award", desc: "Nombor statistik dan senarai kelebihan klinik." },
 };
 let current = "dashboard";
@@ -358,6 +362,8 @@ function go(page) {
 
 function renderPage() {
   const page = current, el = $("#page");
+  if (page === "doktor") return renderOrgAdmin();
+  if (page === "seksyen") return renderSeksyenForm();
   if (PAGES[page].col) return renderCollection(page);
   if (page === "dashboard") return renderDashboard();
   if (page === "tempahan") return renderBookings();
@@ -501,10 +507,106 @@ function renderStatus() {
   icons();
 }
 
-async function seed(reset) {
-  if (!confirm(reset ? "Padam semua kandungan sedia ada dan isi semula dengan data contoh?" : "Isi Firestore dengan data contoh?")) return;
+/* ---------- Tajuk seksyen ---------- */
+const SEK_NAMA = { perkhidmatan: "Perkhidmatan", pakej: "Pakej & Harga", doktor: "Doktor & Pasukan", galeri: "Galeri", testimoni: "Testimoni", soalan: "Soalan Lazim" };
+function renderSeksyenForm() {
+  const data = {};
+  for (const k of Object.keys(SEK_NAMA)) data[k] = { ...DEFAULTS.seksyen[k], ...(cache.seksyen?.[k] || {}) };
+  $("#page").innerHTML = `<form id="fSek">${Object.entries(SEK_NAMA).map(([k, n]) => `<div class="card"><h2>${esc(n)}</h2>${formHTML([
+      { k: `${k}.label`, l: "Label kecil", half: 1 },
+      { k: `${k}.tajuk`, l: "Tajuk", half: 1 },
+      { k: `${k}.teks`, l: "Teks pengenalan (kosongkan untuk sembunyi)", t: "textarea" },
+    ], data)}</div>`).join("")}
+    <div class="card-actions" style="position:sticky;bottom:1rem"><button class="btn btn-primary"><i data-lucide="save"></i>Simpan semua tajuk</button></div></form>`;
+  const fields = Object.keys(SEK_NAMA).flatMap((k) => ["label", "tajuk", "teks"].map((f) => ({ k: `${k}.${f}` })));
+  bindDocForm($("#fSek"), "seksyen", fields);
+  icons();
+}
+
+/* ---------- Carta organisasi doktor & staf ---------- */
+const TIERS = [["ketua", "Ketua"], ["pembantu", "Pembantu Ketua"], ["staf", "Staf"]];
+const tierOf = (d) => d.peringkat || (/\b(ceo|pengasas|ketua pegawai|pengarah)\b/i.test(d.jawatan || "") ? "ketua" : "staf");
+let orgSel = null;
+function orgData() {
+  const org = { ...DEFAULTS.organisasi, ...(cache.organisasi || {}) };
+  org.label = { ...DEFAULTS.organisasi.label, ...(org.label || {}) };
+  return org;
+}
+const tierList = (t) => (cache.doktor || []).filter((d) => tierOf(d) === t).sort(bySusunan);
+
+function renderOrgAdmin() {
+  const org = orgData();
+  const hasPembantu = org.template !== "dua";
+  const card = (d) => `<button type="button" class="oc ${orgSel === d.id ? "sel" : ""} ${tierOf(d) === "ketua" ? "ketua" : ""}" data-id="${d.id}" aria-pressed="${orgSel === d.id}">
+      <span class="oc-ph">${d.imej ? `<img src="${esc(d.imej)}" alt="" />` : esc((d.nama || "?").replace(/^(Dr\.?|Puan|Encik|Cik|Tuan)\s*/i, "").charAt(0))}</span>
+      <strong>${esc(d.nama)}</strong><small>${esc(d.jawatan)}</small></button>`;
+  const tierHTML = ([t, nama]) => {
+    const list = tierList(t);
+    const dim = t === "pembantu" && !hasPembantu;
+    return `<div class="ot ${dim ? "dim" : ""}"><div class="ot-head"><span class="ot-label">${esc(org.label[t])}</span>${dim ? `<small>(templat 2 peringkat: dipapar bersama staf)</small>` : ""}</div>
+      <div class="ot-row">${list.map(card).join("")}<button type="button" class="oc add" data-add="${t}"><i data-lucide="plus"></i><span>Tambah ${esc(nama.toLowerCase())}</span></button></div></div>`;
+  };
+  const sel = (cache.doktor || []).find((d) => d.id === orgSel);
+  $("#page").innerHTML = `
+    <div class="card"><h2><i data-lucide="layout-template"></i>Templat susunan</h2>
+      <div class="tpl">
+        <button type="button" class="tpl-opt ${hasPembantu ? "on" : ""}" data-tpl="tiga"><span class="tpl-pic"><i></i><b><i></i><i></i></b><b><i></i><i></i><i></i></b></span>3 peringkat<small>Ketua → Pembantu → Staf</small></button>
+        <button type="button" class="tpl-opt ${!hasPembantu ? "on" : ""}" data-tpl="dua"><span class="tpl-pic"><i></i><b><i></i><i></i><i></i><i></i></b></span>2 peringkat<small>Ketua → Staf terus</small></button>
+      </div>
+      <form id="fOrgLbl" class="grid3">${TIERS.map(([t, n]) => `<div class="field"><label for="lbl_${t}">Label baris ${esc(n.toLowerCase())}</label><input id="lbl_${t}" data-t="${t}" value="${esc(org.label[t])}" /></div>`).join("")}</form>
+      <div class="card-actions"><button class="btn" id="saveLbl"><i data-lucide="save"></i>Simpan label</button></div>
+    </div>
+    <div class="card org-board">
+      <p class="icon-help" style="margin:0 0 1rem;text-align:center">Klik kad untuk pilih, kemudian guna butang anak panah untuk alih kedudukan. Setiap baris sentiasa di tengah.</p>
+      <div class="otb ${sel ? "" : "off"}" id="orgTools">
+        ${sel ? `<strong>${esc(sel.nama)}</strong>` : `<span>Tiada kad dipilih</span>`}
+        <button class="btn btn-icon" data-mv="up" aria-label="Naik satu peringkat" ${sel ? "" : "disabled"}><i data-lucide="arrow-up"></i></button>
+        <button class="btn btn-icon" data-mv="left" aria-label="Alih ke kiri" ${sel ? "" : "disabled"}><i data-lucide="arrow-left"></i></button>
+        <button class="btn btn-icon" data-mv="right" aria-label="Alih ke kanan" ${sel ? "" : "disabled"}><i data-lucide="arrow-right"></i></button>
+        <button class="btn btn-icon" data-mv="down" aria-label="Turun satu peringkat" ${sel ? "" : "disabled"}><i data-lucide="arrow-down"></i></button>
+        <button class="btn" data-mv="edit" ${sel ? "" : "disabled"}><i data-lucide="pencil"></i>Edit</button>
+        <button class="btn btn-danger" data-mv="del" ${sel ? "" : "disabled"}><i data-lucide="trash-2"></i>Padam</button>
+      </div>
+      <div class="ochart">${TIERS.map(tierHTML).join("")}</div>
+    </div>`;
+  $$(".oc[data-id]").forEach((b) => (b.onclick = () => { orgSel = orgSel === b.dataset.id ? null : b.dataset.id; renderOrgAdmin(); }));
+  $$(".oc[data-add]").forEach((b) => (b.onclick = () => openEditor("doktor", null, { peringkat: b.dataset.add, susunan: tierList(b.dataset.add).length + 1 })));
+  $$("[data-tpl]").forEach((b) => (b.onclick = () => setDoc(doc(db, "tetapan", "organisasi"), { template: b.dataset.tpl }, { merge: true }).then(() => toast("Templat disimpan.")).catch(fail)));
+  $("#saveLbl").onclick = () => {
+    const label = Object.fromEntries($$("#fOrgLbl input").map((i) => [i.dataset.t, i.value.trim()]));
+    setDoc(doc(db, "tetapan", "organisasi"), { label }, { merge: true }).then(() => toast("Label disimpan.")).catch(fail);
+  };
+  $$("[data-mv]").forEach((b) => (b.onclick = () => moveOrg(b.dataset.mv)));
+  icons();
+}
+
+async function moveOrg(act) {
+  const d = (cache.doktor || []).find((x) => x.id === orgSel);
+  if (!d) return;
+  if (act === "edit") return openEditor("doktor", d);
+  if (act === "del") { await removeItem("doktor", d); orgSel = null; return renderOrgAdmin(); }
+  const t = tierOf(d), ti = TIERS.findIndex(([k]) => k === t);
+  const batch = writeBatch(db);
+  const renumber = (list) => list.forEach((x, i) => batch.update(doc(db, "doktor", x.id), { peringkat: tierOf(x), susunan: i + 1 }));
+  if (act === "left" || act === "right") {
+    const list = tierList(t), i = list.findIndex((x) => x.id === d.id), j = i + (act === "left" ? -1 : 1);
+    if (j < 0 || j >= list.length) return;
+    [list[i], list[j]] = [list[j], list[i]];
+    renumber(list);
+  } else {
+    const nt = TIERS[ti + (act === "up" ? -1 : 1)];
+    if (!nt) return;
+    const from = tierList(t).filter((x) => x.id !== d.id);
+    renumber(from);
+    batch.update(doc(db, "doktor", d.id), { peringkat: nt[0], susunan: tierList(nt[0]).length + 1 });
+  }
+  try { await batch.commit(); } catch (e) { fail(e); }
+}
+
+async function seed(reset, auto) {
+  if (!auto && !confirm(reset ? "Padam semua kandungan sedia ada dan isi semula dengan data contoh?" : "Isi Firestore dengan data contoh?")) return;
   const btn = $("#seedBtn");
-  btn.disabled = true;
+  if (btn) btn.disabled = true;
   try {
     const batch = writeBatch(db);
     if (reset) for (const col of Object.keys(COLS)) (await getDocs(collection(db, col))).forEach((d) => batch.delete(d.ref));
@@ -512,19 +614,30 @@ async function seed(reset) {
     batch.set(doc(db, "tetapan", "hero"), DEFAULTS.hero);
     batch.set(doc(db, "tetapan", "statistik"), { senarai: DEFAULTS.statistik });
     batch.set(doc(db, "tetapan", "kelebihan"), { senarai: DEFAULTS.kelebihan });
-    for (const col of Object.keys(COLS))
-      DEFAULTS[col].forEach((item, i) => batch.set(doc(collection(db, col)), { aktif: true, ...item, susunan: item.susunan ?? i + 1 }));
+    batch.set(doc(db, "tetapan", "organisasi"), DEFAULTS.organisasi);
+    batch.set(doc(db, "tetapan", "seksyen"), DEFAULTS.seksyen);
+    for (const col of Object.keys(COLS)) {
+      // Jangan sentuh data yang admin sudah masukkan (kecuali set semula)
+      const existing = reset ? [] : (await getDocs(collection(db, col))).docs.map((d) => ({ id: d.id, ...d.data() }));
+      let items = DEFAULTS[col];
+      if (existing.length && col !== "doktor") continue;
+      if (col === "doktor" && existing.length) {
+        existing.forEach((d) => !d.peringkat && batch.update(doc(db, "doktor", d.id), { peringkat: tierOf(d) }));
+        if (existing.some((d) => tierOf(d) === "ketua")) items = items.filter((d) => d.peringkat !== "ketua");
+      }
+      items.forEach((item, i) => batch.set(doc(collection(db, col)), { aktif: true, ...item, susunan: item.susunan ?? i + 1 }));
+    }
     await batch.commit();
     await set(ref(rtdb, "status"), { ...DEFAULTS.status, dikemaskini: Date.now() });
-    toast("Data contoh berjaya diisi. Semua kini boleh diedit.");
+    toast(auto ? "Kandungan website dimasukkan ke database — kini semua boleh diedit." : "Data contoh berjaya diisi. Semua kini boleh diedit.");
   } catch (e) { fail(e); }
-  btn.disabled = false;
+  if (btn) btn.disabled = false;
 }
 
 /* =========================================================
    Realtime listeners
    ========================================================= */
-let unsubs = [];
+let unsubs = [], autoSeeded = false;
 function startListeners() {
   const rerender = (keys) => { if (keys.includes(current) && !$("#dlg").open) renderPage(); };
   for (const col of Object.keys(COLS))
@@ -540,13 +653,16 @@ function startListeners() {
   unsubs.push(onSnapshot(doc(db, "tetapan", "umum"), (s) => {
     const first = !("umum" in cache) || (!cache.umum && s.exists());
     cache.umum = s.exists() ? s.data() : null;
+    // Kali pertama admin log masuk: isi kandungan website ke database secara automatik
+    if (!s.exists() && !s.metadata.fromCache && !autoSeeded) { autoSeeded = true; seed(false, true); }
     if (cache.umum?.logo) $("#sideLogo").src = cache.umum.logo;
     if (current === "dashboard" || (first && current === "umum")) renderPage();
   }, fail));
-  for (const id of ["hero", "statistik", "kelebihan"])
+  for (const id of ["hero", "statistik", "kelebihan", "organisasi", "seksyen"])
     unsubs.push(onSnapshot(doc(db, "tetapan", id), (s) => {
       const first = !(id in cache);
       cache[id] = s.exists() ? s.data() : null;
+      if (id === "organisasi" && current === "doktor") return renderPage();
       if (first && (current === id || (current === "lain" && id !== "hero"))) renderPage();
     }, fail));
   unsubs.push(onValue(ref(rtdb, "status"), (s) => { rtStatus = { ...DEFAULTS.status, ...(s.val() || {}) }; }, fail));
@@ -604,3 +720,6 @@ addEventListener("hashchange", () => {
   const h = location.hash.slice(1);
   if (auth.currentUser && PAGES[h] && h !== current) go(h);
 });
+
+// Selepas dialog ditutup, papar semula halaman semasa (perubahan semasa dialog terbuka tidak dirender)
+$("#dlg").addEventListener("close", () => renderPage());
