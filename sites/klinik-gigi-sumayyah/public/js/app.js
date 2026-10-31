@@ -1,6 +1,6 @@
 // KLINIK GIGI SUMAYYAH — paparan awam (data realtime dari Firestore + Realtime Database)
-import { db, rtdb } from "./firebase.js";
-import { DEFAULTS } from "./defaults.js";
+import { db, rtdb } from "./firebase.js?v=20261031b";
+import { DEFAULTS } from "./defaults.js?v=20261031b";
 import { doc, collection, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 import { ref, onValue } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
 
@@ -290,7 +290,8 @@ $$(".hscroll").forEach((sc) => {
 /* ---------------- Render semua ---------------- */
 const renderers = { seksyen: renderSeksyen, umum: renderUmum, hero: renderHero, statistik: renderStats, kelebihan: renderWhy, banner: renderBanner, perkhidmatan: renderServices, pakej: renderPakej, galeri: renderGaleri, doktor: renderDoktor, testimoni: renderTestimoni, soalan: renderFaq };
 function render(key) {
-  (key ? [renderers[key]] : Object.values(renderers)).forEach((fn) => fn());
+  // Satu bahagian gagal tidak menghalang bahagian lain dipaparkan
+  (key ? [renderers[key]] : Object.values(renderers)).forEach((fn) => { try { fn(); } catch (e) { console.error(fn.name, e); } });
   icons();
   observeReveal();
 }

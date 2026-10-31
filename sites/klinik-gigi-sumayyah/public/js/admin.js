@@ -1,6 +1,6 @@
 // KLINIK GIGI SUMAYYAH — Panel Admin
-import { db, rtdb, auth, ADMIN_UID } from "./firebase.js";
-import { DEFAULTS } from "./defaults.js";
+import { db, rtdb, auth, ADMIN_UID } from "./firebase.js?v=20261031b";
+import { DEFAULTS } from "./defaults.js?v=20261031b";
 import { signInWithEmailAndPassword, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 import { doc, collection, onSnapshot, setDoc, addDoc, updateDoc, deleteDoc, getDocs, writeBatch, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 import { ref, onValue, set } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
