@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body { @apply bg-surface text-slate-950 font-sans antialiased; }
+  :focus-visible { outline: 3px solid #0369A1; outline-offset: 2px; }
+  button, a, input, select { @apply min-h-[40px]; }
+}
+@layer components {
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer; }
+  .btn-primary { @apply btn bg-accent text-white hover:bg-sky-800; }
+  .btn-ghost { @apply btn border border-line bg-white text-slate-800 hover:bg-muted; }
+  .btn-danger { @apply btn bg-danger text-white hover:bg-red-700; }
+  .card { @apply rounded-xl border border-line bg-white p-4 shadow-sm; }
+  .input { @apply w-full rounded-lg border border-slate-300 bg-white px-3 text-sm; }
+  .th { @apply px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-mutedfg; }
+  .td { @apply px-3 py-3 text-sm; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }

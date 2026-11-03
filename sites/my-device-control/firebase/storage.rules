@@ -1,0 +1,16 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Fail dalam organisasi: hanya ahli organisasi yang sama boleh baca,
+    // hanya ORG_ADMIN / SUPER_ADMIN boleh tulis (maks 10 MB).
+    match /organizations/{orgId}/{allPaths=**} {
+      allow read: if request.auth != null
+                  && (request.auth.token.orgId == orgId || request.auth.token.role == 'SUPER_ADMIN');
+      allow write: if request.auth != null
+                   && (request.auth.token.orgId == orgId || request.auth.token.role == 'SUPER_ADMIN')
+                   && request.auth.token.role in ['SUPER_ADMIN', 'ORG_ADMIN']
+                   && request.resource.size < 10 * 1024 * 1024;
+    }
+    match /{allPaths=**} { allow read, write: if false; }
+  }
+}

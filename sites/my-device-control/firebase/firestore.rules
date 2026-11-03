@@ -1,0 +1,125 @@
+rules_version = '2';
+
+// MY DEVICE CONTROL — Firestore Security Rules
+// Model: pengasingan organisasi + RBAC melalui Custom Claims { orgId, role }.
+// Claims ditetapkan HANYA oleh Cloud Functions (Admin SDK). Ia bebas penyedia
+// log masuk: Email/Password, Google, Microsoft, SAML dsb. semuanya berfungsi
+// selagi pengguna telah diberi claims (lihat functions: bootstrapOrganization,
+// setUserRole).
+//
+// Peranan: SUPER_ADMIN > ORG_ADMIN > DEVICE_MANAGER > VIEWER ; DEVICE (token peranti)
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- Fungsi bantu ----------
+    function signedIn() { return request.auth != null; }
+    function role() { return request.auth.token.role; }
+    function isSuper() { return signedIn() && role() == 'SUPER_ADMIN'; }
+    function inOrg(orgId) {
+      return signedIn() && (isSuper() || request.auth.token.orgId == orgId);
+    }
+    function isHuman() {
+      return signedIn() && role() in ['SUPER_ADMIN', 'ORG_ADMIN', 'DEVICE_MANAGER', 'VIEWER'];
+    }
+    function canRead(orgId)   { return inOrg(orgId) && isHuman(); }
+    function canManage(orgId) { return inOrg(orgId) && role() in ['SUPER_ADMIN', 'ORG_ADMIN', 'DEVICE_MANAGER']; }
+    function canAdmin(orgId)  { return inOrg(orgId) && role() in ['SUPER_ADMIN', 'ORG_ADMIN']; }
+    function isThisDevice(orgId, deviceId) {
+      return signedIn() && role() == 'DEVICE'
+        && request.auth.token.orgId == orgId
+        && request.auth.token.deviceId == deviceId;
+    }
+    // Medan yang dikemas kini oleh klien admin (selebihnya hanya server).
+    function onlyChanges(keys) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys);
+    }
+
+    // ---------- Organisasi ----------
+    match /organizations/{orgId} {
+      allow read: if canRead(orgId);
+      // Cipta/ubah/padam organisasi hanya melalui Cloud Functions.
+      allow write: if false;
+
+      // ---- Pengguna (profil + peranan) — peranan diubah melalui function sahaja
+      match /users/{userId} {
+        allow read: if canRead(orgId) && (canManage(orgId) || request.auth.uid == userId);
+        allow write: if false;
+      }
+
+      // ---- Peranti ----
+      match /devices/{deviceId} {
+        allow read: if canRead(orgId) || isThisDevice(orgId, deviceId);
+        // Admin hanya boleh sunting metadata; status/lastSeen/enrollment diurus server.
+        allow update: if canManage(orgId)
+          && onlyChanges(['deviceName', 'assignedUserId', 'groupId', 'notes', 'updatedAt'])
+          && request.resource.data.deviceName is string
+          && request.resource.data.deviceName.size() > 0
+          && request.resource.data.deviceName.size() <= 80;
+        // Daftar & padam peranti melalui function (audit + pembersihan token).
+        allow create, delete: if false;
+
+        // Aplikasi dipasang — dilaporkan oleh peranti sendiri.
+        match /installedApps/{pkg} {
+          allow read: if canRead(orgId);
+          allow write: if isThisDevice(orgId, deviceId)
+            && request.resource.data.keys().hasOnly(['packageName', 'label', 'versionName', 'updatedAt']);
+        }
+      }
+
+      // ---- Kumpulan peranti ----
+      match /deviceGroups/{groupId} {
+        allow read: if canRead(orgId);
+        allow create, update: if canManage(orgId)
+          && request.resource.data.name is string
+          && request.resource.data.name.size() > 0
+          && request.resource.data.name.size() <= 80
+          && request.resource.data.keys().hasOnly(['name', 'description', 'policyIds', 'createdAt', 'updatedAt', 'createdBy']);
+        allow delete: if canAdmin(orgId);
+      }
+
+      // ---- Command queue ----
+      // Klien TIDAK boleh menulis command. Hanya function (authorization + audit).
+      // Peranti tidak menulis terus; ia menghantar ack melalui function ackCommand.
+      match /commands/{commandId} {
+        allow read: if canRead(orgId) || (signedIn() && role() == 'DEVICE'
+          && request.auth.token.orgId == orgId
+          && resource.data.deviceId == request.auth.token.deviceId);
+        allow write: if false;
+      }
+
+      // ---- Aplikasi (katalog + polisi) ----
+      match /applications/{appId} {
+        allow read: if canRead(orgId) || (signedIn() && role() == 'DEVICE' && request.auth.token.orgId == orgId);
+        allow create, update, delete: if canAdmin(orgId);
+      }
+
+      // ---- Peraturan penapisan web ----
+      match /webFilteringRules/{ruleId} {
+        allow read: if canRead(orgId) || (signedIn() && role() == 'DEVICE' && request.auth.token.orgId == orgId);
+        allow create, update, delete: if canAdmin(orgId);
+      }
+
+      // ---- Log aktiviti (append-only oleh server) ----
+      match /activityLogs/{logId} {
+        allow read: if canRead(orgId);
+        allow write: if false;
+      }
+
+      // ---- Enrollment (token disimpan sebagai hash, hanya server) ----
+      match /enrollments/{enrollmentId} {
+        allow read: if canManage(orgId);
+        allow write: if false;
+      }
+
+      // ---- Tetapan ----
+      match /settings/{settingId} {
+        allow read: if canRead(orgId);
+        allow write: if canAdmin(orgId);
+      }
+    }
+
+    // Selebihnya ditolak.
+    match /{document=**} { allow read, write: if false; }
+  }
+}
