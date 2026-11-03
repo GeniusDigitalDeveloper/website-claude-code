@@ -30,6 +30,9 @@ pre{margin:0;background:var(--code-bg);color:var(--code-fg);border-radius:12px;p
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--ink-fg);border-color:var(--ink)}
 .frame{display:grid;place-items:start center;background:var(--stage);border-radius:12px;padding:10px;min-width:0}
 iframe{border:0;background:#fff;width:100%;height:70vh;min-height:480px;border-radius:8px;transition:width .35s cubic-bezier(.22,1,.36,1);max-width:100%}
+.apk{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.apk b{font-size:16px;display:block}.apk small{display:block;color:var(--muted);font-size:12px;font-weight:500;word-break:break-all}
+a.cp{display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
 .note{font-size:12px;color:var(--muted);margin:8px 2px 0}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--ink-fg);padding:10px 18px;border-radius:10px;font-weight:700;z-index:99;max-width:calc(100% - 32px)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -46,12 +49,16 @@ iframe{border:0;background:#fff;width:100%;height:70vh;min-height:480px;border-r
 </div>
 <main>
   <section class="panel on" id="p-preview" role="tabpanel">
+    <div class="apk" id="apk">
+      <div><b>APK agent Android</b><small id="apkInfo"></small><small>Boleh pada telefon dan tablet Android apa-apa jenama. Buka aplikasi: kamera terus terbuka, imbas kod QR dari panel admin.</small></div>
+      <a class="cp dl" id="apkBtn" target="_blank" rel="noopener">Muat turun APK</a>
+    </div>
     <div class="bar">
       <div class="seg" role="group" aria-label="Halaman"><button data-pv="index" aria-pressed="false">Index (paparan awam)</button><button data-pv="admin" aria-pressed="true">Admin (log masuk)</button><button data-pv="agent" aria-pressed="false">Agent web</button></div>
       <div class="seg" role="group" aria-label="Saiz"><button data-w="100%" aria-pressed="true">Desktop</button><button data-w="390px" aria-pressed="false">Telefon</button></div>
     </div>
     <div class="frame"><iframe id="fr" title="Preview"></iframe></div>
-    <p class="note">Paparan sebenar fail di tab sebelah. Firebase tidak disambung di sini, jadi senarai peranti kosong. Index terbuka terus tanpa log masuk; admin memerlukan e-mel dan kata laluan.</p>
+    <p class="note">Pautan APK dibuka di GitHub (log masuk GitHub jika diminta). Pasang dengan benarkan "pemasangan dari sumber tidak dikenali". Untuk iPhone, Mac, Linux dan peranti lain, guna agent.html. Paparan sebenar fail di tab sebelah. Firebase tidak disambung di sini, jadi senarai peranti kosong. Index terbuka terus tanpa log masuk; admin memerlukan e-mel dan kata laluan.</p>
   </section>
   <section class="panel" id="p-index" role="tabpanel"></section>
   <section class="panel" id="p-admin" role="tabpanel"></section>
@@ -62,6 +69,9 @@ iframe{border:0;background:#fff;width:100%;height:70vh;min-height:480px;border-r
 </div>
 <script>
 const F = /*__DATA__*/{};
+const APK = /*__APK__*/{};
+document.getElementById("apkBtn").href = APK.url;
+document.getElementById("apkInfo").textContent = `MyDeviceControl-agent.apk · ${APK.size} MB · SHA-256 ${APK.sha.slice(0, 16)}…`;
 const toast = (t) => { const d = document.createElement("div"); d.className = "toast"; d.setAttribute("role", "status"); d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2200); };
 async function copy(text) {
   try { await navigator.clipboard.writeText(text); return true; }
