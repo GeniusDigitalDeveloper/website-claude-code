@@ -49,8 +49,8 @@ class CommandExecutor(private val ctx: Context) {
         if (isOwner()) {
             showKioskLock(); Prefs.setLocked(ctx, true); return Pair(true, null)
         }
-        if (GuardService.instance?.lockScreen() == true) return Pair(true, null)      // kunci melalui Aksesibiliti
-        if (isAdminActive()) { dpm.lockNow(); return Pair(true, null) }
+        if (GuardService.instance?.lockScreen() == true) { Prefs.setLocked(ctx, true); return Pair(true, null) }      // kunci melalui Aksesibiliti
+        if (isAdminActive()) { dpm.lockNow(); Prefs.setLocked(ctx, true); return Pair(true, null) }
         return Pair(false, "Aktifkan Kawalan (Aksesibiliti) pada peranti untuk membolehkan kunci skrin. Ketuk notifikasi pada peranti.")
     }
 

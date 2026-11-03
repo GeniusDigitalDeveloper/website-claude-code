@@ -4,8 +4,10 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.ServiceInfo
 import android.net.VpnService
 import android.os.Build
@@ -49,11 +51,21 @@ class AgentService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
+    /** Dikesan bila pengguna buka kunci telefon sendiri (masuk PIN/corak) — status kembali ONLINE serta-merta. */
+    private val unlockReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (!Prefs.locked(applicationContext)) return
+            Prefs.setLocked(applicationContext, false)
+            scope.launch { runCatching { repo.heartbeat(false, statusText()) } }
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
         repo = Repo(applicationContext)
         executor = CommandExecutor(applicationContext)
         PolicyStore.load(applicationContext)
+        registerReceiver(unlockReceiver, IntentFilter(Intent.ACTION_USER_PRESENT))
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -246,6 +258,7 @@ class AgentService : Service() {
 
     override fun onDestroy() {
         regs.forEach { it.remove() }; regs.clear(); selfReg?.remove(); selfReg = null
+        try { unregisterReceiver(unlockReceiver) } catch (_: Exception) {}
         scope.cancel()
         super.onDestroy()
     }
