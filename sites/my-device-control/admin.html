@@ -186,7 +186,7 @@ const toast = (text, err) => { const d = document.createElement("div"); d.classN
 const errMsg = (e) => ((e && e.message) || "Ralat").replace(/^.*?:\s*/, "");
 
 /* ---------- Keadaan & data ---------- */
-const S = { user: null, claims: {}, devices: [], groups: [], commands: [], logs: [], enrollments: [], admins: [], keep: {}, 
+const S = { user: null, claims: {}, devices: [], groups: [], commands: [], logs: [], enrollments: [], keep: {}, 
   loaded: {}, errors: {}, page: "dashboard", q: "", fs: "", ft: "", pg: 0, sel: new Set(), nav: false };
 const can = () => true;   // semua akaun Authentication ialah admin (alat dalaman)
 let fb = null; // modul Firebase
@@ -196,7 +196,7 @@ const render = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(dr
 const previewBlock = () => { toast("Preview: tiada sambungan Firebase. Muat naik fail dan sambungkan untuk guna sebenar.", true); return Promise.reject(new Error("preview")); };
 function loadPreview() {
   S.user = { email: "preview", uid: "preview" }; S.claims = { role: "ADMIN" };
-  ["devices", "groups", "commands", "logs", "enrollments", "admins"].forEach((k) => (S.loaded[k] = true));
+  ["devices", "groups", "commands", "logs", "enrollments"].forEach((k) => (S.loaded[k] = true));
 }
 
 /* ---------- Firebase ---------- */
@@ -239,12 +239,7 @@ function subscribeAll() {
       (e) => { S.errors[key] = e.message; S.loaded[key] = true; render(); }));
   };
   sub("devices", "devices", "createdAt", 500, onDevices); sub("groups", "deviceGroups", null, 200);
-  watchAdmins(); sub("commands", "commands", "createdAt", 300, applyCmdStatus); sub("logs", "activityLogs", "createdAt", 300); sub("enrollments", "enrollments", "createdAt", 100);
-}
-function watchAdmins() {
-  const { onSnapshot, doc } = fb.F;
-  unsubs.push(onSnapshot(doc(fsdb, "config", "admins"), (d) => { S.admins = (d.data() || {}).emails || []; S.loaded.admins = true; delete S.errors.admins; render(); },
-    (e) => { S.errors.admins = e.message; S.loaded.admins = true; render(); }));
+  sub("commands", "commands", "createdAt", 300, applyCmdStatus); sub("logs", "activityLogs", "createdAt", 300); sub("enrollments", "enrollments", "createdAt", 100);
 }
 async function fsWrite(fn) { if (PREVIEW) return previewBlock(); return fn(fb.F); }
 const ref = (...p) => fb.F.doc(fsdb, ...p);
@@ -369,12 +364,11 @@ function pageLogs() {
   return head("Activity Logs", "Audit tindakan pengurusan dan peristiwa peranti (hanya server boleh menulis)") + `<div class="card" style="padding:0">${state("logs", () => !S.logs.length ? empty("Belum ada aktiviti") : `<ol class="tl">${S.logs.map((l) => `<li><time>${fmt(l.createdAt)}</time><code>${esc(l.type)}</code><span>${esc(l.message)}</span></li>`).join("")}</ol>`)}</div>`;
 }
 function pageUsers() {
-  const me = ((S.user && S.user.email) || "").toLowerCase();
-  return head("Users & Roles", "Akaun admin: hanya e-mel dalam senarai ini boleh mengawal sistem") + state("admins", () => `
-    <div class="card tw"><div style="padding:16px 16px 0"><b>Admin (${S.admins.length})</b><p class="sm" style="margin:2px 0 0">Anda log masuk sebagai <b>${esc(me || "—")}</b>.</p></div>
-      <table style="min-width:420px"><thead><tr><th>E-mel</th><th></th></tr></thead><tbody>${S.admins.map((e) => `<tr><td><b>${esc(e)}</b>${e === me ? ' <span class="badge b-ONLINE">ANDA</span>' : ""}</td><td>${e === me ? "" : `<button class="btn i" data-act="admrm" data-id="${esc(e)}" aria-label="Buang admin ${esc(e)}">${ic("trash", 16, "#DC2626")}</button>`}</td></tr>`).join("")}</tbody></table></div>
-    <div class="card" style="margin-top:12px"><b>Tambah admin baharu</b><p class="sm" style="margin:2px 0 8px">Masukkan e-mel dan kata laluan. Akaun dicipta dan terus boleh log masuk. Jika akaun sudah wujud, hanya akses admin diberi (kata laluan tidak diubah).</p>
-      <div class="row"><input id="ae" type="email" placeholder="E-mel" aria-label="E-mel admin baharu" data-keep value="${esc(S.keep.ae || "")}" style="flex:1;min-width:200px"><input id="ap" type="text" placeholder="Kata laluan (min. 6 aksara)" aria-label="Kata laluan" data-keep value="${esc(S.keep.ap || "")}" style="flex:1;min-width:200px" autocomplete="off"><button class="btn p" data-act="admadd">${ic("plus", 16)}Tambah admin</button></div></div>`);
+  const me = (S.user && S.user.email) || "—";
+  return head("Users & Roles", "Akaun admin panel") + `<div class="card"><b>Anda log masuk sebagai</b><p style="margin:6px 0 0;font-weight:700">${esc(me)}</p>
+    <p class="sm">Hanya e-mel admin yang ditetapkan dalam rules boleh mengawal sistem. Akaun lain yang berjaya mendaftar tidak mendapat akses apa-apa.</p></div>
+    <div class="card" style="margin-top:12px"><b>Peranti tidak memerlukan e-mel</b><p class="sm" style="font-size:14px;margin:6px 0 0">Telefon atau peranti apa-apa jenis dan jenama didaftarkan dengan mengimbas kod QR sahaja, tanpa akaun atau e-mel, kemudian admin menekan Sahkan.</p></div>
+    <div class="card" style="margin-top:12px"><b>Tambah admin baharu</b><p class="sm" style="font-size:14px;margin:6px 0 0">Cipta akaun e-mel dan kata laluan di Firebase Console → Authentication → Users → Add user, kemudian minta pembantu menambah e-mel itu ke senarai admin dalam rules.</p></div>`;
 }
 function pageSettings() {
   const rows = [["Projek Firebase", CONFIG.projectId], ["Akaun", (S.user && (S.user.email || S.user.uid)) || "—"], ["Tempoh OFFLINE", "10 minit tanpa heartbeat"], ["Tamat arahan", "24 jam"]];
@@ -549,32 +543,6 @@ const ACTIONS = {
     const d = byId(el.dataset.id);
     confirmBox({ title: "Tolak peranti", body: `Peranti <b>${esc(d.deviceName)}</b> akan dibuang dan tidak boleh dikawal. Aplikasi pada peranti itu akan melepaskan dirinya.`, label: "Tolak", danger: true,
       run: () => fsWrite(async (F) => { const bt = F.writeBatch(fsdb); bt.delete(ref("devices", d.id)); bt.delete(ref("publicStatus", d.id)); logEv(F, bt, "DEVICE_REJECTED", `Peranti "${d.deviceName}" ditolak`, d.id); await bt.commit(); toast("Peranti ditolak."); }) });
-  },
-  async admadd() {
-    const em = ($("#ae").value || "").trim().toLowerCase(), pw = $("#ap").value || "";
-    if (!/^\S+@\S+\.\S+$/.test(em)) return toast("E-mel tidak sah.", true);
-    if (pw.length < 6) return toast("Kata laluan minimum 6 aksara.", true);
-    try {
-      await fsWrite(async (F) => { const bt = F.writeBatch(fsdb);   // 1) beri akses admin dahulu
-        bt.update(ref("config", "admins"), { emails: F.arrayUnion(em), updatedAt: F.serverTimestamp(), updatedBy: S.user.uid });
-        logEv(F, bt, "ADMIN_ADDED", `Admin ditambah: ${em}`); await bt.commit(); });
-      let note = "Akaun dicipta.";
-      const { appMod, A } = fb, vapp = appMod.initializeApp(CONFIG, "adm-" + Date.now());   // 2) cipta akaun (sesi berasingan)
-      try {
-        const vauth = A.initializeAuth(vapp, { persistence: A.inMemoryPersistence });
-        if (window.__MDC_EMULATOR__) A.connectAuthEmulator(vauth, "http://127.0.0.1:9099", { disableWarnings: true });
-        try { await A.createUserWithEmailAndPassword(vauth, em, pw); await A.signOut(vauth); }
-        catch (e) { if (e.code === "auth/email-already-in-use") note = "Akaun sudah wujud; akses admin diberi."; else throw e; }
-      } finally { await appMod.deleteApp(vapp).catch(() => {}); }
-      S.keep.ae = ""; S.keep.ap = ""; toast(`${em} kini admin. ${note}`); playSound(true); render();
-    } catch (e) { if (e.message !== "preview") { playSound(false); toast(AUTH_ERR[e.code] || errMsg(e), true); } }
-  },
-  admrm(el) {
-    const em = el.dataset.id;
-    confirmBox({ title: "Buang admin", body: `<b>${esc(em)}</b> tidak lagi boleh mengawal sistem. Akaun Authentication tidak dipadam; hanya akses admin dibuang.`, label: "Buang", danger: true,
-      run: () => fsWrite(async (F) => { const bt = F.writeBatch(fsdb);
-        bt.update(ref("config", "admins"), { emails: F.arrayRemove(em), updatedAt: F.serverTimestamp(), updatedBy: S.user.uid });
-        logEv(F, bt, "ADMIN_REMOVED", `Admin dibuang: ${em}`); await bt.commit(); toast("Admin dibuang."); }) });
   },
   encancel(el) {
     const e = S.enrollments.find((x) => x.id === el.dataset.id);

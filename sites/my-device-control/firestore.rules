@@ -1,9 +1,9 @@
 rules_version = '2';
 
 // MY DEVICE CONTROL — Firestore Rules (alat dalaman, satu organisasi)
-//  ADMIN  = akaun e-mel/kata laluan (atau Google) yang e-melnya ada dalam config/admins.emails.
-//           Senarai ini diurus dari panel (Users & Roles). Sesiapa lain yang berjaya mendaftar akaun
-//           TIDAK menjadi admin, jadi sign-up dibuka dengan selamat (diperlukan oleh peranti).
+//  ADMIN  = akaun e-mel/kata laluan (atau Google) yang e-melnya ada dalam adminEmails() di bawah.
+//           Sesiapa lain yang berjaya mendaftar akaun TIDAK menjadi admin, jadi sign-up dibuka dengan
+//           selamat (diperlukan oleh peranti). Untuk menambah admin: tambah e-mel di sini dan deploy.
 //  PERANTI = agent peranti yang log masuk "Anonymous" dan mendaftar dengan kod enrollment sekali guna,
 //           kemudian menunggu admin menekan Sahkan.
 //  AWAM    = index.html (tanpa log masuk) hanya membaca koleksi publicStatus (nama, jenis, status, bateri).
@@ -11,8 +11,8 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Senarai e-mel admin (dokumen config/admins, diurus dari panel)
-    function adminEmails() { return get(/databases/$(database)/documents/config/admins).data.emails; }
+    // Senarai e-mel admin (huruf kecil). Peranti TIDAK memerlukan e-mel; ini hanya untuk log masuk panel admin.
+    function adminEmails() { return ['mediapc2026@gmail.com', 'izzulmedia01@gmail.com']; }
 
     function signedIn() { return request.auth != null; }
     function provider() { return request.auth.token.firebase.sign_in_provider; }
@@ -163,15 +163,6 @@ service cloud.firestore {
           && request.resource.data.type in ['DEVICE_REGISTERED', 'DEVICE_ONLINE', 'COMMAND_EXECUTED', 'COMMAND_FAILED']
           && request.resource.data.createdAt == request.time;
       allow update, delete: if false;
-    }
-
-    // Senarai admin: hanya admin boleh baca/ubah, dan tidak boleh mengeluarkan dirinya sendiri
-    match /config/{docId} {
-      allow read: if isAdmin();
-      allow write: if isAdmin() && docId == 'admins'
-        && request.resource.data.keys().hasOnly(['emails', 'updatedAt', 'updatedBy'])
-        && request.resource.data.emails is list && request.resource.data.emails.size() >= 1 && request.resource.data.emails.size() <= 30
-        && request.auth.token.email.lower() in request.resource.data.emails;
     }
 
     match /settings/{settingId} {
