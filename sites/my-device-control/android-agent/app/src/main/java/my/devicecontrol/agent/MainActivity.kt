@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var status: TextView
     private lateinit var input: EditText
     private lateinit var enrollBtn: Button
+    private lateinit var releaseBtn: Button
 
     private val scan = registerForActivityResult(ScanContract()) { r -> r.contents?.let { input.setText(it); enroll() } }
     private fun startScan() =
@@ -58,6 +59,8 @@ class MainActivity : AppCompatActivity() {
         col.addView(button("Imbas kod QR") { startScan() })
         enrollBtn = button("Daftar dengan kod yang ditampal") { enroll() }
         col.addView(enrollBtn)
+        releaseBtn = button("Lepaskan peranti (perlu e-mel & kata laluan admin)") { askRelease() }
+        col.addView(releaseBtn)
         setContentView(ScrollView(this).apply { addView(col) })
 
         if (Build.VERSION.SDK_INT >= 33) notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
@@ -76,7 +79,37 @@ class MainActivity : AppCompatActivity() {
             append("Device Owner (kiosk/unlock jauh/reboot): ").append(if (ex.isOwner()) "ya" else "tidak")
         }
         enrollBtn.isEnabled = !enrolled
+        releaseBtn.visibility = if (enrolled) android.view.View.VISIBLE else android.view.View.GONE
         if (enrolled) ContextCompat.startForegroundService(this, Intent(this, AgentService::class.java))
+    }
+
+    private fun askRelease() {
+        val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(48, 24, 48, 0) }
+        val em = EditText(this).apply { hint = "E-mel admin"; inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS }
+        val pw = EditText(this).apply { hint = "Kata laluan"; inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD }
+        box.addView(em); box.addView(pw)
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Lepaskan peranti")
+            .setMessage("Masukkan e-mel dan kata laluan salah satu akaun Firebase Authentication. Peranti akan dibuang dari panel dan aplikasi boleh dinyahpasang.")
+            .setView(box).setNegativeButton("Batal", null)
+            .setPositiveButton("Lepaskan") { _, _ -> release(em.text.toString().trim(), pw.text.toString()) }.show()
+    }
+
+    private fun release(email: String, password: String) {
+        if (email.isEmpty() || password.isEmpty()) { toast("Masukkan e-mel dan kata laluan."); return }
+        toast("Mengesahkan…")
+        lifecycleScope.launch {
+            try {
+                Repo(applicationContext).adminRelease(email, password)
+                CommandExecutor(this@MainActivity).release()
+                Prefs.setEnrolled(this@MainActivity, false)
+                com.google.firebase.auth.FirebaseAuth.getInstance().signOut()
+                stopService(Intent(this@MainActivity, AgentService::class.java))
+                toast("Peranti dilepaskan. Anda boleh menyahpasang aplikasi ini.")
+                refresh()
+                startActivity(Intent(Intent.ACTION_DELETE, android.net.Uri.parse("package:$packageName")))
+            } catch (e: Exception) { toast(e.message ?: "Gagal melepaskan peranti.") }
+        }
     }
 
     private fun requestAdmin() {

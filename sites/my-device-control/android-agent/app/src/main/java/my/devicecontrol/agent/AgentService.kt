@@ -11,7 +11,9 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +33,8 @@ import java.util.concurrent.ConcurrentHashMap
 class AgentService : Service() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var registration: ListenerRegistration? = null
+    private var selfReg: ListenerRegistration? = null
+    @Volatile private var released = false
     private val busy = ConcurrentHashMap.newKeySet<String>()
     private lateinit var repo: Repo
     private lateinit var executor: CommandExecutor
@@ -70,13 +74,40 @@ class AgentService : Service() {
                 if (uid == null) delay(30_000)
             }
             val id = uid ?: return@launch
+            executor.protect()
             if (Prefs.locked(applicationContext) && executor.isOwner()) executor.showKioskLock()
             listenCommands(id)
+            listenSelf(id)
             while (isActive) {
-                runCatching { repo.heartbeat(Prefs.locked(applicationContext)) }
+                runCatching { repo.heartbeat(Prefs.locked(applicationContext), executor.isAdminActive()) }
                 delay(AgentConfig.HEARTBEAT_MS)
             }
         }
+    }
+
+    /** Jika rekod peranti dipadam oleh admin, peranti ini dilepaskan dari kawalan. */
+    private fun listenSelf(uid: String) {
+        selfReg = FirebaseFirestore.getInstance().collection("devices").document(uid).addSnapshotListener { snap, e ->
+            if (e != null) {
+                if (e is FirebaseFirestoreException && e.code == FirebaseFirestoreException.Code.PERMISSION_DENIED) scope.launch { releaseDevice() }
+                return@addSnapshotListener
+            }
+            if (snap != null && !snap.exists() && !snap.metadata.isFromCache) scope.launch { releaseDevice() }
+        }
+    }
+
+    private fun releaseDevice() {
+        if (released) return
+        released = true
+        registration?.remove(); registration = null; selfReg?.remove(); selfReg = null
+        executor.release()
+        Prefs.setEnrolled(applicationContext, false)
+        FirebaseAuth.getInstance().signOut()
+        val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        nm.notify(2, NotificationCompat.Builder(this, "agent").setSmallIcon(android.R.drawable.ic_lock_idle_lock)
+            .setContentTitle("MY DEVICE CONTROL").setContentText("Peranti ini tidak lagi diurus oleh pentadbir.").build())
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        stopSelf()
     }
 
     private fun listenCommands(uid: String) {
@@ -106,14 +137,14 @@ class AgentService : Service() {
             else ref.update(mapOf("status" to "FAILED", "errorMessage" to (msg ?: "Gagal").take(300))).await()
             runCatching {
                 repo.log(if (ok) "COMMAND_EXECUTED" else "COMMAND_FAILED", if (ok) "$type berjaya" else "$type gagal: $msg")
-                repo.heartbeat(Prefs.locked(applicationContext))
+                repo.heartbeat(Prefs.locked(applicationContext), executor.isAdminActive())
             }
             if (ok && type == "REBOOT") executor.reboot()
         } catch (_: Exception) { /* arahan kekal SENT/PENDING dan dicuba semula pada snapshot seterusnya */ }
     }
 
     override fun onDestroy() {
-        registration?.remove(); registration = null
+        registration?.remove(); registration = null; selfReg?.remove(); selfReg = null
         scope.cancel()
         super.onDestroy()
     }

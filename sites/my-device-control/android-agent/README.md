@@ -41,3 +41,9 @@ Untuk pengeluaran: provisioning QR semasa persediaan awal peranti, zero-touch at
 - Log masuk **Anonymous** mesti diaktifkan di Firebase Console > Authentication > Sign-in method.
 - Heartbeat berjalan dalam perkhidmatan latar depan (4 minit). Penjimatan bateri pengeluar (HONOR) mungkin menghentikannya: tetapkan aplikasi "tiada had bateri". Android 15 menghadkan permulaan semula perkhidmatan `dataSync` selepas boot; Device Owner boleh guna jenis `systemExempted`.
 - Belum ada: FCM (arahan diterima melalui sambungan Firestore langsung), dasar aplikasi (Fasa 2 lanjutan), sekat aplikasi, tapisan web (Fasa 3), skrin langsung (Fasa 4).
+
+## Nyahpasang dan melepaskan peranti
+- **Selagi diurus:** aplikasi tidak boleh dinyahpasang begitu sahaja. Pentadbir peranti aktif menghalang nyahpasang sehingga dinyahaktifkan. Dengan **Device Owner**, nyahpasang disekat sepenuhnya.
+- **Admin buang peranti dari panel:** peranti dikesan terlepas (secara langsung, atau apabila ia kembali dalam talian). Agent berhenti, melepaskan kebenaran pentadbir/Device Owner dan kiosk, lalu aplikasi **boleh dinyahpasang tanpa e-mel atau kata laluan**.
+- **Pada peranti itu sendiri:** tekan "Lepaskan peranti" dan masukkan e-mel serta kata laluan salah satu akaun Firebase Authentication. Peranti dibuang dari panel dan aplikasi terus ditawarkan untuk dinyahpasang.
+- **Had Android:** tanpa Device Owner, pengguna masih boleh menyahaktifkan pentadbir peranti di Tetapan lalu menyahpasang tanpa kata laluan; Android tidak membenarkan aplikasi menghalangnya. Panel akan menandakan peranti itu **ERROR** (pentadbir peranti dinyahaktifkan) pada heartbeat seterusnya. Jika peranti luar talian semasa dibuang dari panel, ia kekal dilindungi sehingga ia kembali dalam talian.

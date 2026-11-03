@@ -26,6 +26,18 @@ class CommandExecutor(private val ctx: Context) {
         else -> Pair(false, "Jenis arahan tidak disokong: $type")
     }
 
+    /** Selagi diurus: Device Owner menghalang nyahpasang; pentadbir peranti biasa menghalang nyahpasang sehingga dinyahaktifkan. */
+    fun protect() { try { if (isOwner()) dpm.setUninstallBlocked(admin, ctx.packageName, true) } catch (_: Exception) {} }
+
+    /** Dilepaskan oleh admin: buang semua kawalan (kiosk, Device Owner, pentadbir peranti). */
+    @Suppress("DEPRECATION")
+    fun release() {
+        LockActivity.current?.finish(); Prefs.setLocked(ctx, false)
+        try { if (isOwner()) dpm.setUninstallBlocked(admin, ctx.packageName, false) } catch (_: Exception) {}
+        try { if (isOwner()) dpm.clearDeviceOwnerApp(ctx.packageName) } catch (_: Exception) {}
+        try { if (isAdminActive()) dpm.removeActiveAdmin(admin) } catch (_: Exception) {}
+    }
+
     fun reboot() { if (isOwner()) dpm.reboot(admin) }
 
     fun showKioskLock() {

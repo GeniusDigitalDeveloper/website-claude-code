@@ -200,3 +200,31 @@ test('JENIS PERANTI: IOS/MAC/LINUX/OTHER dibenarkan; jenis rawak ditolak', async
   }
   await assertFails(setDoc(doc(admin(), 'publicStatus/pub-x'), { deviceName: 'P', deviceType: 'TOASTER', status: 'ONLINE' }));
 });
+
+test('DIPADAM: selepas admin padam peranti, ia tidak boleh lagi menulis status/heartbeat/arahan/baca dirinya', async () => {
+  await env.withSecurityRulesDisabled(async (c) => { const f = c.firestore();
+    await setDoc(doc(f, 'devices/gone1'), { deviceId: 'gone1', deviceName: 'G', deviceType: 'ANDROID', status: 'ONLINE', enrollmentStatus: 'ENROLLED' });
+    await setDoc(doc(f, 'publicStatus/gone1'), { deviceName: 'G', deviceType: 'ANDROID', status: 'ONLINE' });
+    await setDoc(doc(f, 'commands/c-gone'), { deviceId: 'gone1', commandType: 'LOCK', status: 'SENT', expiresAt: future() }); });
+  const f = dev('gone1');
+  await assertSucceeds(updateDoc(doc(f, 'devices/gone1'), { status: 'ONLINE', lastSeen: serverTimestamp(), updatedAt: serverTimestamp() }));
+  await assertSucceeds(deleteDoc(doc(admin(), 'devices/gone1')));
+  await assertFails(updateDoc(doc(f, 'devices/gone1'), { status: 'ONLINE', lastSeen: serverTimestamp(), updatedAt: serverTimestamp() }));
+  await assertFails(updateDoc(doc(f, 'publicStatus/gone1'), { status: 'ONLINE', updatedAt: serverTimestamp() }));
+  await assertFails(updateDoc(doc(f, 'commands/c-gone'), { status: 'EXECUTED', executedAt: serverTimestamp() }));
+  await assertFails(getDoc(doc(f, 'devices/gone1')));
+  await assertFails(setDoc(doc(f, 'devices/gone1'), { deviceId: 'gone1', deviceName: 'G', deviceType: 'ANDROID', status: 'ONLINE' }));
+});
+
+test('LEPASKAN DI PERANTI: dengan akaun admin, peranti + publicStatus dipadam dan log ditulis dalam satu batch; anonymous tidak boleh', async () => {
+  await env.withSecurityRulesDisabled(async (c) => { const f = c.firestore();
+    await setDoc(doc(f, 'devices/rel1'), { deviceId: 'rel1', deviceName: 'R', deviceType: 'ANDROID', status: 'ONLINE', enrollmentStatus: 'ENROLLED' });
+    await setDoc(doc(f, 'publicStatus/rel1'), { deviceName: 'R', deviceType: 'ANDROID', status: 'ONLINE' }); });
+  const a = admin(); const bad = writeBatch(dev('rel1'));
+  bad.delete(doc(dev('rel1'), 'devices/rel1'));
+  await assertFails(bad.commit());
+  const b = writeBatch(a);
+  b.delete(doc(a, 'devices/rel1')); b.delete(doc(a, 'publicStatus/rel1'));
+  b.set(doc(collection(a, 'activityLogs')), { type: 'DEVICE_REMOVED', message: 'dilepaskan', actorId: 'adm', deviceId: 'rel1', createdAt: serverTimestamp() });
+  await assertSucceeds(b.commit());
+});

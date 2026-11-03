@@ -186,7 +186,7 @@ const toast = (text, err) => { const d = document.createElement("div"); d.classN
 const errMsg = (e) => ((e && e.message) || "Ralat").replace(/^.*?:\s*/, "");
 
 /* ---------- Keadaan & data ---------- */
-const S = { user: null, claims: {}, devices: [], groups: [], commands: [], logs: [], 
+const S = { user: null, claims: {}, devices: [], groups: [], commands: [], logs: [], enrollments: [], 
   loaded: {}, errors: {}, page: "dashboard", q: "", fs: "", ft: "", pg: 0, sel: new Set(), nav: false };
 const can = () => true;   // semua akaun Authentication ialah admin (alat dalaman)
 let fb = null; // modul Firebase
@@ -196,7 +196,7 @@ const render = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(dr
 const previewBlock = () => { toast("Preview: tiada sambungan Firebase. Muat naik fail dan sambungkan untuk guna sebenar.", true); return Promise.reject(new Error("preview")); };
 function loadPreview() {
   S.user = { email: "preview", uid: "preview" }; S.claims = { role: "ADMIN" };
-  ["devices", "groups", "commands", "logs"].forEach((k) => (S.loaded[k] = true));
+  ["devices", "groups", "commands", "logs", "enrollments"].forEach((k) => (S.loaded[k] = true));
 }
 
 /* ---------- Firebase ---------- */
@@ -232,7 +232,7 @@ function subscribeAll() {
       (e) => { S.errors[key] = e.message; S.loaded[key] = true; render(); }));
   };
   sub("devices", "devices", "createdAt", 500, applyStatus); sub("groups", "deviceGroups", null, 200);
-  sub("commands", "commands", "createdAt", 300, applyCmdStatus); sub("logs", "activityLogs", "createdAt", 300);
+  sub("commands", "commands", "createdAt", 300, applyCmdStatus); sub("logs", "activityLogs", "createdAt", 300); sub("enrollments", "enrollments", "createdAt", 100);
 }
 async function fsWrite(fn) { if (PREVIEW) return previewBlock(); return fn(fb.F); }
 const ref = (...p) => fb.F.doc(fsdb, ...p);
@@ -278,7 +278,7 @@ function pageDashboard() {
   const D = S.devices, by = (s) => D.filter((d) => d.status === s).length;
   const stat = (l, v, i, c = "#0F172A") => `<div class="card stat lift"><div class="ic">${ic(i, 20, c)}</div><div><b data-n="${v}">${v}</b><span>${l}</span></div></div>`;
   const attention = D.filter((d) => d.status === "ERROR" || (typeof d.batteryLevel === "number" && d.batteryLevel < 15)).length;
-  const pending = D.filter((d) => d.status === "ENROLLMENT_PENDING" || d.enrollmentStatus === "PENDING").length;
+  const pending = S.enrollments.filter((e) => e.status === "PENDING").length;
   const COL = { ONLINE: "#047857", OFFLINE: "#64748B", LOCKED: "#B45309", ENROLLMENT_PENDING: "#0369A1", ERROR: "#DC2626" };
   // donut
   const cnt = {}; D.forEach((d) => (cnt[d.status] = (cnt[d.status] || 0) + 1));
@@ -315,8 +315,12 @@ function pageDevices() {
   const PER = 10, pages = Math.max(1, Math.ceil(rows.length / PER)); if (S.pg >= pages) S.pg = pages - 1;
   const view = rows.slice(S.pg * PER, S.pg * PER + PER), mg = can("DEVICE_MANAGER"), ad = can("ORG_ADMIN");
   const opts = (arr, cur, all) => `<option value="">${all}</option>` + arr.map((a) => `<option ${a === cur ? "selected" : ""}>${a}</option>`).join("");
+  const pend = S.enrollments.filter((e) => e.status === "PENDING");
+  const left = (e) => { const t = ms(e.expiresAt) - Date.now(); return t <= 0 ? '<span class="badge b-EXPIRED">TAMAT TEMPOH</span>' : t < 3600e3 ? Math.ceil(t / 60e3) + " min lagi" : Math.floor(t / 3600e3) + " jam lagi"; };
+  const pendCard = pend.length ? `<div class="card tw" style="margin-bottom:12px"><div style="padding:16px 16px 0"><b>Menunggu imbasan (${pend.length})</b><p class="sm" style="margin:2px 0 0">Kod enrollment sudah dicipta tetapi peranti belum mengimbasnya. Batalkan jika tidak diperlukan; kod itu tidak boleh digunakan lagi.</p></div>
+    <table style="min-width:480px"><thead><tr><th>Nama</th><th>Jenis</th><th>Tamat</th><th></th></tr></thead><tbody>${pend.map((e) => `<tr><td><b>${esc(e.deviceName)}</b></td><td>${esc(e.deviceType)}</td><td>${left(e)}</td><td><button class="btn i" data-act="encancel" data-id="${esc(e.id)}" aria-label="Batalkan enrollment ${esc(e.deviceName)}">${ic("trash", 16, "#DC2626")}</button></td></tr>`).join("")}</tbody></table></div>` : "";
   return head("All Devices", S.devices.length + " peranti", (mg ? `<button class="btn p" data-act="enroll">${ic("plus", 16)}Daftar peranti</button>` : "") + (ad ? `<button class="btn d" data-act="lockall" ${S.devices.length ? "" : "disabled"}>${ic("lock", 16)}Lock All Devices</button>` : "")) + `
-  <div class="card row" style="margin-bottom:12px"><div class="search">${ic("search", 16, "#94a3b8")}<input id="q" aria-label="Cari peranti" placeholder="Cari nama / ID / model" value="${esc(S.q)}"></div>
+  ${pendCard}<div class="card row" style="margin-bottom:12px"><div class="search">${ic("search", 16, "#94a3b8")}<input id="q" aria-label="Cari peranti" placeholder="Cari nama / ID / model" value="${esc(S.q)}"></div>
     <select id="fs" aria-label="Tapis status" style="width:auto">${opts(["ONLINE", "OFFLINE", "LOCKED", "ENROLLMENT_PENDING", "ERROR"], S.fs, "Semua status")}</select>
     <select id="ft" aria-label="Tapis jenis" style="width:auto">${opts(["ANDROID", "IOS", "WINDOWS", "MAC", "LINUX", "OTHER"], S.ft, "Semua jenis")}</select>
     ${mg && S.sel.size ? `<button class="btn" data-act="lock-sel">${ic("lock", 16)}Lock (${S.sel.size})</button><button class="btn" data-act="unlock-sel">${ic("unlock", 16)}Unlock (${S.sel.size})</button>` : ""}</div>
@@ -496,7 +500,7 @@ const ACTIONS = {
   lockall() { confirmBox({ title: "LOCK ALL DEVICES", body: QUEUE_NOTE, label: "Lock semua", danger: true, requireText: "LOCK ALL", run: () => send({ commandType: "LOCK", all: true }) }); },
   remove(el) {
     const d = byId(el.dataset.id);
-    openModal(`<h2>Nyahdaftar peranti</h2><p class="sm" style="font-size:14px">Peranti <b>${esc(d.deviceName)}</b> akan dibuang dan arahan tertunggak dibatalkan. Untuk mengesahkan, masukkan e-mel dan kata laluan <b>salah satu akaun</b> dalam Firebase Authentication.</p>
+    openModal(`<h2>Nyahdaftar peranti</h2><p class="sm" style="font-size:14px">Peranti <b>${esc(d.deviceName)}</b> akan dibuang dan arahan tertunggak dibatalkan. Peranti dilepaskan dari kawalan dan aplikasi agent boleh dinyahpasang tanpa e-mel/kata laluan. Untuk mengesahkan, masukkan e-mel dan kata laluan <b>salah satu akaun</b> dalam Firebase Authentication.</p>
       <label class="f" for="vx">E-mel</label><input id="vx" type="email" autocomplete="off" style="margin-top:4px">
       <label class="f" for="vp">Kata laluan</label><span class="pw"><input id="vp" type="password" autocomplete="off"><button type="button" class="eye" data-act="eye" aria-label="Tunjuk kata laluan" aria-pressed="false">${ic("eye", 20)}</button></span>
       <p id="vmsg" role="alert" style="min-height:22px;margin:8px 0 0;font-size:14px;color:#DC2626"></p>
@@ -513,6 +517,11 @@ const ACTIONS = {
         }
       };
     });
+  },
+  encancel(el) {
+    const e = S.enrollments.find((x) => x.id === el.dataset.id);
+    confirmBox({ title: "Batalkan enrollment", body: `Kod enrollment untuk <b>${esc(e.deviceName)}</b> akan dipadam. Peranti tidak lagi boleh mendaftar dengan kod itu.`, label: "Batalkan kod", danger: true,
+      run: () => fsWrite(async (F) => { const bt = F.writeBatch(fsdb); bt.delete(ref("enrollments", e.id)); logEv(F, bt, "ENROLLMENT_CANCELLED", `Enrollment "${e.deviceName}" dibatalkan`); await bt.commit(); toast("Enrollment dibatalkan."); }) });
   },
   edit(el) {
     const d = byId(el.dataset.id);

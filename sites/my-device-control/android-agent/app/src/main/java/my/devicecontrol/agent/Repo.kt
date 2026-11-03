@@ -3,6 +3,7 @@ package my.devicecontrol.agent
 import android.content.Context
 import android.os.BatteryManager
 import android.os.Build
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -75,10 +76,10 @@ class Repo(private val ctx: Context) {
         }
     }
 
-    suspend fun heartbeat(locked: Boolean) {
+    suspend fun heartbeat(locked: Boolean, adminOk: Boolean = true) {
         val id = uid ?: return
         val now = FieldValue.serverTimestamp()
-        val status = if (locked) "LOCKED" else "ONLINE"
+        val status = if (locked) "LOCKED" else if (!adminOk) "ERROR" else "ONLINE"   // ERROR = pentadbir peranti dinyahaktifkan
         val bat = battery()
         val batch = db.batch()
         batch.update(db.collection("devices").document(id), mapOf(
@@ -89,6 +90,30 @@ class Repo(private val ctx: Context) {
             "status" to status, "batteryLevel" to bat, "lastSeen" to now, "updatedAt" to now
         ))
         batch.commit().await()
+    }
+
+    /**
+     * Lepaskan peranti ini dengan e-mel + kata laluan SALAH SATU akaun admin (Firebase Authentication).
+     * Log masuk melalui aplikasi Firebase kedua supaya identiti peranti tidak hilang jika kelayakan salah.
+     */
+    suspend fun adminRelease(email: String, password: String) {
+        val id = uid ?: throw IllegalStateException("Peranti ini belum didaftarkan.")
+        val app = FirebaseApp.initializeApp(ctx, FirebaseApp.getInstance().options, "release-" + System.currentTimeMillis())
+        try {
+            val vauth = FirebaseAuth.getInstance(app)
+            val admin = try { vauth.signInWithEmailAndPassword(email, password).await().user }
+            catch (e: Exception) { throw IllegalStateException("E-mel atau kata laluan salah.") }
+            if (admin == null || admin.isAnonymous) throw IllegalStateException("Akaun tidak sah.")
+            val vdb = FirebaseFirestore.getInstance(app)
+            val batch = vdb.batch()
+            batch.delete(vdb.collection("devices").document(id))
+            batch.delete(vdb.collection("publicStatus").document(id))
+            batch.set(vdb.collection("activityLogs").document(), hashMapOf<String, Any?>(
+                "type" to "DEVICE_REMOVED", "message" to "Peranti dilepaskan pada peranti sendiri (disahkan: ${admin.email})".take(200),
+                "actorId" to admin.uid, "deviceId" to id, "createdAt" to FieldValue.serverTimestamp()))
+            batch.commit().await()
+            vauth.signOut()
+        } finally { app.delete() }
     }
 
     suspend fun log(type: String, message: String) {
