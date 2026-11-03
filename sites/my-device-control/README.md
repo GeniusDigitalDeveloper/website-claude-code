@@ -2,7 +2,7 @@
 
 Pengurusan peranti berpusat (tablet Android HONOR + laptop Windows). Firebase projek: `my-devide-control`.
 
-Buka **`preview.html`**: ada preview hidup, langkah 1–8 dan butang salin untuk setiap fail.
+Buka **`preview.html`**: 5 tab (Preview, index.html, admin.html, Rules Database, Rules Firestore), setiap satu ada butang salin.
 
 | Fail | Fungsi |
 |---|---|
