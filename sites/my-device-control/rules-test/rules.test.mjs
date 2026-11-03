@@ -169,3 +169,16 @@ test('RTDB: peranti tulis heartbeat sendiri; admin baca; peranti lain/anon tidak
   await assertSucceeds(get(ref(adminCtx().database(), 'presence')));
   await assertFails(get(ref(devCtx('dev1').database(), 'presence')));
 });
+
+test('AGENT ANDROID: heartbeat (devices + publicStatus) dan kitaran arahan seperti kod Kotlin', async () => {
+  await env.withSecurityRulesDisabled(async (c) => { const f = c.firestore();
+    await setDoc(doc(f, 'publicStatus/dev1'), { deviceName: 'T1', deviceType: 'ANDROID', status: 'ONLINE' });
+    await setDoc(doc(f, 'commands/c-agent'), { deviceId: 'dev1', commandType: 'LOCK', status: 'PENDING', expiresAt: future() }); });
+  const f = dev('dev1'); const b = writeBatch(f);
+  b.update(doc(f, 'devices/dev1'), { status: 'ONLINE', isLocked: false, batteryLevel: null, osVersion: 'Android 14', appVersion: '0.1.0', lastSeen: serverTimestamp(), updatedAt: serverTimestamp() });
+  b.update(doc(f, 'publicStatus/dev1'), { status: 'ONLINE', batteryLevel: null, lastSeen: serverTimestamp(), updatedAt: serverTimestamp() });
+  await assertSucceeds(b.commit());
+  await assertSucceeds(updateDoc(doc(f, 'commands/c-agent'), { status: 'SENT', sentAt: serverTimestamp() }));
+  await assertSucceeds(updateDoc(doc(f, 'commands/c-agent'), { status: 'EXECUTED', executedAt: serverTimestamp() }));
+  await assertSucceeds(addDoc(collection(f, 'activityLogs'), { type: 'COMMAND_EXECUTED', message: 'LOCK berjaya', actorId: null, deviceId: 'dev1', createdAt: serverTimestamp() }));
+});

@@ -450,7 +450,7 @@ async function mkEnroll(d) {
     const token = randToken(), bt = F.writeBatch(fsdb);
     bt.set(F.doc(fsdb, "enrollments", token), { deviceName: d.deviceName, deviceType: d.deviceType, groupId: d.groupId, assignedUserId: null, status: "PENDING", createdBy: S.user.uid, createdAt: F.serverTimestamp(), expiresAt: F.Timestamp.fromMillis(Date.now() + 47 * 3600e3) });
     logEv(F, bt, "ENROLLMENT_CREATED", `Enrollment ${d.deviceType} "${d.deviceName}"`); await bt.commit();
-    return { token, qrPayload: JSON.stringify({ v: 1, projectId: CONFIG.projectId, code: token }) };
+    return { token, qrPayload: JSON.stringify({ v: 1, projectId: CONFIG.projectId, code: token, name: d.deviceName, type: d.deviceType }) };
   });
 }
 const byId = (id) => S.devices.find((d) => d.id === id);
@@ -499,10 +499,10 @@ const ACTIONS = {
         try {
           const r = await mkEnroll({ deviceType: m.querySelector("#et").value, deviceName: name, groupId: m.querySelector("#eg").value || null });
           let qr = ""; try { await loadQR(); const q = window.qrcode(0, "M"); q.addData(r.qrPayload); q.make(); qr = q.createSvgTag({ cellSize: 4, margin: 2, scalable: true }); } catch (e) { qr = '<p class="sm">Kod QR tidak dapat dijana (pustaka tidak dimuat). Gunakan token di bawah.</p>'; }
-          m.querySelector("#ebody").innerHTML = `<div style="width:230px;margin:0 auto" role="img" aria-label="Kod QR enrollment">${qr}</div><p class="sm" style="font-size:14px">Imbas kod QR dari agent peranti, atau salin token. <b>Token dipaparkan sekali sahaja</b>, sah 24 jam, sekali guna.</p>
-            <div class="row" style="flex-wrap:nowrap"><input readonly id="tk" aria-label="Token enrollment" class="mono" value="${esc(r.token)}"><button class="btn i" id="cp" aria-label="Salin token">${ic("copy", 16)}</button></div>
+          m.querySelector("#ebody").innerHTML = `<div style="width:230px;margin:0 auto" role="img" aria-label="Kod QR enrollment">${qr}</div><p class="sm" style="font-size:14px">Dalam aplikasi agent, imbas kod QR atau tampal kod di bawah. <b>Dipaparkan sekali sahaja</b>, sah 47 jam, sekali guna.</p>
+            <div class="row" style="flex-wrap:nowrap"><input readonly id="tk" aria-label="Kod enrollment" class="mono" value="${esc(r.qrPayload)}"><button class="btn i" id="cp" aria-label="Salin kod enrollment">${ic("copy", 16)}</button></div>
             <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn p" data-close>Selesai</button></div>`;
-          m.querySelector("#cp").onclick = () => { navigator.clipboard.writeText(r.token); toast("Token disalin."); };
+          m.querySelector("#cp").onclick = () => { navigator.clipboard.writeText(r.qrPayload).then(() => toast("Kod enrollment disalin."), () => { m.querySelector("#tk").select(); toast("Pilih dan salin kod secara manual.", true); }); };
         } catch (e) { if (e.message !== "preview") toast(errMsg(e), true); }
       };
     });
