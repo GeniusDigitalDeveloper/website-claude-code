@@ -1,13 +1,18 @@
 # MY DEVICE CONTROL
 
-Pengurusan peranti berpusat (tablet Android HONOR + laptop Windows). **Fasa 1**: dashboard, Auth, Firestore, pendaftaran peranti, kumpulan, status/heartbeat, log aktiviti, command queue.
+Pengurusan peranti berpusat (tablet Android HONOR + laptop Windows). Firebase projek: `my-devide-control`.
 
-```
-web/            Next.js (eksport statik) — hos di Interactive Link
-firebase/       rules, indeks, Cloud Functions, skrip, ujian rules
-android-agent/  Fasa 2 (belum dibina)
-windows-agent/  Fasa 5 (belum dibina)
-docs/           ARCHITECTURE, FIREBASE_SETUP, DEPLOYMENT, ANDROID_ENROLLMENT, WINDOWS_ENROLLMENT
-design-system/  MASTER.md (UI UX Pro Max)
-```
-Mula: [docs/FIREBASE_SETUP.md](docs/FIREBASE_SETUP.md) → [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+Buka **`preview.html`**: ada preview hidup, langkah 1–8 dan butang salin untuk setiap fail.
+
+| Fail | Fungsi |
+|---|---|
+| `index.html` | Log masuk (satu fail lengkap: HTML + CSS + JS) |
+| `admin.html` | Dashboard admin (satu fail lengkap) |
+| `firestore.rules` | Rules Firestore |
+| `database.rules.json` | Rules Realtime Database |
+| `functions/index.js` | Cloud Functions (backend selamat) |
+| `firebase.json`, `firestore.indexes.json` | Konfigurasi deploy |
+| `scripts/link-existing-admins.mjs` | Hubungkan semua akaun Auth sedia ada |
+| `build-preview.py` + `preview.template.html` | Jana semula `preview.html` selepas ubah fail: `python3 build-preview.py` |
+| `rules-test/` | Ujian rules Firestore (emulator): `cd rules-test && npm i && npm test` |
+| `android-agent/`, `windows-agent/` | Fasa 2 / 5 (belum dibina) |

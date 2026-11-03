@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MY DEVICE CONTROL — Admin</title>
+<style>
+:root{--primary:#0F172A;--accent:#0369A1;--bg:#F8FAFC;--line:#E2E8F0;--muted:#475569;--danger:#DC2626;--ok:#047857;--warn:#B45309;--chip:#E8ECF1}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.5 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:#020617}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+aside{background:#fff;border-right:1px solid var(--line);padding:12px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.brand{display:flex;gap:10px;align-items:center;padding:6px 8px 14px;font-weight:800;font-size:13px;line-height:1.15}
+.brand i{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:var(--primary);color:#fff}
+nav{display:flex;flex-direction:column;gap:2px;overflow:auto}
+nav a{display:flex;gap:10px;align-items:center;padding:0 12px;min-height:40px;border-radius:10px;color:#334155;text-decoration:none;font-weight:600;font-size:14px}
+nav a:hover{background:var(--chip)}nav a.on{background:var(--primary);color:#fff}
+.me{margin-top:auto;border-top:1px solid var(--line);padding-top:10px;font-size:12px}
+.me b{display:block;word-break:break-all}
+main{padding:24px 28px;min-width:0;max-width:1300px}
+.top{display:none}
+h1{margin:0;font-size:24px;letter-spacing:-.01em}
+.head{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:flex-end;margin-bottom:16px}
+.head p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.notice{background:#f0f9ff;border:1px solid #bae6fd;color:#0c4a6e;border-radius:10px;padding:8px 12px;font-size:12px;margin-bottom:14px}
+.demo{background:#fef3c7;border:1px solid #f59e0b;color:#78350f;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:700;margin-bottom:14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 1px 2px rgba(15,23,42,.05)}
+.grid{display:grid;gap:12px}.g4{grid-template-columns:repeat(4,1fr)}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.stat{display:flex;gap:12px;align-items:center}
+.stat .ic{width:40px;height:40px;border-radius:10px;background:var(--chip);display:grid;place-items:center;flex:none}
+.stat b{font-size:24px;line-height:1;display:block;font-weight:800}.stat span{font-size:12px;color:var(--muted);font-weight:600}
+.btn{display:inline-flex;gap:6px;align-items:center;justify-content:center;min-height:40px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:#fff;font-weight:700;font-size:14px;color:#0f172a}
+.btn:hover{background:var(--chip)}.btn.p{background:var(--accent);border-color:var(--accent);color:#fff}.btn.p:hover{background:#075985}
+.btn.d{background:var(--danger);border-color:var(--danger);color:#fff}.btn.d:hover{background:#b91c1c}
+.btn.i{padding:0 10px}.btn:disabled{opacity:.5;cursor:not-allowed}
+input,select,textarea{width:100%;min-height:40px;padding:8px 12px;border:1px solid #cbd5e1;border-radius:10px;background:#fff}
+.f{display:block;font-size:13px;font-weight:700;margin-top:12px}.f input,.f select{margin-top:4px;font-weight:400}
+.search{position:relative;flex:1;min-width:200px}.search svg{position:absolute;left:10px;top:11px}.search input{padding-left:34px}
+.tw{overflow-x:auto;padding:0}
+table{width:100%;border-collapse:collapse;min-width:820px}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:10px 12px}
+td{padding:10px 12px;border-top:1px solid var(--line);font-size:14px;vertical-align:top}
+.mono{font-family:ui-monospace,Consolas,monospace;font-size:11px;color:var(--muted);word-break:break-all}
+.sm{font-size:12px;color:var(--muted)}
+.badge{display:inline-block;border:1px solid;border-radius:99px;padding:1px 9px;font-size:12px;font-weight:700}
+.b-ONLINE,.b-EXECUTED{background:#ecfdf5;color:#065f46;border-color:#a7f3d0}.b-OFFLINE,.b-EXPIRED{background:#f1f5f9;color:#334155;border-color:#cbd5e1}
+.b-LOCKED{background:#fffbeb;color:#78350f;border-color:#fde68a}.b-ENROLLMENT_PENDING,.b-PENDING{background:#f0f9ff;color:#0c4a6e;border-color:#bae6fd}
+.b-ERROR,.b-FAILED{background:#fef2f2;color:#991b1b;border-color:#fecaca}.b-SENT{background:#eef2ff;color:#3730a3;border-color:#c7d2fe}.b-ACKNOWLEDGED{background:#f5f3ff;color:#5b21b6;border-color:#ddd6fe}
+.empty{text-align:center;padding:36px 16px;color:var(--muted)}.empty b{display:block;color:#020617;font-size:16px}
+.pager{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.5);display:grid;place-items:center;padding:16px;z-index:50}
+.modal .card{width:100%;max-width:440px;max-height:92vh;overflow:auto}
+.modal h2{margin:0 0 8px;font-size:18px}
+.toasts{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;z-index:60;max-width:calc(100% - 32px);width:360px}
+.toast{background:#fff;border:1px solid var(--line);border-left:4px solid var(--ok);border-radius:10px;padding:10px 12px;font-size:14px;box-shadow:0 4px 12px rgba(15,23,42,.15)}.toast.err{border-left-color:var(--danger)}
+.loading{padding:40px;text-align:center;color:var(--muted)}
+.bars{display:grid;gap:6px}.bar{display:grid;grid-template-columns:110px 1fr 36px;gap:8px;align-items:center;font-size:13px}.bar i{display:block;height:12px;border-radius:6px;background:var(--accent)}
+.tl{list-style:none;margin:0;padding:0}.tl li{display:flex;flex-wrap:wrap;gap:4px 12px;padding:10px 14px;border-top:1px solid var(--line);align-items:baseline}.tl li:first-child{border-top:0}
+.tl time{width:170px;font-size:12px;font-weight:700;color:var(--muted)}.tl code{background:var(--chip);border-radius:6px;padding:1px 7px;font-size:12px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:6px}.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px}
+.sk{position:absolute;left:-9999px}.sk:focus{left:8px;top:8px;background:#fff;padding:8px;z-index:99}
+@media(max-width:980px){.g4{grid-template-columns:repeat(2,1fr)}.g2{grid-template-columns:1fr}}
+@media(max-width:860px){
+ .app{display:block}
+ aside{position:fixed;z-index:40;left:0;top:0;bottom:0;width:250px;transform:translateX(-100%);transition:transform .2s}
+ aside.open{transform:none}
+ .top{display:flex;gap:8px;align-items:center;position:sticky;top:0;z-index:30;background:rgba(255,255,255,.95);border-bottom:1px solid var(--line);padding:8px 12px;font-weight:800}
+ main{padding:16px}
+ .scrim{position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:35}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<a class="sk" href="#main">Langkau ke kandungan</a>
+<div id="root"><div class="loading">Memuatkan…</div></div>
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+<div id="modal"></div>
+
+<script type="module">
+/* ===================== TETAPAN ===================== */
+const CONFIG = { // sama seperti index.html; jika kosong, guna tetapan yang disimpan oleh index.html
+  apiKey: "", authDomain: "my-devide-control.firebaseapp.com", projectId: "my-devide-control",
+  storageBucket: "my-devide-control.firebasestorage.app", messagingSenderId: "", appId: "", databaseURL: ""
+};
+const REGION = "asia-southeast1";
+const SDK = "https://www.gstatic.com/firebasejs/11.0.2/";
+const QR_LIB = "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js";
+const DEMO = new URLSearchParams(location.search).has("demo") || window.__MDC_DEMO__ === true;
+/* =================================================== */
+
+/* ---------- Bantuan ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const ms = (t) => (t && (t.toMillis ? t.toMillis() : t.seconds ? t.seconds * 1000 : +t)) || 0;
+const fmt = (t) => ms(t) ? new Date(ms(t)).toLocaleString("ms-MY", { dateStyle: "medium", timeStyle: "short" }) : "—";
+const ago = (t) => { if (!ms(t)) return "—"; const s = Math.max(0, (Date.now() - ms(t)) / 1000); return s < 60 ? "baru sahaja" : s < 3600 ? Math.floor(s / 60) + " min lalu" : s < 86400 ? Math.floor(s / 3600) + " jam lalu" : Math.floor(s / 86400) + " hari lalu"; };
+const ROLE = { SUPER_ADMIN: "Super Admin", ORG_ADMIN: "Org Admin", DEVICE_MANAGER: "Device Manager", VIEWER: "Viewer" };
+const RANK = { SUPER_ADMIN: 4, ORG_ADMIN: 3, DEVICE_MANAGER: 2, VIEWER: 1 };
+const ICON = {
+  dash: '<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>',
+  dev: '<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>',
+  grp: '<path d="M12 2l10 5-10 5L2 7z"/><path d="M2 12l10 5 10-5"/><path d="M2 17l10 5 10-5"/>',
+  app: '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/>',
+  web: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 010 20M12 2a15 15 0 000 20"/>',
+  eye: '<path d="M2 12s4-8 10-8 10 8 10 8-4 8-10 8S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  cmd: '<path d="M4 17l6-6-6-6M12 19h8"/>',
+  log: '<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/>',
+  usr: '<path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.9M16 3.1a4 4 0 010 7.8"/>',
+  set: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/>',
+  lock: '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>',
+  unlock: '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 019.9-1"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>', trash: '<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>',
+  edit: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/>', menu: '<path d="M3 6h18M3 12h18M3 18h18"/>',
+  out: '<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>', copy: '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>',
+  search: '<circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/>', wifi: '<path d="M5 12.5a10 10 0 0114 0M8.5 16a5 5 0 017 0M12 20h.01M2 9a15 15 0 0120 0"/>',
+  wifioff: '<path d="M2 2l20 20M8.5 16a5 5 0 016.2-.6M5 12.5a10 10 0 015-2.6M2 9a15 15 0 015.2-3.2M12 20h.01"/>', laptop: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M2 20h20"/>',
+  clock: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>', warn: '<path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/>',
+  x: '<path d="M18 6L6 18M6 6l12 12"/>', left: '<path d="M15 18l-6-6 6-6"/>', right: '<path d="M9 18l6-6-6-6"/>', shield: '<path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/>', info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>'
+};
+const ic = (n, s = 18, c = "currentColor") => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n] || ""}</svg>`;
+const toast = (text, err) => { const d = document.createElement("div"); d.className = "toast" + (err ? " err" : ""); d.textContent = text; $("#toasts").appendChild(d); setTimeout(() => d.remove(), 5500); };
+const errMsg = (e) => ((e && e.message) || "Ralat").replace(/^.*?:\s*/, "");
+
+/* ---------- Keadaan & data ---------- */
+const S = { user: null, claims: {}, devices: [], groups: [], commands: [], logs: [], users: [],
+  loaded: {}, errors: {}, page: "dashboard", q: "", fs: "", ft: "", pg: 0, sel: new Set(), nav: false };
+const can = (min) => (RANK[S.claims.role] || 0) >= RANK[min];
+let fb = null; // modul Firebase
+let raf = 0;
+const render = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); };
+
+/* ---------- Data demo (hanya untuk preview, jelas dilabel) ---------- */
+function loadDemo() {
+  const now = Date.now(), T = (m) => ({ toMillis: () => now - m * 60000 });
+  S.user = { email: "demo@contoh.com", uid: "demo" }; S.claims = { orgId: "demo", role: "ORG_ADMIN" };
+  S.groups = [{ id: "g1", name: "Asrama Putera", description: "Tablet asrama putera" }, { id: "g2", name: "Kelas 1", description: "" }];
+  const st = ["ONLINE", "ONLINE", "LOCKED", "OFFLINE", "ONLINE", "ERROR", "ONLINE", "OFFLINE", "ONLINE", "ENROLLMENT_PENDING", "ONLINE", "LOCKED"];
+  S.devices = st.map((s, i) => ({ id: "d" + i, deviceId: "dev-" + (1000 + i), deviceName: (i % 5 === 4 ? "WIN LAPTOP " : "HONOR TABLET ") + String(i + 1).padStart(2, "0"),
+    deviceType: i % 5 === 4 ? "WINDOWS" : "ANDROID", deviceModel: i % 5 === 4 ? "Laptop" : "HONOR Pad X8", osVersion: i % 5 === 4 ? "Windows 11" : "Android 13", status: s,
+    enrollmentStatus: s === "ENROLLMENT_PENDING" ? "PENDING" : "ENROLLED", assignedUserId: i % 3 ? "pelajar" + i : null, groupId: i % 2 ? "g1" : "g2", batteryLevel: 90 - i * 6, lastSeen: T(i * 7), createdAt: T(i * 1500) }));
+  S.commands = S.devices.slice(0, 7).map((d, i) => ({ id: "c" + i, commandId: "cmd-" + i, deviceId: d.id, commandType: i % 2 ? "UNLOCK" : "LOCK",
+    status: ["EXECUTED", "PENDING", "SENT", "FAILED", "EXECUTED", "EXPIRED", "ACKNOWLEDGED"][i], createdAt: T(i * 400), executedAt: i % 4 === 0 ? T(i * 400 - 1) : null, errorMessage: i === 3 ? "Peranti menolak arahan" : null }));
+  S.logs = [["DEVICE_ONLINE", "Peranti kembali online"], ["COMMAND_CREATED", "LOCK → 3 peranti"], ["COMMAND_EXECUTED", "Arahan cmd-0 → EXECUTED"], ["DEVICE_OFFLINE", "Peranti offline (tiada heartbeat)"], ["ENROLLMENT_CREATED", "Enrollment ANDROID \"HONOR TABLET 12\""], ["DEVICE_REGISTERED", "Peranti didaftarkan"]]
+    .map((l, i) => ({ id: "l" + i, type: l[0], message: l[1], createdAt: T(i * 90) }));
+  S.users = [{ id: "u1", uid: "u1", email: "demo@contoh.com", displayName: "Admin Demo", role: "ORG_ADMIN", provider: "password" }, { id: "u2", uid: "u2", email: "guru@contoh.com", displayName: "Cikgu", role: "DEVICE_MANAGER", provider: "google.com" }];
+  ["devices", "groups", "commands", "logs", "users"].forEach((k) => (S.loaded[k] = true));
+}
+const demoBlock = () => { toast("Mod demo: tiada tindakan sebenar dilakukan.", true); return Promise.reject(new Error("demo")); };
+
+/* ---------- Firebase ---------- */
+function getCfg() {
+  try { const s = JSON.parse(localStorage.getItem("mdc_cfg") || "null"); if (s && s.apiKey) return s; } catch (e) {}
+  return CONFIG.apiKey ? CONFIG : null;
+}
+let call = demoBlock, fsdb = null, auth = null;
+async function boot() {
+  if (DEMO) { loadDemo(); call = demoBlock; render(); return; }
+  const cfg = getCfg();
+  if (!cfg) { location.replace("index.html"); return; }
+  const [{ initializeApp }, A, F, FN] = await Promise.all(["app", "auth", "firestore", "functions"].map((m) => import(`${SDK}firebase-${m}.js`)));
+  fb = { A, F };
+  const app = initializeApp(cfg);
+  auth = A.getAuth(app); fsdb = F.getFirestore(app);
+  const fns = FN.getFunctions(app, REGION);
+  call = (name, data) => FN.httpsCallable(fns, name)(data).then((r) => r.data);
+  A.onAuthStateChanged(auth, async (u) => {
+    if (!u) { location.replace("index.html"); return; }
+    S.user = u; await readClaims(false); subscribeAll(); render();
+  });
+  A.onIdTokenChanged(auth, async (u) => { if (u) { await readClaims(false); render(); } });
+}
+async function readClaims(force) { const r = await auth.currentUser.getIdTokenResult(force); S.claims = { orgId: r.claims.orgId || null, role: r.claims.role || null }; }
+
+let unsubs = [], subscribedOrg = null;
+function subscribeAll() {
+  if (!S.claims.orgId || subscribedOrg === S.claims.orgId) return;
+  unsubs.forEach((u) => u()); unsubs = []; subscribedOrg = S.claims.orgId;
+  const { collection, onSnapshot, query, orderBy, limit } = fb.F;
+  const sub = (key, name, order, max) => {
+    const q = query(collection(fsdb, "organizations", S.claims.orgId, name), ...(order ? [orderBy(order, "desc")] : []), limit(max));
+    unsubs.push(onSnapshot(q, (s) => { S[key] = s.docs.map((d) => ({ id: d.id, ...d.data() })); S.loaded[key] = true; delete S.errors[key]; render(); },
+      (e) => { S.errors[key] = e.message; S.loaded[key] = true; render(); }));
+  };
+  sub("devices", "devices", "createdAt", 500); sub("groups", "deviceGroups", null, 200);
+  sub("commands", "commands", "createdAt", 300); sub("logs", "activityLogs", "createdAt", 300); sub("users", "users", null, 200);
+}
+async function fsWrite(fn) { if (DEMO) return demoBlock(); return fn(fb.F); }
+const ref = (...p) => fb.F.doc(fsdb, "organizations", S.claims.orgId, ...p);
+
+/* ---------- Navigasi ---------- */
+const NAV = [["dashboard", "Dashboard", "dash"], ["devices", "All Devices", "dev"], ["groups", "Device Groups", "grp"], ["apps", "App Management", "app"],
+  ["filtering", "Web Filtering", "web"], ["monitoring", "Live Monitoring", "eye"], ["commands", "Device Commands", "cmd"], ["logs", "Activity Logs", "log"], ["users", "Users & Roles", "usr"], ["settings", "Settings", "set"]];
+const setPage = () => { const h = location.hash.slice(1); S.page = NAV.some((n) => n[0] === h) ? h : "dashboard"; S.nav = false; S.pg = 0; S.sel = new Set(); render(); };
+window.addEventListener("hashchange", setPage);
+
+/* ---------- Komponen ---------- */
+const badge = (s) => `<span class="badge b-${esc(s)}">${esc(String(s).replace("_", " "))}</span>`;
+const head = (t, sub, actions = "") => `<div class="head"><div><h1>${esc(t)}</h1>${sub ? `<p>${esc(sub)}</p>` : ""}</div><div class="row">${actions}</div></div>`;
+const empty = (t, h) => `<div class="empty"><b>${esc(t)}</b>${esc(h || "")}</div>`;
+const state = (key, ok) => !S.loaded[key] ? `<div class="loading">Memuatkan…</div>` : S.errors[key] ? `<div class="card" role="alert"><b>Ralat memuatkan data</b><p class="sm">${esc(S.errors[key])}</p></div>` : ok();
+const gname = (id) => (S.groups.find((g) => g.id === id) || {}).name || "—";
+const dname = (id) => (S.devices.find((d) => d.id === id) || {}).deviceName || id;
+
+function openModal(html, onMount) {
+  const m = $("#modal");
+  m.innerHTML = `<div class="modal" data-close-bg><div class="card" role="dialog" aria-modal="true">${html}</div></div>`;
+  const first = m.querySelector("input,select,button.p,button.d"); if (first) first.focus();
+  if (onMount) onMount(m);
+}
+const closeModal = () => { $("#modal").innerHTML = ""; };
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+function confirmBox({ title, body, label, danger, requireText, run }) {
+  openModal(`<h2>${esc(title)}</h2><div class="sm" style="font-size:14px;color:#334155">${body}</div>
+    ${requireText ? `<label class="f">Taip <b>${esc(requireText)}</b> untuk sahkan<input id="ct" autocomplete="off"></label>` : ""}
+    <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn" data-close>Batal</button><button class="btn ${danger ? "d" : "p"}" id="cok" ${requireText ? "disabled" : ""}>${esc(label)}</button></div>`,
+  (m) => {
+    const ok = m.querySelector("#cok"), ct = m.querySelector("#ct");
+    if (ct) ct.oninput = () => (ok.disabled = ct.value !== requireText);
+    ok.onclick = async () => { ok.disabled = true; try { await run(); closeModal(); } catch (e) { if (e.message !== "demo") toast(errMsg(e), true); ok.disabled = false; } };
+  });
+}
+
+/* ---------- Halaman ---------- */
+function pageDashboard() {
+  const D = S.devices, by = (s) => D.filter((d) => d.status === s).length;
+  const stat = (l, v, i, c = "#0F172A") => `<div class="card stat"><div class="ic">${ic(i, 20, c)}</div><div><b>${v}</b><span>${l}</span></div></div>`;
+  const attention = D.filter((d) => d.status === "ERROR" || (typeof d.batteryLevel === "number" && d.batteryLevel < 15)).length;
+  const pending = D.filter((d) => d.status === "ENROLLMENT_PENDING" || d.enrollmentStatus === "PENDING").length;
+  const COL = { ONLINE: "#047857", OFFLINE: "#64748B", LOCKED: "#B45309", ENROLLMENT_PENDING: "#0369A1", ERROR: "#DC2626" };
+  // donut
+  const cnt = {}; D.forEach((d) => (cnt[d.status] = (cnt[d.status] || 0) + 1));
+  let acc = 0; const R = 40, C = 2 * Math.PI * R;
+  const donut = Object.entries(cnt).map(([k, v]) => { const len = (v / D.length) * C; const s = `<circle r="${R}" cx="60" cy="60" fill="none" stroke="${COL[k] || "#94a3b8"}" stroke-width="18" stroke-dasharray="${len} ${C - len}" stroke-dashoffset="${-acc}" transform="rotate(-90 60 60)"/>`; acc += len; return s; }).join("");
+  // 7 hari
+  const days = Array.from({ length: 7 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() - (6 - i)); return d.toLocaleDateString("en-CA"); });
+  const dk = (t) => (ms(t) ? new Date(ms(t)).toLocaleDateString("en-CA") : "");
+  const series = [["Peranti", D, "#0369A1"], ["Arahan", S.commands, "#0F172A"], ["Aktiviti", S.logs, "#64748B"]];
+  const vals = series.map(([n, arr]) => days.map((k) => arr.filter((x) => dk(x.createdAt) === k).length));
+  const mx = Math.max(1, ...vals.flat()), bw = 12, gw = 3 * bw + 12;
+  const bars = days.map((k, i) => series.map((s, j) => { const h = (vals[j][i] / mx) * 120; return `<rect x="${i * gw + j * bw + 6}" y="${130 - h}" width="${bw - 2}" height="${h}" fill="${s[2]}" rx="2"><title>${s[0]} ${k}: ${vals[j][i]}</title></rect>`; }).join("") + `<text x="${i * gw + gw / 2}" y="146" font-size="10" text-anchor="middle" fill="#475569">${k.slice(5)}</text>`).join("");
+  const cs = {}; S.commands.forEach((c) => (cs[c.status] = (cs[c.status] || 0) + 1));
+  const cmx = Math.max(1, ...Object.values(cs));
+  return head("Dashboard", DEMO ? "Data contoh (mod demo)" : "Data masa nyata dari Cloud Firestore") + state("devices", () => `
+    <div class="grid g4">${stat("Total Devices", D.length, "dev")}${stat("Online", by("ONLINE"), "wifi", "#047857")}${stat("Offline", by("OFFLINE"), "wifioff", "#64748B")}${stat("Locked", by("LOCKED"), "lock", "#B45309")}
+    ${stat("Android", D.filter((d) => d.deviceType === "ANDROID").length, "dev")}${stat("Windows", D.filter((d) => d.deviceType === "WINDOWS").length, "laptop")}${stat("Pending Enrollment", pending, "clock", "#0369A1")}${stat("Perlu Perhatian", attention, "warn", "#DC2626")}</div>
+    ${!D.length ? `<div class="card" style="margin-top:16px">${empty("Belum ada peranti didaftarkan", "Pergi ke All Devices → Daftar peranti untuk menjana token enrollment.")}</div>` : `
+    <div class="grid g2" style="margin-top:16px">
+      <div class="card"><b>Taburan status peranti</b><div class="row" style="margin-top:8px"><svg width="150" height="150" viewBox="0 0 120 120" role="img" aria-label="Carta donat status peranti">${donut}<text x="60" y="65" text-anchor="middle" font-size="18" font-weight="800">${D.length}</text></svg>
+        <div class="legend" style="flex-direction:column">${Object.entries(cnt).map(([k, v]) => `<span><i style="background:${COL[k] || "#94a3b8"}"></i>${k.replace("_", " ")}: ${v}</span>`).join("")}</div></div>
+        <p class="sm">Sejarah trend online/offline memerlukan snapshot berkala (fasa seterusnya); carta ini ialah keadaan semasa.</p></div>
+      <div class="card"><b>Enrollment, arahan &amp; aktiviti (7 hari)</b><svg viewBox="0 0 ${7 * gw + 12} 152" width="100%" role="img" aria-label="Carta bar 7 hari">${bars}</svg>
+        <div class="legend">${series.map((s) => `<span><i style="background:${s[2]}"></i>${s[0]}</span>`).join("")}</div></div>
+      <div class="card"><b>Sejarah pelaksanaan arahan</b>${!S.commands.length ? empty("Belum ada arahan") : `<div class="bars" style="margin-top:10px">${Object.entries(cs).map(([k, v]) => `<div class="bar"><span>${k}</span><i style="width:${(v / cmx) * 100}%"></i><b>${v}</b></div>`).join("")}</div>`}</div>
+      <div class="card tw"><div style="padding:16px 16px 0"><b>Peranti terkini</b></div><table style="min-width:420px"><thead><tr><th>Nama</th><th>Jenis</th><th>Status</th><th>Last seen</th></tr></thead><tbody>
+        ${D.slice(0, 6).map((d) => `<tr><td><b>${esc(d.deviceName)}</b></td><td>${esc(d.deviceType)}</td><td>${badge(d.status)}</td><td>${ago(d.lastSeen)}</td></tr>`).join("")}</tbody></table></div>
+    </div>`}`);
+}
+
+function pageDevices() {
+  const q = S.q.toLowerCase();
+  const rows = S.devices.filter((d) => (!S.fs || d.status === S.fs) && (!S.ft || d.deviceType === S.ft) && (!q || `${d.deviceName} ${d.deviceId} ${d.deviceModel} ${d.assignedUserId || ""}`.toLowerCase().includes(q)));
+  const PER = 10, pages = Math.max(1, Math.ceil(rows.length / PER)); if (S.pg >= pages) S.pg = pages - 1;
+  const view = rows.slice(S.pg * PER, S.pg * PER + PER), mg = can("DEVICE_MANAGER"), ad = can("ORG_ADMIN");
+  const opts = (arr, cur, all) => `<option value="">${all}</option>` + arr.map((a) => `<option ${a === cur ? "selected" : ""}>${a}</option>`).join("");
+  return head("All Devices", S.devices.length + " peranti", (mg ? `<button class="btn p" data-act="enroll">${ic("plus", 16)}Daftar peranti</button>` : "") + (ad ? `<button class="btn d" data-act="lockall" ${S.devices.length ? "" : "disabled"}>${ic("lock", 16)}Lock All Devices</button>` : "")) + `
+  <div class="card row" style="margin-bottom:12px"><div class="search">${ic("search", 16, "#94a3b8")}<input id="q" aria-label="Cari peranti" placeholder="Cari nama / ID / model" value="${esc(S.q)}"></div>
+    <select id="fs" aria-label="Tapis status" style="width:auto">${opts(["ONLINE", "OFFLINE", "LOCKED", "ENROLLMENT_PENDING", "ERROR"], S.fs, "Semua status")}</select>
+    <select id="ft" aria-label="Tapis jenis" style="width:auto">${opts(["ANDROID", "WINDOWS"], S.ft, "Semua jenis")}</select>
+    ${mg && S.sel.size ? `<button class="btn" data-act="lock-sel">${ic("lock", 16)}Lock (${S.sel.size})</button><button class="btn" data-act="unlock-sel">${ic("unlock", 16)}Unlock (${S.sel.size})</button>` : ""}</div>
+  <div class="card tw">${state("devices", () => !rows.length ? empty(S.devices.length ? "Tiada padanan" : "Belum ada peranti", S.devices.length ? "Ubah carian atau penapis." : 'Klik "Daftar peranti" untuk menjana token enrollment.') : `
+    <table><thead><tr><th style="width:36px"><input type="checkbox" id="selall" aria-label="Pilih semua di halaman" ${mg ? "" : "disabled"} ${view.length && view.every((d) => S.sel.has(d.id)) ? "checked" : ""} style="min-height:0;width:auto"></th><th>Peranti</th><th>Jenis / OS</th><th>Status</th><th>Enrollment</th><th>Kumpulan</th><th>Pengguna</th><th>Last seen</th><th></th></tr></thead><tbody>
+    ${view.map((d) => `<tr><td><input type="checkbox" data-sel="${esc(d.id)}" aria-label="Pilih ${esc(d.deviceName)}" ${mg ? "" : "disabled"} ${S.sel.has(d.id) ? "checked" : ""} style="min-height:0;width:auto"></td>
+      <td><b>${esc(d.deviceName)}</b><div class="mono">${esc(d.deviceId)}</div></td><td>${esc(d.deviceType)}<div class="sm">${esc(d.deviceModel)} · ${esc(d.osVersion)}</div></td>
+      <td>${badge(d.status)}${typeof d.batteryLevel === "number" ? `<div class="sm">Bateri ${d.batteryLevel}%</div>` : ""}</td><td>${esc(d.enrollmentStatus)}</td><td>${esc(gname(d.groupId))}</td><td>${esc(d.assignedUserId || "—")}</td><td>${ago(d.lastSeen)}</td>
+      <td style="white-space:nowrap">${mg ? `<button class="btn i" data-act="edit" data-id="${esc(d.id)}" aria-label="Sunting ${esc(d.deviceName)}">${ic("edit", 16)}</button> ` : ""}${ad ? `<button class="btn i" data-act="remove" data-id="${esc(d.id)}" aria-label="Buang ${esc(d.deviceName)}">${ic("trash", 16, "#DC2626")}</button>` : ""}</td></tr>`).join("")}</tbody></table>`)}
+    <div class="pager"><span>Halaman ${S.pg + 1} / ${pages}</span><span class="row"><button class="btn i" data-act="prev" aria-label="Sebelumnya" ${S.pg ? "" : "disabled"}>${ic("left", 16)}</button><button class="btn i" data-act="next" aria-label="Seterusnya" ${S.pg + 1 < pages ? "" : "disabled"}>${ic("right", 16)}</button></span></div></div>`;
+}
+
+function pageGroups() {
+  const mg = can("DEVICE_MANAGER");
+  return head("Device Groups", "Contoh: Asrama Putera, Kelas 1, Tablet Android", mg ? `<button class="btn p" data-act="gnew">${ic("plus", 16)}Kumpulan baharu</button>` : "") + state("groups", () => !S.groups.length ? `<div class="card">${empty("Belum ada kumpulan", "Cipta kumpulan, kemudian tetapkan peranti melalui All Devices → Sunting.")}</div>` :
+    `<div class="grid g3">${S.groups.map((g) => { const n = S.devices.filter((d) => d.groupId === g.id).length; return `<div class="card"><b>${esc(g.name)}</b><p class="sm" style="margin:2px 0 8px">${esc(g.description || "Tiada keterangan")}</p><b style="font-size:14px">${n} peranti</b>
+      ${mg ? `<div class="row" style="margin-top:12px"><button class="btn" data-act="glock" data-id="${esc(g.id)}">${ic("lock", 16)}Lock</button><button class="btn" data-act="gunlock" data-id="${esc(g.id)}">${ic("unlock", 16)}Unlock</button><button class="btn i" data-act="gedit" data-id="${esc(g.id)}" aria-label="Sunting ${esc(g.name)}">${ic("edit", 16)}</button>${can("ORG_ADMIN") ? `<button class="btn i" data-act="gdel" data-id="${esc(g.id)}" aria-label="Padam ${esc(g.name)}">${ic("trash", 16, "#DC2626")}</button>` : ""}</div>` : ""}</div>`; }).join("")}</div>`);
+}
+
+const soon = (t, fasa, txt) => head(t, "Dijadualkan: " + fasa) + `<div class="card row" style="align-items:flex-start;flex-wrap:nowrap">${ic("info", 20, "#0369A1")}<div><b>Modul ini belum dibina. Tiada data atau butang palsu dipaparkan.</b><p class="sm" style="font-size:14px">${txt}</p></div></div>`;
+const pageApps = () => soon("App Management", "Fasa 2", "Memerlukan Android Agent sebagai Device Owner dan Android Management API / Android Device Policy. Laman web sahaja tidak boleh menyekat aplikasi Android. Koleksi Firestore <code>applications</code> (ALLOW / BLOCK / REQUIRE_APPROVAL) dan rules sudah siap.");
+const pageFiltering = () => soon("Web Filtering", "Fasa 3", "Penapisan dilaksanakan melalui managed browser, DNS filtering, web gateway atau polisi pelayar Android Enterprise, bukan oleh Firebase sahaja. Sejarah carian Google tidak boleh diakses tanpa pelayar khas. Koleksi <code>webFilteringRules</code> dan rules sudah siap.");
+const pageMonitoring = () => soon("Live Monitoring", "Fasa 4", "Memerlukan Android Agent dengan MediaProjection, persetujuan pengguna di peranti, penunjuk pemantauan yang kelihatan dan saluran penstriman selamat (WebRTC) atau integrasi remote support yang sah. Tiada tangkapan skrin tersembunyi.");
+
+function pageCommands() {
+  return head("Device Commands", "Queue arahan. EXECUTED hanya selepas disahkan oleh peranti.") + `<div class="card tw">${state("commands", () => !S.commands.length ? empty("Belum ada arahan", "Hantar LOCK / UNLOCK dari All Devices atau Device Groups.") :
+    `<table><thead><tr><th>Arahan</th><th>Peranti</th><th>Status</th><th>Dicipta</th><th>Dilaksana</th><th>Ralat</th></tr></thead><tbody>${S.commands.map((c) => `<tr><td><b>${esc(c.commandType)}</b><div class="mono">${esc(c.commandId)}</div></td><td>${esc(dname(c.deviceId))}</td><td>${badge(c.status)}</td><td>${fmt(c.createdAt)}</td><td>${fmt(c.executedAt)}</td><td style="color:#DC2626">${esc(c.errorMessage || "")}</td></tr>`).join("")}</tbody></table>`)}</div>`;
+}
+function pageLogs() {
+  return head("Activity Logs", "Audit tindakan pengurusan dan peristiwa peranti (hanya server boleh menulis)") + `<div class="card" style="padding:0">${state("logs", () => !S.logs.length ? empty("Belum ada aktiviti") : `<ol class="tl">${S.logs.map((l) => `<li><time>${fmt(l.createdAt)}</time><code>${esc(l.type)}</code><span>${esc(l.message)}</span></li>`).join("")}</ol>`)}</div>`;
+}
+function pageUsers() {
+  const ad = can("ORG_ADMIN");
+  return head("Users & Roles", "Mana-mana akaun Firebase Auth (e-mel, Google, dll.) boleh dihubungkan ke organisasi", ad ? `<button class="btn p" data-act="uadd">${ic("plus", 16)}Hubungkan akaun</button>` : "") +
+    `<div class="card tw">${state("users", () => !S.users.length ? empty("Tiada pengguna") : `<table style="min-width:560px"><thead><tr><th>Pengguna</th><th>Peranan</th><th>Penyedia log masuk</th><th></th></tr></thead><tbody>${S.users.map((u) => `<tr><td><b>${esc(u.displayName || u.email)}</b><div class="sm">${esc(u.email)}</div></td><td>${esc(ROLE[u.role] || u.role)}</td><td>${esc(u.provider || "—")}</td><td>${ad && u.uid !== (S.user && S.user.uid) ? `<button class="btn i" data-act="urm" data-id="${esc(u.uid)}" aria-label="Buang ${esc(u.email)}">${ic("trash", 16, "#DC2626")}</button>` : ""}</td></tr>`).join("")}</tbody></table>`)}</div>
+    <div class="card" style="margin-top:12px"><b>Peranan</b><ul class="sm" style="font-size:14px"><li><b>Super Admin</b>: urus organisasi &amp; semua konfigurasi.</li><li><b>Org Admin</b>: urus semua peranti, kumpulan, polisi &amp; pengguna.</li><li><b>Device Manager</b>: daftar peranti, hantar arahan, sunting peranti.</li><li><b>Viewer</b>: lihat sahaja.</li></ul></div>`;
+}
+function pageSettings() {
+  const c = getCfg() || CONFIG, rows = [["Projek Firebase", c.projectId || "—"], ["Organisasi (orgId)", S.claims.orgId || "—"], ["Peranan anda", ROLE[S.claims.role] || "—"], ["Akaun", (S.user && (S.user.email || S.user.uid)) || "—"], ["Tempoh OFFLINE", "10 minit tanpa heartbeat"], ["Tamat arahan", "24 jam"]];
+  return head("Settings", "Maklumat sambungan dan polisi sistem (baca sahaja dalam Fasa 1)") + `<dl class="card grid g2" style="margin:0">${rows.map(([k, v]) => `<div><dt class="sm" style="text-transform:uppercase;font-weight:700">${k}</dt><dd style="margin:0;font-weight:700;word-break:break-all">${esc(v)}</dd></div>`).join("")}</dl>`;
+}
+
+function pageOnboarding() {
+  return `<div style="max-width:520px;margin:60px auto;padding:16px"><div class="card"><h1 style="font-size:20px">Akaun belum dikaitkan dengan organisasi</h1>
+  <p class="sm" style="font-size:14px">Log masuk sebagai <b>${esc(S.user.email || S.user.uid)}</b> berjaya, tetapi akaun ini belum diberi peranan. Minta Org Admin menjalankan <i>Users &amp; Roles → Hubungkan akaun</i>, atau jika anda pentadbir pertama (e-mel anda ada dalam <code>BOOTSTRAP_ADMIN_EMAILS</code> pada Cloud Functions) cipta organisasi:</p>
+  <label class="f">Nama organisasi<input id="orgname" placeholder="cth. Sekolah Asrama ..."></label>
+  <div class="row" style="margin-top:14px"><button class="btn p" data-act="bootstrap">Cipta organisasi</button><button class="btn" data-act="recheck">Semak semula peranan</button><button class="btn" data-act="logout">Log keluar</button></div></div></div>`;
+}
+
+/* ---------- Lukis ---------- */
+const PAGES = { dashboard: pageDashboard, devices: pageDevices, groups: pageGroups, apps: pageApps, filtering: pageFiltering, monitoring: pageMonitoring, commands: pageCommands, logs: pageLogs, users: pageUsers, settings: pageSettings };
+function draw() {
+  const root = $("#root");
+  if (!S.user) return;
+  if (!S.claims.orgId || !S.claims.role) { root.innerHTML = pageOnboarding(); return; }
+  const focus = document.activeElement && document.activeElement.id, pos = document.activeElement && document.activeElement.selectionStart;
+  root.innerHTML = `<div class="app"><aside class="${S.nav ? "open" : ""}" aria-label="Navigasi utama"><div class="brand"><i>${ic("shield", 20, "#fff")}</i><span>MY DEVICE<br>CONTROL</span></div>
+    <nav>${NAV.map(([id, l, i]) => `<a href="#${id}" class="${S.page === id ? "on" : ""}" ${S.page === id ? 'aria-current="page"' : ""}>${ic(i, 18)}${l}</a>`).join("")}</nav>
+    <div class="me"><b>${esc(S.user.email || S.user.uid)}</b><span class="sm">${ROLE[S.claims.role]}</span><button class="btn" style="width:100%;margin-top:8px" data-act="logout">${ic("out", 16)}Log keluar</button></div></aside>
+    ${S.nav ? '<div class="scrim" data-act="navclose"></div>' : ""}
+    <div><div class="top"><button class="btn i" data-act="navopen" aria-label="Buka menu">${ic("menu", 20)}</button>MY DEVICE CONTROL</div>
+    <main id="main">${DEMO ? '<div class="demo">MOD DEMO — data contoh untuk preview sahaja, bukan data sebenar. Tiada tindakan dilaksanakan.</div>' : ""}
+    <div class="notice">Peranti dalam organisasi ini diurus dan dipantau oleh pentadbir. Hanya data pengurusan yang dibenarkan dikumpul; mesej peribadi, kata laluan dan ketukan kekunci tidak dikumpul.</div>
+    ${PAGES[S.page]()}</main></div></div>`;
+  if (focus) { const el = document.getElementById(focus); if (el) { el.focus(); try { el.setSelectionRange(pos, pos); } catch (e) {} } }
+}
+
+/* ---------- Tindakan ---------- */
+const send = async (data, okText) => { const r = await call("createCommand", data); toast(`${r ? r.count : 0} arahan ${data.commandType} dimasukkan ke queue (PENDING). Status dikemas kini bila peranti mengesahkan.`); S.sel = new Set(); render(); return r; };
+const QUEUE_NOTE = "Arahan dimasukkan ke queue dengan status <b>PENDING</b> dan tamat dalam 24 jam. Peranti offline menerimanya apabila kembali online. <b>EXECUTED</b> hanya dipaparkan selepas peranti mengesahkan.";
+const byId = (id) => S.devices.find((d) => d.id === id);
+
+const ACTIONS = {
+  navopen() { S.nav = true; render(); }, navclose() { S.nav = false; render(); },
+  logout() { if (DEMO) return demoBlock().catch(() => {}); fb.A.signOut(auth); },
+  recheck: async () => { await readClaims(true); subscribeAll(); render(); },
+  bootstrap: async () => { try { await call("bootstrapOrganization", { name: $("#orgname").value }); await readClaims(true); subscribeAll(); render(); toast("Organisasi dicipta. Anda kini Super Admin."); } catch (e) { if (e.message !== "demo") toast(errMsg(e), true); } },
+  prev() { S.pg--; render(); }, next() { S.pg++; render(); },
+  "lock-sel"() { confirmBox({ title: `LOCK ${S.sel.size} peranti`, body: QUEUE_NOTE, label: "Lock", danger: true, run: () => send({ commandType: "LOCK", deviceIds: [...S.sel] }) }); },
+  "unlock-sel"() { confirmBox({ title: `UNLOCK ${S.sel.size} peranti`, body: QUEUE_NOTE, label: "Unlock", run: () => send({ commandType: "UNLOCK", deviceIds: [...S.sel] }) }); },
+  lockall() { confirmBox({ title: "LOCK ALL DEVICES", body: QUEUE_NOTE, label: "Lock semua", danger: true, requireText: "LOCK ALL", run: () => send({ commandType: "LOCK", all: true }) }); },
+  remove(el) { const d = byId(el.dataset.id); confirmBox({ title: "Nyahdaftar peranti", body: `Peranti <b>${esc(d.deviceName)}</b> akan dibuang dan arahan tertunggak dibatalkan.`, label: "Nyahdaftar", danger: true, requireText: d.deviceName, run: async () => { await call("removeDevice", { deviceId: d.id }); toast("Peranti dinyahdaftar."); } }); },
+  edit(el) {
+    const d = byId(el.dataset.id);
+    openModal(`<h2>Sunting peranti</h2><label class="f">Nama<input id="en" maxlength="80" value="${esc(d.deviceName)}"></label><label class="f">Pengguna ditetapkan<input id="eu" value="${esc(d.assignedUserId || "")}"></label>
+      <label class="f">Kumpulan<select id="eg"><option value="">— tiada —</option>${S.groups.map((g) => `<option value="${esc(g.id)}" ${g.id === d.groupId ? "selected" : ""}>${esc(g.name)}</option>`).join("")}</select></label>
+      <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn" data-close>Batal</button><button class="btn p" id="ok">Simpan</button></div>`, (m) => {
+      m.querySelector("#ok").onclick = async () => { try { await fsWrite((F) => F.updateDoc(ref("devices", d.id), { deviceName: m.querySelector("#en").value.trim(), assignedUserId: m.querySelector("#eu").value.trim() || null, groupId: m.querySelector("#eg").value || null, updatedAt: F.serverTimestamp() })); toast("Peranti dikemas kini."); closeModal(); } catch (e) { if (e.message !== "demo") toast(errMsg(e), true); } };
+    });
+  },
+  enroll() {
+    openModal(`<h2>Daftar peranti baharu</h2><div id="ebody"><label class="f">Jenis<select id="et"><option>ANDROID</option><option>WINDOWS</option></select></label>
+      <label class="f">Nama peranti<input id="en" maxlength="80" placeholder="HONOR TABLET 01"></label>
+      <label class="f">Kumpulan (pilihan)<select id="eg"><option value="">— tiada —</option>${S.groups.map((g) => `<option value="${esc(g.id)}">${esc(g.name)}</option>`).join("")}</select></label>
+      <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn" data-close>Batal</button><button class="btn p" id="ok">Jana token</button></div></div>`, (m) => {
+      m.querySelector("#ok").onclick = async () => {
+        const name = m.querySelector("#en").value.trim(); if (!name) return toast("Masukkan nama peranti.", true);
+        try {
+          const r = await call("createEnrollment", { deviceType: m.querySelector("#et").value, deviceName: name, groupId: m.querySelector("#eg").value || undefined });
+          let qr = ""; try { await loadQR(); const q = window.qrcode(0, "M"); q.addData(r.qrPayload); q.make(); qr = q.createSvgTag({ cellSize: 4, margin: 2, scalable: true }); } catch (e) { qr = '<p class="sm">Kod QR tidak dapat dijana (pustaka tidak dimuat). Gunakan token di bawah.</p>'; }
+          m.querySelector("#ebody").innerHTML = `<div style="width:230px;margin:0 auto" role="img" aria-label="Kod QR enrollment">${qr}</div><p class="sm" style="font-size:14px">Imbas kod QR dari agent peranti, atau salin token. <b>Token dipaparkan sekali sahaja</b>, sah 24 jam, sekali guna.</p>
+            <div class="row" style="flex-wrap:nowrap"><input readonly id="tk" aria-label="Token enrollment" class="mono" value="${esc(r.token)}"><button class="btn i" id="cp" aria-label="Salin token">${ic("copy", 16)}</button></div>
+            <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn p" data-close>Selesai</button></div>`;
+          m.querySelector("#cp").onclick = () => { navigator.clipboard.writeText(r.token); toast("Token disalin."); };
+        } catch (e) { if (e.message !== "demo") toast(errMsg(e), true); }
+      };
+    });
+  },
+  gnew() { groupForm(); }, gedit(el) { groupForm(S.groups.find((g) => g.id === el.dataset.id)); },
+  gdel(el) {
+    const g = S.groups.find((x) => x.id === el.dataset.id), n = S.devices.filter((d) => d.groupId === g.id);
+    confirmBox({ title: "Padam kumpulan", body: `Kumpulan <b>${esc(g.name)}</b> dipadam. ${n.length} peranti dilepaskan daripada kumpulan (peranti tidak dipadam).`, label: "Padam", danger: true, requireText: g.name,
+      run: () => fsWrite(async (F) => { await Promise.all(n.map((d) => F.updateDoc(ref("devices", d.id), { groupId: null, updatedAt: F.serverTimestamp() }))); await F.deleteDoc(ref("deviceGroups", g.id)); toast("Kumpulan dipadam."); }) });
+  },
+  glock(el) { groupCmd(el.dataset.id, "LOCK"); }, gunlock(el) { groupCmd(el.dataset.id, "UNLOCK"); },
+  uadd() {
+    const roles = ["VIEWER", "DEVICE_MANAGER", "ORG_ADMIN"].concat(S.claims.role === "SUPER_ADMIN" ? ["SUPER_ADMIN"] : []);
+    openModal(`<h2>Hubungkan akaun Auth</h2><p class="sm" style="font-size:14px">Pengguna mesti pernah log masuk sekali (apa-apa penyedia) supaya wujud dalam Firebase Authentication.</p>
+      <label class="f">E-mel<input id="ue" type="email"></label><label class="f">Peranan<select id="ur">${roles.map((r) => `<option value="${r}">${ROLE[r]}</option>`).join("")}</select></label>
+      <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn" data-close>Batal</button><button class="btn p" id="ok">Hubungkan</button></div>`, (m) => {
+      m.querySelector("#ok").onclick = async () => { try { await call("assignUser", { email: m.querySelector("#ue").value.trim(), role: m.querySelector("#ur").value }); toast("Akaun dihubungkan. Pengguna perlu log masuk semula untuk peranan baharu."); closeModal(); } catch (e) { if (e.message !== "demo") toast(errMsg(e), true); } };
+    });
+  },
+  urm(el) { const u = S.users.find((x) => x.uid === el.dataset.id); confirmBox({ title: "Buang pengguna", body: `${esc(u.email)} akan hilang akses ke organisasi ini.`, label: "Buang", danger: true, run: async () => { await call("removeUser", { uid: u.uid }); toast("Pengguna dibuang."); } }); }
+};
+function groupForm(g) {
+  openModal(`<h2>${g ? "Sunting" : "Baharu"} kumpulan</h2><label class="f">Nama<input id="gn" maxlength="80" value="${esc(g ? g.name : "")}"></label><label class="f">Keterangan<input id="gd" value="${esc(g ? g.description || "" : "")}"></label>
+    <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn" data-close>Batal</button><button class="btn p" id="ok">Simpan</button></div>`, (m) => {
+    m.querySelector("#ok").onclick = async () => {
+      const name = m.querySelector("#gn").value.trim(); if (!name) return toast("Masukkan nama kumpulan.", true);
+      try { await fsWrite(async (F) => { const base = { name, description: m.querySelector("#gd").value.trim(), updatedAt: F.serverTimestamp() };
+        if (g) await F.updateDoc(ref("deviceGroups", g.id), base); else await F.addDoc(F.collection(fsdb, "organizations", S.claims.orgId, "deviceGroups"), { ...base, policyIds: [], createdAt: F.serverTimestamp(), createdBy: S.user.uid }); });
+        toast("Kumpulan disimpan."); closeModal(); } catch (e) { if (e.message !== "demo") toast(errMsg(e), true); }
+    };
+  });
+}
+function groupCmd(id, type) {
+  const g = S.groups.find((x) => x.id === id), n = S.devices.filter((d) => d.groupId === id).length;
+  confirmBox({ title: `${type} kumpulan ${g.name}`, body: `Arahan ${type} dihantar kepada ${n} peranti dalam kumpulan ini melalui queue. ${QUEUE_NOTE}`, label: type, danger: type === "LOCK", run: () => send({ commandType: type, groupId: id }) });
+}
+let qrP; const loadQR = () => qrP || (qrP = new Promise((res, rej) => { if (window.qrcode) return res(); const s = document.createElement("script"); s.src = QR_LIB; s.onload = res; s.onerror = rej; document.head.appendChild(s); }));
+
+document.addEventListener("click", (e) => {
+  if (e.target.closest("[data-close]") || (e.target.matches("[data-close-bg]"))) return closeModal();
+  const a = e.target.closest("[data-act]"); if (a && ACTIONS[a.dataset.act]) ACTIONS[a.dataset.act](a);
+});
+document.addEventListener("change", (e) => {
+  const t = e.target;
+  if (t.dataset && t.dataset.sel) { t.checked ? S.sel.add(t.dataset.sel) : S.sel.delete(t.dataset.sel); render(); }
+  else if (t.id === "selall") { const q = S.q.toLowerCase(); S.devices.filter((d) => (!S.fs || d.status === S.fs) && (!S.ft || d.deviceType === S.ft) && (!q || `${d.deviceName} ${d.deviceId} ${d.deviceModel} ${d.assignedUserId || ""}`.toLowerCase().includes(q))).slice(S.pg * 10, S.pg * 10 + 10).forEach((d) => (t.checked ? S.sel.add(d.id) : S.sel.delete(d.id))); render(); }
+  else if (t.id === "fs") { S.fs = t.value; S.pg = 0; render(); } else if (t.id === "ft") { S.ft = t.value; S.pg = 0; render(); }
+});
+document.addEventListener("input", (e) => { if (e.target.id === "q") { S.q = e.target.value; S.pg = 0; render(); } });
+
+setPage();
+boot().catch((e) => { $("#root").innerHTML = `<div class="loading" role="alert">Gagal memulakan: ${esc(errMsg(e))}</div>`; });
+</script>
+</body>
+</html>

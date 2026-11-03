@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MY DEVICE CONTROL — Log Masuk</title>
+<style>
+:root{--primary:#0F172A;--accent:#0369A1;--bg:#F8FAFC;--line:#E2E8F0;--muted:#475569;--danger:#DC2626;--ok:#047857}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.5 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:#020617}
+.wrap{min-height:100vh;display:grid;grid-template-columns:1.1fr 1fr}
+.hero{background:linear-gradient(160deg,#0F172A,#0c4a6e);color:#fff;padding:48px;display:flex;flex-direction:column;justify-content:center;gap:20px}
+.hero h1{margin:0;font-size:clamp(28px,4vw,44px);line-height:1.1;letter-spacing:-.02em}
+.hero p{margin:0;color:#cbd5e1;max-width:46ch}
+.hero ul{margin:0;padding:0;list-style:none;display:grid;gap:10px}
+.hero li{display:flex;gap:10px;align-items:flex-start;color:#e2e8f0;font-size:15px}
+.hero li svg{flex:none;margin-top:3px}
+.logo{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:.02em}
+.logo span{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.12)}
+.panel{display:grid;place-items:center;padding:24px}
+.card{width:100%;max-width:400px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:0 1px 3px rgba(15,23,42,.08)}
+h2{margin:0 0 4px;font-size:20px}
+.sub{margin:0 0 16px;color:var(--muted);font-size:14px}
+label{display:block;font-size:14px;font-weight:600;margin-top:12px}
+input,textarea{width:100%;margin-top:4px;padding:10px 12px;border:1px solid #cbd5e1;border-radius:10px;font:inherit;min-height:44px;background:#fff}
+textarea{min-height:140px;font:12px/1.4 ui-monospace,Consolas,monospace}
+button{font:inherit;font-weight:700;border-radius:10px;border:1px solid var(--line);min-height:44px;padding:0 16px;cursor:pointer;background:#fff;color:#0f172a}
+button.primary{background:var(--accent);color:#fff;border-color:var(--accent);width:100%;margin-top:16px}
+button.primary:hover{background:#075985}
+button.ghost{width:100%;margin-top:10px}
+button:disabled{opacity:.5;cursor:not-allowed}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.link{background:none;border:0;color:var(--accent);text-decoration:underline;width:100%;margin-top:6px;min-height:40px}
+.msg{margin-top:12px;font-size:14px;min-height:20px}.msg.err{color:var(--danger)}.msg.ok{color:var(--ok)}
+.warn{background:#fffbeb;border:1px solid #fcd34d;color:#78350f;border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:12px}
+.hide{display:none}
+.foot{margin-top:16px;font-size:12px;color:var(--muted);text-align:center}
+@media(max-width:860px){.wrap{grid-template-columns:1fr}.hero{padding:28px 20px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero" aria-label="Tentang sistem">
+    <div class="logo"><span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/></svg></span>MY DEVICE CONTROL</div>
+    <h1>Urus semua tablet &amp; laptop dari satu dashboard.</h1>
+    <p>Pantau status, kunci peranti dari jauh, urus kumpulan dan lihat rekod aktiviti. Semua peranti didaftarkan melalui kaedah pengurusan yang sah.</p>
+    <ul>
+      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7dd3fc" stroke-width="2.5" stroke-linecap="round"><path d="M5 12l5 5L20 7"/></svg>Tablet Android HONOR &amp; laptop Windows</li>
+      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7dd3fc" stroke-width="2.5" stroke-linecap="round"><path d="M5 12l5 5L20 7"/></svg>Peranan: Super Admin, Org Admin, Device Manager, Viewer</li>
+      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7dd3fc" stroke-width="2.5" stroke-linecap="round"><path d="M5 12l5 5L20 7"/></svg>Audit log untuk setiap arahan sensitif</li>
+    </ul>
+  </section>
+
+  <section class="panel">
+    <!-- LANGKAH A: sambung Firebase (hanya sekali) -->
+    <div class="card hide" id="setup">
+      <h2>Sambung Firebase</h2>
+      <p class="sub">Tampal <b>firebaseConfig</b> dari Firebase Console → Project settings → Your apps → Web app. Disimpan dalam pelayar ini sahaja.</p>
+      <label for="cfg">firebaseConfig</label>
+      <textarea id="cfg" spellcheck="false" placeholder='const firebaseConfig = {&#10;  apiKey: "...",&#10;  authDomain: "my-devide-control.firebaseapp.com",&#10;  projectId: "my-devide-control",&#10;  appId: "...",&#10;  databaseURL: "https://....firebasedatabase.app"&#10;};'></textarea>
+      <button class="primary" id="saveCfg">Simpan &amp; sambung</button>
+      <div class="msg" id="cfgMsg" role="alert"></div>
+      <div class="foot">Atau edit pemalar <code>CONFIG</code> di bahagian atas skrip fail ini.</div>
+    </div>
+
+    <!-- LANGKAH B: log masuk -->
+    <div class="card" id="login">
+      <h2>Log masuk pentadbir</h2>
+      <p class="sub">Gunakan akaun Firebase Authentication anda.</p>
+      <div class="warn hide" id="noCfg">Firebase belum disambungkan. <button class="link" id="openSetup" style="width:auto;min-height:0">Sambungkan sekarang</button></div>
+      <form id="form">
+        <label for="email">E-mel</label>
+        <input id="email" type="email" autocomplete="username" required>
+        <label for="pass">Kata laluan</label>
+        <input id="pass" type="password" autocomplete="current-password" required>
+        <button class="primary" id="go">Log masuk</button>
+      </form>
+      <div id="providers"></div>
+      <button class="link" id="reset" type="button">Lupa kata laluan?</button>
+      <button class="link hide" id="changeCfg" type="button">Tukar tetapan Firebase</button>
+      <div class="msg" id="msg" role="alert"></div>
+    </div>
+  </section>
+</div>
+
+<script type="module">
+/* ===================== TETAPAN ===================== */
+// Cara 1: isi nilai di sini. Cara 2: tampal pada skrin "Sambung Firebase" (disimpan dalam localStorage).
+const CONFIG = {
+  apiKey: "",
+  authDomain: "my-devide-control.firebaseapp.com",
+  projectId: "my-devide-control",
+  storageBucket: "my-devide-control.firebasestorage.app",
+  messagingSenderId: "",
+  appId: "",
+  databaseURL: ""
+};
+/* Tambah penyedia log masuk lain di sini (selepas diaktifkan di Firebase Console > Authentication).
+   Contoh Microsoft: { label: "Log masuk dengan Microsoft", make: (m) => new m.OAuthProvider("microsoft.com") } */
+const PROVIDERS = [
+  { label: "Log masuk dengan Google", make: (m) => new m.GoogleAuthProvider() }
+];
+const SDK = "https://www.gstatic.com/firebasejs/11.0.2/";
+/* =================================================== */
+
+const $ = (id) => document.getElementById(id);
+const say = (el, text, kind) => { el.textContent = text || ""; el.className = "msg" + (kind ? " " + kind : ""); };
+const errText = (e) => ({
+  "auth/invalid-credential": "E-mel atau kata laluan salah.",
+  "auth/user-not-found": "Akaun tidak dijumpai.",
+  "auth/wrong-password": "Kata laluan salah.",
+  "auth/too-many-requests": "Terlalu banyak percubaan. Cuba sebentar lagi.",
+  "auth/popup-closed-by-user": "Tetingkap log masuk ditutup.",
+  "auth/unauthorized-domain": "Domain ini belum ditambah di Firebase > Authentication > Settings > Authorized domains.",
+  "auth/operation-not-allowed": "Kaedah log masuk ini belum diaktifkan di Firebase Console."
+}[e && e.code] || (e && e.message) || "Ralat tidak diketahui.");
+
+function loadConfig() {
+  try { const s = JSON.parse(localStorage.getItem("mdc_cfg") || "null"); if (s && s.apiKey) return s; } catch (e) {}
+  return CONFIG.apiKey ? CONFIG : null;
+}
+function parseConfig(text) {
+  const out = {};
+  for (const k of ["apiKey", "authDomain", "projectId", "storageBucket", "messagingSenderId", "appId", "databaseURL", "measurementId"]) {
+    const m = text.match(new RegExp(k + "\\s*[:=]\\s*[\"']([^\"']+)[\"']"));
+    if (m) out[k] = m[1];
+  }
+  return out.apiKey && out.projectId && out.appId ? out : null;
+}
+
+const cfg = loadConfig();
+if (!cfg) { $("setup").classList.remove("hide"); $("login").classList.add("hide"); }
+else $("changeCfg").classList.remove("hide");
+
+$("saveCfg").onclick = () => {
+  const c = parseConfig($("cfg").value);
+  if (!c) return say($("cfgMsg"), "Tidak jumpa apiKey, projectId dan appId. Tampal keseluruhan blok firebaseConfig.", "err");
+  if (!c.databaseURL) c.databaseURL = "";
+  localStorage.setItem("mdc_cfg", JSON.stringify(c));
+  location.reload();
+};
+$("changeCfg").onclick = () => { $("setup").classList.remove("hide"); $("login").classList.add("hide"); };
+$("openSetup").onclick = $("changeCfg").onclick;
+
+if (cfg) {
+  const [{ initializeApp }, A] = await Promise.all([import(SDK + "firebase-app.js"), import(SDK + "firebase-auth.js")]);
+  const app = initializeApp(cfg);
+  const auth = A.getAuth(app);
+  const goAdmin = () => { location.href = "admin.html"; };
+  A.onAuthStateChanged(auth, (u) => { if (u) goAdmin(); });
+
+  $("form").onsubmit = async (e) => {
+    e.preventDefault(); $("go").disabled = true; say($("msg"), "");
+    try { await A.signInWithEmailAndPassword(auth, $("email").value.trim(), $("pass").value); goAdmin(); }
+    catch (er) { say($("msg"), errText(er), "err"); } finally { $("go").disabled = false; }
+  };
+  $("reset").onclick = async () => {
+    const em = $("email").value.trim();
+    if (!em) return say($("msg"), "Masukkan e-mel dahulu.", "err");
+    try { await A.sendPasswordResetEmail(auth, em); say($("msg"), "Pautan tetap semula kata laluan telah dihantar.", "ok"); }
+    catch (er) { say($("msg"), errText(er), "err"); }
+  };
+  for (const p of PROVIDERS) {
+    const b = document.createElement("button"); b.className = "ghost"; b.type = "button"; b.textContent = p.label;
+    b.onclick = async () => { try { await A.signInWithPopup(auth, p.make(A)); goAdmin(); } catch (er) { say($("msg"), errText(er), "err"); } };
+    $("providers").appendChild(b);
+  }
+} else {
+  $("noCfg").classList.add("hide");
+}
+</script>
+</body>
+</html>
