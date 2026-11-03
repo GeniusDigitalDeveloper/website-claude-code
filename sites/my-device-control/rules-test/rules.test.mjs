@@ -18,6 +18,7 @@ before(async () => {
   });
   await env.withSecurityRulesDisabled(async (ctx) => {
     const f = ctx.firestore();
+    await setDoc(doc(f, 'config/admins'), { emails: ['adm@kerja.com', 'baru@kerja.com', 'g@kerja.com'] });
     await setDoc(doc(f, 'devices/dev1'), { deviceId: 'dev1', deviceName: 'T1', deviceType: 'ANDROID', status: 'ONLINE', enrollmentStatus: 'ENROLLED', groupId: null });
     await setDoc(doc(f, 'devices/dev2'), { deviceId: 'dev2', deviceName: 'T2', deviceType: 'ANDROID', status: 'ONLINE', enrollmentStatus: 'ENROLLED', groupId: null });
     await setDoc(doc(f, 'enrollments/' + CODE), { deviceName: 'HONOR 01', deviceType: 'ANDROID', status: 'PENDING', expiresAt: future() });
@@ -266,4 +267,29 @@ test('KELULUSAN: admin boleh Tolak (padam) peranti menunggu dan status awamnya',
   await seedPending('pend4'); const a = admin(); const b = writeBatch(a);
   b.delete(doc(a, 'devices/pend4')); b.delete(doc(a, 'publicStatus/pend4'));
   await assertSucceeds(b.commit());
+});
+
+// ---- Senarai admin (sign-up dibuka dengan selamat) ----
+test('ADMIN: akaun e-mel yang TIDAK dalam senarai admin ditolak walaupun berjaya didaftarkan; huruf besar/kecil e-mel tidak mengubah keputusan', async () => {
+  const stranger = env.authenticatedContext('penyerang', { email: 'penyerang@jahat.com', email_verified: true, firebase: { sign_in_provider: 'password' } }).firestore();
+  await assertFails(getDoc(doc(stranger, 'devices/dev1')));
+  await assertFails(getDocs(collection(stranger, 'enrollments')));
+  await assertFails(setDoc(doc(stranger, 'config/admins'), { emails: ['penyerang@jahat.com'] }));
+  const upper = env.authenticatedContext('besar', { email: 'ADM@Kerja.com', firebase: { sign_in_provider: 'password' } }).firestore();
+  await assertSucceeds(getDoc(doc(upper, 'devices/dev1')));
+});
+test('ADMIN: anonymous dengan e-mel dalam senarai tetap bukan admin; config/admins hanya boleh dibaca admin', async () => {
+  const anon = env.authenticatedContext('anon-x', { email: 'adm@kerja.com', firebase: { sign_in_provider: 'anonymous' } }).firestore();
+  await assertFails(getDoc(doc(anon, 'devices/dev1')));
+  await assertFails(getDoc(doc(anon, 'config/admins')));
+  await assertFails(getDoc(doc(env.unauthenticatedContext().firestore(), 'config/admins')));
+  await assertSucceeds(getDoc(doc(admin(), 'config/admins')));
+});
+test('ADMIN: admin boleh tambah/buang e-mel tetapi tidak boleh mengeluarkan dirinya atau mengosongkan senarai', async () => {
+  const a = admin();
+  await assertSucceeds(setDoc(doc(a, 'config/admins'), { emails: ['adm@kerja.com', 'baru@kerja.com', 'g@kerja.com', 'rakan@kerja.com'], updatedAt: serverTimestamp(), updatedBy: 'adm' }));
+  await assertFails(setDoc(doc(a, 'config/admins'), { emails: ['baru@kerja.com'] }));
+  await assertFails(setDoc(doc(a, 'config/admins'), { emails: [] }));
+  await assertFails(setDoc(doc(a, 'config/admins'), { emails: ['adm@kerja.com'], extra: 1 }));
+  await assertSucceeds(setDoc(doc(a, 'config/admins'), { emails: ['adm@kerja.com', 'baru@kerja.com', 'g@kerja.com'], updatedAt: serverTimestamp(), updatedBy: 'adm' }));
 });

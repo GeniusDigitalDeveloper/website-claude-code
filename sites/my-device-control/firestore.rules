@@ -1,26 +1,24 @@
 rules_version = '2';
 
 // MY DEVICE CONTROL — Firestore Rules (alat dalaman, satu organisasi)
-//  ADMIN  = mana-mana akaun yang anda cipta dalam Firebase Authentication (E-mel/Kata laluan, Google, dll.).
-//           Tiada daftar organisasi, tiada pengesahan e-mel, tiada peranan.
-//  PERANTI = agent peranti yang log masuk "Anonymous" dan mendaftar dengan kod enrollment sekali guna.
+//  ADMIN  = akaun e-mel/kata laluan (atau Google) yang e-melnya ada dalam config/admins.emails.
+//           Senarai ini diurus dari panel (Users & Roles). Sesiapa lain yang berjaya mendaftar akaun
+//           TIDAK menjadi admin, jadi sign-up dibuka dengan selamat (diperlukan oleh peranti).
+//  PERANTI = agent peranti yang log masuk "Anonymous" dan mendaftar dengan kod enrollment sekali guna,
+//           kemudian menunggu admin menekan Sahkan.
 //  AWAM    = index.html (tanpa log masuk) hanya membaca koleksi publicStatus (nama, jenis, status, bateri).
-//
-// PENTING: di Firebase Console > Authentication > Settings > User actions, MATIKAN
-// "Enable create (sign-up)" supaya hanya akaun yang anda cipta di Console boleh log masuk.
-// (Pilihan tambahan: isi adminEmails() di bawah untuk mengehadkan kepada e-mel tertentu.)
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Kosong = semua akaun Authentication yang bukan anonymous ialah admin.
-    function adminEmails() { return []; }   // contoh: ['anda@gmail.com', 'rakan@gmail.com']
+    // Senarai e-mel admin (dokumen config/admins, diurus dari panel)
+    function adminEmails() { return get(/databases/$(database)/documents/config/admins).data.emails; }
 
     function signedIn() { return request.auth != null; }
     function provider() { return request.auth.token.firebase.sign_in_provider; }
     function isAdmin() {
-      return signedIn() && provider() != 'anonymous' && provider() != 'custom'
-        && (adminEmails().size() == 0 || request.auth.token.email in adminEmails());
+      return signedIn() && provider() in ['password', 'google.com'] && 'email' in request.auth.token
+        && request.auth.token.email.lower() in adminEmails();
     }
     function isDevice() { return signedIn() && provider() == 'anonymous'; }
     function isThisDevice(deviceId) {
@@ -165,6 +163,15 @@ service cloud.firestore {
           && request.resource.data.type in ['DEVICE_REGISTERED', 'DEVICE_ONLINE', 'COMMAND_EXECUTED', 'COMMAND_FAILED']
           && request.resource.data.createdAt == request.time;
       allow update, delete: if false;
+    }
+
+    // Senarai admin: hanya admin boleh baca/ubah, dan tidak boleh mengeluarkan dirinya sendiri
+    match /config/{docId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin() && docId == 'admins'
+        && request.resource.data.keys().hasOnly(['emails', 'updatedAt', 'updatedBy'])
+        && request.resource.data.emails is list && request.resource.data.emails.size() >= 1 && request.resource.data.emails.size() <= 30
+        && request.auth.token.email.lower() in request.resource.data.emails;
     }
 
     match /settings/{settingId} {

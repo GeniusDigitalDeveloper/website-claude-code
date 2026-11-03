@@ -123,9 +123,9 @@ async function handleCommand(ref, status, type) {
 
 let active = false, unsubSelf = null;
 function setWaiting(w) {
-  $("hRun").textContent = w ? "Menunggu kelulusan admin" : "Disambungkan";
+  $("hRun").textContent = w ? "Menunggu pengesahan admin" : "Disambungkan";
   $("pulse").style.background = w ? "#B45309" : ""; $("pulse").style.animation = w ? "none" : "";
-  $("runNote").textContent = w ? "Pentadbir perlu menekan Terima di panel admin. Biarkan halaman ini terbuka." : "Peranti ini dilaporkan kepada pentadbir selagi halaman ini terbuka.";
+  $("runNote").textContent = w ? "Pentadbir perlu menekan Sahkan di panel admin. Biarkan halaman ini terbuka." : "Peranti ini dilaporkan kepada pentadbir selagi halaman ini terbuka.";
 }
 /** Selepas daftar / sambung semula: tunggu kelulusan, kemudian mula melapor dan menerima arahan. */
 function start() {
@@ -157,7 +157,7 @@ const params = new URLSearchParams(location.search); if (params.get("code")) $("
 $("fJoin").onsubmit = async (e) => {
   e.preventDefault(); const code = $("code").value.replace(/[\s"'“”]/g, ""); if (code.length < 24) return say("Kod terlalu pendek. Salin kod penuh dari panel admin.", "err");
   $("bJoin").disabled = true; say("Menyambung…");
-  try { await enroll(code); say("Kod diterima. Menunggu kelulusan admin.", "okc"); start(); } catch (er) { say(er.message, "err"); } finally { $("bJoin").disabled = false; }
+  try { await enroll(code); say("Kod diterima. Menunggu pengesahan admin.", "okc"); start(); } catch (er) { say(er.message, "err"); } finally { $("bJoin").disabled = false; }
 };
 $("bStop").onclick = () => { stop(true); say("Diputuskan pada peranti ini. Pentadbir boleh nyahdaftar peranti dari panel."); };
 

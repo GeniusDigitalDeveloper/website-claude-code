@@ -186,7 +186,7 @@ const toast = (text, err) => { const d = document.createElement("div"); d.classN
 const errMsg = (e) => ((e && e.message) || "Ralat").replace(/^.*?:\s*/, "");
 
 /* ---------- Keadaan & data ---------- */
-const S = { user: null, claims: {}, devices: [], groups: [], commands: [], logs: [], enrollments: [], 
+const S = { user: null, claims: {}, devices: [], groups: [], commands: [], logs: [], enrollments: [], admins: [], keep: {}, 
   loaded: {}, errors: {}, page: "dashboard", q: "", fs: "", ft: "", pg: 0, sel: new Set(), nav: false };
 const can = () => true;   // semua akaun Authentication ialah admin (alat dalaman)
 let fb = null; // modul Firebase
@@ -196,7 +196,7 @@ const render = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(dr
 const previewBlock = () => { toast("Preview: tiada sambungan Firebase. Muat naik fail dan sambungkan untuk guna sebenar.", true); return Promise.reject(new Error("preview")); };
 function loadPreview() {
   S.user = { email: "preview", uid: "preview" }; S.claims = { role: "ADMIN" };
-  ["devices", "groups", "commands", "logs", "enrollments"].forEach((k) => (S.loaded[k] = true));
+  ["devices", "groups", "commands", "logs", "enrollments", "admins"].forEach((k) => (S.loaded[k] = true));
 }
 
 /* ---------- Firebase ---------- */
@@ -207,7 +207,7 @@ const isWaiting = (d) => d.enrollmentStatus === "PENDING_APPROVAL";
 function onDevices(list) {
   applyStatus(list);
   const now = new Set(list.filter(isWaiting).map((d) => d.id));
-  if (S._waitInit) list.filter((d) => isWaiting(d) && !(S._wait || new Set()).has(d.id)).forEach((d) => { toast(`Peranti baharu "${d.deviceName}" menunggu kelulusan anda.`); playSound(true); });
+  if (S._waitInit) list.filter((d) => isWaiting(d) && !(S._wait || new Set()).has(d.id)).forEach((d) => { toast(`Peranti baharu "${d.deviceName}" menunggu pengesahan anda. Buka All Devices dan tekan Sahkan.`); playSound(true); });
   S._wait = now; S._waitInit = true;
 }
 // Status berkesan: tiada heartbeat > 10 minit = OFFLINE (dikira di panel, tiada Cloud Functions)
@@ -239,7 +239,12 @@ function subscribeAll() {
       (e) => { S.errors[key] = e.message; S.loaded[key] = true; render(); }));
   };
   sub("devices", "devices", "createdAt", 500, onDevices); sub("groups", "deviceGroups", null, 200);
-  sub("commands", "commands", "createdAt", 300, applyCmdStatus); sub("logs", "activityLogs", "createdAt", 300); sub("enrollments", "enrollments", "createdAt", 100);
+  watchAdmins(); sub("commands", "commands", "createdAt", 300, applyCmdStatus); sub("logs", "activityLogs", "createdAt", 300); sub("enrollments", "enrollments", "createdAt", 100);
+}
+function watchAdmins() {
+  const { onSnapshot, doc } = fb.F;
+  unsubs.push(onSnapshot(doc(fsdb, "config", "admins"), (d) => { S.admins = (d.data() || {}).emails || []; S.loaded.admins = true; delete S.errors.admins; render(); },
+    (e) => { S.errors.admins = e.message; S.loaded.admins = true; render(); }));
 }
 async function fsWrite(fn) { if (PREVIEW) return previewBlock(); return fn(fb.F); }
 const ref = (...p) => fb.F.doc(fsdb, ...p);
@@ -319,9 +324,9 @@ function pageDashboard() {
 function pageDevices() {
   const q = S.q.toLowerCase();
   const ACTIVE = S.devices.filter((d) => !isWaiting(d)), wait = S.devices.filter(isWaiting);
-  const waitCard = wait.length ? `<div class="card tw" style="margin-bottom:12px;border-color:var(--accent)"><div style="padding:16px 16px 0"><b>Menunggu kelulusan (${wait.length})</b><p class="sm" style="margin:2px 0 0">Peranti ini telah mengimbas kod QR. Tekan <b>Terima</b> untuk membolehkan anda mengawalnya, atau <b>Tolak</b> untuk membuangnya.</p></div>
+  const waitCard = wait.length ? `<div class="card tw" style="margin-bottom:12px;border-color:var(--accent)"><div style="padding:16px 16px 0"><b>Menunggu pengesahan (${wait.length})</b><p class="sm" style="margin:2px 0 0">Peranti ini telah mengimbas kod QR. Tekan <b>Sahkan</b> untuk membolehkan anda mengawalnya, atau <b>Tolak</b> untuk membuangnya.</p></div>
     <table style="min-width:520px"><thead><tr><th>Peranti</th><th>Jenis</th><th>Diimbas</th><th></th></tr></thead><tbody>${wait.map((d) => `<tr><td><b>${esc(d.deviceName)}</b><div class="sm">${esc(d.deviceModel || "")} · ${esc(d.osVersion || "")}</div></td><td>${esc(d.deviceType)}</td><td>${ago(d.createdAt || d.lastSeen)}</td>
-      <td style="white-space:nowrap"><button class="btn p" data-act="approve" data-id="${esc(d.id)}">${ic("check", 16)}Terima</button> <button class="btn" data-act="reject" data-id="${esc(d.id)}">Tolak</button></td></tr>`).join("")}</tbody></table></div>` : "";
+      <td style="white-space:nowrap"><button class="btn p" data-act="approve" data-id="${esc(d.id)}">${ic("check", 16)}Sahkan</button> <button class="btn" data-act="reject" data-id="${esc(d.id)}">Tolak</button></td></tr>`).join("")}</tbody></table></div>` : "";
   const rows = ACTIVE.filter((d) => (!S.fs || d.status === S.fs) && (!S.ft || d.deviceType === S.ft) && (!q || `${d.deviceName} ${d.deviceId} ${d.deviceModel} ${d.assignedUserId || ""}`.toLowerCase().includes(q)));
   const PER = 10, pages = Math.max(1, Math.ceil(rows.length / PER)); if (S.pg >= pages) S.pg = pages - 1;
   const view = rows.slice(S.pg * PER, S.pg * PER + PER), mg = can("DEVICE_MANAGER"), ad = can("ORG_ADMIN");
@@ -364,10 +369,12 @@ function pageLogs() {
   return head("Activity Logs", "Audit tindakan pengurusan dan peristiwa peranti (hanya server boleh menulis)") + `<div class="card" style="padding:0">${state("logs", () => !S.logs.length ? empty("Belum ada aktiviti") : `<ol class="tl">${S.logs.map((l) => `<li><time>${fmt(l.createdAt)}</time><code>${esc(l.type)}</code><span>${esc(l.message)}</span></li>`).join("")}</ol>`)}</div>`;
 }
 function pageUsers() {
-  const me = S.user || {};
-  return head("Users & Roles", "Akaun admin diurus dalam Firebase Authentication") + `<div class="card"><b>Akaun anda</b>
-    <p style="margin:6px 0 0">${esc(me.email || me.uid || "—")}</p><p class="sm">Mana-mana akaun e-mel/kata laluan yang ada dalam Firebase Authentication terus boleh log masuk dan menguruskan semua peranti. Tiada pendaftaran organisasi atau pengesahan e-mel.</p></div>
-    <div class="card" style="margin-top:12px"><b>Tambah atau buang admin</b><ol class="sm" style="font-size:14px;line-height:1.7"><li>Buka Firebase Console → projek <b>my-devide-control</b> → Authentication → Users.</li><li><b>Add user</b> (e-mel + kata laluan) untuk tambah admin baharu. Pilih akaun → <b>Delete</b> untuk buang akses.</li><li>Pastikan Authentication → Settings → User actions: <b>Enable create (sign-up)</b> dimatikan supaya orang luar tidak boleh mendaftar sendiri.</li></ol></div>`;
+  const me = ((S.user && S.user.email) || "").toLowerCase();
+  return head("Users & Roles", "Akaun admin: hanya e-mel dalam senarai ini boleh mengawal sistem") + state("admins", () => `
+    <div class="card tw"><div style="padding:16px 16px 0"><b>Admin (${S.admins.length})</b><p class="sm" style="margin:2px 0 0">Anda log masuk sebagai <b>${esc(me || "—")}</b>.</p></div>
+      <table style="min-width:420px"><thead><tr><th>E-mel</th><th></th></tr></thead><tbody>${S.admins.map((e) => `<tr><td><b>${esc(e)}</b>${e === me ? ' <span class="badge b-ONLINE">ANDA</span>' : ""}</td><td>${e === me ? "" : `<button class="btn i" data-act="admrm" data-id="${esc(e)}" aria-label="Buang admin ${esc(e)}">${ic("trash", 16, "#DC2626")}</button>`}</td></tr>`).join("")}</tbody></table></div>
+    <div class="card" style="margin-top:12px"><b>Tambah admin baharu</b><p class="sm" style="margin:2px 0 8px">Masukkan e-mel dan kata laluan. Akaun dicipta dan terus boleh log masuk. Jika akaun sudah wujud, hanya akses admin diberi (kata laluan tidak diubah).</p>
+      <div class="row"><input id="ae" type="email" placeholder="E-mel" aria-label="E-mel admin baharu" data-keep value="${esc(S.keep.ae || "")}" style="flex:1;min-width:200px"><input id="ap" type="text" placeholder="Kata laluan (min. 6 aksara)" aria-label="Kata laluan" data-keep value="${esc(S.keep.ap || "")}" style="flex:1;min-width:200px" autocomplete="off"><button class="btn p" data-act="admadd">${ic("plus", 16)}Tambah admin</button></div></div>`);
 }
 function pageSettings() {
   const rows = [["Projek Firebase", CONFIG.projectId], ["Akaun", (S.user && (S.user.email || S.user.uid)) || "—"], ["Tempoh OFFLINE", "10 minit tanpa heartbeat"], ["Tamat arahan", "24 jam"]];
@@ -534,14 +541,40 @@ const ACTIONS = {
     fsWrite(async (F) => { const bt = F.writeBatch(fsdb);
       bt.update(ref("devices", d.id), { enrollmentStatus: "ENROLLED", status: "ONLINE", updatedAt: F.serverTimestamp() });
       bt.set(ref("publicStatus", d.id), pubDoc(d, { status: "ONLINE", updatedAt: F.serverTimestamp() }));
-      logEv(F, bt, "DEVICE_APPROVED", `Peranti "${d.deviceName}" diterima`, d.id); await bt.commit(); })
-      .then(() => { toast(`"${d.deviceName}" diterima. Anda kini boleh mengawalnya.`); playSound(true); })
+      logEv(F, bt, "DEVICE_APPROVED", `Peranti "${d.deviceName}" disahkan`, d.id); await bt.commit(); })
+      .then(() => { toast(`"${d.deviceName}" disahkan. Anda kini boleh mengawalnya.`); playSound(true); })
       .catch((e) => { if (e.message !== "preview") toast(errMsg(e), true); });
   },
   reject(el) {
     const d = byId(el.dataset.id);
     confirmBox({ title: "Tolak peranti", body: `Peranti <b>${esc(d.deviceName)}</b> akan dibuang dan tidak boleh dikawal. Aplikasi pada peranti itu akan melepaskan dirinya.`, label: "Tolak", danger: true,
       run: () => fsWrite(async (F) => { const bt = F.writeBatch(fsdb); bt.delete(ref("devices", d.id)); bt.delete(ref("publicStatus", d.id)); logEv(F, bt, "DEVICE_REJECTED", `Peranti "${d.deviceName}" ditolak`, d.id); await bt.commit(); toast("Peranti ditolak."); }) });
+  },
+  async admadd() {
+    const em = ($("#ae").value || "").trim().toLowerCase(), pw = $("#ap").value || "";
+    if (!/^\S+@\S+\.\S+$/.test(em)) return toast("E-mel tidak sah.", true);
+    if (pw.length < 6) return toast("Kata laluan minimum 6 aksara.", true);
+    try {
+      await fsWrite(async (F) => { const bt = F.writeBatch(fsdb);   // 1) beri akses admin dahulu
+        bt.update(ref("config", "admins"), { emails: F.arrayUnion(em), updatedAt: F.serverTimestamp(), updatedBy: S.user.uid });
+        logEv(F, bt, "ADMIN_ADDED", `Admin ditambah: ${em}`); await bt.commit(); });
+      let note = "Akaun dicipta.";
+      const { appMod, A } = fb, vapp = appMod.initializeApp(CONFIG, "adm-" + Date.now());   // 2) cipta akaun (sesi berasingan)
+      try {
+        const vauth = A.initializeAuth(vapp, { persistence: A.inMemoryPersistence });
+        if (window.__MDC_EMULATOR__) A.connectAuthEmulator(vauth, "http://127.0.0.1:9099", { disableWarnings: true });
+        try { await A.createUserWithEmailAndPassword(vauth, em, pw); await A.signOut(vauth); }
+        catch (e) { if (e.code === "auth/email-already-in-use") note = "Akaun sudah wujud; akses admin diberi."; else throw e; }
+      } finally { await appMod.deleteApp(vapp).catch(() => {}); }
+      S.keep.ae = ""; S.keep.ap = ""; toast(`${em} kini admin. ${note}`); playSound(true); render();
+    } catch (e) { if (e.message !== "preview") { playSound(false); toast(AUTH_ERR[e.code] || errMsg(e), true); } }
+  },
+  admrm(el) {
+    const em = el.dataset.id;
+    confirmBox({ title: "Buang admin", body: `<b>${esc(em)}</b> tidak lagi boleh mengawal sistem. Akaun Authentication tidak dipadam; hanya akses admin dibuang.`, label: "Buang", danger: true,
+      run: () => fsWrite(async (F) => { const bt = F.writeBatch(fsdb);
+        bt.update(ref("config", "admins"), { emails: F.arrayRemove(em), updatedAt: F.serverTimestamp(), updatedBy: S.user.uid });
+        logEv(F, bt, "ADMIN_REMOVED", `Admin dibuang: ${em}`); await bt.commit(); toast("Admin dibuang."); }) });
   },
   encancel(el) {
     const e = S.enrollments.find((x) => x.id === el.dataset.id);
@@ -624,7 +657,7 @@ document.addEventListener("change", (e) => {
   else if (t.id === "selall") { const q = S.q.toLowerCase(); S.devices.filter((d) => (!S.fs || d.status === S.fs) && (!S.ft || d.deviceType === S.ft) && (!q || `${d.deviceName} ${d.deviceId} ${d.deviceModel} ${d.assignedUserId || ""}`.toLowerCase().includes(q))).slice(S.pg * 10, S.pg * 10 + 10).forEach((d) => (t.checked ? S.sel.add(d.id) : S.sel.delete(d.id))); render(); }
   else if (t.id === "fs") { S.fs = t.value; S.pg = 0; render(); } else if (t.id === "ft") { S.ft = t.value; S.pg = 0; render(); }
 });
-document.addEventListener("input", (e) => { if (e.target.id === "q") { S.q = e.target.value; S.pg = 0; render(); } });
+document.addEventListener("input", (e) => { if (e.target.id === "q") { S.q = e.target.value; S.pg = 0; render(); } else if (e.target.dataset && e.target.dataset.keep !== undefined) S.keep[e.target.id] = e.target.value; });
 
 setPage();
 boot().catch((e) => { $("#root").innerHTML = `<div class="loading" role="alert">Gagal memulakan: ${esc(errMsg(e))}<br><br><button class="btn" onclick="location.reload()">Cuba semula</button></div>`; });

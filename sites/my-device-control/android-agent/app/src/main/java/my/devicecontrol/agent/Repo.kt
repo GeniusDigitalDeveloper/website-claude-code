@@ -39,7 +39,13 @@ class Repo(private val ctx: Context) {
 
     /** Daftar dengan kod enrollment (token biasa). Nama, jenis dan kumpulan dibaca dari enrollment. */
     suspend fun enroll(code: String) {
-        val id = ensureSignedIn()
+        val id = try { ensureSignedIn() } catch (e: Exception) {
+            val m = e.message ?: ""
+            throw IllegalStateException(
+                if (m.contains("ADMIN_ONLY", true) || m.contains("restricted to administrators", true))
+                    "Pendaftaran peranti baharu ditutup di Firebase (sign-up dimatikan). Hubungi pentadbir."
+                else "Tidak dapat menyambung ke Firebase: $m")
+        }
         val snap = try {
             db.collection("enrollments").document(code).get().await()
         } catch (e: FirebaseFirestoreException) {

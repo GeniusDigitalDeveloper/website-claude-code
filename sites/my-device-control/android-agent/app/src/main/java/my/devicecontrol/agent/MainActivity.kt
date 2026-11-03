@@ -130,8 +130,8 @@ class MainActivity : AppCompatActivity() {
             else -> {
                 scanner.pause(); scanBox.visibility = View.GONE; statusBox.visibility = View.VISIBLE
                 if (Prefs.state(this) == "PENDING") {
-                    title.text = "Menunggu kelulusan admin"
-                    body.text = "Kod QR telah diimbas. Pentadbir perlu menekan Terima di panel admin. Biarkan aplikasi ini."
+                    title.text = "Menunggu pengesahan admin"
+                    body.text = "Kod QR telah diimbas. Pentadbir perlu menekan Sahkan di panel admin. Biarkan aplikasi ini."
                 } else {
                     title.text = "Disambungkan"
                     body.text = "Peranti ini diurus oleh pentadbir organisasi. Hanya status peranti, bateri dan arahan pengurusan digunakan; tiada mesej, kata laluan atau ketukan kekunci dikumpul."
@@ -156,7 +156,7 @@ class MainActivity : AppCompatActivity() {
                 Repo(applicationContext).enroll(code)
                 Prefs.setState(this@MainActivity, "PENDING")
                 if (Build.VERSION.SDK_INT >= 33) notifPerm.launch(Manifest.permission.POST_NOTIFICATIONS)
-                toast("Kod diterima. Menunggu kelulusan admin.")
+                toast("Kod diterima. Menunggu pengesahan admin.")
                 refresh()
             } catch (e: Exception) {
                 toast(e.message ?: "Pendaftaran gagal.")
