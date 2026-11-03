@@ -204,7 +204,14 @@ function loadPreview() {
 const getCfg = () => CONFIG;
 let fsdb = null, auth = null;
 // Masa kunci pada lajur Status: admin kunci -> online semula. "Last seen" = kali terakhir peranti dikunci/skrin padam SENDIRI.
-const lockTimes = (d) => !ms(d.adminLockAt) ? "" : `<div class="sm">Admin lock: ${clk(d.adminLockAt)}</div>` + (ms(d.onlineAgainAt) >= ms(d.adminLockAt) ? `<div class="sm">Online semula: ${clk(d.onlineAgainAt)}</div>` : "");
+const lockTimes = (d) => {
+  // Tiga log pada Status, satu kitaran sahaja: Admin lock -> Online (pengguna buka telefon) -> Off (kali terakhir telefon dipadam).
+  // Setiap Lock admin baharu memulakan semula kitaran dari log pertama; log lama sebelum Lock itu tidak dipaparkan.
+  const A = ms(d.adminLockAt); if (!A) return "";
+  const O = ms(d.onlineAgainAt) >= A ? ms(d.onlineAgainAt) : 0;
+  const F = O && ms(d.selfLockAt) >= O ? ms(d.selfLockAt) : 0;
+  return `<div class="sm">Admin lock: ${fmt(d.adminLockAt)}</div>` + (O ? `<div class="sm">Online: ${fmt(d.onlineAgainAt)}</div>` : "") + (F ? `<div class="sm">Off: ${fmt(d.selfLockAt)}</div>` : "");
+};
 const lastSeenCell = (d) => d.deviceType === "ANDROID" ? clk(d.selfLockAt) : ago(d.lastSeen);
 
 const OFFLINE_MS = 10 * 60 * 1000;
@@ -475,12 +482,11 @@ function pageMonitoring() {
     : !U ? '<p class="sm" style="padding:16px">Memuatkan…</p>'
     : !U.apps.length ? empty("Tiada aktiviti direkodkan", "Belum ada aplikasi dibuka pada hari ini, atau peranti belum mengaktifkan Kawalan (Aksesibiliti).")
     : `<table><thead><tr><th>Aplikasi</th><th>Dibuka pertama</th><th>Ditutup terakhir</th><th>Kali dibuka</th><th>Jumlah masa</th></tr></thead><tbody>${U.apps.map((a) => `<tr><td><b>${esc(a.label)}</b><div class="mono">${esc(a.pkg)}</div></td><td>${hm(a.first)}</td><td>${a.active ? (day === today ? '<span class="badge b-ONLINE">Sedang dibuka</span>' : '<span class="sm">tutup tidak direkodkan</span>') + (a.last ? `<div class="sm">sebelum ini ${hm(a.last)}</div>` : "") : hm(a.last)}</td><td><b>${a.count}</b> kali</td><td>${a.total ? dur(a.total) : "—"}</td></tr>`).join("")}</tbody></table>`;
-  const timeline = U && U.sess.length ? `<details class="card" style="margin-top:12px"><summary style="cursor:pointer;font-weight:700">Garis masa penuh (${opens} pembukaan)</summary><ol class="tl" style="margin-top:8px">${[...U.sess].reverse().map((x) => `<li><time>${hm(x.open)} – ${x.close ? hm(x.close) : day === today ? "kini" : "—"}</time><code>${esc(x.label)}</code><span>${x.close ? dur(x.close - x.open) : day === today ? "sedang dibuka" : "tutup tidak direkodkan"}</span></li>`).join("")}</ol></details>` : "";
   return head("Live Monitoring", "Aplikasi yang dibuka pada peranti Android: bila dibuka, bila ditutup dan berapa kali sehari. Kiraan reset setiap pukul 12 malam. Skrin peranti tidak dilihat dan tiada permintaan kepada pengguna.") + `
     <div class="card row"><select id="mondev" aria-label="Pilih peranti" style="width:auto;min-width:240px"><option value="">— pilih peranti —</option>${devs.map((d) => `<option value="${esc(d.id)}" ${S.mon === d.id ? "selected" : ""}>${esc(d.deviceName)}</option>`).join("")}</select>
       <input type="date" id="monday" aria-label="Pilih hari" value="${day}" max="${today}" style="width:auto"><button class="btn" data-act="montoday" ${day === today ? "disabled" : ""}>Hari ini</button>
       ${U ? `<span class="sm"><b>${U.apps.length}</b> aplikasi · <b>${opens}</b> pembukaan${day === today ? " hari ini" : " pada " + day}</span>` : ""}</div>
-    <div class="card tw" style="margin-top:12px">${table}</div>${timeline}
+    <div class="card tw" style="margin-top:12px">${table}</div>
     <p class="sm" style="margin-top:12px">Hanya nama aplikasi dan masa dibuka/ditutup direkodkan. Kandungan skrin, carian atau apa yang ditaip tidak direkodkan. Peranti mesti mengaktifkan Kawalan (Aksesibiliti) supaya aktiviti direkodkan.</p>`;
 }
 
