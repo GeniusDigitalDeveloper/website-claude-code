@@ -3,75 +3,67 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MY DEVICE CONTROL — Log Masuk</title>
+<title>MY DEVICE CONTROL — Paparan Awam</title>
 <style>
-:root{--primary:#0F172A;--accent:#0369A1;--bg:#F8FAFC;--line:#E2E8F0;--muted:#475569;--danger:#DC2626;--ok:#047857}
+:root{--bg:#F5F7FA;--surface:#FFFFFF;--fg:#0F172A;--muted:#475569;--line:#DCE3EC;--accent:#0369A1;--ink:#0F172A;--ink-fg:#FFFFFF;--chip:#E8ECF1;--ok:#047857;--okbg:#ECFDF5;--warn:#B45309;--warnbg:#FFFBEB;--bad:#B91C1C;--badbg:#FEF2F2;--off:#475569;--offbg:#F1F5F9;--pend:#0C4A6E;--pendbg:#F0F9FF;--ease:cubic-bezier(.22,1,.36,1)}
+@media (prefers-color-scheme:dark){:root{--bg:#0B1220;--surface:#111B2E;--fg:#E6EDF7;--muted:#9FB0C8;--line:#22314A;--accent:#38A9E0;--ink:#16233A;--chip:#1A2740;--ok:#34D399;--okbg:#06281E;--warn:#FBBF24;--warnbg:#2B2008;--bad:#F87171;--badbg:#2D1111;--off:#9FB0C8;--offbg:#1A2740;--pend:#7DD3FC;--pendbg:#0B2233}}
 *{box-sizing:border-box}
-body{margin:0;font:16px/1.5 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:#020617}
-.wrap{min-height:100vh;display:grid;grid-template-columns:1.1fr 1fr}
-.hero{background:linear-gradient(160deg,#0F172A,#0c4a6e);color:#fff;padding:48px;display:flex;flex-direction:column;justify-content:center;gap:20px}
-.hero h1{margin:0;font-size:clamp(28px,4vw,44px);line-height:1.1;letter-spacing:-.02em}
-.hero p{margin:0;color:#cbd5e1;max-width:46ch}
-.hero ul{margin:0;padding:0;list-style:none;display:grid;gap:10px}
-.hero li{display:flex;gap:10px;align-items:flex-start;color:#e2e8f0;font-size:15px}
-.hero li svg{flex:none;margin-top:3px}
-.logo{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:.02em}
-.logo span{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.12)}
-.panel{display:grid;place-items:center;padding:24px}
-.card{width:100%;max-width:400px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:0 1px 3px rgba(15,23,42,.08)}
-h2{margin:0 0 4px;font-size:20px}
-.sub{margin:0 0 16px;color:var(--muted);font-size:14px}
-label{display:block;font-size:14px;font-weight:600;margin-top:12px}
-input,textarea{width:100%;margin-top:4px;padding:10px 12px;border:1px solid #cbd5e1;border-radius:10px;font:inherit;min-height:44px;background:#fff}
-textarea{min-height:140px;font:12px/1.4 ui-monospace,Consolas,monospace}
-button{font:inherit;font-weight:700;border-radius:10px;border:1px solid var(--line);min-height:44px;padding:0 16px;cursor:pointer;background:#fff;color:#0f172a}
-button.primary{background:var(--accent);color:#fff;border-color:var(--accent);width:100%;margin-top:16px}
-button.primary:hover{background:#075985}
-button.ghost{width:100%;margin-top:10px}
-button:disabled{opacity:.5;cursor:not-allowed}
+body{margin:0;font:15px/1.5 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--fg)}
+header{background:var(--ink);color:var(--ink-fg);padding:14px 16px}
+.in{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.02em}
+.logo i{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.14)}
+.live{display:flex;align-items:center;gap:8px;font-size:13px;color:#cbd5e1}
+.dot{width:9px;height:9px;border-radius:50%;background:#64748B}.dot.on{background:#34D399;box-shadow:0 0 0 0 rgba(52,211,153,.6);animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 8px rgba(52,211,153,0)}100%{box-shadow:0 0 0 0 rgba(52,211,153,0)}}
+.adm{color:#fff;text-decoration:underline;font-weight:700;font-size:14px}
+main{max-width:1180px;margin:0 auto;padding:20px 16px 48px}
+h1{margin:0 0 2px;font-size:24px;letter-spacing:-.01em}.sub{margin:0 0 16px;color:var(--muted);font-size:14px}
+.grid{display:grid;gap:12px}.stats{grid-template-columns:repeat(5,1fr)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 1px 2px rgba(15,23,42,.05)}
+.stat b{display:block;font-size:26px;line-height:1.1;font-weight:800;font-variant-numeric:tabular-nums}.stat span{font-size:12px;color:var(--muted);font-weight:600}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 12px}
+input,select{font:inherit;min-height:42px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--fg)}
+input{flex:1;min-width:180px}
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-.link{background:none;border:0;color:var(--accent);text-decoration:underline;width:100%;margin-top:6px;min-height:40px}
-.msg{margin-top:12px;font-size:14px;min-height:20px}.msg.err{color:var(--danger)}.msg.ok{color:var(--ok)}
-.warn{background:#fffbeb;border:1px solid #fcd34d;color:#78350f;border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:12px}
-.pw{position:relative}.pw input{padding-right:48px}
-.pw .eye{position:absolute;right:4px;top:8px;width:40px;min-height:40px;height:40px;padding:0;border:0;background:transparent;color:var(--muted);display:grid;place-items:center;border-radius:8px}
-.pw .eye:hover{background:#E8ECF1;color:#0F172A}
-.hide{display:none}
-.foot{margin-top:16px;font-size:12px;color:var(--muted);text-align:center}
-@media(max-width:860px){.wrap{grid-template-columns:1fr}.hero{padding:28px 20px}}
-@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.devs{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.dev{display:flex;flex-direction:column;gap:8px;transition:transform .4s var(--ease),box-shadow .4s var(--ease)}
+.dev:hover{transform:translateY(-3px);box-shadow:0 14px 28px rgba(15,23,42,.12)}
+.dev h2{margin:0;font-size:16px;line-height:1.25;word-break:break-word}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.sm{font-size:12px;color:var(--muted)}
+.badge{display:inline-block;border:1px solid;border-radius:99px;padding:1px 10px;font-size:12px;font-weight:700}
+.b-ONLINE{background:var(--okbg);color:var(--ok);border-color:var(--ok)}.b-OFFLINE{background:var(--offbg);color:var(--off);border-color:var(--line)}
+.b-LOCKED{background:var(--warnbg);color:var(--warn);border-color:var(--warn)}.b-ERROR{background:var(--badbg);color:var(--bad);border-color:var(--bad)}.b-ENROLLMENT_PENDING{background:var(--pendbg);color:var(--pend);border-color:var(--pend)}
+.batt{height:8px;border-radius:99px;background:var(--chip);overflow:hidden}.batt i{display:block;height:100%;border-radius:99px;background:var(--ok);transform-origin:0 50%}
+.batt.low i{background:var(--bad)}
+.empty{text-align:center;padding:40px 16px;color:var(--muted)}.empty b{display:block;color:var(--fg);font-size:16px}
+.err{border-color:var(--bad);color:var(--bad)}
+.note{margin-top:20px;font-size:12px;color:var(--muted)}
+.rv{opacity:0;animation:rise .8s var(--ease) var(--d,0ms) forwards}
+@keyframes rise{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:none}}
+.go .batt i{animation:growx 1s var(--ease) var(--d,0ms) both}@keyframes growx{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}}
+@media(prefers-reduced-motion:reduce){.rv{opacity:1!important;animation:none!important}.dot.on{animation:none}*{transition:none!important}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <section class="hero" aria-label="Tentang sistem">
-    <div class="logo"><span><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/></svg></span>MY DEVICE CONTROL</div>
-    <h1>Urus semua tablet &amp; laptop dari satu dashboard.</h1>
-    <p>Pantau status, kunci peranti dari jauh, urus kumpulan dan lihat rekod aktiviti. Semua peranti didaftarkan melalui kaedah pengurusan yang sah.</p>
-    <ul>
-      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7dd3fc" stroke-width="2.5" stroke-linecap="round"><path d="M5 12l5 5L20 7"/></svg>Tablet Android HONOR &amp; laptop Windows</li>
-      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7dd3fc" stroke-width="2.5" stroke-linecap="round"><path d="M5 12l5 5L20 7"/></svg>Log masuk dengan akaun Firebase Authentication sahaja</li>
-      <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7dd3fc" stroke-width="2.5" stroke-linecap="round"><path d="M5 12l5 5L20 7"/></svg>Audit log untuk setiap arahan sensitif</li>
-    </ul>
-  </section>
-
-  <section class="panel">
-    <!-- LANGKAH B: log masuk -->
-    <div class="card" id="login">
-      <h2>Log masuk pentadbir</h2>
-      <p class="sub">Gunakan akaun Firebase Authentication anda.</p>
-      <form id="form" onsubmit="return false">
-        <label for="email">E-mel</label>
-        <input id="email" type="email" autocomplete="username" required>
-        <label for="pass">Kata laluan</label>
-        <div class="pw"><input id="pass" type="password" autocomplete="current-password" required>
-          <button type="button" id="eye" class="eye" aria-label="Tunjuk kata laluan" aria-pressed="false"><svg id="eyeico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s4-8 10-8 10 8 10 8-4 8-10 8S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
-        <button class="primary" id="go">Log masuk</button>
-      </form>
-      <div class="msg" id="msg" role="alert"></div>
-    </div>
-  </section>
-</div>
+<header><div class="in">
+  <div class="logo"><i><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/></svg></i>MY DEVICE CONTROL</div>
+  <div class="live"><span class="dot" id="dot"></span><span id="livetxt">Menyambung…</span><a class="adm" id="adm" href="#" hidden>Log masuk admin</a></div>
+</div></header>
+<main id="app">
+  <h1>Status Peranti</h1>
+  <p class="sub">Paparan awam, baca sahaja. Dikemas kini secara langsung.</p>
+  <section class="grid stats" id="stats" aria-label="Ringkasan"></section>
+  <div class="bar">
+    <input id="q" type="search" placeholder="Cari nama peranti atau kumpulan" aria-label="Cari peranti">
+    <select id="fs" aria-label="Tapis status"><option value="">Semua status</option><option>ONLINE</option><option>OFFLINE</option><option>LOCKED</option><option>ERROR</option></select>
+    <select id="ft" aria-label="Tapis jenis"><option value="">Semua jenis</option><option>ANDROID</option><option>WINDOWS</option></select>
+  </div>
+  <section class="grid devs" id="devs" aria-live="polite"></section>
+  <p class="note">Hanya nama, jenis, status dan bateri dipaparkan. Peranti dianggap OFFLINE jika tiada isyarat lebih 10 minit. Untuk mengawal peranti, log masuk di halaman admin.</p>
+</main>
 
 <script type="module">
 /* ===================== TETAPAN FIREBASE (projek my-devide-control) ===================== */
@@ -84,63 +76,65 @@ const CONFIG = {
   appId: "1:106788083798:web:1a75a67f5f3dc9ab7243f7",
   measurementId: "G-JG180QB7CS"
 };
-// Alamat halaman admin. Kosong = automatik ("admin.html" jika laman berakhir .html / fail setempat, selain itu "admin").
-// Di Interactive Link, isi mengikut Page Path anda, contoh: "/admin".
-const ADMIN_URL = "";
+// Pautan ke halaman admin anda (pilihan). Contoh: "/admin" atau "https://idea.interactivelink.site/admin". Kosong = pautan disembunyikan.
+const ADMIN_LINK = "";
 const SDK = "https://www.gstatic.com/firebasejs/11.0.2/";
+const PREVIEW = window.__MDC_PREVIEW__ === true;
+const OFFLINE_MS = 10 * 60 * 1000;
 /* ======================================================================================= */
 
-/* Bunyi: berjaya = nada tinggi naik; salah = buzzer rendah. Dimainkan hasil klik pengguna (dibenarkan pelayar). */
-let AC = null;
-const unlockAudio = () => { try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === "suspended") AC.resume(); } catch (e) {} };
-const tone = (f, at, dur, type, vol) => { const o = AC.createOscillator(), g = AC.createGain(); o.type = type; o.frequency.value = f; o.connect(g); g.connect(AC.destination);
-  g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(vol, at + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, at + dur); o.start(at); o.stop(at + dur + 0.05); };
-const playSound = (ok) => { try { unlockAudio(); const t = AC.currentTime + 0.02;
-  if (ok) { tone(1318.5, t, 0.16, "sine", 0.3); tone(1760, t + 0.14, 0.16, "sine", 0.3); tone(2349.3, t + 0.28, 0.42, "sine", 0.3); }
-  else { tone(180, t, 0.28, "sawtooth", 0.22); tone(140, t + 0.3, 0.45, "sawtooth", 0.22); } } catch (e) {} };
 const $ = (id) => document.getElementById(id);
-const say = (el, text, kind) => { el.textContent = text || ""; el.className = "msg" + (kind ? " " + kind : ""); };
-const errText = (e) => ({
-  "auth/invalid-credential": "E-mel atau kata laluan salah.",
-  "auth/user-not-found": "Akaun tidak dijumpai.",
-  "auth/wrong-password": "Kata laluan salah.",
-  "auth/too-many-requests": "Terlalu banyak percubaan. Cuba sebentar lagi.",
-  "auth/popup-closed-by-user": "Tetingkap log masuk ditutup.",
-  "auth/unauthorized-domain": "Domain ini belum ditambah di Firebase > Authentication > Settings > Authorized domains.",
-  "auth/operation-not-allowed": "Kaedah log masuk ini belum diaktifkan di Firebase Console > Authentication > Sign-in method."
-}[e && e.code] || (e && e.message) || "Ralat tidak diketahui.");
+const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const ms = (t) => (t && (t.toMillis ? t.toMillis() : t.seconds ? t.seconds * 1000 : +t)) || 0;
+const ago = (t) => { if (!ms(t)) return "—"; const s = Math.max(0, (Date.now() - ms(t)) / 1000); return s < 60 ? "baru sahaja" : s < 3600 ? Math.floor(s / 60) + " min lalu" : s < 86400 ? Math.floor(s / 3600) + " jam lalu" : Math.floor(s / 86400) + " hari lalu"; };
+const REDUCE = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const S = { list: [], q: "", fs: "", ft: "", loaded: false, error: null, animate: true };
 
-const EYE = '<path d="M2 12s4-8 10-8 10 8 10 8-4 8-10 8S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>', EYEOFF = '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-10-8-10-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 10 8 10 8a18.5 18.5 0 01-2.16 3.19M14.12 14.12a3 3 0 11-4.24-4.24M1 1l22 22"/>';
-$("eye").onclick = () => {
-  const show = $("pass").type === "password";
-  $("pass").type = show ? "text" : "password";
-  $("eyeico").innerHTML = show ? EYEOFF : EYE;
-  $("eye").setAttribute("aria-pressed", String(show));
-  $("eye").setAttribute("aria-label", show ? "Sorok kata laluan" : "Tunjuk kata laluan");
-};
-const adminUrl = () => ADMIN_URL || (/\.html?$/.test(location.pathname) || location.protocol === "file:" ? "admin.html" : "admin");
-const goAdmin = () => {
-  try { location.href = adminUrl(); }
-  catch (e) { $("msg").innerHTML = 'Log masuk berjaya. <a href="' + adminUrl() + '">Buka admin panel</a>'; }
-};
+if (ADMIN_LINK) { $("adm").href = ADMIN_LINK; $("adm").hidden = false; }
 
-if (!window.__MDC_PREVIEW__) try {   // dalam preview, Firebase tidak dimuat
-  const [{ initializeApp }, A] = await Promise.all([import(SDK + "firebase-app.js"), import(SDK + "firebase-auth.js")]);
-  const auth = A.getAuth(initializeApp(CONFIG));
-  document.body.dataset.ready = "1";
-  let manual = false;   // log masuk melalui borang: tunggu bunyi sebelum buka admin
-  A.onAuthStateChanged(auth, (u) => { if (u && !manual) goAdmin(); });
+const eff = (d) => ["ONLINE", "LOCKED", "ERROR"].includes(d.status) && ms(d.lastSeen) && Date.now() - ms(d.lastSeen) > OFFLINE_MS ? "OFFLINE" : d.status;
 
-  $("form").onsubmit = async (e) => {
-    e.preventDefault(); unlockAudio(); manual = true; $("go").disabled = true; say($("msg"), "");
-    try {
-      await A.signInWithEmailAndPassword(auth, $("email").value.trim(), $("pass").value);
-      playSound(true); say($("msg"), "Berjaya. Membuka panel…", "ok");
-      setTimeout(goAdmin, 900);
-    } catch (er) { manual = false; playSound(false); say($("msg"), errText(er), "err"); $("go").disabled = false; }
-  };
-} catch (e) {
-  say($("msg"), "Gagal memuatkan Firebase. Semak sambungan internet. (" + ((e && e.message) || e) + ")", "err");
+function countUp(el) {
+  const to = +el.dataset.n; if (!to || REDUCE) return; const t0 = performance.now();
+  const tick = (t) => { const p = Math.min(1, (t - t0) / 1000), e = p === 1 ? 1 : 1 - Math.pow(2, -10 * p); el.textContent = Math.round(to * e); if (p < 1) requestAnimationFrame(tick); };
+  el.textContent = "0"; requestAnimationFrame(tick);
+}
+function draw() {
+  const L = S.list.map((d) => ({ ...d, st: eff(d) }));
+  const n = (s) => L.filter((d) => d.st === s).length, low = L.filter((d) => typeof d.batteryLevel === "number" && d.batteryLevel < 15).length;
+  const stat = (l, v) => `<div class="card stat"><b data-n="${v}">${v}</b><span>${l}</span></div>`;
+  $("stats").innerHTML = stat("Jumlah peranti", L.length) + stat("Online", n("ONLINE")) + stat("Offline", n("OFFLINE")) + stat("Dikunci", n("LOCKED")) + stat("Bateri rendah", low);
+  const q = S.q.toLowerCase();
+  const rows = L.filter((d) => (!S.fs || d.st === S.fs) && (!S.ft || d.deviceType === S.ft) && (!q || `${d.deviceName} ${d.groupName || ""}`.toLowerCase().includes(q))).sort((a, b) => a.deviceName.localeCompare(b.deviceName));
+  if (S.error) $("devs").innerHTML = `<div class="card err" role="alert" style="grid-column:1/-1"><b>Tidak dapat memuatkan data</b><p class="sm">${esc(S.error)}<br>Semak bahawa Firestore telah dicipta dan rules (koleksi publicStatus) telah dipublish.</p></div>`;
+  else if (!S.loaded) $("devs").innerHTML = `<div class="empty" style="grid-column:1/-1">Memuatkan…</div>`;
+  else if (!rows.length) $("devs").innerHTML = `<div class="card empty" style="grid-column:1/-1"><b>${L.length ? "Tiada padanan" : "Belum ada peranti"}</b>${L.length ? "Ubah carian atau penapis." : "Peranti akan muncul di sini selepas didaftarkan oleh admin dan agent peranti disambungkan."}</div>`;
+  else $("devs").innerHTML = rows.map((d) => `<article class="card dev"><div class="row"><h2>${esc(d.deviceName)}</h2><span class="badge b-${esc(d.st)}">${esc(d.st.replace("_", " "))}</span></div>
+      <div class="sm">${esc(d.deviceType)}${d.groupName ? " · " + esc(d.groupName) : ""}</div>
+      ${typeof d.batteryLevel === "number" ? `<div class="batt ${d.batteryLevel < 15 ? "low" : ""}" role="img" aria-label="Bateri ${d.batteryLevel}%"><i style="width:${d.batteryLevel}%"></i></div><div class="row sm"><span>Bateri ${d.batteryLevel}%</span><span>${ago(d.lastSeen)}</span></div>` : `<div class="row sm"><span>Bateri tidak diketahui</span><span>${ago(d.lastSeen)}</span></div>`}</article>`).join("");
+  if (S.animate && S.loaded && !REDUCE) {
+    S.animate = false; let i = 0;
+    document.querySelectorAll(".stat,.dev,.empty").forEach((el) => { el.style.setProperty("--d", Math.min(i * 50, 700) + "ms"); el.classList.add("rv"); el.addEventListener("animationend", () => el.classList.remove("rv"), { once: true }); i++; });
+    document.querySelectorAll("[data-n]").forEach(countUp);
+    $("app").classList.add("go"); setTimeout(() => $("app").classList.remove("go"), 2000);
+  }
+}
+$("q").oninput = (e) => { S.q = e.target.value; draw(); };
+$("fs").onchange = (e) => { S.fs = e.target.value; draw(); };
+$("ft").onchange = (e) => { S.ft = e.target.value; draw(); };
+
+if (PREVIEW) { S.loaded = true; $("livetxt").textContent = "Preview (tiada sambungan)"; draw(); }
+else {
+  draw();
+  try {
+    const [{ initializeApp }, F] = await Promise.all([import(SDK + "firebase-app.js"), import(SDK + "firebase-firestore.js")]);
+    const db = F.getFirestore(initializeApp(CONFIG));   // tiada log masuk: baca sahaja koleksi awam
+    F.onSnapshot(F.collection(db, "publicStatus"), (snap) => {
+      S.list = snap.docs.map((d) => ({ id: d.id, ...d.data() })); S.loaded = true; S.error = null;
+      $("dot").classList.add("on"); $("livetxt").textContent = "Langsung"; draw();
+    }, (e) => { S.error = e.message; S.loaded = true; $("dot").classList.remove("on"); $("livetxt").textContent = "Terputus"; draw(); });
+    setInterval(draw, 60000);   // kemas kini status OFFLINE mengikut masa
+  } catch (e) { S.error = "Gagal memuatkan Firebase. Semak sambungan internet. (" + ((e && e.message) || e) + ")"; S.loaded = true; draw(); }
 }
 </script>
 </body>

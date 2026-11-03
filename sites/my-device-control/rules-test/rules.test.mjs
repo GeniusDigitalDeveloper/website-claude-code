@@ -2,7 +2,7 @@ import test, { before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { initializeTestEnvironment, assertFails, assertSucceeds } from '@firebase/rules-unit-testing';
-import { doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc, collection, writeBatch, Timestamp, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, getDocs, setDoc, updateDoc, addDoc, deleteDoc, collection, writeBatch, Timestamp, serverTimestamp } from 'firebase/firestore';
 import { ref, set, get } from 'firebase/database';
 
 let env;
@@ -35,8 +35,35 @@ const admin = () => adminCtx().firestore();
 const devCtx = (uid) => env.authenticatedContext(uid, { firebase: { sign_in_provider: 'anonymous' } });
 const dev = (uid = 'dev1') => devCtx(uid).firestore();
 
-test('tanpa log masuk semuanya ditolak', async () => {
-  await assertFails(getDoc(doc(env.unauthenticatedContext().firestore(), 'devices/dev1')));
+test('tanpa log masuk: peranti/arahan/log/enrollment ditolak', async () => {
+  const f = env.unauthenticatedContext().firestore();
+  await assertFails(getDoc(doc(f, 'devices/dev1')));
+  await assertFails(getDoc(doc(f, 'commands/c-pending')));
+  await assertFails(getDoc(doc(f, 'enrollments/' + CODE)));
+  await assertFails(getDoc(doc(f, 'activityLogs/x')));
+  await assertFails(getDocs(collection(f, 'devices')));
+});
+const pub = (over = {}) => ({ deviceName: 'HONOR 01', deviceType: 'ANDROID', status: 'ONLINE', batteryLevel: 80, lastSeen: serverTimestamp(), groupName: null, updatedAt: serverTimestamp(), ...over });
+test('AWAM: publicStatus boleh dibaca tanpa log masuk; tidak boleh ditulis oleh orang awam', async () => {
+  await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'publicStatus/dev1'), { deviceName: 'T1', deviceType: 'ANDROID', status: 'ONLINE' }));
+  const f = env.unauthenticatedContext().firestore();
+  await assertSucceeds(getDoc(doc(f, 'publicStatus/dev1')));
+  await assertSucceeds(getDocs(collection(f, 'publicStatus')));
+  await assertFails(setDoc(doc(f, 'publicStatus/dev1'), pub()));
+  await assertFails(deleteDoc(doc(f, 'publicStatus/dev1')));
+});
+test('AWAM: anonymous biasa (bukan peranti berdaftar) tidak boleh tulis; peranti berdaftar boleh tulis dirinya sahaja', async () => {
+  await assertFails(setDoc(doc(dev('rawak'), 'publicStatus/rawak'), pub()));
+  await assertSucceeds(setDoc(doc(dev('dev1'), 'publicStatus/dev1'), pub()));
+  await assertFails(setDoc(doc(dev('dev1'), 'publicStatus/dev2'), pub()));
+  await assertFails(setDoc(doc(dev('dev1'), 'publicStatus/dev1'), pub({ assignedUserId: 'ali' })));
+});
+test('AWAM: admin boleh tulis; medan sensitif / status tidak sah ditolak', async () => {
+  await assertSucceeds(setDoc(doc(admin(), 'publicStatus/dev1'), pub({ groupName: 'Asrama Putera' })));
+  await assertFails(setDoc(doc(admin(), 'publicStatus/dev1'), pub({ fcmToken: 'rahsia' })));
+  await assertFails(setDoc(doc(admin(), 'publicStatus/dev1'), pub({ status: 'HACKED' })));
+  await assertFails(setDoc(doc(admin(), 'publicStatus/dev1'), pub({ batteryLevel: 900 })));
+  await assertSucceeds(deleteDoc(doc(admin(), 'publicStatus/dev1')));
 });
 test('ADMIN: akaun e-mel/kata laluan terus boleh baca (tiada organisasi/peranan/pengesahan e-mel)', async () => {
   const f = env.authenticatedContext('baru', { email: 'baru@kerja.com', email_verified: false, firebase: { sign_in_provider: 'password' } }).firestore();

@@ -235,6 +235,7 @@ function subscribeAll() {
 }
 async function fsWrite(fn) { if (PREVIEW) return previewBlock(); return fn(fb.F); }
 const ref = (...p) => fb.F.doc(fsdb, ...p);
+const pubDoc = (d, over = {}) => ({ deviceName: d.deviceName, deviceType: d.deviceType, status: d._raw || d.status, batteryLevel: typeof d.batteryLevel === "number" ? d.batteryLevel : null, lastSeen: d.lastSeen || null, groupName: (S.groups.find((g) => g.id === d.groupId) || {}).name || null, ...over });
 const logEv = (F, bt, type, message, deviceId = null) => bt.set(F.doc(F.collection(fsdb, "activityLogs")), { type, message, actorId: S.user.uid, deviceId, createdAt: F.serverTimestamp() });
 const randToken = () => { const a = new Uint8Array(24); crypto.getRandomValues(a); return btoa(String.fromCharCode(...a)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); };
 
@@ -475,13 +476,17 @@ const ACTIONS = {
   remove(el) { const d = byId(el.dataset.id); confirmBox({ title: "Nyahdaftar peranti", body: `Peranti <b>${esc(d.deviceName)}</b> akan dibuang dan arahan tertunggak dibatalkan.`, label: "Nyahdaftar", danger: true, requireText: d.deviceName,
     run: () => fsWrite(async (F) => { const bt = F.writeBatch(fsdb);
       S.commands.filter((c) => c.deviceId === d.id && ["PENDING", "SENT"].includes(c._raw || c.status)).forEach((c) => bt.update(ref("commands", c.id), { status: "EXPIRED", errorMessage: "Peranti dinyahdaftar" }));
-      bt.delete(ref("devices", d.id)); logEv(F, bt, "DEVICE_REMOVED", `Peranti "${d.deviceName}" dinyahdaftar`, d.id); await bt.commit(); toast("Peranti dinyahdaftar."); }) }); },
+      bt.delete(ref("devices", d.id)); bt.delete(ref("publicStatus", d.id)); logEv(F, bt, "DEVICE_REMOVED", `Peranti "${d.deviceName}" dinyahdaftar`, d.id); await bt.commit(); toast("Peranti dinyahdaftar."); }) }); },
   edit(el) {
     const d = byId(el.dataset.id);
     openModal(`<h2>Sunting peranti</h2><label class="f">Nama<input id="en" maxlength="80" value="${esc(d.deviceName)}"></label><label class="f">Pengguna ditetapkan<input id="eu" value="${esc(d.assignedUserId || "")}"></label>
       <label class="f">Kumpulan<select id="eg"><option value="">— tiada —</option>${S.groups.map((g) => `<option value="${esc(g.id)}" ${g.id === d.groupId ? "selected" : ""}>${esc(g.name)}</option>`).join("")}</select></label>
       <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn" data-close>Batal</button><button class="btn p" id="ok">Simpan</button></div>`, (m) => {
-      m.querySelector("#ok").onclick = async () => { try { await fsWrite((F) => F.updateDoc(ref("devices", d.id), { deviceName: m.querySelector("#en").value.trim(), assignedUserId: m.querySelector("#eu").value.trim() || null, groupId: m.querySelector("#eg").value || null, updatedAt: F.serverTimestamp() })); toast("Peranti dikemas kini."); closeModal(); } catch (e) { if (e.message !== "preview") toast(errMsg(e), true); } };
+      m.querySelector("#ok").onclick = async () => { try { await fsWrite(async (F) => {
+          const nm = m.querySelector("#en").value.trim(), gid = m.querySelector("#eg").value || null, bt = F.writeBatch(fsdb);
+          bt.update(ref("devices", d.id), { deviceName: nm, assignedUserId: m.querySelector("#eu").value.trim() || null, groupId: gid, updatedAt: F.serverTimestamp() });
+          bt.set(ref("publicStatus", d.id), pubDoc(d, { deviceName: nm, groupName: (S.groups.find((g) => g.id === gid) || {}).name || null, updatedAt: F.serverTimestamp() }));   // paparan awam (index.html)
+          await bt.commit(); }); toast("Peranti dikemas kini."); closeModal(); } catch (e) { if (e.message !== "preview") toast(errMsg(e), true); } };
     });
   },
   enroll() {
@@ -506,7 +511,7 @@ const ACTIONS = {
   gdel(el) {
     const g = S.groups.find((x) => x.id === el.dataset.id), n = S.devices.filter((d) => d.groupId === g.id);
     confirmBox({ title: "Padam kumpulan", body: `Kumpulan <b>${esc(g.name)}</b> dipadam. ${n.length} peranti dilepaskan daripada kumpulan (peranti tidak dipadam).`, label: "Padam", danger: true, requireText: g.name,
-      run: () => fsWrite(async (F) => { await Promise.all(n.map((d) => F.updateDoc(ref("devices", d.id), { groupId: null, updatedAt: F.serverTimestamp() }))); await F.deleteDoc(ref("deviceGroups", g.id)); toast("Kumpulan dipadam."); }) });
+      run: () => fsWrite(async (F) => { await Promise.all(n.flatMap((d) => [F.updateDoc(ref("devices", d.id), { groupId: null, updatedAt: F.serverTimestamp() }), F.setDoc(ref("publicStatus", d.id), pubDoc(d, { groupName: null }))])); await F.deleteDoc(ref("deviceGroups", g.id)); toast("Kumpulan dipadam."); }) });
   },
   glock(el) { groupCmd(el.dataset.id, "LOCK"); }, gunlock(el) { groupCmd(el.dataset.id, "UNLOCK"); },
 };
@@ -516,7 +521,7 @@ function groupForm(g) {
     m.querySelector("#ok").onclick = async () => {
       const name = m.querySelector("#gn").value.trim(); if (!name) return toast("Masukkan nama kumpulan.", true);
       try { await fsWrite(async (F) => { const base = { name, description: m.querySelector("#gd").value.trim(), updatedAt: F.serverTimestamp() };
-        if (g) await F.updateDoc(ref("deviceGroups", g.id), base); else await F.addDoc(F.collection(fsdb, "deviceGroups"), { ...base, policyIds: [], createdAt: F.serverTimestamp(), createdBy: S.user.uid }); });
+        if (g) { await F.updateDoc(ref("deviceGroups", g.id), base); const bt = F.writeBatch(fsdb); S.devices.filter((d) => d.groupId === g.id).forEach((d) => bt.set(ref("publicStatus", d.id), pubDoc(d, { groupName: name }))); await bt.commit(); } else await F.addDoc(F.collection(fsdb, "deviceGroups"), { ...base, policyIds: [], createdAt: F.serverTimestamp(), createdBy: S.user.uid }); });
         toast("Kumpulan disimpan."); closeModal(); } catch (e) { if (e.message !== "preview") toast(errMsg(e), true); }
     };
   });

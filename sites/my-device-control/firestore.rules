@@ -4,6 +4,7 @@ rules_version = '2';
 //  ADMIN  = mana-mana akaun yang anda cipta dalam Firebase Authentication (E-mel/Kata laluan, Google, dll.).
 //           Tiada daftar organisasi, tiada pengesahan e-mel, tiada peranan.
 //  PERANTI = agent peranti yang log masuk "Anonymous" dan mendaftar dengan kod enrollment sekali guna.
+//  AWAM    = index.html (tanpa log masuk) hanya membaca koleksi publicStatus (nama, jenis, status, bateri).
 //
 // PENTING: di Firebase Console > Authentication > Settings > User actions, MATIKAN
 // "Enable create (sign-up)" supaya hanya akaun yang anda cipta di Console boleh log masuk.
@@ -109,6 +110,25 @@ service cloud.firestore {
         // Admin hanya boleh membatalkan arahan yang belum dilaksanakan
         || isAdmin() && resource.data.status in ['PENDING', 'SENT'] && onlyChanges(['status', 'errorMessage']) && request.resource.data.status == 'EXPIRED';
       allow delete: if false;
+    }
+
+    // ---------- Paparan awam (index.html, tanpa log masuk): hanya maklumat tidak sensitif ----------
+    // Tiada pengguna ditetapkan, tiada token, tiada nota. Hanya admin atau peranti berdaftar boleh menulis.
+    function validPublic() {
+      return request.resource.data.keys().hasOnly(['deviceName', 'deviceType', 'status', 'batteryLevel', 'lastSeen', 'groupName', 'updatedAt'])
+        && request.resource.data.deviceName is string && request.resource.data.deviceName.size() > 0 && request.resource.data.deviceName.size() <= 80
+        && request.resource.data.deviceType in ['ANDROID', 'WINDOWS']
+        && request.resource.data.status in ['ONLINE', 'OFFLINE', 'LOCKED', 'ERROR', 'ENROLLMENT_PENDING']
+        && (!('batteryLevel' in request.resource.data) || request.resource.data.batteryLevel == null
+            || (request.resource.data.batteryLevel is number && request.resource.data.batteryLevel >= 0 && request.resource.data.batteryLevel <= 100))
+        && (!('groupName' in request.resource.data) || request.resource.data.groupName == null
+            || (request.resource.data.groupName is string && request.resource.data.groupName.size() <= 80));
+    }
+    match /publicStatus/{deviceId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && validPublic()
+        || isDevice() && request.auth.uid == deviceId && existsAfter(/databases/$(database)/documents/devices/$(deviceId)) && validPublic();
+      allow delete: if isAdmin();
     }
 
     // ---------- Polisi (Fasa 2/3) ----------
