@@ -23,7 +23,9 @@ import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -61,10 +63,7 @@ class AgentService : Service() {
         override fun onReceive(context: Context, intent: Intent) {
             if (!Prefs.locked(applicationContext)) return
             Prefs.setLocked(applicationContext, false)
-            scope.launch {
-                runCatching { repo.heartbeat(false, statusText()) }
-                runCatching { repo.stamp("onlineAgainAt") }
-            }
+            scope.launch { runCatching { repo.heartbeat(false, statusText(), "onlineAgainAt") } }   // ONLINE + masa dalam satu tulisan, serta-merta
         }
     }
 
@@ -231,18 +230,20 @@ class AgentService : Service() {
     /** PENDING -> SENT -> (laksana) -> EXECUTED / FAILED. EXECUTED hanya selepas pelaksanaan sebenar. */
     private suspend fun handle(ref: DocumentReference, status: String, type: String) {
         try {
-            if (status == "PENDING")
-                ref.update(mapOf("status" to "SENT", "sentAt" to FieldValue.serverTimestamp())).await()
-            val (ok, msg) = executor.run(type)
-            if (ok) ref.update(mapOf("status" to "EXECUTED", "executedAt" to FieldValue.serverTimestamp())).await()
-            else ref.update(mapOf("status" to "FAILED", "errorMessage" to (msg ?: "Gagal").take(300))).await()
-            if (!ok && type == "LOCK") notifyNeedSetup()
-            if (ok && type == "LOCK") runCatching { repo.stamp("adminLockAt") }
-            runCatching {
-                repo.log(if (ok) "COMMAND_EXECUTED" else "COMMAND_FAILED", if (ok) "$type berjaya" else "$type gagal: $msg")
-                repo.heartbeat(Prefs.locked(applicationContext), statusText())
+            coroutineScope {
+                // SENT ditulis serentak dengan pelaksanaan (tidak menunggu pergi-balik rangkaian dahulu): kunci berlaku serta-merta
+                val sent = if (status == "PENDING") async { ref.update(mapOf("status" to "SENT", "sentAt" to FieldValue.serverTimestamp())).await() } else null
+                val (ok, msg) = executor.run(type)
+                // Terus laporkan LOCKED + masa Admin lock dalam SATU tulisan, sebelum langkah lain
+                if (ok && type == "LOCK") runCatching { repo.heartbeat(true, statusText(), "adminLockAt") }
+                sent?.await()
+                if (ok) ref.update(mapOf("status" to "EXECUTED", "executedAt" to FieldValue.serverTimestamp())).await()
+                else ref.update(mapOf("status" to "FAILED", "errorMessage" to (msg ?: "Gagal").take(300))).await()
+                if (!ok && type == "LOCK") notifyNeedSetup()
+                runCatching { repo.log(if (ok) "COMMAND_EXECUTED" else "COMMAND_FAILED", if (ok) "$type berjaya" else "$type gagal: $msg") }
+                if (ok && type != "LOCK") runCatching { repo.heartbeat(Prefs.locked(applicationContext), statusText()) }
+                if (ok && type == "REBOOT") executor.reboot()
             }
-            if (ok && type == "REBOOT") executor.reboot()
         } catch (_: Exception) { /* arahan kekal SENT/PENDING dan dicuba semula pada snapshot seterusnya */ }
     }
 
