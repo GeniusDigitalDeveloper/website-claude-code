@@ -28,6 +28,7 @@ class GuardService : AccessibilityService() {
     companion object {
         @Volatile var instance: GuardService? = null
         @Volatile private var last: String? = null
+        fun resetLast() { last = null }
     }
 
     private val homePkgs by lazy {
@@ -43,7 +44,8 @@ class GuardService : AccessibilityService() {
         last = pkg                                    // aplikasi di hadapan sekarang
         if (pkg == packageName) return
         if (PolicyStore.blockedPkgs.contains(pkg)) { kickOut(pkg); return }
-        if (pkg in homePkgs || Prefs.state(this) != "ACTIVE") return
+        if (Prefs.state(this) != "ACTIVE") return
+        if (pkg in homePkgs) { UsageBuffer.add(AppEvent("__HOME__", "Skrin utama", System.currentTimeMillis())); return }   // aplikasi sebelumnya ditutup
         val label = try { packageManager.getApplicationLabel(packageManager.getApplicationInfo(pkg, 0)).toString() } catch (_: PackageManager.NameNotFoundException) { pkg }
         UsageBuffer.add(AppEvent(pkg, label.take(80), System.currentTimeMillis()))
     }

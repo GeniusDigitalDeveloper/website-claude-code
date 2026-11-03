@@ -45,7 +45,6 @@ class AgentService : Service() {
     @Volatile private var myGroup: String? = null
     @Volatile private var apps: List<AppRule> = emptyList()
     @Volatile private var web: List<WebRule> = emptyList()
-    private var lastReq: Long = 0
     private val busy = ConcurrentHashMap.newKeySet<String>()
     private lateinit var repo: Repo
     private lateinit var executor: CommandExecutor
@@ -73,6 +72,8 @@ class AgentService : Service() {
         override fun onReceive(context: Context, intent: Intent) {
             val c = applicationContext
             if (Prefs.state(c) != "ACTIVE") return
+            UsageBuffer.add(AppEvent("__SCREEN_OFF__", "Skrin dipadam", System.currentTimeMillis()))   // aplikasi di hadapan ditutup
+            GuardService.resetLast()                                                                    // buka semula = dikira satu pembukaan baharu
             if (Prefs.locked(c)) return                                              // masih dikunci admin
             if (System.currentTimeMillis() - Prefs.adminLockMs(c) < 15_000) return   // skrin padam kerana Lock admin
             scope.launch { runCatching { repo.stamp("selfLockAt") } }
@@ -98,7 +99,6 @@ class AgentService : Service() {
         val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= 26) {
             nm.createNotificationChannel(NotificationChannel("agent", "Pengurusan peranti", NotificationManager.IMPORTANCE_LOW))
-            nm.createNotificationChannel(NotificationChannel("monitor", "Permintaan pantau skrin", NotificationManager.IMPORTANCE_HIGH))
         }
         val n = NotificationCompat.Builder(this, "agent")
             .setSmallIcon(android.R.drawable.ic_lock_idle_lock)
@@ -141,7 +141,7 @@ class AgentService : Service() {
         Prefs.setState(applicationContext, "ACTIVE")
         executor.protect()
         if (Prefs.locked(applicationContext) && executor.isOwner()) executor.showKioskLock()
-        listenCommands(uid); listenPolicies(); listenLive(uid)
+        listenCommands(uid); listenPolicies()
         scope.launch {
             runCatching { repo.syncInstalledApps() }
             var tick = 0
@@ -195,34 +195,12 @@ class AgentService : Service() {
         else if (!needVpn && DnsVpnService.running) startService(Intent(this, DnsVpnService::class.java).setAction("STOP"))
     }
 
-    // ---------------- Pantau skrin: admin minta, pengguna ketuk untuk benarkan ----------------
-    private fun listenLive(uid: String) {
-        regs.add(FirebaseFirestore.getInstance().collection("liveSessions").document(uid).addSnapshotListener { s, _ ->
-            if (s == null || !s.exists()) return@addSnapshotListener
-            val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            when (s.getString("state")) {
-                "REQUESTED" -> {
-                    val at = s.getTimestamp("requestedAt")?.toDate()?.time ?: 0L
-                    if (at == lastReq) return@addSnapshotListener
-                    lastReq = at
-                    val pi = PendingIntent.getActivity(this, 4, Intent(this, ConsentActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-                    nm.notify(4, NotificationCompat.Builder(this, "monitor").setSmallIcon(android.R.drawable.ic_menu_view)
-                        .setContentTitle("Admin meminta untuk melihat skrin anda").setContentText("Ketuk untuk membenarkan. Anda boleh berhenti bila-bila masa.")
-                        .setPriority(NotificationCompat.PRIORITY_HIGH).setContentIntent(pi).setAutoCancel(true).build())
-                }
-                "STOPPED" -> { nm.cancel(4); stopService(Intent(this, ScreenShareService::class.java)) }
-            }
-        })
-    }
-
     private fun releaseDevice() {
         if (released) return
         released = true
         regs.forEach { it.remove() }; regs.clear(); selfReg?.remove(); selfReg = null
         executor.release()
         if (DnsVpnService.running) startService(Intent(this, DnsVpnService::class.java).setAction("STOP"))
-        stopService(Intent(this, ScreenShareService::class.java))
         PolicyStore.update(applicationContext, null, emptyList(), emptyList())
         Prefs.setState(applicationContext, "NONE")
         FirebaseAuth.getInstance().signOut()

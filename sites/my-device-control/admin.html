@@ -231,7 +231,7 @@ async function boot() {
     if (!u || u.isAnonymous) { S.user = null; unsubs.forEach((f) => f()); unsubs = []; subscribed = false; S.screen = "login"; render(); return; }
     S.screen = null; S.user = u; S.claims = { role: "ADMIN" }; subscribeAll(); render();   // terus masuk dashboard
   });
-  setInterval(() => { applyStatus(S.devices); applyCmdStatus(S.commands); render(); }, 60000);
+  setInterval(() => { applyStatus(S.devices); applyCmdStatus(S.commands); if (S.mon && !S.monDay && actKey && actKey !== dayKey()) { watchActivity(S.mon); return; } render(); }, 60000);   // lewat tengah malam: mula kiraan hari baharu
 }
 
 let unsubs = [], subscribed = false;
@@ -345,7 +345,7 @@ function pageDevices() {
     ${view.map((d) => `<tr><td><input type="checkbox" data-sel="${esc(d.id)}" aria-label="Pilih ${esc(d.deviceName)}" ${mg ? "" : "disabled"} ${S.sel.has(d.id) ? "checked" : ""} style="min-height:0;width:auto"></td>
       <td><b>${esc(d.deviceName)}</b><div class="mono">${esc(d.deviceId)}</div></td><td>${esc(d.deviceType)}<div class="sm">${esc(d.deviceModel)} · ${esc(d.osVersion)}</div></td>
       <td>${badge(d.status)}${lockTimes(d)}</td><td>${esc(d.enrollmentStatus)}</td><td>${typeof d.batteryLevel === "number" ? d.batteryLevel + "%" : "—"}</td><td>${esc(d.assignedUserId || "—")}</td><td>${lastSeenCell(d)}</td>
-      <td style="white-space:nowrap">${d.deviceType === "ANDROID" ? `<button class="btn i" data-act="monitor" data-id="${esc(d.id)}" aria-label="Pantau ${esc(d.deviceName)}">${ic("eye", 16)}</button> ` : ""}${mg ? `<button class="btn i" data-act="edit" data-id="${esc(d.id)}" aria-label="Sunting ${esc(d.deviceName)}">${ic("edit", 16)}</button> ` : ""}${ad ? `<button class="btn i" data-act="remove" data-id="${esc(d.id)}" aria-label="Buang ${esc(d.deviceName)}">${ic("trash", 16, "#DC2626")}</button>` : ""}</td></tr>`).join("")}</tbody></table>`)}
+      <td style="white-space:nowrap">${d.deviceType === "ANDROID" ? `<button class="btn i" data-act="monitor" data-id="${esc(d.id)}" aria-label="Aktiviti aplikasi ${esc(d.deviceName)}">${ic("eye", 16)}</button> ` : ""}${mg ? `<button class="btn i" data-act="edit" data-id="${esc(d.id)}" aria-label="Sunting ${esc(d.deviceName)}">${ic("edit", 16)}</button> ` : ""}${ad ? `<button class="btn i" data-act="remove" data-id="${esc(d.id)}" aria-label="Buang ${esc(d.deviceName)}">${ic("trash", 16, "#DC2626")}</button>` : ""}</td></tr>`).join("")}</tbody></table>`)}
     <div class="pager"><span>Halaman ${S.pg + 1} / ${pages}</span><span class="row"><button class="btn i" data-act="prev" aria-label="Sebelumnya" ${S.pg ? "" : "disabled"}>${ic("left", 16)}</button><button class="btn i" data-act="next" aria-label="Seterusnya" ${S.pg + 1 < pages ? "" : "disabled"}>${ic("right", 16)}</button></span></div></div>`;
 }
 
@@ -377,7 +377,7 @@ const DOMAIN_RE = /^([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/;
 const PKG_RE = /^[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)+$/;
 const androidDevs = () => S.devices.filter((d) => !isWaiting(d) && d.deviceType === "ANDROID");
 
-let devUnsub = null, liveUnsub = null;
+let devUnsub = null;
 async function watchDevInfo(id) {
   if (devUnsub) { devUnsub(); devUnsub = null; }
   S.devInfo = id ? { id, apps: null, events: [] } : null; render();
@@ -389,17 +389,38 @@ async function watchDevInfo(id) {
     (sn) => { if (S.devInfo && S.devInfo.id === id) { S.devInfo.events = sn.docs.map((d) => d.data()); render(); } }, () => {});
   render();
 }
-const monMsg = () => { const l = S.live, st = l && l.state;
-  return !S.mon ? "Pilih peranti Android." : !l ? "Belum bermula." : st === "REQUESTED" ? "Menunggu pengguna membenarkan pada peranti. Satu notifikasi muncul pada telefon; ketuk untuk benarkan." : st === "ACTIVE" ? `Langsung · bingkai ${l.seq || 0}` : st === "DECLINED" ? "Pengguna menolak permintaan." : "Dihentikan."; };
-function watchLive(id) {
-  if (liveUnsub) { liveUnsub(); liveUnsub = null; }
-  S.live = null; S.mon = id || ""; render();
-  if (!id || PREVIEW) return;
-  liveUnsub = fb.F.onSnapshot(fb.F.doc(fsdb, "liveSessions", id), (d) => {
-    const prev = S.live; S.live = d.exists() ? d.data() : null;
-    if (S.page === "monitoring" && prev && S.live && prev.state === S.live.state && S.live.frame && $("#monimg")) { $("#monimg").src = "data:image/jpeg;base64," + S.live.frame; $("#monmsg").textContent = monMsg(); return; }
-    render();
-  }, () => { S.live = null; render(); });
+// ---------- Live Monitoring = aktiviti aplikasi (tiada kongsi skrin) ----------
+// Setiap rekod appEvents ialah "satu aplikasi menjadi di hadapan". Penanda __HOME__ / __SCREEN_OFF__ = ditutup.
+// Kiraan mengikut hari kalendar (00:00 hingga 24:00) jadi ia reset sendiri pukul 12 malam.
+let actUnsub = null, actKey = "";
+const dayKey = (d = new Date()) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+const hm = (t) => ms(t) ? new Date(ms(t)).toLocaleTimeString("ms-MY", { hour: "numeric", minute: "2-digit" }) : "—";
+function buildUsage(events) {
+  const sess = []; let cur = null;
+  for (const e of events) {
+    const t = ms(e.at); if (!t) continue;
+    if (cur) { cur.close = t; cur = null; }
+    if (String(e.packageName || "").startsWith("__")) continue;
+    cur = { pkg: e.packageName, label: e.label || e.packageName, open: t, close: 0 }; sess.push(cur);
+  }
+  const by = new Map();
+  for (const x of sess) {
+    let a = by.get(x.pkg); if (!a) by.set(x.pkg, a = { pkg: x.pkg, label: x.label, first: x.open, last: 0, count: 0, active: false, total: 0 });
+    a.count++; a.first = Math.min(a.first, x.open);
+    if (x.close) { a.last = Math.max(a.last, x.close); a.total += x.close - x.open; } else a.active = true;
+  }
+  return { sess, apps: [...by.values()].sort((p, q) => q.count - p.count || p.first - q.first) };
+}
+const dur = (m) => { const mn = Math.round(m / 60000); return mn < 1 ? "< 1 min" : mn < 60 ? mn + " min" : Math.floor(mn / 60) + " j " + (mn % 60) + " min"; };
+function watchActivity(id) {
+  if (actUnsub) { actUnsub(); actUnsub = null; }
+  S.mon = id || ""; S.monEvents = null; actKey = dayKey(); render();
+  if (!id) return;
+  if (PREVIEW) { S.monEvents = []; render(); return; }
+  const [y, m, d] = (S.monDay || dayKey()).split("-").map(Number);
+  const { collection, onSnapshot, query, orderBy, where, limit, Timestamp } = fb.F;
+  actUnsub = onSnapshot(query(collection(fsdb, "devices", id, "appEvents"), where("at", ">=", Timestamp.fromDate(new Date(y, m - 1, d))), where("at", "<", Timestamp.fromDate(new Date(y, m - 1, d + 1))), orderBy("at", "desc"), limit(3000)),
+    (sn) => { S.monEvents = sn.docs.map((x) => x.data()).reverse(); render(); }, () => { S.monEvents = []; render(); });
 }
 async function saveApp(p) {
   const ex = S.apps.find((a) => a.packageName === p.packageName && (a.groupId || null) === (p.groupId || null));
@@ -447,12 +468,20 @@ function pageFiltering() {
 }
 
 function pageMonitoring() {
-  const devs = androidDevs(), l = S.live;
-  return head("Live Monitoring", "Lihat skrin peranti Android secara hampir langsung. Pengguna membenarkan di peranti dan notifikasi sentiasa kelihatan semasa dipantau.") + `
+  const devs = androidDevs(), today = dayKey(), day = S.monDay || today, ev = S.monEvents;
+  const U = ev ? buildUsage(ev) : null;
+  const opens = U ? U.sess.length : 0;
+  const table = !S.mon ? empty("Pilih peranti Android", "Aktiviti aplikasi peranti itu akan dipaparkan di bawah.")
+    : !U ? '<p class="sm" style="padding:16px">Memuatkan…</p>'
+    : !U.apps.length ? empty("Tiada aktiviti direkodkan", "Belum ada aplikasi dibuka pada hari ini, atau peranti belum mengaktifkan Kawalan (Aksesibiliti).")
+    : `<table><thead><tr><th>Aplikasi</th><th>Dibuka pertama</th><th>Ditutup terakhir</th><th>Kali dibuka</th><th>Jumlah masa</th></tr></thead><tbody>${U.apps.map((a) => `<tr><td><b>${esc(a.label)}</b><div class="mono">${esc(a.pkg)}</div></td><td>${hm(a.first)}</td><td>${a.active ? (day === today ? '<span class="badge b-ONLINE">Sedang dibuka</span>' : '<span class="sm">tutup tidak direkodkan</span>') + (a.last ? `<div class="sm">sebelum ini ${hm(a.last)}</div>` : "") : hm(a.last)}</td><td><b>${a.count}</b> kali</td><td>${a.total ? dur(a.total) : "—"}</td></tr>`).join("")}</tbody></table>`;
+  const timeline = U && U.sess.length ? `<details class="card" style="margin-top:12px"><summary style="cursor:pointer;font-weight:700">Garis masa penuh (${opens} pembukaan)</summary><ol class="tl" style="margin-top:8px">${[...U.sess].reverse().map((x) => `<li><time>${hm(x.open)} – ${x.close ? hm(x.close) : day === today ? "kini" : "—"}</time><code>${esc(x.label)}</code><span>${x.close ? dur(x.close - x.open) : day === today ? "sedang dibuka" : "tutup tidak direkodkan"}</span></li>`).join("")}</ol></details>` : "";
+  return head("Live Monitoring", "Aplikasi yang dibuka pada peranti Android: bila dibuka, bila ditutup dan berapa kali sehari. Kiraan reset setiap pukul 12 malam. Skrin peranti tidak dilihat dan tiada permintaan kepada pengguna.") + `
     <div class="card row"><select id="mondev" aria-label="Pilih peranti" style="width:auto;min-width:240px"><option value="">— pilih peranti —</option>${devs.map((d) => `<option value="${esc(d.id)}" ${S.mon === d.id ? "selected" : ""}>${esc(d.deviceName)}</option>`).join("")}</select>
-      <button class="btn p" data-act="monstart" ${S.mon ? "" : "disabled"}>${ic("eye", 16)}Mula pantau</button><button class="btn" data-act="monstop" ${S.mon && l && ["REQUESTED", "ACTIVE"].includes(l.state) ? "" : "disabled"}>Henti</button></div>
-    <div class="card" style="margin-top:12px;text-align:center"><p id="monmsg" class="sm" style="font-size:14px">${esc(monMsg())}</p>
-      <div id="monbox">${l && l.frame ? `<img id="monimg" alt="Skrin peranti" src="data:image/jpeg;base64,${l.frame}" style="max-width:min(100%,420px);border-radius:12px;border:1px solid var(--line)">` : ""}</div></div>`;
+      <input type="date" id="monday" aria-label="Pilih hari" value="${day}" max="${today}" style="width:auto"><button class="btn" data-act="montoday" ${day === today ? "disabled" : ""}>Hari ini</button>
+      ${U ? `<span class="sm"><b>${U.apps.length}</b> aplikasi · <b>${opens}</b> pembukaan${day === today ? " hari ini" : " pada " + day}</span>` : ""}</div>
+    <div class="card tw" style="margin-top:12px">${table}</div>${timeline}
+    <p class="sm" style="margin-top:12px">Hanya nama aplikasi dan masa dibuka/ditutup direkodkan. Kandungan skrin, carian atau apa yang ditaip tidak direkodkan. Peranti mesti mengaktifkan Kawalan (Aksesibiliti) supaya aktiviti direkodkan.</p>`;
 }
 
 const delBar = (kind, n, total) => `<button class="btn" data-act="${kind}del" ${n ? "" : "disabled"}>${ic("trash", 16, "#DC2626")}Padam terpilih (${n})</button><button class="btn d" data-act="${kind}clear" ${total ? "" : "disabled"}>Padam semua</button>`;
@@ -670,10 +699,8 @@ const ACTIONS = {
   logclear() { clearAll("activityLogs", "log aktiviti", S.selLog); },
   cmddel() { removeRecords("commands", [...S.selCmd], "rekod arahan", S.selCmd); },
   cmdclear() { clearAll("commands", "rekod arahan", S.selCmd); },
-  monitor(el) { watchLive(el.dataset.id); location.hash = "monitoring"; },
-  monstart() { fsWrite(async (F) => { const bt = F.writeBatch(fsdb); bt.set(ref("liveSessions", S.mon), { state: "REQUESTED", requestedBy: S.user.uid, requestedAt: F.serverTimestamp() }); logEv(F, bt, "LIVE_REQUESTED", `Pantau skrin diminta: ${dname(S.mon)}`, S.mon); await bt.commit(); })
-    .then(() => toast("Permintaan dihantar. Pengguna perlu membenarkan pada peranti.")).catch((e) => { if (e.message !== "preview") toast(errMsg(e), true); }); },
-  monstop() { fsWrite((F) => F.updateDoc(ref("liveSessions", S.mon), { state: "STOPPED" })).then(() => toast("Pantauan dihentikan.")).catch((e) => { if (e.message !== "preview") toast(errMsg(e), true); }); },
+  monitor(el) { S.monDay = ""; watchActivity(el.dataset.id); location.hash = "monitoring"; },
+  montoday() { S.monDay = ""; watchActivity(S.mon); },
   appadd() {
     openModal(`<h2>Tambah polisi aplikasi</h2><label class="f">Pilih pantas<select id="apre"><option value="">— pilih —</option>${PRESET_APPS.map(([l, p]) => `<option value="${p}">${l}</option>`).join("")}</select></label>
       <label class="f">Nama<input id="aln" maxlength="80"></label><label class="f">Nama pakej<input id="apk" placeholder="com.contoh.aplikasi" autocapitalize="off"></label>
@@ -780,7 +807,8 @@ document.addEventListener("change", (e) => {
   else if (t.id === "selall") { const q = S.q.toLowerCase(); S.devices.filter((d) => (!S.fs || d.status === S.fs) && (!S.ft || d.deviceType === S.ft) && (!q || `${d.deviceName} ${d.deviceId} ${d.deviceModel} ${d.assignedUserId || ""}`.toLowerCase().includes(q))).slice(S.pg * 10, S.pg * 10 + 10).forEach((d) => (t.checked ? S.sel.add(d.id) : S.sel.delete(d.id))); render(); }
   else if (t.dataset && t.dataset.apppol) { fsWrite((F) => F.updateDoc(ref("applications", t.dataset.apppol), { policy: t.value, updatedAt: F.serverTimestamp() })).then(() => toast("Polisi dikemas kini.")).catch((e) => { if (e.message !== "preview") toast(errMsg(e), true); render(); }); }
   else if (t.id === "appdev") watchDevInfo(t.value);
-  else if (t.id === "mondev") watchLive(t.value);
+  else if (t.id === "mondev") { S.monDay = ""; watchActivity(t.value); }
+  else if (t.id === "monday") { S.monDay = t.value === dayKey() ? "" : t.value; watchActivity(S.mon); }
   else if (t.id === "fscope") { S.fscope = t.value; render(); }
   else if (t.dataset && t.dataset.cat) {
     const k = t.dataset.cat, ex = S.webRules.find((r) => r.type === "CATEGORY" && r.value === k && (r.groupId || null) === (S.fscope || null));

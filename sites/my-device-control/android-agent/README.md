@@ -19,19 +19,18 @@ gradle testDebugUnitTest      # ujian unit pembina paket DNS dan logik polisi
 ## Apa yang admin boleh urus (dan syarat sebenar pada telefon)
 | Fungsi | Cara | Kebenaran pada telefon |
 |---|---|---|
-| Aplikasi dibuka | Perkhidmatan Aksesibiliti merekod nama pakej + masa (kandungan skrin tidak dibaca) | Aksesibiliti, sekali |
-| Sekat aplikasi (BLOCK / REQUIRE APPROVAL) | Aksesibiliti: aplikasi disekat dibawa ke skrin utama dengan mesej | Aksesibiliti, sekali |
+| Aplikasi dibuka / ditutup | Perkhidmatan Aksesibiliti merekod nama pakej + masa buka; skrin utama / skrin padam = ditutup. Panel admin (Live Monitoring) kira bila dibuka, bila ditutup, berapa kali sehari (reset 12 malam). Kandungan skrin, carian dan taipan tidak dibaca | Aksesibiliti, sekali |
+| Sekat aplikasi (BLOCK / REQUIRE APPROVAL) | Aksesibiliti: aplikasi disekat dibawa ke skrin utama dengan mesej; jika sedang dibuka masa disekat, terus dikeluarkan dan proses latarnya dimatikan | Aksesibiliti, sekali |
 | Kunci skrin (LOCK) | Aksesibiliti (`GLOBAL_ACTION_LOCK_SCREEN`, Android 9+) | Aksesibiliti, sekali |
 | Tapisan web | VPN setempat yang hanya memintas pertanyaan DNS; domain disekat dijawab NXDOMAIN | VPN, sekali |
-| Pantau skrin | MediaProjection, bingkai JPEG kecil setiap saat | Ketuk notifikasi, **setiap sesi** |
 | Aplikasi dipasang | Senarai aplikasi pelancar | Tiada |
 | UNLOCK jauh, REBOOT, kiosk | Hanya jika aplikasi ialah Device Owner | Provisioning khas |
 
 Kunci skrin yang dibatalkan dari jauh (UNLOCK) tidak mungkin pada telefon biasa: pengguna membuka dengan PIN.
 
 ## Had yang jujur
-- Dikompil dan diuji unit (pembina paket DNS, polisi), tetapi **belum dijalankan pada setiap model peranti**. Fungsi VPN, Aksesibiliti dan pantau skrin perlu disahkan pada telefon sebenar.
+- Dikompil dan diuji unit (pembina paket DNS, polisi), tetapi **belum dijalankan pada setiap model peranti**. Fungsi VPN dan Aksesibiliti perlu disahkan pada telefon sebenar.
 - Penapisan web pada peringkat DNS: tidak melihat sejarah carian atau kandungan; Chrome dengan "Secure DNS" dihidupkan boleh memintasnya; pelayan DNS ialah 1.1.1.1/8.8.8.8 semasa VPN aktif.
-- Pantau skrin: sentiasa memerlukan persetujuan pengguna di peranti dan notifikasi "Skrin sedang dipantau" kelihatan, selain penunjuk rakaman sistem. Tidak boleh disembunyikan.
+- Pantau skrin (kongsi skrin) sudah dibuang. Live Monitoring kini hanya aktiviti aplikasi: nama aplikasi dan masa dibuka/ditutup. Carian Chrome dan apa yang ditaip sengaja tidak direkodkan.
 - Penjimatan bateri pengeluar (HONOR/TECNO/Xiaomi) boleh menghentikan agent: tetapkan aplikasi "tiada had bateri".
 - Jika admin membuang peranti dari panel, agent melepaskan dirinya dan aplikasi boleh dinyahpasang tanpa kata laluan.

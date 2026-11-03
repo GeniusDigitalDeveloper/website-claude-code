@@ -135,17 +135,6 @@ class Repo(private val ctx: Context) {
         }
     }
 
-    suspend fun liveState(state: String) {
-        val id = uid ?: return
-        db.collection("liveSessions").document(id).update(mapOf("state" to state, "updatedAt" to FieldValue.serverTimestamp())).await()
-    }
-
-    suspend fun liveFrame(frame: String, w: Int, h: Int, seq: Long) {
-        val id = uid ?: return
-        db.collection("liveSessions").document(id).update(mapOf("state" to "ACTIVE", "frame" to frame, "seq" to seq, "width" to w, "height" to h,
-            "updatedAt" to FieldValue.serverTimestamp())).await()
-    }
-
     suspend fun log(type: String, message: String) {
         val id = uid ?: return
         db.collection("activityLogs").add(logMap(type, message, id)).await()
