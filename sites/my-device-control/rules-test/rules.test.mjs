@@ -287,3 +287,57 @@ test('PERANTI TANPA E-MEL: telefon tanpa sebarang akaun/e-mel boleh mendaftar de
   await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'enrollments/' + 'N'.repeat(32)), { deviceName: 'TANPA EMEL', deviceType: 'ANDROID', status: 'PENDING', expiresAt: future() }));
   await assertSucceeds(register('tanpa-emel', 'N'.repeat(32), { deviceName: 'TANPA EMEL' }));
 });
+
+// ---- Pengurusan: aplikasi, tapisan web, aktiviti, live monitoring ----
+const app = (over = {}) => ({ packageName: 'com.google.android.youtube', label: 'YouTube', policy: 'BLOCK', groupId: null, createdAt: serverTimestamp(), createdBy: 'adm', ...over });
+const wrule = (over = {}) => ({ type: 'DOMAIN', action: 'BLOCK', value: 'tiktok.com', groupId: null, createdAt: serverTimestamp(), createdBy: 'adm', ...over });
+test('POLISI APLIKASI: admin cipta sah; pakej/polisi tidak sah ditolak; peranti tidak boleh tulis; hanya peranti disahkan boleh baca', async () => {
+  await assertSucceeds(addDoc(collection(admin(), 'applications'), app()));
+  await assertSucceeds(addDoc(collection(admin(), 'applications'), app({ policy: 'REQUIRE_APPROVAL', packageName: 'com.android.vending', label: 'Play Store', groupId: 'g1' })));
+  await assertFails(addDoc(collection(admin(), 'applications'), app({ packageName: 'bukan pakej' })));
+  await assertFails(addDoc(collection(admin(), 'applications'), app({ policy: 'DELETE' })));
+  await assertFails(addDoc(collection(admin(), 'applications'), app({ extra: 1 })));
+  await assertFails(addDoc(collection(dev('dev1'), 'applications'), app()));
+  await assertSucceeds(getDocs(collection(dev('dev1'), 'applications')));
+  await seedPending('pol-pend');
+  await assertFails(getDocs(collection(dev('pol-pend'), 'applications')));
+  await assertFails(getDocs(collection(dev('tidak-berdaftar'), 'applications')));
+  await assertFails(getDocs(collection(env.unauthenticatedContext().firestore(), 'applications')));
+});
+test('TAPISAN WEB: domain sah/kategori sah; domain tidak sah ditolak; peranti disahkan boleh baca', async () => {
+  await assertSucceeds(addDoc(collection(admin(), 'webFilteringRules'), wrule()));
+  await assertSucceeds(addDoc(collection(admin(), 'webFilteringRules'), wrule({ type: 'CATEGORY', value: 'SOCIAL_MEDIA', domains: ['facebook.com', 'instagram.com'] })));
+  await assertFails(addDoc(collection(admin(), 'webFilteringRules'), wrule({ value: 'https://tiktok.com/path' })));
+  await assertFails(addDoc(collection(admin(), 'webFilteringRules'), wrule({ type: 'CATEGORY', value: 'RAWAK', domains: [] })));
+  await assertFails(addDoc(collection(dev('dev1'), 'webFilteringRules'), wrule()));
+  await assertSucceeds(getDocs(collection(dev('dev1'), 'webFilteringRules')));
+});
+test('AKTIVITI APLIKASI: peranti disahkan tulis sendiri; admin baca; tidak boleh ubah/padam; medan lain ditolak', async () => {
+  const f = dev('dev1');
+  const ref1 = await assertSucceeds(addDoc(collection(f, 'devices/dev1/appEvents'), { packageName: 'com.whatsapp', label: 'WhatsApp', at: Timestamp.now() }));
+  await assertFails(addDoc(collection(f, 'devices/dev1/appEvents'), { packageName: 'com.whatsapp', label: 'WhatsApp', at: Timestamp.now(), isi: 'rahsia' }));
+  await assertFails(updateDoc(ref1, { label: 'x' }));
+  await assertFails(addDoc(collection(dev('dev2'), 'devices/dev1/appEvents'), { packageName: 'a.b', label: 'x', at: Timestamp.now() }));
+  await assertSucceeds(getDocs(collection(admin(), 'devices/dev1/appEvents')));
+  await assertFails(getDocs(collection(dev('dev1'), 'devices/dev1/appEvents')));
+});
+test('LIVE MONITORING: admin minta; peranti hantar bingkai hanya selepas diminta; berhenti bila STOPPED; peranti tak boleh mulakan sendiri', async () => {
+  const a = admin();
+  await assertFails(setDoc(doc(dev('dev1'), 'liveSessions/dev1'), { state: 'REQUESTED', requestedBy: 'dev1', requestedAt: serverTimestamp() }));
+  await assertFails(setDoc(doc(dev('dev1'), 'liveSessions/dev1'), { state: 'ACTIVE', frame: 'AAAA', seq: 1 }));
+  await assertSucceeds(setDoc(doc(a, 'liveSessions/dev1'), { state: 'REQUESTED', requestedBy: 'adm', requestedAt: serverTimestamp() }));
+  const f = dev('dev1');
+  await assertSucceeds(updateDoc(doc(f, 'liveSessions/dev1'), { state: 'ACTIVE', frame: 'A'.repeat(1000), seq: 1, width: 540, height: 1170, updatedAt: serverTimestamp() }));
+  await assertSucceeds(updateDoc(doc(f, 'liveSessions/dev1'), { frame: 'B'.repeat(1000), seq: 2, updatedAt: serverTimestamp() }));
+  await assertFails(updateDoc(doc(f, 'liveSessions/dev1'), { frame: 'C'.repeat(800000), seq: 3 }));            // terlalu besar
+  await assertFails(updateDoc(doc(f, 'liveSessions/dev1'), { state: 'REQUESTED' }));                              // tidak boleh meminta sendiri
+  await assertFails(updateDoc(doc(dev('dev2'), 'liveSessions/dev1'), { state: 'ACTIVE', frame: 'A', seq: 9 }));    // peranti lain
+  await assertSucceeds(updateDoc(doc(a, 'liveSessions/dev1'), { state: 'STOPPED' }));
+  await assertFails(updateDoc(doc(f, 'liveSessions/dev1'), { state: 'ACTIVE', frame: 'D', seq: 4 }));            // selepas STOPPED tiada bingkai
+  await assertSucceeds(getDoc(doc(f, 'liveSessions/dev1')));
+});
+test('LIVE MONITORING: tidak boleh diminta untuk peranti yang belum disahkan; peranti lapor policyStatus', async () => {
+  await seedPending('mon-pend');
+  await assertFails(setDoc(doc(admin(), 'liveSessions/mon-pend'), { state: 'REQUESTED', requestedBy: 'adm', requestedAt: serverTimestamp() }));
+  await assertSucceeds(updateDoc(doc(dev('dev1'), 'devices/dev1'), { policyStatus: 'Aksesibiliti: aktif; VPN: aktif', updatedAt: serverTimestamp() }));
+});

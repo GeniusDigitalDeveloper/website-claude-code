@@ -1,8 +1,7 @@
 package my.devicecontrol.agent
 
 import android.Manifest
-import android.app.admin.DevicePolicyManager
-import android.content.ComponentName
+import android.net.VpnService
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
@@ -26,7 +25,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.google.firebase.auth.FirebaseAuth
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.ResultPoint
 import com.journeyapps.barcodescanner.BarcodeCallback
@@ -42,8 +40,6 @@ import org.json.JSONObject
  * Tiada skrin tetapan lain.
  */
 class MainActivity : AppCompatActivity() {
-    companion object { const val EXTRA_ASK_ADMIN = "ask_admin" }
-
     private lateinit var scanner: DecoratedBarcodeView
     private lateinit var scanBox: FrameLayout
     private lateinit var statusBox: LinearLayout
@@ -51,6 +47,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var body: TextView
     private lateinit var scanMsg: TextView
     private var busy = false
+    private lateinit var accBtn: Button
+    private lateinit var vpnBtn: Button
+    private val vpnLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { refresh() }
 
     private val camPerm = registerForActivityResult(ActivityResultContracts.RequestPermission()) { ok ->
         if (ok) startScanning() else scanMsg.text = "Kebenaran kamera diperlukan untuk mengimbas kod QR. Ketuk di sini untuk membukanya di Tetapan."
@@ -89,20 +88,15 @@ class MainActivity : AppCompatActivity() {
 
         title = TextView(this).apply { textSize = 24f; setTextColor(Color.WHITE); gravity = Gravity.CENTER }
         body = TextView(this).apply { textSize = 16f; setTextColor(Color.parseColor("#CBD5E1")); gravity = Gravity.CENTER; setPadding(0, pad, 0, pad) }
-        val release = Button(this).apply { text = "Lepaskan peranti (perlu e-mel & kata laluan admin)"; setOnClickListener { askRelease() } }
+        accBtn = Button(this).apply { setOnClickListener { startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) } }
+        vpnBtn = Button(this).apply { setOnClickListener { val i = VpnService.prepare(this@MainActivity); if (i != null) vpnLauncher.launch(i) else refresh() } }
         statusBox = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER; setPadding(pad, pad, pad, pad)
             setBackgroundColor(Color.parseColor("#0F172A")); visibility = View.GONE
-            addView(title); addView(body); addView(release)
+            addView(title); addView(body); addView(accBtn); addView(vpnBtn)
         }
         setContentView(FrameLayout(this).apply { addView(scanBox); addView(statusBox) })
 
-        if (intent?.getBooleanExtra(EXTRA_ASK_ADMIN, false) == true) requestAdmin()
-    }
-
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        if (intent.getBooleanExtra(EXTRA_ASK_ADMIN, false)) requestAdmin()
     }
 
     override fun onResume() {
@@ -134,8 +128,13 @@ class MainActivity : AppCompatActivity() {
                     body.text = "Kod QR telah diimbas. Pentadbir perlu menekan Sahkan di panel admin. Biarkan aplikasi ini."
                 } else {
                     title.text = "Disambungkan"
-                    body.text = "Peranti ini diurus oleh pentadbir organisasi. Hanya status peranti, bateri dan arahan pengurusan digunakan; tiada mesej, kata laluan atau ketukan kekunci dikumpul."
+                    body.text = "Peranti ini diurus oleh admin."
                 }
+                val active = Prefs.state(this) == "ACTIVE"
+                accBtn.text = if (GuardService.instance != null) "✔ Kawalan aplikasi dan kunci skrin: aktif" else "Aktifkan kawalan aplikasi dan kunci skrin (Aksesibiliti)"
+                vpnBtn.text = if (VpnService.prepare(this) == null) "✔ Tapisan web: aktif" else "Aktifkan tapisan web (VPN)"
+                accBtn.visibility = if (active) View.VISIBLE else View.GONE
+                vpnBtn.visibility = if (active) View.VISIBLE else View.GONE
                 ContextCompat.startForegroundService(this, Intent(this, AgentService::class.java))
             }
         }
@@ -173,41 +172,6 @@ class MainActivity : AppCompatActivity() {
         val et = EditText(this).apply { hint = "Kod enrollment"; inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD }
         AlertDialog.Builder(this).setTitle("Tampal kod").setView(et).setNegativeButton("Batal", null)
             .setPositiveButton("Daftar") { _, _ -> busy = true; scanner.pause(); enroll(parseCode(et.text.toString())) }.show()
-    }
-
-    private fun askRelease() {
-        val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(48, 24, 48, 0) }
-        val em = EditText(this).apply { hint = "E-mel admin"; inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS }
-        val pw = EditText(this).apply { hint = "Kata laluan"; inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD }
-        box.addView(em); box.addView(pw)
-        AlertDialog.Builder(this)
-            .setTitle("Lepaskan peranti")
-            .setMessage("Masukkan e-mel dan kata laluan salah satu akaun Firebase Authentication. Peranti akan dibuang dari panel dan aplikasi boleh dinyahpasang.")
-            .setView(box).setNegativeButton("Batal", null)
-            .setPositiveButton("Lepaskan") { _, _ -> release(em.text.toString().trim(), pw.text.toString()) }.show()
-    }
-
-    private fun release(email: String, password: String) {
-        if (email.isEmpty() || password.isEmpty()) { toast("Masukkan e-mel dan kata laluan."); return }
-        toast("Mengesahkan…")
-        lifecycleScope.launch {
-            try {
-                Repo(applicationContext).adminRelease(email, password)
-                CommandExecutor(this@MainActivity).release()
-                Prefs.setState(this@MainActivity, "NONE")
-                FirebaseAuth.getInstance().signOut()
-                stopService(Intent(this@MainActivity, AgentService::class.java))
-                toast("Peranti dilepaskan. Anda boleh menyahpasang aplikasi ini.")
-                startActivity(Intent(Intent.ACTION_DELETE, Uri.parse("package:$packageName")))
-            } catch (e: Exception) { toast(e.message ?: "Gagal melepaskan peranti.") }
-        }
-    }
-
-    /** Hanya dipanggil dari notifikasi apabila admin menghantar LOCK dan kebenaran belum diberi. */
-    private fun requestAdmin() {
-        startActivity(Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)
-            .putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, ComponentName(this, AdminReceiver::class.java))
-            .putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Membolehkan pentadbir mengunci skrin peranti ini dari jauh."))
     }
 
     private fun toast(s: String) = Toast.makeText(this, s, Toast.LENGTH_LONG).show()

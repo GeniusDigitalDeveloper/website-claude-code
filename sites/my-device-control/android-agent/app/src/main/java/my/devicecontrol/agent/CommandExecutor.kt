@@ -49,10 +49,9 @@ class CommandExecutor(private val ctx: Context) {
         if (isOwner()) {
             showKioskLock(); Prefs.setLocked(ctx, true); return Pair(true, null)
         }
-        if (isAdminActive()) {
-            dpm.lockNow(); return Pair(true, null)   // skrin dikunci; pengguna membuka dengan PIN
-        }
-        return Pair(false, "Kebenaran kunci skrin belum diberi pada peranti. Ketuk notifikasi pada peranti untuk memberi kebenaran sekali sahaja.")
+        if (GuardService.instance?.lockScreen() == true) return Pair(true, null)      // kunci melalui Aksesibiliti
+        if (isAdminActive()) { dpm.lockNow(); return Pair(true, null) }
+        return Pair(false, "Aktifkan Kawalan (Aksesibiliti) pada peranti untuk membolehkan kunci skrin. Ketuk notifikasi pada peranti.")
     }
 
     private fun unlock(): Pair<Boolean, String?> {

@@ -1,0 +1,3 @@
+<resources>
+    <string name="guard_desc">Membolehkan pentadbir melihat aplikasi yang dibuka, menyekat aplikasi yang tidak dibenarkan dan mengunci skrin. Kandungan skrin tidak dibaca.</string>
+</resources>

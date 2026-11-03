@@ -3,7 +3,6 @@ package my.devicecontrol.agent
 import android.content.Context
 import android.os.BatteryManager
 import android.os.Build
-import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -82,44 +81,62 @@ class Repo(private val ctx: Context) {
         }
     }
 
-    suspend fun heartbeat(locked: Boolean, adminOk: Boolean = true) {
+    suspend fun heartbeat(locked: Boolean, policyStatus: String? = null) {
         val id = uid ?: return
         val now = FieldValue.serverTimestamp()
-        val status = if (locked) "LOCKED" else if (!adminOk) "ERROR" else "ONLINE"   // ERROR = pentadbir peranti dinyahaktifkan
+        val status = if (locked) "LOCKED" else "ONLINE"
         val bat = battery()
         val batch = db.batch()
-        batch.update(db.collection("devices").document(id), mapOf(
+        val dev = hashMapOf<String, Any?>(
             "status" to status, "isLocked" to locked, "batteryLevel" to bat, "osVersion" to osVersion(),
-            "appVersion" to AgentConfig.APP_VERSION, "lastSeen" to now, "updatedAt" to now
-        ))
+            "appVersion" to AgentConfig.APP_VERSION, "lastSeen" to now, "updatedAt" to now)
+        if (policyStatus != null) dev["policyStatus"] = policyStatus.take(200)
+        batch.update(db.collection("devices").document(id), dev)
         batch.update(db.collection("publicStatus").document(id), mapOf(
             "status" to status, "batteryLevel" to bat, "lastSeen" to now, "updatedAt" to now
         ))
         batch.commit().await()
     }
 
-    /**
-     * Lepaskan peranti ini dengan e-mel + kata laluan SALAH SATU akaun admin (Firebase Authentication).
-     * Log masuk melalui aplikasi Firebase kedua supaya identiti peranti tidak hilang jika kelayakan salah.
-     */
-    suspend fun adminRelease(email: String, password: String) {
-        val id = uid ?: throw IllegalStateException("Peranti ini belum didaftarkan.")
-        val app = FirebaseApp.initializeApp(ctx, FirebaseApp.getInstance().options, "release-" + System.currentTimeMillis())
-        try {
-            val vauth = FirebaseAuth.getInstance(app)
-            val admin = try { vauth.signInWithEmailAndPassword(email, password).await().user }
-            catch (e: Exception) { throw IllegalStateException("E-mel atau kata laluan salah.") }
-            if (admin == null || admin.isAnonymous) throw IllegalStateException("Akaun tidak sah.")
-            val vdb = FirebaseFirestore.getInstance(app)
-            val batch = vdb.batch()
-            batch.delete(vdb.collection("devices").document(id))
-            batch.delete(vdb.collection("publicStatus").document(id))
-            batch.set(vdb.collection("activityLogs").document(), hashMapOf<String, Any?>(
-                "type" to "DEVICE_REMOVED", "message" to "Peranti dilepaskan pada peranti sendiri (disahkan: ${admin.email})".take(200),
-                "actorId" to admin.uid, "deviceId" to id, "createdAt" to FieldValue.serverTimestamp()))
+    /** Senarai aplikasi yang boleh dibuka pengguna (ikon pelancar). Untuk papan pemuka admin. */
+    suspend fun syncInstalledApps() {
+        val id = uid ?: return
+        val pm = ctx.packageManager
+        val list = pm.queryIntentActivities(android.content.Intent(android.content.Intent.ACTION_MAIN).addCategory(android.content.Intent.CATEGORY_LAUNCHER), 0)
+            .distinctBy { it.activityInfo.packageName }.take(400)
+        for (chunk in list.chunked(400)) {
+            val batch = db.batch()
+            for (ri in chunk) {
+                val pkg = ri.activityInfo.packageName
+                val ver = try { pm.getPackageInfo(pkg, 0).versionName } catch (_: Exception) { null }
+                batch.set(db.collection("devices").document(id).collection("installedApps").document(pkg), hashMapOf<String, Any?>(
+                    "packageName" to pkg, "label" to ri.loadLabel(pm).toString().take(80), "versionName" to ver?.take(40),
+                    "updatedAt" to FieldValue.serverTimestamp()))
+            }
             batch.commit().await()
-            vauth.signOut()
-        } finally { app.delete() }
+        }
+    }
+
+    /** Aplikasi yang dibuka (nama pakej + masa sahaja). */
+    suspend fun appEvents(events: List<AppEvent>) {
+        val id = uid ?: return
+        for (chunk in events.chunked(400)) {
+            val batch = db.batch()
+            for (e in chunk) batch.set(db.collection("devices").document(id).collection("appEvents").document(), hashMapOf<String, Any?>(
+                "packageName" to e.pkg, "label" to e.label, "at" to com.google.firebase.Timestamp(java.util.Date(e.atMs))))
+            batch.commit().await()
+        }
+    }
+
+    suspend fun liveState(state: String) {
+        val id = uid ?: return
+        db.collection("liveSessions").document(id).update(mapOf("state" to state, "updatedAt" to FieldValue.serverTimestamp())).await()
+    }
+
+    suspend fun liveFrame(frame: String, w: Int, h: Int, seq: Long) {
+        val id = uid ?: return
+        db.collection("liveSessions").document(id).update(mapOf("state" to "ACTIVE", "frame" to frame, "seq" to seq, "width" to w, "height" to h,
+            "updatedAt" to FieldValue.serverTimestamp())).await()
     }
 
     suspend fun log(type: String, message: String) {

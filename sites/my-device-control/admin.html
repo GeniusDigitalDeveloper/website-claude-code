@@ -186,7 +186,7 @@ const toast = (text, err) => { const d = document.createElement("div"); d.classN
 const errMsg = (e) => ((e && e.message) || "Ralat").replace(/^.*?:\s*/, "");
 
 /* ---------- Keadaan & data ---------- */
-const S = { user: null, claims: {}, devices: [], groups: [], commands: [], logs: [], enrollments: [], keep: {}, 
+const S = { user: null, claims: {}, devices: [], groups: [], commands: [], logs: [], enrollments: [], apps: [], webRules: [], devInfo: null, live: null, mon: "", fscope: "", keep: {}, 
   loaded: {}, errors: {}, page: "dashboard", q: "", fs: "", ft: "", pg: 0, sel: new Set(), nav: false };
 const can = () => true;   // semua akaun Authentication ialah admin (alat dalaman)
 let fb = null; // modul Firebase
@@ -196,7 +196,7 @@ const render = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(dr
 const previewBlock = () => { toast("Preview: tiada sambungan Firebase. Muat naik fail dan sambungkan untuk guna sebenar.", true); return Promise.reject(new Error("preview")); };
 function loadPreview() {
   S.user = { email: "preview", uid: "preview" }; S.claims = { role: "ADMIN" };
-  ["devices", "groups", "commands", "logs", "enrollments"].forEach((k) => (S.loaded[k] = true));
+  ["devices", "groups", "commands", "logs", "enrollments", "apps", "webRules"].forEach((k) => (S.loaded[k] = true));
 }
 
 /* ---------- Firebase ---------- */
@@ -239,7 +239,7 @@ function subscribeAll() {
       (e) => { S.errors[key] = e.message; S.loaded[key] = true; render(); }));
   };
   sub("devices", "devices", "createdAt", 500, onDevices); sub("groups", "deviceGroups", null, 200);
-  sub("commands", "commands", "createdAt", 300, applyCmdStatus); sub("logs", "activityLogs", "createdAt", 300); sub("enrollments", "enrollments", "createdAt", 100);
+  sub("apps", "applications", null, 300); sub("webRules", "webFilteringRules", null, 500); sub("commands", "commands", "createdAt", 300, applyCmdStatus); sub("logs", "activityLogs", "createdAt", 300); sub("enrollments", "enrollments", "createdAt", 100);
 }
 async function fsWrite(fn) { if (PREVIEW) return previewBlock(); return fn(fb.F); }
 const ref = (...p) => fb.F.doc(fsdb, ...p);
@@ -340,7 +340,7 @@ function pageDevices() {
     ${view.map((d) => `<tr><td><input type="checkbox" data-sel="${esc(d.id)}" aria-label="Pilih ${esc(d.deviceName)}" ${mg ? "" : "disabled"} ${S.sel.has(d.id) ? "checked" : ""} style="min-height:0;width:auto"></td>
       <td><b>${esc(d.deviceName)}</b><div class="mono">${esc(d.deviceId)}</div></td><td>${esc(d.deviceType)}<div class="sm">${esc(d.deviceModel)} · ${esc(d.osVersion)}</div></td>
       <td>${badge(d.status)}${typeof d.batteryLevel === "number" ? `<div class="sm">Bateri ${d.batteryLevel}%</div>` : ""}</td><td>${esc(d.enrollmentStatus)}</td><td>${esc(gname(d.groupId))}</td><td>${esc(d.assignedUserId || "—")}</td><td>${ago(d.lastSeen)}</td>
-      <td style="white-space:nowrap">${mg ? `<button class="btn i" data-act="edit" data-id="${esc(d.id)}" aria-label="Sunting ${esc(d.deviceName)}">${ic("edit", 16)}</button> ` : ""}${ad ? `<button class="btn i" data-act="remove" data-id="${esc(d.id)}" aria-label="Buang ${esc(d.deviceName)}">${ic("trash", 16, "#DC2626")}</button>` : ""}</td></tr>`).join("")}</tbody></table>`)}
+      <td style="white-space:nowrap">${d.deviceType === "ANDROID" ? `<button class="btn i" data-act="monitor" data-id="${esc(d.id)}" aria-label="Pantau ${esc(d.deviceName)}">${ic("eye", 16)}</button> ` : ""}${mg ? `<button class="btn i" data-act="edit" data-id="${esc(d.id)}" aria-label="Sunting ${esc(d.deviceName)}">${ic("edit", 16)}</button> ` : ""}${ad ? `<button class="btn i" data-act="remove" data-id="${esc(d.id)}" aria-label="Buang ${esc(d.deviceName)}">${ic("trash", 16, "#DC2626")}</button>` : ""}</td></tr>`).join("")}</tbody></table>`)}
     <div class="pager"><span>Halaman ${S.pg + 1} / ${pages}</span><span class="row"><button class="btn i" data-act="prev" aria-label="Sebelumnya" ${S.pg ? "" : "disabled"}>${ic("left", 16)}</button><button class="btn i" data-act="next" aria-label="Seterusnya" ${S.pg + 1 < pages ? "" : "disabled"}>${ic("right", 16)}</button></span></div></div>`;
 }
 
@@ -351,10 +351,104 @@ function pageGroups() {
       ${mg ? `<div class="row" style="margin-top:12px"><button class="btn" data-act="glock" data-id="${esc(g.id)}">${ic("lock", 16)}Lock</button><button class="btn" data-act="gunlock" data-id="${esc(g.id)}">${ic("unlock", 16)}Unlock</button><button class="btn i" data-act="gedit" data-id="${esc(g.id)}" aria-label="Sunting ${esc(g.name)}">${ic("edit", 16)}</button>${can("ORG_ADMIN") ? `<button class="btn i" data-act="gdel" data-id="${esc(g.id)}" aria-label="Padam ${esc(g.name)}">${ic("trash", 16, "#DC2626")}</button>` : ""}</div>` : ""}</div>`; }).join("")}</div>`);
 }
 
-const soon = (t, fasa, txt) => head(t, "Dijadualkan: " + fasa) + `<div class="card row" style="align-items:flex-start;flex-wrap:nowrap">${ic("info", 20, "#0369A1")}<div><b>Modul ini belum dibina. Tiada data atau butang palsu dipaparkan.</b><p class="sm" style="font-size:14px">${txt}</p></div></div>`;
-const pageApps = () => soon("App Management", "Fasa 2", "Memerlukan Android Agent sebagai Device Owner dan Android Management API / Android Device Policy. Laman web sahaja tidak boleh menyekat aplikasi Android. Koleksi Firestore <code>applications</code> (ALLOW / BLOCK / REQUIRE_APPROVAL) dan rules sudah siap.");
-const pageFiltering = () => soon("Web Filtering", "Fasa 3", "Penapisan dilaksanakan melalui managed browser, DNS filtering, web gateway atau polisi pelayar Android Enterprise, bukan oleh Firebase sahaja. Sejarah carian Google tidak boleh diakses tanpa pelayar khas. Koleksi <code>webFilteringRules</code> dan rules sudah siap.");
-const pageMonitoring = () => soon("Live Monitoring", "Fasa 4", "Memerlukan Android Agent dengan MediaProjection, persetujuan pengguna di peranti, penunjuk pemantauan yang kelihatan dan saluran penstriman selamat (WebRTC) atau integrasi remote support yang sah. Tiada tangkapan skrin tersembunyi.");
+/* ===================== Pengurusan: aplikasi, tapisan web, live monitoring ===================== */
+const PRESET_APPS = [["YouTube", "com.google.android.youtube"], ["TikTok", "com.zhiliaoapp.musically"], ["TikTok (Asia)", "com.ss.android.ugc.trill"], ["Instagram", "com.instagram.android"], ["Facebook", "com.facebook.katana"],
+  ["Google Play Store", "com.android.vending"], ["Chrome", "com.android.chrome"], ["Roblox", "com.roblox.client"], ["Snapchat", "com.snapchat.android"], ["WhatsApp", "com.whatsapp"]];
+const CATS = {
+  ADULT: { label: "Adult Content", hint: "Senarai domain asas. Tidak lengkap.", domains: ["pornhub.com", "xvideos.com", "xnxx.com", "xhamster.com", "redtube.com", "youporn.com", "onlyfans.com"] },
+  GAMBLING: { label: "Gambling", hint: "Senarai domain asas.", domains: ["bet365.com", "1xbet.com", "pokerstars.com", "draftkings.com", "fanduel.com", "888casino.com", "betway.com", "unibet.com"] },
+  VIOLENCE: { label: "Violence", hint: "Tiada senarai domain tetap (tambah domain sendiri).", domains: [] },
+  SOCIAL_MEDIA: { label: "Social Media", hint: "", domains: ["facebook.com", "instagram.com", "tiktok.com", "x.com", "twitter.com", "snapchat.com", "reddit.com", "pinterest.com", "discord.com"] },
+  GAMES: { label: "Games", hint: "", domains: ["roblox.com", "steampowered.com", "epicgames.com", "miniclip.com", "poki.com", "twitch.tv", "minecraft.net"] },
+  EDUCATIONAL: { label: "Educational", hint: "Biasanya dipilih Benarkan.", domains: ["wikipedia.org", "khanacademy.org", "britannica.com", "coursera.org", "edx.org", "duolingo.com", "ted.com"] },
+  SEARCH_ENGINES: { label: "Search Engines", hint: "Menyekat google.com boleh menjejaskan perkhidmatan lain.", domains: ["google.com", "bing.com", "duckduckgo.com", "yahoo.com", "yandex.com"] }
+};
+const POL_LABEL = { ALLOW: "ALLOW", BLOCK: "BLOCK", REQUIRE_APPROVAL: "REQUIRE APPROVAL" };
+const polBadge = (p) => `<span class="badge b-${p === "ALLOW" ? "ONLINE" : p === "BLOCK" ? "ERROR" : "LOCKED"}">${POL_LABEL[p] || esc(p)}</span>`;
+const scopeName = (g) => g ? ((S.groups.find((x) => x.id === g) || {}).name || "Kumpulan dipadam") : "Semua peranti";
+const scopeOpts = (cur) => `<option value="">Semua peranti</option>${S.groups.map((g) => `<option value="${esc(g.id)}" ${g.id === cur ? "selected" : ""}>${esc(g.name)}</option>`).join("")}`;
+const normDomain = (v) => String(v || "").trim().toLowerCase().replace(/^[a-z]+:\/\//, "").replace(/[\/?#:].*$/, "").replace(/^www\./, "");
+const DOMAIN_RE = /^([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/;
+const PKG_RE = /^[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)+$/;
+const androidDevs = () => S.devices.filter((d) => !isWaiting(d) && d.deviceType === "ANDROID");
+
+let devUnsub = null, liveUnsub = null;
+async function watchDevInfo(id) {
+  if (devUnsub) { devUnsub(); devUnsub = null; }
+  S.devInfo = id ? { id, apps: null, events: [] } : null; render();
+  if (!id || PREVIEW) return;
+  const { collection, getDocs, onSnapshot, query, orderBy, limit } = fb.F;
+  try { const sn = await getDocs(collection(fsdb, "devices", id, "installedApps")); if (S.devInfo && S.devInfo.id === id) S.devInfo.apps = sn.docs.map((d) => d.data()).sort((a, b) => (a.label || "").localeCompare(b.label || "")); }
+  catch (e) { if (S.devInfo) S.devInfo.apps = []; }
+  devUnsub = onSnapshot(query(collection(fsdb, "devices", id, "appEvents"), orderBy("at", "desc"), limit(60)),
+    (sn) => { if (S.devInfo && S.devInfo.id === id) { S.devInfo.events = sn.docs.map((d) => d.data()); render(); } }, () => {});
+  render();
+}
+const monMsg = () => { const l = S.live, st = l && l.state;
+  return !S.mon ? "Pilih peranti Android." : !l ? "Belum bermula." : st === "REQUESTED" ? "Menunggu pengguna membenarkan pada peranti. Satu notifikasi muncul pada telefon; ketuk untuk benarkan." : st === "ACTIVE" ? `Langsung · bingkai ${l.seq || 0}` : st === "DECLINED" ? "Pengguna menolak permintaan." : "Dihentikan."; };
+function watchLive(id) {
+  if (liveUnsub) { liveUnsub(); liveUnsub = null; }
+  S.live = null; S.mon = id || ""; render();
+  if (!id || PREVIEW) return;
+  liveUnsub = fb.F.onSnapshot(fb.F.doc(fsdb, "liveSessions", id), (d) => {
+    const prev = S.live; S.live = d.exists() ? d.data() : null;
+    if (S.page === "monitoring" && prev && S.live && prev.state === S.live.state && S.live.frame && $("#monimg")) { $("#monimg").src = "data:image/jpeg;base64," + S.live.frame; $("#monmsg").textContent = monMsg(); return; }
+    render();
+  }, () => { S.live = null; render(); });
+}
+async function saveApp(p) {
+  const ex = S.apps.find((a) => a.packageName === p.packageName && (a.groupId || null) === (p.groupId || null));
+  await fsWrite(async (F) => { const bt = F.writeBatch(fsdb);
+    if (ex) bt.update(ref("applications", ex.id), { label: p.label, policy: p.policy, updatedAt: F.serverTimestamp() });
+    else bt.set(F.doc(F.collection(fsdb, "applications")), { packageName: p.packageName, label: p.label, policy: p.policy, groupId: p.groupId || null, createdAt: F.serverTimestamp(), createdBy: S.user.uid });
+    logEv(F, bt, "APP_POLICY", `${p.label || p.packageName}: ${p.policy} (${scopeName(p.groupId)})`); await bt.commit(); });
+}
+
+function pageApps() {
+  const allow = S.apps.filter((a) => a.policy === "ALLOW"), block = S.apps.filter((a) => a.policy !== "ALLOW");
+  const row = (a) => `<tr><td><b>${esc(a.label)}</b><div class="mono">${esc(a.packageName)}</div></td><td>${esc(scopeName(a.groupId))}</td>
+    <td><select data-apppol="${esc(a.id)}" aria-label="Polisi ${esc(a.label)}" style="width:auto">${["ALLOW", "BLOCK", "REQUIRE_APPROVAL"].map((p) => `<option value="${p}" ${p === a.policy ? "selected" : ""}>${POL_LABEL[p]}</option>`).join("")}</select></td>
+    <td><button class="btn i" data-act="appdel" data-id="${esc(a.id)}" aria-label="Padam polisi ${esc(a.label)}">${ic("trash", 16, "#DC2626")}</button></td></tr>`;
+  const box = (t, arr, hint) => `<div class="card tw"><div style="padding:16px 16px 0"><b>${t} (${arr.length})</b><p class="sm" style="margin:2px 0 0">${hint}</p></div>${arr.length ? `<table style="min-width:420px"><thead><tr><th>Aplikasi</th><th>Skop</th><th>Polisi</th><th></th></tr></thead><tbody>${arr.map(row).join("")}</tbody></table>` : empty("Tiada")}</div>`;
+  const devs = androidDevs(), info = S.devInfo;
+  const pol = (pkg) => { const m = S.apps.find((a) => a.packageName === pkg && !a.groupId); return m ? m.policy : ""; };
+  const cur = info && info.events[0];
+  return head("App Management", "Urus aplikasi yang dibenarkan atau disekat, dan lihat apa yang dibuka pada peranti", `<button class="btn p" data-act="appadd">${ic("plus", 16)}Tambah polisi</button>`) + state("apps", () => `
+    <div class="grid g2">${box("ALLOWED APPLICATIONS", allow, "Aplikasi yang dibenarkan secara jelas.")}${box("BLOCKED APPLICATIONS", block, "BLOCK dan REQUIRE APPROVAL disekat pada peranti sehingga dibenarkan.")}</div>
+    <div class="card" style="margin-top:12px"><b>Aktiviti dan aplikasi pada peranti</b>
+      <div class="row" style="margin-top:8px"><select id="appdev" aria-label="Pilih peranti" style="width:auto;min-width:220px"><option value="">— pilih peranti —</option>${devs.map((d) => `<option value="${esc(d.id)}" ${info && info.id === d.id ? "selected" : ""}>${esc(d.deviceName)}</option>`).join("")}</select></div>
+      ${!info ? `<p class="sm">Pilih peranti untuk melihat aplikasi yang dibuka dan aplikasi yang dipasang.</p>` : `
+      <p style="margin:10px 0 4px"><b>Sedang/terakhir dibuka:</b> ${cur ? `${esc(cur.label || cur.packageName)} <span class="sm">· ${ago(cur.at)}</span>` : '<span class="sm">Belum ada aktiviti dilaporkan.</span>'}</p>
+      <div class="grid g2"><div class="tw"><table style="min-width:300px"><thead><tr><th>Masa</th><th>Aplikasi dibuka</th></tr></thead><tbody>${info.events.map((e) => `<tr><td class="sm">${fmt(e.at)}</td><td><b>${esc(e.label || e.packageName)}</b><div class="mono">${esc(e.packageName)}</div></td></tr>`).join("") || `<tr><td colspan="2" class="sm">Tiada rekod.</td></tr>`}</tbody></table></div>
+      <div class="tw">${info.apps === null ? `<div class="loading">Memuatkan…</div>` : `<table style="min-width:340px"><thead><tr><th>Aplikasi dipasang (${info.apps.length})</th><th></th></tr></thead><tbody>${info.apps.map((a) => `<tr><td><b>${esc(a.label)}</b><div class="mono">${esc(a.packageName)}</div></td><td style="white-space:nowrap">${pol(a.packageName) ? polBadge(pol(a.packageName)) + " " : ""}<button class="btn" data-act="instset" data-pkg="${esc(a.packageName)}" data-label="${esc(a.label)}" data-p="BLOCK">Sekat</button> <button class="btn" data-act="instset" data-pkg="${esc(a.packageName)}" data-label="${esc(a.label)}" data-p="ALLOW">Benarkan</button></td></tr>`).join("") || `<tr><td class="sm">Senarai belum dilaporkan oleh peranti.</td></tr>`}</tbody></table>`}</div></div>`}</div>
+    <div class="card tw" style="margin-top:12px"><div style="padding:16px 16px 0"><b>Status penguatkuasaan pada peranti</b><p class="sm" style="margin:2px 0 0">Polisi hanya berkuat kuasa jika kebenaran Aksesibiliti (aplikasi) dan VPN (laman web) diaktifkan sekali pada peranti.</p></div>
+      <table style="min-width:420px"><thead><tr><th>Peranti</th><th>Status</th></tr></thead><tbody>${devs.map((d) => `<tr><td><b>${esc(d.deviceName)}</b></td><td>${esc(d.policyStatus || "Belum dilaporkan")}</td></tr>`).join("") || `<tr><td colspan="2" class="sm">Tiada peranti Android.</td></tr>`}</tbody></table></div>`);
+}
+
+function pageFiltering() {
+  const gid = S.fscope || null, rules = S.webRules.filter((r) => (r.groupId || null) === gid);
+  const dom = (act) => rules.filter((r) => r.type === "DOMAIN" && r.action === act);
+  const cat = (k) => rules.find((r) => r.type === "CATEGORY" && r.value === k);
+  const list = (title, act, hint) => `<div class="card tw"><div style="padding:16px 16px 0"><b>${title} (${dom(act).length})</b><p class="sm" style="margin:2px 0 8px">${hint}</p>
+      <div class="row" style="margin-bottom:8px"><input id="dom-${act}" data-keep placeholder="contoh: tiktok.com" aria-label="Domain ${act}" value="${esc(S.keep["dom-" + act] || "")}" style="flex:1;min-width:160px"><button class="btn p" data-act="domadd" data-a="${act}">${ic("plus", 16)}Tambah</button></div></div>
+      ${dom(act).length ? `<table style="min-width:300px"><tbody>${dom(act).map((r) => `<tr><td><b>${esc(r.value)}</b></td><td style="width:50px"><button class="btn i" data-act="domdel" data-id="${esc(r.id)}" aria-label="Padam ${esc(r.value)}">${ic("trash", 16, "#DC2626")}</button></td></tr>`).join("")}</tbody></table>` : empty("Tiada")}</div>`;
+  return head("Web Filtering", "Sekat atau benarkan laman web mengikut domain dan kategori, untuk semua peranti atau satu kumpulan") + state("webRules", () => `
+    <div class="card row"><b>Skop polisi:</b><select id="fscope" aria-label="Skop polisi" style="width:auto">${scopeOpts(gid || "")}</select><span class="sm">Senarai di bawah untuk skop ini sahaja.</span></div>
+    <div class="grid g2" style="margin-top:12px">${list("BLOCKLIST", "BLOCK", "Domain yang disekat (termasuk subdomain).")}${list("ALLOWLIST", "ALLOW", "Domain yang sentiasa dibenarkan.")}</div>
+    <div class="card" style="margin-top:12px"><b>CATEGORY FILTERING</b><p class="sm" style="margin:2px 0 8px">Pilih tindakan bagi setiap kategori.</p>
+      <div class="grid g3">${Object.entries(CATS).map(([k, c]) => { const r = cat(k); return `<div class="card"><b>${c.label}</b><p class="sm" style="margin:2px 0 8px">${c.domains.length} domain${c.hint ? ". " + esc(c.hint) : ""}</p>
+        <select data-cat="${k}" aria-label="Tindakan ${c.label}"><option value="">Tiada tindakan</option><option value="BLOCK" ${r && r.action === "BLOCK" ? "selected" : ""}>Sekat (BLOCK)</option><option value="ALLOW" ${r && r.action === "ALLOW" ? "selected" : ""}>Benarkan (ALLOW)</option></select></div>`; }).join("")}</div></div>
+    <div class="card" style="margin-top:12px"><b>Cara ia berfungsi dan had</b><p class="sm" style="font-size:14px;margin:6px 0 0">Penapisan dibuat pada peringkat DNS melalui VPN setempat pada peranti (kebenaran VPN diberi sekali). Ia menyekat domain dalam semua pelayar dan aplikasi. Had: ia tidak melihat sejarah carian atau kandungan halaman, dan Chrome dengan "Secure DNS" dihidupkan boleh memintasnya.</p></div>`);
+}
+
+function pageMonitoring() {
+  const devs = androidDevs(), l = S.live;
+  return head("Live Monitoring", "Lihat skrin peranti Android secara hampir langsung. Pengguna membenarkan di peranti dan notifikasi sentiasa kelihatan semasa dipantau.") + `
+    <div class="card row"><select id="mondev" aria-label="Pilih peranti" style="width:auto;min-width:240px"><option value="">— pilih peranti —</option>${devs.map((d) => `<option value="${esc(d.id)}" ${S.mon === d.id ? "selected" : ""}>${esc(d.deviceName)}</option>`).join("")}</select>
+      <button class="btn p" data-act="monstart" ${S.mon ? "" : "disabled"}>${ic("eye", 16)}Mula pantau</button><button class="btn" data-act="monstop" ${S.mon && l && ["REQUESTED", "ACTIVE"].includes(l.state) ? "" : "disabled"}>Henti</button></div>
+    <div class="card" style="margin-top:12px;text-align:center"><p id="monmsg" class="sm" style="font-size:14px">${esc(monMsg())}</p>
+      <div id="monbox">${l && l.frame ? `<img id="monimg" alt="Skrin peranti" src="data:image/jpeg;base64,${l.frame}" style="max-width:min(100%,420px);border-radius:12px;border:1px solid var(--line)">` : ""}</div></div>`;
+}
 
 function pageCommands() {
   return head("Device Commands", "Queue arahan. EXECUTED hanya selepas disahkan oleh peranti.") + `<div class="card tw">${state("commands", () => !S.commands.length ? empty("Belum ada arahan", "Hantar LOCK / UNLOCK dari All Devices atau Device Groups.") :
@@ -544,6 +638,35 @@ const ACTIONS = {
     confirmBox({ title: "Tolak peranti", body: `Peranti <b>${esc(d.deviceName)}</b> akan dibuang dan tidak boleh dikawal. Aplikasi pada peranti itu akan melepaskan dirinya.`, label: "Tolak", danger: true,
       run: () => fsWrite(async (F) => { const bt = F.writeBatch(fsdb); bt.delete(ref("devices", d.id)); bt.delete(ref("publicStatus", d.id)); logEv(F, bt, "DEVICE_REJECTED", `Peranti "${d.deviceName}" ditolak`, d.id); await bt.commit(); toast("Peranti ditolak."); }) });
   },
+  monitor(el) { watchLive(el.dataset.id); location.hash = "monitoring"; },
+  monstart() { fsWrite(async (F) => { const bt = F.writeBatch(fsdb); bt.set(ref("liveSessions", S.mon), { state: "REQUESTED", requestedBy: S.user.uid, requestedAt: F.serverTimestamp() }); logEv(F, bt, "LIVE_REQUESTED", `Pantau skrin diminta: ${dname(S.mon)}`, S.mon); await bt.commit(); })
+    .then(() => toast("Permintaan dihantar. Pengguna perlu membenarkan pada peranti.")).catch((e) => { if (e.message !== "preview") toast(errMsg(e), true); }); },
+  monstop() { fsWrite((F) => F.updateDoc(ref("liveSessions", S.mon), { state: "STOPPED" })).then(() => toast("Pantauan dihentikan.")).catch((e) => { if (e.message !== "preview") toast(errMsg(e), true); }); },
+  appadd() {
+    openModal(`<h2>Tambah polisi aplikasi</h2><label class="f">Pilih pantas<select id="apre"><option value="">— pilih —</option>${PRESET_APPS.map(([l, p]) => `<option value="${p}">${l}</option>`).join("")}</select></label>
+      <label class="f">Nama<input id="aln" maxlength="80"></label><label class="f">Nama pakej<input id="apk" placeholder="com.contoh.aplikasi" autocapitalize="off"></label>
+      <label class="f">Polisi<select id="apo"><option value="BLOCK">BLOCK (sekat)</option><option value="ALLOW">ALLOW (benarkan)</option><option value="REQUIRE_APPROVAL">REQUIRE APPROVAL</option></select></label>
+      <label class="f">Skop<select id="asc">${scopeOpts("")}</select></label>
+      <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn" data-close>Batal</button><button class="btn p" id="ok">Simpan</button></div>`, (m) => {
+      m.querySelector("#apre").onchange = (e) => { const p = PRESET_APPS.find((x) => x[1] === e.target.value); if (p) { m.querySelector("#aln").value = p[0]; m.querySelector("#apk").value = p[1]; } };
+      m.querySelector("#ok").onclick = async () => {
+        const pkg = m.querySelector("#apk").value.trim(), label = m.querySelector("#aln").value.trim() || pkg;
+        if (!PKG_RE.test(pkg)) return toast("Nama pakej tidak sah (contoh com.contoh.aplikasi).", true);
+        try { await saveApp({ packageName: pkg, label, policy: m.querySelector("#apo").value, groupId: m.querySelector("#asc").value || null }); toast("Polisi disimpan."); closeModal(); }
+        catch (e) { if (e.message !== "preview") toast(errMsg(e), true); }
+      };
+    });
+  },
+  appdel(el) { fsWrite(async (F) => { const bt = F.writeBatch(fsdb); bt.delete(ref("applications", el.dataset.id)); logEv(F, bt, "APP_POLICY", "Polisi aplikasi dipadam"); await bt.commit(); }).then(() => toast("Polisi dipadam.")).catch((e) => { if (e.message !== "preview") toast(errMsg(e), true); }); },
+  instset(el) { saveApp({ packageName: el.dataset.pkg, label: el.dataset.label, policy: el.dataset.p, groupId: null }).then(() => toast(`${el.dataset.label}: ${el.dataset.p} (semua peranti)`)).catch((e) => { if (e.message !== "preview") toast(errMsg(e), true); }); },
+  domadd(el) {
+    const act = el.dataset.a, v = normDomain($("#dom-" + act).value);
+    if (!DOMAIN_RE.test(v)) return toast("Domain tidak sah (contoh tiktok.com).", true);
+    if (S.webRules.some((r) => r.type === "DOMAIN" && r.value === v && (r.groupId || null) === (S.fscope || null))) return toast("Domain ini sudah ada dalam senarai skop ini.", true);
+    fsWrite(async (F) => { const bt = F.writeBatch(fsdb); bt.set(F.doc(F.collection(fsdb, "webFilteringRules")), { type: "DOMAIN", action: act, value: v, groupId: S.fscope || null, createdAt: F.serverTimestamp(), createdBy: S.user.uid });
+      logEv(F, bt, "WEB_RULE", `${act} ${v} (${scopeName(S.fscope)})`); await bt.commit(); }).then(() => { S.keep["dom-" + act] = ""; toast(`${v} ditambah.`); render(); }).catch((e) => { if (e.message !== "preview") toast(errMsg(e), true); });
+  },
+  domdel(el) { fsWrite((F) => F.deleteDoc(ref("webFilteringRules", el.dataset.id))).then(() => toast("Dipadam.")).catch((e) => { if (e.message !== "preview") toast(errMsg(e), true); }); },
   encancel(el) {
     const e = S.enrollments.find((x) => x.id === el.dataset.id);
     confirmBox({ title: "Batalkan enrollment", body: `Kod enrollment untuk <b>${esc(e.deviceName)}</b> akan dipadam. Peranti tidak lagi boleh mendaftar dengan kod itu.`, label: "Batalkan kod", danger: true,
@@ -623,6 +746,19 @@ document.addEventListener("change", (e) => {
   const t = e.target;
   if (t.dataset && t.dataset.sel) { t.checked ? S.sel.add(t.dataset.sel) : S.sel.delete(t.dataset.sel); render(); }
   else if (t.id === "selall") { const q = S.q.toLowerCase(); S.devices.filter((d) => (!S.fs || d.status === S.fs) && (!S.ft || d.deviceType === S.ft) && (!q || `${d.deviceName} ${d.deviceId} ${d.deviceModel} ${d.assignedUserId || ""}`.toLowerCase().includes(q))).slice(S.pg * 10, S.pg * 10 + 10).forEach((d) => (t.checked ? S.sel.add(d.id) : S.sel.delete(d.id))); render(); }
+  else if (t.dataset && t.dataset.apppol) { fsWrite((F) => F.updateDoc(ref("applications", t.dataset.apppol), { policy: t.value, updatedAt: F.serverTimestamp() })).then(() => toast("Polisi dikemas kini.")).catch((e) => { if (e.message !== "preview") toast(errMsg(e), true); render(); }); }
+  else if (t.id === "appdev") watchDevInfo(t.value);
+  else if (t.id === "mondev") watchLive(t.value);
+  else if (t.id === "fscope") { S.fscope = t.value; render(); }
+  else if (t.dataset && t.dataset.cat) {
+    const k = t.dataset.cat, ex = S.webRules.find((r) => r.type === "CATEGORY" && r.value === k && (r.groupId || null) === (S.fscope || null));
+    fsWrite(async (F) => { const bt = F.writeBatch(fsdb);
+      if (!t.value) { if (ex) bt.delete(ref("webFilteringRules", ex.id)); }
+      else if (ex) bt.update(ref("webFilteringRules", ex.id), { action: t.value, updatedAt: F.serverTimestamp() });
+      else bt.set(F.doc(F.collection(fsdb, "webFilteringRules")), { type: "CATEGORY", action: t.value, value: k, domains: CATS[k].domains, groupId: S.fscope || null, createdAt: F.serverTimestamp(), createdBy: S.user.uid });
+      logEv(F, bt, "WEB_RULE", `Kategori ${CATS[k].label}: ${t.value || "tiada"} (${scopeName(S.fscope)})`); await bt.commit(); })
+      .then(() => toast(`${CATS[k].label}: ${t.value || "tiada tindakan"}`)).catch((e) => { if (e.message !== "preview") toast(errMsg(e), true); render(); });
+  }
   else if (t.id === "fs") { S.fs = t.value; S.pg = 0; render(); } else if (t.id === "ft") { S.ft = t.value; S.pg = 0; render(); }
 });
 document.addEventListener("input", (e) => { if (e.target.id === "q") { S.q = e.target.value; S.pg = 0; render(); } else if (e.target.dataset && e.target.dataset.keep !== undefined) S.keep[e.target.id] = e.target.value; });
