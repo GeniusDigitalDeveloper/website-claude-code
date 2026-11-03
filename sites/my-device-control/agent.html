@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MY DEVICE CONTROL — Agent Peranti</title>
+<style>
+:root{--bg:#F5F7FA;--surface:#FFFFFF;--fg:#0F172A;--muted:#475569;--line:#DCE3EC;--accent:#0369A1;--ink:#0F172A;--ok:#047857;--bad:#B91C1C}
+@media (prefers-color-scheme:dark){:root{--bg:#0B1220;--surface:#111B2E;--fg:#E6EDF7;--muted:#9FB0C8;--line:#22314A;--accent:#38A9E0;--ink:#16233A;--ok:#34D399;--bad:#F87171}}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.5 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;display:grid;place-items:center;padding:16px}
+.card{width:100%;max-width:460px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:0 1px 3px rgba(15,23,42,.08)}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;margin-bottom:12px}
+.logo i{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:var(--ink);color:#fff}
+h1{margin:0 0 4px;font-size:20px}p{margin:0 0 12px;color:var(--muted);font-size:14px}
+label{display:block;font-weight:700;font-size:14px}
+input{width:100%;min-height:46px;margin-top:4px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--fg);font:15px ui-monospace,Consolas,monospace}
+button{font:inherit;font-weight:700;min-height:46px;padding:0 18px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer;width:100%;margin-top:12px;transition:transform .15s}
+button.p{background:var(--accent);border-color:var(--accent);color:#fff}button:active{transform:scale(.97)}button:disabled{opacity:.5}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.msg{min-height:22px;margin-top:10px;font-size:14px}.err{color:var(--bad)}.okc{color:var(--ok)}
+dl{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin:12px 0;font-size:14px}dt{color:var(--muted)}dd{margin:0;font-weight:700;word-break:break-word}
+.pulse{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--ok);margin-right:6px;animation:pl 2s infinite}
+@keyframes pl{0%{box-shadow:0 0 0 0 rgba(4,120,87,.5)}70%{box-shadow:0 0 0 9px rgba(4,120,87,0)}100%{box-shadow:0 0 0 0 rgba(4,120,87,0)}}
+.hide{display:none}.note{font-size:12px;color:var(--muted);margin-top:14px}
+@media(prefers-reduced-motion:reduce){.pulse{animation:none}*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="logo"><i><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/></svg></i>MY DEVICE CONTROL</div>
+
+  <section id="vJoin">
+    <h1>Sambungkan peranti ini</h1>
+    <p>Untuk iPhone, iPad, Mac, Linux, laptop atau mana-mana peranti yang ada pelayar. Peranti ini akan diurus dan dipantau oleh pentadbir (status dan bateri sahaja).</p>
+    <form id="fJoin" onsubmit="return false"><label for="code">Kod enrollment dari panel admin</label><input id="code" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Tampal kod 32 aksara"><button class="p" id="bJoin">Sambung</button></form>
+  </section>
+
+  <section id="vRun" class="hide">
+    <h1><span class="pulse" aria-hidden="true"></span>Disambungkan</h1>
+    <p id="runNote">Peranti ini dilaporkan kepada pentadbir selagi halaman ini terbuka.</p>
+    <dl><dt>Nama</dt><dd id="iName">—</dd><dt>Jenis</dt><dd id="iType">—</dd><dt>Peranti</dt><dd id="iModel">—</dd><dt>Bateri</dt><dd id="iBat">—</dd><dt>Isyarat terakhir</dt><dd id="iLast">—</dd></dl>
+    <button id="bStop">Putuskan di peranti ini</button>
+  </section>
+
+  <div class="msg" id="msg" role="status"></div>
+  <p class="note">Halaman web tidak boleh mengunci peranti atau berjalan di latar belakang. Peranti dipaparkan ONLINE hanya semasa halaman ini terbuka; arahan kunci/reboot dilaporkan sebagai tidak disokong. Untuk kawalan penuh pada Android, guna aplikasi agent.</p>
+</main>
+
+<script type="module">
+/* ===================== TETAPAN FIREBASE (projek my-devide-control) ===================== */
+const CONFIG = {
+  apiKey: "AIzaSyArLRlQqRAXckvH9jAsA4gcZ2bGfsJCl_c",
+  authDomain: "my-devide-control.firebaseapp.com",
+  projectId: "my-devide-control",
+  storageBucket: "my-devide-control.firebasestorage.app",
+  messagingSenderId: "106788083798",
+  appId: "1:106788083798:web:1a75a67f5f3dc9ab7243f7",
+  measurementId: "G-JG180QB7CS"
+};
+const SDK = "https://www.gstatic.com/firebasejs/11.0.2/";
+const HEARTBEAT_MS = 60 * 1000;
+/* ======================================================================================= */
+const $ = (id) => document.getElementById(id);
+const say = (t, cls) => { $("msg").textContent = t || ""; $("msg").className = "msg " + (cls || ""); };
+const TYPE_LABEL = { ANDROID: "Android", IOS: "iPhone / iPad", WINDOWS: "Windows", MAC: "Mac", LINUX: "Linux", OTHER: "Lain-lain" };
+
+const PREVIEW = window.__MDC_PREVIEW__ === true;   // dalam preview.html: tiada sambungan Firebase
+if (PREVIEW) {
+  $("fJoin").onsubmit = (e) => { e.preventDefault(); say("Preview: tiada sambungan Firebase. Muat naik fail untuk guna sebenar.", "err"); };
+} else {
+const [{ initializeApp }, A, F] = await Promise.all(["app", "auth", "firestore"].map((m) => import(`${SDK}firebase-${m}.js`)));
+const app = initializeApp(CONFIG), auth = A.getAuth(app), db = F.getFirestore(app);
+if (window.__MDC_EMULATOR__) { A.connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true }); F.connectFirestoreEmulator(db, "127.0.0.1", 8080); }
+
+let uid = null, info = null, timer = null, unsubCmd = null, battery = null;
+const busy = new Set();
+
+function deviceModel() {
+  const u = navigator.userAgentData;
+  const brand = u && u.brands ? u.brands.filter((b) => !/not.?a.?brand/i.test(b.brand)).map((b) => b.brand).pop() : "";
+  const plat = (u && u.platform) || navigator.platform || "";
+  const ua = navigator.userAgent;
+  const b = brand || (/Edg\//.test(ua) ? "Edge" : /Firefox\//.test(ua) ? "Firefox" : /Chrome\//.test(ua) ? "Chrome" : /Safari\//.test(ua) ? "Safari" : "Pelayar");
+  return `${plat || "Peranti"} · ${b}`.slice(0, 80);
+}
+const osVersion = () => ((navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || "Web").slice(0, 40);
+const batteryLevel = () => (battery && typeof battery.level === "number" ? Math.round(battery.level * 100) : null);
+if (navigator.getBattery) navigator.getBattery().then((b) => { battery = b; }).catch(() => {});
+
+const logEv = (type, message) => F.addDoc(F.collection(db, "activityLogs"), { type, message: String(message).slice(0, 200), actorId: null, deviceId: uid, createdAt: F.serverTimestamp() }).catch(() => {});
+
+async function enroll(code) {
+  const cred = auth.currentUser || (await A.signInAnonymously(auth)).user; uid = cred.uid;
+  let snap; try { snap = await F.getDoc(F.doc(db, "enrollments", code)); } catch (e) { throw new Error("Kod tidak sah, sudah digunakan atau telah tamat tempoh."); }
+  if (!snap.exists()) throw new Error("Kod tidak sah, sudah digunakan atau telah tamat tempoh.");
+  const d = snap.data(), now = F.serverTimestamp(), bat = batteryLevel(), bt = F.writeBatch(db);
+  bt.set(F.doc(db, "devices", uid), { deviceId: uid, deviceName: d.deviceName, deviceType: d.deviceType, deviceModel: deviceModel(), osVersion: osVersion(), status: "ONLINE", isLocked: false,
+    enrollmentStatus: "ENROLLED", assignedUserId: null, groupId: d.groupId || null, batteryLevel: bat, lastSeen: now, createdAt: now, updatedAt: now, enrollmentCode: code, appVersion: "web-0.1" });
+  bt.update(F.doc(db, "enrollments", code), { status: "USED", deviceId: uid, usedAt: now });
+  bt.set(F.doc(db, "publicStatus", uid), { deviceName: d.deviceName, deviceType: d.deviceType, status: "ONLINE", batteryLevel: bat, lastSeen: now, groupName: null, updatedAt: now });
+  try { await bt.commit(); } catch (e) { throw new Error("Pendaftaran ditolak. Kod mungkin sudah digunakan atau tamat tempoh."); }
+  await logEv("DEVICE_REGISTERED", "Peranti didaftarkan (agent web)");
+  info = { name: d.deviceName, type: d.deviceType };
+  localStorage.setItem("mdc_agent", JSON.stringify(info));
+}
+
+async function heartbeat() {
+  const now = F.serverTimestamp(), bat = batteryLevel(), bt = F.writeBatch(db);
+  bt.update(F.doc(db, "devices", uid), { status: "ONLINE", isLocked: false, batteryLevel: bat, osVersion: osVersion(), appVersion: "web-0.1", lastSeen: now, updatedAt: now });
+  bt.update(F.doc(db, "publicStatus", uid), { status: "ONLINE", batteryLevel: bat, lastSeen: now, updatedAt: now });
+  try { await bt.commit(); $("iLast").textContent = new Date().toLocaleTimeString("ms-MY"); $("iBat").textContent = bat === null ? "tidak diketahui" : bat + "%"; say(""); }
+  catch (e) { if (/permission|not-found|insufficient/i.test(e.message || "")) { say("Peranti ini telah dinyahdaftar oleh pentadbir.", "err"); stop(true); } else say("Tiada sambungan. Mencuba semula…", "err"); }
+}
+
+async function handleCommand(ref, status, type) {
+  try {
+    if (status === "PENDING") await F.updateDoc(ref, { status: "SENT", sentAt: F.serverTimestamp() });
+    if (type === "SYNC_POLICY") { await F.updateDoc(ref, { status: "EXECUTED", executedAt: F.serverTimestamp() }); await logEv("COMMAND_EXECUTED", "SYNC_POLICY berjaya"); await heartbeat(); }
+    else { const m = `Agent web tidak menyokong ${type}. Gunakan aplikasi agent Android atau akses peranti secara fizikal.`; await F.updateDoc(ref, { status: "FAILED", errorMessage: m }); await logEv("COMMAND_FAILED", `${type} gagal: tidak disokong`); }
+  } catch (e) { /* dicuba semula pada snapshot seterusnya */ }
+}
+
+function start() {
+  $("vJoin").classList.add("hide"); $("vRun").classList.remove("hide");
+  $("iName").textContent = info.name; $("iType").textContent = TYPE_LABEL[info.type] || info.type; $("iModel").textContent = deviceModel();
+  heartbeat(); timer = setInterval(heartbeat, HEARTBEAT_MS);
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && uid) heartbeat(); });
+  const q = F.query(F.collection(db, "commands"), F.where("deviceId", "==", uid), F.where("status", "in", ["PENDING", "SENT"]));
+  unsubCmd = F.onSnapshot(q, (s) => s.docs.forEach((d) => {
+    const exp = d.get("expiresAt"); if (exp && exp.toMillis() < Date.now()) return;
+    if (busy.has(d.id)) return; busy.add(d.id); handleCommand(d.ref, d.get("status"), d.get("commandType")).finally(() => busy.delete(d.id));
+  }), () => {});
+}
+function stop(clear) {
+  clearInterval(timer); if (unsubCmd) unsubCmd(); timer = unsubCmd = null;
+  if (clear) localStorage.removeItem("mdc_agent");
+  $("vRun").classList.add("hide"); $("vJoin").classList.remove("hide");
+}
+
+const params = new URLSearchParams(location.search); if (params.get("code")) $("code").value = params.get("code");
+$("fJoin").onsubmit = async (e) => {
+  e.preventDefault(); const code = $("code").value.replace(/[\s"'“”]/g, ""); if (code.length < 24) return say("Kod terlalu pendek. Salin kod penuh dari panel admin.", "err");
+  $("bJoin").disabled = true; say("Menyambung…");
+  try { await enroll(code); say("Berjaya disambungkan.", "okc"); start(); } catch (er) { say(er.message, "err"); } finally { $("bJoin").disabled = false; }
+};
+$("bStop").onclick = () => { stop(true); say("Diputuskan pada peranti ini. Pentadbir boleh nyahdaftar peranti dari panel."); };
+
+// Sambung semula automatik jika peranti ini sudah didaftarkan
+try {
+  const saved = JSON.parse(localStorage.getItem("mdc_agent") || "null");
+  if (saved) await new Promise((res) => { const off = A.onAuthStateChanged(auth, (u) => { off(); if (u && u.isAnonymous) { uid = u.uid; info = saved; start(); } res(); }); });
+} catch (e) {}
+}
+</script>
+</body>
+</html>

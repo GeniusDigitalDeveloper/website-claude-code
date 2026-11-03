@@ -40,13 +40,14 @@ iframe{border:0;background:#fff;width:100%;height:70vh;min-height:480px;border-r
   <button role="tab" data-t="preview" aria-selected="true">Preview</button>
   <button role="tab" data-t="index" aria-selected="false">index.html</button>
   <button role="tab" data-t="admin" aria-selected="false">admin.html</button>
+  <button role="tab" data-t="agent" aria-selected="false">agent.html</button>
   <button role="tab" data-t="rtdb" aria-selected="false">Rules Database</button>
   <button role="tab" data-t="fs" aria-selected="false">Rules Firestore</button>
 </div>
 <main>
   <section class="panel on" id="p-preview" role="tabpanel">
     <div class="bar">
-      <div class="seg" role="group" aria-label="Halaman"><button data-pv="index" aria-pressed="false">Index (paparan awam)</button><button data-pv="admin" aria-pressed="true">Admin (log masuk)</button></div>
+      <div class="seg" role="group" aria-label="Halaman"><button data-pv="index" aria-pressed="false">Index (paparan awam)</button><button data-pv="admin" aria-pressed="true">Admin (log masuk)</button><button data-pv="agent" aria-pressed="false">Agent web</button></div>
       <div class="seg" role="group" aria-label="Saiz"><button data-w="100%" aria-pressed="true">Desktop</button><button data-w="390px" aria-pressed="false">Telefon</button></div>
     </div>
     <div class="frame"><iframe id="fr" title="Preview"></iframe></div>
@@ -54,6 +55,7 @@ iframe{border:0;background:#fff;width:100%;height:70vh;min-height:480px;border-r
   </section>
   <section class="panel" id="p-index" role="tabpanel"></section>
   <section class="panel" id="p-admin" role="tabpanel"></section>
+  <section class="panel" id="p-agent" role="tabpanel"></section>
   <section class="panel" id="p-rtdb" role="tabpanel"></section>
   <section class="panel" id="p-fs" role="tabpanel"></section>
 </main>
@@ -65,7 +67,7 @@ async function copy(text) {
   try { await navigator.clipboard.writeText(text); return true; }
   catch (e) { const t = document.createElement("textarea"); t.value = text; t.style.cssText = "position:fixed;opacity:0"; document.body.appendChild(t); t.select(); let ok = false; try { ok = document.execCommand("copy"); } catch (x) {} t.remove(); return ok; }
 }
-for (const k of ["index", "admin", "rtdb", "fs"]) {
+for (const k of ["index", "admin", "agent", "rtdb", "fs"]) {
   const f = F[k], p = document.getElementById("p-" + k), lines = f.code.split("\n").length;
   p.innerHTML = `<div class="bar"><div><b>${f.label}</b><small>${f.file} · ${lines} baris · satu fail lengkap</small></div><button class="cp">Salin semua</button></div><pre><code></code></pre>`;
   p.querySelector("code").textContent = f.code;

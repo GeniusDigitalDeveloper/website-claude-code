@@ -191,3 +191,12 @@ test('ENROLLMENT: agent boleh baca enrollment PENDING dengan kod; USED/tamat dil
   await assertFails(getDocs(collection(dev('baru-1'), 'enrollments')));
   await assertFails(getDoc(doc(env.unauthenticatedContext().firestore(), 'enrollments/' + FRESH)));
 });
+
+test('JENIS PERANTI: IOS/MAC/LINUX/OTHER dibenarkan; jenis rawak ditolak', async () => {
+  for (const ty of ['IOS', 'MAC', 'LINUX', 'OTHER', 'WINDOWS']) {
+    const ok = { deviceName: 'Peranti ' + ty, deviceType: ty, groupId: null, assignedUserId: null, status: 'PENDING', createdBy: 'adm', createdAt: serverTimestamp(), expiresAt: future(24) };
+    await assertSucceeds(setDoc(doc(admin(), 'enrollments/' + ty.padEnd(32, 'X')), ok));
+    await assertSucceeds(setDoc(doc(admin(), 'publicStatus/pub-' + ty), { deviceName: 'P', deviceType: ty, status: 'ONLINE' }));
+  }
+  await assertFails(setDoc(doc(admin(), 'publicStatus/pub-x'), { deviceName: 'P', deviceType: 'TOASTER', status: 'ONLINE' }));
+});

@@ -8,3 +8,9 @@ Aplikasi agent ada dalam `android-agent/` (lihat README di sana). Aliran yang ru
 4. Arahan: agent mendengar `commands` miliknya: PENDING → SENT → EXECUTED/FAILED. Rules menolak PENDING → EXECUTED terus dan arahan tamat tempoh.
 
 Lock sebenar yang kekal (kiosk), unlock jauh dan reboot memerlukan Device Owner (Android Enterprise). Lihat `android-agent/README.md`.
+
+## Peranti bukan Android
+Buka `agent.html` pada peranti (apa-apa pelayar), tampal kod enrollment (pilih jenis iPhone/Windows/Mac/Linux/Lain-lain semasa Daftar peranti di panel). Aliran data sama, tetapi agent web hanya melapor status dan bateri semasa halaman terbuka, dan melaporkan LOCK/UNLOCK/REBOOT sebagai tidak disokong (FAILED dengan sebab). Kawalan penuh iPhone/iPad memerlukan Apple MDM, di luar skop sistem ini.
+
+## Nyahdaftar peranti
+Panel meminta e-mel dan kata laluan salah satu akaun Firebase Authentication sebelum memadam peranti (pengesahan dalam panel; bukan peraturan pelayan).

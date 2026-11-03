@@ -4,6 +4,7 @@ import json
 FILES = [
   ("index", "index.html", "index.html"),
   ("admin", "admin.html", "admin.html"),
+  ("agent", "agent.html", "agent.html (peranti lain)"),
   ("rtdb", "database.rules.json", "Rules Database"),
   ("fs", "firestore.rules", "Rules Firestore"),
 ]
