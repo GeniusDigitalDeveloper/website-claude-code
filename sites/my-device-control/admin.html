@@ -27,7 +27,6 @@ h1{margin:0;font-size:24px;letter-spacing:-.01em}
 .head p{margin:2px 0 0;color:var(--muted);font-size:14px}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .notice{background:#f0f9ff;border:1px solid #bae6fd;color:#0c4a6e;border-radius:10px;padding:8px 12px;font-size:12px;margin-bottom:14px}
-.demo{background:#fef3c7;border:1px solid #f59e0b;color:#78350f;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:700;margin-bottom:14px}
 .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 1px 2px rgba(15,23,42,.05)}
 .grid{display:grid;gap:12px}.g4{grid-template-columns:repeat(4,1fr)}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
 .stat{display:flex;gap:12px;align-items:center}
@@ -63,6 +62,49 @@ td{padding:10px 12px;border-top:1px solid var(--line);font-size:14px;vertical-al
 .tl time{width:170px;font-size:12px;font-weight:700;color:var(--muted)}.tl code{background:var(--chip);border-radius:6px;padding:1px 7px;font-size:12px}
 .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:6px}.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px}
 .sk{position:absolute;left:-9999px}.sk:focus{left:8px;top:8px;background:#fff;padding:8px;z-index:99}
+
+/* ===== ANIMASI (transform & opacity sahaja; dihormati prefers-reduced-motion) ===== */
+:root{--ease:cubic-bezier(.22,1,.36,1);--spring:cubic-bezier(.34,1.56,.64,1)}
+nav{position:relative}
+.ind{position:absolute;left:0;right:0;top:0;height:40px;border-radius:10px;background:var(--primary);z-index:0;opacity:0;will-change:transform;box-shadow:0 6px 16px rgba(15,23,42,.25)}
+.ind.on{opacity:1}.ind.anim{transition:transform .6s var(--ease),height .6s var(--ease)}
+nav a{position:relative;z-index:1;transition:color .35s var(--ease),transform .35s var(--ease)}
+nav a.on{background:transparent;color:#fff}
+nav a:not(.on):hover{transform:translateX(3px)}
+nav a svg{transition:transform .5s var(--spring)}
+nav a:hover svg{transform:scale(1.12)}
+nav a.pop svg{animation:iconpop .7s var(--spring)}
+@keyframes iconpop{0%{transform:scale(1) rotate(0)}35%{transform:scale(1.35) rotate(-12deg)}70%{transform:scale(.95) rotate(6deg)}100%{transform:scale(1) rotate(0)}}
+#scrimbox{display:contents}
+#content{will-change:transform,opacity}
+#content.leave{opacity:0;transform:translateY(-10px) scale(.992);filter:blur(2px);transition:opacity .22s ease,transform .22s ease,filter .22s ease}
+.rv{opacity:0;animation:rise .85s var(--ease) var(--d,0ms) forwards}
+tr.rv{animation-name:slidein2;animation-duration:.7s}
+@keyframes rise{from{opacity:0;transform:translateY(28px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes slidein2{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:none}}
+.go .cb{transform-box:fill-box;transform-origin:50% 100%;animation:grow 1s var(--ease) var(--d,0ms) both}
+@keyframes grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.go .bar i{transform-origin:0 50%;animation:growx 1.1s var(--ease) var(--d,0ms) both}
+@keyframes growx{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.go .dn{transform-box:fill-box;transform-origin:50% 50%;animation:spin 1.3s var(--ease) both}
+@keyframes spin{from{opacity:0;transform:rotate(-140deg) scale(.55)}to{opacity:1;transform:none}}
+.lift{transition:transform .4s var(--ease),box-shadow .4s var(--ease)}
+.lift:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(15,23,42,.12)}
+.btn{transition:transform .2s var(--ease),background .25s,box-shadow .25s,opacity .2s}
+.btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 14px rgba(15,23,42,.14)}
+.btn:active:not(:disabled){transform:scale(.96)}
+tbody tr{transition:background .25s}tbody tr:hover{background:#f8fafc}
+.modal{animation:fadein .28s ease both}
+.modal .card{animation:cardin .55s var(--spring) both}
+.modal.out{animation:fadeout .18s ease both}.modal.out .card{animation:cardout .18s ease both}
+@keyframes fadein{from{opacity:0}to{opacity:1}}@keyframes fadeout{to{opacity:0}}
+@keyframes cardin{from{opacity:0;transform:translateY(24px) scale(.92)}to{opacity:1;transform:none}}
+@keyframes cardout{to{opacity:0;transform:translateY(10px) scale(.97)}}
+.toast{animation:toastin .55s var(--spring) both}
+@keyframes toastin{from{opacity:0;transform:translateX(40px) scale(.95)}to{opacity:1;transform:none}}
+.shellin{animation:fadein .6s ease both}
+.scrim{animation:fadein .25s ease both}
+@media(prefers-reduced-motion:reduce){.rv{opacity:1!important;animation:none!important}.ind.anim{transition:none}}
 @media(max-width:980px){.g4{grid-template-columns:repeat(2,1fr)}.g2{grid-template-columns:1fr}}
 @media(max-width:860px){
  .app{display:block}
@@ -90,7 +132,8 @@ const CONFIG = { // sama seperti index.html; jika kosong, guna tetapan yang disi
 const REGION = "asia-southeast1";
 const SDK = "https://www.gstatic.com/firebasejs/11.0.2/";
 const QR_LIB = "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js";
-const DEMO = new URLSearchParams(location.search).has("demo") || window.__MDC_DEMO__ === true;
+// Hook untuk preview.html SAHAJA (skrin kosong tanpa Firebase, tiada data contoh). Tidak aktif pada penggunaan sebenar.
+const PREVIEW = window.__MDC_PREVIEW__ === true;
 /* =================================================== */
 
 /* ---------- Bantuan ---------- */
@@ -134,32 +177,20 @@ let fb = null; // modul Firebase
 let raf = 0;
 const render = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); };
 
-/* ---------- Data demo (hanya untuk preview, jelas dilabel) ---------- */
-function loadDemo() {
-  const now = Date.now(), T = (m) => ({ toMillis: () => now - m * 60000 });
-  S.user = { email: "demo@contoh.com", uid: "demo" }; S.claims = { orgId: "demo", role: "ORG_ADMIN" };
-  S.groups = [{ id: "g1", name: "Asrama Putera", description: "Tablet asrama putera" }, { id: "g2", name: "Kelas 1", description: "" }];
-  const st = ["ONLINE", "ONLINE", "LOCKED", "OFFLINE", "ONLINE", "ERROR", "ONLINE", "OFFLINE", "ONLINE", "ENROLLMENT_PENDING", "ONLINE", "LOCKED"];
-  S.devices = st.map((s, i) => ({ id: "d" + i, deviceId: "dev-" + (1000 + i), deviceName: (i % 5 === 4 ? "WIN LAPTOP " : "HONOR TABLET ") + String(i + 1).padStart(2, "0"),
-    deviceType: i % 5 === 4 ? "WINDOWS" : "ANDROID", deviceModel: i % 5 === 4 ? "Laptop" : "HONOR Pad X8", osVersion: i % 5 === 4 ? "Windows 11" : "Android 13", status: s,
-    enrollmentStatus: s === "ENROLLMENT_PENDING" ? "PENDING" : "ENROLLED", assignedUserId: i % 3 ? "pelajar" + i : null, groupId: i % 2 ? "g1" : "g2", batteryLevel: 90 - i * 6, lastSeen: T(i * 7), createdAt: T(i * 1500) }));
-  S.commands = S.devices.slice(0, 7).map((d, i) => ({ id: "c" + i, commandId: "cmd-" + i, deviceId: d.id, commandType: i % 2 ? "UNLOCK" : "LOCK",
-    status: ["EXECUTED", "PENDING", "SENT", "FAILED", "EXECUTED", "EXPIRED", "ACKNOWLEDGED"][i], createdAt: T(i * 400), executedAt: i % 4 === 0 ? T(i * 400 - 1) : null, errorMessage: i === 3 ? "Peranti menolak arahan" : null }));
-  S.logs = [["DEVICE_ONLINE", "Peranti kembali online"], ["COMMAND_CREATED", "LOCK → 3 peranti"], ["COMMAND_EXECUTED", "Arahan cmd-0 → EXECUTED"], ["DEVICE_OFFLINE", "Peranti offline (tiada heartbeat)"], ["ENROLLMENT_CREATED", "Enrollment ANDROID \"HONOR TABLET 12\""], ["DEVICE_REGISTERED", "Peranti didaftarkan"]]
-    .map((l, i) => ({ id: "l" + i, type: l[0], message: l[1], createdAt: T(i * 90) }));
-  S.users = [{ id: "u1", uid: "u1", email: "demo@contoh.com", displayName: "Admin Demo", role: "ORG_ADMIN", provider: "password" }, { id: "u2", uid: "u2", email: "guru@contoh.com", displayName: "Cikgu", role: "DEVICE_MANAGER", provider: "google.com" }];
+const previewBlock = () => { toast("Preview: tiada sambungan Firebase. Muat naik fail dan sambungkan untuk guna sebenar.", true); return Promise.reject(new Error("preview")); };
+function loadPreview() {
+  S.user = { email: "preview", uid: "preview" }; S.claims = { orgId: "preview", role: "ORG_ADMIN" };
   ["devices", "groups", "commands", "logs", "users"].forEach((k) => (S.loaded[k] = true));
 }
-const demoBlock = () => { toast("Mod demo: tiada tindakan sebenar dilakukan.", true); return Promise.reject(new Error("demo")); };
 
 /* ---------- Firebase ---------- */
 function getCfg() {
   try { const s = JSON.parse(localStorage.getItem("mdc_cfg") || "null"); if (s && s.apiKey) return s; } catch (e) {}
   return CONFIG.apiKey ? CONFIG : null;
 }
-let call = demoBlock, fsdb = null, auth = null;
+let call = previewBlock, fsdb = null, auth = null;
 async function boot() {
-  if (DEMO) { loadDemo(); call = demoBlock; render(); return; }
+  if (PREVIEW) { loadPreview(); render(); return; }
   const cfg = getCfg();
   if (!cfg) { location.replace("index.html"); return; }
   const [{ initializeApp }, A, F, FN] = await Promise.all(["app", "auth", "firestore", "functions"].map((m) => import(`${SDK}firebase-${m}.js`)));
@@ -189,13 +220,13 @@ function subscribeAll() {
   sub("devices", "devices", "createdAt", 500); sub("groups", "deviceGroups", null, 200);
   sub("commands", "commands", "createdAt", 300); sub("logs", "activityLogs", "createdAt", 300); sub("users", "users", null, 200);
 }
-async function fsWrite(fn) { if (DEMO) return demoBlock(); return fn(fb.F); }
+async function fsWrite(fn) { if (PREVIEW) return previewBlock(); return fn(fb.F); }
 const ref = (...p) => fb.F.doc(fsdb, "organizations", S.claims.orgId, ...p);
 
 /* ---------- Navigasi ---------- */
 const NAV = [["dashboard", "Dashboard", "dash"], ["devices", "All Devices", "dev"], ["groups", "Device Groups", "grp"], ["apps", "App Management", "app"],
   ["filtering", "Web Filtering", "web"], ["monitoring", "Live Monitoring", "eye"], ["commands", "Device Commands", "cmd"], ["logs", "Activity Logs", "log"], ["users", "Users & Roles", "usr"], ["settings", "Settings", "set"]];
-const setPage = () => { const h = location.hash.slice(1); S.page = NAV.some((n) => n[0] === h) ? h : "dashboard"; S.nav = false; S.pg = 0; S.sel = new Set(); render(); };
+const setPage = () => { const h = location.hash.slice(1); S.page = NAV.some((n) => n[0] === h) ? h : "dashboard"; S.nav = false; S.pg = 0; S.sel = new Set(); S.animPending = true; S.leaving = false; render(); };
 window.addEventListener("hashchange", setPage);
 
 /* ---------- Komponen ---------- */
@@ -212,7 +243,7 @@ function openModal(html, onMount) {
   const first = m.querySelector("input,select,button.p,button.d"); if (first) first.focus();
   if (onMount) onMount(m);
 }
-const closeModal = () => { $("#modal").innerHTML = ""; };
+const closeModal = () => { const m = $("#modal .modal"); if (!m || REDUCE) { $("#modal").innerHTML = ""; return; } m.classList.add("out"); setTimeout(() => { $("#modal").innerHTML = ""; }, 180); };
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
 function confirmBox({ title, body, label, danger, requireText, run }) {
   openModal(`<h2>${esc(title)}</h2><div class="sm" style="font-size:14px;color:#334155">${body}</div>
@@ -221,31 +252,31 @@ function confirmBox({ title, body, label, danger, requireText, run }) {
   (m) => {
     const ok = m.querySelector("#cok"), ct = m.querySelector("#ct");
     if (ct) ct.oninput = () => (ok.disabled = ct.value !== requireText);
-    ok.onclick = async () => { ok.disabled = true; try { await run(); closeModal(); } catch (e) { if (e.message !== "demo") toast(errMsg(e), true); ok.disabled = false; } };
+    ok.onclick = async () => { ok.disabled = true; try { await run(); closeModal(); } catch (e) { if (e.message !== "preview") toast(errMsg(e), true); ok.disabled = false; } };
   });
 }
 
 /* ---------- Halaman ---------- */
 function pageDashboard() {
   const D = S.devices, by = (s) => D.filter((d) => d.status === s).length;
-  const stat = (l, v, i, c = "#0F172A") => `<div class="card stat"><div class="ic">${ic(i, 20, c)}</div><div><b>${v}</b><span>${l}</span></div></div>`;
+  const stat = (l, v, i, c = "#0F172A") => `<div class="card stat lift"><div class="ic">${ic(i, 20, c)}</div><div><b data-n="${v}">${v}</b><span>${l}</span></div></div>`;
   const attention = D.filter((d) => d.status === "ERROR" || (typeof d.batteryLevel === "number" && d.batteryLevel < 15)).length;
   const pending = D.filter((d) => d.status === "ENROLLMENT_PENDING" || d.enrollmentStatus === "PENDING").length;
   const COL = { ONLINE: "#047857", OFFLINE: "#64748B", LOCKED: "#B45309", ENROLLMENT_PENDING: "#0369A1", ERROR: "#DC2626" };
   // donut
   const cnt = {}; D.forEach((d) => (cnt[d.status] = (cnt[d.status] || 0) + 1));
-  let acc = 0; const R = 40, C = 2 * Math.PI * R;
-  const donut = Object.entries(cnt).map(([k, v]) => { const len = (v / D.length) * C; const s = `<circle r="${R}" cx="60" cy="60" fill="none" stroke="${COL[k] || "#94a3b8"}" stroke-width="18" stroke-dasharray="${len} ${C - len}" stroke-dashoffset="${-acc}" transform="rotate(-90 60 60)"/>`; acc += len; return s; }).join("");
+  let acc = 0, ci = 0; const R = 40, C = 2 * Math.PI * R;
+  const donut = Object.entries(cnt).map(([k, v]) => { const len = (v / D.length) * C; const s = `<circle class="dn" r="${R}" cx="60" cy="60" fill="none" stroke="${COL[k] || "#94a3b8"}" stroke-width="18" stroke-dasharray="${len} ${C - len}" stroke-dashoffset="${-acc}" transform="rotate(-90 60 60)"/>`; acc += len; return s; }).join("");
   // 7 hari
   const days = Array.from({ length: 7 }, (_, i) => { const d = new Date(); d.setDate(d.getDate() - (6 - i)); return d.toLocaleDateString("en-CA"); });
   const dk = (t) => (ms(t) ? new Date(ms(t)).toLocaleDateString("en-CA") : "");
   const series = [["Peranti", D, "#0369A1"], ["Arahan", S.commands, "#0F172A"], ["Aktiviti", S.logs, "#64748B"]];
   const vals = series.map(([n, arr]) => days.map((k) => arr.filter((x) => dk(x.createdAt) === k).length));
   const mx = Math.max(1, ...vals.flat()), bw = 12, gw = 3 * bw + 12;
-  const bars = days.map((k, i) => series.map((s, j) => { const h = (vals[j][i] / mx) * 120; return `<rect x="${i * gw + j * bw + 6}" y="${130 - h}" width="${bw - 2}" height="${h}" fill="${s[2]}" rx="2"><title>${s[0]} ${k}: ${vals[j][i]}</title></rect>`; }).join("") + `<text x="${i * gw + gw / 2}" y="146" font-size="10" text-anchor="middle" fill="#475569">${k.slice(5)}</text>`).join("");
+  const bars = days.map((k, i) => series.map((s, j) => { const h = (vals[j][i] / mx) * 120; return `<rect class="cb" style="--d:${i * 70 + j * 25}ms" x="${i * gw + j * bw + 6}" y="${130 - h}" width="${bw - 2}" height="${h}" fill="${s[2]}" rx="2"><title>${s[0]} ${k}: ${vals[j][i]}</title></rect>`; }).join("") + `<text x="${i * gw + gw / 2}" y="146" font-size="10" text-anchor="middle" fill="#475569">${k.slice(5)}</text>`).join("");
   const cs = {}; S.commands.forEach((c) => (cs[c.status] = (cs[c.status] || 0) + 1));
   const cmx = Math.max(1, ...Object.values(cs));
-  return head("Dashboard", DEMO ? "Data contoh (mod demo)" : "Data masa nyata dari Cloud Firestore") + state("devices", () => `
+  return head("Dashboard", "Data masa nyata dari Cloud Firestore") + state("devices", () => `
     <div class="grid g4">${stat("Total Devices", D.length, "dev")}${stat("Online", by("ONLINE"), "wifi", "#047857")}${stat("Offline", by("OFFLINE"), "wifioff", "#64748B")}${stat("Locked", by("LOCKED"), "lock", "#B45309")}
     ${stat("Android", D.filter((d) => d.deviceType === "ANDROID").length, "dev")}${stat("Windows", D.filter((d) => d.deviceType === "WINDOWS").length, "laptop")}${stat("Pending Enrollment", pending, "clock", "#0369A1")}${stat("Perlu Perhatian", attention, "warn", "#DC2626")}</div>
     ${!D.length ? `<div class="card" style="margin-top:16px">${empty("Belum ada peranti didaftarkan", "Pergi ke All Devices → Daftar peranti untuk menjana token enrollment.")}</div>` : `
@@ -255,7 +286,7 @@ function pageDashboard() {
         <p class="sm">Sejarah trend online/offline memerlukan snapshot berkala (fasa seterusnya); carta ini ialah keadaan semasa.</p></div>
       <div class="card"><b>Enrollment, arahan &amp; aktiviti (7 hari)</b><svg viewBox="0 0 ${7 * gw + 12} 152" width="100%" role="img" aria-label="Carta bar 7 hari">${bars}</svg>
         <div class="legend">${series.map((s) => `<span><i style="background:${s[2]}"></i>${s[0]}</span>`).join("")}</div></div>
-      <div class="card"><b>Sejarah pelaksanaan arahan</b>${!S.commands.length ? empty("Belum ada arahan") : `<div class="bars" style="margin-top:10px">${Object.entries(cs).map(([k, v]) => `<div class="bar"><span>${k}</span><i style="width:${(v / cmx) * 100}%"></i><b>${v}</b></div>`).join("")}</div>`}</div>
+      <div class="card"><b>Sejarah pelaksanaan arahan</b>${!S.commands.length ? empty("Belum ada arahan") : `<div class="bars" style="margin-top:10px">${Object.entries(cs).map(([k, v]) => `<div class="bar"><span>${k}</span><i style="width:${(v / cmx) * 100}%;--d:${Object.keys(cs).indexOf(k) * 80}ms"></i><b>${v}</b></div>`).join("")}</div>`}</div>
       <div class="card tw"><div style="padding:16px 16px 0"><b>Peranti terkini</b></div><table style="min-width:420px"><thead><tr><th>Nama</th><th>Jenis</th><th>Status</th><th>Last seen</th></tr></thead><tbody>
         ${D.slice(0, 6).map((d) => `<tr><td><b>${esc(d.deviceName)}</b></td><td>${esc(d.deviceType)}</td><td>${badge(d.status)}</td><td>${ago(d.lastSeen)}</td></tr>`).join("")}</tbody></table></div>
     </div>`}`);
@@ -284,7 +315,7 @@ function pageDevices() {
 function pageGroups() {
   const mg = can("DEVICE_MANAGER");
   return head("Device Groups", "Contoh: Asrama Putera, Kelas 1, Tablet Android", mg ? `<button class="btn p" data-act="gnew">${ic("plus", 16)}Kumpulan baharu</button>` : "") + state("groups", () => !S.groups.length ? `<div class="card">${empty("Belum ada kumpulan", "Cipta kumpulan, kemudian tetapkan peranti melalui All Devices → Sunting.")}</div>` :
-    `<div class="grid g3">${S.groups.map((g) => { const n = S.devices.filter((d) => d.groupId === g.id).length; return `<div class="card"><b>${esc(g.name)}</b><p class="sm" style="margin:2px 0 8px">${esc(g.description || "Tiada keterangan")}</p><b style="font-size:14px">${n} peranti</b>
+    `<div class="grid g3">${S.groups.map((g) => { const n = S.devices.filter((d) => d.groupId === g.id).length; return `<div class="card lift"><b>${esc(g.name)}</b><p class="sm" style="margin:2px 0 8px">${esc(g.description || "Tiada keterangan")}</p><b style="font-size:14px">${n} peranti</b>
       ${mg ? `<div class="row" style="margin-top:12px"><button class="btn" data-act="glock" data-id="${esc(g.id)}">${ic("lock", 16)}Lock</button><button class="btn" data-act="gunlock" data-id="${esc(g.id)}">${ic("unlock", 16)}Unlock</button><button class="btn i" data-act="gedit" data-id="${esc(g.id)}" aria-label="Sunting ${esc(g.name)}">${ic("edit", 16)}</button>${can("ORG_ADMIN") ? `<button class="btn i" data-act="gdel" data-id="${esc(g.id)}" aria-label="Padam ${esc(g.name)}">${ic("trash", 16, "#DC2626")}</button>` : ""}</div>` : ""}</div>`; }).join("")}</div>`);
 }
 
@@ -320,20 +351,57 @@ function pageOnboarding() {
 
 /* ---------- Lukis ---------- */
 const PAGES = { dashboard: pageDashboard, devices: pageDevices, groups: pageGroups, apps: pageApps, filtering: pageFiltering, monitoring: pageMonitoring, commands: pageCommands, logs: pageLogs, users: pageUsers, settings: pageSettings };
+const REDUCE = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const NOTICE = '<div class="notice">Peranti dalam organisasi ini diurus dan dipantau oleh pentadbir. Hanya data pengurusan yang dibenarkan dikumpul; mesej peribadi, kata laluan dan ketukan kekunci tidak dikumpul.</div>';
+let shellBuilt = false, indReady = false;
+
+function buildShell() {
+  $("#root").innerHTML = `<div class="app shellin"><aside id="side" aria-label="Navigasi utama"><div class="brand"><i>${ic("shield", 20, "#fff")}</i><span>MY DEVICE<br>CONTROL</span></div>
+    <nav id="nav"><i class="ind" id="ind"></i>${NAV.map(([id, l, i]) => `<a href="#${id}" data-nav="${id}">${ic(i, 18)}${l}</a>`).join("")}</nav>
+    <div class="me"><b>${esc(S.user.email || S.user.uid)}</b><span class="sm">${ROLE[S.claims.role]}</span><button class="btn" style="width:100%;margin-top:8px" data-act="logout">${ic("out", 16)}Log keluar</button></div></aside>
+    <div id="scrimbox"></div>
+    <div><div class="top"><button class="btn i" data-act="navopen" aria-label="Buka menu">${ic("menu", 20)}</button>MY DEVICE CONTROL</div>
+    <main id="main"><div id="content"></div></main></div></div>`;
+  shellBuilt = true; indReady = false;
+}
+function updateNav() {
+  $("#side").classList.toggle("open", S.nav);
+  $("#scrimbox").innerHTML = S.nav ? '<div class="scrim" data-act="navclose"></div>' : "";
+  document.querySelectorAll("#nav a").forEach((a) => { const on = a.dataset.nav === S.page; a.classList.toggle("on", on); on ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"); });
+  const act = $("#nav a.on"), ind = $("#ind"); if (!act) return;
+  ind.style.height = act.offsetHeight + "px"; ind.style.transform = `translateY(${act.offsetTop}px)`; ind.classList.add("on");
+  if (!indReady) requestAnimationFrame(() => { indReady = true; ind.classList.add("anim"); });
+}
+window.addEventListener("resize", () => shellBuilt && updateNav());
+
+function countUp(el) {
+  const to = +el.dataset.n; if (!to) return; const t0 = performance.now(), D = 1100;
+  const tick = (t) => { const p = Math.min(1, (t - t0) / D), e = p === 1 ? 1 : 1 - Math.pow(2, -10 * p); el.textContent = Math.round(to * e); if (p < 1) requestAnimationFrame(tick); };
+  el.textContent = "0"; requestAnimationFrame(tick);
+}
+function playIn(c) {
+  if (REDUCE) return;
+  let i = 0;
+  c.querySelectorAll(".head,.notice,.stat,.card:not(.stat),tbody tr,.tl li,.empty").forEach((el) => {
+    if (el.closest("tbody tr") && el.tagName !== "TR") return;
+    el.style.setProperty("--d", Math.min(i * 55, 720) + "ms"); el.classList.add("rv"); i++;
+    el.addEventListener("animationend", () => { el.classList.remove("rv"); el.style.removeProperty("--d"); }, { once: true });
+  });
+  c.querySelectorAll("[data-n]").forEach(countUp);
+  c.classList.add("go"); setTimeout(() => c.classList.remove("go"), 2200);
+}
+
 function draw() {
   const root = $("#root");
-  if (!S.user) return;
-  if (!S.claims.orgId || !S.claims.role) { root.innerHTML = pageOnboarding(); return; }
-  const focus = document.activeElement && document.activeElement.id, pos = document.activeElement && document.activeElement.selectionStart;
-  root.innerHTML = `<div class="app"><aside class="${S.nav ? "open" : ""}" aria-label="Navigasi utama"><div class="brand"><i>${ic("shield", 20, "#fff")}</i><span>MY DEVICE<br>CONTROL</span></div>
-    <nav>${NAV.map(([id, l, i]) => `<a href="#${id}" class="${S.page === id ? "on" : ""}" ${S.page === id ? 'aria-current="page"' : ""}>${ic(i, 18)}${l}</a>`).join("")}</nav>
-    <div class="me"><b>${esc(S.user.email || S.user.uid)}</b><span class="sm">${ROLE[S.claims.role]}</span><button class="btn" style="width:100%;margin-top:8px" data-act="logout">${ic("out", 16)}Log keluar</button></div></aside>
-    ${S.nav ? '<div class="scrim" data-act="navclose"></div>' : ""}
-    <div><div class="top"><button class="btn i" data-act="navopen" aria-label="Buka menu">${ic("menu", 20)}</button>MY DEVICE CONTROL</div>
-    <main id="main">${DEMO ? '<div class="demo">MOD DEMO — data contoh untuk preview sahaja, bukan data sebenar. Tiada tindakan dilaksanakan.</div>' : ""}
-    <div class="notice">Peranti dalam organisasi ini diurus dan dipantau oleh pentadbir. Hanya data pengurusan yang dibenarkan dikumpul; mesej peribadi, kata laluan dan ketukan kekunci tidak dikumpul.</div>
-    ${PAGES[S.page]()}</main></div></div>`;
+  if (!S.user || S.leaving) return;
+  if (!S.claims.orgId || !S.claims.role) { shellBuilt = false; root.innerHTML = pageOnboarding(); return; }
+  if (!shellBuilt || !$("#content")) buildShell();
+  updateNav();
+  const c = $("#content"), ae = document.activeElement, focus = ae && ae.id, pos = ae && ae.selectionStart;
+  c.classList.remove("leave");
+  c.innerHTML = NOTICE + PAGES[S.page]();
   if (focus) { const el = document.getElementById(focus); if (el) { el.focus(); try { el.setSelectionRange(pos, pos); } catch (e) {} } }
+  if (S.animPending && !c.querySelector(".loading")) { S.animPending = false; playIn(c); }
 }
 
 /* ---------- Tindakan ---------- */
@@ -343,9 +411,9 @@ const byId = (id) => S.devices.find((d) => d.id === id);
 
 const ACTIONS = {
   navopen() { S.nav = true; render(); }, navclose() { S.nav = false; render(); },
-  logout() { if (DEMO) return demoBlock().catch(() => {}); fb.A.signOut(auth); },
+  logout() { if (PREVIEW) return previewBlock().catch(() => {}); fb.A.signOut(auth); },
   recheck: async () => { await readClaims(true); subscribeAll(); render(); },
-  bootstrap: async () => { try { await call("bootstrapOrganization", { name: $("#orgname").value }); await readClaims(true); subscribeAll(); render(); toast("Organisasi dicipta. Anda kini Super Admin."); } catch (e) { if (e.message !== "demo") toast(errMsg(e), true); } },
+  bootstrap: async () => { try { await call("bootstrapOrganization", { name: $("#orgname").value }); await readClaims(true); subscribeAll(); render(); toast("Organisasi dicipta. Anda kini Super Admin."); } catch (e) { if (e.message !== "preview") toast(errMsg(e), true); } },
   prev() { S.pg--; render(); }, next() { S.pg++; render(); },
   "lock-sel"() { confirmBox({ title: `LOCK ${S.sel.size} peranti`, body: QUEUE_NOTE, label: "Lock", danger: true, run: () => send({ commandType: "LOCK", deviceIds: [...S.sel] }) }); },
   "unlock-sel"() { confirmBox({ title: `UNLOCK ${S.sel.size} peranti`, body: QUEUE_NOTE, label: "Unlock", run: () => send({ commandType: "UNLOCK", deviceIds: [...S.sel] }) }); },
@@ -356,7 +424,7 @@ const ACTIONS = {
     openModal(`<h2>Sunting peranti</h2><label class="f">Nama<input id="en" maxlength="80" value="${esc(d.deviceName)}"></label><label class="f">Pengguna ditetapkan<input id="eu" value="${esc(d.assignedUserId || "")}"></label>
       <label class="f">Kumpulan<select id="eg"><option value="">— tiada —</option>${S.groups.map((g) => `<option value="${esc(g.id)}" ${g.id === d.groupId ? "selected" : ""}>${esc(g.name)}</option>`).join("")}</select></label>
       <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn" data-close>Batal</button><button class="btn p" id="ok">Simpan</button></div>`, (m) => {
-      m.querySelector("#ok").onclick = async () => { try { await fsWrite((F) => F.updateDoc(ref("devices", d.id), { deviceName: m.querySelector("#en").value.trim(), assignedUserId: m.querySelector("#eu").value.trim() || null, groupId: m.querySelector("#eg").value || null, updatedAt: F.serverTimestamp() })); toast("Peranti dikemas kini."); closeModal(); } catch (e) { if (e.message !== "demo") toast(errMsg(e), true); } };
+      m.querySelector("#ok").onclick = async () => { try { await fsWrite((F) => F.updateDoc(ref("devices", d.id), { deviceName: m.querySelector("#en").value.trim(), assignedUserId: m.querySelector("#eu").value.trim() || null, groupId: m.querySelector("#eg").value || null, updatedAt: F.serverTimestamp() })); toast("Peranti dikemas kini."); closeModal(); } catch (e) { if (e.message !== "preview") toast(errMsg(e), true); } };
     });
   },
   enroll() {
@@ -373,7 +441,7 @@ const ACTIONS = {
             <div class="row" style="flex-wrap:nowrap"><input readonly id="tk" aria-label="Token enrollment" class="mono" value="${esc(r.token)}"><button class="btn i" id="cp" aria-label="Salin token">${ic("copy", 16)}</button></div>
             <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn p" data-close>Selesai</button></div>`;
           m.querySelector("#cp").onclick = () => { navigator.clipboard.writeText(r.token); toast("Token disalin."); };
-        } catch (e) { if (e.message !== "demo") toast(errMsg(e), true); }
+        } catch (e) { if (e.message !== "preview") toast(errMsg(e), true); }
       };
     });
   },
@@ -389,7 +457,7 @@ const ACTIONS = {
     openModal(`<h2>Hubungkan akaun Auth</h2><p class="sm" style="font-size:14px">Pengguna mesti pernah log masuk sekali (apa-apa penyedia) supaya wujud dalam Firebase Authentication.</p>
       <label class="f">E-mel<input id="ue" type="email"></label><label class="f">Peranan<select id="ur">${roles.map((r) => `<option value="${r}">${ROLE[r]}</option>`).join("")}</select></label>
       <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn" data-close>Batal</button><button class="btn p" id="ok">Hubungkan</button></div>`, (m) => {
-      m.querySelector("#ok").onclick = async () => { try { await call("assignUser", { email: m.querySelector("#ue").value.trim(), role: m.querySelector("#ur").value }); toast("Akaun dihubungkan. Pengguna perlu log masuk semula untuk peranan baharu."); closeModal(); } catch (e) { if (e.message !== "demo") toast(errMsg(e), true); } };
+      m.querySelector("#ok").onclick = async () => { try { await call("assignUser", { email: m.querySelector("#ue").value.trim(), role: m.querySelector("#ur").value }); toast("Akaun dihubungkan. Pengguna perlu log masuk semula untuk peranan baharu."); closeModal(); } catch (e) { if (e.message !== "preview") toast(errMsg(e), true); } };
     });
   },
   urm(el) { const u = S.users.find((x) => x.uid === el.dataset.id); confirmBox({ title: "Buang pengguna", body: `${esc(u.email)} akan hilang akses ke organisasi ini.`, label: "Buang", danger: true, run: async () => { await call("removeUser", { uid: u.uid }); toast("Pengguna dibuang."); } }); }
@@ -401,7 +469,7 @@ function groupForm(g) {
       const name = m.querySelector("#gn").value.trim(); if (!name) return toast("Masukkan nama kumpulan.", true);
       try { await fsWrite(async (F) => { const base = { name, description: m.querySelector("#gd").value.trim(), updatedAt: F.serverTimestamp() };
         if (g) await F.updateDoc(ref("deviceGroups", g.id), base); else await F.addDoc(F.collection(fsdb, "organizations", S.claims.orgId, "deviceGroups"), { ...base, policyIds: [], createdAt: F.serverTimestamp(), createdBy: S.user.uid }); });
-        toast("Kumpulan disimpan."); closeModal(); } catch (e) { if (e.message !== "demo") toast(errMsg(e), true); }
+        toast("Kumpulan disimpan."); closeModal(); } catch (e) { if (e.message !== "preview") toast(errMsg(e), true); }
     };
   });
 }
@@ -412,6 +480,17 @@ function groupCmd(id, type) {
 let qrP; const loadQR = () => qrP || (qrP = new Promise((res, rej) => { if (window.qrcode) return res(); const s = document.createElement("script"); s.src = QR_LIB; s.onload = res; s.onerror = rej; document.head.appendChild(s); }));
 
 document.addEventListener("click", (e) => {
+  const nl = e.target.closest("#nav a[data-nav]");
+  if (nl) {
+    e.preventDefault(); const id = nl.dataset.nav;
+    nl.classList.remove("pop"); void nl.offsetWidth; nl.classList.add("pop"); setTimeout(() => nl.classList.remove("pop"), 750);
+    if (id === S.page) return;
+    S.nav = false; const c = $("#content");
+    // tanda halaman aktif serta-merta supaya indicator mula meluncur sambil kandungan lama pudar
+    S.page = id; updateNav();
+    if (c && !REDUCE) { S.leaving = true; c.classList.add("leave"); setTimeout(() => { location.hash = id; }, 200); } else location.hash = id;
+    return;
+  }
   if (e.target.closest("[data-close]") || (e.target.matches("[data-close-bg]"))) return closeModal();
   const a = e.target.closest("[data-act]"); if (a && ACTIONS[a.dataset.act]) ACTIONS[a.dataset.act](a);
 });

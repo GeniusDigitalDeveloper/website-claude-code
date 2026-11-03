@@ -61,10 +61,10 @@ table{border-collapse:collapse;width:100%;font-size:14px}td,th{border:1px solid 
 <main>
 <section id="preview">
   <h2>Preview hidup</h2>
-  <p>Ini paparan sebenar fail <code>index.html</code> dan <code>admin.html</code>. Admin dalam <b>mod demo</b> dengan data contoh yang dilabel jelas; tiada Firebase disambung di sini.</p>
+  <p>Ini paparan sebenar fail <code>index.html</code> dan <code>admin.html</code>. <b>Tiada data contoh dan tiada mod demo</b>: di sini Firebase tidak disambung, jadi admin dipaparkan kosong. Klik menu kiri untuk lihat animasi peralihan. Bila disambung ke Firebase, angka, carta dan jadual akan beranimasi dengan data sebenar.</p>
   <div class="pv">
     <div class="bar" role="group" aria-label="Pilihan preview">
-      <button data-pv="index" aria-pressed="false">index.html</button><button data-pv="admin" aria-pressed="true">admin.html (demo)</button>
+      <button data-pv="index" aria-pressed="false">index.html</button><button data-pv="admin" aria-pressed="true">admin.html</button>
       <span style="flex:1"></span>
       <button data-w="100%" aria-pressed="true">Desktop</button><button data-w="390px" aria-pressed="false">Telefon</button>
     </div>
@@ -202,7 +202,7 @@ const fr = document.getElementById("fr");
 let which = "admin";
 function load() {
   const code = byPath[which + ".html"].code;
-  fr.srcdoc = code.replace("<head>", "<head><script>window.__MDC_DEMO__=true<\/script>");
+  fr.srcdoc = code.replace("<head>", "<head><script>window.__MDC_PREVIEW__=true<\/script>");
 }
 document.querySelectorAll("[data-pv]").forEach((b) => b.onclick = () => { which = b.dataset.pv; document.querySelectorAll("[data-pv]").forEach((x) => x.setAttribute("aria-pressed", x === b)); load(); });
 document.querySelectorAll("[data-w]").forEach((b) => b.onclick = () => { fr.style.width = b.dataset.w; document.querySelectorAll("[data-w]").forEach((x) => x.setAttribute("aria-pressed", x === b)); });
