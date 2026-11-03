@@ -33,6 +33,9 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .link{background:none;border:0;color:var(--accent);text-decoration:underline;width:100%;margin-top:6px;min-height:40px}
 .msg{margin-top:12px;font-size:14px;min-height:20px}.msg.err{color:var(--danger)}.msg.ok{color:var(--ok)}
 .warn{background:#fffbeb;border:1px solid #fcd34d;color:#78350f;border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:12px}
+.pw{position:relative}.pw input{padding-right:48px}
+.pw .eye{position:absolute;right:4px;top:8px;width:40px;min-height:40px;height:40px;padding:0;border:0;background:transparent;color:var(--muted);display:grid;place-items:center;border-radius:8px}
+.pw .eye:hover{background:#E8ECF1;color:#0F172A}
 .hide{display:none}
 .foot{margin-top:16px;font-size:12px;color:var(--muted);text-align:center}
 @media(max-width:860px){.wrap{grid-template-columns:1fr}.hero{padding:28px 20px}}
@@ -61,7 +64,8 @@ button:disabled{opacity:.5;cursor:not-allowed}
         <label for="email">E-mel</label>
         <input id="email" type="email" autocomplete="username" required>
         <label for="pass">Kata laluan</label>
-        <input id="pass" type="password" autocomplete="current-password" required>
+        <div class="pw"><input id="pass" type="password" autocomplete="current-password" required>
+          <button type="button" id="eye" class="eye" aria-label="Tunjuk kata laluan" aria-pressed="false"><svg id="eyeico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s4-8 10-8 10 8 10 8-4 8-10 8S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
         <button class="primary" id="go">Log masuk</button>
       </form>
       <div id="providers"></div>
@@ -105,13 +109,21 @@ const errText = (e) => ({
   "auth/operation-not-allowed": "Kaedah log masuk ini belum diaktifkan di Firebase Console > Authentication > Sign-in method."
 }[e && e.code] || (e && e.message) || "Ralat tidak diketahui.");
 
+const EYE = '<path d="M2 12s4-8 10-8 10 8 10 8-4 8-10 8S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>', EYEOFF = '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-10-8-10-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 10 8 10 8a18.5 18.5 0 01-2.16 3.19M14.12 14.12a3 3 0 11-4.24-4.24M1 1l22 22"/>';
+$("eye").onclick = () => {
+  const show = $("pass").type === "password";
+  $("pass").type = show ? "text" : "password";
+  $("eyeico").innerHTML = show ? EYEOFF : EYE;
+  $("eye").setAttribute("aria-pressed", String(show));
+  $("eye").setAttribute("aria-label", show ? "Sorok kata laluan" : "Tunjuk kata laluan");
+};
 const adminUrl = () => ADMIN_URL || (/\.html?$/.test(location.pathname) || location.protocol === "file:" ? "admin.html" : "admin");
 const goAdmin = () => {
   try { location.href = adminUrl(); }
   catch (e) { $("msg").innerHTML = 'Log masuk berjaya. <a href="' + adminUrl() + '">Buka admin panel</a>'; }
 };
 
-try {
+if (!window.__MDC_PREVIEW__) try {   // dalam preview, Firebase tidak dimuat
   const [{ initializeApp }, A] = await Promise.all([import(SDK + "firebase-app.js"), import(SDK + "firebase-auth.js")]);
   const auth = A.getAuth(initializeApp(CONFIG));
   A.onAuthStateChanged(auth, (u) => { if (u) goAdmin(); });
