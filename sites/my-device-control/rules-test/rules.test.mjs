@@ -195,6 +195,19 @@ test('MASA KUNCI: peranti rekod adminLockAt / onlineAgainAt / selfLockAt (cap ma
   await assertFails(updateDoc(doc(dev('dev2'), 'devices/dev1'), { selfLockAt: serverTimestamp(), updatedAt: serverTimestamp() }));
 });
 
+test('STATUS SERTA-MERTA: peranti tulis LOCKED/ONLINE + statusSince pada devices & publicStatus dalam satu batch', async () => {
+  await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'publicStatus/dev1'), { deviceName: 'T1', deviceType: 'ANDROID', status: 'ONLINE' }));
+  const f = dev('dev1');
+  for (const st of ['LOCKED', 'ONLINE']) {
+    const b = writeBatch(f);
+    b.update(doc(f, 'devices/dev1'), { status: st, isLocked: st === 'LOCKED', selfLockAt: serverTimestamp(), statusSince: serverTimestamp(), lastSeen: serverTimestamp(), updatedAt: serverTimestamp() });
+    b.update(doc(f, 'publicStatus/dev1'), { status: st, batteryLevel: 80, lastSeen: serverTimestamp(), statusSince: serverTimestamp(), updatedAt: serverTimestamp() });
+    await assertSucceeds(b.commit());
+  }
+  await assertFails(updateDoc(doc(f, 'publicStatus/dev1'), { status: 'ONLINE', statusSince: 'tadi', updatedAt: serverTimestamp() }));
+  await assertFails(updateDoc(doc(f, 'devices/dev1'), { statusSince: 'tadi', updatedAt: serverTimestamp() }));
+});
+
 test('ENROLLMENT: agent boleh baca enrollment PENDING dengan kod; USED/tamat dilindungi; tidak boleh senarai; tanpa log masuk ditolak', async () => {
   const FRESH = 'P'.repeat(32);
   await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'enrollments/' + FRESH), { deviceName: 'HONOR 77', deviceType: 'ANDROID', status: 'PENDING', expiresAt: future() }));

@@ -60,8 +60,8 @@ service cloud.firestore {
           && request.resource.data.enrollmentStatus == 'ENROLLED' && request.resource.data.status == 'ONLINE')
         || (isThisDevice(deviceId) && resource.data.enrollmentStatus == 'ENROLLED'
           && onlyChanges(['status', 'isLocked', 'batteryLevel', 'osVersion', 'appVersion', 'fcmToken', 'lastSeen', 'updatedAt', 'policyStatus',
-                       'adminLockAt', 'onlineAgainAt', 'selfLockAt'])
-          && tsOrAbsent('adminLockAt') && tsOrAbsent('onlineAgainAt') && tsOrAbsent('selfLockAt')
+                       'adminLockAt', 'onlineAgainAt', 'selfLockAt', 'statusSince'])
+          && tsOrAbsent('adminLockAt') && tsOrAbsent('onlineAgainAt') && tsOrAbsent('selfLockAt') && tsOrAbsent('statusSince')
           && request.resource.data.status in ['ONLINE', 'LOCKED', 'ERROR']
           && (!('batteryLevel' in request.resource.data) || request.resource.data.batteryLevel == null
               || (request.resource.data.batteryLevel is number && request.resource.data.batteryLevel >= 0 && request.resource.data.batteryLevel <= 100)));
@@ -137,7 +137,8 @@ service cloud.firestore {
     // ---------- Paparan awam (index.html, tanpa log masuk): hanya maklumat tidak sensitif ----------
     // Tiada pengguna ditetapkan, tiada token, tiada nota. Hanya admin atau peranti berdaftar boleh menulis.
     function validPublic() {
-      return request.resource.data.keys().hasOnly(['deviceName', 'deviceType', 'status', 'batteryLevel', 'lastSeen', 'groupName', 'updatedAt'])
+      return request.resource.data.keys().hasOnly(['deviceName', 'deviceType', 'status', 'batteryLevel', 'lastSeen', 'groupName', 'updatedAt', 'statusSince'])
+        && (!('statusSince' in request.resource.data) || request.resource.data.statusSince is timestamp)
         && request.resource.data.deviceName is string && request.resource.data.deviceName.size() > 0 && request.resource.data.deviceName.size() <= 80
         && request.resource.data.deviceType in ['ANDROID', 'WINDOWS', 'IOS', 'MAC', 'LINUX', 'OTHER']
         && request.resource.data.status in ['ONLINE', 'OFFLINE', 'LOCKED', 'ERROR', 'ENROLLMENT_PENDING']

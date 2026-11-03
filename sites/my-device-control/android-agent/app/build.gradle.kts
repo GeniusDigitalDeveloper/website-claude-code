@@ -10,8 +10,8 @@ android {
         applicationId = "my.devicecontrol.agent"
         minSdk = 24
         targetSdk = 34
-        versionCode = 9
-        versionName = "0.9.0"
+        versionCode = 10
+        versionName = "0.10.0"
     }
     // Tandatangan v1+v2+v3 supaya boleh dipasang di semua versi Android 7+ (kunci sama dengan versi lama)
     signingConfigs {

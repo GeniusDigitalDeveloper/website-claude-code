@@ -20,6 +20,10 @@ object Prefs {
     fun adminLockMs(c: Context) = sp(c).getLong("adminLockMs", 0L)
     fun setAdminLockMs(c: Context, v: Long) = sp(c).edit().putLong("adminLockMs", v).apply()
 
+    /** Benar bila Lock admin sedang berkuat kuasa dan pengguna belum membuka telefon (untuk masa "Online"). */
+    fun adminHold(c: Context) = sp(c).getBoolean("adminHold", false)
+    fun setAdminHold(c: Context, v: Boolean) = sp(c).edit().putBoolean("adminHold", v).apply()
+
     fun listen(c: Context, l: SharedPreferences.OnSharedPreferenceChangeListener) = sp(c).registerOnSharedPreferenceChangeListener(l)
     fun unlisten(c: Context, l: SharedPreferences.OnSharedPreferenceChangeListener) = sp(c).unregisterOnSharedPreferenceChangeListener(l)
 }

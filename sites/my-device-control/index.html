@@ -92,6 +92,7 @@ const S = { list: [], q: "", fs: "", ft: "", loaded: false, error: null, animate
 
 if (ADMIN_LINK) { $("adm").href = ADMIN_LINK; $("adm").hidden = false; }
 
+const sinceTxt = (d) => d.st === "LOCKED" && ms(d.statusSince) ? "dikunci " + ago(d.statusSince) : ago(d.lastSeen);
 const eff = (d) => ["ONLINE", "LOCKED", "ERROR"].includes(d.status) && ms(d.lastSeen) && Date.now() - ms(d.lastSeen) > OFFLINE_MS ? "OFFLINE" : d.status;
 
 function countUp(el) {
@@ -111,7 +112,7 @@ function draw() {
   else if (!rows.length) $("devs").innerHTML = `<div class="card empty" style="grid-column:1/-1"><b>${L.length ? "Tiada padanan" : "Belum ada peranti"}</b>${L.length ? "Ubah carian atau penapis." : "Peranti akan muncul di sini selepas didaftarkan oleh admin dan agent peranti disambungkan."}</div>`;
   else $("devs").innerHTML = rows.map((d) => `<article class="card dev"><div class="row"><h2>${esc(d.deviceName)}</h2><span class="badge b-${esc(d.st)}">${esc(d.st.replace("_", " "))}</span></div>
       <div class="sm">${esc(d.deviceType)}${d.groupName ? " · " + esc(d.groupName) : ""}</div>
-      ${typeof d.batteryLevel === "number" ? `<div class="batt ${d.batteryLevel < 15 ? "low" : ""}" role="img" aria-label="Bateri ${d.batteryLevel}%"><i style="width:${d.batteryLevel}%"></i></div><div class="row sm"><span>Bateri ${d.batteryLevel}%</span><span>${ago(d.lastSeen)}</span></div>` : `<div class="row sm"><span>Bateri tidak diketahui</span><span>${ago(d.lastSeen)}</span></div>`}</article>`).join("");
+      ${typeof d.batteryLevel === "number" ? `<div class="batt ${d.batteryLevel < 15 ? "low" : ""}" role="img" aria-label="Bateri ${d.batteryLevel}%"><i style="width:${d.batteryLevel}%"></i></div><div class="row sm"><span>Bateri ${d.batteryLevel}%</span><span>${sinceTxt(d)}</span></div>` : `<div class="row sm"><span>Bateri tidak diketahui</span><span>${sinceTxt(d)}</span></div>`}</article>`).join("");
   if (S.animate && S.loaded && !REDUCE) {
     S.animate = false; let i = 0;
     document.querySelectorAll(".stat,.dev,.empty").forEach((el) => { el.style.setProperty("--d", Math.min(i * 50, 700) + "ms"); el.classList.add("rv"); el.addEventListener("animationend", () => el.classList.remove("rv"), { once: true }); i++; });

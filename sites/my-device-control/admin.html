@@ -212,6 +212,8 @@ const lockTimes = (d) => {
   const F = O && ms(d.selfLockAt) >= O ? ms(d.selfLockAt) : 0;
   return `<div class="sm">Admin lock: ${fmt(d.adminLockAt)}</div>` + (O ? `<div class="sm">Online: ${fmt(d.onlineAgainAt)}</div>` : "") + (F ? `<div class="sm">Lock sendiri: ${fmt(d.selfLockAt)}</div>` : "");
 };
+// Teks masa pada Dashboard: peranti LOCKED dikira dari masa ia dikunci; lain-lain dari isyarat terakhir.
+const since = (d) => d.status === "LOCKED" && ms(d.statusSince) ? "dikunci " + ago(d.statusSince) : ago(d.lastSeen);
 const lastSeenCell = (d) => d.deviceType === "ANDROID" ? clk(d.selfLockAt) : ago(d.lastSeen);
 
 const OFFLINE_MS = 10 * 60 * 1000;
@@ -324,7 +326,7 @@ function pageDashboard() {
         <div class="legend">${series.map((s) => `<span><i style="background:${s[2]}"></i>${s[0]}</span>`).join("")}</div></div>
       <div class="card"><b>Sejarah pelaksanaan arahan</b>${!S.commands.length ? empty("Belum ada arahan") : `<div class="bars" style="margin-top:10px">${Object.entries(cs).map(([k, v]) => `<div class="bar"><span>${k}</span><i style="width:${(v / cmx) * 100}%;--d:${Object.keys(cs).indexOf(k) * 80}ms"></i><b>${v}</b></div>`).join("")}</div>`}</div>
       <div class="card tw"><div style="padding:16px 16px 0"><b>Peranti terkini</b></div><table style="min-width:420px"><thead><tr><th>Nama</th><th>Jenis</th><th>Status</th><th>Last seen</th></tr></thead><tbody>
-        ${D.slice(0, 6).map((d) => `<tr><td><b>${esc(d.deviceName)}</b></td><td>${esc(d.deviceType)}</td><td>${badge(d.status)}</td><td>${ago(d.lastSeen)}</td></tr>`).join("")}</tbody></table></div>
+        ${D.slice(0, 6).map((d) => `<tr><td><b>${esc(d.deviceName)}</b></td><td>${esc(d.deviceType)}</td><td>${badge(d.status)}</td><td>${since(d)}</td></tr>`).join("")}</tbody></table></div>
     </div>`}`);
 }
 

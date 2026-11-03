@@ -61,18 +61,24 @@ class AgentService : Service() {
      *  - onlineAgainAt : pengguna buka kunci telefon selepas Lock admin -> status kembali ONLINE
      *  - selfLockAt    : skrin dikunci/dipadam oleh telefon/pengguna sendiri (bukan kerana admin) = "Last seen"
      */
+    /** Telefon dibuka: status ONLINE serta-merta. Masa "Online" hanya dicatat selepas Lock admin. */
+    private fun markUnlocked() {
+        val c = applicationContext
+        if (!Prefs.locked(c)) return
+        Prefs.setLocked(c, false)
+        val hold = Prefs.adminHold(c); Prefs.setAdminHold(c, false)
+        scope.launch { runCatching { repo.heartbeat(false, statusText(), if (hold) "onlineAgainAt" else null, changed = true) } }
+    }
+
     private val unlockReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (!Prefs.locked(applicationContext)) return
-            Prefs.setLocked(applicationContext, false)
-            scope.launch { runCatching { repo.heartbeat(false, statusText(), "onlineAgainAt") } }   // ONLINE + masa dalam satu tulisan, serta-merta
-        }
+        override fun onReceive(context: Context, intent: Intent) = markUnlocked()
     }
 
     /**
-     * Semakan terus keadaan skrin dan kunci setiap 0.4 saat (tidak bergantung pada isyarat Android yang kadang-kadang tidak sampai):
-     *  - skrin padam            -> penanda "aplikasi ditutup"; jika bukan kerana Lock admin = selfLockAt (Lock sendiri)
-     *  - selepas Lock admin: skrin hidup + kunci dibuka -> status ONLINE + onlineAgainAt, dalam satu tulisan
+     * Semakan terus skrin dan kunci setiap 0.4 saat. Status yang dilaporkan sentiasa sama dengan keadaan telefon:
+     *  - skrin padam bukan kerana Lock admin -> LOCKED + selfLockAt ("Lock sendiri") serta-merta
+     *  - skrin hidup dan kunci dibuka selepas dikunci -> ONLINE serta-merta
+     * Panel admin, Dashboard dan halaman awam membaca dokumen yang sama, jadi semuanya berubah serentak.
      */
     private fun watchScreen() {
         val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
@@ -86,14 +92,14 @@ class AgentService : Service() {
                     if (wasOn && !on) {
                         UsageBuffer.add(AppEvent("__SCREEN_OFF__", "Skrin dipadam", System.currentTimeMillis()))   // aplikasi di hadapan ditutup
                         GuardService.resetLast()                                                                    // buka semula = pembukaan baharu
-                        if (!Prefs.locked(c) && System.currentTimeMillis() - Prefs.adminLockMs(c) > 15_000) runCatching { repo.stamp("selfLockAt") }
+                        if (!Prefs.locked(c) && System.currentTimeMillis() - Prefs.adminLockMs(c) > 15_000) {
+                            Prefs.setLocked(c, true)
+                            runCatching { repo.heartbeat(true, statusText(), "selfLockAt", changed = true) }
+                        }
                     }
                     if (Prefs.locked(c)) {
                         if (!on) sawOff = true
-                        else if (sawOff && !km.isKeyguardLocked) {
-                            sawOff = false; Prefs.setLocked(c, false)
-                            runCatching { repo.heartbeat(false, statusText(), "onlineAgainAt") }
-                        }
+                        else if (sawOff && !km.isKeyguardLocked) { sawOff = false; markUnlocked() }
                     } else sawOff = false
                     wasOn = on
                 }

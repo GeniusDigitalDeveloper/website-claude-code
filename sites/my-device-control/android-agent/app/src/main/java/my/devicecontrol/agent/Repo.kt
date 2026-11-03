@@ -82,7 +82,7 @@ class Repo(private val ctx: Context) {
     }
 
     /** [stamp]: medan masa peristiwa kunci (adminLockAt / onlineAgainAt) ditulis dalam satu batch yang sama supaya status & masa sampai serentak. */
-    suspend fun heartbeat(locked: Boolean, policyStatus: String? = null, stamp: String? = null) {
+    suspend fun heartbeat(locked: Boolean, policyStatus: String? = null, stamp: String? = null, changed: Boolean = stamp != null) {
         val id = uid ?: return
         val now = FieldValue.serverTimestamp()
         val status = if (locked) "LOCKED" else "ONLINE"
@@ -92,11 +92,12 @@ class Repo(private val ctx: Context) {
             "status" to status, "isLocked" to locked, "batteryLevel" to bat, "osVersion" to osVersion(),
             "appVersion" to AgentConfig.APP_VERSION, "lastSeen" to now, "updatedAt" to now)
         if (policyStatus != null) dev["policyStatus"] = policyStatus.take(200)
-        if (stamp != null) { require(stamp in setOf("adminLockAt", "onlineAgainAt")); dev[stamp] = now }
+        if (stamp != null) { require(stamp in setOf("adminLockAt", "onlineAgainAt", "selfLockAt")); dev[stamp] = now }
+        if (changed) dev["statusSince"] = now                 // bila status LOCKED/ONLINE bermula (untuk "dikunci x min lalu")
         batch.update(db.collection("devices").document(id), dev)
-        batch.update(db.collection("publicStatus").document(id), mapOf(
-            "status" to status, "batteryLevel" to bat, "lastSeen" to now, "updatedAt" to now
-        ))
+        val pub = hashMapOf<String, Any?>("status" to status, "batteryLevel" to bat, "lastSeen" to now, "updatedAt" to now)
+        if (changed) pub["statusSince"] = now
+        batch.update(db.collection("publicStatus").document(id), pub)
         batch.commit().await()
     }
 
