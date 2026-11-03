@@ -53,22 +53,10 @@ button:disabled{opacity:.5;cursor:not-allowed}
   </section>
 
   <section class="panel">
-    <!-- LANGKAH A: sambung Firebase (hanya sekali) -->
-    <div class="card hide" id="setup">
-      <h2>Sambung Firebase</h2>
-      <p class="sub">Tampal <b>firebaseConfig</b> dari Firebase Console → Project settings → Your apps → Web app. Disimpan dalam pelayar ini sahaja.</p>
-      <label for="cfg">firebaseConfig</label>
-      <textarea id="cfg" spellcheck="false" placeholder='const firebaseConfig = {&#10;  apiKey: "...",&#10;  authDomain: "my-devide-control.firebaseapp.com",&#10;  projectId: "my-devide-control",&#10;  appId: "...",&#10;  databaseURL: "https://....firebasedatabase.app"&#10;};'></textarea>
-      <button class="primary" id="saveCfg">Simpan &amp; sambung</button>
-      <div class="msg" id="cfgMsg" role="alert"></div>
-      <div class="foot">Atau edit pemalar <code>CONFIG</code> di bahagian atas skrip fail ini.</div>
-    </div>
-
     <!-- LANGKAH B: log masuk -->
     <div class="card" id="login">
       <h2>Log masuk pentadbir</h2>
       <p class="sub">Gunakan akaun Firebase Authentication anda.</p>
-      <div class="warn hide" id="noCfg">Firebase belum disambungkan. <button class="link" id="openSetup" style="width:auto;min-height:0">Sambungkan sekarang</button></div>
       <form id="form">
         <label for="email">E-mel</label>
         <input id="email" type="email" autocomplete="username" required>
@@ -78,34 +66,32 @@ button:disabled{opacity:.5;cursor:not-allowed}
       </form>
       <div id="providers"></div>
       <button class="link" id="reset" type="button">Lupa kata laluan?</button>
-      <button class="link hide" id="changeCfg" type="button">Tukar tetapan Firebase</button>
       <div class="msg" id="msg" role="alert"></div>
     </div>
   </section>
 </div>
 
 <script type="module">
-/* ===================== TETAPAN ===================== */
-// Cara 1: isi nilai di sini. Cara 2: tampal pada skrin "Sambung Firebase" (disimpan dalam localStorage).
+/* ===================== TETAPAN FIREBASE (projek my-devide-control) ===================== */
 const CONFIG = {
-  apiKey: "",
+  apiKey: "AIzaSyArLRlQqRAXckvH9jAsA4gcZ2bGfsJCl_c",
   authDomain: "my-devide-control.firebaseapp.com",
   projectId: "my-devide-control",
   storageBucket: "my-devide-control.firebasestorage.app",
-  messagingSenderId: "",
-  appId: "",
-  databaseURL: ""
+  messagingSenderId: "106788083798",
+  appId: "1:106788083798:web:1a75a67f5f3dc9ab7243f7",
+  measurementId: "G-JG180QB7CS"
 };
 /* Tambah penyedia log masuk lain di sini (selepas diaktifkan di Firebase Console > Authentication).
    Contoh Microsoft: { label: "Log masuk dengan Microsoft", make: (m) => new m.OAuthProvider("microsoft.com") } */
 const PROVIDERS = [
   { label: "Log masuk dengan Google", make: (m) => new m.GoogleAuthProvider() }
 ];
-const SDK = "https://www.gstatic.com/firebasejs/11.0.2/";
 // Alamat halaman admin. Kosong = automatik ("admin.html" jika laman berakhir .html / fail setempat, selain itu "admin").
-// Di Interactive Link, isi mengikut Page Path yang anda pilih, contoh: "/admin".
+// Di Interactive Link, isi mengikut Page Path anda, contoh: "/admin".
 const ADMIN_URL = "";
-/* =================================================== */
+const SDK = "https://www.gstatic.com/firebasejs/11.0.2/";
+/* ======================================================================================= */
 
 const $ = (id) => document.getElementById(id);
 const say = (el, text, kind) => { el.textContent = text || ""; el.className = "msg" + (kind ? " " + kind : ""); };
@@ -116,45 +102,18 @@ const errText = (e) => ({
   "auth/too-many-requests": "Terlalu banyak percubaan. Cuba sebentar lagi.",
   "auth/popup-closed-by-user": "Tetingkap log masuk ditutup.",
   "auth/unauthorized-domain": "Domain ini belum ditambah di Firebase > Authentication > Settings > Authorized domains.",
-  "auth/operation-not-allowed": "Kaedah log masuk ini belum diaktifkan di Firebase Console."
+  "auth/operation-not-allowed": "Kaedah log masuk ini belum diaktifkan di Firebase Console > Authentication > Sign-in method."
 }[e && e.code] || (e && e.message) || "Ralat tidak diketahui.");
 
-function loadConfig() {
-  try { const s = JSON.parse(localStorage.getItem("mdc_cfg") || "null"); if (s && s.apiKey) return s; } catch (e) {}
-  return CONFIG.apiKey ? CONFIG : null;
-}
-function parseConfig(text) {
-  const out = {};
-  for (const k of ["apiKey", "authDomain", "projectId", "storageBucket", "messagingSenderId", "appId", "databaseURL", "measurementId"]) {
-    const m = text.match(new RegExp(k + "\\s*[:=]\\s*[\"']([^\"']+)[\"']"));
-    if (m) out[k] = m[1];
-  }
-  return out.apiKey && out.projectId && out.appId ? out : null;
-}
-
-const cfg = loadConfig();
-if (!cfg) { $("setup").classList.remove("hide"); $("login").classList.add("hide"); }
-else $("changeCfg").classList.remove("hide");
-
-$("saveCfg").onclick = () => {
-  const c = parseConfig($("cfg").value);
-  if (!c) return say($("cfgMsg"), "Tidak jumpa apiKey, projectId dan appId. Tampal keseluruhan blok firebaseConfig.", "err");
-  if (!c.databaseURL) c.databaseURL = "";
-  localStorage.setItem("mdc_cfg", JSON.stringify(c));
-  location.reload();
+const adminUrl = () => ADMIN_URL || (/\.html?$/.test(location.pathname) || location.protocol === "file:" ? "admin.html" : "admin");
+const goAdmin = () => {
+  try { location.href = adminUrl(); }
+  catch (e) { $("msg").innerHTML = 'Log masuk berjaya. <a href="' + adminUrl() + '">Buka admin panel</a>'; }
 };
-$("changeCfg").onclick = () => { $("setup").classList.remove("hide"); $("login").classList.add("hide"); };
-$("openSetup").onclick = $("changeCfg").onclick;
 
-if (cfg) {
+try {
   const [{ initializeApp }, A] = await Promise.all([import(SDK + "firebase-app.js"), import(SDK + "firebase-auth.js")]);
-  const app = initializeApp(cfg);
-  const auth = A.getAuth(app);
-  const adminUrl = () => ADMIN_URL || (/\.html?$/.test(location.pathname) || location.protocol === "file:" ? "admin.html" : "admin");
-  const goAdmin = () => {
-    try { location.href = adminUrl(); }
-    catch (e) { $("msg").innerHTML = 'Log masuk berjaya. <a href="' + adminUrl() + '">Buka admin panel</a>'; }
-  };
+  const auth = A.getAuth(initializeApp(CONFIG));
   A.onAuthStateChanged(auth, (u) => { if (u) goAdmin(); });
 
   $("form").onsubmit = async (e) => {
@@ -173,8 +132,8 @@ if (cfg) {
     b.onclick = async () => { try { await A.signInWithPopup(auth, p.make(A)); goAdmin(); } catch (er) { say($("msg"), errText(er), "err"); } };
     $("providers").appendChild(b);
   }
-} else {
-  $("noCfg").classList.add("hide");
+} catch (e) {
+  say($("msg"), "Gagal memuatkan Firebase. Semak sambungan internet. (" + ((e && e.message) || e) + ")", "err");
 }
 </script>
 </body>

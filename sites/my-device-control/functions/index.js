@@ -1,7 +1,7 @@
 "use strict";
 // Logik tulen (tanpa Firebase) supaya boleh diuji unit.
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.expireCommands = exports.markOfflineDevices = exports.onPresenceWrite = exports.ackCommand = exports.fetchPendingCommands = exports.createCommand = exports.removeDevice = exports.registerDevice = exports.createEnrollment = exports.removeUser = exports.assignUser = exports.bootstrapOrganization = void 0;
+exports.expireCommands = exports.markOfflineDevices = exports.onPresenceWrite = exports.ackCommand = exports.fetchPendingCommands = exports.createCommand = exports.removeDevice = exports.registerDevice = exports.createEnrollment = void 0;
 const ROLES = ['SUPER_ADMIN', 'ORG_ADMIN', 'DEVICE_MANAGER', 'VIEWER'];
 const COMMAND_TYPES = ['LOCK', 'UNLOCK', 'REBOOT', 'SYNC_POLICY'];
 const NEXT = {
@@ -58,10 +58,6 @@ const node_crypto_1 = require("node:crypto");
 const db = (0, firestore_1.getFirestore)();
 const REGION = 'asia-southeast1';
 const opts = { region: REGION, enforceAppCheck: false }; // tukar kepada true selepas App Check didaftarkan
-// Senarai e-mel yang dibenarkan mencipta organisasi pertama / jadi SUPER_ADMIN.
-// >>> EDIT: tulis e-mel admin anda di sini (pisah dengan koma) <<<
-const BOOTSTRAP_ADMIN_EMAILS_DEFAULT = 'GANTI@emel-anda.com';
-const BOOTSTRAP_EMAILS = { value: () => process.env.BOOTSTRAP_ADMIN_EMAILS || BOOTSTRAP_ADMIN_EMAILS_DEFAULT };
 // ---------- Bantuan ----------
 const org = (orgId) => db.collection('organizations').doc(orgId);
 const sha256 = (s) => (0, node_crypto_1.createHash)('sha256').update(s).digest('hex');
@@ -70,12 +66,21 @@ function claims(req) {
         throw new https_1.HttpsError('unauthenticated', 'Sila log masuk.');
     return req.auth.token;
 }
-function requireRole(req, min) {
+/** Peranan: Custom Claims jika ada, jika tidak dokumen Firestore members/{uid} (diurus dari admin panel). */
+async function requireRole(req, min) {
     const c = claims(req);
-    if (!c.orgId || !hasAtLeast(c.role, min)) {
+    let orgId = c.orgId, role = c.role;
+    if (!orgId || !role) {
+        const m = await db.collection('members').doc(req.auth.uid).get();
+        if (m.exists) {
+            orgId = m.get('orgId');
+            role = m.get('role');
+        }
+    }
+    if (!orgId || !hasAtLeast(role, min)) {
         throw new https_1.HttpsError('permission-denied', 'Anda tiada kebenaran untuk tindakan ini.');
     }
-    return { uid: req.auth.uid, orgId: c.orgId, role: c.role };
+    return { uid: req.auth.uid, orgId, role };
 }
 /** SUPER_ADMIN boleh bertindak ke atas organisasi lain; yang lain terkunci pada orgId sendiri. */
 function targetOrg(req, who) {
@@ -119,86 +124,11 @@ async function rateLimit(key, max, windowSec) {
 // =====================================================================
 // 1. ORGANISASI & PENGGUNA (apa-apa penyedia Auth)
 // =====================================================================
-/**
- * Cipta organisasi dan jadikan pemanggil admin. Berfungsi untuk SEMUA penyedia
- * log masuk (Email, Google, Microsoft, SAML...) kerana hanya bergantung pada uid.
- * Hanya e-mel dalam BOOTSTRAP_ADMIN_EMAILS dibenarkan (SUPER_ADMIN).
- */
-exports.bootstrapOrganization = (0, https_1.onCall)(opts, async (req) => {
-    const c = claims(req);
-    const email = (req.auth.token.email ?? '').toLowerCase();
-    const allow = BOOTSTRAP_EMAILS.value().split(',').map((s) => s.trim().toLowerCase()).filter(Boolean);
-    if (!email || !allow.includes(email) || req.auth.token.email_verified === false) {
-        throw new https_1.HttpsError('permission-denied', 'E-mel ini tiada dalam senarai BOOTSTRAP_ADMIN_EMAILS atau belum disahkan.');
-    }
-    if (c.orgId)
-        throw new https_1.HttpsError('already-exists', 'Akaun ini sudah dikaitkan dengan organisasi.');
-    const name = String(req.data?.name ?? '').trim();
-    if (name.length < 2 || name.length > 100)
-        throw new https_1.HttpsError('invalid-argument', 'Nama organisasi tidak sah.');
-    const ref = db.collection('organizations').doc();
-    await ref.set({ name, createdAt: firestore_1.FieldValue.serverTimestamp(), createdBy: req.auth.uid });
-    await ref.collection('users').doc(req.auth.uid).set({
-        uid: req.auth.uid, email, displayName: req.auth.token.name ?? null,
-        role: 'SUPER_ADMIN', provider: req.auth.token.firebase?.sign_in_provider ?? null,
-        createdAt: firestore_1.FieldValue.serverTimestamp(),
-    });
-    await (0, auth_1.getAuth)().setCustomUserClaims(req.auth.uid, { orgId: ref.id, role: 'SUPER_ADMIN' });
-    await audit(ref.id, { type: 'ORG_CREATED', message: `Organisasi "${name}" dicipta`, actorId: req.auth.uid });
-    return { orgId: ref.id, note: 'Log keluar & masuk semula (atau refresh token) untuk mengaktifkan peranan.' };
-});
-/**
- * Hubungkan akaun Auth SEDIA ADA (atau yang ditambah kemudian, apa-apa penyedia)
- * ke organisasi dengan peranan. Rujuk melalui e-mel ATAU uid.
- */
-exports.assignUser = (0, https_1.onCall)(opts, async (req) => {
-    const who = requireRole(req, 'ORG_ADMIN');
-    const orgId = targetOrg(req, who);
-    const { email, uid, role } = req.data;
-    if (!isRole(role))
-        throw new https_1.HttpsError('invalid-argument', 'Peranan tidak sah.');
-    if (role === 'SUPER_ADMIN' && who.role !== 'SUPER_ADMIN') {
-        throw new https_1.HttpsError('permission-denied', 'Hanya SUPER_ADMIN boleh melantik SUPER_ADMIN.');
-    }
-    let user;
-    try {
-        user = uid ? await (0, auth_1.getAuth)().getUser(uid) : await (0, auth_1.getAuth)().getUserByEmail(String(email));
-    }
-    catch {
-        throw new https_1.HttpsError('not-found', 'Pengguna Auth tidak dijumpai. Mereka perlu log masuk sekali dahulu.');
-    }
-    const existing = user.customClaims;
-    if (existing?.orgId && existing.orgId !== orgId && who.role !== 'SUPER_ADMIN') {
-        throw new https_1.HttpsError('failed-precondition', 'Pengguna ini milik organisasi lain.');
-    }
-    await (0, auth_1.getAuth)().setCustomUserClaims(user.uid, { orgId, role });
-    await org(orgId).collection('users').doc(user.uid).set({
-        uid: user.uid, email: user.email ?? null, displayName: user.displayName ?? null, role,
-        provider: user.providerData[0]?.providerId ?? null, updatedAt: firestore_1.FieldValue.serverTimestamp(),
-    }, { merge: true });
-    await audit(orgId, { type: 'USER_ROLE_SET', message: `${user.email ?? user.uid} → ${role}`, actorId: who.uid });
-    return { uid: user.uid };
-});
-exports.removeUser = (0, https_1.onCall)(opts, async (req) => {
-    const who = requireRole(req, 'ORG_ADMIN');
-    const orgId = targetOrg(req, who);
-    const uid = String(req.data.uid ?? '');
-    if (!uid || uid === who.uid)
-        throw new https_1.HttpsError('invalid-argument', 'Tidak boleh buang diri sendiri.');
-    const user = await (0, auth_1.getAuth)().getUser(uid);
-    if (user.customClaims?.orgId !== orgId)
-        throw new https_1.HttpsError('not-found', 'Bukan ahli organisasi ini.');
-    await (0, auth_1.getAuth)().setCustomUserClaims(uid, null);
-    await (0, auth_1.getAuth)().revokeRefreshTokens(uid);
-    await org(orgId).collection('users').doc(uid).delete();
-    await audit(orgId, { type: 'USER_REMOVED', message: `${user.email ?? uid} dibuang`, actorId: who.uid });
-    return { ok: true };
-});
 // =====================================================================
 // 2. ENROLLMENT & PENDAFTARAN PERANTI
 // =====================================================================
 exports.createEnrollment = (0, https_1.onCall)(opts, async (req) => {
-    const who = requireRole(req, 'DEVICE_MANAGER');
+    const who = await requireRole(req, 'DEVICE_MANAGER');
     const orgId = targetOrg(req, who);
     const d = req.data;
     if (d.deviceType !== 'ANDROID' && d.deviceType !== 'WINDOWS')
@@ -246,7 +176,7 @@ exports.registerDevice = (0, https_1.onCall)({ ...opts, invoker: 'public' }, asy
     return { deviceId, customToken };
 });
 exports.removeDevice = (0, https_1.onCall)(opts, async (req) => {
-    const who = requireRole(req, 'ORG_ADMIN');
+    const who = await requireRole(req, 'ORG_ADMIN');
     const orgId = targetOrg(req, who);
     const deviceId = String(req.data.deviceId ?? '');
     const dref = org(orgId).collection('devices').doc(deviceId);
@@ -265,7 +195,7 @@ exports.removeDevice = (0, https_1.onCall)(opts, async (req) => {
 // 3. COMMAND QUEUE
 // =====================================================================
 exports.createCommand = (0, https_1.onCall)(opts, async (req) => {
-    const who = requireRole(req, 'DEVICE_MANAGER');
+    const who = await requireRole(req, 'DEVICE_MANAGER');
     const orgId = targetOrg(req, who);
     const d = req.data;
     if (!isCommandType(d.commandType))

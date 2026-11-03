@@ -1,65 +1,97 @@
 rules_version = '2';
 
 // MY DEVICE CONTROL — Firestore Security Rules
-// Model: pengasingan organisasi + RBAC melalui Custom Claims { orgId, role }.
-// Claims ditetapkan HANYA oleh Cloud Functions (Admin SDK). Ia bebas penyedia
-// log masuk: Email/Password, Google, Microsoft, SAML dsb. semuanya berfungsi
-// selagi pengguna telah diberi claims (lihat functions: bootstrapOrganization,
-// setUserRole).
-//
-// Peranan: SUPER_ADMIN > ORG_ADMIN > DEVICE_MANAGER > VIEWER ; DEVICE (token peranti)
+// Peranan admin disimpan dalam dokumen members/{uid} (BUKAN bergantung pada Cloud Functions).
+// Berfungsi dengan SEMUA penyedia log masuk (E-mel, Google, Microsoft...). Custom Claims
+// (jika ada) juga diterima. Peranti menggunakan token khas { role:'DEVICE', orgId, deviceId }.
+// Peranan: SUPER_ADMIN > ORG_ADMIN > DEVICE_MANAGER > VIEWER
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ---------- Fungsi bantu ----------
+    // >>> EDIT: e-mel yang dibenarkan mencipta organisasi pertama (dan menjadi SUPER_ADMIN) <<<
+    function bootstrapEmails() { return ['izzulmedia01@gmail.com']; }
+
+    // ---------- Identiti & peranan ----------
     function signedIn() { return request.auth != null; }
-    function role() { return request.auth.token.role; }
-    function isSuper() { return signedIn() && role() == 'SUPER_ADMIN'; }
-    function inOrg(orgId) {
-      return signedIn() && (isSuper() || request.auth.token.orgId == orgId);
+    function memberPath() { return /databases/$(database)/documents/members/$(request.auth.uid); }
+    function hasMember() { return exists(memberPath()); }
+    function claimRole() { return 'role' in request.auth.token ? request.auth.token.role : null; }
+    function myRole() { return claimRole() != null ? claimRole() : (hasMember() ? get(memberPath()).data.role : null); }
+    function myOrg() { return 'orgId' in request.auth.token ? request.auth.token.orgId : (hasMember() ? get(memberPath()).data.orgId : null); }
+    function myEmail() { return request.auth.token.email.lower(); }
+    function verified() { return request.auth.token.email_verified == true; }
+
+    function isHuman() { return signedIn() && myRole() in ['SUPER_ADMIN', 'ORG_ADMIN', 'DEVICE_MANAGER', 'VIEWER']; }
+    function isSuper() { return isHuman() && myRole() == 'SUPER_ADMIN'; }
+    function inOrg(orgId) { return isHuman() && (isSuper() || myOrg() == orgId); }
+    function canRead(orgId)   { return inOrg(orgId); }
+    function canManage(orgId) { return inOrg(orgId) && myRole() in ['SUPER_ADMIN', 'ORG_ADMIN', 'DEVICE_MANAGER']; }
+    function canAdmin(orgId)  { return inOrg(orgId) && myRole() in ['SUPER_ADMIN', 'ORG_ADMIN']; }
+    // Peranan yang boleh diberikan oleh pemanggil (Org Admin tidak boleh melantik Super Admin)
+    function grantable(role) { return role in ['VIEWER', 'DEVICE_MANAGER', 'ORG_ADMIN'] || (role == 'SUPER_ADMIN' && isSuper()); }
+
+    function isDevice(orgId) { return signedIn() && claimRole() == 'DEVICE' && request.auth.token.orgId == orgId; }
+    function isThisDevice(orgId, deviceId) { return isDevice(orgId) && request.auth.token.deviceId == deviceId; }
+    function onlyChanges(keys) { return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys); }
+
+    // ---------- members/{uid}: siapa pengguna ini & peranannya ----------
+    match /members/{uid} {
+      allow get: if signedIn() && (request.auth.uid == uid || canAdmin(resource.data.orgId));
+      allow list: if isHuman() && canManage(resource.data.orgId);
+
+      // (a) Admin pertama: cipta organisasi + dirinya sebagai SUPER_ADMIN dalam satu batch
+      allow create: if signedIn() && request.auth.uid == uid && verified()
+          && myEmail() in bootstrapEmails()
+          && request.resource.data.role == 'SUPER_ADMIN'
+          && request.resource.data.keys().hasOnly(['orgId', 'role', 'email', 'displayName', 'createdAt'])
+          && getAfter(/databases/$(database)/documents/organizations/$(request.resource.data.orgId)).data.ownerUid == uid
+          && !exists(/databases/$(database)/documents/organizations/$(request.resource.data.orgId))
+        // (b) Pengguna dijemput oleh admin (jemputan mengikut e-mel yang disahkan)
+        || signedIn() && request.auth.uid == uid && verified()
+          && exists(/databases/$(database)/documents/invites/$(myEmail()))
+          && get(/databases/$(database)/documents/invites/$(myEmail())).data.orgId == request.resource.data.orgId
+          && get(/databases/$(database)/documents/invites/$(myEmail())).data.role == request.resource.data.role
+          && request.resource.data.keys().hasOnly(['orgId', 'role', 'email', 'displayName', 'createdAt'])
+        // (c) Admin menambah/ubah ahli organisasinya
+        || canAdmin(request.resource.data.orgId) && grantable(request.resource.data.role);
+      allow update: if canAdmin(resource.data.orgId) && grantable(request.resource.data.role)
+          && request.resource.data.orgId == resource.data.orgId && resource.data.role != 'SUPER_ADMIN' || isSuper() && onlyChanges(['role', 'displayName']);
+      allow delete: if canAdmin(resource.data.orgId) && request.auth.uid != uid
+          && (resource.data.role != 'SUPER_ADMIN' || isSuper());
     }
-    function isHuman() {
-      return signedIn() && role() in ['SUPER_ADMIN', 'ORG_ADMIN', 'DEVICE_MANAGER', 'VIEWER'];
-    }
-    function canRead(orgId)   { return inOrg(orgId) && isHuman(); }
-    function canManage(orgId) { return inOrg(orgId) && role() in ['SUPER_ADMIN', 'ORG_ADMIN', 'DEVICE_MANAGER']; }
-    function canAdmin(orgId)  { return inOrg(orgId) && role() in ['SUPER_ADMIN', 'ORG_ADMIN']; }
-    function isThisDevice(orgId, deviceId) {
-      return signedIn() && role() == 'DEVICE'
-        && request.auth.token.orgId == orgId
-        && request.auth.token.deviceId == deviceId;
-    }
-    // Medan yang dikemas kini oleh klien admin (selebihnya hanya server).
-    function onlyChanges(keys) {
-      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys);
+
+    // ---------- invites/{email}: jemputan sambung akaun Auth baharu ----------
+    match /invites/{email} {
+      allow get: if signedIn() && ((verified() && myEmail() == email) || canAdmin(resource.data.orgId));
+      allow list: if canAdmin(resource.data.orgId);
+      allow create, update: if canAdmin(request.resource.data.orgId) && grantable(request.resource.data.role)
+          && request.resource.data.keys().hasOnly(['orgId', 'role', 'createdBy', 'createdAt']);
+      allow delete: if canAdmin(resource.data.orgId) || (signedIn() && verified() && myEmail() == email);
     }
 
     // ---------- Organisasi ----------
     match /organizations/{orgId} {
       allow read: if canRead(orgId);
-      // Cipta/ubah/padam organisasi hanya melalui Cloud Functions.
-      allow write: if false;
-
-      // ---- Pengguna (profil + peranan) — peranan diubah melalui function sahaja
-      match /users/{userId} {
-        allow read: if canRead(orgId) && (canManage(orgId) || request.auth.uid == userId);
-        allow write: if false;
-      }
+      // Hanya admin pertama (e-mel dibenarkan) boleh cipta, sekali sahaja, bersama members/{uid} dalam batch yang sama
+      allow create: if signedIn() && verified() && myEmail() in bootstrapEmails()
+          && request.resource.data.ownerUid == request.auth.uid
+          && request.resource.data.keys().hasOnly(['name', 'ownerUid', 'createdAt'])
+          && request.resource.data.name is string && request.resource.data.name.size() >= 2 && request.resource.data.name.size() <= 100
+          && getAfter(/databases/$(database)/documents/members/$(request.auth.uid)).data.orgId == orgId;
+      allow update: if canAdmin(orgId) && onlyChanges(['name']);
+      allow delete: if false;
 
       // ---- Peranti ----
       match /devices/{deviceId} {
         allow read: if canRead(orgId) || isThisDevice(orgId, deviceId);
-        // Admin hanya boleh sunting metadata; status/lastSeen/enrollment diurus server.
         allow update: if canManage(orgId)
           && onlyChanges(['deviceName', 'assignedUserId', 'groupId', 'notes', 'updatedAt'])
           && request.resource.data.deviceName is string
           && request.resource.data.deviceName.size() > 0
           && request.resource.data.deviceName.size() <= 80;
-        // Daftar & padam peranti melalui function (audit + pembersihan token).
-        allow create, delete: if false;
+        allow create, delete: if false;   // melalui Cloud Functions (daftar peranti / nyahdaftar)
 
-        // Aplikasi dipasang — dilaporkan oleh peranti sendiri.
         match /installedApps/{pkg} {
           allow read: if canRead(orgId);
           allow write: if isThisDevice(orgId, deviceId)
@@ -78,48 +110,34 @@ service cloud.firestore {
         allow delete: if canAdmin(orgId);
       }
 
-      // ---- Command queue ----
-      // Klien TIDAK boleh menulis command. Hanya function (authorization + audit).
-      // Peranti tidak menulis terus; ia menghantar ack melalui function ackCommand.
+      // ---- Command queue: hanya Cloud Functions boleh menulis ----
       match /commands/{commandId} {
-        allow read: if canRead(orgId) || (signedIn() && role() == 'DEVICE'
-          && request.auth.token.orgId == orgId
-          && resource.data.deviceId == request.auth.token.deviceId);
+        allow read: if canRead(orgId) || (isDevice(orgId) && resource.data.deviceId == request.auth.token.deviceId);
         allow write: if false;
       }
 
-      // ---- Aplikasi (katalog + polisi) ----
       match /applications/{appId} {
-        allow read: if canRead(orgId) || (signedIn() && role() == 'DEVICE' && request.auth.token.orgId == orgId);
+        allow read: if canRead(orgId) || isDevice(orgId);
         allow create, update, delete: if canAdmin(orgId);
       }
-
-      // ---- Peraturan penapisan web ----
       match /webFilteringRules/{ruleId} {
-        allow read: if canRead(orgId) || (signedIn() && role() == 'DEVICE' && request.auth.token.orgId == orgId);
+        allow read: if canRead(orgId) || isDevice(orgId);
         allow create, update, delete: if canAdmin(orgId);
       }
-
-      // ---- Log aktiviti (append-only oleh server) ----
       match /activityLogs/{logId} {
         allow read: if canRead(orgId);
         allow write: if false;
       }
-
-      // ---- Enrollment (token disimpan sebagai hash, hanya server) ----
       match /enrollments/{enrollmentId} {
         allow read: if canManage(orgId);
         allow write: if false;
       }
-
-      // ---- Tetapan ----
       match /settings/{settingId} {
         allow read: if canRead(orgId);
         allow write: if canAdmin(orgId);
       }
     }
 
-    // Selebihnya ditolak.
     match /{document=**} { allow read, write: if false; }
   }
 }
