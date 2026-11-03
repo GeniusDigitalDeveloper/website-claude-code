@@ -220,8 +220,8 @@ test('LEPASKAN DI PERANTI: dengan akaun admin, peranti + publicStatus dipadam da
   await env.withSecurityRulesDisabled(async (c) => { const f = c.firestore();
     await setDoc(doc(f, 'devices/rel1'), { deviceId: 'rel1', deviceName: 'R', deviceType: 'ANDROID', status: 'ONLINE', enrollmentStatus: 'ENROLLED' });
     await setDoc(doc(f, 'publicStatus/rel1'), { deviceName: 'R', deviceType: 'ANDROID', status: 'ONLINE' }); });
-  const a = admin(); const bad = writeBatch(dev('rel1'));
-  bad.delete(doc(dev('rel1'), 'devices/rel1'));
+  const a = admin(); const d = dev('rel1'); const bad = writeBatch(d);
+  bad.delete(doc(d, 'devices/rel1'));
   await assertFails(bad.commit());
   const b = writeBatch(a);
   b.delete(doc(a, 'devices/rel1')); b.delete(doc(a, 'publicStatus/rel1'));
