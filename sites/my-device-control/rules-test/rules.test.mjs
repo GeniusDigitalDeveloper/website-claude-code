@@ -76,7 +76,7 @@ test('PERANTI anonymous tidak boleh jadi admin: tidak boleh baca peranti lain / 
   await assertFails(getDoc(doc(dev('rawak'), 'devices/dev1')));
   await assertFails(getDoc(doc(dev('dev1'), 'devices/dev2')));
   await assertFails(addDoc(collection(dev('dev1'), 'deviceGroups'), { name: 'X' }));
-  await assertFails(getDoc(doc(dev('dev1'), 'enrollments/' + CODE)));
+  await assertFails(getDocs(collection(dev('dev1'), 'enrollments')));
 });
 test('ADMIN: cipta enrollment sah; kod pendek / jenis salah ditolak; peranti tidak boleh cipta', async () => {
   const ok = { deviceName: 'HONOR 10', deviceType: 'ANDROID', groupId: null, assignedUserId: null, status: 'PENDING', createdBy: 'adm', createdAt: serverTimestamp(), expiresAt: future(24) };
@@ -181,4 +181,13 @@ test('AGENT ANDROID: heartbeat (devices + publicStatus) dan kitaran arahan seper
   await assertSucceeds(updateDoc(doc(f, 'commands/c-agent'), { status: 'SENT', sentAt: serverTimestamp() }));
   await assertSucceeds(updateDoc(doc(f, 'commands/c-agent'), { status: 'EXECUTED', executedAt: serverTimestamp() }));
   await assertSucceeds(addDoc(collection(f, 'activityLogs'), { type: 'COMMAND_EXECUTED', message: 'LOCK berjaya', actorId: null, deviceId: 'dev1', createdAt: serverTimestamp() }));
+});
+
+test('ENROLLMENT: agent boleh baca enrollment PENDING dengan kod; USED/tamat dilindungi; tidak boleh senarai; tanpa log masuk ditolak', async () => {
+  const FRESH = 'P'.repeat(32);
+  await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'enrollments/' + FRESH), { deviceName: 'HONOR 77', deviceType: 'ANDROID', status: 'PENDING', expiresAt: future() }));
+  await assertSucceeds(getDoc(doc(dev('baru-1'), 'enrollments/' + FRESH)));
+  await assertFails(getDoc(doc(dev('baru-1'), 'enrollments/' + CODE2)));
+  await assertFails(getDocs(collection(dev('baru-1'), 'enrollments')));
+  await assertFails(getDoc(doc(env.unauthenticatedContext().firestore(), 'enrollments/' + FRESH)));
 });

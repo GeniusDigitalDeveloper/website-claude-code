@@ -29,7 +29,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var input: EditText
     private lateinit var enrollBtn: Button
 
-    private val scan = registerForActivityResult(ScanContract()) { r -> r.contents?.let { input.setText(it) } }
+    private val scan = registerForActivityResult(ScanContract()) { r -> r.contents?.let { input.setText(it); enroll() } }
+    private fun startScan() =
+        scan.launch(ScanOptions().setBeepEnabled(false).setPrompt("Imbas kod QR dari panel admin").setOrientationLocked(false))
+
     private val notifPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,19 +48,21 @@ class MainActivity : AppCompatActivity() {
         col.addView(text("Agent peranti. Peranti ini akan diurus dan dipantau oleh pentadbir organisasi. Hanya status peranti, bateri dan arahan pengurusan digunakan; tiada mesej, kata laluan atau ketukan kekunci dikumpul."))
         status = text("")
         col.addView(status)
-        col.addView(button("1. Aktifkan pentadbir peranti") { requestAdmin() })
-        col.addView(text("2. Tampal kod enrollment dari panel admin (atau imbas kod QR)"))
+        col.addView(button("Aktifkan pentadbir peranti (untuk kunci skrin)") { requestAdmin() })
+        col.addView(text("Imbas kod QR dari panel admin. Peranti terus didaftarkan. Atau tampal kod secara manual:"))
         input = EditText(this).apply {
-            hint = """{"v":1,"projectId":"...","code":"...","name":"...","type":"ANDROID"}"""
-            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE; minLines = 3
+            hint = "Kod enrollment"
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD; maxLines = 3
         }
         col.addView(input, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
-        col.addView(button("Imbas kod QR") { scan.launch(ScanOptions().setBeepEnabled(false).setPrompt("Imbas kod QR enrollment").setOrientationLocked(false)) })
-        enrollBtn = button("3. Daftar peranti") { enroll() }
+        col.addView(button("Imbas kod QR") { startScan() })
+        enrollBtn = button("Daftar dengan kod yang ditampal") { enroll() }
         col.addView(enrollBtn)
         setContentView(ScrollView(this).apply { addView(col) })
 
         if (Build.VERSION.SDK_INT >= 33) notifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+        // Belum didaftarkan: terus buka kamera untuk mengimbas kod QR (tiada langkah lain)
+        if (savedInstanceState == null && !Prefs.enrolled(this)) startScan()
     }
 
     override fun onResume() { super.onResume(); refresh() }
@@ -80,16 +85,24 @@ class MainActivity : AppCompatActivity() {
             .putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Membolehkan pentadbir mengunci skrin peranti ini dari jauh."))
     }
 
+    /** Terima token biasa; kod JSON lama ({"code":"..."}) juga diterima. */
+    private fun parseCode(raw: String): String {
+        val t = raw.trim()
+        val code = if (t.startsWith("{")) try { JSONObject(t).optString("code") } catch (e: Exception) { "" } else t
+        return code.replace(Regex("[\\s\"'“”]"), "")
+    }
+
     private fun enroll() {
-        val j = try { JSONObject(input.text.toString().trim()) } catch (e: Exception) { toast("Kod enrollment tidak sah (bukan JSON)."); return }
-        val code = j.optString("code"); val name = j.optString("name"); val type = j.optString("type", "ANDROID")
-        if (code.length < 24 || name.isBlank() || j.optString("projectId") != AgentConfig.PROJECT_ID) { toast("Kod enrollment tidak lengkap atau untuk projek lain."); return }
+        val code = parseCode(input.text.toString())
+        if (code.length < 24) { toast("Kod terlalu pendek. Salin kod penuh dari panel admin."); return }
         enrollBtn.isEnabled = false
+        toast("Mendaftar…")
         lifecycleScope.launch {
             try {
-                Repo(applicationContext).enroll(code, name, type)
+                Repo(applicationContext).enroll(code)
                 Prefs.setEnrolled(this@MainActivity, true)
                 toast("Peranti berjaya didaftarkan.")
+                if (!CommandExecutor(this@MainActivity).isAdminActive()) requestAdmin()
             } catch (e: Exception) {
                 toast(e.message ?: "Pendaftaran gagal.")
             }

@@ -67,7 +67,9 @@ service cloud.firestore {
 
     // ---------- Enrollment (kod = ID dokumen; hanya admin boleh senarai) ----------
     match /enrollments/{code} {
-      allow read: if isAdmin();
+      allow list: if isAdmin();
+      // Agent membaca nama/jenis dari enrollment yang masih PENDING (hanya jika tahu kod 32 aksara). Tidak boleh senarai.
+      allow get: if isAdmin() || (isDevice() && resource.data.status == 'PENDING');
       allow create: if isAdmin()
         && request.resource.data.keys().hasOnly(['deviceName', 'deviceType', 'groupId', 'assignedUserId', 'status', 'createdBy', 'createdAt', 'expiresAt'])
         && request.resource.data.status == 'PENDING' && request.resource.data.createdBy == request.auth.uid

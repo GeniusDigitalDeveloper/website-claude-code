@@ -330,7 +330,7 @@ function pageDevices() {
 
 function pageGroups() {
   const mg = can("DEVICE_MANAGER");
-  return head("Device Groups", "Contoh: Asrama Putera, Kelas 1, Tablet Android", mg ? `<button class="btn p" data-act="gnew">${ic("plus", 16)}Kumpulan baharu</button>` : "") + state("groups", () => !S.groups.length ? `<div class="card">${empty("Belum ada kumpulan", "Cipta kumpulan, kemudian tetapkan peranti melalui All Devices → Sunting.")}</div>` :
+  return head("Device Groups", "Contoh: Asrama Putera, Kelas 1, Telefon Guru", mg ? `<button class="btn p" data-act="gnew">${ic("plus", 16)}Kumpulan baharu</button>` : "") + state("groups", () => !S.groups.length ? `<div class="card">${empty("Belum ada kumpulan", "Cipta kumpulan, kemudian tetapkan peranti melalui All Devices → Sunting.")}</div>` :
     `<div class="grid g3">${S.groups.map((g) => { const n = S.devices.filter((d) => d.groupId === g.id).length; return `<div class="card lift"><b>${esc(g.name)}</b><p class="sm" style="margin:2px 0 8px">${esc(g.description || "Tiada keterangan")}</p><b style="font-size:14px">${n} peranti</b>
       ${mg ? `<div class="row" style="margin-top:12px"><button class="btn" data-act="glock" data-id="${esc(g.id)}">${ic("lock", 16)}Lock</button><button class="btn" data-act="gunlock" data-id="${esc(g.id)}">${ic("unlock", 16)}Unlock</button><button class="btn i" data-act="gedit" data-id="${esc(g.id)}" aria-label="Sunting ${esc(g.name)}">${ic("edit", 16)}</button>${can("ORG_ADMIN") ? `<button class="btn i" data-act="gdel" data-id="${esc(g.id)}" aria-label="Padam ${esc(g.name)}">${ic("trash", 16, "#DC2626")}</button>` : ""}</div>` : ""}</div>`; }).join("")}</div>`);
 }
@@ -450,7 +450,7 @@ async function mkEnroll(d) {
     const token = randToken(), bt = F.writeBatch(fsdb);
     bt.set(F.doc(fsdb, "enrollments", token), { deviceName: d.deviceName, deviceType: d.deviceType, groupId: d.groupId, assignedUserId: null, status: "PENDING", createdBy: S.user.uid, createdAt: F.serverTimestamp(), expiresAt: F.Timestamp.fromMillis(Date.now() + 47 * 3600e3) });
     logEv(F, bt, "ENROLLMENT_CREATED", `Enrollment ${d.deviceType} "${d.deviceName}"`); await bt.commit();
-    return { token, qrPayload: JSON.stringify({ v: 1, projectId: CONFIG.projectId, code: token, name: d.deviceName, type: d.deviceType }) };
+    return { token, qrPayload: token };   // kod biasa (32 aksara): sama untuk QR dan salin
   });
 }
 const byId = (id) => S.devices.find((d) => d.id === id);
@@ -490,8 +490,8 @@ const ACTIONS = {
     });
   },
   enroll() {
-    openModal(`<h2>Daftar peranti baharu</h2><div id="ebody"><label class="f">Jenis<select id="et"><option>ANDROID</option><option>WINDOWS</option></select></label>
-      <label class="f">Nama peranti<input id="en" maxlength="80" placeholder="HONOR TABLET 01"></label>
+    openModal(`<h2>Daftar peranti baharu</h2><div id="ebody"><label class="f">Jenis<select id="et"><option value="ANDROID">ANDROID (telefon / tablet)</option><option value="WINDOWS">WINDOWS (laptop)</option></select></label>
+      <label class="f">Nama peranti<input id="en" maxlength="80" placeholder="HONOR TABLET 01 atau TELEFON GURU"></label>
       <label class="f">Kumpulan (pilihan)<select id="eg"><option value="">— tiada —</option>${S.groups.map((g) => `<option value="${esc(g.id)}">${esc(g.name)}</option>`).join("")}</select></label>
       <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn" data-close>Batal</button><button class="btn p" id="ok">Jana token</button></div></div>`, (m) => {
       m.querySelector("#ok").onclick = async () => {
@@ -499,7 +499,7 @@ const ACTIONS = {
         try {
           const r = await mkEnroll({ deviceType: m.querySelector("#et").value, deviceName: name, groupId: m.querySelector("#eg").value || null });
           let qr = ""; try { await loadQR(); const q = window.qrcode(0, "M"); q.addData(r.qrPayload); q.make(); qr = q.createSvgTag({ cellSize: 4, margin: 2, scalable: true }); } catch (e) { qr = '<p class="sm">Kod QR tidak dapat dijana (pustaka tidak dimuat). Gunakan token di bawah.</p>'; }
-          m.querySelector("#ebody").innerHTML = `<div style="width:230px;margin:0 auto" role="img" aria-label="Kod QR enrollment">${qr}</div><p class="sm" style="font-size:14px">Dalam aplikasi agent, imbas kod QR atau tampal kod di bawah. <b>Dipaparkan sekali sahaja</b>, sah 47 jam, sekali guna.</p>
+          m.querySelector("#ebody").innerHTML = `<div style="width:230px;margin:0 auto" role="img" aria-label="Kod QR enrollment">${qr}</div><p class="sm" style="font-size:14px">Dalam aplikasi agent, imbas kod QR atau tampal kod di bawah (satu baris, tanpa ruang). <b>Dipaparkan sekali sahaja</b>, sah 47 jam, sekali guna.</p>
             <div class="row" style="flex-wrap:nowrap"><input readonly id="tk" aria-label="Kod enrollment" class="mono" value="${esc(r.qrPayload)}"><button class="btn i" id="cp" aria-label="Salin kod enrollment">${ic("copy", 16)}</button></div>
             <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn p" data-close>Selesai</button></div>`;
           m.querySelector("#cp").onclick = () => { navigator.clipboard.writeText(r.qrPayload).then(() => toast("Kod enrollment disalin."), () => { m.querySelector("#tk").select(); toast("Pilih dan salin kod secara manual.", true); }); };

@@ -1,6 +1,6 @@
 # MY DEVICE CONTROL
 
-Dashboard dalaman untuk menguruskan tablet Android dan laptop Windows di tempat kerja. Firebase projek: `my-devide-control`.
+Dashboard dalaman untuk menguruskan telefon/tablet Android dan laptop Windows di tempat kerja. Firebase projek: `my-devide-control`.
 `index.html` terbuka terus untuk sesiapa (baca sahaja, hanya nama/status/bateri). `admin.html`: log masuk dengan akaun Firebase Authentication anda terus masuk panel admin. Tiada pendaftaran organisasi atau pengesahan e-mel.
 
 | Fail | Fungsi |

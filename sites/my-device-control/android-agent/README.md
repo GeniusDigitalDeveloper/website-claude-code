@@ -1,6 +1,6 @@
 # Android Agent (Fasa 2)
 
-Aplikasi Kotlin untuk tablet Android (HONOR). Mendaftar dengan kod enrollment dari panel admin, menghantar heartbeat dan melaksanakan arahan.
+Aplikasi Kotlin untuk **telefon dan tablet Android** (Android 7.0 ke atas, contoh HONOR). iPhone/iPad tidak disokong: Apple hanya membenarkan pengurusan melalui Apple MDM. Mendaftar dengan kod enrollment dari panel admin, menghantar heartbeat dan melaksanakan arahan.
 
 ## Bina
 ```bash
@@ -10,11 +10,13 @@ gradle assembleDebug                            # APK: app/build/outputs/apk/deb
 ```
 Android Studio: File > Open > folder `android-agent`, tunggu Gradle sync, kemudian Run atau Build APK.
 
-## Pasang & daftar
-1. Pasang APK pada tablet (benarkan pemasangan dari sumber ini).
-2. Buka aplikasi: **1. Aktifkan pentadbir peranti** (kebenaran untuk kunci skrin).
-3. Panel admin > All Devices > **Daftar peranti** > salin kod atau imbas QR dalam aplikasi > **3. Daftar peranti**.
-4. Peranti muncul di panel dan di `index.html` (paparan awam). Notifikasi "Peranti ini diurus oleh pentadbir" sentiasa kelihatan.
+## Pasang & daftar (imbas sahaja)
+1. Pasang APK pada telefon atau tablet (benarkan pemasangan dari sumber ini).
+2. Panel admin > All Devices > **Daftar peranti**: kod QR dipaparkan.
+3. Buka aplikasi: **kamera terus terbuka**. Imbas kod QR itu. Peranti didaftarkan serta-merta, kemudian sistem meminta kebenaran pentadbir peranti (untuk kunci skrin): tekan Aktifkan.
+4. Peranti muncul di panel dan di `index.html`. Notifikasi "Peranti ini diurus oleh pentadbir" sentiasa kelihatan.
+
+Jika kamera ditutup, tekan "Imbas kod QR", atau tampal kod secara manual.
 
 ## Apa yang dilakukan (dan tidak)
 | Arahan | Pentadbir peranti biasa | Device Owner |

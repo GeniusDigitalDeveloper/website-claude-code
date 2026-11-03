@@ -31,18 +31,31 @@ class Repo(private val ctx: Context) {
         return if (v in 0..100) v else null
     }
 
+    /** Telefon atau tablet (lebar skrin terkecil >= 600dp = tablet). Untuk paparan di panel sahaja. */
+    private fun formFactor() = if (ctx.resources.configuration.smallestScreenWidthDp >= 600) "Tablet" else "Telefon"
+
     private fun osVersion() = "Android ${Build.VERSION.RELEASE}".take(40)
 
-    suspend fun enroll(code: String, name: String, type: String) {
+    /** Daftar dengan kod enrollment (token biasa). Nama, jenis dan kumpulan dibaca dari enrollment. */
+    suspend fun enroll(code: String) {
         val id = ensureSignedIn()
+        val snap = try {
+            db.collection("enrollments").document(code).get().await()
+        } catch (e: FirebaseFirestoreException) {
+            throw IllegalStateException("Kod tidak sah, sudah digunakan atau telah tamat tempoh.")
+        }
+        if (!snap.exists()) throw IllegalStateException("Kod tidak sah, sudah digunakan atau telah tamat tempoh.")
+        val name = snap.getString("deviceName") ?: throw IllegalStateException("Enrollment rosak (tiada nama peranti).")
+        val type = snap.getString("deviceType") ?: "ANDROID"
+        val groupId = snap.getString("groupId")
         val now = FieldValue.serverTimestamp()
         val bat = battery()
         val batch = db.batch()
         batch.set(db.collection("devices").document(id), hashMapOf<String, Any?>(
             "deviceId" to id, "deviceName" to name, "deviceType" to type,
-            "deviceModel" to "${Build.MANUFACTURER} ${Build.MODEL}".take(80), "osVersion" to osVersion(),
+            "deviceModel" to "${Build.MANUFACTURER} ${Build.MODEL} (${formFactor()})".take(80), "osVersion" to osVersion(),
             "status" to "ONLINE", "isLocked" to false, "enrollmentStatus" to "ENROLLED",
-            "assignedUserId" to null, "groupId" to null, "batteryLevel" to bat,
+            "assignedUserId" to null, "groupId" to groupId, "batteryLevel" to bat,
             "lastSeen" to now, "createdAt" to now, "updatedAt" to now,
             "enrollmentCode" to code, "appVersion" to AgentConfig.APP_VERSION
         ))
