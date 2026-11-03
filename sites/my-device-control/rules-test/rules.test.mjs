@@ -186,6 +186,15 @@ test('AGENT ANDROID: heartbeat (devices + publicStatus) dan kitaran arahan seper
   await assertSucceeds(addDoc(collection(f, 'activityLogs'), { type: 'COMMAND_EXECUTED', message: 'LOCK berjaya', actorId: null, deviceId: 'dev1', createdAt: serverTimestamp() }));
 });
 
+test('MASA KUNCI: peranti rekod adminLockAt / onlineAgainAt / selfLockAt (cap masa sahaja); medan lain & teks ditolak', async () => {
+  const f = dev('dev1');
+  for (const k of ['adminLockAt', 'onlineAgainAt', 'selfLockAt'])
+    await assertSucceeds(updateDoc(doc(f, 'devices/dev1'), { [k]: serverTimestamp(), updatedAt: serverTimestamp() }));
+  await assertFails(updateDoc(doc(f, 'devices/dev1'), { selfLockAt: 'semalam', updatedAt: serverTimestamp() }));
+  await assertFails(updateDoc(doc(f, 'devices/dev1'), { deviceName: 'X', selfLockAt: serverTimestamp(), updatedAt: serverTimestamp() }));
+  await assertFails(updateDoc(doc(dev('dev2'), 'devices/dev1'), { selfLockAt: serverTimestamp(), updatedAt: serverTimestamp() }));
+});
+
 test('ENROLLMENT: agent boleh baca enrollment PENDING dengan kod; USED/tamat dilindungi; tidak boleh senarai; tanpa log masuk ditolak', async () => {
   const FRESH = 'P'.repeat(32);
   await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'enrollments/' + FRESH), { deviceName: 'HONOR 77', deviceType: 'ANDROID', status: 'PENDING', expiresAt: future() }));

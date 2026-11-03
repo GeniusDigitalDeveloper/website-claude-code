@@ -98,6 +98,13 @@ class Repo(private val ctx: Context) {
         batch.commit().await()
     }
 
+    /** Cap masa peristiwa kunci: adminLockAt / onlineAgainAt / selfLockAt (hanya medan ini + updatedAt). */
+    suspend fun stamp(field: String) {
+        val id = uid ?: return
+        require(field in setOf("adminLockAt", "onlineAgainAt", "selfLockAt"))
+        db.collection("devices").document(id).update(mapOf(field to FieldValue.serverTimestamp(), "updatedAt" to FieldValue.serverTimestamp())).await()
+    }
+
     /** Senarai aplikasi yang boleh dibuka pengguna (ikon pelancar). Untuk papan pemuka admin. */
     suspend fun syncInstalledApps() {
         val id = uid ?: return

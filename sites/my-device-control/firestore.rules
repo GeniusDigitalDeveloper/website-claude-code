@@ -28,6 +28,8 @@ service cloud.firestore {
     function approved(id) { return get(/databases/$(database)/documents/devices/$(id)).data.enrollmentStatus == 'ENROLLED'; }
     function isApprovedDevice() { return isDevice() && exists(/databases/$(database)/documents/devices/$(request.auth.uid)) && approved(request.auth.uid); }
     function onlyChanges(keys) { return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys); }
+    // Masa peristiwa kunci (admin kunci / dalam talian semula / kunci sendiri): mesti cap masa, bukan teks
+    function tsOrAbsent(k) { return !(k in request.resource.data) || request.resource.data[k] is timestamp; }
     function enroll(code) { return /databases/$(database)/documents/enrollments/$(code); }
 
     // ---------- Peranti ----------
@@ -57,7 +59,9 @@ service cloud.firestore {
           && onlyChanges(['enrollmentStatus', 'status', 'updatedAt'])
           && request.resource.data.enrollmentStatus == 'ENROLLED' && request.resource.data.status == 'ONLINE')
         || (isThisDevice(deviceId) && resource.data.enrollmentStatus == 'ENROLLED'
-          && onlyChanges(['status', 'isLocked', 'batteryLevel', 'osVersion', 'appVersion', 'fcmToken', 'lastSeen', 'updatedAt', 'policyStatus'])
+          && onlyChanges(['status', 'isLocked', 'batteryLevel', 'osVersion', 'appVersion', 'fcmToken', 'lastSeen', 'updatedAt', 'policyStatus',
+                       'adminLockAt', 'onlineAgainAt', 'selfLockAt'])
+          && tsOrAbsent('adminLockAt') && tsOrAbsent('onlineAgainAt') && tsOrAbsent('selfLockAt')
           && request.resource.data.status in ['ONLINE', 'LOCKED', 'ERROR']
           && (!('batteryLevel' in request.resource.data) || request.resource.data.batteryLevel == null
               || (request.resource.data.batteryLevel is number && request.resource.data.batteryLevel >= 0 && request.resource.data.batteryLevel <= 100)));

@@ -13,6 +13,7 @@ import android.net.VpnService
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
@@ -51,12 +52,30 @@ class AgentService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    /** Dikesan bila pengguna buka kunci telefon sendiri (masuk PIN/corak) — status kembali ONLINE serta-merta. */
+    /**
+     * Tiga masa untuk admin:
+     *  - adminLockAt   : arahan LOCK admin dilaksanakan (dalam handle())
+     *  - onlineAgainAt : pengguna buka kunci telefon selepas Lock admin -> status kembali ONLINE
+     *  - selfLockAt    : skrin dikunci/dipadam oleh telefon/pengguna sendiri (bukan kerana admin) = "Last seen"
+     */
     private val unlockReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (!Prefs.locked(applicationContext)) return
             Prefs.setLocked(applicationContext, false)
-            scope.launch { runCatching { repo.heartbeat(false, statusText()) } }
+            scope.launch {
+                runCatching { repo.heartbeat(false, statusText()) }
+                runCatching { repo.stamp("onlineAgainAt") }
+            }
+        }
+    }
+
+    private val screenOffReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val c = applicationContext
+            if (Prefs.state(c) != "ACTIVE") return
+            if (Prefs.locked(c)) return                                              // masih dikunci admin
+            if (System.currentTimeMillis() - Prefs.adminLockMs(c) < 15_000) return   // skrin padam kerana Lock admin
+            scope.launch { runCatching { repo.stamp("selfLockAt") } }
         }
     }
 
@@ -65,7 +84,8 @@ class AgentService : Service() {
         repo = Repo(applicationContext)
         executor = CommandExecutor(applicationContext)
         PolicyStore.load(applicationContext)
-        registerReceiver(unlockReceiver, IntentFilter(Intent.ACTION_USER_PRESENT))
+        ContextCompat.registerReceiver(this, unlockReceiver, IntentFilter(Intent.ACTION_USER_PRESENT), ContextCompat.RECEIVER_NOT_EXPORTED)
+        ContextCompat.registerReceiver(this, screenOffReceiver, IntentFilter(Intent.ACTION_SCREEN_OFF), ContextCompat.RECEIVER_NOT_EXPORTED)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -238,6 +258,7 @@ class AgentService : Service() {
             if (ok) ref.update(mapOf("status" to "EXECUTED", "executedAt" to FieldValue.serverTimestamp())).await()
             else ref.update(mapOf("status" to "FAILED", "errorMessage" to (msg ?: "Gagal").take(300))).await()
             if (!ok && type == "LOCK") notifyNeedSetup()
+            if (ok && type == "LOCK") runCatching { repo.stamp("adminLockAt") }
             runCatching {
                 repo.log(if (ok) "COMMAND_EXECUTED" else "COMMAND_FAILED", if (ok) "$type berjaya" else "$type gagal: $msg")
                 repo.heartbeat(Prefs.locked(applicationContext), statusText())
@@ -259,6 +280,7 @@ class AgentService : Service() {
     override fun onDestroy() {
         regs.forEach { it.remove() }; regs.clear(); selfReg?.remove(); selfReg = null
         try { unregisterReceiver(unlockReceiver) } catch (_: Exception) {}
+        try { unregisterReceiver(screenOffReceiver) } catch (_: Exception) {}
         scope.cancel()
         super.onDestroy()
     }

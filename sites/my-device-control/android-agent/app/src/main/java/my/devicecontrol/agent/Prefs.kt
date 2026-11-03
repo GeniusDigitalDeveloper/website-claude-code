@@ -16,6 +16,10 @@ object Prefs {
     fun locked(c: Context) = sp(c).getBoolean("locked", false)
     fun setLocked(c: Context, v: Boolean) = sp(c).edit().putBoolean("locked", v).apply()
 
+    /** Masa (ms) arahan LOCK admin dilaksanakan; skrin padam sejurus selepas itu bukan 'kunci sendiri'. */
+    fun adminLockMs(c: Context) = sp(c).getLong("adminLockMs", 0L)
+    fun setAdminLockMs(c: Context, v: Long) = sp(c).edit().putLong("adminLockMs", v).apply()
+
     fun listen(c: Context, l: SharedPreferences.OnSharedPreferenceChangeListener) = sp(c).registerOnSharedPreferenceChangeListener(l)
     fun unlisten(c: Context, l: SharedPreferences.OnSharedPreferenceChangeListener) = sp(c).unregisterOnSharedPreferenceChangeListener(l)
 }

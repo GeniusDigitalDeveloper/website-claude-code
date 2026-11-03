@@ -156,6 +156,7 @@ const playSound = (ok) => { try { unlockAudio(); const t = AC.currentTime + 0.02
 const $ = (s, r = document) => r.querySelector(s);
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const ms = (t) => (t && (t.toMillis ? t.toMillis() : t.seconds ? t.seconds * 1000 : +t)) || 0;
+const clk = (t) => ms(t) ? new Date(ms(t)).toLocaleString("ms-MY", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }) : "—";
 const fmt = (t) => ms(t) ? new Date(ms(t)).toLocaleString("ms-MY", { dateStyle: "medium", timeStyle: "short" }) : "—";
 const ago = (t) => { if (!ms(t)) return "—"; const s = Math.max(0, (Date.now() - ms(t)) / 1000); return s < 60 ? "baru sahaja" : s < 3600 ? Math.floor(s / 60) + " min lalu" : s < 86400 ? Math.floor(s / 3600) + " jam lalu" : Math.floor(s / 86400) + " hari lalu"; };
 const ROLE = { ADMIN: "Admin" };
@@ -202,6 +203,10 @@ function loadPreview() {
 /* ---------- Firebase ---------- */
 const getCfg = () => CONFIG;
 let fsdb = null, auth = null;
+// Masa kunci pada lajur Status: admin kunci -> online semula. "Last seen" = kali terakhir peranti dikunci/skrin padam SENDIRI.
+const lockTimes = (d) => !ms(d.adminLockAt) ? "" : `<div class="sm">Admin lock: ${clk(d.adminLockAt)}</div>` + (ms(d.onlineAgainAt) >= ms(d.adminLockAt) ? `<div class="sm">Online semula: ${clk(d.onlineAgainAt)}</div>` : "");
+const lastSeenCell = (d) => d.deviceType === "ANDROID" ? clk(d.selfLockAt) : ago(d.lastSeen);
+
 const OFFLINE_MS = 10 * 60 * 1000;
 const isWaiting = (d) => d.enrollmentStatus === "PENDING_APPROVAL";
 function onDevices(list) {
@@ -336,10 +341,10 @@ function pageDevices() {
     <select id="ft" aria-label="Tapis jenis" style="width:auto">${opts(["ANDROID", "IOS", "WINDOWS", "MAC", "LINUX", "OTHER"], S.ft, "Semua jenis")}</select>
     ${mg && S.sel.size ? `<button class="btn" data-act="lock-sel">${ic("lock", 16)}Lock (${S.sel.size})</button><button class="btn" data-act="unlock-sel">${ic("unlock", 16)}Unlock (${S.sel.size})</button>` : ""}</div>
   <div class="card tw">${state("devices", () => !rows.length ? empty(ACTIVE.length ? "Tiada padanan" : "Belum ada peranti", ACTIVE.length ? "Ubah carian atau penapis." : 'Klik "Daftar peranti" untuk menjana token enrollment.') : `
-    <table><thead><tr><th style="width:36px"><input type="checkbox" id="selall" aria-label="Pilih semua di halaman" ${mg ? "" : "disabled"} ${view.length && view.every((d) => S.sel.has(d.id)) ? "checked" : ""} style="min-height:0;width:auto"></th><th>Peranti</th><th>Jenis / OS</th><th>Status</th><th>Enrollment</th><th>Kumpulan</th><th>Pengguna</th><th>Last seen</th><th></th></tr></thead><tbody>
+    <table><thead><tr><th style="width:36px"><input type="checkbox" id="selall" aria-label="Pilih semua di halaman" ${mg ? "" : "disabled"} ${view.length && view.every((d) => S.sel.has(d.id)) ? "checked" : ""} style="min-height:0;width:auto"></th><th>Peranti</th><th>Jenis / OS</th><th>Status</th><th>Enrollment</th><th>Bateri</th><th>Pengguna</th><th>Last seen</th><th></th></tr></thead><tbody>
     ${view.map((d) => `<tr><td><input type="checkbox" data-sel="${esc(d.id)}" aria-label="Pilih ${esc(d.deviceName)}" ${mg ? "" : "disabled"} ${S.sel.has(d.id) ? "checked" : ""} style="min-height:0;width:auto"></td>
       <td><b>${esc(d.deviceName)}</b><div class="mono">${esc(d.deviceId)}</div></td><td>${esc(d.deviceType)}<div class="sm">${esc(d.deviceModel)} · ${esc(d.osVersion)}</div></td>
-      <td>${badge(d.status)}${typeof d.batteryLevel === "number" ? `<div class="sm">Bateri ${d.batteryLevel}%</div>` : ""}</td><td>${esc(d.enrollmentStatus)}</td><td>${esc(gname(d.groupId))}</td><td>${esc(d.assignedUserId || "—")}</td><td>${ago(d.lastSeen)}</td>
+      <td>${badge(d.status)}${lockTimes(d)}</td><td>${esc(d.enrollmentStatus)}</td><td>${typeof d.batteryLevel === "number" ? d.batteryLevel + "%" : "—"}</td><td>${esc(d.assignedUserId || "—")}</td><td>${lastSeenCell(d)}</td>
       <td style="white-space:nowrap">${d.deviceType === "ANDROID" ? `<button class="btn i" data-act="monitor" data-id="${esc(d.id)}" aria-label="Pantau ${esc(d.deviceName)}">${ic("eye", 16)}</button> ` : ""}${mg ? `<button class="btn i" data-act="edit" data-id="${esc(d.id)}" aria-label="Sunting ${esc(d.deviceName)}">${ic("edit", 16)}</button> ` : ""}${ad ? `<button class="btn i" data-act="remove" data-id="${esc(d.id)}" aria-label="Buang ${esc(d.deviceName)}">${ic("trash", 16, "#DC2626")}</button>` : ""}</td></tr>`).join("")}</tbody></table>`)}
     <div class="pager"><span>Halaman ${S.pg + 1} / ${pages}</span><span class="row"><button class="btn i" data-act="prev" aria-label="Sebelumnya" ${S.pg ? "" : "disabled"}>${ic("left", 16)}</button><button class="btn i" data-act="next" aria-label="Seterusnya" ${S.pg + 1 < pages ? "" : "disabled"}>${ic("right", 16)}</button></span></div></div>`;
 }
