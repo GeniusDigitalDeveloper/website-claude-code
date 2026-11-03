@@ -60,7 +60,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
     <div class="card" id="login">
       <h2>Log masuk pentadbir</h2>
       <p class="sub">Gunakan akaun Firebase Authentication anda.</p>
-      <form id="form">
+      <form id="form" onsubmit="return false">
         <label for="email">E-mel</label>
         <input id="email" type="email" autocomplete="username" required>
         <label for="pass">Kata laluan</label>
@@ -68,8 +68,6 @@ button:disabled{opacity:.5;cursor:not-allowed}
           <button type="button" id="eye" class="eye" aria-label="Tunjuk kata laluan" aria-pressed="false"><svg id="eyeico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s4-8 10-8 10 8 10 8-4 8-10 8S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
         <button class="primary" id="go">Log masuk</button>
       </form>
-      <div id="providers"></div>
-      <button class="link" id="reset" type="button">Lupa kata laluan?</button>
       <div class="msg" id="msg" role="alert"></div>
     </div>
   </section>
@@ -86,17 +84,20 @@ const CONFIG = {
   appId: "1:106788083798:web:1a75a67f5f3dc9ab7243f7",
   measurementId: "G-JG180QB7CS"
 };
-/* Tambah penyedia log masuk lain di sini (selepas diaktifkan di Firebase Console > Authentication).
-   Contoh Microsoft: { label: "Log masuk dengan Microsoft", make: (m) => new m.OAuthProvider("microsoft.com") } */
-const PROVIDERS = [
-  { label: "Log masuk dengan Google", make: (m) => new m.GoogleAuthProvider() }
-];
 // Alamat halaman admin. Kosong = automatik ("admin.html" jika laman berakhir .html / fail setempat, selain itu "admin").
 // Di Interactive Link, isi mengikut Page Path anda, contoh: "/admin".
 const ADMIN_URL = "";
 const SDK = "https://www.gstatic.com/firebasejs/11.0.2/";
 /* ======================================================================================= */
 
+/* Bunyi: berjaya = nada tinggi naik; salah = buzzer rendah. Dimainkan hasil klik pengguna (dibenarkan pelayar). */
+let AC = null;
+const unlockAudio = () => { try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === "suspended") AC.resume(); } catch (e) {} };
+const tone = (f, at, dur, type, vol) => { const o = AC.createOscillator(), g = AC.createGain(); o.type = type; o.frequency.value = f; o.connect(g); g.connect(AC.destination);
+  g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(vol, at + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, at + dur); o.start(at); o.stop(at + dur + 0.05); };
+const playSound = (ok) => { try { unlockAudio(); const t = AC.currentTime + 0.02;
+  if (ok) { tone(1318.5, t, 0.16, "sine", 0.3); tone(1760, t + 0.14, 0.16, "sine", 0.3); tone(2349.3, t + 0.28, 0.42, "sine", 0.3); }
+  else { tone(180, t, 0.28, "sawtooth", 0.22); tone(140, t + 0.3, 0.45, "sawtooth", 0.22); } } catch (e) {} };
 const $ = (id) => document.getElementById(id);
 const say = (el, text, kind) => { el.textContent = text || ""; el.className = "msg" + (kind ? " " + kind : ""); };
 const errText = (e) => ({
@@ -126,24 +127,18 @@ const goAdmin = () => {
 if (!window.__MDC_PREVIEW__) try {   // dalam preview, Firebase tidak dimuat
   const [{ initializeApp }, A] = await Promise.all([import(SDK + "firebase-app.js"), import(SDK + "firebase-auth.js")]);
   const auth = A.getAuth(initializeApp(CONFIG));
-  A.onAuthStateChanged(auth, (u) => { if (u) goAdmin(); });
+  document.body.dataset.ready = "1";
+  let manual = false;   // log masuk melalui borang: tunggu bunyi sebelum buka admin
+  A.onAuthStateChanged(auth, (u) => { if (u && !manual) goAdmin(); });
 
   $("form").onsubmit = async (e) => {
-    e.preventDefault(); $("go").disabled = true; say($("msg"), "");
-    try { await A.signInWithEmailAndPassword(auth, $("email").value.trim(), $("pass").value); goAdmin(); }
-    catch (er) { say($("msg"), errText(er), "err"); } finally { $("go").disabled = false; }
+    e.preventDefault(); unlockAudio(); manual = true; $("go").disabled = true; say($("msg"), "");
+    try {
+      await A.signInWithEmailAndPassword(auth, $("email").value.trim(), $("pass").value);
+      playSound(true); say($("msg"), "Berjaya. Membuka panel…", "ok");
+      setTimeout(goAdmin, 900);
+    } catch (er) { manual = false; playSound(false); say($("msg"), errText(er), "err"); $("go").disabled = false; }
   };
-  $("reset").onclick = async () => {
-    const em = $("email").value.trim();
-    if (!em) return say($("msg"), "Masukkan e-mel dahulu.", "err");
-    try { await A.sendPasswordResetEmail(auth, em); say($("msg"), "Pautan tetap semula kata laluan telah dihantar.", "ok"); }
-    catch (er) { say($("msg"), errText(er), "err"); }
-  };
-  for (const p of PROVIDERS) {
-    const b = document.createElement("button"); b.className = "ghost"; b.type = "button"; b.textContent = p.label;
-    b.onclick = async () => { try { await A.signInWithPopup(auth, p.make(A)); goAdmin(); } catch (er) { say($("msg"), errText(er), "err"); } };
-    $("providers").appendChild(b);
-  }
 } catch (e) {
   say($("msg"), "Gagal memuatkan Firebase. Semak sambungan internet. (" + ((e && e.message) || e) + ")", "err");
 }

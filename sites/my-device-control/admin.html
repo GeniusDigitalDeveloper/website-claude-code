@@ -144,6 +144,14 @@ const QR_LIB = "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qr
 const PREVIEW = window.__MDC_PREVIEW__ === true;
 /* =================================================== */
 
+/* Bunyi: berjaya = nada tinggi naik; salah = buzzer rendah. Dimainkan hasil klik pengguna (dibenarkan pelayar). */
+let AC = null;
+const unlockAudio = () => { try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === "suspended") AC.resume(); } catch (e) {} };
+const tone = (f, at, dur, type, vol) => { const o = AC.createOscillator(), g = AC.createGain(); o.type = type; o.frequency.value = f; o.connect(g); g.connect(AC.destination);
+  g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(vol, at + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, at + dur); o.start(at); o.stop(at + dur + 0.05); };
+const playSound = (ok) => { try { unlockAudio(); const t = AC.currentTime + 0.02;
+  if (ok) { tone(1318.5, t, 0.16, "sine", 0.3); tone(1760, t + 0.14, 0.16, "sine", 0.3); tone(2349.3, t + 0.28, 0.42, "sine", 0.3); }
+  else { tone(180, t, 0.28, "sawtooth", 0.22); tone(140, t + 0.3, 0.45, "sawtooth", 0.22); } } catch (e) {} };
 /* ---------- Bantuan ---------- */
 const $ = (s, r = document) => r.querySelector(s);
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -341,7 +349,7 @@ function pageLogs() {
 function pageUsers() {
   const me = S.user || {};
   return head("Users & Roles", "Akaun admin diurus dalam Firebase Authentication") + `<div class="card"><b>Akaun anda</b>
-    <p style="margin:6px 0 0">${esc(me.email || me.uid || "—")}</p><p class="sm">Mana-mana akaun e-mel/kata laluan (atau Google) yang ada dalam Firebase Authentication terus boleh log masuk dan menguruskan semua peranti. Tiada pendaftaran organisasi atau pengesahan e-mel.</p></div>
+    <p style="margin:6px 0 0">${esc(me.email || me.uid || "—")}</p><p class="sm">Mana-mana akaun e-mel/kata laluan yang ada dalam Firebase Authentication terus boleh log masuk dan menguruskan semua peranti. Tiada pendaftaran organisasi atau pengesahan e-mel.</p></div>
     <div class="card" style="margin-top:12px"><b>Tambah atau buang admin</b><ol class="sm" style="font-size:14px;line-height:1.7"><li>Buka Firebase Console → projek <b>my-devide-control</b> → Authentication → Users.</li><li><b>Add user</b> (e-mel + kata laluan) untuk tambah admin baharu. Pilih akaun → <b>Delete</b> untuk buang akses.</li><li>Pastikan Authentication → Settings → User actions: <b>Enable create (sign-up)</b> dimatikan supaya orang luar tidak boleh mendaftar sendiri.</li></ol></div>`;
 }
 function pageSettings() {
@@ -360,9 +368,7 @@ function authScreen() {
     <div class="brand" style="padding:0 0 12px"><i>${ic("shield", 20, "#fff")}</i><span>MY DEVICE<br>CONTROL</span></div>
     <h1 style="font-size:20px">Log masuk</h1><p class="sm" style="font-size:14px">Gunakan akaun Firebase Authentication anda.</p>
     <form id="lf"><label class="f">E-mel<input id="le" type="email" autocomplete="username" required></label><label class="f" for="lp">Kata laluan</label><span class="pw"><input id="lp" type="password" autocomplete="current-password" required><button type="button" class="eye" data-act="eye" aria-label="Tunjuk kata laluan" aria-pressed="false">${ic("eye", 20)}</button></span>
-    <button class="btn p" style="width:100%;margin-top:14px" data-act="dologin">Log masuk</button></form>
-    <button class="btn" style="width:100%;margin-top:8px" data-act="dogoogle">Log masuk dengan Google</button>
-    <div class="row" style="margin-top:8px"><button class="btn" data-act="doreset">Lupa kata laluan?</button></div>
+    <button class="btn p" style="width:100%;margin-top:14px" type="submit">Log masuk</button></form>
     <p id="amsg" role="alert" style="min-height:22px;margin:12px 0 0;font-size:14px;color:#DC2626"></p></div></div>`;
 }
 const amsg = (t, ok) => { const el = $("#amsg"); if (el) { el.textContent = t; el.style.color = ok ? "#047857" : "#DC2626"; } };
@@ -455,9 +461,11 @@ const ACTIONS = {
     el.setAttribute("aria-label", show ? "Sorok kata laluan" : "Tunjuk kata laluan");
     el.innerHTML = show ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-10-8-10-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 10 8 10 8a18.5 18.5 0 01-2.16 3.19M14.12 14.12a3 3 0 11-4.24-4.24M1 1l22 22"/></svg>` : ic("eye", 20);
   },
-  async dologin() { amsg(""); try { await fb.A.signInWithEmailAndPassword(auth, $("#le").value.trim(), $("#lp").value); } catch (e) { amsg(authErr(e)); } },
-  async dogoogle() { amsg(""); try { await fb.A.signInWithPopup(auth, new fb.A.GoogleAuthProvider()); } catch (e) { amsg(authErr(e)); } },
-  async doreset() { const em = $("#le").value.trim(); if (!em) return amsg("Masukkan e-mel dahulu."); try { await fb.A.sendPasswordResetEmail(auth, em); amsg("Pautan tetap semula kata laluan telah dihantar.", true); } catch (e) { amsg(authErr(e)); } },
+  async dologin() {
+    amsg(""); unlockAudio();
+    try { await fb.A.signInWithEmailAndPassword(auth, $("#le").value.trim(), $("#lp").value); playSound(true); }
+    catch (e) { playSound(false); amsg(authErr(e)); }
+  },
   navopen() { S.nav = true; render(); }, navclose() { S.nav = false; render(); },
   logout() { if (PREVIEW) return previewBlock().catch(() => {}); fb.A.signOut(auth); },
   prev() { S.pg--; render(); }, next() { S.pg++; render(); },
