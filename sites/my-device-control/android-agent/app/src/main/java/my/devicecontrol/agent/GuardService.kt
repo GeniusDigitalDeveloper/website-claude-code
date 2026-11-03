@@ -46,6 +46,7 @@ class GuardService : AccessibilityService() {
         if (PolicyStore.blockedPkgs.contains(pkg)) { kickOut(pkg); return }
         if (Prefs.state(this) != "ACTIVE") return
         if (pkg in homePkgs) { UsageBuffer.add(AppEvent("__HOME__", "Skrin utama", System.currentTimeMillis())); return }   // aplikasi sebelumnya ditutup
+        if (packageManager.getLaunchIntentForPackage(pkg) == null) return   // abaikan tetingkap sistem (AOD, Smart Panel, dialog VPN...)
         val label = try { packageManager.getApplicationLabel(packageManager.getApplicationInfo(pkg, 0)).toString() } catch (_: PackageManager.NameNotFoundException) { pkg }
         UsageBuffer.add(AppEvent(pkg, label.take(80), System.currentTimeMillis()))
     }

@@ -4,6 +4,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.app.KeyguardManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -12,6 +13,7 @@ import android.content.pm.ServiceInfo
 import android.net.VpnService
 import android.os.Build
 import android.os.IBinder
+import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
@@ -67,15 +69,36 @@ class AgentService : Service() {
         }
     }
 
-    private val screenOffReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val c = applicationContext
-            if (Prefs.state(c) != "ACTIVE") return
-            UsageBuffer.add(AppEvent("__SCREEN_OFF__", "Skrin dipadam", System.currentTimeMillis()))   // aplikasi di hadapan ditutup
-            GuardService.resetLast()                                                                    // buka semula = dikira satu pembukaan baharu
-            if (Prefs.locked(c)) return                                              // masih dikunci admin
-            if (System.currentTimeMillis() - Prefs.adminLockMs(c) < 15_000) return   // skrin padam kerana Lock admin
-            scope.launch { runCatching { repo.stamp("selfLockAt") } }
+    /**
+     * Semakan terus keadaan skrin dan kunci setiap 0.4 saat (tidak bergantung pada isyarat Android yang kadang-kadang tidak sampai):
+     *  - skrin padam            -> penanda "aplikasi ditutup"; jika bukan kerana Lock admin = selfLockAt (Lock sendiri)
+     *  - selepas Lock admin: skrin hidup + kunci dibuka -> status ONLINE + onlineAgainAt, dalam satu tulisan
+     */
+    private fun watchScreen() {
+        val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+        val km = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+        scope.launch {
+            var wasOn = pm.isInteractive; var sawOff = false
+            while (isActive) {
+                val c = applicationContext
+                if (Prefs.state(c) == "ACTIVE") {
+                    val on = pm.isInteractive
+                    if (wasOn && !on) {
+                        UsageBuffer.add(AppEvent("__SCREEN_OFF__", "Skrin dipadam", System.currentTimeMillis()))   // aplikasi di hadapan ditutup
+                        GuardService.resetLast()                                                                    // buka semula = pembukaan baharu
+                        if (!Prefs.locked(c) && System.currentTimeMillis() - Prefs.adminLockMs(c) > 15_000) runCatching { repo.stamp("selfLockAt") }
+                    }
+                    if (Prefs.locked(c)) {
+                        if (!on) sawOff = true
+                        else if (sawOff && !km.isKeyguardLocked) {
+                            sawOff = false; Prefs.setLocked(c, false)
+                            runCatching { repo.heartbeat(false, statusText(), "onlineAgainAt") }
+                        }
+                    } else sawOff = false
+                    wasOn = on
+                }
+                delay(400)
+            }
         }
     }
 
@@ -85,7 +108,7 @@ class AgentService : Service() {
         executor = CommandExecutor(applicationContext)
         PolicyStore.load(applicationContext)
         ContextCompat.registerReceiver(this, unlockReceiver, IntentFilter(Intent.ACTION_USER_PRESENT), ContextCompat.RECEIVER_NOT_EXPORTED)
-        ContextCompat.registerReceiver(this, screenOffReceiver, IntentFilter(Intent.ACTION_SCREEN_OFF), ContextCompat.RECEIVER_NOT_EXPORTED)
+        watchScreen()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -260,7 +283,6 @@ class AgentService : Service() {
     override fun onDestroy() {
         regs.forEach { it.remove() }; regs.clear(); selfReg?.remove(); selfReg = null
         try { unregisterReceiver(unlockReceiver) } catch (_: Exception) {}
-        try { unregisterReceiver(screenOffReceiver) } catch (_: Exception) {}
         scope.cancel()
         super.onDestroy()
     }
