@@ -1,9 +1,13 @@
 package my.devicecontrol.agent
 
 import android.accessibilityservice.AccessibilityService
+import android.app.ActivityManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.view.accessibility.AccessibilityEvent
 import android.widget.Toast
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -35,16 +39,31 @@ class GuardService : AccessibilityService() {
     override fun onAccessibilityEvent(e: AccessibilityEvent) {
         if (e.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
         val pkg = e.packageName?.toString() ?: return
-        if (pkg == packageName || pkg == "com.android.systemui" || pkg == last) return
-        last = pkg
-        if (PolicyStore.blockedPkgs.contains(pkg)) {
-            performGlobalAction(GLOBAL_ACTION_HOME)
-            Toast.makeText(this, "Aplikasi ini disekat oleh admin.", Toast.LENGTH_LONG).show()
-            return
-        }
+        if (pkg == "com.android.systemui" || pkg == last) return
+        last = pkg                                    // aplikasi di hadapan sekarang
+        if (pkg == packageName) return
+        if (PolicyStore.blockedPkgs.contains(pkg)) { kickOut(pkg); return }
         if (pkg in homePkgs || Prefs.state(this) != "ACTIVE") return
         val label = try { packageManager.getApplicationLabel(packageManager.getApplicationInfo(pkg, 0)).toString() } catch (_: PackageManager.NameNotFoundException) { pkg }
         UsageBuffer.add(AppEvent(pkg, label.take(80), System.currentTimeMillis()))
+    }
+
+    private val ui = Handler(Looper.getMainLooper())
+
+    /** Keluarkan pengguna ke skrin utama dan matikan proses latar belakang aplikasi itu (selagi masih disekat). */
+    private fun kickOut(pkg: String) {
+        performGlobalAction(GLOBAL_ACTION_HOME)
+        ui.post { Toast.makeText(this, "Aplikasi ini disekat oleh admin.", Toast.LENGTH_LONG).show() }
+        last = null                                   // supaya membuka semula aplikasi yang sama dikesan lagi
+        val am = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        for (delay in longArrayOf(1200, 4000))
+            ui.postDelayed({ if (PolicyStore.blockedPkgs.contains(pkg)) runCatching { am.killBackgroundProcesses(pkg) } }, delay)
+    }
+
+    /** Dipanggil bila polisi berubah: jika aplikasi yang sedang dibuka baru sahaja disekat, terus keluarkan. */
+    fun enforceNow() {
+        val p = last ?: return
+        if (PolicyStore.blockedPkgs.contains(p)) kickOut(p)
     }
 
     override fun onInterrupt() {}

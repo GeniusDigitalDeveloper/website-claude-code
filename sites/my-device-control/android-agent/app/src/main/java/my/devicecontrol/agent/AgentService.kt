@@ -189,6 +189,7 @@ class AgentService : Service() {
 
     private fun recompute() {
         PolicyStore.update(applicationContext, myGroup, apps, web)
+        GuardService.instance?.enforceNow()           // app yang sedang dibuka dan baru disekat: terus dikeluarkan
         val needVpn = PolicyStore.blockDomains.isNotEmpty()
         if (needVpn && VpnService.prepare(this) == null) startService(Intent(this, DnsVpnService::class.java))
         else if (!needVpn && DnsVpnService.running) startService(Intent(this, DnsVpnService::class.java).setAction("STOP"))
