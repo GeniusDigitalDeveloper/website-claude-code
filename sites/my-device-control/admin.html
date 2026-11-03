@@ -192,7 +192,7 @@ let call = previewBlock, fsdb = null, auth = null;
 async function boot() {
   if (PREVIEW) { loadPreview(); render(); return; }
   const cfg = getCfg();
-  if (!cfg) { location.replace("index.html"); return; }
+  if (!cfg) { S.screen = "setup"; render(); return; }
   const [{ initializeApp }, A, F, FN] = await Promise.all(["app", "auth", "firestore", "functions"].map((m) => import(`${SDK}firebase-${m}.js`)));
   fb = { A, F };
   const app = initializeApp(cfg);
@@ -200,8 +200,8 @@ async function boot() {
   const fns = FN.getFunctions(app, REGION);
   call = (name, data) => FN.httpsCallable(fns, name)(data).then((r) => r.data);
   A.onAuthStateChanged(auth, async (u) => {
-    if (!u) { location.replace("index.html"); return; }
-    S.user = u; await readClaims(false); subscribeAll(); render();
+    if (!u) { S.user = null; S.claims = {}; subscribedOrg = null; unsubs.forEach((f) => f()); unsubs = []; S.screen = "login"; render(); return; }
+    S.screen = null; S.user = u; await readClaims(false); subscribeAll(); render();
   });
   A.onIdTokenChanged(auth, async (u) => { if (u) { await readClaims(false); render(); } });
 }
@@ -349,6 +349,35 @@ function pageOnboarding() {
   <div class="row" style="margin-top:14px"><button class="btn p" data-act="bootstrap">Cipta organisasi</button><button class="btn" data-act="recheck">Semak semula peranan</button><button class="btn" data-act="logout">Log keluar</button></div></div></div>`;
 }
 
+/* ---------- Skrin sambung Firebase & log masuk (admin.html berdiri sendiri) ---------- */
+function parseCfg(text) {
+  const out = {};
+  for (const k of ["apiKey", "authDomain", "projectId", "storageBucket", "messagingSenderId", "appId", "databaseURL", "measurementId"]) {
+    const m = text.match(new RegExp(k + "\\s*[:=]\\s*[\"']([^\"']+)[\"']")); if (m) out[k] = m[1];
+  }
+  return out.apiKey && out.projectId && out.appId ? out : null;
+}
+const AUTH_ERR = { "auth/invalid-credential": "E-mel atau kata laluan salah.", "auth/user-not-found": "Akaun tidak dijumpai.", "auth/wrong-password": "Kata laluan salah.",
+  "auth/too-many-requests": "Terlalu banyak percubaan. Cuba sebentar lagi.", "auth/popup-closed-by-user": "Tetingkap log masuk ditutup.",
+  "auth/unauthorized-domain": "Domain ini belum ditambah di Firebase > Authentication > Settings > Authorized domains.",
+  "auth/operation-not-allowed": "Kaedah log masuk ini belum diaktifkan di Firebase Console.", "auth/invalid-api-key": "apiKey tidak sah. Semak firebaseConfig." };
+const authErr = (e) => AUTH_ERR[e && e.code] || (e && /api-key-not-valid|invalid-api-key/.test(e.code || "") ? AUTH_ERR["auth/invalid-api-key"] : errMsg(e));
+function authScreen() {
+  const setup = S.screen === "setup";
+  return `<div style="min-height:100vh;display:grid;place-items:center;padding:16px"><div class="card" style="width:100%;max-width:420px">
+    <div class="brand" style="padding:0 0 12px"><i>${ic("shield", 20, "#fff")}</i><span>MY DEVICE<br>CONTROL</span></div>
+    ${setup ? `<h1 style="font-size:20px">Sambung Firebase</h1><p class="sm" style="font-size:14px">Tampal <b>firebaseConfig</b> dari Firebase Console → Project settings → Your apps → Web app. Disimpan dalam pelayar ini sahaja.</p>
+      <label class="f">firebaseConfig<textarea id="cfgtxt" spellcheck="false" style="min-height:150px;font:12px/1.4 ui-monospace,monospace" placeholder='const firebaseConfig = {&#10;  apiKey: "...",&#10;  authDomain: "my-devide-control.firebaseapp.com",&#10;  projectId: "my-devide-control",&#10;  appId: "..."&#10;};'></textarea></label>
+      <button class="btn p" style="width:100%;margin-top:14px" data-act="savecfg">Simpan &amp; sambung</button>`
+    : `<h1 style="font-size:20px">Log masuk pentadbir</h1><p class="sm" style="font-size:14px">Gunakan akaun Firebase Authentication anda.</p>
+      <form id="lf"><label class="f">E-mel<input id="le" type="email" autocomplete="username" required></label><label class="f">Kata laluan<input id="lp" type="password" autocomplete="current-password" required></label>
+      <button class="btn p" style="width:100%;margin-top:14px" data-act="dologin">Log masuk</button></form>
+      <button class="btn" style="width:100%;margin-top:8px" data-act="dogoogle">Log masuk dengan Google</button>
+      <div class="row" style="justify-content:space-between;margin-top:8px"><button class="btn" data-act="doreset">Lupa kata laluan?</button><button class="btn" data-act="resetcfg">Tukar tetapan Firebase</button></div>`}
+    <p id="amsg" role="alert" style="min-height:22px;margin:12px 0 0;font-size:14px;color:#DC2626"></p></div></div>`;
+}
+const amsg = (t, ok) => { const el = $("#amsg"); if (el) { el.textContent = t; el.style.color = ok ? "#047857" : "#DC2626"; } };
+
 /* ---------- Lukis ---------- */
 const PAGES = { dashboard: pageDashboard, devices: pageDevices, groups: pageGroups, apps: pageApps, filtering: pageFiltering, monitoring: pageMonitoring, commands: pageCommands, logs: pageLogs, users: pageUsers, settings: pageSettings };
 const REDUCE = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -393,6 +422,7 @@ function playIn(c) {
 
 function draw() {
   const root = $("#root");
+  if (S.screen) { shellBuilt = false; root.innerHTML = authScreen(); const lf = $("#lf"); if (lf) lf.onsubmit = (e) => { e.preventDefault(); ACTIONS.dologin(); }; return; }
   if (!S.user || S.leaving) return;
   if (!S.claims.orgId || !S.claims.role) { shellBuilt = false; root.innerHTML = pageOnboarding(); return; }
   if (!shellBuilt || !$("#content")) buildShell();
@@ -410,6 +440,11 @@ const QUEUE_NOTE = "Arahan dimasukkan ke queue dengan status <b>PENDING</b> dan 
 const byId = (id) => S.devices.find((d) => d.id === id);
 
 const ACTIONS = {
+  savecfg() { const c = parseCfg($("#cfgtxt").value); if (!c) return amsg("Tidak jumpa apiKey, projectId dan appId. Tampal keseluruhan blok firebaseConfig."); try { localStorage.setItem("mdc_cfg", JSON.stringify(c)); } catch (e) { return amsg("Pelayar menghalang penyimpanan. Isi pemalar CONFIG dalam fail ini."); } location.reload(); },
+  resetcfg() { try { localStorage.removeItem("mdc_cfg"); } catch (e) {} location.reload(); },
+  async dologin() { amsg(""); try { await fb.A.signInWithEmailAndPassword(auth, $("#le").value.trim(), $("#lp").value); } catch (e) { amsg(authErr(e)); } },
+  async dogoogle() { amsg(""); try { await fb.A.signInWithPopup(auth, new fb.A.GoogleAuthProvider()); } catch (e) { amsg(authErr(e)); } },
+  async doreset() { const em = $("#le").value.trim(); if (!em) return amsg("Masukkan e-mel dahulu."); try { await fb.A.sendPasswordResetEmail(auth, em); amsg("Pautan tetap semula kata laluan telah dihantar.", true); } catch (e) { amsg(authErr(e)); } },
   navopen() { S.nav = true; render(); }, navclose() { S.nav = false; render(); },
   logout() { if (PREVIEW) return previewBlock().catch(() => {}); fb.A.signOut(auth); },
   recheck: async () => { await readClaims(true); subscribeAll(); render(); },
@@ -503,7 +538,7 @@ document.addEventListener("change", (e) => {
 document.addEventListener("input", (e) => { if (e.target.id === "q") { S.q = e.target.value; S.pg = 0; render(); } });
 
 setPage();
-boot().catch((e) => { $("#root").innerHTML = `<div class="loading" role="alert">Gagal memulakan: ${esc(errMsg(e))}</div>`; });
+boot().catch((e) => { $("#root").innerHTML = `<div class="loading" role="alert">Gagal memulakan: ${esc(errMsg(e))}<br><br><button class="btn" onclick="try{localStorage.removeItem(\'mdc_cfg\')}catch(e){};location.reload()">Tetapkan semula tetapan Firebase</button></div>`; });
 </script>
 </body>
 </html>

@@ -102,6 +102,9 @@ const PROVIDERS = [
   { label: "Log masuk dengan Google", make: (m) => new m.GoogleAuthProvider() }
 ];
 const SDK = "https://www.gstatic.com/firebasejs/11.0.2/";
+// Alamat halaman admin. Kosong = automatik ("admin.html" jika laman berakhir .html / fail setempat, selain itu "admin").
+// Di Interactive Link, isi mengikut Page Path yang anda pilih, contoh: "/admin".
+const ADMIN_URL = "";
 /* =================================================== */
 
 const $ = (id) => document.getElementById(id);
@@ -147,7 +150,11 @@ if (cfg) {
   const [{ initializeApp }, A] = await Promise.all([import(SDK + "firebase-app.js"), import(SDK + "firebase-auth.js")]);
   const app = initializeApp(cfg);
   const auth = A.getAuth(app);
-  const goAdmin = () => { location.href = "admin.html"; };
+  const adminUrl = () => ADMIN_URL || (/\.html?$/.test(location.pathname) || location.protocol === "file:" ? "admin.html" : "admin");
+  const goAdmin = () => {
+    try { location.href = adminUrl(); }
+    catch (e) { $("msg").innerHTML = 'Log masuk berjaya. <a href="' + adminUrl() + '">Buka admin panel</a>'; }
+  };
   A.onAuthStateChanged(auth, (u) => { if (u) goAdmin(); });
 
   $("form").onsubmit = async (e) => {
