@@ -26,8 +26,6 @@ service cloud.firestore {
     function isThisDevice(deviceId) {
       return isDevice() && request.auth.uid == deviceId && exists(/databases/$(database)/documents/devices/$(deviceId));
     }
-    // Peranti yang telah berdaftar (rekod devices/{uid} wujud): boleh membaca polisi
-    function isRegDevice() { return isDevice() && exists(/databases/$(database)/documents/devices/$(request.auth.uid)); }
     function onlyChanges(keys) { return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys); }
     function enroll(code) { return /databases/$(database)/documents/enrollments/$(code); }
 
@@ -54,7 +52,7 @@ service cloud.firestore {
           && request.resource.data.deviceName is string
           && request.resource.data.deviceName.size() > 0 && request.resource.data.deviceName.size() <= 80
         || isThisDevice(deviceId)
-          && onlyChanges(['status', 'isLocked', 'batteryLevel', 'osVersion', 'appVersion', 'fcmToken', 'lastSeen', 'updatedAt', 'policyStatus'])
+          && onlyChanges(['status', 'isLocked', 'batteryLevel', 'osVersion', 'appVersion', 'fcmToken', 'lastSeen', 'updatedAt'])
           && request.resource.data.status in ['ONLINE', 'LOCKED', 'ERROR']
           && (!('batteryLevel' in request.resource.data) || request.resource.data.batteryLevel == null
               || (request.resource.data.batteryLevel is number && request.resource.data.batteryLevel >= 0 && request.resource.data.batteryLevel <= 100));
@@ -136,34 +134,13 @@ service cloud.firestore {
     }
 
     // ---------- Polisi (Fasa 2/3) ----------
-    // Polisi aplikasi: ALLOW / BLOCK / REQUIRE_APPROVAL; groupId kosong = semua peranti
-    function validApp() {
-      return request.resource.data.keys().hasOnly(['packageName', 'label', 'policy', 'groupId', 'createdAt', 'updatedAt', 'createdBy'])
-        && request.resource.data.packageName is string && request.resource.data.packageName.size() <= 200
-        && request.resource.data.packageName.matches('^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z0-9_]+)+$')
-        && request.resource.data.label is string && request.resource.data.label.size() <= 80
-        && request.resource.data.policy in ['ALLOW', 'BLOCK', 'REQUIRE_APPROVAL'];
-    }
     match /applications/{appId} {
-      allow read: if isAdmin() || isRegDevice();
-      allow create, update: if isAdmin() && validApp();
-      allow delete: if isAdmin();
-    }
-
-    // Peraturan tapisan web: DOMAIN (domain tunggal) atau CATEGORY (kategori + senarai domain); groupId kosong = semua
-    function validRule() {
-      return request.resource.data.keys().hasOnly(['type', 'action', 'value', 'domains', 'groupId', 'createdAt', 'updatedAt', 'createdBy'])
-        && request.resource.data.action in ['BLOCK', 'ALLOW']
-        && request.resource.data.value is string && request.resource.data.value.size() >= 1 && request.resource.data.value.size() <= 120
-        && (request.resource.data.type == 'DOMAIN' && request.resource.data.value.matches('^([a-z0-9]([a-z0-9-]*[a-z0-9])?\\.)+[a-z]{2,}$')
-            || request.resource.data.type == 'CATEGORY'
-               && request.resource.data.value in ['ADULT', 'GAMBLING', 'VIOLENCE', 'SOCIAL_MEDIA', 'GAMES', 'EDUCATIONAL', 'SEARCH_ENGINES']
-               && request.resource.data.domains is list && request.resource.data.domains.size() <= 200);
+      allow read: if isAdmin() || isDevice();
+      allow create, update, delete: if isAdmin();
     }
     match /webFilteringRules/{ruleId} {
-      allow read: if isAdmin() || isRegDevice();
-      allow create, update: if isAdmin() && validRule();
-      allow delete: if isAdmin();
+      allow read: if isAdmin() || isDevice();
+      allow create, update, delete: if isAdmin();
     }
 
     // ---------- Log aktiviti (tambah sahaja, tidak boleh diubah/dipadam) ----------
@@ -180,10 +157,8 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
-    // settings/policy (sekat pemasangan, mod allowlist, DNS peribadi...) boleh dibaca peranti berdaftar
     match /settings/{settingId} {
       allow read, write: if isAdmin();
-      allow get: if settingId == 'policy' && isRegDevice();
     }
 
     match /{document=**} { allow read, write: if false; }
