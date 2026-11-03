@@ -3,17 +3,15 @@
     ".read": false,
     ".write": false,
     "presence": {
-      "$orgId": {
-        ".read": "auth != null && (auth.token.orgId === $orgId || auth.token.role === 'SUPER_ADMIN')",
-        "$deviceId": {
-          ".write": "auth != null && auth.token.role === 'DEVICE' && auth.token.orgId === $orgId && auth.token.deviceId === $deviceId",
-          ".validate": "newData.hasChildren(['status', 'lastSeen'])",
-          "status": { ".validate": "newData.isString() && (newData.val() === 'ONLINE' || newData.val() === 'LOCKED' || newData.val() === 'ERROR')" },
-          "batteryLevel": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100" },
-          "lastSeen": { ".validate": "newData.val() === now" },
-          "appVersion": { ".validate": "newData.isString() && newData.val().length <= 32" },
-          "$other": { ".validate": false }
-        }
+      "$deviceId": {
+        ".read": "auth != null && auth.provider !== 'anonymous'",
+        ".write": "auth != null && auth.provider === 'anonymous' && auth.uid === $deviceId",
+        ".validate": "newData.hasChildren(['status', 'lastSeen'])",
+        "status": { ".validate": "newData.isString() && (newData.val() === 'ONLINE' || newData.val() === 'LOCKED' || newData.val() === 'ERROR')" },
+        "batteryLevel": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100" },
+        "lastSeen": { ".validate": "newData.val() === now" },
+        "appVersion": { ".validate": "newData.isString() && newData.val().length <= 32" },
+        "$other": { ".validate": false }
       }
     }
   }

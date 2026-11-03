@@ -1,3 +1,2 @@
-# Enrollment Windows — Fasa 5
-
-Belum dibina. Pendekatan sah: agent berkhidmat Windows (berhak istimewa, dipasang oleh admin) yang menggunakan aliran enrollment/heartbeat/command yang sama (`registerDevice`, RTDB presence, `fetchPendingCommands`, `ackCommand`), atau Windows MDM (Intune/OMA-DM). Lock skrin: `LockWorkStation`. Tiada remote shell tersembunyi; pantauan mesti dimaklumkan kepada pengguna.
+# Windows (Fasa 5, belum dibina)
+Agent berkhidmat Windows yang menggunakan aliran enrollment/heartbeat/arahan yang sama seperti Android. Lock skrin: `LockWorkStation`. Tiada remote shell tersembunyi.

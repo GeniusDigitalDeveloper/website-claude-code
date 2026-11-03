@@ -150,7 +150,7 @@ const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 const ms = (t) => (t && (t.toMillis ? t.toMillis() : t.seconds ? t.seconds * 1000 : +t)) || 0;
 const fmt = (t) => ms(t) ? new Date(ms(t)).toLocaleString("ms-MY", { dateStyle: "medium", timeStyle: "short" }) : "—";
 const ago = (t) => { if (!ms(t)) return "—"; const s = Math.max(0, (Date.now() - ms(t)) / 1000); return s < 60 ? "baru sahaja" : s < 3600 ? Math.floor(s / 60) + " min lalu" : s < 86400 ? Math.floor(s / 3600) + " jam lalu" : Math.floor(s / 86400) + " hari lalu"; };
-const ROLE = { SUPER_ADMIN: "Super Admin", ORG_ADMIN: "Org Admin", DEVICE_MANAGER: "Device Manager", VIEWER: "Viewer" };
+const ROLE = { ADMIN: "Admin" };
 const RANK = { SUPER_ADMIN: 4, ORG_ADMIN: 3, DEVICE_MANAGER: 2, VIEWER: 1 };
 const ICON = {
   dash: '<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>',
@@ -178,79 +178,57 @@ const toast = (text, err) => { const d = document.createElement("div"); d.classN
 const errMsg = (e) => ((e && e.message) || "Ralat").replace(/^.*?:\s*/, "");
 
 /* ---------- Keadaan & data ---------- */
-const S = { user: null, claims: {}, devices: [], groups: [], commands: [], logs: [], users: [], invites: [],
+const S = { user: null, claims: {}, devices: [], groups: [], commands: [], logs: [], 
   loaded: {}, errors: {}, page: "dashboard", q: "", fs: "", ft: "", pg: 0, sel: new Set(), nav: false };
-const can = (min) => (RANK[S.claims.role] || 0) >= RANK[min];
+const can = () => true;   // semua akaun Authentication ialah admin (alat dalaman)
 let fb = null; // modul Firebase
 let raf = 0;
 const render = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); };
 
 const previewBlock = () => { toast("Preview: tiada sambungan Firebase. Muat naik fail dan sambungkan untuk guna sebenar.", true); return Promise.reject(new Error("preview")); };
 function loadPreview() {
-  S.user = { email: "preview", uid: "preview" }; S.claims = { orgId: "preview", role: "ORG_ADMIN" };
-  ["devices", "groups", "commands", "logs", "users"].forEach((k) => (S.loaded[k] = true));
+  S.user = { email: "preview", uid: "preview" }; S.claims = { role: "ADMIN" };
+  ["devices", "groups", "commands", "logs"].forEach((k) => (S.loaded[k] = true));
 }
 
 /* ---------- Firebase ---------- */
 const getCfg = () => CONFIG;
-let call = previewBlock, fsdb = null, auth = null;
+let fsdb = null, auth = null;
+const OFFLINE_MS = 10 * 60 * 1000;
+// Status berkesan: tiada heartbeat > 10 minit = OFFLINE (dikira di panel, tiada Cloud Functions)
+function effStatus(d) { const raw = d._raw || d.status; return ["ONLINE", "LOCKED", "ERROR"].includes(raw) && ms(d.lastSeen) && Date.now() - ms(d.lastSeen) > OFFLINE_MS ? "OFFLINE" : raw; }
+function applyStatus(list) { list.forEach((d) => { if (d._raw === undefined) d._raw = d.status; d.status = effStatus(d); }); }
+function applyCmdStatus(list) { list.forEach((c) => { if (c._raw === undefined) c._raw = c.status; c.status = ["PENDING", "SENT"].includes(c._raw) && ms(c.expiresAt) && ms(c.expiresAt) < Date.now() ? "EXPIRED" : c._raw; }); }
+
 async function boot() {
   if (PREVIEW) { loadPreview(); render(); return; }
-  const cfg = getCfg();
-  const [{ initializeApp }, A, F, FN] = await Promise.all(["app", "auth", "firestore", "functions"].map((m) => import(`${SDK}firebase-${m}.js`)));
+  const [{ initializeApp }, A, F] = await Promise.all(["app", "auth", "firestore"].map((m) => import(`${SDK}firebase-${m}.js`)));
   fb = { A, F };
-  const app = initializeApp(cfg);
+  const app = initializeApp(CONFIG);
   auth = A.getAuth(app); fsdb = F.getFirestore(app);
-  const fns = FN.getFunctions(app, REGION);
-  call = (name, data) => FN.httpsCallable(fns, name)(data).then((r) => r.data);
-  A.onAuthStateChanged(auth, async (u) => {
-    if (!u) { S.user = null; S.claims = {}; subscribedOrg = null; unsubs.forEach((f) => f()); unsubs = []; S.screen = "login"; render(); return; }
-    S.screen = null; S.user = u; await readClaims(false); subscribeAll(); render();
+  A.onAuthStateChanged(auth, (u) => {
+    if (!u || u.isAnonymous) { S.user = null; unsubs.forEach((f) => f()); unsubs = []; subscribed = false; S.screen = "login"; render(); return; }
+    S.screen = null; S.user = u; S.claims = { role: "ADMIN" }; subscribeAll(); render();   // terus masuk dashboard
   });
-  A.onIdTokenChanged(auth, async (u) => { if (u) { await readClaims(false); render(); } });
-}
-async function readClaims(force) {
-  const u = auth.currentUser, r = await u.getIdTokenResult(force);
-  if (r.claims.orgId && r.claims.role) { S.claims = { orgId: r.claims.orgId, role: r.claims.role }; return; }
-  const F = fb.F;
-  S.claims = { orgId: null, role: null };
-  try {
-    const m = await F.getDoc(F.doc(fsdb, "members", u.uid));
-    if (m.exists()) { S.claims = { orgId: m.data().orgId, role: m.data().role }; return; }
-    const em = (u.email || "").toLowerCase();
-    if (em && u.emailVerified) {   // dijemput oleh admin? sambung secara automatik
-      const inv = await F.getDoc(F.doc(fsdb, "invites", em)).catch(() => null);
-      if (inv && inv.exists()) {
-        const d = inv.data(), bt = F.writeBatch(fsdb);
-        bt.set(F.doc(fsdb, "members", u.uid), { orgId: d.orgId, role: d.role, email: em, displayName: u.displayName || null, createdAt: F.serverTimestamp() });
-        bt.delete(inv.ref); await bt.commit();
-        S.claims = { orgId: d.orgId, role: d.role };
-      }
-    }
-  } catch (e) { S.claimErr = e.message; }
+  setInterval(() => { applyStatus(S.devices); applyCmdStatus(S.commands); render(); }, 60000);
 }
 
-let unsubs = [], subscribedOrg = null;
+let unsubs = [], subscribed = false;
 function subscribeAll() {
-  if (!S.claims.orgId || subscribedOrg === S.claims.orgId) return;
-  unsubs.forEach((u) => u()); unsubs = []; subscribedOrg = S.claims.orgId;
+  if (subscribed) return; subscribed = true;
   const { collection, onSnapshot, query, orderBy, limit } = fb.F;
-  const sub = (key, name, order, max) => {
-    const q = query(collection(fsdb, "organizations", S.claims.orgId, name), ...(order ? [orderBy(order, "desc")] : []), limit(max));
-    unsubs.push(onSnapshot(q, (s) => { S[key] = s.docs.map((d) => ({ id: d.id, ...d.data() })); S.loaded[key] = true; delete S.errors[key]; render(); },
+  const sub = (key, name, order, max, post) => {
+    const q = query(collection(fsdb, name), ...(order ? [orderBy(order, "desc")] : []), limit(max));
+    unsubs.push(onSnapshot(q, (s) => { S[key] = s.docs.map((d) => ({ id: d.id, ...d.data() })); if (post) post(S[key]); S.loaded[key] = true; delete S.errors[key]; render(); },
       (e) => { S.errors[key] = e.message; S.loaded[key] = true; render(); }));
   };
-  sub("devices", "devices", "createdAt", 500); sub("groups", "deviceGroups", null, 200);
-  sub("commands", "commands", "createdAt", 300); sub("logs", "activityLogs", "createdAt", 300);
-  const { where } = fb.F;
-  const top = (key, name, map) => unsubs.push(onSnapshot(query(collection(fsdb, name), where("orgId", "==", S.claims.orgId)),
-    (s) => { S[key] = s.docs.map((d) => ({ id: d.id, uid: d.id, ...d.data() })); S.loaded[key] = true; delete S.errors[key]; render(); },
-    (e) => { S.errors[key] = e.message; S.loaded[key] = true; render(); }));
-  if (can("DEVICE_MANAGER")) top("users", "members"); else S.loaded.users = true;
-  if (can("ORG_ADMIN")) top("invites", "invites"); else S.loaded.invites = true;
+  sub("devices", "devices", "createdAt", 500, applyStatus); sub("groups", "deviceGroups", null, 200);
+  sub("commands", "commands", "createdAt", 300, applyCmdStatus); sub("logs", "activityLogs", "createdAt", 300);
 }
 async function fsWrite(fn) { if (PREVIEW) return previewBlock(); return fn(fb.F); }
-const ref = (...p) => fb.F.doc(fsdb, "organizations", S.claims.orgId, ...p);
+const ref = (...p) => fb.F.doc(fsdb, ...p);
+const logEv = (F, bt, type, message, deviceId = null) => bt.set(F.doc(F.collection(fsdb, "activityLogs")), { type, message, actorId: S.user.uid, deviceId, createdAt: F.serverTimestamp() });
+const randToken = () => { const a = new Uint8Array(24); crypto.getRandomValues(a); return btoa(String.fromCharCode(...a)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); };
 
 /* ---------- Navigasi ---------- */
 const NAV = [["dashboard", "Dashboard", "dash"], ["devices", "All Devices", "dev"], ["groups", "Device Groups", "grp"], ["apps", "App Management", "app"],
@@ -361,29 +339,14 @@ function pageLogs() {
   return head("Activity Logs", "Audit tindakan pengurusan dan peristiwa peranti (hanya server boleh menulis)") + `<div class="card" style="padding:0">${state("logs", () => !S.logs.length ? empty("Belum ada aktiviti") : `<ol class="tl">${S.logs.map((l) => `<li><time>${fmt(l.createdAt)}</time><code>${esc(l.type)}</code><span>${esc(l.message)}</span></li>`).join("")}</ol>`)}</div>`;
 }
 function pageUsers() {
-  const ad = can("ORG_ADMIN");
-  const sel = (u) => !ad || u.uid === (S.user && S.user.uid) || (u.role === "SUPER_ADMIN" && S.claims.role !== "SUPER_ADMIN") ? esc(ROLE[u.role] || u.role)
-    : `<select data-role="${esc(u.uid)}" aria-label="Peranan ${esc(u.email)}" style="width:auto">${grantRoles().map((r) => `<option value="${r}" ${r === u.role ? "selected" : ""}>${ROLE[r]}</option>`).join("")}</select>`;
-  return head("Users & Roles", "Mana-mana akaun Firebase Auth (e-mel, Google, dll.) boleh dihubungkan melalui jemputan e-mel", ad ? `<button class="btn p" data-act="uadd">${ic("plus", 16)}Tambah pengguna</button>` : "") +
-    `<div class="card tw">${state("users", () => !S.users.length ? empty("Tiada pengguna") : `<table style="min-width:560px"><thead><tr><th>Pengguna</th><th>Peranan</th><th></th></tr></thead><tbody>${S.users.map((u) => `<tr><td><b>${esc(u.displayName || u.email)}</b><div class="sm">${esc(u.email)}</div></td><td>${sel(u)}</td><td>${ad && u.uid !== (S.user && S.user.uid) && (u.role !== "SUPER_ADMIN" || S.claims.role === "SUPER_ADMIN") ? `<button class="btn i" data-act="urm" data-id="${esc(u.uid)}" aria-label="Buang ${esc(u.email)}">${ic("trash", 16, "#DC2626")}</button>` : ""}</td></tr>`).join("")}</tbody></table>`)}</div>
-    ${ad && S.invites.length ? `<div class="card tw" style="margin-top:12px"><div style="padding:16px 16px 0"><b>Jemputan menunggu</b><p class="sm" style="margin:2px 0 0">Pengguna disambungkan automatik selepas log masuk dengan e-mel ini (e-mel mesti disahkan; akaun Google sentiasa disahkan).</p></div><table style="min-width:420px"><thead><tr><th>E-mel</th><th>Peranan</th><th></th></tr></thead><tbody>${S.invites.map((v) => `<tr><td>${esc(v.id)}</td><td>${esc(ROLE[v.role] || v.role)}</td><td><button class="btn i" data-act="invdel" data-id="${esc(v.id)}" aria-label="Batal jemputan ${esc(v.id)}">${ic("x", 16)}</button></td></tr>`).join("")}</tbody></table></div>` : ""}
-    <div class="card" style="margin-top:12px"><b>Peranan</b><ul class="sm" style="font-size:14px"><li><b>Super Admin</b>: urus organisasi &amp; semua konfigurasi.</li><li><b>Org Admin</b>: urus semua peranti, kumpulan, polisi &amp; pengguna.</li><li><b>Device Manager</b>: daftar peranti, hantar arahan, sunting peranti.</li><li><b>Viewer</b>: lihat sahaja.</li></ul></div>`;
+  const me = S.user || {};
+  return head("Users & Roles", "Akaun admin diurus dalam Firebase Authentication") + `<div class="card"><b>Akaun anda</b>
+    <p style="margin:6px 0 0">${esc(me.email || me.uid || "—")}</p><p class="sm">Mana-mana akaun e-mel/kata laluan (atau Google) yang ada dalam Firebase Authentication terus boleh log masuk dan menguruskan semua peranti. Tiada pendaftaran organisasi atau pengesahan e-mel.</p></div>
+    <div class="card" style="margin-top:12px"><b>Tambah atau buang admin</b><ol class="sm" style="font-size:14px;line-height:1.7"><li>Buka Firebase Console → projek <b>my-devide-control</b> → Authentication → Users.</li><li><b>Add user</b> (e-mel + kata laluan) untuk tambah admin baharu. Pilih akaun → <b>Delete</b> untuk buang akses.</li><li>Pastikan Authentication → Settings → User actions: <b>Enable create (sign-up)</b> dimatikan supaya orang luar tidak boleh mendaftar sendiri.</li></ol></div>`;
 }
-const grantRoles = () => ["VIEWER", "DEVICE_MANAGER", "ORG_ADMIN"].concat(S.claims.role === "SUPER_ADMIN" ? ["SUPER_ADMIN"] : []);
 function pageSettings() {
-  const c = getCfg() || CONFIG, rows = [["Projek Firebase", c.projectId || "—"], ["Organisasi (orgId)", S.claims.orgId || "—"], ["Peranan anda", ROLE[S.claims.role] || "—"], ["Akaun", (S.user && (S.user.email || S.user.uid)) || "—"], ["Tempoh OFFLINE", "10 minit tanpa heartbeat"], ["Tamat arahan", "24 jam"]];
-  return head("Settings", "Maklumat sambungan dan polisi sistem (baca sahaja dalam Fasa 1)") + `<dl class="card grid g2" style="margin:0">${rows.map(([k, v]) => `<div><dt class="sm" style="text-transform:uppercase;font-weight:700">${k}</dt><dd style="margin:0;font-weight:700;word-break:break-all">${esc(v)}</dd></div>`).join("")}</dl>`;
-}
-
-function pageOnboarding() {
-  const u = S.user, ver = u.emailVerified !== false;
-  return `<div style="max-width:540px;margin:48px auto;padding:16px"><div class="card"><h1 style="font-size:20px">Paparan Pengguna</h1>
-  <p class="sm" style="font-size:14px;margin:2px 0 10px">Log masuk sebagai <b>${esc(u.email || u.uid)}</b>. Akaun ini belum dikaitkan dengan organisasi.</p>
-  <ul class="sm" style="font-size:14px;margin:0 0 12px"><li>Jika anda <b>dijemput</b> oleh admin, log masuk dengan e-mel yang dijemput dan tekan "Semak semula".</li><li>Jika anda <b>pentadbir pertama</b>, cipta organisasi di bawah (hanya e-mel pentadbir yang dibenarkan dalam rules).</li></ul>
-  ${ver ? "" : `<div class="notice" style="background:#fffbeb;border-color:#fcd34d;color:#78350f">E-mel anda belum disahkan. Sahkan dahulu (atau log masuk dengan Google). <button class="btn" data-act="sendverify" style="margin-top:6px">Hantar e-mel pengesahan</button></div>`}
-  ${S.claimErr ? `<p class="sm" style="color:#DC2626">${esc(S.claimErr)}</p>` : ""}
-  <label class="f">Nama organisasi<input id="orgname" placeholder="cth. Sekolah Asrama ..."></label>
-  <div class="row" style="margin-top:14px"><button class="btn p" data-act="bootstrap">Cipta organisasi</button><button class="btn" data-act="recheck">Semak semula</button><button class="btn" data-act="logout">Log keluar</button></div></div></div>`;
+  const rows = [["Projek Firebase", CONFIG.projectId], ["Akaun", (S.user && (S.user.email || S.user.uid)) || "—"], ["Tempoh OFFLINE", "10 minit tanpa heartbeat"], ["Tamat arahan", "24 jam"]];
+  return head("Settings", "Maklumat sambungan dan polisi sistem") + `<dl class="card grid g2" style="margin:0">${rows.map(([k, v]) => `<div><dt class="sm" style="text-transform:uppercase;font-weight:700">${k}</dt><dd style="margin:0;font-weight:700;word-break:break-all">${esc(v)}</dd></div>`).join("")}</dl>`;
 }
 
 /* ---------- Skrin sambung Firebase & log masuk (admin.html berdiri sendiri) ---------- */
@@ -413,7 +376,7 @@ let shellBuilt = false, indReady = false;
 function buildShell() {
   $("#root").innerHTML = `<div class="app shellin"><aside id="side" aria-label="Navigasi utama"><div class="brand"><i>${ic("shield", 20, "#fff")}</i><span>MY DEVICE<br>CONTROL</span></div>
     <nav id="nav"><i class="ind" id="ind"></i>${NAV.map(([id, l, i]) => `<a href="#${id}" data-nav="${id}">${ic(i, 18)}${l}</a>`).join("")}</nav>
-    <div class="me"><b>${esc(S.user.email || S.user.uid)}</b><span class="sm">${ROLE[S.claims.role]}</span><button class="btn" style="width:100%;margin-top:8px" data-act="logout">${ic("out", 16)}Log keluar</button></div></aside>
+    <div class="me"><b>${esc(S.user.email || S.user.uid)}</b><span class="sm">Admin</span><button class="btn" style="width:100%;margin-top:8px" data-act="logout">${ic("out", 16)}Log keluar</button></div></aside>
     <div id="scrimbox"></div>
     <div><div class="top"><button class="btn i" data-act="navopen" aria-label="Buka menu">${ic("menu", 20)}</button>MY DEVICE CONTROL</div>
     <main id="main"><div id="content"></div></main></div></div>`;
@@ -450,7 +413,6 @@ function draw() {
   const root = $("#root");
   if (S.screen) { shellBuilt = false; root.innerHTML = authScreen(); const lf = $("#lf"); if (lf) lf.onsubmit = (e) => { e.preventDefault(); ACTIONS.dologin(); }; return; }
   if (!S.user || S.leaving) return;
-  if (!S.claims.orgId || !S.claims.role) { shellBuilt = false; root.innerHTML = pageOnboarding(); return; }
   if (!shellBuilt || !$("#content")) buildShell();
   updateNav();
   const c = $("#content"), ae = document.activeElement, focus = ae && ae.id, pos = ae && ae.selectionStart;
@@ -461,8 +423,29 @@ function draw() {
 }
 
 /* ---------- Tindakan ---------- */
-const send = async (data, okText) => { const r = await call("createCommand", data); toast(`${r ? r.count : 0} arahan ${data.commandType} dimasukkan ke queue (PENDING). Status dikemas kini bila peranti mengesahkan.`); S.sel = new Set(); render(); return r; };
+// Hantar arahan: satu dokumen PENDING setiap peranti (rules mengesahkan jenis, tamat dalam 24 jam, peranti wujud)
+const send = async (data) => {
+  const ids = data.all ? S.devices.map((d) => d.id) : data.groupId ? S.devices.filter((d) => d.groupId === data.groupId).map((d) => d.id) : data.deviceIds;
+  if (!ids.length) { toast("Tiada peranti sasaran.", true); return; }
+  await fsWrite(async (F) => {
+    for (let i = 0; i < ids.length; i += 200) {
+      const bt = F.writeBatch(fsdb);
+      ids.slice(i, i + 200).forEach((id) => { const r = F.doc(F.collection(fsdb, "commands")); bt.set(r, { commandId: r.id, deviceId: id, commandType: data.commandType, status: "PENDING", createdBy: S.user.uid, createdAt: F.serverTimestamp(), expiresAt: F.Timestamp.fromMillis(Date.now() + 23.5 * 3600e3), sentAt: null, executedAt: null, errorMessage: null }); });
+      if (i + 200 >= ids.length) logEv(F, bt, "COMMAND_CREATED", `${data.commandType} → ${ids.length} peranti`);
+      await bt.commit();
+    }
+  });
+  toast(`${ids.length} arahan ${data.commandType} dimasukkan ke queue (PENDING). Status dikemas kini bila peranti mengesahkan.`); S.sel = new Set(); render();
+};
 const QUEUE_NOTE = "Arahan dimasukkan ke queue dengan status <b>PENDING</b> dan tamat dalam 24 jam. Peranti offline menerimanya apabila kembali online. <b>EXECUTED</b> hanya dipaparkan selepas peranti mengesahkan.";
+async function mkEnroll(d) {
+  return fsWrite(async (F) => {
+    const token = randToken(), bt = F.writeBatch(fsdb);
+    bt.set(F.doc(fsdb, "enrollments", token), { deviceName: d.deviceName, deviceType: d.deviceType, groupId: d.groupId, assignedUserId: null, status: "PENDING", createdBy: S.user.uid, createdAt: F.serverTimestamp(), expiresAt: F.Timestamp.fromMillis(Date.now() + 47 * 3600e3) });
+    logEv(F, bt, "ENROLLMENT_CREATED", `Enrollment ${d.deviceType} "${d.deviceName}"`); await bt.commit();
+    return { token, qrPayload: JSON.stringify({ v: 1, projectId: CONFIG.projectId, code: token }) };
+  });
+}
 const byId = (id) => S.devices.find((d) => d.id === id);
 
 const ACTIONS = {
@@ -477,26 +460,14 @@ const ACTIONS = {
   async doreset() { const em = $("#le").value.trim(); if (!em) return amsg("Masukkan e-mel dahulu."); try { await fb.A.sendPasswordResetEmail(auth, em); amsg("Pautan tetap semula kata laluan telah dihantar.", true); } catch (e) { amsg(authErr(e)); } },
   navopen() { S.nav = true; render(); }, navclose() { S.nav = false; render(); },
   logout() { if (PREVIEW) return previewBlock().catch(() => {}); fb.A.signOut(auth); },
-  recheck: async () => { try { await auth.currentUser.reload(); S.user = auth.currentUser; } catch (e) {} S.claimErr = null; await readClaims(true); subscribeAll(); render(); },
-  async sendverify() { try { await fb.A.sendEmailVerification(auth.currentUser); toast("E-mel pengesahan dihantar. Klik pautan, kemudian tekan Semak semula."); } catch (e) { toast(authErr(e), true); } },
-  bootstrap: async () => {
-    const name = ($("#orgname").value || "").trim(); if (name.length < 2) return toast("Masukkan nama organisasi.", true);
-    try {
-      await fsWrite(async (F) => {
-        await auth.currentUser.reload(); await auth.currentUser.getIdToken(true);
-        const uid = S.user.uid, oref = F.doc(F.collection(fsdb, "organizations")), bt = F.writeBatch(fsdb);
-        bt.set(oref, { name, ownerUid: uid, createdAt: F.serverTimestamp() });
-        bt.set(F.doc(fsdb, "members", uid), { orgId: oref.id, role: "SUPER_ADMIN", email: (S.user.email || "").toLowerCase(), displayName: S.user.displayName || null, createdAt: F.serverTimestamp() });
-        await bt.commit();
-      });
-      await readClaims(true); subscribeAll(); render(); toast("Organisasi dicipta. Anda kini Super Admin.");
-    } catch (e) { if (e.message !== "preview") toast(/permission|insufficient/i.test(e.message) ? "Ditolak: e-mel ini tiada dalam senarai pentadbir (firestore.rules), e-mel belum disahkan, atau organisasi sudah wujud." : errMsg(e), true); }
-  },
   prev() { S.pg--; render(); }, next() { S.pg++; render(); },
   "lock-sel"() { confirmBox({ title: `LOCK ${S.sel.size} peranti`, body: QUEUE_NOTE, label: "Lock", danger: true, run: () => send({ commandType: "LOCK", deviceIds: [...S.sel] }) }); },
   "unlock-sel"() { confirmBox({ title: `UNLOCK ${S.sel.size} peranti`, body: QUEUE_NOTE, label: "Unlock", run: () => send({ commandType: "UNLOCK", deviceIds: [...S.sel] }) }); },
   lockall() { confirmBox({ title: "LOCK ALL DEVICES", body: QUEUE_NOTE, label: "Lock semua", danger: true, requireText: "LOCK ALL", run: () => send({ commandType: "LOCK", all: true }) }); },
-  remove(el) { const d = byId(el.dataset.id); confirmBox({ title: "Nyahdaftar peranti", body: `Peranti <b>${esc(d.deviceName)}</b> akan dibuang dan arahan tertunggak dibatalkan.`, label: "Nyahdaftar", danger: true, requireText: d.deviceName, run: async () => { await call("removeDevice", { deviceId: d.id }); toast("Peranti dinyahdaftar."); } }); },
+  remove(el) { const d = byId(el.dataset.id); confirmBox({ title: "Nyahdaftar peranti", body: `Peranti <b>${esc(d.deviceName)}</b> akan dibuang dan arahan tertunggak dibatalkan.`, label: "Nyahdaftar", danger: true, requireText: d.deviceName,
+    run: () => fsWrite(async (F) => { const bt = F.writeBatch(fsdb);
+      S.commands.filter((c) => c.deviceId === d.id && ["PENDING", "SENT"].includes(c._raw || c.status)).forEach((c) => bt.update(ref("commands", c.id), { status: "EXPIRED", errorMessage: "Peranti dinyahdaftar" }));
+      bt.delete(ref("devices", d.id)); logEv(F, bt, "DEVICE_REMOVED", `Peranti "${d.deviceName}" dinyahdaftar`, d.id); await bt.commit(); toast("Peranti dinyahdaftar."); }) }); },
   edit(el) {
     const d = byId(el.dataset.id);
     openModal(`<h2>Sunting peranti</h2><label class="f">Nama<input id="en" maxlength="80" value="${esc(d.deviceName)}"></label><label class="f">Pengguna ditetapkan<input id="eu" value="${esc(d.assignedUserId || "")}"></label>
@@ -513,7 +484,7 @@ const ACTIONS = {
       m.querySelector("#ok").onclick = async () => {
         const name = m.querySelector("#en").value.trim(); if (!name) return toast("Masukkan nama peranti.", true);
         try {
-          const r = await call("createEnrollment", { deviceType: m.querySelector("#et").value, deviceName: name, groupId: m.querySelector("#eg").value || undefined });
+          const r = await mkEnroll({ deviceType: m.querySelector("#et").value, deviceName: name, groupId: m.querySelector("#eg").value || null });
           let qr = ""; try { await loadQR(); const q = window.qrcode(0, "M"); q.addData(r.qrPayload); q.make(); qr = q.createSvgTag({ cellSize: 4, margin: 2, scalable: true }); } catch (e) { qr = '<p class="sm">Kod QR tidak dapat dijana (pustaka tidak dimuat). Gunakan token di bawah.</p>'; }
           m.querySelector("#ebody").innerHTML = `<div style="width:230px;margin:0 auto" role="img" aria-label="Kod QR enrollment">${qr}</div><p class="sm" style="font-size:14px">Imbas kod QR dari agent peranti, atau salin token. <b>Token dipaparkan sekali sahaja</b>, sah 24 jam, sekali guna.</p>
             <div class="row" style="flex-wrap:nowrap"><input readonly id="tk" aria-label="Token enrollment" class="mono" value="${esc(r.token)}"><button class="btn i" id="cp" aria-label="Salin token">${ic("copy", 16)}</button></div>
@@ -530,19 +501,6 @@ const ACTIONS = {
       run: () => fsWrite(async (F) => { await Promise.all(n.map((d) => F.updateDoc(ref("devices", d.id), { groupId: null, updatedAt: F.serverTimestamp() }))); await F.deleteDoc(ref("deviceGroups", g.id)); toast("Kumpulan dipadam."); }) });
   },
   glock(el) { groupCmd(el.dataset.id, "LOCK"); }, gunlock(el) { groupCmd(el.dataset.id, "UNLOCK"); },
-  uadd() {
-    openModal(`<h2>Tambah pengguna</h2><p class="sm" style="font-size:14px">Masukkan e-mel akaun (apa-apa penyedia log masuk). Mereka akan disambungkan automatik bila log masuk dengan e-mel itu.</p>
-      <label class="f">E-mel<input id="ue" type="email"></label><label class="f">Peranan<select id="ur">${grantRoles().map((r) => `<option value="${r}">${ROLE[r]}</option>`).join("")}</select></label>
-      <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn" data-close>Batal</button><button class="btn p" id="ok">Hantar jemputan</button></div>`, (m) => {
-      m.querySelector("#ok").onclick = async () => {
-        const em = m.querySelector("#ue").value.trim().toLowerCase(); if (!/^\S+@\S+\.\S+$/.test(em)) return toast("E-mel tidak sah.", true);
-        try { await fsWrite((F) => F.setDoc(F.doc(fsdb, "invites", em), { orgId: S.claims.orgId, role: m.querySelector("#ur").value, createdBy: S.user.uid, createdAt: F.serverTimestamp() })); toast("Jemputan dicipta untuk " + em + "."); closeModal(); }
-        catch (e) { if (e.message !== "preview") toast(errMsg(e), true); }
-      };
-    });
-  },
-  invdel(el) { fsWrite((F) => F.deleteDoc(F.doc(fsdb, "invites", el.dataset.id))).then(() => toast("Jemputan dibatalkan.")).catch((e) => { if (e.message !== "preview") toast(errMsg(e), true); }); },
-  urm(el) { const u = S.users.find((x) => x.uid === el.dataset.id); confirmBox({ title: "Buang pengguna", body: `${esc(u.email)} akan hilang akses ke organisasi ini.`, label: "Buang", danger: true, run: async () => { await fsWrite((F) => F.deleteDoc(F.doc(fsdb, "members", u.uid))); toast("Pengguna dibuang."); } }); }
 };
 function groupForm(g) {
   openModal(`<h2>${g ? "Sunting" : "Baharu"} kumpulan</h2><label class="f">Nama<input id="gn" maxlength="80" value="${esc(g ? g.name : "")}"></label><label class="f">Keterangan<input id="gd" value="${esc(g ? g.description || "" : "")}"></label>
@@ -550,7 +508,7 @@ function groupForm(g) {
     m.querySelector("#ok").onclick = async () => {
       const name = m.querySelector("#gn").value.trim(); if (!name) return toast("Masukkan nama kumpulan.", true);
       try { await fsWrite(async (F) => { const base = { name, description: m.querySelector("#gd").value.trim(), updatedAt: F.serverTimestamp() };
-        if (g) await F.updateDoc(ref("deviceGroups", g.id), base); else await F.addDoc(F.collection(fsdb, "organizations", S.claims.orgId, "deviceGroups"), { ...base, policyIds: [], createdAt: F.serverTimestamp(), createdBy: S.user.uid }); });
+        if (g) await F.updateDoc(ref("deviceGroups", g.id), base); else await F.addDoc(F.collection(fsdb, "deviceGroups"), { ...base, policyIds: [], createdAt: F.serverTimestamp(), createdBy: S.user.uid }); });
         toast("Kumpulan disimpan."); closeModal(); } catch (e) { if (e.message !== "preview") toast(errMsg(e), true); }
     };
   });
@@ -580,7 +538,6 @@ document.addEventListener("change", (e) => {
   const t = e.target;
   if (t.dataset && t.dataset.sel) { t.checked ? S.sel.add(t.dataset.sel) : S.sel.delete(t.dataset.sel); render(); }
   else if (t.id === "selall") { const q = S.q.toLowerCase(); S.devices.filter((d) => (!S.fs || d.status === S.fs) && (!S.ft || d.deviceType === S.ft) && (!q || `${d.deviceName} ${d.deviceId} ${d.deviceModel} ${d.assignedUserId || ""}`.toLowerCase().includes(q))).slice(S.pg * 10, S.pg * 10 + 10).forEach((d) => (t.checked ? S.sel.add(d.id) : S.sel.delete(d.id))); render(); }
-  else if (t.dataset && t.dataset.role) { fsWrite((F) => F.updateDoc(F.doc(fsdb, "members", t.dataset.role), { role: t.value })).then(() => toast("Peranan dikemas kini.")).catch((e) => { if (e.message !== "preview") toast(errMsg(e), true); render(); }); }
   else if (t.id === "fs") { S.fs = t.value; S.pg = 0; render(); } else if (t.id === "ft") { S.ft = t.value; S.pg = 0; render(); }
 });
 document.addEventListener("input", (e) => { if (e.target.id === "q") { S.q = e.target.value; S.pg = 0; render(); } });

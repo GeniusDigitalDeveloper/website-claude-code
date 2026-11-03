@@ -1,18 +1,15 @@
 # MY DEVICE CONTROL
 
-Pengurusan peranti berpusat (tablet Android HONOR + laptop Windows). Firebase projek: `my-devide-control`.
-
-Buka **`preview.html`**: 5 tab (Preview, index.html, admin.html, Rules Database, Rules Firestore), setiap satu ada butang salin.
+Dashboard dalaman untuk menguruskan tablet Android dan laptop Windows di tempat kerja. Firebase projek: `my-devide-control`.
+Log masuk dengan akaun Firebase Authentication anda terus masuk panel admin. Tiada pendaftaran organisasi atau pengesahan e-mel.
 
 | Fail | Fungsi |
 |---|---|
-| `index.html` | Log masuk (satu fail lengkap: HTML + CSS + JS) |
-| `admin.html` | Dashboard admin (satu fail lengkap) |
+| `index.html` | Halaman log masuk (satu fail lengkap) |
+| `admin.html` | Panel admin (satu fail lengkap) |
 | `firestore.rules` | Rules Firestore |
-| `database.rules.json` | Rules Realtime Database |
-| `functions/index.js` | Cloud Functions (backend selamat) |
-| `firebase.json`, `firestore.indexes.json` | Konfigurasi deploy |
-| `scripts/link-existing-admins.mjs` | Hubungkan semua akaun Auth sedia ada |
-| `build-preview.py` + `preview.template.html` | Jana semula `preview.html` selepas ubah fail: `python3 build-preview.py` |
+| `database.rules.json` | Rules Realtime Database (heartbeat pilihan) |
+| `preview.html` / `preview-artifact.html` | Preview + butang salin. Jana semula: `python3 build-preview.py` |
 | `rules-test/` | Ujian rules Firestore (emulator): `cd rules-test && npm i && npm test` |
-| `android-agent/`, `windows-agent/` | Fasa 2 / 5 (belum dibina) |
+
+Penting: Firebase Console → Authentication → Settings → User actions → matikan **Enable create (sign-up)**.

@@ -2,10 +2,14 @@ import test, { before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { initializeTestEnvironment, assertFails, assertSucceeds } from '@firebase/rules-unit-testing';
-import { doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc, collection, query, where, getDocs, writeBatch } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc, collection, writeBatch, Timestamp, serverTimestamp } from 'firebase/firestore';
 import { ref, set, get } from 'firebase/database';
 
 let env;
+const future = (h = 24) => Timestamp.fromMillis(Date.now() + h * 3600e3);
+const past = () => Timestamp.fromMillis(Date.now() - 3600e3);
+const CODE = 'A'.repeat(32), CODE2 = 'B'.repeat(32), CODEX = 'C'.repeat(32);
+
 before(async () => {
   env = await initializeTestEnvironment({
     projectId: 'demo-mdc',
@@ -14,159 +18,127 @@ before(async () => {
   });
   await env.withSecurityRulesDisabled(async (ctx) => {
     const f = ctx.firestore();
-    await setDoc(doc(f, 'organizations/A/devices/d1'), { deviceName: 'T1', status: 'ONLINE', groupId: null });
-    await setDoc(doc(f, 'organizations/B/devices/d9'), { deviceName: 'X', status: 'ONLINE' });
-    await setDoc(doc(f, 'organizations/A/commands/c1'), { deviceId: 'd1', status: 'PENDING' });
-    await setDoc(doc(f, 'organizations/A'), { name: 'Org A', ownerUid: 'x', createdAt: 1 });
-    await setDoc(doc(f, 'members/m-admin'), { orgId: 'A', role: 'ORG_ADMIN', email: 'admin@a.com' });
-    await setDoc(doc(f, 'members/m-mgr'), { orgId: 'A', role: 'DEVICE_MANAGER', email: 'mgr@a.com' });
-    await setDoc(doc(f, 'members/m-view'), { orgId: 'A', role: 'VIEWER', email: 'v@a.com' });
-    await setDoc(doc(f, 'members/m-super'), { orgId: 'A', role: 'SUPER_ADMIN', email: 'super@a.com' });
-    await setDoc(doc(f, 'members/m-b'), { orgId: 'B', role: 'ORG_ADMIN', email: 'b@b.com' });
-    await setDoc(doc(f, 'invites/jemput@a.com'), { orgId: 'A', role: 'VIEWER', createdBy: 'm-admin' });
+    await setDoc(doc(f, 'devices/dev1'), { deviceId: 'dev1', deviceName: 'T1', deviceType: 'ANDROID', status: 'ONLINE', enrollmentStatus: 'ENROLLED', groupId: null });
+    await setDoc(doc(f, 'devices/dev2'), { deviceId: 'dev2', deviceName: 'T2', deviceType: 'ANDROID', status: 'ONLINE', enrollmentStatus: 'ENROLLED', groupId: null });
+    await setDoc(doc(f, 'enrollments/' + CODE), { deviceName: 'HONOR 01', deviceType: 'ANDROID', status: 'PENDING', expiresAt: future() });
+    await setDoc(doc(f, 'enrollments/' + CODE2), { deviceName: 'HONOR 02', deviceType: 'ANDROID', status: 'USED', deviceId: 'x', expiresAt: future() });
+    await setDoc(doc(f, 'enrollments/' + CODEX), { deviceName: 'HONOR 03', deviceType: 'ANDROID', status: 'PENDING', expiresAt: past() });
+    await setDoc(doc(f, 'commands/c-pending'), { deviceId: 'dev1', commandType: 'LOCK', status: 'PENDING', expiresAt: future() });
+    await setDoc(doc(f, 'commands/c-sent'), { deviceId: 'dev1', commandType: 'LOCK', status: 'SENT', expiresAt: future() });
+    await setDoc(doc(f, 'commands/c-expired'), { deviceId: 'dev1', commandType: 'LOCK', status: 'SENT', expiresAt: past() });
   });
 });
 after(() => env.cleanup());
 
-const user = (role, orgId = 'A') => env.authenticatedContext('u-' + role, { role, orgId }).firestore();
-const device = (deviceId = 'd1', orgId = 'A') => env.authenticatedContext('device:' + deviceId, { role: 'DEVICE', orgId, deviceId });
+const adminCtx = (uid = 'adm', provider = 'password') => env.authenticatedContext(uid, { email: uid + '@kerja.com', firebase: { sign_in_provider: provider } });
+const admin = () => adminCtx().firestore();
+const devCtx = (uid) => env.authenticatedContext(uid, { firebase: { sign_in_provider: 'anonymous' } });
+const dev = (uid = 'dev1') => devCtx(uid).firestore();
 
-test('tanpa log masuk ditolak', async () => {
-  await assertFails(getDoc(doc(env.unauthenticatedContext().firestore(), 'organizations/A/devices/d1')));
+test('tanpa log masuk semuanya ditolak', async () => {
+  await assertFails(getDoc(doc(env.unauthenticatedContext().firestore(), 'devices/dev1')));
 });
-test('pengasingan organisasi', async () => {
-  await assertSucceeds(getDoc(doc(user('ORG_ADMIN'), 'organizations/A/devices/d1')));
-  await assertFails(getDoc(doc(user('ORG_ADMIN'), 'organizations/B/devices/d9')));
+test('ADMIN: akaun e-mel/kata laluan terus boleh baca (tiada organisasi/peranan/pengesahan e-mel)', async () => {
+  const f = env.authenticatedContext('baru', { email: 'baru@kerja.com', email_verified: false, firebase: { sign_in_provider: 'password' } }).firestore();
+  await assertSucceeds(getDoc(doc(f, 'devices/dev1')));
 });
-test('SUPER_ADMIN boleh baca organisasi lain', async () => {
-  await assertSucceeds(getDoc(doc(user('SUPER_ADMIN'), 'organizations/B/devices/d9')));
+test('ADMIN: Google juga diterima', async () => {
+  await assertSucceeds(getDoc(doc(adminCtx('g', 'google.com').firestore(), 'devices/dev1')));
 });
-test('VIEWER baca sahaja', async () => {
-  await assertSucceeds(getDoc(doc(user('VIEWER'), 'organizations/A/devices/d1')));
-  await assertFails(updateDoc(doc(user('VIEWER'), 'organizations/A/devices/d1'), { deviceName: 'Z' }));
+test('PERANTI anonymous tidak boleh jadi admin: tidak boleh baca peranti lain / kumpulan / enrollment', async () => {
+  await assertFails(getDoc(doc(dev('rawak'), 'devices/dev1')));
+  await assertFails(getDoc(doc(dev('dev1'), 'devices/dev2')));
+  await assertFails(addDoc(collection(dev('dev1'), 'deviceGroups'), { name: 'X' }));
+  await assertFails(getDoc(doc(dev('dev1'), 'enrollments/' + CODE)));
 });
-test('DEVICE_MANAGER sunting metadata tetapi bukan status', async () => {
-  const m = user('DEVICE_MANAGER');
-  await assertSucceeds(updateDoc(doc(m, 'organizations/A/devices/d1'), { deviceName: 'Baru' }));
-  await assertFails(updateDoc(doc(m, 'organizations/A/devices/d1'), { status: 'LOCKED' }));
-  await assertFails(updateDoc(doc(m, 'organizations/A/devices/d1'), { isLocked: true }));
-});
-test('klien tidak boleh menulis command (hanya function)', async () => {
-  await assertFails(addDoc(collection(user('ORG_ADMIN'), 'organizations/A/commands'), { deviceId: 'd1', commandType: 'LOCK', status: 'EXECUTED' }));
-  await assertFails(updateDoc(doc(user('ORG_ADMIN'), 'organizations/A/commands/c1'), { status: 'EXECUTED' }));
-});
-test('activityLogs & enrollments tidak boleh ditulis klien', async () => {
-  await assertFails(addDoc(collection(user('SUPER_ADMIN'), 'organizations/A/activityLogs'), { type: 'X' }));
-  await assertFails(setDoc(doc(user('SUPER_ADMIN'), 'organizations/A/enrollments/e1'), { a: 1 }));
-});
-test('peranti tidak boleh ubah status sendiri di Firestore', async () => {
-  const d = device().firestore();
-  await assertSucceeds(getDoc(doc(d, 'organizations/A/devices/d1')));
-  await assertFails(updateDoc(doc(d, 'organizations/A/devices/d1'), { status: 'ONLINE' }));
-  await assertFails(getDoc(doc(d, 'organizations/A/devices/other')));
-});
-test('peranti hanya baca command miliknya', async () => {
-  await assertSucceeds(getDoc(doc(device().firestore(), 'organizations/A/commands/c1')));
-  await assertFails(getDoc(doc(device('d2').firestore(), 'organizations/A/commands/c1')));
-});
-test('pengguna tidak boleh cipta/padam organisasi', async () => {
-  await assertFails(setDoc(doc(user('SUPER_ADMIN'), 'organizations/Z'), { name: 'x' }));
-});
-test('MANAGER tidak boleh ubah settings; ADMIN boleh', async () => {
-  await assertFails(setDoc(doc(user('DEVICE_MANAGER'), 'organizations/A/settings/s'), { a: 1 }));
-  await assertSucceeds(setDoc(doc(user('ORG_ADMIN'), 'organizations/A/settings/s'), { a: 1 }));
+test('ADMIN: cipta enrollment sah; kod pendek / jenis salah ditolak; peranti tidak boleh cipta', async () => {
+  const ok = { deviceName: 'HONOR 10', deviceType: 'ANDROID', groupId: null, assignedUserId: null, status: 'PENDING', createdBy: 'adm', createdAt: serverTimestamp(), expiresAt: future(24) };
+  await assertSucceeds(setDoc(doc(admin(), 'enrollments/' + 'D'.repeat(32)), ok));
+  await assertFails(setDoc(doc(admin(), 'enrollments/pendek'), ok));
+  await assertFails(setDoc(doc(admin(), 'enrollments/' + 'E'.repeat(32)), { ...ok, deviceType: 'TOASTER' }));
+  await assertFails(setDoc(doc(dev('dev1'), 'enrollments/' + 'F'.repeat(32)), ok));
 });
 
-// ---- Realtime Database (heartbeat) ----
-test('RTDB: peranti tulis heartbeat sendiri sahaja', { skip: !process.env.RTDB }, async () => {
-  const d = device().database();
-  await assertSucceeds(set(ref(d, 'presence/A/d1'), { status: 'ONLINE', batteryLevel: 80, lastSeen: { '.sv': 'timestamp' } }));
-  await assertFails(set(ref(d, 'presence/A/d2'), { status: 'ONLINE', lastSeen: { '.sv': 'timestamp' } }));
-  await assertFails(set(ref(d, 'presence/B/d1'), { status: 'ONLINE', lastSeen: { '.sv': 'timestamp' } }));
-  await assertFails(set(ref(d, 'presence/A/d1'), { status: 'HACKED', lastSeen: { '.sv': 'timestamp' } }));
+const regDoc = (uid, code, over = {}) => ({ deviceId: uid, deviceName: 'HONOR 01', deviceType: 'ANDROID', deviceModel: 'HONOR', osVersion: '13', status: 'ONLINE', isLocked: false,
+  enrollmentStatus: 'ENROLLED', assignedUserId: null, groupId: null, batteryLevel: 80, lastSeen: serverTimestamp(), createdAt: serverTimestamp(), updatedAt: serverTimestamp(), enrollmentCode: code, ...over });
+function register(uid, code, over = {}, usedBy = uid) {
+  const f = dev(uid); const b = writeBatch(f);
+  b.set(doc(f, 'devices/' + uid), regDoc(uid, code, over));
+  b.update(doc(f, 'enrollments/' + code), { status: 'USED', deviceId: usedBy, usedAt: serverTimestamp() });
+  return b.commit();
+}
+test('ENROLLMENT: peranti mendaftar dengan kod sah (sekali guna)', async () => {
+  await assertSucceeds(register('new-dev', CODE));
 });
-test('RTDB: admin baca organisasi sendiri, tidak boleh tulis', { skip: !process.env.RTDB }, async () => {
-  const a = env.authenticatedContext('adm', { role: 'ORG_ADMIN', orgId: 'A' }).database();
-  await assertSucceeds(get(ref(a, 'presence/A')));
-  await assertFails(get(ref(a, 'presence/B')));
-  await assertFails(set(ref(a, 'presence/A/d1'), { status: 'ONLINE', lastSeen: { '.sv': 'timestamp' } }));
+test('ENROLLMENT: kod yang sudah USED / tamat / tidak wujud ditolak', async () => {
+  await assertFails(register('dev-a', CODE2));
+  await assertFails(register('dev-b', CODEX));
+  await assertFails(register('dev-c', 'Z'.repeat(32)));
+});
+test('ENROLLMENT: nama/jenis mesti sama dengan enrollment; uid mesti sama dengan deviceId', async () => {
+  await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'enrollments/' + 'G'.repeat(32)), { deviceName: 'HONOR 07', deviceType: 'ANDROID', status: 'PENDING', expiresAt: future() }));
+  await assertFails(register('dev-d', 'G'.repeat(32), { deviceName: 'DIPALSUKAN' }));
+  await assertFails(register('dev-e', 'G'.repeat(32), {}, 'orang-lain'));
+  await assertFails(register('dev-f', 'G'.repeat(32), { status: 'LOCKED' }));
+});
+test('ENROLLMENT: tidak boleh cipta peranti tanpa menanda kod USED', async () => {
+  await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'enrollments/' + 'H'.repeat(32)), { deviceName: 'HONOR 08', deviceType: 'ANDROID', status: 'PENDING', expiresAt: future() }));
+  await assertFails(setDoc(doc(dev('dev-g'), 'devices/dev-g'), regDoc('dev-g', 'H'.repeat(32), { deviceName: 'HONOR 08' })));
 });
 
-// ---- Peranan melalui dokumen members (tanpa Custom Claims / tanpa Cloud Functions) ----
-const asUser = (uid, extra = {}) => env.authenticatedContext(uid, { email: uid + '@x.com', email_verified: true, ...extra }).firestore();
+test('PERANTI: lapor heartbeat sendiri sahaja; tidak boleh ubah nama/kumpulan', async () => {
+  await assertSucceeds(updateDoc(doc(dev('dev1'), 'devices/dev1'), { status: 'ONLINE', batteryLevel: 55, lastSeen: serverTimestamp(), updatedAt: serverTimestamp() }));
+  await assertFails(updateDoc(doc(dev('dev1'), 'devices/dev1'), { deviceName: 'DIPALSUKAN' }));
+  await assertFails(updateDoc(doc(dev('dev1'), 'devices/dev1'), { groupId: 'x' }));
+  await assertFails(updateDoc(doc(dev('dev1'), 'devices/dev2'), { status: 'ONLINE' }));
+  await assertFails(updateDoc(doc(dev('dev1'), 'devices/dev1'), { batteryLevel: 500 }));
+});
+test('ADMIN: sunting metadata peranti, tidak boleh ubah status; boleh padam', async () => {
+  await assertSucceeds(updateDoc(doc(admin(), 'devices/dev1'), { deviceName: 'Nama Baru', assignedUserId: 'ali', groupId: 'g1', updatedAt: serverTimestamp() }));
+  await assertFails(updateDoc(doc(admin(), 'devices/dev1'), { status: 'LOCKED' }));
+  await assertFails(updateDoc(doc(admin(), 'devices/dev1'), { deviceName: '' }));
+  await assertSucceeds(deleteDoc(doc(admin(), 'devices/dev2')));
+});
+test('ADMIN: kumpulan CRUD', async () => {
+  await assertSucceeds(addDoc(collection(admin(), 'deviceGroups'), { name: 'Asrama Putera', description: '', policyIds: [], createdAt: serverTimestamp(), createdBy: 'adm' }));
+});
 
-test('MEMBER: ORG_ADMIN (tanpa claims) boleh baca peranti organisasinya, bukan organisasi lain', async () => {
-  await assertSucceeds(getDoc(doc(asUser('m-admin'), 'organizations/A/devices/d1')));
-  await assertFails(getDoc(doc(asUser('m-admin'), 'organizations/B/devices/d9')));
+const cmd = (over = {}) => ({ commandId: 'x', deviceId: 'dev1', commandType: 'LOCK', status: 'PENDING', createdBy: 'adm', createdAt: serverTimestamp(), expiresAt: future(24), sentAt: null, executedAt: null, errorMessage: null, ...over });
+test('ARAHAN: admin cipta PENDING sah; EXECUTED palsu / peranti tiada / jenis tidak sah / tanpa tamat ditolak', async () => {
+  await assertSucceeds(addDoc(collection(admin(), 'commands'), cmd()));
+  await assertFails(addDoc(collection(admin(), 'commands'), cmd({ status: 'EXECUTED' })));
+  await assertFails(addDoc(collection(admin(), 'commands'), cmd({ deviceId: 'tiada' })));
+  await assertFails(addDoc(collection(admin(), 'commands'), cmd({ commandType: 'WIPE' })));
+  await assertFails(addDoc(collection(admin(), 'commands'), cmd({ expiresAt: future(24 * 30) })));
+  await assertFails(addDoc(collection(dev('dev1'), 'commands'), cmd()));
 });
-test('MEMBER: VIEWER baca sahaja; MANAGER sunting peranti', async () => {
-  await assertSucceeds(getDoc(doc(asUser('m-view'), 'organizations/A/devices/d1')));
-  await assertFails(updateDoc(doc(asUser('m-view'), 'organizations/A/devices/d1'), { deviceName: 'Z' }));
-  await assertSucceeds(updateDoc(doc(asUser('m-mgr'), 'organizations/A/devices/d1'), { deviceName: 'Z' }));
+test('ARAHAN: peranti PENDING→EXECUTED terus ditolak; SENT→EXECUTED dan PENDING→SENT dibenarkan', async () => {
+  await assertFails(updateDoc(doc(dev('dev1'), 'commands/c-pending'), { status: 'EXECUTED', executedAt: serverTimestamp() }));
+  await assertSucceeds(updateDoc(doc(dev('dev1'), 'commands/c-pending'), { status: 'SENT', sentAt: serverTimestamp() }));
+  await assertSucceeds(updateDoc(doc(dev('dev1'), 'commands/c-sent'), { status: 'EXECUTED', executedAt: serverTimestamp() }));
 });
-test('MEMBER: pengguna tanpa dokumen member tidak boleh baca apa-apa', async () => {
-  await assertFails(getDoc(doc(asUser('orang-asing'), 'organizations/A/devices/d1')));
-  await assertFails(getDoc(doc(asUser('orang-asing'), 'organizations/A')));
+test('ARAHAN: peranti lain / arahan tamat tempoh ditolak; admin tidak boleh set EXECUTED', async () => {
+  await assertFails(updateDoc(doc(dev('dev2'), 'commands/c-pending'), { status: 'SENT' }));
+  await assertFails(updateDoc(doc(dev('dev1'), 'commands/c-expired'), { status: 'EXECUTED', executedAt: serverTimestamp() }));
+  await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'commands/c-a2'), { deviceId: 'dev1', commandType: 'LOCK', status: 'PENDING', expiresAt: future() }));
+  await assertFails(updateDoc(doc(admin(), 'commands/c-a2'), { status: 'EXECUTED' }));
+  await assertSucceeds(updateDoc(doc(admin(), 'commands/c-a2'), { status: 'EXPIRED', errorMessage: 'Dibatalkan' }));
 });
-test('MEMBER: pengguna boleh baca dokumen member sendiri sahaja', async () => {
-  await assertSucceeds(getDoc(doc(asUser('m-view'), 'members/m-view')));
-  await assertFails(getDoc(doc(asUser('m-view'), 'members/m-admin')));
+test('LOG: tambah sahaja; admin tidak boleh palsukan actorId; peranti hanya jenis tertentu; tiada ubah/padam', async () => {
+  const a = admin();
+  const ok = await assertSucceeds(addDoc(collection(a, 'activityLogs'), { type: 'COMMAND_CREATED', message: 'LOCK', actorId: 'adm', deviceId: null, createdAt: serverTimestamp() }));
+  await assertFails(addDoc(collection(a, 'activityLogs'), { type: 'COMMAND_CREATED', message: 'x', actorId: 'orang-lain', deviceId: null, createdAt: serverTimestamp() }));
+  await assertFails(updateDoc(ok, { message: 'ubah' }));
+  await assertFails(deleteDoc(ok));
+  await assertSucceeds(addDoc(collection(dev('dev1'), 'activityLogs'), { type: 'COMMAND_EXECUTED', message: 'ok', actorId: null, deviceId: 'dev1', createdAt: serverTimestamp() }));
+  await assertFails(addDoc(collection(dev('dev1'), 'activityLogs'), { type: 'USER_REMOVED', message: 'x', actorId: null, deviceId: 'dev1', createdAt: serverTimestamp() }));
+  await assertFails(getDoc(doc(dev('dev1'), 'activityLogs/' + ok.id)));
 });
-test('MEMBER: senarai ahli (Users & Roles) hanya organisasi sendiri', async () => {
-  await assertSucceeds(getDocs(query(collection(asUser('m-mgr'), 'members'), where('orgId', '==', 'A'))));
-  await assertFails(getDocs(query(collection(asUser('m-mgr'), 'members'), where('orgId', '==', 'B'))));
-  await assertFails(getDocs(query(collection(asUser('m-view'), 'members'), where('orgId', '==', 'A'))));
-});
-test('BOOTSTRAP: e-mel dibenarkan + disahkan boleh cipta organisasi pertama (batch)', async () => {
-  const f = asUser('boss', { email: 'izzulmedia01@gmail.com' });
-  const b = writeBatch(f);
-  b.set(doc(f, 'organizations/NEW'), { name: 'Sekolah', ownerUid: 'boss', createdAt: 1 });
-  b.set(doc(f, 'members/boss'), { orgId: 'NEW', role: 'SUPER_ADMIN', email: 'izzulmedia01@gmail.com', displayName: null, createdAt: 1 });
-  await assertSucceeds(b.commit());
-});
-test('BOOTSTRAP: e-mel tiada dalam senarai / belum disahkan / org sedia ada ditolak', async () => {
-  const mk = (ctx, org) => { const b = writeBatch(ctx); b.set(doc(ctx, 'organizations/' + org), { name: 'Hack', ownerUid: ctx._delegate ? 'u' : 'u', createdAt: 1 }); return b; };
-  const f1 = env.authenticatedContext('u1', { email: 'penyerang@x.com', email_verified: true }).firestore();
-  let b = writeBatch(f1); b.set(doc(f1, 'organizations/H1'), { name: 'Hack', ownerUid: 'u1', createdAt: 1 }); b.set(doc(f1, 'members/u1'), { orgId: 'H1', role: 'SUPER_ADMIN', email: 'penyerang@x.com', createdAt: 1 });
-  await assertFails(b.commit());
-  const f2 = env.authenticatedContext('u2', { email: 'izzulmedia01@gmail.com', email_verified: false }).firestore();
-  b = writeBatch(f2); b.set(doc(f2, 'organizations/H2'), { name: 'Hack', ownerUid: 'u2', createdAt: 1 }); b.set(doc(f2, 'members/u2'), { orgId: 'H2', role: 'SUPER_ADMIN', email: 'izzulmedia01@gmail.com', createdAt: 1 });
-  await assertFails(b.commit());
-  const f3 = env.authenticatedContext('u3', { email: 'izzulmedia01@gmail.com', email_verified: true }).firestore();
-  b = writeBatch(f3); b.set(doc(f3, 'organizations/A'), { name: 'Ambil alih', ownerUid: 'u3', createdAt: 1 }); b.set(doc(f3, 'members/u3'), { orgId: 'A', role: 'SUPER_ADMIN', email: 'izzulmedia01@gmail.com', createdAt: 1 });
-  await assertFails(b.commit());
-});
-test('BOOTSTRAP: tidak boleh jadikan diri SUPER_ADMIN organisasi sedia ada tanpa organisasi baharu', async () => {
-  const f = env.authenticatedContext('u4', { email: 'izzulmedia01@gmail.com', email_verified: true }).firestore();
-  await assertFails(setDoc(doc(f, 'members/u4'), { orgId: 'A', role: 'SUPER_ADMIN', email: 'izzulmedia01@gmail.com', createdAt: 1 }));
-});
-test('JEMPUTAN: e-mel dijemput (disahkan) boleh tuntut peranan yang sama sahaja', async () => {
-  const f = env.authenticatedContext('baru', { email: 'jemput@a.com', email_verified: true }).firestore();
-  await assertFails(setDoc(doc(f, 'members/baru'), { orgId: 'A', role: 'ORG_ADMIN', email: 'jemput@a.com', createdAt: 1 }));   // naik taraf sendiri
-  await assertSucceeds(setDoc(doc(f, 'members/baru'), { orgId: 'A', role: 'VIEWER', email: 'jemput@a.com', createdAt: 1 }));
-});
-test('JEMPUTAN: e-mel tidak disahkan atau tidak dijemput ditolak', async () => {
-  const f = env.authenticatedContext('baru2', { email: 'jemput@a.com', email_verified: false }).firestore();
-  await assertFails(setDoc(doc(f, 'members/baru2'), { orgId: 'A', role: 'VIEWER', email: 'jemput@a.com', createdAt: 1 }));
-  const g = env.authenticatedContext('baru3', { email: 'lain@a.com', email_verified: true }).firestore();
-  await assertFails(setDoc(doc(g, 'members/baru3'), { orgId: 'A', role: 'VIEWER', email: 'lain@a.com', createdAt: 1 }));
-});
-test('ADMIN: boleh cipta jemputan & tambah ahli; ORG_ADMIN tidak boleh lantik SUPER_ADMIN', async () => {
-  const a = asUser('m-admin');
-  await assertSucceeds(setDoc(doc(a, 'invites/guru@a.com'), { orgId: 'A', role: 'DEVICE_MANAGER', createdBy: 'm-admin', createdAt: 1 }));
-  await assertFails(setDoc(doc(a, 'invites/bos@a.com'), { orgId: 'A', role: 'SUPER_ADMIN', createdBy: 'm-admin', createdAt: 1 }));
-  await assertFails(setDoc(doc(a, 'invites/org-b@a.com'), { orgId: 'B', role: 'VIEWER', createdBy: 'm-admin', createdAt: 1 }));
-  await assertSucceeds(setDoc(doc(a, 'members/uid-baru'), { orgId: 'A', role: 'VIEWER', email: 'z@a.com', createdAt: 1 }));
-});
-test('ADMIN: MANAGER/VIEWER tidak boleh urus ahli; tidak boleh ubah SUPER_ADMIN atau buang diri', async () => {
-  await assertFails(setDoc(doc(asUser('m-mgr'), 'members/uid-x'), { orgId: 'A', role: 'VIEWER', email: 'x@a.com', createdAt: 1 }));
-  await assertFails(updateDoc(doc(asUser('m-admin'), 'members/m-super'), { role: 'VIEWER' }));
-  await assertFails(deleteDoc(doc(asUser('m-admin'), 'members/m-admin')));
-  await assertSucceeds(updateDoc(doc(asUser('m-admin'), 'members/m-view'), { role: 'DEVICE_MANAGER' }));
-});
-test('JEMPUTAN: semak jemputan sendiri yang tiada tidak ralat; jemputan orang lain tidak boleh dibaca', async () => {
-  const f = env.authenticatedContext('semak', { email: 'tiada-jemputan@a.com', email_verified: true }).firestore();
-  const snap = await assertSucceeds(getDoc(doc(f, 'invites/tiada-jemputan@a.com')));
-  assert.equal(snap.exists(), false);
-  await assertFails(getDoc(doc(f, 'invites/jemput@a.com')));
+
+// ---- Realtime Database (heartbeat pilihan) ----
+test('RTDB: peranti tulis heartbeat sendiri; admin baca; peranti lain/anon tidak boleh baca', { skip: !process.env.RTDB }, async () => {
+  await assertSucceeds(set(ref(devCtx('dev1').database(), 'presence/dev1'), { status: 'ONLINE', batteryLevel: 80, lastSeen: { '.sv': 'timestamp' } }));
+  await assertFails(set(ref(devCtx('dev1').database(), 'presence/dev2'), { status: 'ONLINE', lastSeen: { '.sv': 'timestamp' } }));
+  await assertSucceeds(get(ref(adminCtx().database(), 'presence')));
+  await assertFails(get(ref(devCtx('dev1').database(), 'presence')));
 });

@@ -1,9 +1,10 @@
-# Enrollment Android (HONOR) — Fasa 2
+# Enrollment peranti (Fasa 2, belum dibina)
 
-Fasa 1 sudah menyediakan sisi server: `createEnrollment` (token + payload QR), `registerDevice`, heartbeat RTDB, `fetchPendingCommands`, `ackCommand`.
+Tiada Cloud Functions. Aliran yang rules sokong:
 
-**Fasa 2 perlu dibina dan diuji pada peranti fizikal:**
-- Agent Kotlin (`android-agent/`) sebagai **Device Owner/DPC**. Memasang APK biasa **tidak** memberi Device Owner. Laluan sah: QR provisioning pada peranti yang di-factory-reset (ketik skrin 6 kali di skrin Welcome), zero-touch, atau `dpm set-device-owner` (hanya untuk pembangunan, peranti tanpa akaun).
-- Lock: `DevicePolicyManager.lockNow()`. Unlock jauh tidak ditakrif oleh API Android; model yang sah ialah **kiosk/Lock Task mode** yang dikawal agent, atau reset kod laluan. Dokumentasikan pendekatan yang dipilih sebelum bina.
-- Atau gunakan Android Management API (perlu akaun Google Cloud + enterprise binding).
-- Agent: panggil `registerDevice` → `signInWithCustomToken` → tulis `presence/{orgId}/{deviceId}` setiap ~5 minit (WorkManager) → `fetchPendingCommands` apabila FCM `COMMANDS_AVAILABLE` / apabila kembali online → `ackCommand`.
+1. Admin: All Devices → Daftar peranti → panel mencipta `enrollments/{kod}` (kod rawak 32 aksara, sah 48 jam, sekali guna) dan memaparkan QR `{v:1, projectId, code}`.
+2. Agent peranti: log masuk **Anonymous** → dalam satu batch: cipta `devices/{uid}` (nama/jenis mesti sama dengan enrollment, `enrollmentCode`=kod) dan kemas kini `enrollments/{kod}` kepada `status:USED, deviceId:uid`. Rules menolak kod yang sudah USED, tamat atau tidak wujud.
+3. Heartbeat: agent mengemas kini `devices/{uid}` (`status`, `batteryLevel`, `lastSeen`, ...) kira-kira setiap 5 minit. Panel menganggap peranti OFFLINE jika `lastSeen` > 10 minit. (Pilihan: `presence/{uid}` dalam Realtime Database.)
+4. Arahan: agent membaca `commands` miliknya dan menukar status mengikut urutan PENDING → SENT → ACKNOWLEDGED → EXECUTED/FAILED. Rules menolak PENDING → EXECUTED terus dan arahan tamat tempoh.
+
+Lock sebenar di Android memerlukan agent Kotlin sebagai Device Owner (Android Enterprise). APK biasa tidak cukup.
