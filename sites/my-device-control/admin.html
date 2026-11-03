@@ -186,7 +186,7 @@ const toast = (text, err) => { const d = document.createElement("div"); d.classN
 const errMsg = (e) => ((e && e.message) || "Ralat").replace(/^.*?:\s*/, "");
 
 /* ---------- Keadaan & data ---------- */
-const S = { user: null, claims: {}, devices: [], groups: [], commands: [], logs: [], enrollments: [], apps: [], webRules: [], devInfo: null, live: null, mon: "", fscope: "", keep: {}, 
+const S = { user: null, claims: {}, devices: [], groups: [], commands: [], logs: [], enrollments: [], selLog: new Set(), selCmd: new Set(), apps: [], webRules: [], devInfo: null, live: null, mon: "", fscope: "", keep: {}, 
   loaded: {}, errors: {}, page: "dashboard", q: "", fs: "", ft: "", pg: 0, sel: new Set(), nav: false };
 const can = () => true;   // semua akaun Authentication ialah admin (alat dalaman)
 let fb = null; // modul Firebase
@@ -450,12 +450,17 @@ function pageMonitoring() {
       <div id="monbox">${l && l.frame ? `<img id="monimg" alt="Skrin peranti" src="data:image/jpeg;base64,${l.frame}" style="max-width:min(100%,420px);border-radius:12px;border:1px solid var(--line)">` : ""}</div></div>`;
 }
 
+const delBar = (kind, n, total) => `<button class="btn" data-act="${kind}del" ${n ? "" : "disabled"}>${ic("trash", 16, "#DC2626")}Padam terpilih (${n})</button><button class="btn d" data-act="${kind}clear" ${total ? "" : "disabled"}>Padam semua</button>`;
 function pageCommands() {
-  return head("Device Commands", "Queue arahan. EXECUTED hanya selepas disahkan oleh peranti.") + `<div class="card tw">${state("commands", () => !S.commands.length ? empty("Belum ada arahan", "Hantar LOCK / UNLOCK dari All Devices atau Device Groups.") :
-    `<table><thead><tr><th>Arahan</th><th>Peranti</th><th>Status</th><th>Dicipta</th><th>Dilaksana</th><th>Ralat</th></tr></thead><tbody>${S.commands.map((c) => `<tr><td><b>${esc(c.commandType)}</b><div class="mono">${esc(c.commandId)}</div></td><td>${esc(dname(c.deviceId))}</td><td>${badge(c.status)}</td><td>${fmt(c.createdAt)}</td><td>${fmt(c.executedAt)}</td><td style="color:#DC2626">${esc(c.errorMessage || "")}</td></tr>`).join("")}</tbody></table>`)}</div>`;
+  const sel = S.selCmd, all = S.commands.length > 0 && S.commands.every((c) => sel.has(c.id));
+  return head("Device Commands", "Queue arahan. EXECUTED hanya selepas disahkan oleh peranti. Rekod boleh dipadam.", delBar("cmd", sel.size, S.commands.length)) + `<div class="card tw">${state("commands", () => !S.commands.length ? empty("Belum ada arahan", "Hantar LOCK / UNLOCK dari All Devices atau Device Groups.") :
+    `<table><thead><tr><th style="width:36px"><input type="checkbox" id="cmdall" aria-label="Pilih semua arahan" ${all ? "checked" : ""} style="min-height:0;width:auto"></th><th>Arahan</th><th>Peranti</th><th>Status</th><th>Dicipta</th><th>Dilaksana</th><th>Ralat</th></tr></thead><tbody>${S.commands.map((c) => `<tr><td><input type="checkbox" data-selcmd="${esc(c.id)}" aria-label="Pilih arahan ${esc(c.commandType)}" ${sel.has(c.id) ? "checked" : ""} style="min-height:0;width:auto"></td><td><b>${esc(c.commandType)}</b><div class="mono">${esc(c.commandId)}</div></td><td>${esc(dname(c.deviceId))}</td><td>${badge(c.status)}</td><td>${fmt(c.createdAt)}</td><td>${fmt(c.executedAt)}</td><td style="color:#DC2626">${esc(c.errorMessage || "")}</td></tr>`).join("")}</tbody></table>`)}</div>`;
 }
 function pageLogs() {
-  return head("Activity Logs", "Audit tindakan pengurusan dan peristiwa peranti (hanya server boleh menulis)") + `<div class="card" style="padding:0">${state("logs", () => !S.logs.length ? empty("Belum ada aktiviti") : `<ol class="tl">${S.logs.map((l) => `<li><time>${fmt(l.createdAt)}</time><code>${esc(l.type)}</code><span>${esc(l.message)}</span></li>`).join("")}</ol>`)}</div>`;
+  const sel = S.selLog, all = S.logs.length > 0 && S.logs.every((l) => sel.has(l.id));
+  return head("Activity Logs", "Audit tindakan pengurusan dan peristiwa peranti. Rekod boleh dipadam.", delBar("log", sel.size, S.logs.length)) + `<div class="card" style="padding:0">${state("logs", () => !S.logs.length ? empty("Belum ada aktiviti") : `
+    <label class="row" style="padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px"><input type="checkbox" id="logall" ${all ? "checked" : ""} style="min-height:0;width:auto"> Pilih semua yang dipaparkan</label>
+    <ol class="tl">${S.logs.map((l) => `<li><input type="checkbox" data-sellog="${esc(l.id)}" aria-label="Pilih rekod ${esc(l.type)}" ${sel.has(l.id) ? "checked" : ""} style="min-height:0;width:auto"><time>${fmt(l.createdAt)}</time><code>${esc(l.type)}</code><span>${esc(l.message)}</span></li>`).join("")}</ol>`)}</div>`;
 }
 function pageUsers() {
   const me = (S.user && S.user.email) || "—";
@@ -584,6 +589,24 @@ async function doRemove(d, by) {
     logEv(F, bt, "DEVICE_REMOVED", `Peranti "${d.deviceName}" dinyahdaftar (disahkan: ${by})`, d.id); await bt.commit(); });
   toast("Peranti dinyahdaftar.");
 }
+/** Padam rekod terpilih (kelompok 400). Satu catatan audit ditinggalkan supaya ada jejak. */
+function removeRecords(col, ids, noun, selSet) {
+  confirmBox({ title: `Padam ${ids.length} ${noun}`, body: `${ids.length} ${noun} akan dipadam. Tindakan ini tidak boleh dibatalkan.`, label: "Padam", danger: true,
+    run: () => fsWrite(async (F) => {
+      for (let i = 0; i < ids.length; i += 400) { const bt = F.writeBatch(fsdb); ids.slice(i, i + 400).forEach((id) => bt.delete(ref(col, id)));
+        if (i + 400 >= ids.length && col !== "activityLogs") logEv(F, bt, "RECORDS_DELETED", `${ids.length} ${noun} dipadam`); await bt.commit(); }
+      if (col === "activityLogs") { const bt = F.writeBatch(fsdb); logEv(F, bt, "RECORDS_DELETED", `${ids.length} ${noun} dipadam`); await bt.commit(); }
+      selSet.clear(); toast(`${ids.length} ${noun} dipadam.`); }) });
+}
+/** Padam SEMUA rekod dalam koleksi (termasuk yang belum dipaparkan), kemudian tinggalkan satu catatan audit. */
+function clearAll(col, noun, selSet) {
+  confirmBox({ title: `Padam semua ${noun}`, body: `Semua ${noun} akan dipadam, termasuk yang tidak dipaparkan di sini. Tindakan ini tidak boleh dibatalkan.`, label: "Padam semua", danger: true, requireText: "PADAM SEMUA",
+    run: () => fsWrite(async (F) => { let total = 0;
+      for (;;) { const sn = await F.getDocs(F.query(F.collection(fsdb, col), F.limit(400))); if (sn.empty) break;
+        const bt = F.writeBatch(fsdb); sn.docs.forEach((d) => bt.delete(d.ref)); await bt.commit(); total += sn.size; if (sn.size < 400) break; }
+      const bt = F.writeBatch(fsdb); logEv(F, bt, "RECORDS_DELETED", `Semua ${noun} dipadam (${total} rekod)`); await bt.commit();
+      selSet.clear(); toast(`Semua ${noun} dipadam (${total}).`); }) });
+}
 const byId = (id) => S.devices.find((d) => d.id === id);
 
 const ACTIONS = {
@@ -638,6 +661,10 @@ const ACTIONS = {
     confirmBox({ title: "Tolak peranti", body: `Peranti <b>${esc(d.deviceName)}</b> akan dibuang dan tidak boleh dikawal. Aplikasi pada peranti itu akan melepaskan dirinya.`, label: "Tolak", danger: true,
       run: () => fsWrite(async (F) => { const bt = F.writeBatch(fsdb); bt.delete(ref("devices", d.id)); bt.delete(ref("publicStatus", d.id)); logEv(F, bt, "DEVICE_REJECTED", `Peranti "${d.deviceName}" ditolak`, d.id); await bt.commit(); toast("Peranti ditolak."); }) });
   },
+  logdel() { removeRecords("activityLogs", [...S.selLog], "log aktiviti", S.selLog); },
+  logclear() { clearAll("activityLogs", "log aktiviti", S.selLog); },
+  cmddel() { removeRecords("commands", [...S.selCmd], "rekod arahan", S.selCmd); },
+  cmdclear() { clearAll("commands", "rekod arahan", S.selCmd); },
   monitor(el) { watchLive(el.dataset.id); location.hash = "monitoring"; },
   monstart() { fsWrite(async (F) => { const bt = F.writeBatch(fsdb); bt.set(ref("liveSessions", S.mon), { state: "REQUESTED", requestedBy: S.user.uid, requestedAt: F.serverTimestamp() }); logEv(F, bt, "LIVE_REQUESTED", `Pantau skrin diminta: ${dname(S.mon)}`, S.mon); await bt.commit(); })
     .then(() => toast("Permintaan dihantar. Pengguna perlu membenarkan pada peranti.")).catch((e) => { if (e.message !== "preview") toast(errMsg(e), true); }); },
@@ -759,6 +786,10 @@ document.addEventListener("change", (e) => {
       logEv(F, bt, "WEB_RULE", `Kategori ${CATS[k].label}: ${t.value || "tiada"} (${scopeName(S.fscope)})`); await bt.commit(); })
       .then(() => toast(`${CATS[k].label}: ${t.value || "tiada tindakan"}`)).catch((e) => { if (e.message !== "preview") toast(errMsg(e), true); render(); });
   }
+  else if (t.dataset && t.dataset.sellog !== undefined) { t.checked ? S.selLog.add(t.dataset.sellog) : S.selLog.delete(t.dataset.sellog); render(); }
+  else if (t.dataset && t.dataset.selcmd !== undefined) { t.checked ? S.selCmd.add(t.dataset.selcmd) : S.selCmd.delete(t.dataset.selcmd); render(); }
+  else if (t.id === "logall") { S.logs.forEach((l) => (t.checked ? S.selLog.add(l.id) : S.selLog.delete(l.id))); render(); }
+  else if (t.id === "cmdall") { S.commands.forEach((c) => (t.checked ? S.selCmd.add(c.id) : S.selCmd.delete(c.id))); render(); }
   else if (t.id === "fs") { S.fs = t.value; S.pg = 0; render(); } else if (t.id === "ft") { S.ft = t.value; S.pg = 0; render(); }
 });
 document.addEventListener("input", (e) => { if (e.target.id === "q") { S.q = e.target.value; S.pg = 0; render(); } else if (e.target.dataset && e.target.dataset.keep !== undefined) S.keep[e.target.id] = e.target.value; });

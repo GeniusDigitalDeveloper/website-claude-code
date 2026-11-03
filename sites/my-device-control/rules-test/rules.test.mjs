@@ -158,7 +158,8 @@ test('LOG: tambah sahaja; admin tidak boleh palsukan actorId; peranti hanya jeni
   const ok = await assertSucceeds(addDoc(collection(a, 'activityLogs'), { type: 'COMMAND_CREATED', message: 'LOCK', actorId: 'adm', deviceId: null, createdAt: serverTimestamp() }));
   await assertFails(addDoc(collection(a, 'activityLogs'), { type: 'COMMAND_CREATED', message: 'x', actorId: 'orang-lain', deviceId: null, createdAt: serverTimestamp() }));
   await assertFails(updateDoc(ok, { message: 'ubah' }));
-  await assertFails(deleteDoc(ok));
+  await assertFails(deleteDoc(doc(dev('dev1'), 'activityLogs/' + ok.id)));   // peranti tidak boleh memadam
+  await assertSucceeds(deleteDoc(ok));                                      // admin boleh memadam
   await assertSucceeds(addDoc(collection(dev('dev1'), 'activityLogs'), { type: 'COMMAND_EXECUTED', message: 'ok', actorId: null, deviceId: 'dev1', createdAt: serverTimestamp() }));
   await assertFails(addDoc(collection(dev('dev1'), 'activityLogs'), { type: 'USER_REMOVED', message: 'x', actorId: null, deviceId: 'dev1', createdAt: serverTimestamp() }));
   await assertFails(getDoc(doc(dev('dev1'), 'activityLogs/' + ok.id)));
@@ -340,4 +341,17 @@ test('LIVE MONITORING: tidak boleh diminta untuk peranti yang belum disahkan; pe
   await seedPending('mon-pend');
   await assertFails(setDoc(doc(admin(), 'liveSessions/mon-pend'), { state: 'REQUESTED', requestedBy: 'adm', requestedAt: serverTimestamp() }));
   await assertSucceeds(updateDoc(doc(dev('dev1'), 'devices/dev1'), { policyStatus: 'Aksesibiliti: aktif; VPN: aktif', updatedAt: serverTimestamp() }));
+});
+
+test('PADAM: admin boleh memadam log aktiviti dan rekod arahan; peranti dan orang awam tidak boleh', async () => {
+  await env.withSecurityRulesDisabled(async (c) => { const f = c.firestore();
+    await setDoc(doc(f, 'activityLogs/l-del'), { type: 'X', message: 'x', actorId: null, deviceId: null });
+    await setDoc(doc(f, 'commands/c-del'), { deviceId: 'dev1', commandType: 'LOCK', status: 'EXECUTED', expiresAt: future() }); });
+  await assertFails(deleteDoc(doc(dev('dev1'), 'commands/c-del')));
+  await assertFails(deleteDoc(doc(env.unauthenticatedContext().firestore(), 'commands/c-del')));
+  await assertFails(deleteDoc(doc(env.unauthenticatedContext().firestore(), 'activityLogs/l-del')));
+  const a = admin(); const b = writeBatch(a);
+  b.delete(doc(a, 'commands/c-del')); b.delete(doc(a, 'activityLogs/l-del'));
+  await assertSucceeds(b.commit());
+  await assertFails(updateDoc(doc(admin(), 'activityLogs/x'), { message: 'ubah' }));   // tetap tidak boleh diubah
 });

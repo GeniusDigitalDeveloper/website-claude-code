@@ -127,7 +127,7 @@ service cloud.firestore {
               || resource.data.status == 'ACKNOWLEDGED' && request.resource.data.status in ['EXECUTED', 'FAILED'])
         // Admin hanya boleh membatalkan arahan yang belum dilaksanakan
         || isAdmin() && resource.data.status in ['PENDING', 'SENT'] && onlyChanges(['status', 'errorMessage']) && request.resource.data.status == 'EXPIRED';
-      allow delete: if false;
+      allow delete: if isAdmin();   // admin boleh memadam rekod arahan
     }
 
     // ---------- Paparan awam (index.html, tanpa log masuk): hanya maklumat tidak sensitif ----------
@@ -211,7 +211,8 @@ service cloud.firestore {
           && request.resource.data.deviceId == request.auth.uid && request.resource.data.actorId == null
           && request.resource.data.type in ['DEVICE_REGISTERED', 'DEVICE_ONLINE', 'COMMAND_EXECUTED', 'COMMAND_FAILED']
           && request.resource.data.createdAt == request.time;
-      allow update, delete: if false;
+      allow update: if false;           // rekod tidak boleh diubah
+      allow delete: if isAdmin();       // admin boleh memadam (tidak kekal)
     }
 
     match /settings/{settingId} {
