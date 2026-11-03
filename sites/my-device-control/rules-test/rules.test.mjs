@@ -86,8 +86,8 @@ test('ADMIN: cipta enrollment sah; kod pendek / jenis salah ditolak; peranti tid
   await assertFails(setDoc(doc(dev('dev1'), 'enrollments/' + 'F'.repeat(32)), ok));
 });
 
-const regDoc = (uid, code, over = {}) => ({ deviceId: uid, deviceName: 'HONOR 01', deviceType: 'ANDROID', deviceModel: 'HONOR', osVersion: '13', status: 'ONLINE', isLocked: false,
-  enrollmentStatus: 'ENROLLED', assignedUserId: null, groupId: null, batteryLevel: 80, lastSeen: serverTimestamp(), createdAt: serverTimestamp(), updatedAt: serverTimestamp(), enrollmentCode: code, ...over });
+const regDoc = (uid, code, over = {}) => ({ deviceId: uid, deviceName: 'HONOR 01', deviceType: 'ANDROID', deviceModel: 'HONOR', osVersion: '13', status: 'ENROLLMENT_PENDING', isLocked: false,
+  enrollmentStatus: 'PENDING_APPROVAL', assignedUserId: null, groupId: null, batteryLevel: 80, lastSeen: serverTimestamp(), createdAt: serverTimestamp(), updatedAt: serverTimestamp(), enrollmentCode: code, ...over });
 function register(uid, code, over = {}, usedBy = uid) {
   const f = dev(uid); const b = writeBatch(f);
   b.set(doc(f, 'devices/' + uid), regDoc(uid, code, over));
@@ -107,6 +107,7 @@ test('ENROLLMENT: nama/jenis mesti sama dengan enrollment; uid mesti sama dengan
   await assertFails(register('dev-d', 'G'.repeat(32), { deviceName: 'DIPALSUKAN' }));
   await assertFails(register('dev-e', 'G'.repeat(32), {}, 'orang-lain'));
   await assertFails(register('dev-f', 'G'.repeat(32), { status: 'LOCKED' }));
+  await assertFails(register('dev-f2', 'G'.repeat(32), { status: 'ONLINE', enrollmentStatus: 'ENROLLED' }));   // tidak boleh meluluskan diri sendiri
 });
 test('ENROLLMENT: tidak boleh cipta peranti tanpa menanda kod USED', async () => {
   await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'enrollments/' + 'H'.repeat(32)), { deviceName: 'HONOR 08', deviceType: 'ANDROID', status: 'PENDING', expiresAt: future() }));
@@ -226,5 +227,43 @@ test('LEPASKAN DI PERANTI: dengan akaun admin, peranti + publicStatus dipadam da
   const b = writeBatch(a);
   b.delete(doc(a, 'devices/rel1')); b.delete(doc(a, 'publicStatus/rel1'));
   b.set(doc(collection(a, 'activityLogs')), { type: 'DEVICE_REMOVED', message: 'dilepaskan', actorId: 'adm', deviceId: 'rel1', createdAt: serverTimestamp() });
+  await assertSucceeds(b.commit());
+});
+
+// ---- Kelulusan admin (Terima) ----
+const seedPending = (id) => env.withSecurityRulesDisabled(async (c) => { const f = c.firestore();
+  await setDoc(doc(f, 'devices/' + id), { deviceId: id, deviceName: 'BARU ' + id, deviceType: 'ANDROID', status: 'ENROLLMENT_PENDING', enrollmentStatus: 'PENDING_APPROVAL', assignedUserId: null, groupId: null, lastSeen: Timestamp.now() });
+  await setDoc(doc(f, 'publicStatus/' + id), { deviceName: 'BARU ' + id, deviceType: 'ANDROID', status: 'ENROLLMENT_PENDING' }); });
+test('KELULUSAN: peranti menunggu tidak boleh heartbeat, kemas kini status awam, atau meluluskan diri sendiri', async () => {
+  await seedPending('pend1'); const f = dev('pend1');
+  await assertFails(updateDoc(doc(f, 'devices/pend1'), { status: 'ONLINE', lastSeen: serverTimestamp(), updatedAt: serverTimestamp() }));
+  await assertFails(updateDoc(doc(f, 'devices/pend1'), { enrollmentStatus: 'ENROLLED', status: 'ONLINE', updatedAt: serverTimestamp() }));
+  await assertFails(updateDoc(doc(f, 'publicStatus/pend1'), { status: 'ONLINE', updatedAt: serverTimestamp() }));
+  await assertSucceeds(getDoc(doc(f, 'devices/pend1')));   // boleh membaca rekod sendiri untuk tahu keputusan
+});
+test('KELULUSAN: admin Terima (hanya enrollmentStatus/status); selepas itu peranti boleh heartbeat', async () => {
+  await seedPending('pend2');
+  await assertFails(updateDoc(doc(admin(), 'devices/pend2'), { enrollmentStatus: 'ENROLLED', status: 'ONLINE', groupId: 'x', updatedAt: serverTimestamp() }));
+  await assertFails(updateDoc(doc(admin(), 'devices/pend2'), { enrollmentStatus: 'ENROLLED', status: 'LOCKED', updatedAt: serverTimestamp() }));
+  const a = admin(); const b = writeBatch(a);
+  b.update(doc(a, 'devices/pend2'), { enrollmentStatus: 'ENROLLED', status: 'ONLINE', updatedAt: serverTimestamp() });
+  b.set(doc(a, 'publicStatus/pend2'), { deviceName: 'BARU pend2', deviceType: 'ANDROID', status: 'ONLINE', updatedAt: serverTimestamp() });
+  await assertSucceeds(b.commit());
+  await assertSucceeds(updateDoc(doc(dev('pend2'), 'devices/pend2'), { status: 'ONLINE', lastSeen: serverTimestamp(), updatedAt: serverTimestamp() }));
+  await assertSucceeds(updateDoc(doc(dev('pend2'), 'publicStatus/pend2'), { status: 'ONLINE', updatedAt: serverTimestamp() }));
+  await assertFails(updateDoc(doc(admin(), 'devices/pend2'), { enrollmentStatus: 'PENDING_APPROVAL', status: 'ENROLLMENT_PENDING', updatedAt: serverTimestamp() }));   // tidak boleh diundur
+});
+test('KELULUSAN: admin tidak boleh hantar arahan kepada peranti menunggu; selepas Terima boleh; peranti menunggu tidak boleh kemas kini arahan', async () => {
+  await seedPending('pend3');
+  await assertFails(addDoc(collection(admin(), 'commands'), cmd({ deviceId: 'pend3' })));
+  await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'commands/c-pend'), { deviceId: 'pend3', commandType: 'LOCK', status: 'PENDING', expiresAt: future() }));
+  await assertFails(updateDoc(doc(dev('pend3'), 'commands/c-pend'), { status: 'SENT', sentAt: serverTimestamp() }));
+  await updateDoc(doc(admin(), 'devices/pend3'), { enrollmentStatus: 'ENROLLED', status: 'ONLINE', updatedAt: serverTimestamp() });
+  await assertSucceeds(addDoc(collection(admin(), 'commands'), cmd({ deviceId: 'pend3' })));
+  await assertSucceeds(updateDoc(doc(dev('pend3'), 'commands/c-pend'), { status: 'SENT', sentAt: serverTimestamp() }));
+});
+test('KELULUSAN: admin boleh Tolak (padam) peranti menunggu dan status awamnya', async () => {
+  await seedPending('pend4'); const a = admin(); const b = writeBatch(a);
+  b.delete(doc(a, 'devices/pend4')); b.delete(doc(a, 'publicStatus/pend4'));
   await assertSucceeds(b.commit());
 });

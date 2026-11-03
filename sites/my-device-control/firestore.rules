@@ -26,6 +26,8 @@ service cloud.firestore {
     function isThisDevice(deviceId) {
       return isDevice() && request.auth.uid == deviceId && exists(/databases/$(database)/documents/devices/$(deviceId));
     }
+    // Peranti hanya aktif selepas admin menekan Terima (enrollmentStatus ENROLLED)
+    function approved(id) { return get(/databases/$(database)/documents/devices/$(id)).data.enrollmentStatus == 'ENROLLED'; }
     function onlyChanges(keys) { return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys); }
     function enroll(code) { return /databases/$(database)/documents/enrollments/$(code); }
 
@@ -38,7 +40,7 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['deviceId', 'deviceName', 'deviceType', 'deviceModel', 'osVersion', 'status', 'isLocked',
              'enrollmentStatus', 'assignedUserId', 'groupId', 'batteryLevel', 'lastSeen', 'createdAt', 'updatedAt', 'enrollmentCode', 'appVersion', 'fcmToken'])
         && request.resource.data.deviceId == deviceId
-        && request.resource.data.status == 'ONLINE' && request.resource.data.enrollmentStatus == 'ENROLLED'
+        && request.resource.data.status == 'ENROLLMENT_PENDING' && request.resource.data.enrollmentStatus == 'PENDING_APPROVAL'
         && get(enroll(request.resource.data.enrollmentCode)).data.status == 'PENDING'
         && get(enroll(request.resource.data.enrollmentCode)).data.expiresAt > request.time
         && request.resource.data.deviceName == get(enroll(request.resource.data.enrollmentCode)).data.deviceName
@@ -46,16 +48,20 @@ service cloud.firestore {
         && getAfter(enroll(request.resource.data.enrollmentCode)).data.status == 'USED'
         && getAfter(enroll(request.resource.data.enrollmentCode)).data.deviceId == deviceId;
 
-      // Admin sunting metadata; peranti melapor status/heartbeat sendiri
-      allow update: if isAdmin()
+      // Admin: sunting metadata ATAU terima peranti baharu (PENDING_APPROVAL -> ENROLLED).
+      // Peranti: heartbeat hanya selepas diterima.
+      allow update: if (isAdmin()
           && onlyChanges(['deviceName', 'assignedUserId', 'groupId', 'notes', 'updatedAt'])
           && request.resource.data.deviceName is string
-          && request.resource.data.deviceName.size() > 0 && request.resource.data.deviceName.size() <= 80
-        || isThisDevice(deviceId)
+          && request.resource.data.deviceName.size() > 0 && request.resource.data.deviceName.size() <= 80)
+        || (isAdmin() && resource.data.enrollmentStatus == 'PENDING_APPROVAL'
+          && onlyChanges(['enrollmentStatus', 'status', 'updatedAt'])
+          && request.resource.data.enrollmentStatus == 'ENROLLED' && request.resource.data.status == 'ONLINE')
+        || (isThisDevice(deviceId) && resource.data.enrollmentStatus == 'ENROLLED'
           && onlyChanges(['status', 'isLocked', 'batteryLevel', 'osVersion', 'appVersion', 'fcmToken', 'lastSeen', 'updatedAt'])
           && request.resource.data.status in ['ONLINE', 'LOCKED', 'ERROR']
           && (!('batteryLevel' in request.resource.data) || request.resource.data.batteryLevel == null
-              || (request.resource.data.batteryLevel is number && request.resource.data.batteryLevel >= 0 && request.resource.data.batteryLevel <= 100));
+              || (request.resource.data.batteryLevel is number && request.resource.data.batteryLevel >= 0 && request.resource.data.batteryLevel <= 100)));
       allow delete: if isAdmin();
 
       match /installedApps/{pkg} {
@@ -102,9 +108,10 @@ service cloud.firestore {
         && request.resource.data.status == 'PENDING' && request.resource.data.createdBy == request.auth.uid
         && request.resource.data.executedAt == null
         && request.resource.data.expiresAt > request.time && request.resource.data.expiresAt <= request.time + duration.value(1, 'd')
-        && exists(/databases/$(database)/documents/devices/$(request.resource.data.deviceId));
+        && exists(/databases/$(database)/documents/devices/$(request.resource.data.deviceId))
+        && approved(request.resource.data.deviceId);   // hanya peranti yang telah diterima
       // Peranti sahaja boleh bergerak PENDING → SENT → ACKNOWLEDGED → EXECUTED/FAILED (tidak boleh langkau PENDING → EXECUTED)
-      allow update: if isThisDevice(resource.data.deviceId) && resource.data.expiresAt > request.time
+      allow update: if isThisDevice(resource.data.deviceId) && approved(resource.data.deviceId) && resource.data.expiresAt > request.time
           && onlyChanges(['status', 'sentAt', 'executedAt', 'errorMessage'])
           && (resource.data.status == 'PENDING' && request.resource.data.status in ['SENT', 'ACKNOWLEDGED']
               || resource.data.status == 'SENT' && request.resource.data.status in ['ACKNOWLEDGED', 'EXECUTED', 'FAILED']
@@ -128,8 +135,11 @@ service cloud.firestore {
     }
     match /publicStatus/{deviceId} {
       allow read: if true;
-      allow create, update: if isAdmin() && validPublic()
-        || isDevice() && request.auth.uid == deviceId && existsAfter(/databases/$(database)/documents/devices/$(deviceId)) && validPublic();
+      allow create: if isAdmin() && validPublic()
+        || isDevice() && request.auth.uid == deviceId && existsAfter(/databases/$(database)/documents/devices/$(deviceId))
+           && validPublic() && request.resource.data.status == 'ENROLLMENT_PENDING';
+      allow update: if isAdmin() && validPublic()
+        || isDevice() && request.auth.uid == deviceId && exists(/databases/$(database)/documents/devices/$(deviceId)) && approved(deviceId) && validPublic();
       allow delete: if isAdmin();
     }
 

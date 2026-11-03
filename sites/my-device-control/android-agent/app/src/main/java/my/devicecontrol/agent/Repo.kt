@@ -55,7 +55,7 @@ class Repo(private val ctx: Context) {
         batch.set(db.collection("devices").document(id), hashMapOf<String, Any?>(
             "deviceId" to id, "deviceName" to name, "deviceType" to type,
             "deviceModel" to "${Build.MANUFACTURER} ${Build.MODEL} (${formFactor()})".take(80), "osVersion" to osVersion(),
-            "status" to "ONLINE", "isLocked" to false, "enrollmentStatus" to "ENROLLED",
+            "status" to "ENROLLMENT_PENDING", "isLocked" to false, "enrollmentStatus" to "PENDING_APPROVAL",
             "assignedUserId" to null, "groupId" to groupId, "batteryLevel" to bat,
             "lastSeen" to now, "createdAt" to now, "updatedAt" to now,
             "enrollmentCode" to code, "appVersion" to AgentConfig.APP_VERSION
@@ -63,10 +63,10 @@ class Repo(private val ctx: Context) {
         batch.update(db.collection("enrollments").document(code),
             mapOf("status" to "USED", "deviceId" to id, "usedAt" to now))
         batch.set(db.collection("publicStatus").document(id), hashMapOf<String, Any?>(
-            "deviceName" to name, "deviceType" to type, "status" to "ONLINE",
+            "deviceName" to name, "deviceType" to type, "status" to "ENROLLMENT_PENDING",
             "batteryLevel" to bat, "lastSeen" to now, "groupName" to null, "updatedAt" to now
         ))
-        batch.set(db.collection("activityLogs").document(), logMap("DEVICE_REGISTERED", "Peranti didaftarkan", id))
+        batch.set(db.collection("activityLogs").document(), logMap("DEVICE_REGISTERED", "Peranti mengimbas kod, menunggu kelulusan", id))
         try {
             batch.commit().await()
         } catch (e: FirebaseFirestoreException) {

@@ -10,13 +10,14 @@ gradle assembleDebug                            # APK: app/build/outputs/apk/deb
 ```
 Android Studio: File > Open > folder `android-agent`, tunggu Gradle sync, kemudian Run atau Build APK.
 
-## Pasang & daftar (imbas sahaja)
+## Pasang & sambung (imbas, kemudian admin Terima)
 1. Pasang APK pada telefon atau tablet (benarkan pemasangan dari sumber ini).
-2. Panel admin > All Devices > **Daftar peranti**: kod QR dipaparkan.
-3. Buka aplikasi: **kamera terus terbuka**. Imbas kod QR itu. Peranti didaftarkan serta-merta, kemudian sistem meminta kebenaran pentadbir peranti (untuk kunci skrin): tekan Aktifkan.
-4. Peranti muncul di panel dan di `index.html`. Notifikasi "Peranti ini diurus oleh pentadbir" sentiasa kelihatan.
+2. Panel admin > All Devices > **Daftar peranti**: pilih jenis, taip nama apa-apa (tak perlu sama dengan peranti sebenar), jana kod QR.
+3. Buka aplikasi: **skrin pertama ialah kamera**. Imbas kod QR itu. Tiada skrin tetapan lain.
+4. Peranti muncul di panel dalam kad **"Menunggu kelulusan"** (dengan bunyi dan toast). Admin tekan **Terima**, dan peranti terus boleh dikawal. **Tolak** membuang peranti, dan aplikasi melepaskan dirinya.
+5. Notifikasi "Peranti ini diurus oleh pentadbir" sentiasa kelihatan.
 
-Jika kamera ditutup, tekan "Imbas kod QR", atau tampal kod secara manual.
+Kunci skrin memerlukan kebenaran pentadbir peranti **sekali** pada peranti (Android tidak membenarkan ia dilangkau tanpa Device Owner). Aplikasi tidak memintanya di awal: apabila admin menghantar LOCK pertama kali, satu notifikasi muncul; ketuk untuk memberi kebenaran.
 
 ## Apa yang dilakukan (dan tidak)
 | Arahan | Pentadbir peranti biasa | Device Owner |

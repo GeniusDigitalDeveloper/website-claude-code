@@ -14,3 +14,6 @@ Buka `agent.html` pada peranti (apa-apa pelayar), tampal kod enrollment (pilih j
 
 ## Nyahdaftar peranti
 Panel meminta e-mel dan kata laluan salah satu akaun Firebase Authentication sebelum memadam peranti (pengesahan dalam panel; bukan peraturan pelayan).
+
+## Kelulusan admin
+Selepas agent mengimbas kod, `devices/{uid}` dicipta dengan `enrollmentStatus: PENDING_APPROVAL` dan `status: ENROLLMENT_PENDING`. Peranti tidak boleh heartbeat, menerima arahan atau mengemas kini status awam sehingga admin menekan Terima (`enrollmentStatus: ENROLLED`, `status: ONLINE`). Rules juga menolak arahan kepada peranti yang belum diterima, dan peranti tidak boleh meluluskan dirinya sendiri. Tolak memadam rekod peranti.

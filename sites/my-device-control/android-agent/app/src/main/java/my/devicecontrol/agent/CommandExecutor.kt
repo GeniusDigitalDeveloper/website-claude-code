@@ -52,7 +52,7 @@ class CommandExecutor(private val ctx: Context) {
         if (isAdminActive()) {
             dpm.lockNow(); return Pair(true, null)   // skrin dikunci; pengguna membuka dengan PIN
         }
-        return Pair(false, "Kebenaran pentadbir peranti belum diaktifkan pada peranti ini.")
+        return Pair(false, "Kebenaran kunci skrin belum diberi pada peranti. Ketuk notifikasi pada peranti untuk memberi kebenaran sekali sahaja.")
     }
 
     private fun unlock(): Pair<Boolean, String?> {

@@ -2,6 +2,7 @@ package my.devicecontrol.agent
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -9,9 +10,9 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ListenerRegistration
@@ -26,15 +27,17 @@ import kotlinx.coroutines.tasks.await
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * Perkhidmatan latar depan (notifikasi sentiasa kelihatan: peranti ini diurus pentadbir):
- *  - heartbeat setiap 4 minit
- *  - mendengar arahan PENDING/SENT untuk peranti ini dan melaksanakannya
+ * Perkhidmatan latar depan (notifikasi sentiasa kelihatan: peranti ini diurus pentadbir).
+ *  1. Selepas imbas QR: menunggu admin menekan Terima (enrollmentStatus PENDING_APPROVAL -> ENROLLED)
+ *  2. Selepas diterima: heartbeat setiap 4 minit dan melaksanakan arahan
+ *  3. Jika rekod peranti dipadam admin: melepaskan peranti dari kawalan
  */
 class AgentService : Service() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var registration: ListenerRegistration? = null
     private var selfReg: ListenerRegistration? = null
     @Volatile private var released = false
+    @Volatile private var working = false
     private val busy = ConcurrentHashMap.newKeySet<String>()
     private lateinit var repo: Repo
     private lateinit var executor: CommandExecutor
@@ -49,7 +52,7 @@ class AgentService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startInForeground()
-        if (registration == null) startWork()
+        if (selfReg == null) startWork()
         return START_STICKY
     }
 
@@ -73,26 +76,35 @@ class AgentService : Service() {
                 uid = runCatching { repo.ensureSignedIn() }.getOrNull()
                 if (uid == null) delay(30_000)
             }
-            val id = uid ?: return@launch
-            executor.protect()
-            if (Prefs.locked(applicationContext) && executor.isOwner()) executor.showKioskLock()
-            listenCommands(id)
-            listenSelf(id)
-            while (isActive) {
-                runCatching { repo.heartbeat(Prefs.locked(applicationContext), executor.isAdminActive()) }
-                delay(AgentConfig.HEARTBEAT_MS)
-            }
+            listenSelf(uid ?: return@launch)
         }
     }
 
-    /** Jika rekod peranti dipadam oleh admin, peranti ini dilepaskan dari kawalan. */
+    /** Memerhati rekod peranti ini: diterima (ENROLLED), atau dipadam/ditolak oleh admin. */
     private fun listenSelf(uid: String) {
         selfReg = FirebaseFirestore.getInstance().collection("devices").document(uid).addSnapshotListener { snap, e ->
             if (e != null) {
                 if (e is FirebaseFirestoreException && e.code == FirebaseFirestoreException.Code.PERMISSION_DENIED) scope.launch { releaseDevice() }
                 return@addSnapshotListener
             }
-            if (snap != null && !snap.exists() && !snap.metadata.isFromCache) scope.launch { releaseDevice() }
+            if (snap == null) return@addSnapshotListener
+            if (!snap.exists()) { if (!snap.metadata.isFromCache) scope.launch { releaseDevice() }; return@addSnapshotListener }
+            if (snap.getString("enrollmentStatus") == "ENROLLED") activate(uid) else Prefs.setState(applicationContext, "PENDING")
+        }
+    }
+
+    private fun activate(uid: String) {
+        if (working) return
+        working = true
+        Prefs.setState(applicationContext, "ACTIVE")
+        executor.protect()
+        if (Prefs.locked(applicationContext) && executor.isOwner()) executor.showKioskLock()
+        listenCommands(uid)
+        scope.launch {
+            while (isActive) {
+                runCatching { repo.heartbeat(Prefs.locked(applicationContext), executor.isAdminActive()) }
+                delay(AgentConfig.HEARTBEAT_MS)
+            }
         }
     }
 
@@ -101,7 +113,7 @@ class AgentService : Service() {
         released = true
         registration?.remove(); registration = null; selfReg?.remove(); selfReg = null
         executor.release()
-        Prefs.setEnrolled(applicationContext, false)
+        Prefs.setState(applicationContext, "NONE")
         FirebaseAuth.getInstance().signOut()
         val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         nm.notify(2, NotificationCompat.Builder(this, "agent").setSmallIcon(android.R.drawable.ic_lock_idle_lock)
@@ -135,12 +147,25 @@ class AgentService : Service() {
             val (ok, msg) = executor.run(type)
             if (ok) ref.update(mapOf("status" to "EXECUTED", "executedAt" to FieldValue.serverTimestamp())).await()
             else ref.update(mapOf("status" to "FAILED", "errorMessage" to (msg ?: "Gagal").take(300))).await()
+            if (!ok && type == "LOCK" && !executor.isAdminActive() && !executor.isOwner()) notifyNeedLockPermission()
             runCatching {
                 repo.log(if (ok) "COMMAND_EXECUTED" else "COMMAND_FAILED", if (ok) "$type berjaya" else "$type gagal: $msg")
                 repo.heartbeat(Prefs.locked(applicationContext), executor.isAdminActive())
             }
             if (ok && type == "REBOOT") executor.reboot()
         } catch (_: Exception) { /* arahan kekal SENT/PENDING dan dicuba semula pada snapshot seterusnya */ }
+    }
+
+    /** Kunci skrin memerlukan kebenaran pentadbir peranti SEKALI pada peranti (Android tidak membenarkan dilangkau). */
+    private fun notifyNeedLockPermission() {
+        val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val pi = PendingIntent.getActivity(this, 3,
+            Intent(this, MainActivity::class.java).putExtra(MainActivity.EXTRA_ASK_ADMIN, true)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+        nm.notify(3, NotificationCompat.Builder(this, "agent").setSmallIcon(android.R.drawable.ic_lock_idle_lock)
+            .setContentTitle("Kunci jauh belum diaktifkan").setContentText("Ketuk untuk memberi kebenaran sekali sahaja.")
+            .setContentIntent(pi).setAutoCancel(true).build())
     }
 
     override fun onDestroy() {

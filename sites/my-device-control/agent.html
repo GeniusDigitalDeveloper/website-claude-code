@@ -37,7 +37,7 @@ dl{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin:12px 0;font-s
   </section>
 
   <section id="vRun" class="hide">
-    <h1><span class="pulse" aria-hidden="true"></span>Disambungkan</h1>
+    <h1><span class="pulse" id="pulse" aria-hidden="true"></span><span id="hRun">Disambungkan</span></h1>
     <p id="runNote">Peranti ini dilaporkan kepada pentadbir selagi halaman ini terbuka.</p>
     <dl><dt>Nama</dt><dd id="iName">—</dd><dt>Jenis</dt><dd id="iType">—</dd><dt>Peranti</dt><dd id="iModel">—</dd><dt>Bateri</dt><dd id="iBat">—</dd><dt>Isyarat terakhir</dt><dd id="iLast">—</dd></dl>
     <button id="bStop">Putuskan di peranti ini</button>
@@ -95,12 +95,12 @@ async function enroll(code) {
   let snap; try { snap = await F.getDoc(F.doc(db, "enrollments", code)); } catch (e) { throw new Error("Kod tidak sah, sudah digunakan atau telah tamat tempoh."); }
   if (!snap.exists()) throw new Error("Kod tidak sah, sudah digunakan atau telah tamat tempoh.");
   const d = snap.data(), now = F.serverTimestamp(), bat = batteryLevel(), bt = F.writeBatch(db);
-  bt.set(F.doc(db, "devices", uid), { deviceId: uid, deviceName: d.deviceName, deviceType: d.deviceType, deviceModel: deviceModel(), osVersion: osVersion(), status: "ONLINE", isLocked: false,
-    enrollmentStatus: "ENROLLED", assignedUserId: null, groupId: d.groupId || null, batteryLevel: bat, lastSeen: now, createdAt: now, updatedAt: now, enrollmentCode: code, appVersion: "web-0.1" });
+  bt.set(F.doc(db, "devices", uid), { deviceId: uid, deviceName: d.deviceName, deviceType: d.deviceType, deviceModel: deviceModel(), osVersion: osVersion(), status: "ENROLLMENT_PENDING", isLocked: false,
+    enrollmentStatus: "PENDING_APPROVAL", assignedUserId: null, groupId: d.groupId || null, batteryLevel: bat, lastSeen: now, createdAt: now, updatedAt: now, enrollmentCode: code, appVersion: "web-0.1" });
   bt.update(F.doc(db, "enrollments", code), { status: "USED", deviceId: uid, usedAt: now });
-  bt.set(F.doc(db, "publicStatus", uid), { deviceName: d.deviceName, deviceType: d.deviceType, status: "ONLINE", batteryLevel: bat, lastSeen: now, groupName: null, updatedAt: now });
+  bt.set(F.doc(db, "publicStatus", uid), { deviceName: d.deviceName, deviceType: d.deviceType, status: "ENROLLMENT_PENDING", batteryLevel: bat, lastSeen: now, groupName: null, updatedAt: now });
   try { await bt.commit(); } catch (e) { throw new Error("Pendaftaran ditolak. Kod mungkin sudah digunakan atau tamat tempoh."); }
-  await logEv("DEVICE_REGISTERED", "Peranti didaftarkan (agent web)");
+  await logEv("DEVICE_REGISTERED", "Peranti mengimbas kod, menunggu kelulusan (agent web)");
   info = { name: d.deviceName, type: d.deviceType };
   localStorage.setItem("mdc_agent", JSON.stringify(info));
 }
@@ -121,11 +121,26 @@ async function handleCommand(ref, status, type) {
   } catch (e) { /* dicuba semula pada snapshot seterusnya */ }
 }
 
+let active = false, unsubSelf = null;
+function setWaiting(w) {
+  $("hRun").textContent = w ? "Menunggu kelulusan admin" : "Disambungkan";
+  $("pulse").style.background = w ? "#B45309" : ""; $("pulse").style.animation = w ? "none" : "";
+  $("runNote").textContent = w ? "Pentadbir perlu menekan Terima di panel admin. Biarkan halaman ini terbuka." : "Peranti ini dilaporkan kepada pentadbir selagi halaman ini terbuka.";
+}
+/** Selepas daftar / sambung semula: tunggu kelulusan, kemudian mula melapor dan menerima arahan. */
 function start() {
   $("vJoin").classList.add("hide"); $("vRun").classList.remove("hide");
   $("iName").textContent = info.name; $("iType").textContent = TYPE_LABEL[info.type] || info.type; $("iModel").textContent = deviceModel();
+  setWaiting(true);
+  unsubSelf = F.onSnapshot(F.doc(db, "devices", uid), (s) => {
+    if (!s.exists()) { if (!s.metadata.fromCache) { say("Peranti ini ditolak atau dinyahdaftar oleh pentadbir.", "err"); stop(true); } return; }
+    if (s.get("enrollmentStatus") === "ENROLLED" && !active) activate();
+  }, (e) => { if (/permission/i.test((e && (e.code || e.message)) || "")) { say("Peranti ini ditolak atau dinyahdaftar oleh pentadbir.", "err"); stop(true); } });
+}
+function activate() {
+  active = true; setWaiting(false); say("Diterima oleh admin.", "okc");
   heartbeat(); timer = setInterval(heartbeat, HEARTBEAT_MS);
-  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && uid) heartbeat(); });
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && uid && active) heartbeat(); });
   const q = F.query(F.collection(db, "commands"), F.where("deviceId", "==", uid), F.where("status", "in", ["PENDING", "SENT"]));
   unsubCmd = F.onSnapshot(q, (s) => s.docs.forEach((d) => {
     const exp = d.get("expiresAt"); if (exp && exp.toMillis() < Date.now()) return;
@@ -133,7 +148,7 @@ function start() {
   }), () => {});
 }
 function stop(clear) {
-  clearInterval(timer); if (unsubCmd) unsubCmd(); timer = unsubCmd = null;
+  active = false; clearInterval(timer); if (unsubCmd) unsubCmd(); if (unsubSelf) unsubSelf(); timer = unsubCmd = unsubSelf = null;
   if (clear) localStorage.removeItem("mdc_agent");
   $("vRun").classList.add("hide"); $("vJoin").classList.remove("hide");
 }
@@ -142,7 +157,7 @@ const params = new URLSearchParams(location.search); if (params.get("code")) $("
 $("fJoin").onsubmit = async (e) => {
   e.preventDefault(); const code = $("code").value.replace(/[\s"'“”]/g, ""); if (code.length < 24) return say("Kod terlalu pendek. Salin kod penuh dari panel admin.", "err");
   $("bJoin").disabled = true; say("Menyambung…");
-  try { await enroll(code); say("Berjaya disambungkan.", "okc"); start(); } catch (er) { say(er.message, "err"); } finally { $("bJoin").disabled = false; }
+  try { await enroll(code); say("Kod diterima. Menunggu kelulusan admin.", "okc"); start(); } catch (er) { say(er.message, "err"); } finally { $("bJoin").disabled = false; }
 };
 $("bStop").onclick = () => { stop(true); say("Diputuskan pada peranti ini. Pentadbir boleh nyahdaftar peranti dari panel."); };
 

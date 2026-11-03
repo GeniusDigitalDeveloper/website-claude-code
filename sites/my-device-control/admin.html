@@ -179,7 +179,7 @@ const ICON = {
   search: '<circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/>', wifi: '<path d="M5 12.5a10 10 0 0114 0M8.5 16a5 5 0 017 0M12 20h.01M2 9a15 15 0 0120 0"/>',
   wifioff: '<path d="M2 2l20 20M8.5 16a5 5 0 016.2-.6M5 12.5a10 10 0 015-2.6M2 9a15 15 0 015.2-3.2M12 20h.01"/>', laptop: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M2 20h20"/>',
   clock: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>', warn: '<path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/>',
-  x: '<path d="M18 6L6 18M6 6l12 12"/>', left: '<path d="M15 18l-6-6 6-6"/>', right: '<path d="M9 18l6-6-6-6"/>', shield: '<path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/>', info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>'
+  x: '<path d="M18 6L6 18M6 6l12 12"/>', check: '<path d="M5 12l5 5L20 7"/>', left: '<path d="M15 18l-6-6 6-6"/>', right: '<path d="M9 18l6-6-6-6"/>', shield: '<path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/>', info: '<circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>'
 };
 const ic = (n, s = 18, c = "currentColor") => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n] || ""}</svg>`;
 const toast = (text, err) => { const d = document.createElement("div"); d.className = "toast" + (err ? " err" : ""); d.textContent = text; $("#toasts").appendChild(d); setTimeout(() => d.remove(), 5500); };
@@ -203,6 +203,13 @@ function loadPreview() {
 const getCfg = () => CONFIG;
 let fsdb = null, auth = null;
 const OFFLINE_MS = 10 * 60 * 1000;
+const isWaiting = (d) => d.enrollmentStatus === "PENDING_APPROVAL";
+function onDevices(list) {
+  applyStatus(list);
+  const now = new Set(list.filter(isWaiting).map((d) => d.id));
+  if (S._waitInit) list.filter((d) => isWaiting(d) && !(S._wait || new Set()).has(d.id)).forEach((d) => { toast(`Peranti baharu "${d.deviceName}" menunggu kelulusan anda.`); playSound(true); });
+  S._wait = now; S._waitInit = true;
+}
 // Status berkesan: tiada heartbeat > 10 minit = OFFLINE (dikira di panel, tiada Cloud Functions)
 function effStatus(d) { const raw = d._raw || d.status; return ["ONLINE", "LOCKED", "ERROR"].includes(raw) && ms(d.lastSeen) && Date.now() - ms(d.lastSeen) > OFFLINE_MS ? "OFFLINE" : raw; }
 function applyStatus(list) { list.forEach((d) => { if (d._raw === undefined) d._raw = d.status; d.status = effStatus(d); }); }
@@ -231,7 +238,7 @@ function subscribeAll() {
     unsubs.push(onSnapshot(q, (s) => { S[key] = s.docs.map((d) => ({ id: d.id, ...d.data() })); if (post) post(S[key]); S.loaded[key] = true; delete S.errors[key]; render(); },
       (e) => { S.errors[key] = e.message; S.loaded[key] = true; render(); }));
   };
-  sub("devices", "devices", "createdAt", 500, applyStatus); sub("groups", "deviceGroups", null, 200);
+  sub("devices", "devices", "createdAt", 500, onDevices); sub("groups", "deviceGroups", null, 200);
   sub("commands", "commands", "createdAt", 300, applyCmdStatus); sub("logs", "activityLogs", "createdAt", 300); sub("enrollments", "enrollments", "createdAt", 100);
 }
 async function fsWrite(fn) { if (PREVIEW) return previewBlock(); return fn(fb.F); }
@@ -275,10 +282,10 @@ function confirmBox({ title, body, label, danger, requireText, run }) {
 
 /* ---------- Halaman ---------- */
 function pageDashboard() {
-  const D = S.devices, by = (s) => D.filter((d) => d.status === s).length;
+  const D = S.devices.filter((d) => !isWaiting(d)), by = (s) => D.filter((d) => d.status === s).length;
   const stat = (l, v, i, c = "#0F172A") => `<div class="card stat lift"><div class="ic">${ic(i, 20, c)}</div><div><b data-n="${v}">${v}</b><span>${l}</span></div></div>`;
   const attention = D.filter((d) => d.status === "ERROR" || (typeof d.batteryLevel === "number" && d.batteryLevel < 15)).length;
-  const pending = S.enrollments.filter((e) => e.status === "PENDING").length;
+  const pending = S.enrollments.filter((e) => e.status === "PENDING").length + (S.devices.length - D.length);
   const COL = { ONLINE: "#047857", OFFLINE: "#64748B", LOCKED: "#B45309", ENROLLMENT_PENDING: "#0369A1", ERROR: "#DC2626" };
   // donut
   const cnt = {}; D.forEach((d) => (cnt[d.status] = (cnt[d.status] || 0) + 1));
@@ -311,7 +318,11 @@ function pageDashboard() {
 
 function pageDevices() {
   const q = S.q.toLowerCase();
-  const rows = S.devices.filter((d) => (!S.fs || d.status === S.fs) && (!S.ft || d.deviceType === S.ft) && (!q || `${d.deviceName} ${d.deviceId} ${d.deviceModel} ${d.assignedUserId || ""}`.toLowerCase().includes(q)));
+  const ACTIVE = S.devices.filter((d) => !isWaiting(d)), wait = S.devices.filter(isWaiting);
+  const waitCard = wait.length ? `<div class="card tw" style="margin-bottom:12px;border-color:var(--accent)"><div style="padding:16px 16px 0"><b>Menunggu kelulusan (${wait.length})</b><p class="sm" style="margin:2px 0 0">Peranti ini telah mengimbas kod QR. Tekan <b>Terima</b> untuk membolehkan anda mengawalnya, atau <b>Tolak</b> untuk membuangnya.</p></div>
+    <table style="min-width:520px"><thead><tr><th>Peranti</th><th>Jenis</th><th>Diimbas</th><th></th></tr></thead><tbody>${wait.map((d) => `<tr><td><b>${esc(d.deviceName)}</b><div class="sm">${esc(d.deviceModel || "")} · ${esc(d.osVersion || "")}</div></td><td>${esc(d.deviceType)}</td><td>${ago(d.createdAt || d.lastSeen)}</td>
+      <td style="white-space:nowrap"><button class="btn p" data-act="approve" data-id="${esc(d.id)}">${ic("check", 16)}Terima</button> <button class="btn" data-act="reject" data-id="${esc(d.id)}">Tolak</button></td></tr>`).join("")}</tbody></table></div>` : "";
+  const rows = ACTIVE.filter((d) => (!S.fs || d.status === S.fs) && (!S.ft || d.deviceType === S.ft) && (!q || `${d.deviceName} ${d.deviceId} ${d.deviceModel} ${d.assignedUserId || ""}`.toLowerCase().includes(q)));
   const PER = 10, pages = Math.max(1, Math.ceil(rows.length / PER)); if (S.pg >= pages) S.pg = pages - 1;
   const view = rows.slice(S.pg * PER, S.pg * PER + PER), mg = can("DEVICE_MANAGER"), ad = can("ORG_ADMIN");
   const opts = (arr, cur, all) => `<option value="">${all}</option>` + arr.map((a) => `<option ${a === cur ? "selected" : ""}>${a}</option>`).join("");
@@ -319,12 +330,12 @@ function pageDevices() {
   const left = (e) => { const t = ms(e.expiresAt) - Date.now(); return t <= 0 ? '<span class="badge b-EXPIRED">TAMAT TEMPOH</span>' : t < 3600e3 ? Math.ceil(t / 60e3) + " min lagi" : Math.floor(t / 3600e3) + " jam lagi"; };
   const pendCard = pend.length ? `<div class="card tw" style="margin-bottom:12px"><div style="padding:16px 16px 0"><b>Menunggu imbasan (${pend.length})</b><p class="sm" style="margin:2px 0 0">Kod enrollment sudah dicipta tetapi peranti belum mengimbasnya. Batalkan jika tidak diperlukan; kod itu tidak boleh digunakan lagi.</p></div>
     <table style="min-width:480px"><thead><tr><th>Nama</th><th>Jenis</th><th>Tamat</th><th></th></tr></thead><tbody>${pend.map((e) => `<tr><td><b>${esc(e.deviceName)}</b></td><td>${esc(e.deviceType)}</td><td>${left(e)}</td><td><button class="btn i" data-act="encancel" data-id="${esc(e.id)}" aria-label="Batalkan enrollment ${esc(e.deviceName)}">${ic("trash", 16, "#DC2626")}</button></td></tr>`).join("")}</tbody></table></div>` : "";
-  return head("All Devices", S.devices.length + " peranti", (mg ? `<button class="btn p" data-act="enroll">${ic("plus", 16)}Daftar peranti</button>` : "") + (ad ? `<button class="btn d" data-act="lockall" ${S.devices.length ? "" : "disabled"}>${ic("lock", 16)}Lock All Devices</button>` : "")) + `
-  ${pendCard}<div class="card row" style="margin-bottom:12px"><div class="search">${ic("search", 16, "#94a3b8")}<input id="q" aria-label="Cari peranti" placeholder="Cari nama / ID / model" value="${esc(S.q)}"></div>
+  return head("All Devices", ACTIVE.length + " peranti", (mg ? `<button class="btn p" data-act="enroll">${ic("plus", 16)}Daftar peranti</button>` : "") + (ad ? `<button class="btn d" data-act="lockall" ${ACTIVE.length ? "" : "disabled"}>${ic("lock", 16)}Lock All Devices</button>` : "")) + `
+  ${waitCard}${pendCard}<div class="card row" style="margin-bottom:12px"><div class="search">${ic("search", 16, "#94a3b8")}<input id="q" aria-label="Cari peranti" placeholder="Cari nama / ID / model" value="${esc(S.q)}"></div>
     <select id="fs" aria-label="Tapis status" style="width:auto">${opts(["ONLINE", "OFFLINE", "LOCKED", "ENROLLMENT_PENDING", "ERROR"], S.fs, "Semua status")}</select>
     <select id="ft" aria-label="Tapis jenis" style="width:auto">${opts(["ANDROID", "IOS", "WINDOWS", "MAC", "LINUX", "OTHER"], S.ft, "Semua jenis")}</select>
     ${mg && S.sel.size ? `<button class="btn" data-act="lock-sel">${ic("lock", 16)}Lock (${S.sel.size})</button><button class="btn" data-act="unlock-sel">${ic("unlock", 16)}Unlock (${S.sel.size})</button>` : ""}</div>
-  <div class="card tw">${state("devices", () => !rows.length ? empty(S.devices.length ? "Tiada padanan" : "Belum ada peranti", S.devices.length ? "Ubah carian atau penapis." : 'Klik "Daftar peranti" untuk menjana token enrollment.') : `
+  <div class="card tw">${state("devices", () => !rows.length ? empty(ACTIVE.length ? "Tiada padanan" : "Belum ada peranti", ACTIVE.length ? "Ubah carian atau penapis." : 'Klik "Daftar peranti" untuk menjana token enrollment.') : `
     <table><thead><tr><th style="width:36px"><input type="checkbox" id="selall" aria-label="Pilih semua di halaman" ${mg ? "" : "disabled"} ${view.length && view.every((d) => S.sel.has(d.id)) ? "checked" : ""} style="min-height:0;width:auto"></th><th>Peranti</th><th>Jenis / OS</th><th>Status</th><th>Enrollment</th><th>Kumpulan</th><th>Pengguna</th><th>Last seen</th><th></th></tr></thead><tbody>
     ${view.map((d) => `<tr><td><input type="checkbox" data-sel="${esc(d.id)}" aria-label="Pilih ${esc(d.deviceName)}" ${mg ? "" : "disabled"} ${S.sel.has(d.id) ? "checked" : ""} style="min-height:0;width:auto"></td>
       <td><b>${esc(d.deviceName)}</b><div class="mono">${esc(d.deviceId)}</div></td><td>${esc(d.deviceType)}<div class="sm">${esc(d.deviceModel)} · ${esc(d.osVersion)}</div></td>
@@ -437,7 +448,7 @@ function draw() {
 /* ---------- Tindakan ---------- */
 // Hantar arahan: satu dokumen PENDING setiap peranti (rules mengesahkan jenis, tamat dalam 24 jam, peranti wujud)
 const send = async (data) => {
-  const ids = data.all ? S.devices.map((d) => d.id) : data.groupId ? S.devices.filter((d) => d.groupId === data.groupId).map((d) => d.id) : data.deviceIds;
+  const live = S.devices.filter((d) => !isWaiting(d)), ids = data.all ? live.map((d) => d.id) : data.groupId ? live.filter((d) => d.groupId === data.groupId).map((d) => d.id) : data.deviceIds;
   if (!ids.length) { toast("Tiada peranti sasaran.", true); return; }
   await fsWrite(async (F) => {
     for (let i = 0; i < ids.length; i += 200) {
@@ -517,6 +528,20 @@ const ACTIONS = {
         }
       };
     });
+  },
+  approve(el) {
+    const d = byId(el.dataset.id);
+    fsWrite(async (F) => { const bt = F.writeBatch(fsdb);
+      bt.update(ref("devices", d.id), { enrollmentStatus: "ENROLLED", status: "ONLINE", updatedAt: F.serverTimestamp() });
+      bt.set(ref("publicStatus", d.id), pubDoc(d, { status: "ONLINE", updatedAt: F.serverTimestamp() }));
+      logEv(F, bt, "DEVICE_APPROVED", `Peranti "${d.deviceName}" diterima`, d.id); await bt.commit(); })
+      .then(() => { toast(`"${d.deviceName}" diterima. Anda kini boleh mengawalnya.`); playSound(true); })
+      .catch((e) => { if (e.message !== "preview") toast(errMsg(e), true); });
+  },
+  reject(el) {
+    const d = byId(el.dataset.id);
+    confirmBox({ title: "Tolak peranti", body: `Peranti <b>${esc(d.deviceName)}</b> akan dibuang dan tidak boleh dikawal. Aplikasi pada peranti itu akan melepaskan dirinya.`, label: "Tolak", danger: true,
+      run: () => fsWrite(async (F) => { const bt = F.writeBatch(fsdb); bt.delete(ref("devices", d.id)); bt.delete(ref("publicStatus", d.id)); logEv(F, bt, "DEVICE_REJECTED", `Peranti "${d.deviceName}" ditolak`, d.id); await bt.commit(); toast("Peranti ditolak."); }) });
   },
   encancel(el) {
     const e = S.enrollments.find((x) => x.id === el.dataset.id);
