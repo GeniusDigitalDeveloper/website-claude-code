@@ -10,6 +10,7 @@ Dashboard dalaman untuk menguruskan peranti apa-apa jenis dan jenama (Android te
 | `firestore.rules` | Rules Firestore |
 | `database.rules.json` | Rules Realtime Database (heartbeat pilihan) |
 | `agent.html` | Agent web untuk mana-mana peranti dengan pelayar (iPhone, Mac, Linux, laptop, lain-lain): status sahaja, tiada kunci jauh |
+| `windows-agent/` | Agent latar belakang untuk Windows (satu fail PowerShell): status walaupun pelayar ditutup + kunci jauh. Lihat `windows-agent/README.md` |
 | `preview.html` / `preview-artifact.html` | Preview + butang salin. Jana semula: `python3 build-preview.py` |
 | `rules-test/` | Ujian rules Firestore (emulator): `cd rules-test && npm i && npm test` |
 
