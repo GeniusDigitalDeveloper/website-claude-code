@@ -157,11 +157,29 @@ function friendly(stderr = '') {
 }
 
 /* ---------------- Maklumat video ---------------- */
+/* ---------------- Tapisan hak cipta (usaha terbaik, BUKAN jaminan) ----------------
+   Tiada cara sebenar untuk mengesahkan status hak cipta sesuatu video daripada metadata platform. Lapisan di sini:
+   1) lesen terbuka (Creative Commons / domain awam) dibenarkan terus;
+   2) muzik, filem/siri dan kandungan terhad/berbayar yang jelas dikenal pasti ditolak (kod copyright_*);
+   3) selebihnya dibenarkan HANYA jika pengguna mengesahkan pengakuan (declared) dan pengesahan itu direkodkan. */
+import { classify, REJECT_MSG } from './classify.mjs';
+const verdictCache = new Map(); // url -> { at, verdict }
+function recordBlocked(platform, code) {
+  db.stats.blocked = (db.stats.blocked || 0) + 1;
+  db.logs.unshift({ t: Date.now(), platform, format: '-', quality: '-', ok: false, title: 'ditolak (hak cipta): ' + code });
+  db.logs.length = Math.min(db.logs.length, 100);
+  saveDb();
+}
+const blockedReply = (verdict) => ({ error: REJECT_MSG[verdict.code], code: 'copyright_' + verdict.code });
+const needDeclare = { error: 'Sila sahkan pengakuan hak cipta dahulu.', code: 'declare' };
+
 async function getInfo(url) {
   const out = await run(['-J', '--no-playlist', '--no-warnings', '--skip-download', ...cookieArgs(), '--', url], 60_000);
   const j = JSON.parse(out);
   const heights = [...new Set((j.formats || []).map((f) => f.height).filter(Boolean))].sort((a, b) => b - a);
-  return { title: j.title || 'Video', thumbnail: j.thumbnail || '', duration: j.duration || 0, uploader: j.uploader || j.channel || '', maxHeight: heights[0] || 0, isLive: !!j.is_live };
+  const verdict = classify(j);
+  verdictCache.set(url, { at: Date.now(), verdict });
+  return { title: j.title || 'Video', thumbnail: j.thumbnail || '', duration: j.duration || 0, uploader: j.uploader || j.channel || '', maxHeight: heights[0] || 0, isLive: !!j.is_live, verdict };
 }
 
 /* ---------------- Kerja muat turun ---------------- */
@@ -270,8 +288,10 @@ async function api(req, res, url) {
     const body = await readJson(req);
     const r = resolveUrl(body.url);
     if (r.error) return send(res, 400, { error: r.error });
+    if (body.declared !== true) return send(res, 400, needDeclare);
     try {
-      const info = await getInfo(r.url);
+      const { verdict, ...info } = await getInfo(r.url);
+      if (!verdict.ok) { recordBlocked(r.platform.id, verdict.code); return send(res, 451, blockedReply(verdict)); }
       if (info.isLive) return send(res, 400, { error: 'Siaran langsung belum boleh dimuat turun. Tunggu ia tamat.' });
       if (info.duration > MAX_DURATION) return send(res, 400, { error: `Video terlalu panjang (had ${MAX_DURATION / 60} minit).` });
       return send(res, 200, { ...info, platform: { id: r.platform.id, name: r.platform.name }, url: r.url });
@@ -288,6 +308,13 @@ async function api(req, res, url) {
     const body = await readJson(req);
     const r = resolveUrl(body.url);
     if (r.error) return send(res, 400, { error: r.error });
+    if (body.declared !== true) return send(res, 400, needDeclare);
+    // Semak semula status hak cipta sebelum muat turun (guna keputusan 10 minit terakhir jika ada).
+    let cached = verdictCache.get(r.url);
+    if (!cached || Date.now() - cached.at > 10 * 60e3) {
+      try { cached = { verdict: (await getInfo(r.url)).verdict }; } catch (e) { return send(res, 422, { error: friendly(e.stderr) }); }
+    }
+    if (!cached.verdict.ok) { recordBlocked(r.platform.id, cached.verdict.code); return send(res, 451, blockedReply(cached.verdict)); }
     const format = String(body.format || 'mp4').toLowerCase();
     const quality = String(body.quality || 'best');
     if (![...VIDEO_FORMATS, ...AUDIO_FORMATS].includes(format) || !QUALITIES.includes(quality)) return send(res, 400, { error: 'Format atau kualiti tidak sah.' });

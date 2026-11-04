@@ -17,7 +17,7 @@ async function req(path, { method = 'GET', body, token } = {}) {
   try { data = await res.json(); } catch {}
   if (!res.ok) {
     if (!data && (res.status === 404 || res.status === 405)) { const e = new Error('Pelayan muat turun belum bersambung.'); e.offline = true; throw e; }
-    const e = new Error(data?.error || 'Ralat pelayan'); e.status = res.status; throw e;
+    const e = new Error(data?.error || 'Ralat pelayan'); e.status = res.status; e.code = data?.code || ''; throw e;
   }
   return data;
 }
@@ -47,8 +47,9 @@ const call = (path, opts) => (DEMO ? demo(path, opts) : req(path, opts));
 
 export const api = {
   config: async () => (await import('./firebase.js')).fb.getSite(),
-  info: (url) => call('/api/info', { method: 'POST', body: { url } }),
-  startJob: (url, format, quality) => call('/api/jobs', { method: 'POST', body: { url, format, quality } }),
+  // declared: pengguna telah menandakan pengakuan hak cipta (diwajibkan oleh borang, disemak semula oleh pelayan).
+  info: (url) => call('/api/info', { method: 'POST', body: { url, declared: true } }),
+  startJob: (url, format, quality) => call('/api/jobs', { method: 'POST', body: { url, format, quality, declared: true } }),
   job: (id) => call('/api/jobs/' + id),
   health: () => (DEMO ? Promise.resolve({ ok: true }) : req('/api/health')),
 };

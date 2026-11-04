@@ -213,7 +213,7 @@ function adminsView() {
   const rows = [`<div class="row-item glass"><div class="pi" data-ico="shield"></div><div class="txt"><b>${esc(me.email)}</b><small>Anda${me.owner ? ' · Pemilik' : ''}</small></div></div>`]
     .concat(admins.filter((a) => a.email !== String(me.email).toLowerCase()).map((a) => `<div class="row-item glass"><div class="pi" data-ico="shield"></div><div class="txt"><b>${esc(a.email)}</b><small>Admin${a.addedBy ? ' · ditambah oleh ' + esc(a.addedBy) : ''}</small></div>${me.owner ? `<div class="acts"><button class="icon-btn" data-rm="${esc(a.email)}" aria-label="Buang ${esc(a.email)}" data-ico="trash"></button></div>` : ''}</div>`));
   return `<div class="toolbar"><div><h1>Admin</h1><p class="sub2" style="margin:0">Akaun yang boleh log masuk ke panel ini.</p></div></div>
-  ${me.owner ? `<form class="settings-card glass" id="admForm" novalidate style="margin-bottom:.9rem"><div class="f"><label for="admEmail">Tambah admin (e-mel)</label><input id="admEmail" type="email" inputmode="email" autocapitalize="off" placeholder="nama@contoh.com"><small>Akaun e-mel itu mesti sudah wujud dalam Firebase Authentication atau sudah berdaftar. Selepas ditambah, ia boleh terus log masuk ke panel ini.</small></div><button class="btn gold" type="submit"><span class="t">Tambah admin</span></button></form>` : '<p class="sub2">Hanya pemilik boleh menambah atau membuang admin.</p>'}
+  <p class="sub2">Akaun admin diurus melalui Firebase Authentication oleh pemilik sistem. Tiada borang tambah e-mel di sini.</p>
   <div class="list">${rows.join('')}</div>`;
 }
 function bindAdmins() {

@@ -65,7 +65,7 @@ export function modal({ icon: ic = 'check', err = false, title, text, actions = 
     const el = document.createElement(a.href ? 'a' : 'button');
     el.className = 'btn ' + (a.cls || 'gold');
     el.textContent = a.label;
-    if (a.href) { el.href = a.href; el.setAttribute('download', ''); el.rel = 'noopener'; }
+    if (a.href) { el.href = a.href; el.rel = 'noopener'; if (a.external) el.target = '_blank'; else el.setAttribute('download', ''); }
     el.addEventListener('click', () => { a.onClick?.(); if (!a.keep) close(); });
     box.append(el);
   });

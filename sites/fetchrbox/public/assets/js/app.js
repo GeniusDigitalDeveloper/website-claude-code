@@ -23,7 +23,7 @@ setupPwToggles();
 const notifyApi = initNotify();
 
 /* ---------- Halaman berasingan: Utama / Cara guna / Soalan lazim / Profil ---------- */
-const VIEWS = ['home', 'cara', 'faq', 'profil'];
+const VIEWS = ['home', 'cara', 'faq', 'profil', 'terma'];
 function route() {
   let v = location.hash.replace('#', '') || 'home';
   if (!VIEWS.includes(v)) v = 'home';
@@ -271,6 +271,7 @@ $('#form').addEventListener('submit', async (e) => {
   if (st.busy || !st.user) return;
   const url = $('#url').value.trim();
   if (!url) { toast(t('empty_url')); sfx.error(); $('#url').focus(); return; }
+  if (!needDecl()) return;
   setBusy($('#checkBtn'), true, t('checking'));
   hideResult();
   try { st.info = await api.info(url); sfx.pop(); renderResult(st.info); }
@@ -285,7 +286,20 @@ function setBusy(btn, on, label) {
   tt.textContent = label;
   if (!on) { tt.dataset.i18n = btn.id === 'goBtn' ? 'btn_download' : 'btn_check'; }
 }
+/** Pengakuan hak cipta wajib ditandakan sebelum mengimbas atau memuat turun. */
+function needDecl() {
+  const box = $('#decl');
+  if (box.checked) return true;
+  const lab = $('#declBox');
+  lab.classList.add('shake'); setTimeout(() => lab.classList.toggle('shake', false), 600);
+  toast(t('cr_need_decl')); sfx.error(); box.focus();
+  return false;
+}
 function failModal(err) {
+  if (String(err.code || '').startsWith('copyright_')) {
+    const key = 'cr_' + err.code.slice('copyright_'.length);
+    return modal({ icon: 'shield', err: true, title: t('cr_title'), text: t(key) === key ? err.message : t(key), actions: [{ label: t('chat_wa'), cls: 'ghost', href: 'https://wa.me/60177977935?text=' + encodeURIComponent(t('wa_text')), keep: false, external: true }] });
+  }
   if (err.offline) modal({ icon: 'alert', err: true, title: t('m_off_title'), text: t('m_off_text') });
   else modal({ icon: 'alert', err: true, title: t('m_fail_title'), text: err.message });
 }
@@ -324,6 +338,7 @@ $('#qualities').addEventListener('change', (e) => { st.quality = e.target.value;
 /* ---------- Muat turun ---------- */
 $('#goBtn').addEventListener('click', async () => {
   if (st.busy || !st.info || !st.user) return;
+  if (!needDecl()) return;
   const btn = $('#goBtn');
   setBusy(btn, true, t('preparing'));
   $('#progress').classList.add('show'); setProgress(0, 'preparing');

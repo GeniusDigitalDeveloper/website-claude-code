@@ -100,6 +100,7 @@
 
         <!-- Pemuat turun (dipaparkan selepas log masuk) -->
         <div class="dl glass wide-holo hot" id="dlBox" hidden>
+          <p class="cr-note" role="note"><span class="ico" data-ico="shield"></span><span data-i18n="cr_note"></span></p>
           <form id="form" class="field" novalidate>
             <div class="input-wrap holo wide-holo hot">
               <span class="ico" data-ico="link"></span>
@@ -109,6 +110,7 @@
             </div>
             <button class="btn gold" id="checkBtn" type="submit"><span class="ico" data-ico="zap"></span><span class="t" data-i18n="btn_check">Imbas</span></button>
           </form>
+          <label class="decl" id="declBox"><input type="checkbox" id="decl"><span data-i18n="cr_decl"></span></label>
           <div class="detected" id="detected" aria-live="polite"></div>
         </div>
 
@@ -159,6 +161,15 @@
       <div class="faq" id="faqList"></div>
     </section>
 
+    <!-- ============ TERMA & HAK CIPTA ============ -->
+    <section class="view page" data-view="terma" hidden aria-labelledby="termsh">
+      <h2 class="h2" id="termsh" data-i18n="terms_title"></h2>
+      <p class="cr-note terms-note" role="note"><span class="ico" data-ico="shield"></span><span data-i18n="cr_note"></span></p>
+      <ol class="terms">
+        <li data-i18n="terms_1"></li><li data-i18n="terms_2"></li><li data-i18n="terms_3"></li><li data-i18n="terms_4"></li><li data-i18n="terms_5"></li><li data-i18n="terms_6"></li>
+      </ol>
+    </section>
+
     <!-- ============ PROFIL (susunan seperti profil TikTok) ============ -->
     <section class="view page" data-view="profil" hidden aria-labelledby="profh">
       <div class="tt">
@@ -199,7 +210,7 @@
   </main>
 
   <footer class="foot">
-    <p class="foot-copy" data-i18n="foot"></p>
+    <div class="foot-left"><p class="foot-copy" data-i18n="foot"></p><a class="foot-terms" href="#terma" data-nav="terma" data-i18n="terms_link">Terma &amp; Hak Cipta</a></div>
     <p class="foot-stats" id="footStats" aria-live="off"></p>
   </footer>
 

@@ -74,3 +74,13 @@ Tapak admin berasingan. Ringkasan statistik, tambah/edit/hidupkan/matikan platfo
 - `notifications/{id}` : `{ title:{ms,en,ar}, body:{ms,en,ar}, createdAt, by }` (admin hantar, semua pengguna baca). Keadaan baca/padam setiap pengguna disimpan di `users/{uid}/nstate/{id}`. Pop-up kekal sehingga pengguna buka panel notifikasi.
 - `chats/{uid}` + `chats/{uid}/messages/{mid}` : chat pengguna dengan admin, masa nyata. Pengguna hanya boleh akses chat sendiri.
 - **Terjemahan** (`assets/js/translate.js`) dilakukan di pelayar menggunakan titik akhir percuma (Google tidak rasmi, kemudian MyMemory). Tiada jaminan perkhidmatan: jika gagal, teks asal dipaparkan. Untuk kebolehpercayaan penuh, gantikan dengan Cloud Translation API melalui pelayan (perlukan Blaze). Teks mesej dihantar kepada penyedia terjemahan itu.
+
+## Hak cipta: apa yang dilakukan sistem (dan yang tidak)
+Tiada cara sebenar untuk mengesahkan status hak cipta sesuatu video daripada metadata platform (contohnya video muzik rasmi tidak membawa medan lesen atau artis). Perlindungan berlapis:
+1. **Notis merah** di atas kotak tampal dan halaman **Terma & Hak Cipta** (3 bahasa).
+2. **Pengakuan wajib** (kotak tanda) sebelum Imbas dan Muat Turun. Pelayan menolak permintaan tanpa `declared: true`.
+3. **Tapisan automatik** (`server/classify.mjs`): lesen Creative Commons / domain awam dibenarkan; muzik rasmi, lirik, trek berartis, label/VEVO/Topic, filem/siri/episod dan kandungan terhad atau berbayar ditolak dengan HTTP 451 (`copyright_music`, `copyright_media`, `copyright_restricted`). Semakan diulang semasa permintaan muat turun. Penolakan direkodkan (`stats.blocked`).
+4. Pautan WhatsApp admin untuk pemilik hak cipta yang mahu aduan atau penyekatan.
+Ini usaha terbaik dan **bukan jaminan undang-undang**. Dapatkan nasihat peguam untuk terma dan dasar privasi rasmi.
+
+Ujian tapisan: `node --test server/classify.test.mjs`.
