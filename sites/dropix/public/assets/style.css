@@ -1,4 +1,4 @@
-/* Ngap — tema ngap + emas, glassmorphism, gerak gaya iOS. */
+/* Dropix — tema dropix + emas, glassmorphism, gerak gaya iOS. */
 :root {
   --bg0: #021613; --bg1: #052922; --bg2: #0a3a31;
   --emerald: #2ec4a0; --emerald-d: #0e7a66;
@@ -77,7 +77,7 @@ a { color: var(--gold); }
 main { max-width: 1120px; margin: 0 auto; padding: 0 1rem 4rem; }
 .hero { text-align: center; padding: clamp(1.5rem, 5vw, 3.5rem) 0 2rem; }
 .kicker { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.9rem; border-radius: 99px; font-size: 0.85rem; color: var(--gold-l); border: 1px solid var(--line); background: rgba(230, 195, 106, 0.08); }
-.wordmark { font-family: var(--display); font-weight: 800; line-height: 1; letter-spacing: -0.03em; font-size: clamp(3.9rem, 17vw, 10.5rem); margin: 1rem 0 0.4rem; display: flex; justify-content: center; }
+.wordmark { font-family: var(--display); font-weight: 800; line-height: 1; letter-spacing: -0.03em; font-size: clamp(3.4rem, 15vw, 9.5rem); margin: 1rem 0 0.4rem; display: flex; justify-content: center; }
 .wordmark span { display: inline-block; background: linear-gradient(180deg, #fff6d8 0%, var(--gold) 45%, var(--gold-d) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 10px 30px rgba(230, 195, 106, 0.28)); }
 .tagline { font-family: var(--display); font-size: clamp(1.1rem, 3.2vw, 1.7rem); font-weight: 600; }
 .sub { color: var(--muted); max-width: 640px; margin: 0.7rem auto 0; font-size: clamp(0.98rem, 2.4vw, 1.1rem); }

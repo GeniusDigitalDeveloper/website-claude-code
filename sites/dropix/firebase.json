@@ -41,12 +41,12 @@
         ]
       }
     ],
-    "site": "ngap-media-izzul"
+    "site": "dropix-media-izzul"
   },
   "auth": {
     "providers": {
       "googleSignIn": {
-        "oAuthBrandDisplayName": "Ngap",
+        "oAuthBrandDisplayName": "Dropix",
         "supportEmail": "izzulmedia01@gmail.com"
       }
     }

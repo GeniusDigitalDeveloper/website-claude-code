@@ -1,14 +1,14 @@
-// Sambungan Firebase (projek ngap-media-izzul). Kunci web Firebase memang awam; keselamatan dijaga oleh firestore.rules.
+// Sambungan Firebase (projek dropix-media-izzul). Kunci web Firebase memang awam; keselamatan dijaga oleh firestore.rules.
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
 import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyAXohE_7ayzJgHMeo60o6Pi67FPGonLcEw',
-  authDomain: 'ngap-media-izzul.firebaseapp.com',
-  projectId: 'ngap-media-izzul',
-  storageBucket: 'ngap-media-izzul.firebasestorage.app',
-  messagingSenderId: '1095889534434',
-  appId: '1:1095889534434:web:0a5014c91f9849ad194dbb',
+  apiKey: 'AIzaSyDgJE2460aCB9fLFwm_WybVvVrxFLk6NQE',
+  authDomain: 'dropix-media-izzul.firebaseapp.com',
+  projectId: 'dropix-media-izzul',
+  storageBucket: 'dropix-media-izzul.firebasestorage.app',
+  messagingSenderId: '329005802551',
+  appId: '1:329005802551:web:7ee273ecd0dd310c6d0bb2',
 };
 // Hanya petunjuk UI. Kuasa sebenar menulis ditentukan oleh firestore.rules.
 const ADMIN_EMAILS = ['izzulmedia01@gmail.com'];

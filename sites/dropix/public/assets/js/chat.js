@@ -68,7 +68,7 @@ export function initChat(faq, { onInsertUrl } = {}) {
   function open() {
     chat.classList.add('show'); chat.setAttribute('aria-hidden', 'false'); fab.setAttribute('aria-expanded', 'true');
     sfx.open();
-    if (!greeted) { greeted = true; botSay('Assalamualaikum! Saya pembantu Ngap. Tanya apa sahaja pasal muat turun video atau MP3, atau pilih soalan di bawah.'); }
+    if (!greeted) { greeted = true; botSay('Assalamualaikum! Saya pembantu Dropix. Tanya apa sahaja pasal muat turun video atau MP3, atau pilih soalan di bawah.'); }
     setTimeout(() => input.focus({ preventScroll: true }), 300);
   }
   function close() { chat.classList.remove('show'); chat.setAttribute('aria-hidden', 'true'); fab.setAttribute('aria-expanded', 'false'); sfx.close(); }

@@ -1,8 +1,8 @@
-# Ngap
+# Dropix
 
 Sistem muat turun video dan audio: YouTube, TikTok (tanpa watermark), Instagram, Facebook. Format MP4, MOV, MKV, MP3, M4A, WAV, FLAC. Ada panel admin dan chatbot bantuan.
 
-## Hos: Firebase (projek `ngap-media-izzul`)
+## Hos: Firebase (projek `dropix-media-izzul`)
 
 | Bahagian | Di mana | Status |
 |---|---|---|
@@ -17,15 +17,15 @@ Pelayan muat turun tidak boleh jalan di Hosting/Spark. Selagi ia belum disambung
 ## Deploy
 
 ```bash
-cd sites/ngap
+cd sites/dropix
 firebase deploy --only hosting,firestore
 ```
 
 ## Aktifkan muat turun sebenar (Cloud Run)
 
 1. Naik taraf projek ke pelan **Blaze** (Console > Usage and billing). Ada kuota percuma, tapi perlukan kad.
-2. `gcloud run deploy ngap --source . --region asia-southeast1 --allow-unauthenticated` (guna `Dockerfile` sedia ada).
-3. Tambah dalam `firebase.json` bawah `hosting`: `"rewrites": [{ "source": "/api/**", "run": { "serviceId": "ngap", "region": "asia-southeast1" } }]`.
+2. `gcloud run deploy dropix --source . --region asia-southeast1 --allow-unauthenticated` (guna `Dockerfile` sedia ada).
+3. Tambah dalam `firebase.json` bawah `hosting`: `"rewrites": [{ "source": "/api/**", "run": { "serviceId": "dropix", "region": "asia-southeast1" } }]`.
 4. Tukar `DOWNLOADS_ENABLED` kepada `true`, deploy semula Hosting.
 
 Pelayan kini ada API admin sendiri (kata laluan) yang tidak digunakan oleh panel Firebase. Ia akan diubah supaya membaca platform dari Firestore dan menulis statistik ke `stats/summary` semasa langkah ini.
@@ -36,7 +36,7 @@ Firebase Console > Hosting > *Add custom domain*, kemudian letak rekod DNS yang 
 ## Jalankan setempat
 ```bash
 pip install yt-dlp && sudo apt install ffmpeg
-cd sites/ngap && ADMIN_PASSWORD=... npm start   # http://localhost:8080
+cd sites/dropix && ADMIN_PASSWORD=... npm start   # http://localhost:8080
 ```
 Pratonton reka bentuk: tambah `?demo` pada URL.
 

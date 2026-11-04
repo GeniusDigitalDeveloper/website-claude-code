@@ -1,6 +1,6 @@
 {
   "projects": {
-    "default": "ngap-media-izzul"
+    "default": "dropix-media-izzul"
   },
   "targets": {},
   "etags": {}
