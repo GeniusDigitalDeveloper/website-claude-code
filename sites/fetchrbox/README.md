@@ -4,15 +4,32 @@ Sistem muat turun video dan audio: YouTube, TikTok (tanpa watermark), Instagram,
 
 ## Hos: Firebase (projek `fetchr-box-izzul`)
 
-| Bahagian | Di mana | Status |
+| Bahagian | Pautan / lokasi | Status |
 |---|---|---|
-| Frontend (`public/`) | Firebase Hosting | Aktif |
-| Pangkalan data (platform, FAQ chatbot, pengumuman, statistik) | Cloud Firestore, `asia-southeast1` | Aktif |
-| Rules | `firestore.rules`: `site/*` awam baca, admin sahaja tulis; `stats/*` admin sahaja | Aktif |
-| Log masuk admin | Firebase Auth, Google. E-mel admin ditetapkan dalam `firestore.rules` dan `firebase.js` | Aktif |
-| Pelayan muat turun (`server/`, yt-dlp + ffmpeg) | Cloud Run, disambung ke Hosting melalui rewrite `/api/**` | **Belum**, perlukan pelan Blaze |
+| Laman awam | https://fetchr-box-izzul.web.app | Aktif |
+| Panel admin (tapak berasingan) | https://fetchrbox-admin-izzul.web.app | Aktif |
+| Pangkalan data | Cloud Firestore `asia-southeast1`, dikongsi kedua-dua tapak, masa nyata | Aktif |
+| Rules | `firestore.rules` | Aktif |
+| Pengesahan | Firebase Auth, **e-mel + kata laluan sahaja** (tiada Google, tiada e-mel pengesahan) | Aktif |
+| Pelayan muat turun (`server/`, yt-dlp + ffmpeg) | Cloud Run, disambung melalui rewrite `/api/**` | **Belum**, perlukan pelan Blaze |
 
-Pelayan muat turun tidak boleh jalan di Hosting/Spark. Selagi ia belum disambung, `DOWNLOADS_ENABLED` dalam `public/assets/js/config.js` ialah `false` dan laman berada dalam **mod pratonton** (data contoh, tiada muat turun sebenar).
+Dua tapak Hosting berkongsi folder `public/`. `firebase.json` menetapkan fail mana yang diabaikan bagi setiap tapak, jadi kod admin tidak pernah dihantar ke tapak awam.
+
+### Pengguna
+Pengguna mesti **daftar** (e-mel + kata laluan) sebelum boleh guna. Selepas daftar mereka terus ke skrin log masuk. Lupa kata laluan: pautan reset dihantar ke e-mel pendaftaran (Firebase). Tiada e-mel pengesahan dihantar semasa daftar.
+
+### Admin
+Admin ialah akaun yang ada **custom claim `admin=true`** (rules menyemak claim, bukan e-mel, supaya tidak boleh dipalsukan melalui pendaftaran awam). Cara jadikan satu akaun admin: daftar di laman awam, kemudian set claim (`auth_update_user` melalui Firebase MCP, atau Admin SDK `setCustomUserClaims(uid, {admin: true})`).
+
+### Statistik (masa nyata, waktu Malaysia)
+Pelayan muat turun menulis ke Firestore (akaun perkhidmatan, tidak tertakluk pada rules):
+- `daily/{YYYY-MM-DD}` : `{ count, byPlatform, byFormat }` (kunci tarikh = reset pukul 12 tengah malam MYT secara semula jadi)
+- `stats/summary` : `{ total, failed, byPlatform, byFormat, recent: [...] }`
+
+Panel admin: **hari ini** = dokumen harini; **bulan ini** = jumlah semua hari dalam bulan kalendar semasa (28/29/30/31 mengikut kalendar); **keseluruhan** = `stats/summary.total`. Bila bulan bertukar, hari-hari bulan lepas tidak lagi dikira sebagai "bulan ini" tetapi kekal dalam jumlah keseluruhan dan sejarah bulanan.
+
+### Bahasa
+Laman awam: Bahasa Melayu (lalai), English, العربية (RTL). Kandungan FAQ dan pengumuman disimpan tiga bahasa dalam Firestore dan diedit dari panel admin.
 
 ## Deploy
 
@@ -28,7 +45,7 @@ firebase deploy --only hosting,firestore
 3. Tambah dalam `firebase.json` bawah `hosting`: `"rewrites": [{ "source": "/api/**", "run": { "serviceId": "fetchrbox", "region": "asia-southeast1" } }]`.
 4. Tukar `DOWNLOADS_ENABLED` kepada `true`, deploy semula Hosting.
 
-Pelayan kini ada API admin sendiri (kata laluan) yang tidak digunakan oleh panel Firebase. Ia akan diubah supaya membaca platform dari Firestore dan menulis statistik ke `stats/summary` semasa langkah ini.
+Pelayan akan diubah supaya mengesahkan token Firebase pengguna, membaca platform dari Firestore dan menulis statistik seperti di atas semasa langkah ini.
 
 ## Domain sendiri
 Firebase Console > Hosting > *Add custom domain*, kemudian letak rekod DNS yang diberi.
@@ -41,7 +58,7 @@ cd sites/fetchrbox && ADMIN_PASSWORD=... npm start   # http://localhost:8080
 Pratonton reka bentuk: tambah `?demo` pada URL.
 
 ## Admin
-`/admin`: log masuk Google. Ringkasan statistik, tambah/edit/hidupkan/matikan platform (satu domain sudah cukup), edit jawapan chatbot, pengumuman, mod penyelenggaraan.
+Tapak admin berasingan. Ringkasan statistik, tambah/edit/hidupkan/matikan platform (satu domain sudah cukup), edit jawapan chatbot, pengumuman, mod penyelenggaraan.
 
 ## Had
 - Video private, had umur, atau perlu log masuk tidak boleh, kecuali ada `cookies.txt` (`YTDLP_COOKIES`).

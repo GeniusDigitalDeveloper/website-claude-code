@@ -1,16 +1,16 @@
 <!doctype html>
-<html lang="ms">
+<html lang="ms" dir="ltr">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Fetchr Box — Muat Turun Video &amp; MP3 Percuma</title>
-  <meta name="description" content="Fetchr Box: muat turun video dan audio dari YouTube, TikTok tanpa watermark, Instagram dan Facebook. Format MP4, MOV, MP3 dan banyak lagi. Percuma, laju, serasi iPhone dan Android.">
-  <meta name="theme-color" content="#f6f4ff">
+  <title>Fetchr Box — Muat Turun Video &amp; MP3</title>
+  <meta name="description" content="Fetchr Box: muat turun video dan audio dari YouTube, TikTok tanpa watermark, Instagram dan Facebook. MP4, MOV, MP3 dan banyak lagi. Serasi iPhone dan Android.">
+  <meta name="theme-color" content="#f2f6fc">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="assets/logo.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700&family=Montserrat:wght@500;600;700&family=Poppins:wght@500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
   <script src="assets/js/boot.js"></script>
 </head>
@@ -20,30 +20,75 @@
 
   <header class="topbar">
     <div class="in glass">
-      <a class="brand" href="./" aria-label="Fetchr Box, laman utama"><img src="assets/logo.svg" alt="" width="40" height="40"><b>Fetchr Box</b></a>
-      <nav class="nav" aria-label="Menu utama">
-        <a class="link" href="#cara">Cara guna</a>
-        <a class="link" href="#faq">Soalan lazim</a>
+      <a class="brand" href="./" aria-label="Fetchr Box"><img src="assets/logo.svg" alt="" width="42" height="42"><b>Fetchr Box</b></a>
+      <nav class="nav">
+        <a class="link" href="#cara" data-i18n="nav_how">Cara guna</a>
+        <a class="link" href="#faq" data-i18n="nav_faq">Soalan lazim</a>
+        <div class="langs" role="group" data-i18n-aria="lang_aria" aria-label="Pilih bahasa">
+          <button type="button" data-lang="ms" aria-pressed="true" lang="ms">BM</button>
+          <button type="button" data-lang="en" aria-pressed="false" lang="en">EN</button>
+          <button type="button" data-lang="ar" aria-pressed="false" lang="ar">AR</button>
+        </div>
       </nav>
     </div>
   </header>
 
   <main>
     <section class="hero">
-      <span class="kicker reveal" data-ico="sparkle">Percuma · Tanpa akaun · Serasi semua peranti</span>
+      <span class="kicker reveal" data-ico="sparkle"><span data-i18n="kicker">Percuma · Pantas · Serasi semua peranti</span></span>
       <h1 class="wordmark" aria-label="Fetchr Box"><b style="display:contents"><span style="--i:0">F</span><span style="--i:1">e</span><span style="--i:2">t</span><span style="--i:3">c</span><span style="--i:4">h</span><span style="--i:5">r</span></b><span class="sp" aria-hidden="true"></span><b class="alt" style="display:contents"><span style="--i:6">B</span><span style="--i:7">o</span><span style="--i:8">x</span></b></h1>
-      <p class="tagline reveal" style="--d:.25s">Download video &amp; MP3, sekelip mata.</p>
-      <p class="sub reveal" style="--d:.35s">Tampal pautan YouTube, TikTok, Instagram atau Facebook. Pilih MP4, MOV atau MP3, dan simpan dalam kualiti tertinggi.</p>
+      <p class="tagline reveal" style="--d:.25s" data-i18n="tagline">Muat turun video &amp; MP3, sekelip mata.</p>
+      <p class="sub reveal" style="--d:.35s" data-i18n="sub"></p>
 
-      <div class="dl glass reveal" style="--d:.45s">
+      <!-- Daftar / Log masuk (dipaparkan jika belum log masuk) -->
+      <section class="authbox glass" id="authBox" hidden>
+        <div class="tabs" role="tablist">
+          <button type="button" role="tab" id="tabRegister" data-tab="register" aria-selected="true" data-i18n="tab_register">Daftar</button>
+          <button type="button" role="tab" id="tabLogin" data-tab="login" aria-selected="false" data-i18n="tab_login">Log Masuk</button>
+        </div>
+
+        <form id="regForm" novalidate data-view="register">
+          <h2 data-i18n="reg_title"></h2>
+          <p class="lead" data-i18n="reg_sub"></p>
+          <div class="f"><label for="regEmail" data-i18n="label_email"></label><input id="regEmail" type="email" autocomplete="email" inputmode="email" autocapitalize="off" data-i18n-ph="ph_email" required></div>
+          <div class="f"><label for="regPw" data-i18n="label_pw"></label><input id="regPw" type="password" autocomplete="new-password" minlength="6" data-i18n-ph="ph_pw" required></div>
+          <div class="f"><label for="regPw2" data-i18n="label_pw2"></label><input id="regPw2" type="password" autocomplete="new-password" minlength="6" required></div>
+          <p class="msgline" id="regMsg" role="alert"></p>
+          <button class="btn gold" type="submit"><span class="t" data-i18n="btn_register">Daftar</span></button>
+          <div class="note"><span class="ico" data-ico="info"></span><div><b data-i18n="note_title"></b><span data-i18n="note"></span></div></div>
+        </form>
+
+        <form id="loginForm" novalidate data-view="login" hidden>
+          <h2 data-i18n="login_title"></h2>
+          <p class="lead" data-i18n="login_sub"></p>
+          <div class="f"><label for="logEmail" data-i18n="label_email"></label><input id="logEmail" type="email" autocomplete="username" inputmode="email" autocapitalize="off" data-i18n-ph="ph_email" required></div>
+          <div class="f"><label for="logPw" data-i18n="label_pw"></label><input id="logPw" type="password" autocomplete="current-password" required></div>
+          <p class="msgline" id="logMsg" role="alert"></p>
+          <button class="btn gold" type="submit"><span class="t" data-i18n="btn_login">Log Masuk</span></button>
+          <div class="links"><button type="button" class="linkbtn" id="toForgot" data-i18n="forgot_link"></button></div>
+        </form>
+
+        <form id="forgotForm" novalidate data-view="forgot" hidden>
+          <h2 data-i18n="forgot_title"></h2>
+          <p class="lead" data-i18n="forgot_sub"></p>
+          <div class="f"><label for="fgEmail" data-i18n="label_email"></label><input id="fgEmail" type="email" autocomplete="email" inputmode="email" autocapitalize="off" data-i18n-ph="ph_email" required></div>
+          <p class="msgline" id="fgMsg" role="alert"></p>
+          <button class="btn gold" type="submit"><span class="t" data-i18n="btn_send_reset"></span></button>
+          <div class="links"><button type="button" class="linkbtn" id="backLogin" data-i18n="back_login"></button></div>
+        </form>
+      </section>
+
+      <!-- Pemuat turun (dipaparkan selepas log masuk) -->
+      <div class="dl glass" id="dlBox" hidden>
+        <div class="userbar"><span><span data-i18n="signed_as"></span> <b id="userEmail"></b></span><button class="btn ghost sm" id="logoutBtn" type="button"><span class="t" data-i18n="logout">Keluar</span></button></div>
         <form id="form" class="field" novalidate>
           <div class="input-wrap">
             <span class="ico" data-ico="link"></span>
-            <label class="sr" for="url">Pautan video</label>
-            <input id="url" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Tampal pautan video di sini…">
-            <button class="paste icon-btn" id="pasteBtn" type="button" aria-label="Tampal dari papan keratan" data-ico="paste"></button>
+            <label class="sr" for="url" data-i18n="ph_url"></label>
+            <input id="url" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" data-i18n-ph="ph_url">
+            <button class="paste icon-btn" id="pasteBtn" type="button" data-i18n-aria="paste_aria" data-ico="paste"></button>
           </div>
-          <button class="btn gold" id="checkBtn" type="submit"><span class="ico" data-ico="zap"></span><span class="t">Semak</span></button>
+          <button class="btn gold" id="checkBtn" type="submit"><span class="ico" data-ico="zap"></span><span class="t" data-i18n="btn_check">Semak</span></button>
         </form>
         <div class="detected" id="detected" aria-live="polite"></div>
       </div>
@@ -53,50 +98,47 @@
           <img class="thumb" id="thumb" alt="" referrerpolicy="no-referrer" width="132" height="74">
           <div><h3 id="title"></h3><p id="metaLine"></p></div>
         </div>
-        <div class="seg" role="group" aria-label="Jenis fail">
-          <button type="button" id="modeVideo" aria-pressed="true"><span class="ico" data-ico="video"></span>Video</button>
-          <button type="button" id="modeAudio" aria-pressed="false"><span class="ico" data-ico="music"></span>Audio</button>
+        <div class="seg" role="group" data-i18n-aria="mode_aria">
+          <button type="button" id="modeVideo" aria-pressed="true"><span class="ico" data-ico="video"></span><span data-i18n="mode_video">Video</span></button>
+          <button type="button" id="modeAudio" aria-pressed="false"><span class="ico" data-ico="music"></span><span data-i18n="mode_audio">Audio</span></button>
         </div>
-        <div class="label">Format</div>
-        <div class="chips" id="formats" role="radiogroup" aria-label="Format"></div>
-        <div id="qualityWrap"><div class="label">Kualiti</div><div class="chips" id="qualities" role="radiogroup" aria-label="Kualiti"></div></div>
-        <button class="btn gold go" id="goBtn" type="button"><span class="ico" data-ico="download"></span><span class="t">Muat Turun</span></button>
-        <div class="progress" id="progress"><div class="bar"><i id="barFill"></i></div><p><span id="progLabel">Menyediakan…</span><span id="progPct">0%</span></p></div>
+        <div class="label" data-i18n="label_format">Format</div>
+        <div class="chips" id="formats" role="radiogroup"></div>
+        <div id="qualityWrap"><div class="label" data-i18n="label_quality">Kualiti</div><div class="chips" id="qualities" role="radiogroup"></div></div>
+        <button class="btn gold go" id="goBtn" type="button"><span class="ico" data-ico="download"></span><span class="t" data-i18n="btn_download">Muat Turun</span></button>
+        <div class="progress" id="progress"><div class="bar"><i id="barFill"></i></div><p><span id="progLabel"></span><span id="progPct">0%</span></p></div>
       </div>
 
-      <div class="platforms reveal" id="platforms" style="--d:.55s" aria-label="Platform disokong"></div>
+      <div class="platforms reveal" id="platforms" style="--d:.55s"></div>
     </section>
 
     <section class="block" aria-labelledby="why">
-      <h2 class="h2 reveal" id="why">Dibina untuk kualiti</h2>
-      <p class="lead reveal">Ringkas di luar, kuat di dalam.</p>
+      <h2 class="h2 reveal" id="why" data-i18n="why_title"></h2>
+      <p class="lead reveal" data-i18n="why_lead"></p>
       <div class="grid">
-        <article class="card glass reveal"><div class="badge" data-ico="shield"></div><h3>TikTok tanpa watermark</h3><p>Sumber asal tanpa logo, resolusi tertinggi yang TikTok sediakan.</p></article>
-        <article class="card glass reveal" style="--d:.08s"><div class="badge" data-ico="eye"></div><h3>Kualiti tajam, tidak pecah</h3><p>Pilih sehingga 4K bila video asal ada. Video dan audio digabung dengan kemas.</p></article>
-        <article class="card glass reveal" style="--d:.16s"><div class="badge" data-ico="phone"></div><h3>Semua peranti</h3><p>iPhone, iPad, Android, PC dan laptop. MP4 h264 serasi terus dengan galeri.</p></article>
-        <article class="card glass reveal" style="--d:.24s"><div class="badge" data-ico="layers"></div><h3>Banyak format</h3><p>MP4, MOV, MKV untuk video. MP3, M4A, WAV, FLAC untuk audio.</p></article>
+        <article class="card glass reveal"><div class="badge" data-ico="shield"></div><h3 data-i18n="f1_t"></h3><p data-i18n="f1_p"></p></article>
+        <article class="card glass reveal" style="--d:.08s"><div class="badge" data-ico="eye"></div><h3 data-i18n="f2_t"></h3><p data-i18n="f2_p"></p></article>
+        <article class="card glass reveal" style="--d:.16s"><div class="badge" data-ico="phone"></div><h3 data-i18n="f3_t"></h3><p data-i18n="f3_p"></p></article>
+        <article class="card glass reveal" style="--d:.24s"><div class="badge" data-ico="layers"></div><h3 data-i18n="f4_t"></h3><p data-i18n="f4_p"></p></article>
       </div>
     </section>
 
     <section class="block" id="cara" aria-labelledby="how">
-      <h2 class="h2 reveal" id="how">Tiga langkah sahaja</h2>
+      <h2 class="h2 reveal" id="how" data-i18n="how_title"></h2>
       <div class="grid steps">
-        <article class="card glass reveal"><div class="badge" data-ico="link"></div><h3>Salin pautan</h3><p>Buka video, tekan Share, kemudian Salin pautan.</p></article>
-        <article class="card glass reveal" style="--d:.08s"><div class="badge" data-ico="paste"></div><h3>Tampal dan semak</h3><p>Tampal di kotak atas. Fetchr Box kenal platform secara automatik.</p></article>
-        <article class="card glass reveal" style="--d:.16s"><div class="badge" data-ico="download"></div><h3>Pilih dan simpan</h3><p>Pilih format dan kualiti, tekan Muat Turun, siap.</p></article>
+        <article class="card glass reveal"><div class="badge" data-ico="link"></div><h3 data-i18n="s1_t"></h3><p data-i18n="s1_p"></p></article>
+        <article class="card glass reveal" style="--d:.08s"><div class="badge" data-ico="paste"></div><h3 data-i18n="s2_t"></h3><p data-i18n="s2_p"></p></article>
+        <article class="card glass reveal" style="--d:.16s"><div class="badge" data-ico="download"></div><h3 data-i18n="s3_t"></h3><p data-i18n="s3_p"></p></article>
       </div>
     </section>
 
     <section class="block" id="faq" aria-labelledby="faqh">
-      <h2 class="h2 reveal" id="faqh">Soalan lazim</h2>
+      <h2 class="h2 reveal" id="faqh" data-i18n="faq_title"></h2>
       <div class="faq" id="faqList"></div>
     </section>
   </main>
 
-  <footer>
-    <p><b>Fetchr Box</b> · Muat turun hanya kandungan yang anda ada hak untuk simpan, atau yang pemiliknya benarkan. Hormati hak cipta dan terma setiap platform.</p>
-    <p>Tidak berkaitan dengan YouTube, TikTok, Instagram atau Facebook. <a href="admin.html" data-nosfx>Admin</a></p>
-  </footer>
+  <footer><p data-i18n="foot"></p></footer>
 
   <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="mTitle">
     <div class="sheet glass">
@@ -107,12 +149,12 @@
   </div>
   <div class="toast" id="toast" role="status"></div>
 
-  <button class="fab" id="fab" type="button" aria-label="Buka chatbot bantuan" aria-expanded="false" data-ico="chat"></button>
-  <section class="chat glass" id="chat" aria-label="Chatbot bantuan Fetchr Box" aria-hidden="true">
-    <header><div class="av" data-ico="bot"></div><div><b>Pembantu Fetchr Box</b><small>Sedia membantu</small></div><button class="icon-btn" id="chatClose" type="button" aria-label="Tutup chatbot" data-ico="x"></button></header>
+  <button class="fab" id="fab" type="button" data-i18n-aria="chat_aria" aria-expanded="false" data-ico="chat"></button>
+  <section class="chat glass" id="chat" aria-hidden="true">
+    <header><div class="av" data-ico="bot"></div><div><b data-i18n="chat_title"></b><small data-i18n="chat_online"></small></div><button class="icon-btn" id="chatClose" type="button" data-i18n-aria="chat_close" data-ico="x"></button></header>
     <div class="msgs" id="msgs" aria-live="polite"></div>
     <div class="quick" id="quick"></div>
-    <form id="chatForm" autocomplete="off"><input id="chatIn" type="text" placeholder="Tanya apa-apa…" aria-label="Mesej anda"><button class="btn gold" type="submit" aria-label="Hantar" data-ico="send"></button></form>
+    <form id="chatForm" autocomplete="off"><input id="chatIn" type="text" data-i18n-ph="chat_ph" data-i18n-aria="chat_ph"><button class="btn gold" type="submit" data-i18n-aria="chat_send" data-ico="send"></button></form>
   </section>
 
   <script src="assets/js/config.js"></script>

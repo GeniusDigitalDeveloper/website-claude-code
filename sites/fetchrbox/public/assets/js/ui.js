@@ -1,5 +1,6 @@
 import { icon } from './icons.js';
 import { sfx } from './sfx.js';
+import { t } from './i18n.js';
 
 export const $ = (s, r = document) => r.querySelector(s);
 export const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -60,7 +61,7 @@ export function modal({ icon: ic = 'check', err = false, title, text, actions = 
     setTimeout(() => ov.classList.remove('show', 'out'), reduced ? 0 : 240);
     document.removeEventListener('keydown', onKey);
   };
-  [...actions, { label: 'Tutup', cls: 'ghost' }].forEach((a) => {
+  [...actions, { label: t('close'), cls: 'ghost' }].forEach((a) => {
     const el = document.createElement(a.href ? 'a' : 'button');
     el.className = 'btn ' + (a.cls || 'gold');
     el.textContent = a.label;

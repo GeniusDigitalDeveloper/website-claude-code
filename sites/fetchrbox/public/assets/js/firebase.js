@@ -1,6 +1,12 @@
 // Sambungan Firebase (projek fetchr-box-izzul). Kunci web Firebase memang awam; keselamatan dijaga oleh firestore.rules.
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
-import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+import {
+  getFirestore, doc, getDoc, setDoc, onSnapshot, collection, query, orderBy, limit, serverTimestamp,
+} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+import {
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
+  onAuthStateChanged, sendPasswordResetEmail,
+} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyCZi-nFSqEE3vQ-WARpgf0ePuByEmLJjkM',
@@ -10,17 +16,10 @@ const firebaseConfig = {
   messagingSenderId: '87434149496',
   appId: '1:87434149496:web:4c990197042a24c783378d',
 };
-// Hanya petunjuk UI. Kuasa sebenar menulis ditentukan oleh firestore.rules.
-const ADMIN_EMAILS = ['izzulmedia01@gmail.com'];
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const AUTH_URL = 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
-let authMod, auth;
-async function getAuthMod() {
-  if (!authMod) { authMod = await import(AUTH_URL); auth = authMod.getAuth(app); }
-  return authMod;
-}
+const auth = getAuth(app);
 
 let defaultsCache;
 export async function getDefaults() {
@@ -28,22 +27,48 @@ export async function getDefaults() {
   return defaultsCache;
 }
 
+/** Gabung dokumen Firestore dengan nilai lalai (supaya laman sentiasa ada kandungan). */
+async function withDefaults(remote = {}) {
+  const d = await getDefaults();
+  return {
+    platforms: remote.platforms || d.platforms,
+    faq: remote.faq || d.faq,
+    settings: { ...d.settings, ...(remote.settings || {}) },
+  };
+}
+
 export const fb = {
-  /** Tetapan tapak. Jika dokumen belum wujud, guna nilai lalai. */
+  /** Langgan tetapan tapak secara masa nyata. Perubahan admin terus sampai ke laman awam. */
+  watchSite(cb) {
+    withDefaults().then(cb);
+    return onSnapshot(doc(db, 'site', 'config'), (snap) => withDefaults(snap.exists() ? snap.data() : {}).then(cb), () => {});
+  },
   async getSite() {
-    const d = await getDefaults();
-    let remote = {};
-    try { const snap = await getDoc(doc(db, 'site', 'config')); if (snap.exists()) remote = snap.data(); } catch { /* guna lalai */ }
-    return { platforms: remote.platforms || d.platforms, faq: remote.faq || d.faq, settings: { ...d.settings, ...(remote.settings || {}) } };
+    try { const s = await getDoc(doc(db, 'site', 'config')); return withDefaults(s.exists() ? s.data() : {}); } catch { return withDefaults(); }
   },
   async saveSite(part) { await setDoc(doc(db, 'site', 'config'), part, { merge: true }); },
-  async getStats() {
-    try { const s = await getDoc(doc(db, 'stats', 'summary')); return s.exists() ? s.data() : null; } catch { return null; }
+
+  /* ---- Pengesahan (e-mel + kata laluan sahaja) ---- */
+  onUser: (cb) => onAuthStateChanged(auth, cb),
+  currentUser: () => auth.currentUser,
+  /** Daftar, simpan profil, kemudian log keluar supaya pengguna terus ke skrin log masuk. */
+  async register(email, password, lang) {
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    try { await setDoc(doc(db, 'users', cred.user.uid), { email: cred.user.email, createdAt: serverTimestamp(), lang }); } catch { /* profil pilihan */ }
+    await signOut(auth);
   },
-  isAdminHint: (email) => ADMIN_EMAILS.includes((email || '').toLowerCase()),
-  async signIn() { const m = await getAuthMod(); return m.signInWithPopup(auth, new m.GoogleAuthProvider()); },
-  async signInEmail(email, pw) { const m = await getAuthMod(); return m.signInWithEmailAndPassword(auth, email, pw); },
-  async verifyEmail(user) { const m = await getAuthMod(); return m.sendEmailVerification(user); },
-  async signOut() { const m = await getAuthMod(); return m.signOut(auth); },
-  async onUser(cb) { const m = await getAuthMod(); return m.onAuthStateChanged(auth, cb); },
+  login: (email, password) => signInWithEmailAndPassword(auth, email, password),
+  logout: () => signOut(auth),
+  resetPassword: (email) => sendPasswordResetEmail(auth, email),
+  /** Untuk panel admin: adakah akaun ini ada claim admin? */
+  async isAdmin(user) { const r = await user.getIdTokenResult(true); return r.claims.admin === true; },
+
+  /* ---- Statistik masa nyata (admin) ---- */
+  watchSummary(cb) { return onSnapshot(doc(db, 'stats', 'summary'), (s) => cb(s.exists() ? s.data() : {}), () => cb({})); },
+  watchDaily(cb, days = 400) {
+    return onSnapshot(query(collection(db, 'daily'), orderBy('__name__', 'desc'), limit(days)), (s) => cb(s.docs.map((d) => ({ day: d.id, ...d.data() }))), () => cb([]));
+  },
+  watchUsers(cb) {
+    return onSnapshot(query(collection(db, 'users'), orderBy('createdAt', 'desc'), limit(200)), (s) => cb(s.docs.map((d) => ({ uid: d.id, ...d.data() }))), () => cb([]));
+  },
 };

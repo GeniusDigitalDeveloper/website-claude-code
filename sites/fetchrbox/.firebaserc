@@ -1,7 +1,8 @@
 {
-  "projects": {
-    "default": "fetchr-box-izzul"
-  },
-  "targets": {},
-  "etags": {}
+  "projects": { "default": "fetchr-box-izzul" },
+  "targets": {
+    "fetchr-box-izzul": {
+      "hosting": { "public": ["fetchr-box-izzul"], "admin": ["fetchrbox-admin-izzul"] }
+    }
+  }
 }

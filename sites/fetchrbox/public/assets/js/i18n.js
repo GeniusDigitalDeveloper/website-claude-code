@@ -1,0 +1,181 @@
+// Tiga bahasa: Melayu (lalai), English, العربية (RTL).
+const KEY = 'fetchrbox:lang';
+export const LANGS = [{ code: 'ms', label: 'BM', name: 'Bahasa Melayu' }, { code: 'en', label: 'EN', name: 'English' }, { code: 'ar', label: 'AR', name: 'العربية' }];
+
+const T = {
+  ms: {
+    nav_how: 'Cara guna', nav_faq: 'Soalan lazim', lang_aria: 'Pilih bahasa',
+    kicker: 'Percuma · Pantas · Serasi semua peranti',
+    tagline: 'Muat turun video & MP3, sekelip mata.',
+    sub: 'Tampal pautan YouTube, TikTok, Instagram atau Facebook. Pilih MP4, MOV atau MP3, dan simpan dalam kualiti tertinggi.',
+    tab_register: 'Daftar', tab_login: 'Log Masuk',
+    reg_title: 'Cipta akaun anda', reg_sub: 'Daftar sekali, kemudian terus muat turun.',
+    login_title: 'Selamat kembali', login_sub: 'Log masuk dengan e-mel dan kata laluan anda.',
+    label_email: 'E-mel', label_pw: 'Kata laluan', label_pw2: 'Sahkan kata laluan', ph_email: 'nama@contoh.com', ph_pw: 'Sekurang-kurangnya 6 aksara',
+    btn_register: 'Daftar', btn_login: 'Log Masuk', forgot_link: 'Lupa kata laluan?',
+    forgot_title: 'Tetapkan semula kata laluan', forgot_sub: 'Masukkan e-mel yang anda daftarkan. Kami hantar pautan untuk anda cipta kata laluan baharu.',
+    btn_send_reset: 'Hantar pautan', back_login: 'Kembali ke log masuk',
+    reset_sent: 'Pautan telah dihantar ke {email}. Semak peti masuk dan folder spam.',
+    reg_ok: 'Pendaftaran berjaya. Sila log masuk.',
+    note_title: 'Sila ambil perhatian',
+    note: 'Pastikan e-mel dan kata laluan anda tepat. E-mel ini ialah kunci untuk menetapkan semula kata laluan jika anda terlupa. Data anda disimpan dengan selamat dan privasi anda dijaga.',
+    err_email: 'Masukkan e-mel yang sah.', err_pw_short: 'Kata laluan sekurang-kurangnya 6 aksara.', err_pw_mismatch: 'Kata laluan tidak sepadan.',
+    err_used: 'E-mel ini sudah berdaftar. Sila log masuk.', err_cred: 'E-mel atau kata laluan salah.', err_many: 'Terlalu banyak percubaan. Cuba lagi sebentar.',
+    err_net: 'Tiada sambungan internet. Cuba lagi.', err_generic: 'Sesuatu tidak kena. Cuba lagi.', err_nouser: 'Tiada akaun dengan e-mel ini.',
+    signed_as: 'Log masuk sebagai', logout: 'Keluar',
+    ph_url: 'Tampal pautan video di sini…', paste_aria: 'Tampal dari papan keratan', paste_fail: 'Tekan lama pada kotak untuk Tampal.',
+    btn_check: 'Semak', checking: 'Menyemak…', empty_url: 'Tampal pautan video dahulu.',
+    det_bad: 'Tampal pautan penuh yang bermula dengan https://', det_unsupported: 'Platform ini belum disokong.', det_off: '{name} dimatikan buat sementara.', det_ok: 'Dikesan: <b>{name}</b>',
+    mode_video: 'Video', mode_audio: 'Audio', mode_aria: 'Jenis fail', label_format: 'Format', label_quality: 'Kualiti', q_best: 'Terbaik',
+    btn_download: 'Muat Turun', preparing: 'Menyediakan…', downloading: 'Memuat turun…', processing: 'Memproses fail…', finished: 'Siap',
+    m_off_title: 'Pelayan belum bersambung', m_off_text: 'Tidak dapat menghubungi pelayan muat turun. Cuba lagi sebentar, atau hubungi admin.',
+    m_fail_title: 'Tidak berjaya', m_done_title: 'Siap! Fail anda dimuat turun',
+    m_done_text: 'Semak folder Downloads anda. Tak muncul? Tekan butang di bawah.',
+    m_done_ios: 'Di iPhone/iPad: tekan ikon muat turun di Safari, pilih fail, kemudian Share > Save Video untuk simpan ke Photos.',
+    m_again: 'Muat turun semula', m_other: 'Muat turun lain', m_demo: 'Mod pratonton', close: 'Tutup',
+    demo_banner: 'Pratonton: muat turun sebenar aktif selepas pelayan disambung.', maint: 'Sistem dalam penyelenggaraan. Cuba lagi sebentar lagi.',
+    why_title: 'Dibina untuk kualiti', why_lead: 'Ringkas di luar, kuat di dalam.',
+    f1_t: 'TikTok tanpa watermark', f1_p: 'Sumber asal tanpa logo, resolusi tertinggi yang TikTok sediakan.',
+    f2_t: 'Kualiti tajam', f2_p: 'Pilih sehingga 4K bila video asal ada. Video dan audio digabung dengan kemas.',
+    f3_t: 'Semua peranti', f3_p: 'iPhone, iPad, Android, PC dan laptop. MP4 h264 serasi terus dengan galeri.',
+    f4_t: 'Banyak format', f4_p: 'MP4, MOV, MKV untuk video. MP3, M4A, WAV, FLAC untuk audio.',
+    how_title: 'Tiga langkah sahaja',
+    s1_t: 'Salin pautan', s1_p: 'Buka video, tekan Share, kemudian Salin pautan.',
+    s2_t: 'Tampal dan semak', s2_p: 'Tampal di kotak atas. Fetchr Box kenal platform secara automatik.',
+    s3_t: 'Pilih dan simpan', s3_p: 'Pilih format dan kualiti, tekan Muat Turun, siap.',
+    faq_title: 'Soalan lazim',
+    foot: '© {year} Fetchr Box. Hak cipta terpelihara.',
+    chat_aria: 'Buka chatbot bantuan', chat_close: 'Tutup chatbot', chat_title: 'Pembantu Fetchr Box', chat_online: 'Sedia membantu', chat_ph: 'Tanya apa-apa…', chat_send: 'Hantar',
+    chat_greet: 'Hai! Saya pembantu Fetchr Box. Tanya apa sahaja pasal muat turun video atau MP3, atau pilih soalan di bawah.',
+    chat_url: 'Nampak macam pautan video. Saya letakkan dalam kotak muat turun, tekan Semak untuk teruskan.', chat_put: 'Letak dalam kotak',
+    chat_hello: 'Waalaikumussalam! Ada apa yang boleh saya bantu?', chat_hi: 'Hai! Ada apa yang boleh saya bantu?', chat_thanks: 'Sama-sama! Kalau ada soalan lain, tanya sahaja.',
+    chat_unsure: 'Maaf, saya belum pasti jawapannya. Cuba tanya dengan cara lain, atau pilih salah satu:',
+    login_first: 'Log masuk dahulu untuk muat turun.',
+  },
+  en: {
+    nav_how: 'How it works', nav_faq: 'FAQ', lang_aria: 'Choose language',
+    kicker: 'Free · Fast · Works on every device',
+    tagline: 'Download video & MP3 in a blink.',
+    sub: 'Paste a YouTube, TikTok, Instagram or Facebook link. Pick MP4, MOV or MP3 and save it in the highest quality.',
+    tab_register: 'Sign up', tab_login: 'Log in',
+    reg_title: 'Create your account', reg_sub: 'Sign up once, then download right away.',
+    login_title: 'Welcome back', login_sub: 'Log in with your email and password.',
+    label_email: 'Email', label_pw: 'Password', label_pw2: 'Confirm password', ph_email: 'name@example.com', ph_pw: 'At least 6 characters',
+    btn_register: 'Sign up', btn_login: 'Log in', forgot_link: 'Forgot password?',
+    forgot_title: 'Reset your password', forgot_sub: 'Enter the email you registered with. We will send a link so you can create a new password.',
+    btn_send_reset: 'Send link', back_login: 'Back to log in',
+    reset_sent: 'A link was sent to {email}. Check your inbox and spam folder.',
+    reg_ok: 'Registration successful. Please log in.',
+    note_title: 'Please note',
+    note: 'Make sure your email and password are correct. This email is the key to resetting your password if you forget it. Your data is stored securely and your privacy is protected.',
+    err_email: 'Enter a valid email.', err_pw_short: 'Password must be at least 6 characters.', err_pw_mismatch: 'Passwords do not match.',
+    err_used: 'This email is already registered. Please log in.', err_cred: 'Wrong email or password.', err_many: 'Too many attempts. Try again shortly.',
+    err_net: 'No internet connection. Try again.', err_generic: 'Something went wrong. Try again.', err_nouser: 'No account with this email.',
+    signed_as: 'Signed in as', logout: 'Log out',
+    ph_url: 'Paste the video link here…', paste_aria: 'Paste from clipboard', paste_fail: 'Long-press the box to paste.',
+    btn_check: 'Check', checking: 'Checking…', empty_url: 'Paste a video link first.',
+    det_bad: 'Paste the full link starting with https://', det_unsupported: 'This platform is not supported yet.', det_off: '{name} is temporarily turned off.', det_ok: 'Detected: <b>{name}</b>',
+    mode_video: 'Video', mode_audio: 'Audio', mode_aria: 'File type', label_format: 'Format', label_quality: 'Quality', q_best: 'Best',
+    btn_download: 'Download', preparing: 'Preparing…', downloading: 'Downloading…', processing: 'Processing file…', finished: 'Done',
+    m_off_title: 'Server not connected', m_off_text: 'Could not reach the download server. Try again shortly, or contact the admin.',
+    m_fail_title: 'Something went wrong', m_done_title: 'Done! Your file is downloaded',
+    m_done_text: 'Check your Downloads folder. Not there? Tap the button below.',
+    m_done_ios: 'On iPhone/iPad: tap the download icon in Safari, open the file, then Share > Save Video to add it to Photos.',
+    m_again: 'Download again', m_other: 'Download another', m_demo: 'Preview mode', close: 'Close',
+    demo_banner: 'Preview: real downloads go live once the server is connected.', maint: 'Down for maintenance. Please try again shortly.',
+    why_title: 'Built for quality', why_lead: 'Simple on the outside, powerful inside.',
+    f1_t: 'TikTok without watermark', f1_p: 'The original source with no logo, in the highest resolution TikTok provides.',
+    f2_t: 'Sharp quality', f2_p: 'Pick up to 4K when the original has it. Video and audio are merged cleanly.',
+    f3_t: 'Every device', f3_p: 'iPhone, iPad, Android, PC and laptop. h264 MP4 plays straight from your gallery.',
+    f4_t: 'Many formats', f4_p: 'MP4, MOV, MKV for video. MP3, M4A, WAV, FLAC for audio.',
+    how_title: 'Just three steps',
+    s1_t: 'Copy the link', s1_p: 'Open the video, tap Share, then Copy link.',
+    s2_t: 'Paste and check', s2_p: 'Paste it in the box above. Fetchr Box detects the platform automatically.',
+    s3_t: 'Choose and save', s3_p: 'Pick a format and quality, tap Download, done.',
+    faq_title: 'Frequently asked questions',
+    foot: '© {year} Fetchr Box. All rights reserved.',
+    chat_aria: 'Open help chatbot', chat_close: 'Close chatbot', chat_title: 'Fetchr Box Assistant', chat_online: 'Here to help', chat_ph: 'Ask anything…', chat_send: 'Send',
+    chat_greet: 'Hi! I am the Fetchr Box assistant. Ask me anything about downloading video or MP3, or pick a question below.',
+    chat_url: 'That looks like a video link. I will place it in the download box, tap Check to continue.', chat_put: 'Put in the box',
+    chat_hello: 'Hello! How can I help?', chat_hi: 'Hi! How can I help?', chat_thanks: 'You are welcome! Ask me anything else.',
+    chat_unsure: 'Sorry, I am not sure about that yet. Try rephrasing, or pick one of these:',
+    login_first: 'Log in first to download.',
+  },
+  ar: {
+    nav_how: 'كيف يعمل', nav_faq: 'الأسئلة الشائعة', lang_aria: 'اختر اللغة',
+    kicker: 'مجاني · سريع · يعمل على كل الأجهزة',
+    tagline: 'حمّل الفيديو وMP3 في لحظة.',
+    sub: 'الصق رابط يوتيوب أو تيك توك أو إنستغرام أو فيسبوك. اختر MP4 أو MOV أو MP3 واحفظه بأعلى جودة.',
+    tab_register: 'إنشاء حساب', tab_login: 'تسجيل الدخول',
+    reg_title: 'أنشئ حسابك', reg_sub: 'سجّل مرة واحدة ثم ابدأ التحميل مباشرة.',
+    login_title: 'أهلاً بعودتك', login_sub: 'سجّل الدخول بالبريد الإلكتروني وكلمة المرور.',
+    label_email: 'البريد الإلكتروني', label_pw: 'كلمة المرور', label_pw2: 'تأكيد كلمة المرور', ph_email: 'name@example.com', ph_pw: '6 أحرف على الأقل',
+    btn_register: 'إنشاء حساب', btn_login: 'دخول', forgot_link: 'نسيت كلمة المرور؟',
+    forgot_title: 'إعادة تعيين كلمة المرور', forgot_sub: 'أدخل البريد الذي سجّلت به. سنرسل لك رابطًا لإنشاء كلمة مرور جديدة.',
+    btn_send_reset: 'إرسال الرابط', back_login: 'العودة إلى تسجيل الدخول',
+    reset_sent: 'تم إرسال الرابط إلى {email}. تحقق من صندوق الوارد ومجلد الرسائل غير المرغوبة.',
+    reg_ok: 'تم التسجيل بنجاح. يرجى تسجيل الدخول.',
+    note_title: 'يرجى الانتباه',
+    note: 'تأكد من صحة بريدك الإلكتروني وكلمة المرور. هذا البريد هو مفتاح إعادة تعيين كلمة المرور إذا نسيتها. بياناتك محفوظة بأمان وخصوصيتك محمية.',
+    err_email: 'أدخل بريدًا إلكترونيًا صحيحًا.', err_pw_short: 'يجب ألا تقل كلمة المرور عن 6 أحرف.', err_pw_mismatch: 'كلمتا المرور غير متطابقتين.',
+    err_used: 'هذا البريد مسجّل مسبقًا. يرجى تسجيل الدخول.', err_cred: 'البريد الإلكتروني أو كلمة المرور غير صحيحة.', err_many: 'محاولات كثيرة. حاول بعد قليل.',
+    err_net: 'لا يوجد اتصال بالإنترنت. حاول مرة أخرى.', err_generic: 'حدث خطأ ما. حاول مرة أخرى.', err_nouser: 'لا يوجد حساب بهذا البريد.',
+    signed_as: 'مسجّل الدخول باسم', logout: 'خروج',
+    ph_url: 'الصق رابط الفيديو هنا…', paste_aria: 'لصق من الحافظة', paste_fail: 'اضغط مطولًا على الحقل للصق.',
+    btn_check: 'فحص', checking: 'جارٍ الفحص…', empty_url: 'الصق رابط الفيديو أولًا.',
+    det_bad: 'الصق الرابط الكامل الذي يبدأ بـ https://', det_unsupported: 'هذه المنصة غير مدعومة بعد.', det_off: '{name} متوقفة مؤقتًا.', det_ok: 'تم التعرف: <b>{name}</b>',
+    mode_video: 'فيديو', mode_audio: 'صوت', mode_aria: 'نوع الملف', label_format: 'الصيغة', label_quality: 'الجودة', q_best: 'الأفضل',
+    btn_download: 'تحميل', preparing: 'جارٍ التجهيز…', downloading: 'جارٍ التحميل…', processing: 'جارٍ معالجة الملف…', finished: 'تم',
+    m_off_title: 'الخادم غير متصل', m_off_text: 'تعذّر الوصول إلى خادم التحميل. حاول بعد قليل أو تواصل مع المشرف.',
+    m_fail_title: 'لم تنجح العملية', m_done_title: 'تم! تم تحميل ملفك',
+    m_done_text: 'تحقق من مجلد التنزيلات. لا يظهر؟ اضغط الزر أدناه.',
+    m_done_ios: 'على آيفون/آيباد: اضغط أيقونة التحميل في سفاري، افتح الملف، ثم مشاركة > حفظ الفيديو لإضافته إلى الصور.',
+    m_again: 'تحميل مرة أخرى', m_other: 'تحميل آخر', m_demo: 'وضع المعاينة', close: 'إغلاق',
+    demo_banner: 'معاينة: يبدأ التحميل الفعلي بعد ربط الخادم.', maint: 'النظام قيد الصيانة. حاول مرة أخرى بعد قليل.',
+    why_title: 'مصمَّم للجودة', why_lead: 'بسيط في الشكل، قوي في الأداء.',
+    f1_t: 'تيك توك بلا علامة مائية', f1_p: 'المصدر الأصلي دون شعار، بأعلى دقة يوفرها تيك توك.',
+    f2_t: 'جودة حادة', f2_p: 'اختر حتى 4K عندما يتوفر في الأصل. يُدمج الفيديو والصوت بإتقان.',
+    f3_t: 'كل الأجهزة', f3_p: 'آيفون وآيباد وأندرويد وحاسوب. ملف MP4 بترميز h264 يعمل مباشرة من المعرض.',
+    f4_t: 'صيغ متعددة', f4_p: 'MP4 وMOV وMKV للفيديو. MP3 وM4A وWAV وFLAC للصوت.',
+    how_title: 'ثلاث خطوات فقط',
+    s1_t: 'انسخ الرابط', s1_p: 'افتح الفيديو، اضغط مشاركة، ثم نسخ الرابط.',
+    s2_t: 'الصق وافحص', s2_p: 'الصقه في الحقل أعلاه. يتعرف Fetchr Box على المنصة تلقائيًا.',
+    s3_t: 'اختر واحفظ', s3_p: 'اختر الصيغة والجودة، اضغط تحميل، وانتهى.',
+    faq_title: 'الأسئلة الشائعة',
+    foot: '© {year} Fetchr Box. جميع الحقوق محفوظة.',
+    chat_aria: 'افتح مساعد الدردشة', chat_close: 'أغلق الدردشة', chat_title: 'مساعد Fetchr Box', chat_online: 'جاهز للمساعدة', chat_ph: 'اسأل أي شيء…', chat_send: 'إرسال',
+    chat_greet: 'مرحبًا! أنا مساعد Fetchr Box. اسألني عن تحميل الفيديو أو MP3، أو اختر سؤالًا من الأسفل.',
+    chat_url: 'يبدو أنه رابط فيديو. سأضعه في خانة التحميل، اضغط فحص للمتابعة.', chat_put: 'ضعه في الخانة',
+    chat_hello: 'وعليكم السلام! كيف أستطيع مساعدتك؟', chat_hi: 'مرحبًا! كيف أستطيع مساعدتك؟', chat_thanks: 'على الرحب والسعة! اسأل متى شئت.',
+    chat_unsure: 'عذرًا، لست متأكدًا من الإجابة بعد. جرّب صياغة أخرى، أو اختر أحد هذه:',
+    login_first: 'سجّل الدخول أولًا للتحميل.',
+  },
+};
+
+let lang = 'ms';
+try { const s = localStorage.getItem(KEY); if (T[s]) lang = s; } catch { /* abaikan */ }
+
+export const getLang = () => lang;
+export const t = (key, vars = {}) => {
+  let s = (T[lang] && T[lang][key]) ?? T.ms[key] ?? key;
+  for (const [k, v] of Object.entries({ year: new Date().getFullYear(), ...vars })) s = s.replaceAll(`{${k}}`, v);
+  return s;
+};
+/** Pilih teks mengikut bahasa daripada {ms,en,ar} atau rentetan biasa. */
+export const pick = (v) => (v && typeof v === 'object' ? v[lang] || v.ms || '' : v || '');
+
+export function applyI18n(root = document) {
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  root.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = t(el.dataset.i18n); });
+  root.querySelectorAll('[data-i18n-html]').forEach((el) => { el.innerHTML = t(el.dataset.i18nHtml); });
+  root.querySelectorAll('[data-i18n-ph]').forEach((el) => { el.placeholder = t(el.dataset.i18nPh); });
+  root.querySelectorAll('[data-i18n-aria]').forEach((el) => { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
+}
+export function setLang(l) {
+  if (!T[l]) return;
+  lang = l;
+  try { localStorage.setItem(KEY, l); } catch { /* abaikan */ }
+  applyI18n();
+  document.dispatchEvent(new CustomEvent('langchange', { detail: l }));
+}

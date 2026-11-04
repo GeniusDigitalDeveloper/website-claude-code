@@ -31,6 +31,9 @@ export const ICONS = {
   alert: s('<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.1"/>'),
   chevron: s('<path d="M6 9l6 6 6-6"/>'),
   bot: s('<rect x="4" y="8" width="16" height="12" rx="4"/><path d="M12 4v4M9 13v1M15 13v1M9.5 17h5"/><circle cx="12" cy="3.5" r="1"/>'),
+  info: s('<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.1"/>'),
+  lock: s('<rect x="4.5" y="10.5" width="15" height="10" rx="3"/><path d="M8 10.5V8a4 4 0 018 0v2.5"/>'),
+  user: s('<circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4 4-6 8-6s7.2 2 8 6"/>'),
   eye: s('<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'),
 };
 const PLATFORM_ICON = { youtube: 'youtube', tiktok: 'tiktok', instagram: 'instagram', facebook: 'facebook', x: 'xlogo', music: 'music', video: 'video', globe: 'globe' };

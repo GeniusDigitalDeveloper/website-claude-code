@@ -1,54 +1,28 @@
 {
-  "firestore": {
-    "database": "(default)",
-    "location": "asia-southeast1",
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
-  },
-  "hosting": {
-    "public": "public",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "cleanUrls": true,
-    "headers": [
-      {
-        "source": "**",
-        "headers": [
-          {
-            "key": "X-Content-Type-Options",
-            "value": "nosniff"
-          },
-          {
-            "key": "Referrer-Policy",
-            "value": "strict-origin-when-cross-origin"
-          },
-          {
-            "key": "X-Frame-Options",
-            "value": "DENY"
-          }
-        ]
-      },
-      {
-        "source": "**/*.@(js|css|svg|json)",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "public, max-age=300"
-          }
-        ]
-      }
-    ],
-    "site": "fetchr-box-izzul"
-  },
-  "auth": {
-    "providers": {
-      "googleSignIn": {
-        "oAuthBrandDisplayName": "Fetchr Box",
-        "supportEmail": "izzulmedia01@gmail.com"
-      }
+  "firestore": { "database": "(default)", "location": "asia-southeast1", "rules": "firestore.rules", "indexes": "firestore.indexes.json" },
+  "auth": { "providers": { "emailPassword": true } },
+  "hosting": [
+    {
+      "target": "public",
+      "public": "public",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**", "admin.html", "assets/admin.css", "assets/js/admin.js"],
+      "cleanUrls": true,
+      "headers": [
+        { "source": "**", "headers": [{ "key": "X-Content-Type-Options", "value": "nosniff" }, { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }, { "key": "X-Frame-Options", "value": "DENY" }] },
+        { "source": "**/*.@(html)", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] },
+        { "source": "**/*.@(js|css|svg|json)", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] }
+      ]
+    },
+    {
+      "target": "admin",
+      "public": "public",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**", "index.html", "404.html", "assets/js/app.js", "assets/js/chat.js"],
+      "cleanUrls": true,
+      "rewrites": [{ "source": "/", "destination": "/admin.html" }],
+      "headers": [
+        { "source": "**", "headers": [{ "key": "X-Content-Type-Options", "value": "nosniff" }, { "key": "Referrer-Policy", "value": "no-referrer" }, { "key": "X-Frame-Options", "value": "DENY" }, { "key": "X-Robots-Tag", "value": "noindex, nofollow" }] },
+        { "source": "**/*.@(html|js|css|svg|json)", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] }
+      ]
     }
-  }
+  ]
 }

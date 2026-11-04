@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex,nofollow">
   <title>Fetchr Box Admin</title>
-  <meta name="theme-color" content="#f6f4ff">
+  <meta name="theme-color" content="#f2f6fc">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Poppins:wght@500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
   <link rel="stylesheet" href="assets/admin.css">
   <script src="assets/js/boot.js"></script>
@@ -18,33 +18,31 @@
   <div class="bg" aria-hidden="true"><div class="orb a"></div><div class="orb b"></div></div>
 
   <section class="login" id="login">
-    <div class="glass box">
+    <form class="glass box" id="loginForm" novalidate>
       <img src="assets/logo.svg" alt="" width="72" height="72">
       <h1>Fetchr Box Admin</h1>
-      <p>Log masuk dengan akaun Google admin untuk urus platform, chatbot dan statistik.</p>
-      <button class="btn gold" id="loginBtn" type="button"><span class="t">Log masuk dengan Google</span></button>
-      <div class="divider">atau e-mel</div>
-      <form class="em" id="emailForm">
-        <label class="sr" for="em">E-mel</label><input id="em" type="email" autocomplete="username" placeholder="E-mel admin" required>
-        <label class="sr" for="pw">Kata laluan</label><input id="pw" type="password" autocomplete="current-password" placeholder="Kata laluan" required>
-        <button class="btn ghost" type="submit"><span class="t">Log masuk</span></button>
-      </form>
+      <p>Log masuk dengan akaun admin.</p>
+      <div class="f"><label for="em">E-mel</label><input id="em" type="email" autocomplete="username" inputmode="email" autocapitalize="off" required></div>
+      <div class="f"><label for="pw">Kata laluan</label><input id="pw" type="password" autocomplete="current-password" required></div>
+      <button class="btn gold" type="submit"><span class="t">Log Masuk</span></button>
       <small id="loginErr" role="alert"></small>
-      <a href="./" data-nosfx>Kembali ke laman awam</a>
-    </div>
+      <small class="copy">© 2026 Fetchr Box. Hak cipta terpelihara.</small>
+    </form>
   </section>
 
   <div class="shell" id="shell" hidden>
     <aside class="side glass" aria-label="Menu admin">
-      <a class="brand" href="./"><img src="assets/logo.svg" alt="" width="36" height="36"><b>Fetchr Box</b></a>
+      <div class="brand"><img src="assets/logo.svg" alt="" width="38" height="38"><b>Fetchr Box</b></div>
       <nav id="tabs">
         <button data-tab="overview" aria-current="page"><span class="ico" data-ico="dashboard"></span><span>Ringkasan</span></button>
         <button data-tab="platforms"><span class="ico" data-ico="layers"></span><span>Platform</span></button>
         <button data-tab="faq"><span class="ico" data-ico="help"></span><span>Chatbot</span></button>
+        <button data-tab="users"><span class="ico" data-ico="user"></span><span>Pengguna</span></button>
         <button data-tab="settings"><span class="ico" data-ico="settings"></span><span>Tetapan</span></button>
       </nav>
       <div class="side-foot">
-        <button class="icon-btn" id="logout" type="button" aria-label="Log keluar" data-ico="logout"></button>
+        <button class="btn ghost sm" id="logout" type="button"><span class="ico" data-ico="logout"></span><span class="t">Keluar</span></button>
+        <small>© 2026 Fetchr Box.<br>Hak cipta terpelihara.</small>
       </div>
     </aside>
     <main class="content" id="content" tabindex="-1"></main>

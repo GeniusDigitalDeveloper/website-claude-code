@@ -80,7 +80,6 @@
  "faq": [
   {
    "id": "cara",
-   "q": "Macam mana nak muat turun?",
    "keywords": [
     "cara",
     "macam mana",
@@ -89,13 +88,24 @@
     "mula",
     "download",
     "muat turun",
-    "tutorial"
+    "tutorial",
+    "كيف",
+    "تحميل",
+    "طريقة"
    ],
-   "a": "1) Buka video, tekan Share lalu Salin pautan. 2) Tampal di kotak Fetchr Box dan tekan Semak. 3) Pilih format dan kualiti. 4) Tekan Muat Turun."
+   "q": {
+    "ms": "Macam mana nak muat turun?",
+    "en": "How do I download?",
+    "ar": "كيف أحمّل؟"
+   },
+   "a": {
+    "ms": "1) Buka video, tekan Share lalu Salin pautan. 2) Tampal di kotak dan tekan Semak. 3) Pilih format dan kualiti. 4) Tekan Muat Turun.",
+    "en": "1) Open the video, tap Share and copy the link. 2) Paste it in the box and tap Check. 3) Pick a format and quality. 4) Tap Download.",
+    "ar": "١) افتح الفيديو، اضغط مشاركة ثم انسخ الرابط. ٢) الصقه في الحقل واضغط فحص. ٣) اختر الصيغة والجودة. ٤) اضغط تحميل."
+   }
   },
   {
    "id": "format",
-   "q": "Format apa yang ada?",
    "keywords": [
     "format",
     "mp3",
@@ -105,24 +115,45 @@
     "mkv",
     "audio",
     "video",
-    "lagu"
+    "lagu",
+    "صيغة",
+    "صوت",
+    "فيديو"
    ],
-   "a": "Video: MP4, MOV, MKV. Audio: MP3, M4A, WAV, FLAC. MP4 paling serasi untuk iPhone dan Android."
+   "q": {
+    "ms": "Format apa yang ada?",
+    "en": "Which formats are available?",
+    "ar": "ما الصيغ المتاحة؟"
+   },
+   "a": {
+    "ms": "Video: MP4, MOV, MKV. Audio: MP3, M4A, WAV, FLAC. MP4 paling serasi untuk iPhone dan Android.",
+    "en": "Video: MP4, MOV, MKV. Audio: MP3, M4A, WAV, FLAC. MP4 is the most compatible with iPhone and Android.",
+    "ar": "الفيديو: MP4 وMOV وMKV. الصوت: MP3 وM4A وWAV وFLAC. صيغة MP4 هي الأكثر توافقًا مع آيفون وأندرويد."
+   }
   },
   {
    "id": "tiktok",
-   "q": "TikTok ada watermark tak?",
    "keywords": [
     "tiktok",
     "watermark",
     "logo",
-    "tanda air"
+    "tanda air",
+    "تيك توك",
+    "علامة مائية"
    ],
-   "a": "Fetchr Box ambil sumber TikTok asal tanpa watermark pada kualiti tertinggi yang TikTok sediakan."
+   "q": {
+    "ms": "TikTok ada watermark tak?",
+    "en": "Does TikTok have a watermark?",
+    "ar": "هل يحتوي تيك توك على علامة مائية؟"
+   },
+   "a": {
+    "ms": "Fetchr Box ambil sumber TikTok asal tanpa watermark pada kualiti tertinggi yang TikTok sediakan.",
+    "en": "Fetchr Box fetches the original TikTok source without a watermark, in the highest quality TikTok provides.",
+    "ar": "يجلب Fetchr Box مصدر تيك توك الأصلي دون علامة مائية وبأعلى جودة يوفرها تيك توك."
+   }
   },
   {
    "id": "kualiti",
-   "q": "Macam mana nak kualiti terbaik?",
    "keywords": [
     "kualiti",
     "quality",
@@ -131,13 +162,22 @@
     "hd",
     "pecah",
     "blur",
-    "jelas"
+    "jelas",
+    "جودة"
    ],
-   "a": "Pilih \"Terbaik\" untuk kualiti tertinggi. 4K hanya ada jika video asal memang 4K. Untuk iPhone lama, pilih 1080p MP4 supaya terus boleh main."
+   "q": {
+    "ms": "Macam mana nak kualiti terbaik?",
+    "en": "How do I get the best quality?",
+    "ar": "كيف أحصل على أفضل جودة؟"
+   },
+   "a": {
+    "ms": "Pilih \"Terbaik\" untuk kualiti tertinggi. 4K hanya ada jika video asal memang 4K. Untuk iPhone lama, pilih 1080p MP4 supaya terus boleh main.",
+    "en": "Choose \"Best\" for the highest quality. 4K only appears if the original is 4K. For older iPhones pick 1080p MP4 so it plays right away.",
+    "ar": "اختر \"الأفضل\" لأعلى جودة. لا يظهر 4K إلا إذا كان الأصل بدقة 4K. للآيفون القديم اختر 1080p MP4 ليعمل مباشرة."
+   }
   },
   {
    "id": "peribadi",
-   "q": "Video peribadi atau private boleh?",
    "keywords": [
     "private",
     "peribadi",
@@ -145,14 +185,22 @@
     "login",
     "umur",
     "age",
-    "berdaftar",
-    "unlisted"
+    "unlisted",
+    "خاص"
    ],
-   "a": "Video awam dan unlisted (ada pautan) boleh. Video private atau had umur perlukan akaun, jadi tidak disokong kecuali admin menetapkan cookies."
+   "q": {
+    "ms": "Video peribadi atau private boleh?",
+    "en": "Can I download private videos?",
+    "ar": "هل يمكن تحميل الفيديوهات الخاصة؟"
+   },
+   "a": {
+    "ms": "Video awam dan unlisted (ada pautan) boleh. Video private atau had umur perlukan akaun, jadi tidak disokong.",
+    "en": "Public and unlisted (link-only) videos work. Private or age-restricted videos need an account, so they are not supported.",
+    "ar": "الفيديوهات العامة وغير المدرجة (بالرابط) تعمل. الفيديوهات الخاصة أو المقيّدة بالعمر تحتاج إلى حساب ولذلك غير مدعومة."
+   }
   },
   {
    "id": "iphone",
-   "q": "Macam mana simpan di iPhone?",
    "keywords": [
     "iphone",
     "ipad",
@@ -162,13 +210,23 @@
     "simpan",
     "galeri",
     "photos",
-    "files"
+    "files",
+    "آيفون",
+    "ايفون"
    ],
-   "a": "Guna Safari. Lepas muat turun, tekan ikon anak panah di bar alamat, pilih fail, lalu Share > Save Video untuk masuk Photos. Atau ia tersimpan dalam app Files."
+   "q": {
+    "ms": "Macam mana simpan di iPhone?",
+    "en": "How do I save on iPhone?",
+    "ar": "كيف أحفظ على الآيفون؟"
+   },
+   "a": {
+    "ms": "Guna Safari. Lepas muat turun, tekan ikon muat turun di bar alamat, pilih fail, lalu Share > Save Video untuk masuk Photos. Atau ia tersimpan dalam app Files.",
+    "en": "Use Safari. After downloading, tap the download icon in the address bar, open the file, then Share > Save Video to add it to Photos. It is also saved in the Files app.",
+    "ar": "استخدم سفاري. بعد التحميل اضغط أيقونة التحميل في شريط العنوان، افتح الملف ثم مشاركة > حفظ الفيديو ليُضاف إلى الصور. كما يُحفظ في تطبيق الملفات."
+   }
   },
   {
    "id": "android",
-   "q": "Android / PC macam mana?",
    "keywords": [
     "android",
     "pc",
@@ -176,13 +234,23 @@
     "komputer",
     "chrome",
     "windows",
-    "mac"
+    "mac",
+    "أندرويد",
+    "حاسوب"
    ],
-   "a": "Fail akan masuk folder Downloads secara automatik. Di Android, buka app Files atau Galeri."
+   "q": {
+    "ms": "Android dan PC macam mana?",
+    "en": "What about Android and PC?",
+    "ar": "وماذا عن أندرويد والحاسوب؟"
+   },
+   "a": {
+    "ms": "Fail akan masuk folder Downloads secara automatik. Di Android, buka app Files atau Galeri.",
+    "en": "The file goes to your Downloads folder automatically. On Android, open the Files or Gallery app.",
+    "ar": "يُحفظ الملف تلقائيًا في مجلد التنزيلات. على أندرويد افتح تطبيق الملفات أو المعرض."
+   }
   },
   {
    "id": "gagal",
-   "q": "Kenapa gagal?",
    "keywords": [
     "gagal",
     "error",
@@ -191,26 +259,73 @@
     "tak jadi",
     "fail",
     "rosak",
-    "masalah"
+    "masalah",
+    "خطأ",
+    "مشكلة"
    ],
-   "a": "Semak pautan lengkap dan video itu awam. Cuba lagi sebentar, kadang-kadang platform sekat sementara. Kalau masih gagal, hubungi admin."
+   "q": {
+    "ms": "Kenapa gagal?",
+    "en": "Why did it fail?",
+    "ar": "لماذا فشل؟"
+   },
+   "a": {
+    "ms": "Semak pautan penuh dan pastikan video awam. Cuba lagi sebentar, kadang-kadang platform sekat sementara. Kalau masih gagal, hubungi admin.",
+    "en": "Check the full link and make sure the video is public. Try again shortly, platforms sometimes block temporarily. If it keeps failing, contact the admin.",
+    "ar": "تحقق من الرابط الكامل وتأكد أن الفيديو عام. حاول بعد قليل فقد تحجب المنصات مؤقتًا. إذا استمر الفشل تواصل مع المشرف."
+   }
   },
   {
    "id": "percuma",
-   "q": "Percuma ke?",
    "keywords": [
     "percuma",
     "free",
     "bayar",
     "harga",
     "kos",
-    "langganan"
+    "langganan",
+    "مجاني",
+    "سعر"
    ],
-   "a": "Percuma sepenuhnya, tanpa akaun. Muat turun hanya kandungan yang anda ada hak untuk simpan."
+   "q": {
+    "ms": "Percuma ke?",
+    "en": "Is it free?",
+    "ar": "هل هو مجاني؟"
+   },
+   "a": {
+    "ms": "Percuma. Anda hanya perlu daftar akaun dengan e-mel. Muat turun hanya kandungan yang anda ada hak untuk simpan.",
+    "en": "Yes. You only need to sign up with an email. Download only content you have the right to keep.",
+    "ar": "نعم. تحتاج فقط إلى التسجيل بالبريد الإلكتروني. حمّل فقط المحتوى الذي يحق لك الاحتفاظ به."
+   }
+  },
+  {
+   "id": "akaun",
+   "keywords": [
+    "akaun",
+    "daftar",
+    "register",
+    "password",
+    "kata laluan",
+    "lupa",
+    "reset",
+    "e-mel",
+    "email",
+    "حساب",
+    "كلمة المرور",
+    "نسيت"
+   ],
+   "q": {
+    "ms": "Lupa kata laluan?",
+    "en": "I forgot my password",
+    "ar": "نسيت كلمة المرور"
+   },
+   "a": {
+    "ms": "Tekan \"Lupa kata laluan?\" di skrin log masuk, masukkan e-mel yang anda daftarkan, dan kami hantar pautan untuk cipta kata laluan baharu.",
+    "en": "Tap \"Forgot password?\" on the log in screen, enter the email you registered with, and we will send a link to create a new password.",
+    "ar": "اضغط \"نسيت كلمة المرور؟\" في شاشة الدخول، أدخل البريد الذي سجّلت به وسنرسل رابطًا لإنشاء كلمة مرور جديدة."
+   }
   },
   {
    "id": "platform",
-   "q": "Platform apa disokong?",
    "keywords": [
     "platform",
     "sokong",
@@ -219,13 +334,27 @@
     "instagram",
     "facebook",
     "twitter",
-    "laman"
+    "laman",
+    "منصة"
    ],
-   "a": "YouTube, TikTok, Instagram dan Facebook. Platform baru ditambah dari masa ke masa."
+   "q": {
+    "ms": "Platform apa disokong?",
+    "en": "Which platforms are supported?",
+    "ar": "ما المنصات المدعومة؟"
+   },
+   "a": {
+    "ms": "YouTube, TikTok, Instagram dan Facebook. Platform baharu ditambah dari masa ke masa.",
+    "en": "YouTube, TikTok, Instagram and Facebook. New platforms are added over time.",
+    "ar": "يوتيوب وتيك توك وإنستغرام وفيسبوك. تُضاف منصات جديدة مع الوقت."
+   }
   }
  ],
  "settings": {
-  "announcement": "",
+  "announcement": {
+   "ms": "",
+   "en": "",
+   "ar": ""
+  },
   "maintenance": false
  }
 }

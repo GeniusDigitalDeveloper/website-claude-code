@@ -1,19 +1,32 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Admin = akaun yang diberi custom claim admin=true (bukan berdasarkan e-mel, supaya tidak boleh dipalsukan melalui pendaftaran awam).
     function isAdmin() {
-      return request.auth != null
-        && request.auth.token.email_verified == true
-        && request.auth.token.email in ['izzulmedia01@gmail.com'];
+      return request.auth != null && request.auth.token.admin == true;
     }
-    // Tetapan awam (platform, FAQ chatbot, pengumuman): sesiapa boleh baca, admin sahaja boleh tulis.
+    // Tetapan awam (platform, FAQ 3 bahasa, pengumuman): semua boleh baca, admin sahaja boleh tulis.
     match /site/{doc} {
       allow read: if true;
       allow write: if isAdmin();
     }
-    // Statistik dan log: admin sahaja (pelayan muat turun guna akaun perkhidmatan, tidak tertakluk pada rules).
+    // Statistik: admin baca sahaja. Pelayan muat turun menulis melalui akaun perkhidmatan (tidak tertakluk pada rules).
     match /stats/{doc} {
-      allow read, write: if isAdmin();
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+    match /daily/{day} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+    // Profil pengguna berdaftar: pengguna cipta rekod sendiri sahaja, admin boleh baca semua.
+    match /users/{uid} {
+      allow create: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['email', 'createdAt', 'lang'])
+        && request.resource.data.email == request.auth.token.email;
+      allow read: if isAdmin() || (request.auth != null && request.auth.uid == uid);
+      allow update, delete: if false;
     }
     match /{document=**} {
       allow read, write: if false;
