@@ -43,6 +43,38 @@ service cloud.firestore {
         && (!('photo' in request.resource.data) || (request.resource.data.photo is string && request.resource.data.photo.size() < 150000));
       allow delete: if false;
     }
+    // Notifikasi: admin hantar, semua pengguna yang log masuk boleh baca. Keadaan baca/padam disimpan per pengguna.
+    match /notifications/{id} {
+      allow read: if request.auth != null;
+      allow create, update, delete: if isAdmin();
+    }
+    match /users/{uid}/nstate/{nid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['read', 'deleted']);
+    }
+    // Chat pengguna <-> admin. Pengguna hanya boleh akses chat sendiri. Admin boleh akses semua dan balas.
+    match /chats/{uid} {
+      allow read: if isAdmin() || (request.auth != null && request.auth.uid == uid);
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['email', 'lang', 'lastText', 'lastFrom', 'lastAt', 'unreadAdmin'])
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.lastFrom == 'user' && request.resource.data.unreadAdmin == true;
+      allow update: if isAdmin() || (request.auth != null && request.auth.uid == uid
+        && ((request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lang', 'lastText', 'lastFrom', 'lastAt', 'unreadAdmin'])
+             && request.resource.data.lastFrom == 'user' && request.resource.data.unreadAdmin == true)
+            || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['unreadUser'])
+             && request.resource.data.unreadUser == false)));
+      match /messages/{mid} {
+        allow read: if isAdmin() || (request.auth != null && request.auth.uid == uid);
+        allow create: if request.auth != null && request.auth.uid == uid
+          && request.resource.data.from == 'user'
+          && request.resource.data.keys().hasOnly(['from', 'text', 'lang', 'at'])
+          && request.resource.data.text is string && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 1000;
+        allow create: if isAdmin() && request.resource.data.from == 'admin';
+        allow update: if isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['trMs']);
+      }
+    }
     match /{document=**} {
       allow read, write: if false;
     }

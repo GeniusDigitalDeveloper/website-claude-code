@@ -5,6 +5,8 @@ import { sfx } from './sfx.js';
 import { t, pick, getLang, setLang, applyI18n } from './i18n.js';
 import { $, $$, esc, hydrateIcons, setupReveal, toast, modal, reduced } from './ui.js';
 import { initChat } from './chat.js';
+import { initNotify } from './notify.js';
+import { setupPwToggles } from './pw.js';
 
 const VIDEO = ['mp4', 'mov', 'mkv'];
 const AUDIO = ['mp3', 'm4a', 'wav', 'flac'];
@@ -17,6 +19,8 @@ const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform 
 hydrateIcons();
 applyI18n();
 setupReveal();
+setupPwToggles();
+const notifyApi = initNotify();
 
 /* ---------- Halaman berasingan: Utama / Cara guna / Soalan lazim / Profil ---------- */
 const VIEWS = ['home', 'cara', 'faq', 'profil'];
@@ -46,7 +50,7 @@ let chatApi;
 fb.watchSite((cfg) => {
   st.cfg = cfg;
   renderPlatforms(); renderFaq(); paintAnnounce(); detect();
-  if (!chatApi) chatApi = initChat(() => st.cfg.faq, { onInsertUrl });
+  if (!chatApi) { chatApi = initChat(() => st.cfg.faq, { onInsertUrl }); chatApi.setUser(st.user); }
 });
 function onInsertUrl(u) {
   if (!st.user) { toast(t('login_first')); return; }
@@ -148,6 +152,8 @@ fb.onUser((user) => {
   $('#authBox').hidden = !!user;
   $('#dlBox').hidden = !user;
   $('#navProfile').hidden = !user; $('.pdot').hidden = !user;
+  notifyApi.setUser(user);
+  if (chatApi) chatApi.setUser(user);
   if (stopProfile) { stopProfile(); stopProfile = null; }
   if (user) {
     const local = (user.email || 'pengguna').split('@')[0];

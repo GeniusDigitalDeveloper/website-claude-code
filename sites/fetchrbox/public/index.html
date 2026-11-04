@@ -21,13 +21,25 @@
   <header class="topbar">
     <div class="in">
       <a class="brand" href="#" id="brand" aria-label="Fetchr Box"><img src="assets/logo.svg" alt="" width="40" height="40"><b>Fetchr Box</b></a>
-      <div class="langs" role="group" data-i18n-aria="lang_aria" aria-label="Pilih bahasa">
-        <button type="button" data-lang="ms" aria-pressed="true" lang="ms">BM</button>
-        <button type="button" data-lang="en" aria-pressed="false" lang="en">EN</button>
-        <button type="button" data-lang="ar" aria-pressed="false" lang="ar">AR</button>
+      <div class="hright">
+        <button class="icon-btn bell" id="bellBtn" type="button" hidden data-i18n-aria="bell_aria" aria-label="Notifikasi"><span id="bellIco"></span><i class="nbadge" id="bellBadge" hidden>0</i></button>
+        <div class="langs" role="group" data-i18n-aria="lang_aria" aria-label="Pilih bahasa">
+          <button type="button" data-lang="ms" aria-pressed="true" lang="ms">BM</button>
+          <button type="button" data-lang="en" aria-pressed="false" lang="en">EN</button>
+          <button type="button" data-lang="ar" aria-pressed="false" lang="ar">AR</button>
+        </div>
       </div>
     </div>
   </header>
+
+  <!-- Notifikasi: panel (boleh skrol) dan pop-up yang kekal sehingga dibaca -->
+  <section class="notif glass" id="notifPanel" hidden aria-labelledby="notifT">
+    <header><b id="notifT" data-i18n="notif_title">Notifikasi</b><button class="btn red sm" id="notifClear" type="button" data-i18n="notif_clear" hidden>Padam semua</button></header>
+    <ul class="nlist" id="nList"></ul>
+  </section>
+  <div class="npop" id="notifPop" role="status" hidden>
+    <button type="button" id="notifPopBtn"><span class="ico" data-ico="bell"></span><span class="ntxt"><b id="npopT"></b><small id="npopS"></small></span></button>
+  </div>
 
   <main>
     <!-- ============ UTAMA ============ -->
@@ -48,8 +60,8 @@
             <h2 data-i18n="reg_title"></h2>
             <p class="lead" data-i18n="reg_sub"></p>
             <div class="f"><label for="regEmail" data-i18n="label_email"></label><input id="regEmail" type="email" autocomplete="email" inputmode="email" autocapitalize="off" data-i18n-ph="ph_email" required></div>
-            <div class="f"><label for="regPw" data-i18n="label_pw"></label><input id="regPw" type="password" autocomplete="new-password" minlength="6" data-i18n-ph="ph_pw" required></div>
-            <div class="f"><label for="regPw2" data-i18n="label_pw2"></label><input id="regPw2" type="password" autocomplete="new-password" minlength="6" required></div>
+            <div class="f"><label for="regPw" data-i18n="label_pw"></label><div class="pw"><input id="regPw" type="password" autocomplete="new-password" minlength="6" data-i18n-ph="ph_pw" required><button class="eye" type="button" data-nosfx></button></div></div>
+            <div class="f"><label for="regPw2" data-i18n="label_pw2"></label><div class="pw"><input id="regPw2" type="password" autocomplete="new-password" minlength="6" required><button class="eye" type="button" data-nosfx></button></div></div>
             <p class="msgline" id="regMsg" role="alert"></p>
             <button class="btn gold" type="submit"><span class="t" data-i18n="btn_register">Daftar</span></button>
             <div class="note"><span class="ico" data-ico="info"></span><div><b data-i18n="note_title"></b><span data-i18n="note"></span></div></div>
@@ -59,7 +71,7 @@
             <h2 data-i18n="login_title"></h2>
             <p class="lead" data-i18n="login_sub"></p>
             <div class="f"><label for="logEmail" data-i18n="label_email"></label><input id="logEmail" type="email" autocomplete="username" inputmode="email" autocapitalize="off" data-i18n-ph="ph_email" required></div>
-            <div class="f"><label for="logPw" data-i18n="label_pw"></label><input id="logPw" type="password" autocomplete="current-password" required></div>
+            <div class="f"><label for="logPw" data-i18n="label_pw"></label><div class="pw"><input id="logPw" type="password" autocomplete="current-password" required><button class="eye" type="button" data-nosfx></button></div></div>
             <p class="msgline" id="logMsg" role="alert"></p>
             <button class="btn gold" type="submit"><span class="t" data-i18n="btn_login">Log Masuk</span></button>
             <div class="links"><button type="button" class="linkbtn" id="toForgot" data-i18n="forgot_link"></button></div>
@@ -188,10 +200,15 @@
     <button class="teaser-main" id="teaserOpen" type="button"><span data-i18n="chat_teaser">Ada apa yang boleh saya bantu?</span></button>
     <button class="teaser-x" id="teaserClose" type="button" data-i18n-aria="close" data-ico="x"></button>
   </div>
-  <button class="fab holo hot" id="fab" type="button" data-i18n-aria="chat_aria" aria-expanded="false"><img src="assets/logo.svg" alt="" width="38" height="38"></button>
+  <button class="fab holo hot" id="fab" type="button" data-i18n-aria="chat_aria" aria-expanded="false"><img src="assets/logo.svg" alt="" width="38" height="38"><i class="dot fabdot" id="fabDot" hidden></i></button>
   <section class="chat glass" id="chat" aria-hidden="true">
     <header><div class="av"><img src="assets/logo.svg" alt="" width="34" height="34"></div><div><b data-i18n="chat_title"></b><small data-i18n="chat_online"></small></div><button class="icon-btn" id="chatClose" type="button" data-i18n-aria="chat_close" data-ico="x"></button></header>
+    <div class="ctabs" id="chatTabs" role="tablist">
+      <button type="button" role="tab" data-ct="bot" aria-selected="true" data-i18n="ct_bot">Pembantu</button>
+      <button type="button" role="tab" data-ct="admin" aria-selected="false"><span data-i18n="ct_admin">Chat Admin</span><i class="dot" id="adminDot" hidden></i></button>
+    </div>
     <div class="msgs" id="msgs" aria-live="polite"></div>
+    <div class="msgs" id="amsgs" aria-live="polite" hidden></div>
     <div class="quick" id="quick"></div>
     <a class="wa" id="waBtn" href="https://wa.me/60177977935" target="_blank" rel="noopener"><span class="ico" data-ico="whatsapp"></span><span data-i18n="chat_wa">WhatsApp Admin</span></a>
     <form id="chatForm" autocomplete="off"><input id="chatIn" type="text" data-i18n-ph="chat_ph" data-i18n-aria="chat_ph"><button class="btn gold" type="submit" data-i18n-aria="chat_send" data-ico="send"></button></form>

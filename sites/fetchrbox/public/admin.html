@@ -23,7 +23,7 @@
       <h1>Fetchr Box Admin</h1>
       <p>Log masuk dengan akaun admin.</p>
       <div class="f"><label for="em">E-mel</label><input id="em" type="email" autocomplete="username" inputmode="email" autocapitalize="off" required></div>
-      <div class="f"><label for="pw">Kata laluan</label><input id="pw" type="password" autocomplete="current-password" required></div>
+      <div class="f"><label for="pw">Kata laluan</label><div class="pw"><input id="pw" type="password" autocomplete="current-password" required><button class="eye" type="button" data-nosfx></button></div></div>
       <button class="btn gold" type="submit"><span class="t">Log Masuk</span></button>
       <small id="loginErr" role="alert"></small>
       <small class="copy">© 2026 Fetchr Box. Hak cipta terpelihara.</small>
@@ -37,6 +37,8 @@
         <button data-tab="overview" aria-current="page"><span class="ico" data-ico="dashboard"></span><span>Ringkasan</span></button>
         <button data-tab="platforms"><span class="ico" data-ico="layers"></span><span>Platform</span></button>
         <button data-tab="faq"><span class="ico" data-ico="help"></span><span>Chatbot</span></button>
+        <button data-tab="chat"><span class="ico" data-ico="chat"></span><span>Chat</span><i class="nbadge" id="chatBadge" hidden>0</i></button>
+        <button data-tab="notifs"><span class="ico" data-ico="bell"></span><span>Notifikasi</span></button>
         <button data-tab="users"><span class="ico" data-ico="user"></span><span>Pengguna</span></button>
         <button data-tab="admins"><span class="ico" data-ico="shield"></span><span>Admin</span></button>
         <button data-tab="settings"><span class="ico" data-ico="settings"></span><span>Tetapan</span></button>

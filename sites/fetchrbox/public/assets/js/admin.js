@@ -2,14 +2,18 @@ import { fb } from './firebase.js';
 import { platformIcon } from './icons.js';
 import { sfx } from './sfx.js';
 import { $, $$, esc, hydrateIcons, toast, modal } from './ui.js';
+import { setupPwToggles } from './pw.js';
+import { initExtra, resetExtra, onChats, chatView, bindChat, notifsView, bindNotifs, paintSent, setSent } from './admin-extra.js';
 
 const TZ = 'Asia/Kuala_Lumpur';
 let tab = 'overview';
 let site = null, summary = {}, daily = [], users = [], admins = [], me = { email: '', owner: false };
+initExtra({ getTab: () => tab, rerender: () => render(), getMe: () => me });
 let stops = [];
 let clock;
 
 hydrateIcons();
+setupPwToggles();
 
 /* ---------- Tarikh (zon waktu Malaysia, reset pukul 12 malam) ---------- */
 const todayKey = () => new Intl.DateTimeFormat('en-CA', { timeZone: TZ }).format(new Date()); // YYYY-MM-DD
@@ -48,12 +52,14 @@ function startWatching() {
     fb.watchDaily((d) => { daily = d; if (tab === 'overview') render(); }),
     fb.watchUsers((u) => { users = u; if (['overview', 'users'].includes(tab)) render(); }),
     fb.watchAdmins((a) => { admins = a; if (tab === 'admins') render(); }),
+    fb.watchChats(onChats),
+    fb.watchNotifs((n) => { setSent(n); if (tab === 'notifs') paintSent(); }),
   ];
   let last = todayKey();
   clock = setInterval(() => { const k = todayKey(); if (k !== last) { last = k; if (tab === 'overview') render(); } }, 20000);
   render();
 }
-function stopWatching() { stops.forEach((f) => f && f()); stops = []; clearInterval(clock); }
+function stopWatching() { stops.forEach((f) => f && f()); stops = []; clearInterval(clock); resetExtra(); }
 
 $('#tabs').addEventListener('click', (e) => {
   const b = e.target.closest('button[data-tab]'); if (!b) return;
@@ -63,11 +69,11 @@ $('#tabs').addEventListener('click', (e) => {
 function render() {
   if (!site) return;
   $$('#tabs button').forEach((b) => { if (b.dataset.tab === tab) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
-  document.body.dataset.theme = { overview: 'home', platforms: 'cara', faq: 'faq', users: 'profil', admins: 'cara', settings: 'faq' }[tab];
+  document.body.dataset.theme = { overview: 'home', platforms: 'cara', faq: 'faq', chat: 'home', notifs: 'profil', users: 'profil', admins: 'cara', settings: 'faq' }[tab];
   const c = $('#content');
-  c.innerHTML = `<div class="view">${{ overview, platforms, faq, users: usersView, admins: adminsView, settings }[tab]()}</div>`;
+  c.innerHTML = `<div class="view">${{ overview, platforms, faq, chat: chatView, notifs: notifsView, users: usersView, admins: adminsView, settings }[tab]()}</div>`;
   hydrateIcons(c);
-  ({ overview: () => {}, platforms: bindPlatforms, faq: bindFaq, users: () => {}, admins: bindAdmins, settings: bindSettings }[tab])();
+  ({ overview: () => {}, platforms: bindPlatforms, faq: bindFaq, chat: bindChat, notifs: bindNotifs, users: () => {}, admins: bindAdmins, settings: bindSettings }[tab])();
 }
 const guard = async (fn) => {
   try { await fn(); toast('Disimpan'); sfx.success(); }

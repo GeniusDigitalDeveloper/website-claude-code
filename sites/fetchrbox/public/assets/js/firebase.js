@@ -1,7 +1,7 @@
 // Sambungan Firebase (projek fetchr-box-izzul). Kunci web Firebase memang awam; keselamatan dijaga oleh firestore.rules.
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
 import {
-  getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, orderBy, limit, serverTimestamp,
+  getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, collection, query, orderBy, limit, serverTimestamp, writeBatch,
 } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
@@ -69,6 +69,34 @@ export const fb = {
   watchAdmins(cb) { return onSnapshot(collection(db, 'admins'), (s) => cb(s.docs.map((d) => ({ email: d.id, ...d.data() }))), () => cb([])); },
   addAdmin: (email, by) => setDoc(doc(db, 'admins', email.toLowerCase()), { addedBy: by, addedAt: serverTimestamp() }),
   removeAdmin: (email) => deleteDoc(doc(db, 'admins', email.toLowerCase())),
+
+  /* ---- Notifikasi: admin hantar ke semua pengguna, setiap pengguna ada keadaan baca/padam sendiri ---- */
+  watchNotifs(cb) { return onSnapshot(query(collection(db, 'notifications'), orderBy('createdAt', 'desc'), limit(100)), (s) => cb(s.docs.map((d) => ({ id: d.id, ...d.data() }))), () => cb([])); },
+  watchNState(uid, cb) { return onSnapshot(collection(db, 'users', uid, 'nstate'), (s) => { const m = {}; s.docs.forEach((d) => { m[d.id] = d.data(); }); cb(m); }, () => cb({})); },
+  async markRead(uid, ids) { const b = writeBatch(db); ids.slice(0, 400).forEach((id) => b.set(doc(db, 'users', uid, 'nstate', id), { read: true }, { merge: true })); await b.commit(); },
+  async deleteNotifs(uid, ids) { const b = writeBatch(db); ids.slice(0, 400).forEach((id) => b.set(doc(db, 'users', uid, 'nstate', id), { read: true, deleted: true }, { merge: true })); await b.commit(); },
+  sendNotif: (n) => addDoc(collection(db, 'notifications'), { ...n, createdAt: serverTimestamp() }),
+  removeNotif: (id) => deleteDoc(doc(db, 'notifications', id)),
+
+  /* ---- Chat pengguna <-> admin ---- */
+  watchMyChat(uid, cb) { return onSnapshot(query(collection(db, 'chats', uid, 'messages'), orderBy('at', 'asc'), limit(200)), (s) => cb(s.docs.map((d) => ({ id: d.id, ...d.data() }))), () => cb([])); },
+  watchChatMeta(uid, cb) { return onSnapshot(doc(db, 'chats', uid), (s) => cb(s.exists() ? s.data() : {}), () => cb({})); },
+  async sendToAdmin(user, text, lang) {
+    await addDoc(collection(db, 'chats', user.uid, 'messages'), { from: 'user', text, lang, at: serverTimestamp() });
+    await setDoc(doc(db, 'chats', user.uid), { email: user.email, lang, lastText: text.slice(0, 120), lastFrom: 'user', lastAt: serverTimestamp(), unreadAdmin: true }, { merge: true });
+  },
+  markChatReadUser(uid) { return updateDoc(doc(db, 'chats', uid), { unreadUser: false }).catch(() => {}); },
+  // Admin
+  watchChats(cb) { return onSnapshot(query(collection(db, 'chats'), orderBy('lastAt', 'desc'), limit(100)), (s) => cb(s.docs.map((d) => ({ uid: d.id, ...d.data() }))), () => cb([])); },
+  watchThread(uid, cb) { return onSnapshot(query(collection(db, 'chats', uid, 'messages'), orderBy('at', 'asc'), limit(300)), (s) => cb(s.docs.map((d) => ({ id: d.id, ...d.data() }))), () => cb([])); },
+  async sendAsAdmin(uid, text, trUser, toLang) {
+    const m = { from: 'admin', text, lang: 'ms', at: serverTimestamp() };
+    if (trUser) { m.trUser = trUser; m.toLang = toLang; }
+    await addDoc(collection(db, 'chats', uid, 'messages'), m);
+    await updateDoc(doc(db, 'chats', uid), { lastText: text.slice(0, 120), lastFrom: 'admin', lastAt: serverTimestamp(), unreadAdmin: false, unreadUser: true });
+  },
+  markChatReadAdmin: (uid) => updateDoc(doc(db, 'chats', uid), { unreadAdmin: false }).catch(() => {}),
+  saveTrMs: (uid, mid, text) => updateDoc(doc(db, 'chats', uid, 'messages', mid), { trMs: text }),
 
   /* ---- Profil pengguna ---- */
   watchProfile(uid, cb) { return onSnapshot(doc(db, 'users', uid), (s) => cb(s.exists() ? s.data() : {}), () => cb({})); },

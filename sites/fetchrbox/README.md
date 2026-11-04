@@ -69,3 +69,8 @@ Tapak admin berasingan. Ringkasan statistik, tambah/edit/hidupkan/matikan platfo
 - YouTube kadang-kadang menyekat IP pusat data.
 - Kemas yt-dlp dengan kerap; Docker image tarik versi terkini setiap build.
 - Muat turun hanya kandungan yang pengguna ada hak untuk simpan.
+
+## Notifikasi, chat admin dan terjemahan automatik
+- `notifications/{id}` : `{ title:{ms,en,ar}, body:{ms,en,ar}, createdAt, by }` (admin hantar, semua pengguna baca). Keadaan baca/padam setiap pengguna disimpan di `users/{uid}/nstate/{id}`. Pop-up kekal sehingga pengguna buka panel notifikasi.
+- `chats/{uid}` + `chats/{uid}/messages/{mid}` : chat pengguna dengan admin, masa nyata. Pengguna hanya boleh akses chat sendiri.
+- **Terjemahan** (`assets/js/translate.js`) dilakukan di pelayar menggunakan titik akhir percuma (Google tidak rasmi, kemudian MyMemory). Tiada jaminan perkhidmatan: jika gagal, teks asal dipaparkan. Untuk kebolehpercayaan penuh, gantikan dengan Cloud Translation API melalui pelayan (perlukan Blaze). Teks mesej dihantar kepada penyedia terjemahan itu.
