@@ -1,9 +1,18 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Admin = akaun yang diberi custom claim admin=true (bukan berdasarkan e-mel, supaya tidak boleh dipalsukan melalui pendaftaran awam).
-    function isAdmin() {
+    // Pemilik = akaun dengan custom claim admin=true. Admin lain = e-mel yang didaftarkan oleh pemilik dalam koleksi admins.
+    // Dua-dua dinilai di sini (bukan di pelayar), jadi pengguna awam tidak boleh menjadikan diri sendiri admin.
+    function isOwner() {
       return request.auth != null && request.auth.token.admin == true;
+    }
+    function isAdmin() {
+      return isOwner() || (request.auth != null && request.auth.token.email != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.token.email.lower())));
+    }
+    match /admins/{email} {
+      allow read: if isAdmin();
+      allow write: if isOwner();
     }
     // Tetapan awam (platform, FAQ 3 bahasa, pengumuman): semua boleh baca, admin sahaja boleh tulis.
     match /site/{doc} {

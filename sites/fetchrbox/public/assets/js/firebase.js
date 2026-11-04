@@ -1,7 +1,7 @@
 // Sambungan Firebase (projek fetchr-box-izzul). Kunci web Firebase memang awam; keselamatan dijaga oleh firestore.rules.
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
 import {
-  getFirestore, doc, getDoc, setDoc, onSnapshot, collection, query, orderBy, limit, serverTimestamp,
+  getFirestore, doc, getDoc, setDoc, deleteDoc, onSnapshot, collection, query, orderBy, limit, serverTimestamp,
 } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
@@ -60,8 +60,15 @@ export const fb = {
   login: (email, password) => signInWithEmailAndPassword(auth, email, password),
   logout: () => signOut(auth),
   resetPassword: (email) => sendPasswordResetEmail(auth, email),
-  /** Untuk panel admin: adakah akaun ini ada claim admin? */
-  async isAdmin(user) { const r = await user.getIdTokenResult(true); return r.claims.admin === true; },
+  /** Untuk panel admin: { ok, owner }. Pemilik = claim admin; admin lain = e-mel dalam koleksi admins. */
+  async adminState(user) {
+    const r = await user.getIdTokenResult(true);
+    if (r.claims.admin === true) return { ok: true, owner: true };
+    try { const s = await getDoc(doc(db, 'admins', String(user.email).toLowerCase())); return { ok: s.exists(), owner: false }; } catch { return { ok: false, owner: false }; }
+  },
+  watchAdmins(cb) { return onSnapshot(collection(db, 'admins'), (s) => cb(s.docs.map((d) => ({ email: d.id, ...d.data() }))), () => cb([])); },
+  addAdmin: (email, by) => setDoc(doc(db, 'admins', email.toLowerCase()), { addedBy: by, addedAt: serverTimestamp() }),
+  removeAdmin: (email) => deleteDoc(doc(db, 'admins', email.toLowerCase())),
 
   /* ---- Statistik masa nyata (admin) ---- */
   watchSummary(cb) { return onSnapshot(doc(db, 'stats', 'summary'), (s) => cb(s.exists() ? s.data() : {}), () => cb({})); },

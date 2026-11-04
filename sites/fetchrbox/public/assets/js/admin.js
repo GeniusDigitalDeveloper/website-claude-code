@@ -5,7 +5,7 @@ import { $, $$, esc, hydrateIcons, toast, modal } from './ui.js';
 
 const TZ = 'Asia/Kuala_Lumpur';
 let tab = 'overview';
-let site = null, summary = {}, daily = [], users = [];
+let site = null, summary = {}, daily = [], users = [], admins = [], me = { email: '', owner: false };
 let stops = [];
 let clock;
 
@@ -31,9 +31,10 @@ $('#logout').addEventListener('click', () => fb.logout());
 fb.onUser(async (user) => {
   stopWatching();
   if (!user) { $('#login').hidden = false; $('#shell').hidden = true; return; }
-  let ok = false;
-  try { ok = await fb.isAdmin(user); } catch { ok = false; }
-  if (!ok) { $('#loginErr').textContent = `${user.email} belum diberi akses admin.`; sfx.error(); await fb.logout(); return; }
+  let st = { ok: false, owner: false };
+  try { st = await fb.adminState(user); } catch { /* bukan admin */ }
+  if (!st.ok) { $('#loginErr').textContent = `${user.email} belum diberi akses admin.`; sfx.error(); await fb.logout(); return; }
+  me = { email: user.email, owner: st.owner };
   sfx.success();
   $('#login').hidden = true; $('#shell').hidden = false;
   startWatching();
@@ -46,6 +47,7 @@ function startWatching() {
     fb.watchSummary((s) => { summary = s; if (tab === 'overview') render(); }),
     fb.watchDaily((d) => { daily = d; if (tab === 'overview') render(); }),
     fb.watchUsers((u) => { users = u; if (['overview', 'users'].includes(tab)) render(); }),
+    fb.watchAdmins((a) => { admins = a; if (tab === 'admins') render(); }),
   ];
   let last = todayKey();
   clock = setInterval(() => { const k = todayKey(); if (k !== last) { last = k; if (tab === 'overview') render(); } }, 20000);
@@ -62,9 +64,9 @@ function render() {
   if (!site) return;
   $$('#tabs button').forEach((b) => { if (b.dataset.tab === tab) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   const c = $('#content');
-  c.innerHTML = `<div class="view">${{ overview, platforms, faq, users: usersView, settings }[tab]()}</div>`;
+  c.innerHTML = `<div class="view">${{ overview, platforms, faq, users: usersView, admins: adminsView, settings }[tab]()}</div>`;
   hydrateIcons(c);
-  ({ overview: () => {}, platforms: bindPlatforms, faq: bindFaq, users: () => {}, settings: bindSettings }[tab])();
+  ({ overview: () => {}, platforms: bindPlatforms, faq: bindFaq, users: () => {}, admins: bindAdmins, settings: bindSettings }[tab])();
 }
 const guard = async (fn) => {
   try { await fn(); toast('Disimpan'); sfx.success(); }
@@ -195,6 +197,29 @@ function usersView() {
   const fmt = (ts) => { try { return ts?.toDate ? new Intl.DateTimeFormat('ms-MY', { timeZone: TZ, dateStyle: 'medium', timeStyle: 'short' }).format(ts.toDate()) : ''; } catch { return ''; } };
   return `<h1>Pengguna <span class="live">LANGSUNG</span></h1><p class="sub2">${num(users.length)} pengguna berdaftar. Terbaharu di atas.</p>
   <div class="list">${users.map((u) => `<div class="row-item glass"><div class="pi" data-ico="user"></div><div class="txt"><b>${esc(u.email)}</b><small>${esc(fmt(u.createdAt))}${u.lang ? ' · ' + esc(String(u.lang).toUpperCase()) : ''}</small></div></div>`).join('') || '<p class="empty">Belum ada pengguna berdaftar.</p>'}</div>`;
+}
+
+/* ---------- Pentadbir (akaun lain boleh jadi admin dari sini) ---------- */
+function adminsView() {
+  const rows = [`<div class="row-item glass"><div class="pi" data-ico="shield"></div><div class="txt"><b>${esc(me.email)}</b><small>Anda${me.owner ? ' · Pemilik' : ''}</small></div></div>`]
+    .concat(admins.filter((a) => a.email !== String(me.email).toLowerCase()).map((a) => `<div class="row-item glass"><div class="pi" data-ico="shield"></div><div class="txt"><b>${esc(a.email)}</b><small>Admin${a.addedBy ? ' · ditambah oleh ' + esc(a.addedBy) : ''}</small></div>${me.owner ? `<div class="acts"><button class="icon-btn" data-rm="${esc(a.email)}" aria-label="Buang ${esc(a.email)}" data-ico="trash"></button></div>` : ''}</div>`));
+  return `<div class="toolbar"><div><h1>Admin</h1><p class="sub2" style="margin:0">Akaun yang boleh log masuk ke panel ini.</p></div></div>
+  ${me.owner ? `<form class="settings-card glass" id="admForm" novalidate style="margin-bottom:.9rem"><div class="f"><label for="admEmail">Tambah admin (e-mel)</label><input id="admEmail" type="email" inputmode="email" autocapitalize="off" placeholder="nama@contoh.com"><small>Akaun e-mel itu mesti sudah wujud dalam Firebase Authentication atau sudah berdaftar. Selepas ditambah, ia boleh terus log masuk ke panel ini.</small></div><button class="btn gold" type="submit"><span class="t">Tambah admin</span></button></form>` : '<p class="sub2">Hanya pemilik boleh menambah atau membuang admin.</p>'}
+  <div class="list">${rows.join('')}</div>`;
+}
+function bindAdmins() {
+  const f = $('#admForm');
+  if (f) f.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = $('#admEmail').value.trim().toLowerCase();
+    if (!/^[^\s@\/]+@[^\s@\/]+\.[^\s@\/]{2,}$/.test(email)) { toast('Masukkan e-mel yang sah.'); sfx.error(); return; }
+    guard(async () => { await fb.addAdmin(email, me.email); $('#admEmail').value = ''; });
+  });
+  $('.view').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-rm]'); if (!b) return;
+    const email = b.dataset.rm;
+    modal({ icon: 'trash', err: true, title: 'Buang admin?', text: email, actions: [{ label: 'Buang', cls: 'danger', onClick: () => guard(() => fb.removeAdmin(email)) }] });
+  });
 }
 
 /* ---------- Tetapan ---------- */
