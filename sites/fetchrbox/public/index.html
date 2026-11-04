@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700&family=Montserrat:wght@500;600;700&family=Poppins:ital,wght@0,500;0,600;0,700;1,700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=8">
+  <link rel="stylesheet" href="assets/style.css?v=9">
   <script src="assets/js/boot.js"></script>
 </head>
 <body>
@@ -180,15 +180,10 @@
             <p class="tt-name" id="pfEmail"></p>
             <div class="tt-bio" id="bioBox">
               <span class="bio-text" id="bioText"></span>
-              <button class="bio-edit" id="bioEdit" type="button" data-i18n-aria="prof_bio_edit" data-ico="edit"></button>
-              <form class="bio-form" id="bioForm" hidden novalidate>
-                <input id="bioIn" type="text" maxlength="80" data-i18n-ph="prof_bio_ph" data-i18n-aria="prof_bio_ph">
-                <button class="btn gold sm" type="submit"><span class="t" data-i18n="prof_bio_save">Simpan</span></button>
-                <button class="btn grey sm" id="bioCancel" type="button"><span class="t" data-i18n="prof_bio_cancel">Batal</span></button>
-              </form>
+              <a class="bio-link" id="bioLink" href="#" target="_blank" rel="noopener noreferrer nofollow ugc" hidden><span class="ico" data-ico="link"></span><span id="bioLinkTxt"></span></a>
             </div>
             <div class="tt-btns">
-              <button class="btn grey sm" id="photoBtn" type="button"><span class="ico" data-ico="camera"></span><span class="t" data-i18n="prof_photo">Tukar gambar</span></button>
+              <button class="btn grey sm" id="editProfile" type="button"><span class="ico" data-ico="edit"></span><span class="t" data-i18n="prof_edit">Edit profil</span></button>
               <button class="btn red sm" id="logoutBtn" type="button"><span class="ico" data-ico="logout"></span><span class="t" data-i18n="logout">Keluar</span></button>
               <input id="photoInput" type="file" accept="image/*" hidden>
             </div>
@@ -213,6 +208,23 @@
       </div>
     </section>
   </main>
+
+
+  <!-- Edit profil: gambar (pangkas semula / tukar), bio dan satu pautan -->
+  <div class="crop pedit" id="pedit" hidden role="dialog" aria-modal="true" aria-labelledby="peT">
+    <form class="crop-card glass hot" id="peForm" novalidate>
+      <h3 id="peT" data-i18n="prof_edit">Edit profil</h3>
+      <div class="pe-av"><div class="avatar" id="peAvatar"><img id="peImg" alt="" hidden><span id="peInit"></span></div></div>
+      <div class="pe-btns">
+        <button class="btn grey sm" id="peCrop" type="button"><span class="ico" data-ico="edit"></span><span class="t" data-i18n="pe_crop">Edit gambar</span></button>
+        <button class="btn grey sm" id="peChange" type="button"><span class="ico" data-ico="camera"></span><span class="t" data-i18n="prof_photo">Tukar gambar</span></button>
+      </div>
+      <label class="pe-f"><span data-i18n="pe_bio">Bio</span><textarea id="peBio" rows="3" maxlength="150" data-i18n-ph="prof_bio_ph"></textarea></label>
+      <label class="pe-f"><span data-i18n="pe_link">Pautan (satu sahaja)</span><input id="peLink" type="url" inputmode="url" autocapitalize="off" autocomplete="off" maxlength="200" placeholder="https://"></label>
+      <p class="msgline" id="peMsg" role="alert"></p>
+      <div class="crop-actions"><button class="btn ghost" id="peCancel" type="button"><span class="t" data-i18n="prof_bio_cancel">Batal</span></button><button class="btn gold" type="submit"><span class="t" data-i18n="prof_bio_save">Simpan</span></button></div>
+    </form>
+  </div>
 
   <footer class="foot">
     <div class="foot-left"><p class="foot-copy" data-i18n="foot"></p><a class="foot-terms" href="#terma" data-nav="terma" data-i18n="terms_link">Terma &amp; Hak Cipta</a></div>
@@ -262,6 +274,6 @@
   </section>
 
   <script src="assets/js/config.js"></script>
-  <script type="module" src="assets/js/app.js?v=8"></script>
+  <script type="module" src="assets/js/app.js?v=9"></script>
 </body>
 </html>

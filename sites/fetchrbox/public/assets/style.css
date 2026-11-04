@@ -613,3 +613,37 @@ footer.foot .foot-copy, footer.foot .foot-stats { text-align: center; margin: 0;
 .crop-zoom { display: flex; align-items: center; gap: 0.7rem; margin: 0 0.3rem 1rem; font-size: 0.78rem; font-weight: 700; color: var(--muted); }
 .crop-zoom input { flex: 1; accent-color: var(--blue); height: 28px; }
 .crop-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+
+/* ================= Menu halaman: jubin sama lebar (tanpa skrol), tab profil tanpa garisan, edit profil, pautan bio ================= */
+.subnav { padding: 0.65rem 1rem 0.3rem; }
+.subnav .in { display: flex; flex-wrap: nowrap; overflow: visible; gap: 0.55rem; padding: 0; }
+.sbtn { flex: 1 1 0; max-width: 150px; min-width: 0; flex-direction: column; justify-content: center; gap: 0.3rem; min-height: 64px; padding: 0.5rem 0.25rem; border-radius: 18px; font-size: 0.76rem; line-height: 1.15; text-align: center; background: rgba(255, 255, 255, 0.82); box-shadow: 0 10px 20px -14px rgba(var(--bd-rgb), 0.7); }
+.sbtn .ico { display: block; width: 1.35rem; height: 1.35rem; font-size: 1.35rem; }
+.sbtn:hover { box-shadow: 0 14px 24px -12px rgba(var(--bd-rgb), 0.6); }
+@media (max-width: 640px) { .subnav .in { overflow: visible; padding-bottom: 0; } .sbtn { flex: 1 1 0; padding: 0.5rem 0.2rem; font-size: 0.72rem; } .sbtn .ico { display: block; } }
+#navChat { display: none; }
+body[data-theme='profil'] #navChat { display: inline-flex; }
+
+.tt-tabs { border-bottom: 0; gap: 0.5rem; margin-top: 1.2rem; }
+.tt-tabs button { margin-bottom: 0; padding: 0 1.1rem; min-height: 42px; border: 0; border-radius: 14px; background: rgba(11, 27, 51, 0.06); }
+.tt-tabs button[aria-selected='true'] { color: #fff; background: var(--grad); }
+
+.tt-bio { flex-direction: column; align-items: center; gap: 0.35rem; }
+.bio-link { display: inline-flex; align-items: center; gap: 0.35rem; max-width: 100%; color: #0f55e6; font-weight: 700; text-decoration: none; word-break: break-all; text-shadow: 0 0 14px rgba(40, 120, 255, 0.55); }
+.bio-link .ico { width: 1em; height: 1em; flex: none; }
+.bio-link:hover { text-decoration: underline; }
+@media (min-width: 720px) { .tt-bio { align-items: flex-start; } }
+
+.pedit[hidden] { display: none; }
+.pedit { z-index: 90; }
+.pedit .crop-card { max-height: calc(100dvh - 2rem); overflow-y: auto; overscroll-behavior: contain; }
+.pe-av { display: grid; justify-items: center; margin: 0.9rem 0 0.7rem; }
+.pe-av .avatar { width: 96px; height: 96px; font-size: 2.2rem; border: 0; box-shadow: 0 12px 26px -14px rgba(var(--bd-rgb), 0.7); }
+.pe-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; }
+.pe-btns .btn:disabled { opacity: 0.45; pointer-events: none; }
+.pe-f { display: grid; gap: 0.3rem; text-align: start; margin-bottom: 0.75rem; font-weight: 700; font-size: 0.8rem; color: var(--muted); }
+.pe-f textarea, .pe-f input { width: 100%; padding: 0.65rem 0.8rem; border-radius: 12px; border: 1px solid var(--line); background: #fff; color: var(--ink); font: 600 0.92rem var(--body); resize: none; }
+.pe-f textarea:focus, .pe-f input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(var(--b-rgb), 0.16); }
+.pedit .msgline { margin: 0 0 0.6rem; }
+.pe-btns { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.pe-btns .btn { min-width: 0; padding: 0 0.5rem; gap: 0.35rem; font-size: 0.7rem; white-space: nowrap; }

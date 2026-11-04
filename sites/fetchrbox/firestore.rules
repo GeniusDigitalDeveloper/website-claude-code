@@ -44,16 +44,18 @@ service cloud.firestore {
     match /users/{uid} {
       allow create: if request.auth != null
         && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['email', 'createdAt', 'lang', 'photo', 'username', 'bio'])
+        && request.resource.data.keys().hasOnly(['email', 'createdAt', 'lang', 'photo', 'photoSrc', 'username', 'bio', 'link'])
         && request.resource.data.email == request.auth.token.email
         && (!('username' in request.resource.data)
             || getAfter(/databases/$(database)/documents/usernames/$(request.resource.data.username)).data.uid == uid);
       allow read: if isAdmin() || (request.auth != null && request.auth.uid == uid);
       allow update: if request.auth != null
         && request.auth.uid == uid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['photo', 'lang', 'bio'])
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['photo', 'photoSrc', 'lang', 'bio', 'link'])
         && (!('photo' in request.resource.data) || (request.resource.data.photo is string && request.resource.data.photo.size() < 150000))
-        && (!('bio' in request.resource.data) || (request.resource.data.bio is string && request.resource.data.bio.size() <= 80));
+        && (!('bio' in request.resource.data) || (request.resource.data.bio is string && request.resource.data.bio.size() <= 150))
+        && (!('photoSrc' in request.resource.data) || (request.resource.data.photoSrc is string && request.resource.data.photoSrc.size() < 260000))
+        && (!('link' in request.resource.data) || (request.resource.data.link is string && request.resource.data.link.size() <= 200 && (request.resource.data.link == '' || request.resource.data.link.matches('^https?://[^ ]+$'))));
       allow delete: if false;
     }
     // Permohonan kelulusan kandungan berhak cipta: pengguna mohon (status pending), hanya admin boleh putuskan.

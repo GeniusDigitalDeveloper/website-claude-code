@@ -127,8 +127,9 @@ export const fb = {
   async ensureProfile(user, lang) {
     try { const r = doc(db, 'users', user.uid); if (!(await getDoc(r)).exists()) await setDoc(r, { email: user.email, createdAt: serverTimestamp(), lang }); } catch { /* abaikan */ }
   },
-  savePhoto: (uid, dataUrl) => updateDoc(doc(db, 'users', uid), { photo: dataUrl }),
-  saveBio: (uid, bio) => updateDoc(doc(db, 'users', uid), { bio: String(bio).slice(0, 80) }),
+  savePhoto: (uid, dataUrl, srcUrl) => updateDoc(doc(db, 'users', uid), srcUrl ? { photo: dataUrl, photoSrc: srcUrl } : { photo: dataUrl }),
+  saveProfileInfo: (uid, bio, link) => updateDoc(doc(db, 'users', uid), { bio: String(bio).slice(0, 150), link: String(link).slice(0, 200) }),
+  saveBio: (uid, bio) => updateDoc(doc(db, 'users', uid), { bio: String(bio).slice(0, 150) }),
 
   /** Statistik awam untuk footer: { total, days: { 'YYYY-MM-DD': n } } (ditulis oleh pelayan). */
   watchPublicStats(cb) { return onSnapshot(doc(db, 'stats', 'public'), (s) => cb(s.exists() ? s.data() : {}), () => cb({})); },

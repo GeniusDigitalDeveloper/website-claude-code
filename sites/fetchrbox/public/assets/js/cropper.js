@@ -8,9 +8,11 @@ const MAX_ZOOM = 4;    // 4x daripada saiz minimum
 
 export function openCropper(file) {
   return new Promise((resolve) => {
-    const url = URL.createObjectURL(file);
+    // `file` boleh jadi File (gambar baru) atau data URL (sunting gambar sedia ada)
+    const own = typeof file !== 'string';
+    const url = own ? URL.createObjectURL(file) : file;
     const img = new Image();
-    img.onerror = () => { URL.revokeObjectURL(url); resolve(null); };
+    img.onerror = () => { if (own) URL.revokeObjectURL(url); resolve(null); };
     img.onload = () => start(img, url, resolve);
     img.src = url;
   });
@@ -69,7 +71,7 @@ function start(img, objUrl, resolve) {
     document.body.style.overflow = prevOverflow;
     root.classList.add('out');
     setTimeout(() => root.remove(), 220);
-    URL.revokeObjectURL(objUrl);
+    if (objUrl.startsWith('blob:')) URL.revokeObjectURL(objUrl);
     resolve(result);
   }
   function crop() {

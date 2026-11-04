@@ -244,8 +244,11 @@ function paintProfile(d) {
   $('#pfEmail').textContent = email;
   $('#avatarInit').textContent = username.charAt(0).toUpperCase();
   const bio = (d.bio || '').trim();
-  $('#bioText').textContent = bio || t('prof_bio_empty');
+  $('#bioText').textContent = bio || t('prof_bio_empty'); $('#bioText').hidden = !bio && !!d.link;
   $('#bioText').classList.toggle('muted', !bio);
+  const lk = cleanLink(d.link), a = $('#bioLink');
+  a.hidden = !lk; if (lk) { a.href = lk; $('#bioLinkTxt').textContent = lk.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, ''); }
+  if ($('#pedit') && !$('#pedit').hidden) paintEditAvatar();
   const stt = d.stats || {};
   const mp4 = stt.mp4 || 0, mp3 = stt.mp3 || 0, wav = stt.wav || 0, other = stt.other || 0;
   $('#stTotal').textContent = nf(stt.total ?? mp4 + mp3 + wav + other);
@@ -265,30 +268,74 @@ function paintProfile(d) {
 }
 document.addEventListener('langchange', () => paintProfile(profile));
 
-/* Bio: sunting ringkas (maksimum 80 aksara) */
-const bioOpen = (on) => { $('#bioForm').hidden = !on; $('#bioText').hidden = on; $('#bioEdit').hidden = on; if (on) { $('#bioIn').value = (profile.bio || '').trim(); $('#bioIn').focus(); } };
-$('#bioEdit').addEventListener('click', () => bioOpen(true));
-$('#bioText').addEventListener('click', () => bioOpen(true));
-$('#bioCancel').addEventListener('click', () => bioOpen(false));
-$('#bioForm').addEventListener('submit', async (e) => {
+/* ---------- Edit profil: gambar (pangkas semula / tukar), bio dan satu pautan ---------- */
+const cleanLink = (v) => {
+  v = String(v || '').trim(); if (!v) return '';
+  if (!/^[a-z][a-z0-9+.-]*:/i.test(v)) v = 'https://' + v;
+  try { const u = new URL(v); if (!['http:', 'https:'].includes(u.protocol) || !u.hostname.includes('.') || /\s/.test(v) || v.length > 200) return null; return u.href; } catch { return null; }
+};
+// Simpan gambar asal (kecil sedikit) supaya pengguna boleh pangkas bahagian lain tanpa pilih gambar baru
+function shrinkOriginal(file, max = 960) {
+  return new Promise((resolve, reject) => {
+    const img = new Image(), u = URL.createObjectURL(file);
+    img.onload = () => {
+      const k = Math.min(1, max / Math.max(img.width, img.height)), c = document.createElement('canvas');
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(u);
+      let q = 0.82, out = c.toDataURL('image/jpeg', q);
+      while (out.length > 240000 && q > 0.4) { q -= 0.1; out = c.toDataURL('image/jpeg', q); }
+      out.length > 240000 ? reject(new Error('big')) : resolve(out);
+    };
+    img.onerror = () => { URL.revokeObjectURL(u); reject(new Error('img')); };
+    img.src = u;
+  });
+}
+function paintEditAvatar() {
+  const img = $('#peImg'), has = !!profile.photo;
+  img.hidden = !has; if (has) img.src = profile.photo;
+  $('#peInit').hidden = has; $('#peInit').textContent = $('#avatarInit').textContent;
+  $('#peCrop').disabled = !(profile.photoSrc || profile.photo);
+}
+const editOpen = (on) => {
+  const box = $('#pedit');
+  if (on) { $('#peBio').value = (profile.bio || '').trim(); $('#peLink').value = profile.link || ''; say('#peMsg', ''); paintEditAvatar(); box.hidden = false; document.body.style.overflow = 'hidden'; sfx.open(); $('#peBio').focus(); }
+  else { box.hidden = true; document.body.style.overflow = ''; }
+};
+$('#editProfile').addEventListener('click', () => editOpen(true));
+$('#peCancel').addEventListener('click', () => editOpen(false));
+$('#pedit').addEventListener('click', (e) => { if (e.target.id === 'pedit') editOpen(false); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('#pedit').hidden && !document.querySelector('.crop:not(.pedit)')) editOpen(false); });
+$('#peForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   if (!st.user) return;
-  try { await fb.saveBio(st.user.uid, $('#bioIn').value.trim()); sfx.success(); bioOpen(false); }
-  catch { say('#pfMsg', 'prof_err'); sfx.error(); }
+  const link = cleanLink($('#peLink').value);
+  if (link === null) { say('#peMsg', 'pe_link_bad'); sfx.error(); return; }
+  try { await fb.saveProfileInfo(st.user.uid, $('#peBio').value.trim(), link); sfx.success(); editOpen(false); }
+  catch { say('#peMsg', 'prof_err'); sfx.error(); }
 });
 $('#navChat').addEventListener('click', () => $('#fab').click());
-$('#photoBtn').addEventListener('click', () => $('#photoInput').click());
+// Edit gambar sedia ada: pangkas bahagian lain tanpa pilih gambar baru
+$('#peCrop').addEventListener('click', async () => {
+  const src = profile.photoSrc || profile.photo;
+  if (!src || !st.user) return;
+  say('#peMsg', '');
+  try { const cropped = await openCropper(src); if (cropped) { await fb.savePhoto(st.user.uid, cropped); paintEditAvatar(); } }
+  catch { say('#peMsg', 'prof_err'); sfx.error(); }
+});
+$('#peChange').addEventListener('click', () => $('#photoInput').click());
 $('#photoInput').addEventListener('change', async (e) => {
   const file = e.target.files[0]; e.target.value = '';
   if (!file || !st.user) return;
-  say('#pfMsg', '');
-  if (!file.type.startsWith('image/')) { say('#pfMsg', 'prof_err'); sfx.error(); return; }
+  say('#peMsg', '');
+  if (!file.type.startsWith('image/')) { say('#peMsg', 'prof_err'); sfx.error(); return; }
   try {
     // Pengguna memilih bahagian gambar (muka, badan dan sebagainya) dengan menyeret dan zum, kemudian tekan Selesai.
     const cropped = await openCropper(file);
     if (!cropped) return; // dibatalkan
-    await fb.savePhoto(st.user.uid, cropped);
-  } catch { say('#pfMsg', 'prof_err'); sfx.error(); }
+    await fb.savePhoto(st.user.uid, cropped, await shrinkOriginal(file));
+    paintEditAvatar();
+  } catch { say('#peMsg', 'prof_err'); sfx.error(); }
 });
 
 /* ---------- Kesan platform ketika menaip ---------- */
