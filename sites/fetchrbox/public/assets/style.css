@@ -1,4 +1,4 @@
-/* Dropix — tema dropix + emas, glassmorphism, gerak gaya iOS. */
+/* Fetchr Box — tema fetchrbox + emas, glassmorphism, gerak gaya iOS. */
 :root {
   --bg0: #021613; --bg1: #052922; --bg2: #0a3a31;
   --emerald: #2ec4a0; --emerald-d: #0e7a66;
@@ -278,3 +278,8 @@ a { color: #7a5a0c; }
 .input-wrap input:focus, .chat form input:focus { box-shadow: 0 0 0 4px rgba(212, 169, 55, 0.25); }
 .pchip.on { background: rgba(212, 169, 55, 0.25); }
 .row-item .pi { color: var(--emerald-d); }
+
+/* Wordmark dua perkataan: FETCHR (hijau) + BOX (emas) */
+.wordmark { font-size: clamp(2.8rem, 12.5vw, 8.2rem); flex-wrap: wrap; row-gap: 0; }
+.wordmark .sp { display: inline-block; width: 0.28em; }
+.wordmark .alt span { background: linear-gradient(180deg, #f2d68a 0%, #d4a937 45%, #9a7418 100%); -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 12px 22px rgba(154, 116, 24, 0.28)); }

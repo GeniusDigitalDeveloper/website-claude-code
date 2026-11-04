@@ -1,9 +1,9 @@
-name: Dropix - CI
+name: Fetchr Box - CI
 on:
   push:
-    paths: ['sites/dropix/**']
+    paths: ['sites/fetchrbox/**']
   pull_request:
-    paths: ['sites/dropix/**']
+    paths: ['sites/fetchrbox/**']
 permissions:
   contents: read
 jobs:
@@ -14,9 +14,9 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
       - name: Semak sintaks server dan frontend
-        working-directory: sites/dropix
+        working-directory: sites/fetchrbox
         run: |
           node --check server/server.mjs
           for f in public/assets/js/*.js; do node --check "$f"; done
       - name: Imbas rahsia
-        run: "! grep -rEn '(ADMIN_PASSWORD|SECRET)=[^ ]{6,}' sites/dropix --exclude='.env.example' --exclude-dir=node_modules"
+        run: "! grep -rEn '(ADMIN_PASSWORD|SECRET)=[^ ]{6,}' sites/fetchrbox --exclude='.env.example' --exclude-dir=node_modules"

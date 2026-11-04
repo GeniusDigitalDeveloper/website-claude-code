@@ -1,6 +1,6 @@
 // Bunyi sintetik (WebAudio) — tiada fail audio. Dimatikan/dihidupkan dengan togol, simpan dalam localStorage.
 let ctx, master;
-const KEY = 'dropix:sound';
+const KEY = 'fetchrbox:sound';
 let on = true;
 try { on = localStorage.getItem(KEY) !== 'off'; } catch {}
 function ensure() {

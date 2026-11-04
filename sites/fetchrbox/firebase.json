@@ -41,12 +41,12 @@
         ]
       }
     ],
-    "site": "dropix-media-izzul"
+    "site": "fetchr-box-izzul"
   },
   "auth": {
     "providers": {
       "googleSignIn": {
-        "oAuthBrandDisplayName": "Dropix",
+        "oAuthBrandDisplayName": "Fetchr Box",
         "supportEmail": "izzulmedia01@gmail.com"
       }
     }

@@ -6,7 +6,7 @@
 
 ---
 
-**Project:** Dropix
+**Project:** Fetchr Box
 **Generated:** 2026-11-04 14:58:24
 **Category:** Remote Work/Collaboration Tool
 
@@ -215,15 +215,15 @@ Before delivering any UI code, verify:
 
 ---
 
-## OVERRIDE (keputusan sebenar projek Dropix)
+## OVERRIDE (keputusan sebenar projek Fetchr Box)
 
-Cadangan auto di atas (indigo) tidak sesuai. Dropix guna tema **Islamik halus**:
+Cadangan auto di atas (indigo) tidak sesuai. Fetchr Box guna tema **Islamik halus**:
 
-- Latar: hijau dropix gelap `#04201C` → `#0A3A31`, corak bintang 8 penjuru (khatam) pada opacity 5-7%.
-- Aksen: emas `#E6C36A` (butang utama, teks atas gelap), dropix terang `#2EC4A0`.
+- Latar: hijau fetchrbox gelap `#04201C` → `#0A3A31`, corak bintang 8 penjuru (khatam) pada opacity 5-7%.
+- Aksen: emas `#E6C36A` (butang utama, teks atas gelap), fetchrbox terang `#2EC4A0`.
 - Teks: `#F2F7F5` (kontras > 12:1 atas latar), muted `#A9C7BF` (> 7:1).
 - Glass: `rgba(255,255,255,.06)` + blur 18px + border `rgba(230,195,106,.22)`.
 - Fon: Sora (tajuk), Inter (isi), Amiri hanya untuk sentuhan kaligrafi kecil.
 - Gerak: easing iOS `cubic-bezier(.32,.72,0,1)`, hanya `transform`/`opacity`, hormati `prefers-reduced-motion`.
 - Bunyi: WebAudio sintetik (klik, pop, berjaya, ralat), boleh dimatikan.
-- Header: logo kiri + nama kecil, dan tajuk wordmark besar "Dropix" dalam hero.
+- Header: logo kiri + nama kecil, dan tajuk wordmark besar "Fetchr Box" dalam hero.
