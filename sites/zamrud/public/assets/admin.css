@@ -88,3 +88,17 @@
   .kv { grid-template-columns: 1fr; gap: 0.1rem; }
   .toast { bottom: 100px; }
 }
+
+/* Tema cerah */
+.login input, .f input, .f textarea, .f select { background: #fff; }
+.login input:focus, .f input:focus, .f textarea:focus, .f select:focus { box-shadow: 0 0 0 4px rgba(212, 169, 55, 0.25); }
+.stat b { background: linear-gradient(180deg, #17a98c, #0b5f50); -webkit-background-clip: text; background-clip: text; }
+.hbar .track { background: rgba(10, 46, 39, 0.1); }
+.log li { background: rgba(10, 46, 39, 0.05); }
+.switch span { background: rgba(10, 46, 39, 0.22); }
+.icons span { background: #fff; }
+.icons input:checked + span { color: #5e4306; background: rgba(212, 169, 55, 0.28); }
+.row-item .pi { background: rgba(15, 138, 114, 0.1); }
+.divider { display: flex; align-items: center; gap: 0.7rem; color: var(--muted); font-size: 0.85rem; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--line-soft); }
+.login form.em { display: grid; gap: 0.7rem; width: 100%; }

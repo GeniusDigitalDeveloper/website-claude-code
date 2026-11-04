@@ -42,6 +42,8 @@ export const fb = {
   },
   isAdminHint: (email) => ADMIN_EMAILS.includes((email || '').toLowerCase()),
   async signIn() { const m = await getAuthMod(); return m.signInWithPopup(auth, new m.GoogleAuthProvider()); },
+  async signInEmail(email, pw) { const m = await getAuthMod(); return m.signInWithEmailAndPassword(auth, email, pw); },
+  async verifyEmail(user) { const m = await getAuthMod(); return m.sendEmailVerification(user); },
   async signOut() { const m = await getAuthMod(); return m.signOut(auth); },
   async onUser(cb) { const m = await getAuthMod(); return m.onAuthStateChanged(auth, cb); },
 };

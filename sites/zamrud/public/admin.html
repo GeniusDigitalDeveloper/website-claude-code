@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex,nofollow">
   <title>Zamrud Admin</title>
-  <meta name="theme-color" content="#052922">
+  <meta name="theme-color" content="#f7f4ea">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,6 +23,12 @@
       <h1>Zamrud Admin</h1>
       <p>Log masuk dengan akaun Google admin untuk urus platform, chatbot dan statistik.</p>
       <button class="btn gold" id="loginBtn" type="button"><span class="t">Log masuk dengan Google</span></button>
+      <div class="divider">atau e-mel</div>
+      <form class="em" id="emailForm">
+        <label class="sr" for="em">E-mel</label><input id="em" type="email" autocomplete="username" placeholder="E-mel admin" required>
+        <label class="sr" for="pw">Kata laluan</label><input id="pw" type="password" autocomplete="current-password" placeholder="Kata laluan" required>
+        <button class="btn ghost" type="submit"><span class="t">Log masuk</span></button>
+      </form>
       <small id="loginErr" role="alert"></small>
       <a href="./" data-nosfx>Kembali ke laman awam</a>
     </div>

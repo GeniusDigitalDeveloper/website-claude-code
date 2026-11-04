@@ -16,10 +16,20 @@ $('#loginBtn').addEventListener('click', async () => {
   try { await fb.signIn(); }
   catch (ex) { if (ex.code !== 'auth/popup-closed-by-user') { err.textContent = 'Log masuk gagal: ' + (ex.code || ex.message); sfx.error(); } }
 });
+$('#emailForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const err = $('#loginErr'); err.textContent = '';
+  try { await fb.signInEmail($('#em').value.trim(), $('#pw').value); }
+  catch (ex) { err.textContent = ['auth/invalid-credential', 'auth/wrong-password', 'auth/user-not-found'].includes(ex.code) ? 'E-mel atau kata laluan salah.' : 'Log masuk gagal: ' + (ex.code || ex.message); sfx.error(); }
+});
 $('#logout').addEventListener('click', () => fb.signOut());
 fb.onUser(async (user) => {
   if (!user) { $('#login').hidden = false; $('#shell').hidden = true; return; }
   if (!fb.isAdminHint(user.email)) { $('#loginErr').textContent = `${user.email} bukan akaun admin.`; sfx.error(); await fb.signOut(); return; }
+  if (!user.emailVerified) {
+    try { await fb.verifyEmail(user); } catch {}
+    $('#loginErr').textContent = `E-mel ${user.email} belum disahkan. Pautan pengesahan dihantar, sahkan kemudian log masuk semula.`; sfx.error(); await fb.signOut(); return;
+  }
   try { await load(); } catch (e) { $('#loginErr').textContent = 'Gagal memuat data: ' + e.message; return; }
   sfx.success();
   $('#login').hidden = true; $('#shell').hidden = false;

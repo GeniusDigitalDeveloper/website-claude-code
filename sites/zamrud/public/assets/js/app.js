@@ -28,7 +28,7 @@ async function loadConfig() {
     ], faq: null, settings: {}, offline: true };
   }
   if (!st.cfg.faq) { try { st.cfg.faq = (await (await fetch('assets/defaults.json')).json()).faq; } catch { st.cfg.faq = []; } }
-  renderPlatforms(); renderFaq();
+  renderPlatforms(); renderFaq(); detect();
   const a = st.cfg.settings?.announcement;
   if (a || st.cfg.settings?.maintenance) { const el = $('#announce'); el.hidden = false; el.textContent = st.cfg.settings.maintenance ? 'Sistem dalam penyelenggaraan. Cuba lagi sebentar lagi.' : a; }
   initChat(st.cfg.faq, { onInsertUrl: (u) => { $('#url').value = u; $('#url').focus(); $('#url').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' }); detect(); } });
@@ -45,6 +45,7 @@ function renderFaq() {
 /* ---------- Kesan platform ketika menaip ---------- */
 const hostOf = (v) => { try { return new URL(v.match(/https?:\/\/\S+/)?.[0] || '').hostname.toLowerCase(); } catch { return ''; } };
 function detect() {
+  if (!st.cfg) return;
   const v = $('#url').value.trim();
   const host = hostOf(v);
   const p = host && st.cfg?.platforms.find((x) => x.domains.some((d) => host === d || host.endsWith('.' + d)));
