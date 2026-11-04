@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Pasang pelayan muat turun Fetchr Box pada VM Oracle Cloud (Ubuntu 22.04/24.04, ARM atau x86).
+# Pasang pelayan muat turun Fetchr Box pada mana-mana VPS Ubuntu 22.04/24.04 (Oracle, Hetzner, DigitalOcean, Vultr...), ARM atau x86.
 # Jalankan SEKALI di dalam VM:   bash oracle-setup.sh
 # Hasil: pelayan di https://<ip>.sslip.io (HTTPS percuma automatik melalui Caddy, tiada domain diperlukan).
 set -euo pipefail
@@ -10,8 +10,9 @@ APP_DIR=/opt/fetchrbox
 ORIGINS="${ALLOWED_ORIGIN:-https://fetchr-box-izzul.web.app,https://fetchrbox-admin-izzul.web.app}"
 
 echo "==> 1/6 Pasang Docker dan git"
-sudo apt-get update -y
-sudo apt-get install -y docker.io git curl ca-certificates iptables-persistent
+export DEBIAN_FRONTEND=noninteractive
+sudo -E apt-get update -y
+sudo -E apt-get install -y docker.io git curl ca-certificates iptables-persistent
 sudo systemctl enable --now docker
 
 echo "==> 2/6 Buka port 80 dan 443 (firewall VM)"
