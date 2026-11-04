@@ -149,9 +149,13 @@
   </div>
   <div class="toast" id="toast" role="status"></div>
 
-  <button class="fab" id="fab" type="button" data-i18n-aria="chat_aria" aria-expanded="false" data-ico="chat"></button>
+  <div class="teaser" id="teaser" role="status" hidden>
+    <button class="teaser-main" id="teaserOpen" type="button"><span data-i18n="chat_teaser">Ada apa yang boleh saya bantu?</span></button>
+    <button class="teaser-x" id="teaserClose" type="button" data-i18n-aria="close" data-ico="x"></button>
+  </div>
+  <button class="fab holo hot" id="fab" type="button" data-i18n-aria="chat_aria" aria-expanded="false"><img src="assets/logo.svg" alt="" width="38" height="38"></button>
   <section class="chat glass" id="chat" aria-hidden="true">
-    <header><div class="av" data-ico="bot"></div><div><b data-i18n="chat_title"></b><small data-i18n="chat_online"></small></div><button class="icon-btn" id="chatClose" type="button" data-i18n-aria="chat_close" data-ico="x"></button></header>
+    <header><div class="av"><img src="assets/logo.svg" alt="" width="34" height="34"></div><div><b data-i18n="chat_title"></b><small data-i18n="chat_online"></small></div><button class="icon-btn" id="chatClose" type="button" data-i18n-aria="chat_close" data-ico="x"></button></header>
     <div class="msgs" id="msgs" aria-live="polite"></div>
     <div class="quick" id="quick"></div>
     <form id="chatForm" autocomplete="off"><input id="chatIn" type="text" data-i18n-ph="chat_ph" data-i18n-aria="chat_ph"><button class="btn gold" type="submit" data-i18n-aria="chat_send" data-ico="send"></button></form>

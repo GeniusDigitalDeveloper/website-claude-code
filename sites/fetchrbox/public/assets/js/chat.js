@@ -74,7 +74,24 @@ export function initChat(getFaq, { onInsertUrl } = {}) {
   }
   function close() { chat.classList.remove('show'); chat.setAttribute('aria-hidden', 'true'); fab.setAttribute('aria-expanded', 'false'); sfx.close(); }
 
-  fab.addEventListener('click', () => (chat.classList.contains('show') ? close() : open()));
+  // Gelembung soalan: "Ada apa yang boleh saya bantu?" muncul seketika selepas laman dibuka.
+  const teaser = $('#teaser');
+  const hideTeaser = (remember) => {
+    if (teaser.hidden) return;
+    teaser.classList.add('out');
+    setTimeout(() => { teaser.hidden = true; teaser.classList.remove('out'); }, 300);
+    if (remember) { try { sessionStorage.setItem('fetchrbox:teaser', '1'); } catch { /* abaikan */ } }
+  };
+  let seen = false;
+  try { seen = !!sessionStorage.getItem('fetchrbox:teaser'); } catch { /* abaikan */ }
+  if (!seen) {
+    setTimeout(() => { if (!chat.classList.contains('show')) { teaser.hidden = false; sfx.msg(); } }, 2500);
+    setTimeout(() => hideTeaser(false), 18000);
+  }
+  $('#teaserOpen').addEventListener('click', () => { hideTeaser(true); open(); });
+  $('#teaserClose').addEventListener('click', () => hideTeaser(true));
+
+  fab.addEventListener('click', () => { hideTeaser(true); chat.classList.contains('show') ? close() : open(); });
   $('#chatClose').addEventListener('click', close);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && chat.classList.contains('show') && !$('#overlay').classList.contains('show')) close(); });
   form.addEventListener('submit', (e) => { e.preventDefault(); const v = input.value; input.value = ''; send(v); });

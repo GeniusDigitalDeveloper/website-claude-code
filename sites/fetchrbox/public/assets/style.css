@@ -219,16 +219,27 @@ footer { text-align: center; color: var(--muted); font-size: 0.86rem; font-weigh
 .toast.show { opacity: 1; transform: translate3d(-50%, 0, 0); }
 
 /* ---------- Chatbot (Poppins; teks kecil Montserrat) ---------- */
-.fab { position: fixed; inset-inline-end: 16px; bottom: 16px; z-index: 40; width: 62px; height: 62px; border-radius: 22px 22px 8px 22px; display: grid; place-items: center; color: #fff; font-size: 1.75rem; background: var(--grad); box-shadow: 0 16px 34px -10px rgba(10, 63, 209, 0.75); transition: transform 0.45s var(--ease); }
+.fab { position: fixed; inset-inline-end: 16px; bottom: 16px; z-index: 40; width: 64px; height: 64px; display: grid; place-items: center; --r: 22px; --bw: 3px; --surface: #fff; transition: transform 0.45s var(--ease); }
+.fab img { width: 38px; height: 38px; filter: drop-shadow(0 4px 8px rgba(10, 63, 209, 0.35)); }
 .fab:hover { transform: scale(1.08) rotate(-4deg); }
 .fab:active { transform: scale(0.92); }
-.fab::after { content: ''; position: absolute; inset: -6px; border-radius: 26px 26px 12px 26px; border: 2px solid var(--blue); opacity: 0; animation: ping 2.6s ease-out infinite; }
+.teaser { position: fixed; inset-inline-end: 16px; bottom: 92px; z-index: 41; display: flex; align-items: stretch; max-width: min(300px, calc(100vw - 32px)); border-radius: 20px 20px 6px 20px; background: #fff; border: 1px solid var(--line); box-shadow: 0 18px 40px -16px rgba(10, 63, 209, 0.55), 0 0 24px -8px rgba(179, 107, 255, 0.4); transform-origin: bottom right; animation: teaserIn 0.7s var(--ease) both; }
+[dir='rtl'] .teaser { border-radius: 20px 20px 20px 6px; transform-origin: bottom left; }
+.teaser.out { animation: teaserOut 0.3s ease forwards; }
+.teaser-main { padding: 0.8rem 0.4rem 0.8rem 1rem; text-align: start; font-family: var(--strong); font-weight: 600; font-size: 0.92rem; line-height: 1.4; color: var(--ink); }
+[dir='rtl'] .teaser-main { padding: 0.8rem 1rem 0.8rem 0.4rem; }
+.teaser-x { align-self: flex-start; width: 34px; height: 34px; margin: 4px; display: grid; place-items: center; border-radius: 10px; color: var(--muted); font-size: 0.95rem; }
+.teaser-x:hover { background: rgba(11, 27, 51, 0.07); }
+.teaser::after { content: ''; position: absolute; bottom: -7px; inset-inline-end: 22px; width: 14px; height: 14px; background: #fff; border-inline-end: 1px solid var(--line); border-bottom: 1px solid var(--line); transform: rotate(45deg); }
+@keyframes teaserIn { from { opacity: 0; transform: translate3d(0, 18px, 0) scale(0.7); } }
+@keyframes teaserOut { to { opacity: 0; transform: translate3d(0, 10px, 0) scale(0.85); } }
 @keyframes ping { 0% { opacity: 0.6; transform: scale(0.9); } 100% { opacity: 0; transform: scale(1.25); } }
 .chat { position: fixed; inset-inline-end: 16px; bottom: 92px; z-index: 50; width: min(390px, calc(100vw - 32px)); height: min(560px, calc(100dvh - 120px)); display: flex; flex-direction: column; font-family: var(--strong); --surface: #f6f9ff; transform-origin: bottom right; opacity: 0; transform: translate3d(0, 24px, 0) scale(0.85); pointer-events: none; transition: transform 0.55s var(--ease), opacity 0.35s; }
 [dir='rtl'] .chat { transform-origin: bottom left; }
 .chat.show { opacity: 1; transform: none; pointer-events: auto; }
 .chat header { display: flex; align-items: center; gap: 0.7rem; padding: 0.9rem 1rem; border-bottom: 1px solid var(--line); }
-.chat header .av { width: 40px; height: 40px; border-radius: 14px 14px 14px 5px; display: grid; place-items: center; color: #fff; font-size: 1.4rem; background: var(--grad); }
+.chat header .av { width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center; background: #fff; border: 1px solid var(--line); }
+.chat header .av img { width: 30px; height: 30px; }
 .chat header b { font-family: var(--strong); font-weight: 700; display: block; line-height: 1.2; }
 .chat header small { font-family: var(--body); font-weight: 600; font-size: 0.75rem; color: var(--ok); }
 .chat header .icon-btn { margin-inline-start: auto; width: 38px; height: 38px; }
