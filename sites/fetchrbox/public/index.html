@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700&family=Montserrat:wght@500;600;700&family=Poppins:wght@500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css">
+  <link rel="stylesheet" href="assets/style.css?v=3">
   <script src="assets/js/boot.js"></script>
 </head>
 <body>
@@ -19,7 +19,7 @@
   <div id="announce" class="announce" hidden></div>
 
   <header class="topbar">
-    <div class="in glass">
+    <div class="in glass wide-holo hot">
       <a class="brand" href="./" aria-label="Fetchr Box"><img src="assets/logo.svg" alt="" width="42" height="42"><b>Fetchr Box</b></a>
       <nav class="nav">
         <a class="link" href="#cara" data-i18n="nav_how">Cara guna</a>
@@ -41,7 +41,7 @@
       <p class="sub reveal" style="--d:.35s" data-i18n="sub"></p>
 
       <!-- Daftar / Log masuk (dipaparkan jika belum log masuk) -->
-      <section class="authbox glass" id="authBox" hidden>
+      <section class="authbox glass hot" id="authBox" hidden>
         <div class="tabs" role="tablist">
           <button type="button" role="tab" id="tabRegister" data-tab="register" aria-selected="true" data-i18n="tab_register">Daftar</button>
           <button type="button" role="tab" id="tabLogin" data-tab="login" aria-selected="false" data-i18n="tab_login">Log Masuk</button>
@@ -79,21 +79,21 @@
       </section>
 
       <!-- Pemuat turun (dipaparkan selepas log masuk) -->
-      <div class="dl glass" id="dlBox" hidden>
+      <div class="dl glass wide-holo hot" id="dlBox" hidden>
         <div class="userbar"><span><span data-i18n="signed_as"></span> <b id="userEmail"></b></span><button class="btn ghost sm" id="logoutBtn" type="button"><span class="t" data-i18n="logout">Keluar</span></button></div>
         <form id="form" class="field" novalidate>
-          <div class="input-wrap">
+          <div class="input-wrap holo wide-holo hot">
             <span class="ico" data-ico="link"></span>
             <label class="sr" for="url" data-i18n="ph_url"></label>
             <input id="url" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" data-i18n-ph="ph_url">
             <button class="paste icon-btn" id="pasteBtn" type="button" data-i18n-aria="paste_aria" data-ico="paste"></button>
           </div>
-          <button class="btn gold" id="checkBtn" type="submit"><span class="ico" data-ico="zap"></span><span class="t" data-i18n="btn_check">Semak</span></button>
+          <button class="btn gold" id="checkBtn" type="submit"><span class="ico" data-ico="zap"></span><span class="t" data-i18n="btn_check">Imbas</span></button>
         </form>
         <div class="detected" id="detected" aria-live="polite"></div>
       </div>
 
-      <div class="result glass" id="result" aria-live="polite">
+      <div class="result glass hot" id="result" aria-live="polite">
         <div class="meta">
           <img class="thumb" id="thumb" alt="" referrerpolicy="no-referrer" width="132" height="74">
           <div><h3 id="title"></h3><p id="metaLine"></p></div>
@@ -126,9 +126,9 @@
     <section class="block" id="cara" aria-labelledby="how">
       <h2 class="h2 reveal" id="how" data-i18n="how_title"></h2>
       <div class="grid steps">
-        <article class="card glass reveal"><div class="badge" data-ico="link"></div><h3 data-i18n="s1_t"></h3><p data-i18n="s1_p"></p></article>
-        <article class="card glass reveal" style="--d:.08s"><div class="badge" data-ico="paste"></div><h3 data-i18n="s2_t"></h3><p data-i18n="s2_p"></p></article>
-        <article class="card glass reveal" style="--d:.16s"><div class="badge" data-ico="download"></div><h3 data-i18n="s3_t"></h3><p data-i18n="s3_p"></p></article>
+        <article class="card glass reveal"><span class="num">01</span><div class="badge" data-ico="link"></div><h3 data-i18n="s1_t"></h3><p data-i18n="s1_p"></p></article>
+        <article class="card glass reveal" style="--d:.08s"><span class="num">02</span><div class="badge" data-ico="paste"></div><h3 data-i18n="s2_t"></h3><p data-i18n="s2_p"></p></article>
+        <article class="card glass reveal" style="--d:.16s"><span class="num">03</span><div class="badge" data-ico="download"></div><h3 data-i18n="s3_t"></h3><p data-i18n="s3_p"></p></article>
       </div>
     </section>
 
