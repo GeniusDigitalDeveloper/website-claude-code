@@ -17,7 +17,7 @@ GitHub Pages hanya hos fail statik. Ia **tidak boleh** menjalankan yt-dlp, jadi 
 ```bash
 pip install yt-dlp && sudo apt install ffmpeg   # sekali sahaja
 cd sites/zamrud
-ADMIN_PASSWORD=kata-laluan-kuat npm start       # http://localhost:8080
+ADMIN_PASSWORD=... npm start                      # http://localhost:8080 (isi kata laluan sendiri)
 ```
 
 Pratonton reka bentuk tanpa pelayan: buka `public/index.html?demo`.
