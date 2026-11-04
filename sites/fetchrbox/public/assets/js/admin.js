@@ -203,7 +203,7 @@ function editFaq(i) {
 function usersView() {
   const fmt = (ts) => { try { return ts?.toDate ? new Intl.DateTimeFormat('ms-MY', { timeZone: TZ, dateStyle: 'medium', timeStyle: 'short' }).format(ts.toDate()) : ''; } catch { return ''; } };
   return `<h1>Pengguna <span class="live">LANGSUNG</span></h1><p class="sub2">${num(users.length)} pengguna berdaftar. Terbaharu di atas.</p>
-  <div class="list">${users.map((u) => `<div class="row-item glass"><div class="pi" data-ico="user"></div><div class="txt"><b>${esc(u.email)}</b><small>${esc(fmt(u.createdAt))}${u.lang ? ' · ' + esc(String(u.lang).toUpperCase()) : ''}</small></div></div>`).join('') || '<p class="empty">Belum ada pengguna berdaftar.</p>'}</div>`;
+  <div class="list">${users.map((u) => `<div class="row-item glass"><div class="pi" data-ico="user"></div><div class="txt"><b>${esc(u.username ? '@' + u.username : u.email)}</b><small>${u.username ? esc(u.email) + ' · ' : ''}${esc(fmt(u.createdAt))}${u.lang ? ' · ' + esc(String(u.lang).toUpperCase()) : ''}</small></div></div>`).join('') || '<p class="empty">Belum ada pengguna berdaftar.</p>'}</div>`;
 }
 
 /* ---------- Pentadbir (akaun lain boleh jadi admin dari sini) ---------- */

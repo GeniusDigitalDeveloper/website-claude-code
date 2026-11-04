@@ -29,18 +29,31 @@ service cloud.firestore {
       allow read: if isAdmin();
       allow write: if false;
     }
-    // Profil pengguna berdaftar. Pengguna boleh cipta rekod sendiri dan tukar gambar/bahasa sahaja.
-    // Jumlah muat turun (stats) hanya ditulis oleh pelayan, jadi tidak boleh dipalsukan oleh pengguna.
+    // Nama pengguna unik: dokumen usernames/{nama} dicipta sekali sahaja oleh pemiliknya (tidak boleh diubah atau dipadam).
+    match /usernames/{name} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if request.auth != null
+        && name.matches('^[a-z0-9_.]{3,20}$')
+        && request.resource.data.keys().hasOnly(['uid'])
+        && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if false;
+    }
+    // Profil pengguna berdaftar. Pengguna boleh cipta rekod sendiri dan tukar gambar, bahasa dan bio sahaja.
+    // Jumlah muat turun (stats, recent) hanya ditulis oleh pelayan, jadi tidak boleh dipalsukan oleh pengguna.
     match /users/{uid} {
       allow create: if request.auth != null
         && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['email', 'createdAt', 'lang', 'photo'])
-        && request.resource.data.email == request.auth.token.email;
+        && request.resource.data.keys().hasOnly(['email', 'createdAt', 'lang', 'photo', 'username', 'bio'])
+        && request.resource.data.email == request.auth.token.email
+        && (!('username' in request.resource.data)
+            || getAfter(/databases/$(database)/documents/usernames/$(request.resource.data.username)).data.uid == uid);
       allow read: if isAdmin() || (request.auth != null && request.auth.uid == uid);
       allow update: if request.auth != null
         && request.auth.uid == uid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['photo', 'lang'])
-        && (!('photo' in request.resource.data) || (request.resource.data.photo is string && request.resource.data.photo.size() < 150000));
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['photo', 'lang', 'bio'])
+        && (!('photo' in request.resource.data) || (request.resource.data.photo is string && request.resource.data.photo.size() < 150000))
+        && (!('bio' in request.resource.data) || (request.resource.data.bio is string && request.resource.data.bio.size() <= 80));
       allow delete: if false;
     }
     // Notifikasi: admin hantar, semua pengguna yang log masuk boleh baca. Keadaan baca/padam disimpan per pengguna.

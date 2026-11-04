@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700&family=Montserrat:wght@500;600;700&family=Poppins:ital,wght@0,500;0,600;0,700;1,700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=5">
+  <link rel="stylesheet" href="assets/style.css?v=6">
   <script src="assets/js/boot.js"></script>
 </head>
 <body>
@@ -31,6 +31,16 @@
       </div>
     </div>
   </header>
+
+  <!-- Menu halaman: setiap satu butang tersendiri, di bawah header -->
+  <nav class="subnav" aria-label="Menu halaman">
+    <div class="in">
+      <a class="sbtn" href="#cara" data-nav="cara"><span class="ico" data-ico="layers"></span><span data-i18n="nav_how">Cara guna</span></a>
+      <a class="sbtn" href="#faq" data-nav="faq"><span class="ico" data-ico="help"></span><span data-i18n="nav_faq">Soalan lazim</span></a>
+      <a class="sbtn" href="#profil" data-nav="profil" id="navProfile" hidden><span class="ico" data-ico="user"></span><span data-i18n="nav_profile">Profil</span></a>
+      <button class="sbtn" id="navChat" type="button"><span class="ico" data-ico="chat"></span><span data-i18n="nav_chat">Bantuan</span><i class="dot" id="navChatDot" hidden></i></button>
+    </div>
+  </nav>
 
   <!-- Notifikasi: panel (boleh skrol) dan pop-up yang kekal sehingga dibaca -->
   <section class="notif glass" id="notifPanel" hidden aria-labelledby="notifT">
@@ -59,6 +69,7 @@
           <form id="regForm" novalidate data-view="register">
             <h2 data-i18n="reg_title"></h2>
             <p class="lead" data-i18n="reg_sub"></p>
+            <div class="f"><label for="regUser" data-i18n="label_user"></label><input id="regUser" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="20" data-i18n-ph="ph_user" required></div>
             <div class="f"><label for="regEmail" data-i18n="label_email"></label><input id="regEmail" type="email" autocomplete="email" inputmode="email" autocapitalize="off" data-i18n-ph="ph_email" required></div>
             <div class="f"><label for="regPw" data-i18n="label_pw"></label><div class="pw"><input id="regPw" type="password" autocomplete="new-password" minlength="6" data-i18n-ph="ph_pw" required><button class="eye" type="button" data-nosfx></button></div></div>
             <div class="f"><label for="regPw2" data-i18n="label_pw2"></label><div class="pw"><input id="regPw2" type="password" autocomplete="new-password" minlength="6" required><button class="eye" type="button" data-nosfx></button></div></div>
@@ -155,7 +166,16 @@
           <div class="avatar" id="avatar"><img id="avatarImg" alt="" hidden><span id="avatarInit"></span></div>
           <div class="tt-info">
             <h2 class="tt-handle" id="profh">@pengguna</h2>
-            <p class="tt-name" id="pfName"></p>
+            <p class="tt-name" id="pfEmail"></p>
+            <div class="tt-bio" id="bioBox">
+              <span class="bio-text" id="bioText"></span>
+              <button class="bio-edit" id="bioEdit" type="button" data-i18n-aria="prof_bio_edit" data-ico="edit"></button>
+              <form class="bio-form" id="bioForm" hidden novalidate>
+                <input id="bioIn" type="text" maxlength="80" data-i18n-ph="prof_bio_ph" data-i18n-aria="prof_bio_ph">
+                <button class="btn gold sm" type="submit"><span class="t" data-i18n="prof_bio_save">Simpan</span></button>
+                <button class="btn grey sm" id="bioCancel" type="button"><span class="t" data-i18n="prof_bio_cancel">Batal</span></button>
+              </form>
+            </div>
             <div class="tt-btns">
               <button class="btn grey sm" id="photoBtn" type="button"><span class="ico" data-ico="camera"></span><span class="t" data-i18n="prof_photo">Tukar gambar</span></button>
               <button class="btn red sm" id="logoutBtn" type="button"><span class="ico" data-ico="logout"></span><span class="t" data-i18n="logout">Keluar</span></button>
@@ -165,26 +185,21 @@
               <div><b id="stTotal">0</b><span data-i18n="prof_total">Jumlah berjaya</span></div>
               <div><b id="stMp4">0</b><span>MP4</span></div>
               <div><b id="stMp3">0</b><span>MP3</span></div>
+              <div id="stOtherBox" hidden><b id="stOther">0</b><span data-i18n="prof_other">Lain-lain</span></div>
             </div>
-            <p class="tt-bio"><span class="ico" data-ico="mail"></span><span id="pfEmail"></span></p>
             <p class="msgline" id="pfMsg" role="alert"></p>
           </div>
         </div>
         <div class="tt-tabs" role="tablist"><button type="button" role="tab" aria-selected="true"><span class="ico" data-ico="grid"></span><span data-i18n="prof_tab">Muat turun</span></button></div>
-        <div class="tt-grid" id="ttGrid"></div>
+        <ul class="dl-list" id="dlList"></ul>
         <div class="tt-empty" id="ttEmpty"><span class="ico" data-ico="download"></span><b data-i18n="prof_empty">Belum ada muat turun</b><span data-i18n="prof_empty_sub">Muat turun yang berjaya akan muncul di sini.</span></div>
       </div>
     </section>
   </main>
 
   <footer class="foot">
-    <nav class="foot-links" aria-label="Pautan">
-      <a href="#cara" data-nav="cara" data-i18n="nav_how">Cara guna</a><i aria-hidden="true">·</i>
-      <a href="#faq" data-nav="faq" data-i18n="nav_faq">Soalan lazim</a><i aria-hidden="true" class="pdot" hidden>·</i>
-      <a href="#profil" data-nav="profil" id="navProfile" data-i18n="nav_profile" hidden>Profil</a>
-    </nav>
-    <p class="foot-stats" id="footStats" aria-live="off"></p>
     <p class="foot-copy" data-i18n="foot"></p>
+    <p class="foot-stats" id="footStats" aria-live="off"></p>
   </footer>
 
   <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="mTitle">
@@ -215,6 +230,6 @@
   </section>
 
   <script src="assets/js/config.js"></script>
-  <script type="module" src="assets/js/app.js?v=5"></script>
+  <script type="module" src="assets/js/app.js?v=6"></script>
 </body>
 </html>

@@ -83,6 +83,7 @@ function errKey(e) {
   if (c === 'auth/network-request-failed') return 'err_net';
   if (c === 'auth/weak-password') return 'err_pw_short';
   if (c === 'auth/invalid-email') return 'err_email';
+  if (c === 'app/username-taken') return 'err_user_taken';
   return 'err_generic';
 }
 const say = (id, key, kind = 'err', vars) => { const el = $(id); el.textContent = key ? t(key, vars) : ''; el.className = 'msgline ' + (key ? kind : ''); };
@@ -108,13 +109,15 @@ function busy(btn, on) {
 
 $('#regForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const email = $('#regEmail').value.trim(), pw = $('#regPw').value, pw2 = $('#regPw2').value, btn = e.submitter || $('#regForm button[type=submit]');
+  const username = $('#regUser').value.trim().toLowerCase(), email = $('#regEmail').value.trim(), pw = $('#regPw').value, pw2 = $('#regPw2').value, btn = e.submitter || $('#regForm button[type=submit]');
+  if (!/^[a-z0-9_.]{3,20}$/.test(username)) return fail('#regMsg', 'err_user');
   if (!emailOk(email)) return fail('#regMsg', 'err_email');
   if (pw.length < 6) return fail('#regMsg', 'err_pw_short');
   if (pw !== pw2) return fail('#regMsg', 'err_pw_mismatch');
   say('#regMsg', ''); busy(btn, true); st.registering = true;
   try {
-    await fb.register(email, pw, getLang());
+    if (!(await fb.usernameFree(username))) { st.registering = false; busy(btn, false); return fail('#regMsg', 'err_user_taken'); }
+    await fb.register(email, pw, getLang(), username);
     try { localStorage.setItem('fetchrbox:hasAccount', '1'); } catch { /* abaikan */ }
     $('#regForm').reset(); $('#logEmail').value = email; $('#logPw').value = '';
     showView('login'); say('#logMsg', 'reg_ok', 'ok'); sfx.success(); $('#logPw').focus();
@@ -151,16 +154,12 @@ fb.onUser((user) => {
   st.user = user;
   $('#authBox').hidden = !!user;
   $('#dlBox').hidden = !user;
-  $('#navProfile').hidden = !user; $('.pdot').hidden = !user;
+  $('#navProfile').hidden = !user;
   notifyApi.setUser(user);
   if (chatApi) chatApi.setUser(user);
   if (stopProfile) { stopProfile(); stopProfile = null; }
   if (user) {
-    const local = (user.email || 'pengguna').split('@')[0];
-    $('#pfEmail').textContent = user.email;
-    $('#profh').textContent = '@' + local.toLowerCase();
-    $('#pfName').textContent = local.charAt(0).toUpperCase() + local.slice(1);
-    $('#avatarInit').textContent = (user.email || '?').charAt(0).toUpperCase();
+    paintProfile({});
     fb.ensureProfile(user, getLang());
     stopProfile = fb.watchProfile(user.uid, paintProfile);
   } else {
@@ -173,18 +172,48 @@ fb.onUser((user) => {
 
 /* ---------- Profil: gambar, e-mel, jumlah berjaya (masa nyata) ---------- */
 const nf = (n) => Number(n || 0).toLocaleString('en-US');
+let profile = {};
 function paintProfile(d) {
+  profile = d;
+  const email = st.user?.email || '';
+  const username = d.username || (email.split('@')[0] || 'pengguna').toLowerCase();
+  $('#profh').textContent = '@' + username;
+  $('#pfEmail').textContent = email;
+  $('#avatarInit').textContent = username.charAt(0).toUpperCase();
+  const bio = (d.bio || '').trim();
+  $('#bioText').textContent = bio || t('prof_bio_empty');
+  $('#bioText').classList.toggle('muted', !bio);
   const stt = d.stats || {};
-  const mp4 = stt.mp4 || 0, mp3 = stt.mp3 || 0;
-  $('#stTotal').textContent = nf(stt.total ?? mp4 + mp3 + (stt.other || 0));
+  const mp4 = stt.mp4 || 0, mp3 = stt.mp3 || 0, other = stt.other || 0;
+  $('#stTotal').textContent = nf(stt.total ?? mp4 + mp3 + other);
   $('#stMp4').textContent = nf(mp4); $('#stMp3').textContent = nf(mp3);
-  // Grid muat turun (ditulis oleh pelayan): users/{uid}.recent = [{ title, thumb, format, platform }]
-  const recent = Array.isArray(d.recent) ? d.recent.slice(0, 30) : [];
-  $('#ttGrid').innerHTML = recent.map((r) => `<div class="tt-tile" title="${esc(r.title || '')}">${r.thumb ? `<img src="${esc(r.thumb)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ''}<span class="fmt">${esc(String(r.format || '').toUpperCase())}</span><span class="cap">${esc(r.title || '')}</span></div>`).join('');
+  $('#stOther').textContent = nf(other); $('#stOtherBox').hidden = other === 0;
+  // Senarai muat turun (ditulis oleh pelayan): users/{uid}.recent = [{ title, format, platform, at }]
+  const recent = Array.isArray(d.recent) ? d.recent.slice(0, 100) : [];
+  const when = (v) => { try { const dt = v?.toDate ? v.toDate() : v ? new Date(v) : null; return dt ? new Intl.DateTimeFormat(getLang() === 'ar' ? 'ar' : getLang() === 'en' ? 'en-GB' : 'ms-MY', { timeZone: 'Asia/Kuala_Lumpur', dateStyle: 'medium' }).format(dt) : ''; } catch { return ''; } };
+  $('#dlList').innerHTML = recent.map((r) => {
+    const fmt = String(r.format || '').toLowerCase();
+    return `<li class="dl-row"><span class="fmt f-${esc(fmt)}">${esc(fmt.toUpperCase())}</span><span class="ttl">${esc(r.title || '')}</span><span class="when">${esc([r.platform, when(r.at)].filter(Boolean).join(' · '))}</span></li>`;
+  }).join('');
+  $('#dlList').hidden = recent.length === 0;
   $('#ttEmpty').hidden = recent.length > 0;
   const img = $('#avatarImg');
   if (d.photo) { img.src = d.photo; img.hidden = false; $('#avatarInit').hidden = true; } else { img.hidden = true; $('#avatarInit').hidden = false; }
 }
+document.addEventListener('langchange', () => paintProfile(profile));
+
+/* Bio: sunting ringkas (maksimum 80 aksara) */
+const bioOpen = (on) => { $('#bioForm').hidden = !on; $('#bioText').hidden = on; $('#bioEdit').hidden = on; if (on) { $('#bioIn').value = (profile.bio || '').trim(); $('#bioIn').focus(); } };
+$('#bioEdit').addEventListener('click', () => bioOpen(true));
+$('#bioText').addEventListener('click', () => bioOpen(true));
+$('#bioCancel').addEventListener('click', () => bioOpen(false));
+$('#bioForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!st.user) return;
+  try { await fb.saveBio(st.user.uid, $('#bioIn').value.trim()); sfx.success(); bioOpen(false); }
+  catch { say('#pfMsg', 'prof_err'); sfx.error(); }
+});
+$('#navChat').addEventListener('click', () => $('#fab').click());
 $('#photoBtn').addEventListener('click', () => $('#photoInput').click());
 $('#photoInput').addEventListener('change', async (e) => {
   const file = e.target.files[0]; e.target.value = '';

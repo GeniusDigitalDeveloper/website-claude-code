@@ -51,10 +51,21 @@ export const fb = {
   /* ---- Pengesahan (e-mel + kata laluan sahaja) ---- */
   onUser: (cb) => onAuthStateChanged(auth, cb),
   currentUser: () => auth.currentUser,
-  /** Daftar, simpan profil, kemudian log keluar supaya pengguna terus ke skrin log masuk. */
-  async register(email, password, lang) {
+  /** Nama pengguna ini masih kosong? (dokumen usernames/{nama} tidak wujud) */
+  async usernameFree(name) { try { return !(await getDoc(doc(db, 'usernames', name))).exists(); } catch { return true; } },
+  /** Daftar, tuntut nama pengguna + simpan profil secara atomik, kemudian log keluar supaya pengguna terus ke skrin log masuk. */
+  async register(email, password, lang, username) {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
-    try { await setDoc(doc(db, 'users', cred.user.uid), { email: cred.user.email, createdAt: serverTimestamp(), lang }); } catch { /* profil pilihan */ }
+    try {
+      const b = writeBatch(db);
+      b.set(doc(db, 'usernames', username), { uid: cred.user.uid });
+      b.set(doc(db, 'users', cred.user.uid), { email: cred.user.email, createdAt: serverTimestamp(), lang, username, bio: '' });
+      await b.commit();
+    } catch (e) {
+      // Nama pengguna diambil orang lain serentak: batalkan akaun supaya e-mel boleh digunakan semula.
+      try { await cred.user.delete(); } catch { /* abaikan */ }
+      const err = new Error('username-taken'); err.code = 'app/username-taken'; throw err;
+    }
     await signOut(auth);
   },
   login: (email, password) => signInWithEmailAndPassword(auth, email, password),
@@ -105,6 +116,7 @@ export const fb = {
     try { const r = doc(db, 'users', user.uid); if (!(await getDoc(r)).exists()) await setDoc(r, { email: user.email, createdAt: serverTimestamp(), lang }); } catch { /* abaikan */ }
   },
   savePhoto: (uid, dataUrl) => updateDoc(doc(db, 'users', uid), { photo: dataUrl }),
+  saveBio: (uid, bio) => updateDoc(doc(db, 'users', uid), { bio: String(bio).slice(0, 80) }),
 
   /** Statistik awam untuk footer: { total, days: { 'YYYY-MM-DD': n } } (ditulis oleh pelayan). */
   watchPublicStats(cb) { return onSnapshot(doc(db, 'stats', 'public'), (s) => cb(s.exists() ? s.data() : {}), () => cb({})); },

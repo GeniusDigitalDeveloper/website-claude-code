@@ -79,6 +79,7 @@ export function initChat(getFaq, { onInsertUrl } = {}) {
     const unread = !!meta.unreadUser;
     $('#adminDot').hidden = !(unread && !(mode === 'admin' && isOpen()));
     $('#fabDot').hidden = !(unread && !isOpen());
+    const nd = $('#navChatDot'); if (nd) nd.hidden = !(unread && !isOpen());
   }
 
   async function sendAdmin(text) {
