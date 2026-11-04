@@ -1,0 +1,13 @@
+{
+  "name": "zamrud",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Zamrud - muat turun video & audio dari YouTube, TikTok, Instagram, Facebook dan lain-lain",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node server/server.mjs",
+    "dev": "node --watch server/server.mjs",
+    "test": "node --test server/"
+  }
+}
