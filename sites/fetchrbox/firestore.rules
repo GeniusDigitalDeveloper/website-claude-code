@@ -28,14 +28,19 @@ service cloud.firestore {
       allow read: if isAdmin();
       allow write: if false;
     }
-    // Profil pengguna berdaftar: pengguna cipta rekod sendiri sahaja, admin boleh baca semua.
+    // Profil pengguna berdaftar. Pengguna boleh cipta rekod sendiri dan tukar gambar/bahasa sahaja.
+    // Jumlah muat turun (stats) hanya ditulis oleh pelayan, jadi tidak boleh dipalsukan oleh pengguna.
     match /users/{uid} {
       allow create: if request.auth != null
         && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['email', 'createdAt', 'lang'])
+        && request.resource.data.keys().hasOnly(['email', 'createdAt', 'lang', 'photo'])
         && request.resource.data.email == request.auth.token.email;
       allow read: if isAdmin() || (request.auth != null && request.auth.uid == uid);
-      allow update, delete: if false;
+      allow update: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['photo', 'lang'])
+        && (!('photo' in request.resource.data) || (request.resource.data.photo is string && request.resource.data.photo.size() < 150000));
+      allow delete: if false;
     }
     match /{document=**} {
       allow read, write: if false;

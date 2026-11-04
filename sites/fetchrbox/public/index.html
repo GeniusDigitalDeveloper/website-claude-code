@@ -10,8 +10,8 @@
   <link rel="apple-touch-icon" href="assets/logo.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700&family=Montserrat:wght@500;600;700&family=Poppins:wght@500;600;700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=3">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700&family=Montserrat:wght@500;600;700&family=Poppins:ital,wght@0,500;0,600;0,700;1,700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css?v=4">
   <script src="assets/js/boot.js"></script>
 </head>
 <body>
@@ -20,10 +20,11 @@
 
   <header class="topbar">
     <div class="in glass wide-holo hot">
-      <a class="brand" href="./" aria-label="Fetchr Box"><img src="assets/logo.svg" alt="" width="42" height="42"><b>Fetchr Box</b></a>
+      <a class="brand" href="#" id="brand" aria-label="Fetchr Box"><img src="assets/logo.svg" alt="" width="44" height="44"><b>Fetchr Box</b></a>
       <nav class="nav">
-        <a class="link" href="#cara" data-i18n="nav_how">Cara guna</a>
-        <a class="link" href="#faq" data-i18n="nav_faq">Soalan lazim</a>
+        <a class="link" href="#cara" data-nav="cara" data-i18n="nav_how">Cara guna</a>
+        <a class="link" href="#faq" data-nav="faq" data-i18n="nav_faq">Soalan lazim</a>
+        <a class="link" href="#profil" data-nav="profil" id="navProfile" data-i18n="nav_profile" hidden>Profil</a>
         <div class="langs" role="group" data-i18n-aria="lang_aria" aria-label="Pilih bahasa">
           <button type="button" data-lang="ms" aria-pressed="true" lang="ms">BM</button>
           <button type="button" data-lang="en" aria-pressed="false" lang="en">EN</button>
@@ -34,107 +35,131 @@
   </header>
 
   <main>
-    <section class="hero">
-      <span class="kicker reveal" data-ico="sparkle"><span data-i18n="kicker">Percuma · Pantas · Serasi semua peranti</span></span>
-      <h1 class="wordmark" aria-label="Fetchr Box"><b style="display:contents"><span style="--i:0">F</span><span style="--i:1">e</span><span style="--i:2">t</span><span style="--i:3">c</span><span style="--i:4">h</span><span style="--i:5">r</span></b><span class="sp" aria-hidden="true"></span><b class="alt" style="display:contents"><span style="--i:6">B</span><span style="--i:7">o</span><span style="--i:8">x</span></b></h1>
-      <p class="tagline reveal" style="--d:.25s" data-i18n="tagline">Muat turun video &amp; MP3, sekelip mata.</p>
-      <p class="sub reveal" style="--d:.35s" data-i18n="sub"></p>
+    <!-- ============ UTAMA ============ -->
+    <section class="view" data-view="home">
+      <div class="hero">
+        <h1 class="wordmark" aria-label="Fetchr Box"><b style="display:contents"><span style="--i:0">F</span><span style="--i:1">e</span><span style="--i:2">t</span><span style="--i:3">c</span><span style="--i:4">h</span><span style="--i:5">r</span></b><span class="sp" aria-hidden="true"></span><b class="alt" style="display:contents"><span style="--i:6">B</span><span style="--i:7">o</span><span style="--i:8">x</span></b></h1>
+        <p class="tagline reveal" style="--d:.25s" data-i18n="tagline">Muat turun video &amp; MP3, sekelip mata.</p>
+        <p class="sub reveal" style="--d:.35s" data-i18n="sub"></p>
 
-      <!-- Daftar / Log masuk (dipaparkan jika belum log masuk) -->
-      <section class="authbox glass hot" id="authBox" hidden>
-        <div class="tabs" role="tablist">
-          <button type="button" role="tab" id="tabRegister" data-tab="register" aria-selected="true" data-i18n="tab_register">Daftar</button>
-          <button type="button" role="tab" id="tabLogin" data-tab="login" aria-selected="false" data-i18n="tab_login">Log Masuk</button>
-        </div>
-
-        <form id="regForm" novalidate data-view="register">
-          <h2 data-i18n="reg_title"></h2>
-          <p class="lead" data-i18n="reg_sub"></p>
-          <div class="f"><label for="regEmail" data-i18n="label_email"></label><input id="regEmail" type="email" autocomplete="email" inputmode="email" autocapitalize="off" data-i18n-ph="ph_email" required></div>
-          <div class="f"><label for="regPw" data-i18n="label_pw"></label><input id="regPw" type="password" autocomplete="new-password" minlength="6" data-i18n-ph="ph_pw" required></div>
-          <div class="f"><label for="regPw2" data-i18n="label_pw2"></label><input id="regPw2" type="password" autocomplete="new-password" minlength="6" required></div>
-          <p class="msgline" id="regMsg" role="alert"></p>
-          <button class="btn gold" type="submit"><span class="t" data-i18n="btn_register">Daftar</span></button>
-          <div class="note"><span class="ico" data-ico="info"></span><div><b data-i18n="note_title"></b><span data-i18n="note"></span></div></div>
-        </form>
-
-        <form id="loginForm" novalidate data-view="login" hidden>
-          <h2 data-i18n="login_title"></h2>
-          <p class="lead" data-i18n="login_sub"></p>
-          <div class="f"><label for="logEmail" data-i18n="label_email"></label><input id="logEmail" type="email" autocomplete="username" inputmode="email" autocapitalize="off" data-i18n-ph="ph_email" required></div>
-          <div class="f"><label for="logPw" data-i18n="label_pw"></label><input id="logPw" type="password" autocomplete="current-password" required></div>
-          <p class="msgline" id="logMsg" role="alert"></p>
-          <button class="btn gold" type="submit"><span class="t" data-i18n="btn_login">Log Masuk</span></button>
-          <div class="links"><button type="button" class="linkbtn" id="toForgot" data-i18n="forgot_link"></button></div>
-        </form>
-
-        <form id="forgotForm" novalidate data-view="forgot" hidden>
-          <h2 data-i18n="forgot_title"></h2>
-          <p class="lead" data-i18n="forgot_sub"></p>
-          <div class="f"><label for="fgEmail" data-i18n="label_email"></label><input id="fgEmail" type="email" autocomplete="email" inputmode="email" autocapitalize="off" data-i18n-ph="ph_email" required></div>
-          <p class="msgline" id="fgMsg" role="alert"></p>
-          <button class="btn gold" type="submit"><span class="t" data-i18n="btn_send_reset"></span></button>
-          <div class="links"><button type="button" class="linkbtn" id="backLogin" data-i18n="back_login"></button></div>
-        </form>
-      </section>
-
-      <!-- Pemuat turun (dipaparkan selepas log masuk) -->
-      <div class="dl glass wide-holo hot" id="dlBox" hidden>
-        <div class="userbar"><span><span data-i18n="signed_as"></span> <b id="userEmail"></b></span><button class="btn ghost sm" id="logoutBtn" type="button"><span class="t" data-i18n="logout">Keluar</span></button></div>
-        <form id="form" class="field" novalidate>
-          <div class="input-wrap holo wide-holo hot">
-            <span class="ico" data-ico="link"></span>
-            <label class="sr" for="url" data-i18n="ph_url"></label>
-            <input id="url" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" data-i18n-ph="ph_url">
-            <button class="paste icon-btn" id="pasteBtn" type="button" data-i18n-aria="paste_aria" data-ico="paste"></button>
+        <!-- Daftar / Log masuk (dipaparkan jika belum log masuk) -->
+        <section class="authbox glass hot" id="authBox" hidden>
+          <div class="tabs" role="tablist">
+            <button type="button" role="tab" id="tabRegister" data-tab="register" aria-selected="true" data-i18n="tab_register">Daftar</button>
+            <button type="button" role="tab" id="tabLogin" data-tab="login" aria-selected="false" data-i18n="tab_login">Log Masuk</button>
           </div>
-          <button class="btn gold" id="checkBtn" type="submit"><span class="ico" data-ico="zap"></span><span class="t" data-i18n="btn_check">Imbas</span></button>
-        </form>
-        <div class="detected" id="detected" aria-live="polite"></div>
+
+          <form id="regForm" novalidate data-view="register">
+            <h2 data-i18n="reg_title"></h2>
+            <p class="lead" data-i18n="reg_sub"></p>
+            <div class="f"><label for="regEmail" data-i18n="label_email"></label><input id="regEmail" type="email" autocomplete="email" inputmode="email" autocapitalize="off" data-i18n-ph="ph_email" required></div>
+            <div class="f"><label for="regPw" data-i18n="label_pw"></label><input id="regPw" type="password" autocomplete="new-password" minlength="6" data-i18n-ph="ph_pw" required></div>
+            <div class="f"><label for="regPw2" data-i18n="label_pw2"></label><input id="regPw2" type="password" autocomplete="new-password" minlength="6" required></div>
+            <p class="msgline" id="regMsg" role="alert"></p>
+            <button class="btn gold" type="submit"><span class="t" data-i18n="btn_register">Daftar</span></button>
+            <div class="note"><span class="ico" data-ico="info"></span><div><b data-i18n="note_title"></b><span data-i18n="note"></span></div></div>
+          </form>
+
+          <form id="loginForm" novalidate data-view="login" hidden>
+            <h2 data-i18n="login_title"></h2>
+            <p class="lead" data-i18n="login_sub"></p>
+            <div class="f"><label for="logEmail" data-i18n="label_email"></label><input id="logEmail" type="email" autocomplete="username" inputmode="email" autocapitalize="off" data-i18n-ph="ph_email" required></div>
+            <div class="f"><label for="logPw" data-i18n="label_pw"></label><input id="logPw" type="password" autocomplete="current-password" required></div>
+            <p class="msgline" id="logMsg" role="alert"></p>
+            <button class="btn gold" type="submit"><span class="t" data-i18n="btn_login">Log Masuk</span></button>
+            <div class="links"><button type="button" class="linkbtn" id="toForgot" data-i18n="forgot_link"></button></div>
+          </form>
+
+          <form id="forgotForm" novalidate data-view="forgot" hidden>
+            <h2 data-i18n="forgot_title"></h2>
+            <p class="lead" data-i18n="forgot_sub"></p>
+            <div class="f"><label for="fgEmail" data-i18n="label_email"></label><input id="fgEmail" type="email" autocomplete="email" inputmode="email" autocapitalize="off" data-i18n-ph="ph_email" required></div>
+            <p class="msgline" id="fgMsg" role="alert"></p>
+            <button class="btn gold" type="submit"><span class="t" data-i18n="btn_send_reset"></span></button>
+            <div class="links"><button type="button" class="linkbtn" id="backLogin" data-i18n="back_login"></button></div>
+          </form>
+        </section>
+
+        <!-- Pemuat turun (dipaparkan selepas log masuk) -->
+        <div class="dl glass wide-holo hot" id="dlBox" hidden>
+          <form id="form" class="field" novalidate>
+            <div class="input-wrap holo wide-holo hot">
+              <span class="ico" data-ico="link"></span>
+              <label class="sr" for="url" data-i18n="ph_url"></label>
+              <input id="url" type="url" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" data-i18n-ph="ph_url">
+              <button class="paste icon-btn" id="pasteBtn" type="button" data-i18n-aria="paste_aria" data-ico="paste"></button>
+            </div>
+            <button class="btn gold" id="checkBtn" type="submit"><span class="ico" data-ico="zap"></span><span class="t" data-i18n="btn_check">Imbas</span></button>
+          </form>
+          <div class="detected" id="detected" aria-live="polite"></div>
+        </div>
+
+        <div class="result glass hot" id="result" aria-live="polite">
+          <div class="meta">
+            <img class="thumb" id="thumb" alt="" referrerpolicy="no-referrer" width="132" height="74">
+            <div><h3 id="title"></h3><p id="metaLine"></p></div>
+          </div>
+          <div class="seg" role="group" data-i18n-aria="mode_aria">
+            <button type="button" id="modeVideo" aria-pressed="true"><span class="ico" data-ico="video"></span><span data-i18n="mode_video">Video</span></button>
+            <button type="button" id="modeAudio" aria-pressed="false"><span class="ico" data-ico="music"></span><span data-i18n="mode_audio">Audio</span></button>
+          </div>
+          <div class="label" data-i18n="label_format">Format</div>
+          <div class="chips" id="formats" role="radiogroup"></div>
+          <div id="qualityWrap"><div class="label" data-i18n="label_quality">Kualiti</div><div class="chips" id="qualities" role="radiogroup"></div></div>
+          <button class="btn gold go" id="goBtn" type="button"><span class="ico" data-ico="download"></span><span class="t" data-i18n="btn_download">Muat Turun</span></button>
+          <div class="progress" id="progress"><div class="bar"><i id="barFill"></i></div><p><span id="progLabel"></span><span id="progPct">0%</span></p></div>
+        </div>
+
+        <div class="platforms" id="platforms" aria-label="Platform"></div>
       </div>
 
-      <div class="result glass hot" id="result" aria-live="polite">
-        <div class="meta">
-          <img class="thumb" id="thumb" alt="" referrerpolicy="no-referrer" width="132" height="74">
-          <div><h3 id="title"></h3><p id="metaLine"></p></div>
+      <section class="block" aria-labelledby="why">
+        <h2 class="h2 reveal" id="why" data-i18n="why_title"></h2>
+        <p class="lead reveal" data-i18n="why_lead"></p>
+        <div class="grid">
+          <article class="card glass reveal"><div class="badge" data-ico="shield"></div><h3 data-i18n="f1_t"></h3><p data-i18n="f1_p"></p></article>
+          <article class="card glass reveal" style="--d:.08s"><div class="badge" data-ico="eye"></div><h3 data-i18n="f2_t"></h3><p data-i18n="f2_p"></p></article>
+          <article class="card glass reveal" style="--d:.16s"><div class="badge" data-ico="phone"></div><h3 data-i18n="f3_t"></h3><p data-i18n="f3_p"></p></article>
+          <article class="card glass reveal" style="--d:.24s"><div class="badge" data-ico="layers"></div><h3 data-i18n="f4_t"></h3><p data-i18n="f4_p"></p></article>
         </div>
-        <div class="seg" role="group" data-i18n-aria="mode_aria">
-          <button type="button" id="modeVideo" aria-pressed="true"><span class="ico" data-ico="video"></span><span data-i18n="mode_video">Video</span></button>
-          <button type="button" id="modeAudio" aria-pressed="false"><span class="ico" data-ico="music"></span><span data-i18n="mode_audio">Audio</span></button>
-        </div>
-        <div class="label" data-i18n="label_format">Format</div>
-        <div class="chips" id="formats" role="radiogroup"></div>
-        <div id="qualityWrap"><div class="label" data-i18n="label_quality">Kualiti</div><div class="chips" id="qualities" role="radiogroup"></div></div>
-        <button class="btn gold go" id="goBtn" type="button"><span class="ico" data-ico="download"></span><span class="t" data-i18n="btn_download">Muat Turun</span></button>
-        <div class="progress" id="progress"><div class="bar"><i id="barFill"></i></div><p><span id="progLabel"></span><span id="progPct">0%</span></p></div>
-      </div>
-
-      <div class="platforms reveal" id="platforms" style="--d:.55s"></div>
+      </section>
     </section>
 
-    <section class="block" aria-labelledby="why">
-      <h2 class="h2 reveal" id="why" data-i18n="why_title"></h2>
-      <p class="lead reveal" data-i18n="why_lead"></p>
-      <div class="grid">
-        <article class="card glass reveal"><div class="badge" data-ico="shield"></div><h3 data-i18n="f1_t"></h3><p data-i18n="f1_p"></p></article>
-        <article class="card glass reveal" style="--d:.08s"><div class="badge" data-ico="eye"></div><h3 data-i18n="f2_t"></h3><p data-i18n="f2_p"></p></article>
-        <article class="card glass reveal" style="--d:.16s"><div class="badge" data-ico="phone"></div><h3 data-i18n="f3_t"></h3><p data-i18n="f3_p"></p></article>
-        <article class="card glass reveal" style="--d:.24s"><div class="badge" data-ico="layers"></div><h3 data-i18n="f4_t"></h3><p data-i18n="f4_p"></p></article>
-      </div>
-    </section>
-
-    <section class="block" id="cara" aria-labelledby="how">
-      <h2 class="h2 reveal" id="how" data-i18n="how_title"></h2>
+    <!-- ============ CARA GUNA ============ -->
+    <section class="view page" data-view="cara" hidden aria-labelledby="how">
+      <h2 class="h2" id="how" data-i18n="how_title"></h2>
       <div class="grid steps">
-        <article class="card glass reveal"><span class="num">01</span><div class="badge" data-ico="link"></div><h3 data-i18n="s1_t"></h3><p data-i18n="s1_p"></p></article>
-        <article class="card glass reveal" style="--d:.08s"><span class="num">02</span><div class="badge" data-ico="paste"></div><h3 data-i18n="s2_t"></h3><p data-i18n="s2_p"></p></article>
-        <article class="card glass reveal" style="--d:.16s"><span class="num">03</span><div class="badge" data-ico="download"></div><h3 data-i18n="s3_t"></h3><p data-i18n="s3_p"></p></article>
+        <article class="card glass"><span class="num">01</span><div class="badge" data-ico="link"></div><h3 data-i18n="s1_t"></h3><p data-i18n="s1_p"></p></article>
+        <article class="card glass"><span class="num">02</span><div class="badge" data-ico="paste"></div><h3 data-i18n="s2_t"></h3><p data-i18n="s2_p"></p></article>
+        <article class="card glass"><span class="num">03</span><div class="badge" data-ico="download"></div><h3 data-i18n="s3_t"></h3><p data-i18n="s3_p"></p></article>
       </div>
     </section>
 
-    <section class="block" id="faq" aria-labelledby="faqh">
-      <h2 class="h2 reveal" id="faqh" data-i18n="faq_title"></h2>
+    <!-- ============ SOALAN LAZIM ============ -->
+    <section class="view page" data-view="faq" hidden aria-labelledby="faqh">
+      <h2 class="h2" id="faqh" data-i18n="faq_title"></h2>
       <div class="faq" id="faqList"></div>
+    </section>
+
+    <!-- ============ PROFIL ============ -->
+    <section class="view page" data-view="profil" hidden aria-labelledby="profh">
+      <div class="profile glass hot">
+        <div class="avatar-wrap">
+          <div class="avatar" id="avatar"><img id="avatarImg" alt="" hidden><span id="avatarInit"></span></div>
+          <button class="btn ghost sm" id="photoBtn" type="button"><span class="ico" data-ico="camera"></span><span class="t" data-i18n="prof_photo">Tukar gambar</span></button>
+          <input id="photoInput" type="file" accept="image/*" hidden>
+        </div>
+        <h2 id="profh" data-i18n="prof_title">Profil</h2>
+        <div class="pf-email"><span class="ico" data-ico="mail"></span><span><small data-i18n="label_email"></small><b id="pfEmail"></b></span></div>
+        <div class="pf-stats">
+          <div class="pf-stat"><b id="stTotal">0</b><small data-i18n="prof_total">Jumlah berjaya</small></div>
+          <div class="pf-stat"><b id="stMp4">0</b><small>MP4</small></div>
+          <div class="pf-stat"><b id="stMp3">0</b><small>MP3</small></div>
+        </div>
+        <p class="pf-hint" data-i18n="prof_hint"></p>
+        <p class="msgline" id="pfMsg" role="alert"></p>
+        <button class="btn red" id="logoutBtn" type="button"><span class="ico" data-ico="logout"></span><span class="t" data-i18n="logout">Keluar</span></button>
+      </div>
     </section>
   </main>
 
@@ -158,10 +183,11 @@
     <header><div class="av"><img src="assets/logo.svg" alt="" width="34" height="34"></div><div><b data-i18n="chat_title"></b><small data-i18n="chat_online"></small></div><button class="icon-btn" id="chatClose" type="button" data-i18n-aria="chat_close" data-ico="x"></button></header>
     <div class="msgs" id="msgs" aria-live="polite"></div>
     <div class="quick" id="quick"></div>
+    <a class="wa" id="waBtn" href="https://wa.me/60177977935" target="_blank" rel="noopener"><span class="ico" data-ico="whatsapp"></span><span data-i18n="chat_wa">WhatsApp Admin</span></a>
     <form id="chatForm" autocomplete="off"><input id="chatIn" type="text" data-i18n-ph="chat_ph" data-i18n-aria="chat_ph"><button class="btn gold" type="submit" data-i18n-aria="chat_send" data-ico="send"></button></form>
   </section>
 
   <script src="assets/js/config.js"></script>
-  <script type="module" src="assets/js/app.js"></script>
+  <script type="module" src="assets/js/app.js?v=4"></script>
 </body>
 </html>

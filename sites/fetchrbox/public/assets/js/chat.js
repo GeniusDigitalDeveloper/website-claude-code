@@ -23,19 +23,19 @@ export function initChat(getFaq, { onInsertUrl } = {}) {
   const chat = $('#chat'), fab = $('#fab'), msgs = $('#msgs'), form = $('#chatForm'), input = $('#chatIn');
   let greeted = false;
 
-  const add = (text, who = 'bot', action) => {
+  const add = (text, who = 'bot', action, cls = '') => {
     const el = document.createElement('div');
-    el.className = 'msg ' + who;
+    el.className = 'msg ' + who + (cls ? ' ' + cls : '');
     el.innerHTML = esc(text);
     if (action) { const b = document.createElement('button'); b.className = 'btn gold sm act'; b.textContent = action.label; b.addEventListener('click', action.fn); el.append(b); }
     msgs.append(el);
     msgs.scrollTo({ top: msgs.scrollHeight, behavior: reduced ? 'auto' : 'smooth' });
   };
-  const botSay = (text, action) => new Promise((res) => {
+  const botSay = (text, action, cls) => new Promise((res) => {
     const typing = document.createElement('div');
     typing.className = 'msg bot typing'; typing.innerHTML = '<i></i><i></i><i></i>';
     msgs.append(typing); msgs.scrollTo({ top: msgs.scrollHeight });
-    setTimeout(() => { typing.remove(); add(text, 'bot', action); sfx.msg(); res(); }, reduced ? 0 : 450 + Math.min(text.length * 6, 700));
+    setTimeout(() => { typing.remove(); add(text, 'bot', action, cls); sfx.msg(); res(); }, reduced ? 0 : 450 + Math.min(text.length * 6, 700));
   });
 
   function answer(text) {
@@ -62,13 +62,15 @@ export function initChat(getFaq, { onInsertUrl } = {}) {
       quick.append(b);
     });
   }
-  paintQuick();
-  document.addEventListener('langchange', paintQuick);
+  // WhatsApp admin: 0177977935 (format antarabangsa Malaysia 60177977935), mesej pembuka ikut bahasa.
+  const paintWa = () => { $('#waBtn').href = 'https://wa.me/60177977935?text=' + encodeURIComponent(t('wa_text')); };
+  paintQuick(); paintWa();
+  document.addEventListener('langchange', () => { paintQuick(); paintWa(); });
 
   function open() {
     chat.classList.add('show'); chat.setAttribute('aria-hidden', 'false'); fab.setAttribute('aria-expanded', 'true');
     sfx.open();
-    if (!greeted) { greeted = true; botSay(t('chat_greet')); }
+    if (!greeted) { greeted = true; botSay(t('chat_greet')).then(() => botSay(t('chat_warn'), null, 'warn')); }
     paintQuick();
     setTimeout(() => input.focus({ preventScroll: true }), 300);
   }

@@ -34,6 +34,9 @@ export const ICONS = {
   info: s('<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.1"/>'),
   lock: s('<rect x="4.5" y="10.5" width="15" height="10" rx="3"/><path d="M8 10.5V8a4 4 0 018 0v2.5"/>'),
   user: s('<circle cx="12" cy="8" r="4"/><path d="M4 21c.8-4 4-6 8-6s7.2 2 8 6"/>'),
+  camera: s('<path d="M4 8h3l1.6-2.5h6.8L17 8h3a1 1 0 011 1v9a1 1 0 01-1 1H4a1 1 0 01-1-1V9a1 1 0 011-1z"/><circle cx="12" cy="13" r="3.5"/>'),
+  mail: s('<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3.5 7.5l8.5 6 8.5-6"/>'),
+  whatsapp: s('<path d="M3.5 20.5l1.3-4.3A8.5 8.5 0 1112 20.5a8.4 8.4 0 01-4.1-1.1z"/><path d="M9 8.5c.2 3 2.6 5.6 5.6 6l1.3-1.5-2-1-.9.8a4 4 0 01-1.9-1.9l.8-.9-1-2z"/>'),
   eye: s('<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'),
 };
 const PLATFORM_ICON = { youtube: 'youtube', tiktok: 'tiktok', instagram: 'instagram', facebook: 'facebook', x: 'xlogo', music: 'music', video: 'video', globe: 'globe' };

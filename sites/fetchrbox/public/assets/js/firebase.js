@@ -1,7 +1,7 @@
 // Sambungan Firebase (projek fetchr-box-izzul). Kunci web Firebase memang awam; keselamatan dijaga oleh firestore.rules.
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
 import {
-  getFirestore, doc, getDoc, setDoc, deleteDoc, onSnapshot, collection, query, orderBy, limit, serverTimestamp,
+  getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, orderBy, limit, serverTimestamp,
 } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
@@ -69,6 +69,14 @@ export const fb = {
   watchAdmins(cb) { return onSnapshot(collection(db, 'admins'), (s) => cb(s.docs.map((d) => ({ email: d.id, ...d.data() }))), () => cb([])); },
   addAdmin: (email, by) => setDoc(doc(db, 'admins', email.toLowerCase()), { addedBy: by, addedAt: serverTimestamp() }),
   removeAdmin: (email) => deleteDoc(doc(db, 'admins', email.toLowerCase())),
+
+  /* ---- Profil pengguna ---- */
+  watchProfile(uid, cb) { return onSnapshot(doc(db, 'users', uid), (s) => cb(s.exists() ? s.data() : {}), () => cb({})); },
+  /** Cipta rekod profil jika belum ada (cth akaun yang dicipta terus dalam Firebase). */
+  async ensureProfile(user, lang) {
+    try { const r = doc(db, 'users', user.uid); if (!(await getDoc(r)).exists()) await setDoc(r, { email: user.email, createdAt: serverTimestamp(), lang }); } catch { /* abaikan */ }
+  },
+  savePhoto: (uid, dataUrl) => updateDoc(doc(db, 'users', uid), { photo: dataUrl }),
 
   /* ---- Statistik masa nyata (admin) ---- */
   watchSummary(cb) { return onSnapshot(doc(db, 'stats', 'summary'), (s) => cb(s.exists() ? s.data() : {}), () => cb({})); },

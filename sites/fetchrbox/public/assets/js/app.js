@@ -18,6 +18,18 @@ hydrateIcons();
 applyI18n();
 setupReveal();
 
+/* ---------- Halaman berasingan: Utama / Cara guna / Soalan lazim / Profil ---------- */
+const VIEWS = ['home', 'cara', 'faq', 'profil'];
+function route() {
+  let v = location.hash.replace('#', '') || 'home';
+  if (!VIEWS.includes(v)) v = 'home';
+  if (v === 'profil' && !st.user) v = 'home';
+  $$('.view').forEach((el) => { const on = el.dataset.view === v; if (el.hidden === on) el.hidden = !on; });
+  $$('[data-nav]').forEach((a) => { if (a.dataset.nav === v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+  window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', route);
+
 /* ---------- Bahasa ---------- */
 function paintLangs() { $$('.langs button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === getLang()))); }
 $$('.langs button').forEach((b) => b.addEventListener('click', () => setLang(b.dataset.lang)));
@@ -128,14 +140,58 @@ $('#forgotForm').addEventListener('submit', async (e) => {
 
 $('#logoutBtn').addEventListener('click', () => fb.logout());
 
+let stopProfile = null;
 fb.onUser((user) => {
   if (st.registering) return; // abaikan log masuk sementara semasa pendaftaran
   st.user = user;
   $('#authBox').hidden = !!user;
   $('#dlBox').hidden = !user;
-  $('#userEmail').textContent = user ? user.email : '';
-  if (!user) { hideResult(); $('#url').value = ''; $('#detected').textContent = ''; }
+  $('#navProfile').hidden = !user;
+  if (stopProfile) { stopProfile(); stopProfile = null; }
+  if (user) {
+    $('#pfEmail').textContent = user.email;
+    $('#avatarInit').textContent = (user.email || '?').charAt(0).toUpperCase();
+    fb.ensureProfile(user, getLang());
+    stopProfile = fb.watchProfile(user.uid, paintProfile);
+  } else {
+    hideResult(); $('#url').value = ''; $('#detected').textContent = '';
+    $$('.pchip').forEach((c) => c.classList.toggle('on', false));
+    paintProfile({});
+  }
+  route();
 });
+
+/* ---------- Profil: gambar, e-mel, jumlah berjaya (masa nyata) ---------- */
+const nf = (n) => Number(n || 0).toLocaleString('en-US');
+function paintProfile(d) {
+  const stt = d.stats || {};
+  const mp4 = stt.mp4 || 0, mp3 = stt.mp3 || 0;
+  $('#stTotal').textContent = nf(stt.total ?? mp4 + mp3 + (stt.other || 0));
+  $('#stMp4').textContent = nf(mp4); $('#stMp3').textContent = nf(mp3);
+  const img = $('#avatarImg');
+  if (d.photo) { img.src = d.photo; img.hidden = false; $('#avatarInit').hidden = true; } else { img.hidden = true; $('#avatarInit').hidden = false; }
+}
+$('#photoBtn').addEventListener('click', () => $('#photoInput').click());
+$('#photoInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0]; e.target.value = '';
+  if (!file || !st.user) return;
+  say('#pfMsg', '');
+  try { await fb.savePhoto(st.user.uid, await resizePhoto(file, 256)); sfx.success(); }
+  catch { say('#pfMsg', 'prof_err'); sfx.error(); }
+});
+function resizePhoto(file, size) {
+  return new Promise((resolve, reject) => {
+    const img = new Image(), u = URL.createObjectURL(file);
+    img.onload = () => {
+      const c = document.createElement('canvas'); c.width = c.height = size;
+      const m = Math.min(img.width, img.height), sx = (img.width - m) / 2, sy = (img.height - m) / 2;
+      c.getContext('2d').drawImage(img, sx, sy, m, m, 0, 0, size, size);
+      URL.revokeObjectURL(u); resolve(c.toDataURL('image/jpeg', 0.82));
+    };
+    img.onerror = () => { URL.revokeObjectURL(u); reject(new Error('img')); };
+    img.src = u;
+  });
+}
 
 /* ---------- Kesan platform ketika menaip ---------- */
 const hostOf = (v) => { try { return new URL(v.match(/https?:\/\/\S+/)?.[0] || '').hostname.toLowerCase(); } catch { return ''; } };
@@ -250,3 +306,5 @@ function done(id, name) {
     actions: [{ label: DEMO ? t('m_demo') : t('m_again'), href, cls: 'gold', keep: true }, { label: t('m_other'), cls: 'ghost', onClick: () => { hideResult(); $('#url').value = ''; detect(); $('#url').focus(); } }],
   }), 350);
 }
+
+route();
