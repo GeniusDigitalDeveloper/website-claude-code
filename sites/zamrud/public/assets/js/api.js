@@ -1,5 +1,5 @@
 const base = () => (window.ZAMRUD?.API_BASE || '').replace(/\/$/, '');
-export const DEMO = new URLSearchParams(location.search).has('demo');
+export const DEMO = new URLSearchParams(location.search).has('demo') || (!window.ZAMRUD?.API_BASE && location.hostname.endsWith('github.io'));
 
 async function req(path, { method = 'GET', body, token } = {}) {
   let res;

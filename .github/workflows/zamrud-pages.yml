@@ -4,7 +4,7 @@
 name: Zamrud - Deploy Pages
 on:
   push:
-    branches: [main]
+    branches: [main, ccr-0e48f698-6e8bal]
     paths: ['sites/zamrud/public/**', '.github/workflows/zamrud-pages.yml']
   workflow_dispatch:
 permissions:

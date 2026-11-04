@@ -167,4 +167,4 @@ function done(id, name) {
 /* ---------- Mula ---------- */
 document.addEventListener('DOMContentLoaded', () => {});
 loadConfig();
-if (DEMO) toast('Mod demo: data contoh, tiada muat turun sebenar.');
+if (DEMO) { const a = $('#announce'); a.hidden = false; a.textContent = 'Pratonton reka bentuk: muat turun sebenar aktif selepas pelayan disambung.'; }
