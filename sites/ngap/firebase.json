@@ -41,12 +41,12 @@
         ]
       }
     ],
-    "site": "sauk-media-izzul"
+    "site": "ngap-media-izzul"
   },
   "auth": {
     "providers": {
       "googleSignIn": {
-        "oAuthBrandDisplayName": "Sauk",
+        "oAuthBrandDisplayName": "Ngap",
         "supportEmail": "izzulmedia01@gmail.com"
       }
     }

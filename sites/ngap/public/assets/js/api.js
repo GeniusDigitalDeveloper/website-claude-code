@@ -1,5 +1,5 @@
-const base = () => (window.SAUK?.API_BASE || '').replace(/\/$/, '');
-export const DEMO = new URLSearchParams(location.search).has('demo') || !window.SAUK?.DOWNLOADS_ENABLED;
+const base = () => (window.NGAP?.API_BASE || '').replace(/\/$/, '');
+export const DEMO = new URLSearchParams(location.search).has('demo') || !window.NGAP?.DOWNLOADS_ENABLED;
 
 async function req(path, { method = 'GET', body, token } = {}) {
   let res;
@@ -10,7 +10,7 @@ async function req(path, { method = 'GET', body, token } = {}) {
       body: body ? JSON.stringify(body) : undefined,
     });
   } catch {
-    const e = new Error('Tidak dapat bersambung ke pelayan Sauk.'); e.offline = true; throw e;
+    const e = new Error('Tidak dapat bersambung ke pelayan Ngap.'); e.offline = true; throw e;
   }
   let data = null;
   try { data = await res.json(); } catch {}
