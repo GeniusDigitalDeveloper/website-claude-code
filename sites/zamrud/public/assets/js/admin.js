@@ -1,39 +1,43 @@
-import { api } from './api.js';
-import { ICONS, platformIcon } from './icons.js';
+import { fb } from './firebase.js';
+import { platformIcon } from './icons.js';
 import { sfx } from './sfx.js';
 import { $, $$, esc, hydrateIcons, setupSound, toast, modal } from './ui.js';
 
-const KEY = 'zamrud:admintoken';
-let token = '';
-try { token = sessionStorage.getItem(KEY) || ''; } catch {}
 let data = null;
 let tab = 'overview';
 
 hydrateIcons();
 setupSound($('#soundBtn'));
 
-/* ---------- Log masuk ---------- */
-$('#loginForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const btn = e.submitter, err = $('#loginErr');
-  err.textContent = ''; btn.disabled = true;
-  try {
-    const r = await api.login($('#pw').value);
-    token = r.token;
-    try { sessionStorage.setItem(KEY, token); } catch {}
-    sfx.success(); await enter();
-  } catch (ex) { err.textContent = ex.offline ? 'Pelayan admin tidak dapat dihubungi. Semak API_BASE dalam config.js.' : ex.message; sfx.error(); }
-  finally { btn.disabled = false; }
+/* ---------- Log masuk (Firebase Auth, Google) ---------- */
+$('#loginBtn').addEventListener('click', async () => {
+  const err = $('#loginErr');
+  err.textContent = '';
+  try { await fb.signIn(); }
+  catch (ex) { if (ex.code !== 'auth/popup-closed-by-user') { err.textContent = 'Log masuk gagal: ' + (ex.code || ex.message); sfx.error(); } }
 });
-$('#logout').addEventListener('click', () => { token = ''; try { sessionStorage.removeItem(KEY); } catch {} location.reload(); });
-
-async function enter() {
-  try { data = await api.overview(token); }
-  catch (e) { if (e.status === 401) { token = ''; return; } throw e; }
+$('#logout').addEventListener('click', () => fb.signOut());
+fb.onUser(async (user) => {
+  if (!user) { $('#login').hidden = false; $('#shell').hidden = true; return; }
+  if (!fb.isAdminHint(user.email)) { $('#loginErr').textContent = `${user.email} bukan akaun admin.`; sfx.error(); await fb.signOut(); return; }
+  try { await load(); } catch (e) { $('#loginErr').textContent = 'Gagal memuat data: ' + e.message; return; }
+  sfx.success();
   $('#login').hidden = true; $('#shell').hidden = false;
   render();
+});
+
+async function load() {
+  const [site, s] = await Promise.all([fb.getSite(), fb.getStats()]);
+  const st = s || {};
+  const byDay = st.byDay || {};
+  const days = [];
+  for (let i = 13; i >= 0; i--) { const d = new Date(Date.now() - i * 864e5).toISOString().slice(0, 10); days.push({ day: d, count: byDay[d] || 0 }); }
+  data = {
+    ...site, days, logs: st.logs || [], today: byDay[new Date().toISOString().slice(0, 10)] || 0, activeJobs: 0,
+    stats: { total: st.total || 0, failed: st.failed || 0, byPlatform: st.byPlatform || {}, byFormat: st.byFormat || {} },
+  };
 }
-async function refresh() { data = await api.overview(token); render(); }
+async function refresh() { await load(); render(); }
 
 $('#tabs').addEventListener('click', (e) => {
   const b = e.target.closest('button[data-tab]'); if (!b) return;
@@ -48,7 +52,7 @@ function render() {
   ({ overview: bindNone, platforms: bindPlatforms, faq: bindFaq, settings: bindSettings }[tab])();
 }
 const bindNone = () => {};
-const guard = async (fn) => { try { await fn(); } catch (e) { if (e.status === 401) { toast('Sesi tamat.'); setTimeout(() => location.reload(), 900); } else { toast(e.message); sfx.error(); } } };
+const guard = async (fn) => { try { await fn(); } catch (e) { if (e.code === 'permission-denied') { toast('Tiada kebenaran. Log masuk dengan akaun admin.'); sfx.error(); } else { toast(e.message); sfx.error(); } } };
 
 /* ---------- Ringkasan ---------- */
 function overview() {
@@ -77,7 +81,7 @@ function platforms() {
   return `<div class="toolbar"><div><h1 style="font-family:var(--display)">Platform</h1><p class="sub2" style="margin:0">Tambah laman baru dengan satu domain. Hidup/matikan bila-bila masa.</p></div><button class="btn gold" id="addP"><span class="ico" data-ico="plus"></span>Tambah platform</button></div>
   <div class="list">${data.platforms.map((p, i) => `<div class="row-item glass"><div class="pi">${platformIcon(p.icon)}</div><div class="txt"><b>${esc(p.name)}</b><small>${esc(p.domains.join(', '))}${p.note ? ' · ' + esc(p.note) : ''}</small></div><label class="switch" title="Hidup/mati"><input type="checkbox" data-sw="${i}" ${p.enabled ? 'checked' : ''} aria-label="Aktifkan ${esc(p.name)}"><span></span></label><div class="acts"><button class="icon-btn" data-edit="${i}" aria-label="Edit ${esc(p.name)}" data-ico="edit"></button><button class="icon-btn" data-del="${i}" aria-label="Padam ${esc(p.name)}" data-ico="trash"></button></div></div>`).join('')}</div>`;
 }
-const savePlatforms = (list) => guard(async () => { await api.savePlatforms(token, list); toast('Disimpan'); sfx.success(); await refresh(); });
+const savePlatforms = (list) => guard(async () => { await fb.saveSite({ platforms: list }); toast('Disimpan'); sfx.success(); await refresh(); });
 function bindPlatforms() {
   const c = $('.view');
   $('#addP').addEventListener('click', () => editPlatform());
@@ -117,7 +121,7 @@ function faq() {
   return `<div class="toolbar"><div><h1 style="font-family:var(--display)">Chatbot</h1><p class="sub2" style="margin:0">Soalan dan jawapan yang chatbot boleh jawab. Kata kunci membantu ia faham pelbagai cara bertanya.</p></div><button class="btn gold" id="addF"><span class="ico" data-ico="plus"></span>Tambah jawapan</button></div>
   <div class="list">${data.faq.map((q, i) => `<div class="row-item glass"><div class="pi" data-ico="bot"></div><div class="txt"><b>${esc(q.q)}</b><small>${esc(q.a)}</small></div><div class="acts"><button class="icon-btn" data-edit="${i}" aria-label="Edit" data-ico="edit"></button><button class="icon-btn" data-del="${i}" aria-label="Padam" data-ico="trash"></button></div></div>`).join('') || '<p class="empty">Belum ada jawapan.</p>'}</div>`;
 }
-const saveFaq = (list) => guard(async () => { await api.saveFaq(token, list); toast('Disimpan'); sfx.success(); await refresh(); });
+const saveFaq = (list) => guard(async () => { await fb.saveSite({ faq: list }); toast('Disimpan'); sfx.success(); await refresh(); });
 function bindFaq() {
   $('#addF').addEventListener('click', () => editFaq());
   $('.view').addEventListener('click', (e) => {
@@ -158,15 +162,15 @@ function settings() {
   </div>
   <div class="settings-card glass" style="margin-top:.9rem">
     <h2 style="font-family:var(--display);font-size:1.05rem;margin-bottom:.4rem">Sistem</h2>
-    <div class="kv"><span>Cookies yt-dlp</span><span>${data.cookies ? 'Aktif (video umur-terhad boleh)' : 'Tiada (video awam sahaja)'}</span></div>
+    <div class="kv"><span>Pangkalan data</span><span>Cloud Firestore (zamrud-media-izzul)</span></div>
     <div class="kv"><span>Platform aktif</span><span>${data.platforms.filter((p) => p.enabled).length} / ${data.platforms.length}</span></div>
-    <div class="kv"><span>Kata laluan admin</span><span>Tetapkan melalui pembolehubah <code>ADMIN_PASSWORD</code> pada pelayan.</span></div>
+    <div class="kv"><span>Muat turun</span><span>${window.ZAMRUD?.DOWNLOADS_ENABLED ? 'Pelayan disambung' : 'Pelayan muat turun belum disambung (mod pratonton)'}</span></div>
+    <div class="kv"><span>Akses admin</span><span>Log masuk Google. Senarai e-mel admin dalam <code>firestore.rules</code>.</span></div>
     <button class="btn ghost" id="out" style="margin-top:.8rem"><span class="ico" data-ico="logout"></span><span>Log keluar</span></button>
   </div>`;
 }
 function bindSettings() {
-  $('#saveS').addEventListener('click', () => guard(async () => { await api.saveSettings(token, { announcement: $('#an').value, maintenance: $('#mt').checked }); toast('Disimpan'); sfx.success(); await refresh(); }));
+  $('#saveS').addEventListener('click', () => guard(async () => { await fb.saveSite({ settings: { announcement: $('#an').value.slice(0, 200), maintenance: $('#mt').checked } }); toast('Disimpan'); sfx.success(); await refresh(); }));
   $('#out').addEventListener('click', () => $('#logout').click());
 }
 
-if (token) enter().catch(() => {});

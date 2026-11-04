@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in ['izzulmedia01@gmail.com'];
+    }
+    // Tetapan awam (platform, FAQ chatbot, pengumuman): sesiapa boleh baca, admin sahaja boleh tulis.
+    match /site/{doc} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    // Statistik dan log: admin sahaja (pelayan muat turun guna akaun perkhidmatan, tidak tertakluk pada rules).
+    match /stats/{doc} {
+      allow read, write: if isAdmin();
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

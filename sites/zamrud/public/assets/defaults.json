@@ -1,0 +1,231 @@
+{
+ "platforms": [
+  {
+   "id": "youtube",
+   "name": "YouTube",
+   "icon": "youtube",
+   "enabled": true,
+   "domains": [
+    "youtube.com",
+    "youtu.be",
+    "youtube-nocookie.com"
+   ],
+   "note": "Video, Shorts, Live, Muzik, unlisted"
+  },
+  {
+   "id": "tiktok",
+   "name": "TikTok",
+   "icon": "tiktok",
+   "enabled": true,
+   "domains": [
+    "tiktok.com"
+   ],
+   "note": "Tanpa watermark, kualiti tertinggi"
+  },
+  {
+   "id": "instagram",
+   "name": "Instagram",
+   "icon": "instagram",
+   "enabled": true,
+   "domains": [
+    "instagram.com",
+    "instagr.am"
+   ],
+   "note": "Reels dan video awam"
+  },
+  {
+   "id": "facebook",
+   "name": "Facebook",
+   "icon": "facebook",
+   "enabled": true,
+   "domains": [
+    "facebook.com",
+    "fb.watch",
+    "fb.com"
+   ],
+   "note": "Video dan Reels awam"
+  },
+  {
+   "id": "x",
+   "name": "X (Twitter)",
+   "icon": "x",
+   "enabled": false,
+   "domains": [
+    "x.com",
+    "twitter.com"
+   ],
+   "note": "Aktifkan di panel admin"
+  },
+  {
+   "id": "soundcloud",
+   "name": "SoundCloud",
+   "icon": "music",
+   "enabled": false,
+   "domains": [
+    "soundcloud.com"
+   ],
+   "note": "Aktifkan di panel admin"
+  },
+  {
+   "id": "vimeo",
+   "name": "Vimeo",
+   "icon": "video",
+   "enabled": false,
+   "domains": [
+    "vimeo.com"
+   ],
+   "note": "Aktifkan di panel admin"
+  }
+ ],
+ "faq": [
+  {
+   "id": "cara",
+   "q": "Macam mana nak muat turun?",
+   "keywords": [
+    "cara",
+    "macam mana",
+    "how",
+    "guna",
+    "mula",
+    "download",
+    "muat turun",
+    "tutorial"
+   ],
+   "a": "1) Buka video, tekan Share lalu Salin pautan. 2) Tampal di kotak Zamrud dan tekan Semak. 3) Pilih format dan kualiti. 4) Tekan Muat Turun."
+  },
+  {
+   "id": "format",
+   "q": "Format apa yang ada?",
+   "keywords": [
+    "format",
+    "mp3",
+    "mp4",
+    "mov",
+    "wav",
+    "mkv",
+    "audio",
+    "video",
+    "lagu"
+   ],
+   "a": "Video: MP4, MOV, MKV. Audio: MP3, M4A, WAV, FLAC. MP4 paling serasi untuk iPhone dan Android."
+  },
+  {
+   "id": "tiktok",
+   "q": "TikTok ada watermark tak?",
+   "keywords": [
+    "tiktok",
+    "watermark",
+    "logo",
+    "tanda air"
+   ],
+   "a": "Zamrud ambil sumber TikTok asal tanpa watermark pada kualiti tertinggi yang TikTok sediakan."
+  },
+  {
+   "id": "kualiti",
+   "q": "Macam mana nak kualiti terbaik?",
+   "keywords": [
+    "kualiti",
+    "quality",
+    "4k",
+    "1080",
+    "hd",
+    "pecah",
+    "blur",
+    "jelas"
+   ],
+   "a": "Pilih \"Terbaik\" untuk kualiti tertinggi. 4K hanya ada jika video asal memang 4K. Untuk iPhone lama, pilih 1080p MP4 supaya terus boleh main."
+  },
+  {
+   "id": "peribadi",
+   "q": "Video peribadi atau private boleh?",
+   "keywords": [
+    "private",
+    "peribadi",
+    "privasi",
+    "login",
+    "umur",
+    "age",
+    "berdaftar",
+    "unlisted"
+   ],
+   "a": "Video awam dan unlisted (ada pautan) boleh. Video private atau had umur perlukan akaun, jadi tidak disokong kecuali admin menetapkan cookies."
+  },
+  {
+   "id": "iphone",
+   "q": "Macam mana simpan di iPhone?",
+   "keywords": [
+    "iphone",
+    "ipad",
+    "apple",
+    "ios",
+    "safari",
+    "simpan",
+    "galeri",
+    "photos",
+    "files"
+   ],
+   "a": "Guna Safari. Lepas muat turun, tekan ikon anak panah di bar alamat, pilih fail, lalu Share > Save Video untuk masuk Photos. Atau ia tersimpan dalam app Files."
+  },
+  {
+   "id": "android",
+   "q": "Android / PC macam mana?",
+   "keywords": [
+    "android",
+    "pc",
+    "laptop",
+    "komputer",
+    "chrome",
+    "windows",
+    "mac"
+   ],
+   "a": "Fail akan masuk folder Downloads secara automatik. Di Android, buka app Files atau Galeri."
+  },
+  {
+   "id": "gagal",
+   "q": "Kenapa gagal?",
+   "keywords": [
+    "gagal",
+    "error",
+    "ralat",
+    "tak boleh",
+    "tak jadi",
+    "fail",
+    "rosak",
+    "masalah"
+   ],
+   "a": "Semak pautan lengkap dan video itu awam. Cuba lagi sebentar, kadang-kadang platform sekat sementara. Kalau masih gagal, hubungi admin."
+  },
+  {
+   "id": "percuma",
+   "q": "Percuma ke?",
+   "keywords": [
+    "percuma",
+    "free",
+    "bayar",
+    "harga",
+    "kos",
+    "langganan"
+   ],
+   "a": "Percuma sepenuhnya, tanpa akaun. Muat turun hanya kandungan yang anda ada hak untuk simpan."
+  },
+  {
+   "id": "platform",
+   "q": "Platform apa disokong?",
+   "keywords": [
+    "platform",
+    "sokong",
+    "support",
+    "youtube",
+    "instagram",
+    "facebook",
+    "twitter",
+    "laman"
+   ],
+   "a": "YouTube, TikTok, Instagram dan Facebook. Platform baru ditambah dari masa ke masa."
+  }
+ ],
+ "settings": {
+  "announcement": "",
+  "maintenance": false
+ }
+}

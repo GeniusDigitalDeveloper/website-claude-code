@@ -27,7 +27,7 @@ async function loadConfig() {
       { id: 'facebook', name: 'Facebook', icon: 'facebook', enabled: true, domains: ['facebook.com', 'fb.watch'] },
     ], faq: null, settings: {}, offline: true };
   }
-  if (!st.cfg.faq) { try { st.cfg.faq = await (await fetch('assets/faq-default.json')).json(); } catch { st.cfg.faq = []; } }
+  if (!st.cfg.faq) { try { st.cfg.faq = (await (await fetch('assets/defaults.json')).json()).faq; } catch { st.cfg.faq = []; } }
   renderPlatforms(); renderFaq();
   const a = st.cfg.settings?.announcement;
   if (a || st.cfg.settings?.maintenance) { const el = $('#announce'); el.hidden = false; el.textContent = st.cfg.settings.maintenance ? 'Sistem dalam penyelenggaraan. Cuba lagi sebentar lagi.' : a; }

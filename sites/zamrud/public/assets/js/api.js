@@ -1,5 +1,5 @@
 const base = () => (window.ZAMRUD?.API_BASE || '').replace(/\/$/, '');
-export const DEMO = new URLSearchParams(location.search).has('demo') || (!window.ZAMRUD?.API_BASE && location.hostname.endsWith('github.io'));
+export const DEMO = new URLSearchParams(location.search).has('demo') || !window.ZAMRUD?.DOWNLOADS_ENABLED;
 
 async function req(path, { method = 'GET', body, token } = {}) {
   let res;
@@ -42,14 +42,9 @@ async function demo(path, opts) {
 const call = (path, opts) => (DEMO ? demo(path, opts) : req(path, opts));
 
 export const api = {
-  config: () => call('/api/config'),
+  config: async () => (await import('./firebase.js')).fb.getSite(),
   info: (url) => call('/api/info', { method: 'POST', body: { url } }),
   startJob: (url, format, quality) => call('/api/jobs', { method: 'POST', body: { url, format, quality } }),
   job: (id) => call('/api/jobs/' + id),
   health: () => (DEMO ? Promise.resolve({ ok: true }) : req('/api/health')),
-  login: (password) => req('/api/admin/login', { method: 'POST', body: { password } }),
-  overview: (t) => req('/api/admin/overview', { token: t }),
-  savePlatforms: (t, platforms) => req('/api/admin/platforms', { method: 'PUT', token: t, body: { platforms } }),
-  saveFaq: (t, faq) => req('/api/admin/faq', { method: 'PUT', token: t, body: { faq } }),
-  saveSettings: (t, s) => req('/api/admin/settings', { method: 'PUT', token: t, body: s }),
 };
