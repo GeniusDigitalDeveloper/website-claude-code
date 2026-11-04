@@ -78,6 +78,9 @@ export const fb = {
   },
   savePhoto: (uid, dataUrl) => updateDoc(doc(db, 'users', uid), { photo: dataUrl }),
 
+  /** Statistik awam untuk footer: { total, days: { 'YYYY-MM-DD': n } } (ditulis oleh pelayan). */
+  watchPublicStats(cb) { return onSnapshot(doc(db, 'stats', 'public'), (s) => cb(s.exists() ? s.data() : {}), () => cb({})); },
+
   /* ---- Statistik masa nyata (admin) ---- */
   watchSummary(cb) { return onSnapshot(doc(db, 'stats', 'summary'), (s) => cb(s.exists() ? s.data() : {}), () => cb({})); },
   watchDaily(cb, days = 400) {

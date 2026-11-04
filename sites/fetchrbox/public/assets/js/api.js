@@ -1,5 +1,6 @@
 const base = () => (window.FETCHRBOX?.API_BASE || '').replace(/\/$/, '');
-export const DEMO = new URLSearchParams(location.search).has('demo') || !window.FETCHRBOX?.DOWNLOADS_ENABLED;
+// Mod demo hanya untuk pratonton reka bentuk (?demo). Tanpa itu, tiada keputusan palsu dipaparkan.
+export const DEMO = new URLSearchParams(location.search).has('demo');
 
 async function req(path, { method = 'GET', body, token } = {}) {
   let res;
@@ -14,7 +15,10 @@ async function req(path, { method = 'GET', body, token } = {}) {
   }
   let data = null;
   try { data = await res.json(); } catch {}
-  if (!res.ok) { const e = new Error(data?.error || 'Ralat pelayan'); e.status = res.status; throw e; }
+  if (!res.ok) {
+    if (!data && (res.status === 404 || res.status === 405)) { const e = new Error('Pelayan muat turun belum bersambung.'); e.offline = true; throw e; }
+    const e = new Error(data?.error || 'Ralat pelayan'); e.status = res.status; throw e;
+  }
   return data;
 }
 export const fileUrl = (id) => `${base()}/api/jobs/${id}/file`;

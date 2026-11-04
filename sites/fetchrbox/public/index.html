@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700&family=Montserrat:wght@500;600;700&family=Poppins:ital,wght@0,500;0,600;0,700;1,700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=4">
+  <link rel="stylesheet" href="assets/style.css?v=5">
   <script src="assets/js/boot.js"></script>
 </head>
 <body>
@@ -19,18 +19,13 @@
   <div id="announce" class="announce" hidden></div>
 
   <header class="topbar">
-    <div class="in glass wide-holo hot">
-      <a class="brand" href="#" id="brand" aria-label="Fetchr Box"><img src="assets/logo.svg" alt="" width="44" height="44"><b>Fetchr Box</b></a>
-      <nav class="nav">
-        <a class="link" href="#cara" data-nav="cara" data-i18n="nav_how">Cara guna</a>
-        <a class="link" href="#faq" data-nav="faq" data-i18n="nav_faq">Soalan lazim</a>
-        <a class="link" href="#profil" data-nav="profil" id="navProfile" data-i18n="nav_profile" hidden>Profil</a>
-        <div class="langs" role="group" data-i18n-aria="lang_aria" aria-label="Pilih bahasa">
-          <button type="button" data-lang="ms" aria-pressed="true" lang="ms">BM</button>
-          <button type="button" data-lang="en" aria-pressed="false" lang="en">EN</button>
-          <button type="button" data-lang="ar" aria-pressed="false" lang="ar">AR</button>
-        </div>
-      </nav>
+    <div class="in">
+      <a class="brand" href="#" id="brand" aria-label="Fetchr Box"><img src="assets/logo.svg" alt="" width="40" height="40"><b>Fetchr Box</b></a>
+      <div class="langs" role="group" data-i18n-aria="lang_aria" aria-label="Pilih bahasa">
+        <button type="button" data-lang="ms" aria-pressed="true" lang="ms">BM</button>
+        <button type="button" data-lang="en" aria-pressed="false" lang="en">EN</button>
+        <button type="button" data-lang="ar" aria-pressed="false" lang="ar">AR</button>
+      </div>
     </div>
   </header>
 
@@ -141,29 +136,44 @@
       <div class="faq" id="faqList"></div>
     </section>
 
-    <!-- ============ PROFIL ============ -->
+    <!-- ============ PROFIL (susunan seperti profil TikTok) ============ -->
     <section class="view page" data-view="profil" hidden aria-labelledby="profh">
-      <div class="profile glass hot">
-        <div class="avatar-wrap">
+      <div class="tt">
+        <div class="tt-head">
           <div class="avatar" id="avatar"><img id="avatarImg" alt="" hidden><span id="avatarInit"></span></div>
-          <button class="btn ghost sm" id="photoBtn" type="button"><span class="ico" data-ico="camera"></span><span class="t" data-i18n="prof_photo">Tukar gambar</span></button>
-          <input id="photoInput" type="file" accept="image/*" hidden>
+          <div class="tt-info">
+            <h2 class="tt-handle" id="profh">@pengguna</h2>
+            <p class="tt-name" id="pfName"></p>
+            <div class="tt-btns">
+              <button class="btn grey sm" id="photoBtn" type="button"><span class="ico" data-ico="camera"></span><span class="t" data-i18n="prof_photo">Tukar gambar</span></button>
+              <button class="btn red sm" id="logoutBtn" type="button"><span class="ico" data-ico="logout"></span><span class="t" data-i18n="logout">Keluar</span></button>
+              <input id="photoInput" type="file" accept="image/*" hidden>
+            </div>
+            <div class="tt-stats">
+              <div><b id="stTotal">0</b><span data-i18n="prof_total">Jumlah berjaya</span></div>
+              <div><b id="stMp4">0</b><span>MP4</span></div>
+              <div><b id="stMp3">0</b><span>MP3</span></div>
+            </div>
+            <p class="tt-bio"><span class="ico" data-ico="mail"></span><span id="pfEmail"></span></p>
+            <p class="msgline" id="pfMsg" role="alert"></p>
+          </div>
         </div>
-        <h2 id="profh" data-i18n="prof_title">Profil</h2>
-        <div class="pf-email"><span class="ico" data-ico="mail"></span><span><small data-i18n="label_email"></small><b id="pfEmail"></b></span></div>
-        <div class="pf-stats">
-          <div class="pf-stat"><b id="stTotal">0</b><small data-i18n="prof_total">Jumlah berjaya</small></div>
-          <div class="pf-stat"><b id="stMp4">0</b><small>MP4</small></div>
-          <div class="pf-stat"><b id="stMp3">0</b><small>MP3</small></div>
-        </div>
-        <p class="pf-hint" data-i18n="prof_hint"></p>
-        <p class="msgline" id="pfMsg" role="alert"></p>
-        <button class="btn red" id="logoutBtn" type="button"><span class="ico" data-ico="logout"></span><span class="t" data-i18n="logout">Keluar</span></button>
+        <div class="tt-tabs" role="tablist"><button type="button" role="tab" aria-selected="true"><span class="ico" data-ico="grid"></span><span data-i18n="prof_tab">Muat turun</span></button></div>
+        <div class="tt-grid" id="ttGrid"></div>
+        <div class="tt-empty" id="ttEmpty"><span class="ico" data-ico="download"></span><b data-i18n="prof_empty">Belum ada muat turun</b><span data-i18n="prof_empty_sub">Muat turun yang berjaya akan muncul di sini.</span></div>
       </div>
     </section>
   </main>
 
-  <footer><p data-i18n="foot"></p></footer>
+  <footer class="foot">
+    <nav class="foot-links" aria-label="Pautan">
+      <a href="#cara" data-nav="cara" data-i18n="nav_how">Cara guna</a><i aria-hidden="true">·</i>
+      <a href="#faq" data-nav="faq" data-i18n="nav_faq">Soalan lazim</a><i aria-hidden="true" class="pdot" hidden>·</i>
+      <a href="#profil" data-nav="profil" id="navProfile" data-i18n="nav_profile" hidden>Profil</a>
+    </nav>
+    <p class="foot-stats" id="footStats" aria-live="off"></p>
+    <p class="foot-copy" data-i18n="foot"></p>
+  </footer>
 
   <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="mTitle">
     <div class="sheet glass">
@@ -188,6 +198,6 @@
   </section>
 
   <script src="assets/js/config.js"></script>
-  <script type="module" src="assets/js/app.js?v=4"></script>
+  <script type="module" src="assets/js/app.js?v=5"></script>
 </body>
 </html>

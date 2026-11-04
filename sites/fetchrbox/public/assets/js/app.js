@@ -54,7 +54,7 @@ function onInsertUrl(u) {
 }
 function paintAnnounce() {
   const el = $('#announce'), s = st.cfg?.settings || {};
-  const text = s.maintenance ? t('maint') : pick(s.announcement) || (DEMO ? t('demo_banner') : '');
+  const text = s.maintenance ? t('maint') : pick(s.announcement);
   el.hidden = !text; el.textContent = text;
 }
 function renderPlatforms() {
@@ -64,7 +64,7 @@ function renderPlatforms() {
 function renderFaq() {
   if (!st.cfg) return;
   const open = new Set($$('#faqList details[open]').map((d) => d.dataset.id));
-  $('#faqList').innerHTML = st.cfg.faq.map((f, i) => `<details class="glass reveal in" data-id="${esc(f.id)}" ${open.has(f.id) ? 'open' : ''} style="--d:${i * 0.04}s"><summary>${esc(pick(f.q))}<span class="ico" data-ico="chevron"></span></summary><p>${esc(pick(f.a))}</p></details>`).join('');
+  $('#faqList').innerHTML = st.cfg.faq.map((f) => `<details class="faq-i" data-id="${esc(f.id)}" ${open.has(f.id) ? 'open' : ''}><summary><img class="mk" src="assets/logo.svg" alt="" width="22" height="22"><span class="q">${esc(pick(f.q))}</span><span class="ico" data-ico="chevron"></span></summary><p>${esc(pick(f.a))}</p></details>`).join('');
   hydrateIcons($('#faqList'));
 }
 
@@ -147,10 +147,13 @@ fb.onUser((user) => {
   st.user = user;
   $('#authBox').hidden = !!user;
   $('#dlBox').hidden = !user;
-  $('#navProfile').hidden = !user;
+  $('#navProfile').hidden = !user; $('.pdot').hidden = !user;
   if (stopProfile) { stopProfile(); stopProfile = null; }
   if (user) {
+    const local = (user.email || 'pengguna').split('@')[0];
     $('#pfEmail').textContent = user.email;
+    $('#profh').textContent = '@' + local.toLowerCase();
+    $('#pfName').textContent = local.charAt(0).toUpperCase() + local.slice(1);
     $('#avatarInit').textContent = (user.email || '?').charAt(0).toUpperCase();
     fb.ensureProfile(user, getLang());
     stopProfile = fb.watchProfile(user.uid, paintProfile);
@@ -169,6 +172,10 @@ function paintProfile(d) {
   const mp4 = stt.mp4 || 0, mp3 = stt.mp3 || 0;
   $('#stTotal').textContent = nf(stt.total ?? mp4 + mp3 + (stt.other || 0));
   $('#stMp4').textContent = nf(mp4); $('#stMp3').textContent = nf(mp3);
+  // Grid muat turun (ditulis oleh pelayan): users/{uid}.recent = [{ title, thumb, format, platform }]
+  const recent = Array.isArray(d.recent) ? d.recent.slice(0, 30) : [];
+  $('#ttGrid').innerHTML = recent.map((r) => `<div class="tt-tile" title="${esc(r.title || '')}">${r.thumb ? `<img src="${esc(r.thumb)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ''}<span class="fmt">${esc(String(r.format || '').toUpperCase())}</span><span class="cap">${esc(r.title || '')}</span></div>`).join('');
+  $('#ttEmpty').hidden = recent.length > 0;
   const img = $('#avatarImg');
   if (d.photo) { img.src = d.photo; img.hidden = false; $('#avatarInit').hidden = true; } else { img.hidden = true; $('#avatarInit').hidden = false; }
 }
@@ -309,3 +316,18 @@ function done(id, name) {
 }
 
 route();
+
+/* ---------- Statistik kecil di footer (masa nyata, waktu Malaysia, reset pukul 12 malam) ---------- */
+let pub = {};
+const myt = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kuala_Lumpur' }).format(new Date()); // YYYY-MM-DD
+function paintStats() {
+  const days = pub.days || {}, today = myt(), month = today.slice(0, 7);
+  const todayN = days[today] || 0;
+  const monthN = Object.entries(days).reduce((a, [k, v]) => (k.startsWith(month) ? a + (v || 0) : a), 0);
+  const total = pub.total ?? Object.values(days).reduce((a, v) => a + (v || 0), 0);
+  $('#footStats').textContent = [`${t('stat_today')} ${nf(todayN)}`, `${t('stat_month')} ${nf(monthN)}`, `${t('stat_total')} ${nf(total)}`].join(' · ');
+}
+fb.watchPublicStats((d) => { pub = d; paintStats(); });
+setInterval(paintStats, 30000); // bertukar tepat pada tengah malam
+document.addEventListener('langchange', paintStats);
+paintStats();

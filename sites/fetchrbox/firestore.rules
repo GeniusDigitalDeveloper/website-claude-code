@@ -20,8 +20,9 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     // Statistik: admin baca sahaja. Pelayan muat turun menulis melalui akaun perkhidmatan (tidak tertakluk pada rules).
+    // stats/public = jumlah awam untuk footer (tiada data peribadi). Selebihnya admin sahaja.
     match /stats/{doc} {
-      allow read: if isAdmin();
+      allow read: if doc == 'public' || isAdmin();
       allow write: if false;
     }
     match /daily/{day} {

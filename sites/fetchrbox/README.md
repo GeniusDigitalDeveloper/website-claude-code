@@ -21,6 +21,10 @@ Pengguna mesti **daftar** (e-mel + kata laluan) sebelum boleh guna. Selepas daft
 ### Admin
 Admin ialah akaun yang ada **custom claim `admin=true`** (rules menyemak claim, bukan e-mel, supaya tidak boleh dipalsukan melalui pendaftaran awam). Cara jadikan satu akaun admin: daftar di laman awam, kemudian set claim (`auth_update_user` melalui Firebase MCP, atau Admin SDK `setCustomUserClaims(uid, {admin: true})`).
 
+### Data yang ditulis pelayan untuk laman awam
+- `stats/public` : `{ total, days: { 'YYYY-MM-DD': n } }` (footer awam: hari ini, bulan ini, jumlah. Boleh dibaca semua, tiada data peribadi)
+- `users/{uid}.stats` : `{ total, mp4, mp3, other }` dan `users/{uid}.recent` : `[{ title, thumb, format, platform }]` (halaman profil pengguna sendiri)
+
 ### Statistik (masa nyata, waktu Malaysia)
 Pelayan muat turun menulis ke Firestore (akaun perkhidmatan, tidak tertakluk pada rules):
 - `daily/{YYYY-MM-DD}` : `{ count, byPlatform, byFormat }` (kunci tarikh = reset pukul 12 tengah malam MYT secara semula jadi)
