@@ -1,8 +1,8 @@
 // Tetapan sambungan.
-// DOWNLOADS_ENABLED: tukar kepada true bila pelayan muat turun (Cloud Run) sudah disambung melalui rewrite /api.
-// API_BASE: biar kosong jika /api berada di domain yang sama.
+// API_BASE: alamat pelayan muat turun (Render). Biar kosong jika /api berada di domain yang sama.
+// DOWNLOADS_ENABLED: true bila pelayan muat turun sudah disambung.
 window.FETCHRBOX = {
-  API_BASE: '',
-  DOWNLOADS_ENABLED: false,
+  API_BASE: 'https://fetchrbox-server.onrender.com',
+  DOWNLOADS_ENABLED: true,
   SITE_NAME: 'Fetchr Box',
 };
