@@ -1,14 +1,14 @@
-// Sambungan Firebase (projek zamrud-media-izzul). Kunci web Firebase memang awam; keselamatan dijaga oleh firestore.rules.
+// Sambungan Firebase (projek sauk-media-izzul). Kunci web Firebase memang awam; keselamatan dijaga oleh firestore.rules.
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
 import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyCbGSevDeSMPpNtMaWZ8jOpKHjfNZA0F1I',
-  authDomain: 'zamrud-media-izzul.firebaseapp.com',
-  projectId: 'zamrud-media-izzul',
-  storageBucket: 'zamrud-media-izzul.firebasestorage.app',
-  messagingSenderId: '1032968876350',
-  appId: '1:1032968876350:web:ceef1fa100466eda99fc6f',
+  apiKey: 'AIzaSyBeSs66m3Q-edlN_AeoTJN6rtTqnOqrVn4',
+  authDomain: 'sauk-media-izzul.firebaseapp.com',
+  projectId: 'sauk-media-izzul',
+  storageBucket: 'sauk-media-izzul.firebasestorage.app',
+  messagingSenderId: '797689535293',
+  appId: '1:797689535293:web:6a09f3f94173fdaf1dc354',
 };
 // Hanya petunjuk UI. Kuasa sebenar menulis ditentukan oleh firestore.rules.
 const ADMIN_EMAILS = ['izzulmedia01@gmail.com'];

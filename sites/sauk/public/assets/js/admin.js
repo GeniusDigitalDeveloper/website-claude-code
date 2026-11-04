@@ -172,9 +172,9 @@ function settings() {
   </div>
   <div class="settings-card glass" style="margin-top:.9rem">
     <h2 style="font-family:var(--display);font-size:1.05rem;margin-bottom:.4rem">Sistem</h2>
-    <div class="kv"><span>Pangkalan data</span><span>Cloud Firestore (zamrud-media-izzul)</span></div>
+    <div class="kv"><span>Pangkalan data</span><span>Cloud Firestore (sauk-media-izzul)</span></div>
     <div class="kv"><span>Platform aktif</span><span>${data.platforms.filter((p) => p.enabled).length} / ${data.platforms.length}</span></div>
-    <div class="kv"><span>Muat turun</span><span>${window.ZAMRUD?.DOWNLOADS_ENABLED ? 'Pelayan disambung' : 'Pelayan muat turun belum disambung (mod pratonton)'}</span></div>
+    <div class="kv"><span>Muat turun</span><span>${window.SAUK?.DOWNLOADS_ENABLED ? 'Pelayan disambung' : 'Pelayan muat turun belum disambung (mod pratonton)'}</span></div>
     <div class="kv"><span>Akses admin</span><span>Log masuk Google. Senarai e-mel admin dalam <code>firestore.rules</code>.</span></div>
     <button class="btn ghost" id="out" style="margin-top:.8rem"><span class="ico" data-ico="logout"></span><span>Log keluar</span></button>
   </div>`;

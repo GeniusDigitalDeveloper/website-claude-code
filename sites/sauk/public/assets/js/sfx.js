@@ -1,6 +1,6 @@
 // Bunyi sintetik (WebAudio) — tiada fail audio. Dimatikan/dihidupkan dengan togol, simpan dalam localStorage.
 let ctx, master;
-const KEY = 'zamrud:sound';
+const KEY = 'sauk:sound';
 let on = true;
 try { on = localStorage.getItem(KEY) !== 'off'; } catch {}
 function ensure() {

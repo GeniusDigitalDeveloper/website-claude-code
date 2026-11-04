@@ -90,7 +90,7 @@ function setBusy(btn, on, label) {
   t.textContent = label;
 }
 function fail(err) {
-  if (err.offline) modal({ icon: 'alert', err: true, title: 'Pelayan belum bersambung', text: 'Zamrud tidak dapat menghubungi pelayan muat turun. Cuba lagi sebentar, atau hubungi admin.' });
+  if (err.offline) modal({ icon: 'alert', err: true, title: 'Pelayan belum bersambung', text: 'Sauk tidak dapat menghubungi pelayan muat turun. Cuba lagi sebentar, atau hubungi admin.' });
   else modal({ icon: 'alert', err: true, title: 'Tidak berjaya', text: err.message });
 }
 

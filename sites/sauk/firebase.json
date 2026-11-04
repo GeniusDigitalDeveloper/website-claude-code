@@ -41,12 +41,12 @@
         ]
       }
     ],
-    "site": "zamrud-media-izzul"
+    "site": "sauk-media-izzul"
   },
   "auth": {
     "providers": {
       "googleSignIn": {
-        "oAuthBrandDisplayName": "Zamrud",
+        "oAuthBrandDisplayName": "Sauk",
         "supportEmail": "izzulmedia01@gmail.com"
       }
     }

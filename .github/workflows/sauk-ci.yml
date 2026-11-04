@@ -1,9 +1,9 @@
-name: Zamrud - CI
+name: Sauk - CI
 on:
   push:
-    paths: ['sites/zamrud/**']
+    paths: ['sites/sauk/**']
   pull_request:
-    paths: ['sites/zamrud/**']
+    paths: ['sites/sauk/**']
 permissions:
   contents: read
 jobs:
@@ -14,9 +14,9 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
       - name: Semak sintaks server dan frontend
-        working-directory: sites/zamrud
+        working-directory: sites/sauk
         run: |
           node --check server/server.mjs
           for f in public/assets/js/*.js; do node --check "$f"; done
       - name: Imbas rahsia
-        run: "! grep -rEn '(ADMIN_PASSWORD|SECRET)=[^ ]{6,}' sites/zamrud --exclude='.env.example' --exclude-dir=node_modules"
+        run: "! grep -rEn '(ADMIN_PASSWORD|SECRET)=[^ ]{6,}' sites/sauk --exclude='.env.example' --exclude-dir=node_modules"

@@ -6,7 +6,7 @@
 
 ---
 
-**Project:** Zamrud
+**Project:** Sauk
 **Generated:** 2026-11-04 14:58:24
 **Category:** Remote Work/Collaboration Tool
 
@@ -215,15 +215,15 @@ Before delivering any UI code, verify:
 
 ---
 
-## OVERRIDE (keputusan sebenar projek Zamrud)
+## OVERRIDE (keputusan sebenar projek Sauk)
 
-Cadangan auto di atas (indigo) tidak sesuai. Zamrud guna tema **Islamik halus**:
+Cadangan auto di atas (indigo) tidak sesuai. Sauk guna tema **Islamik halus**:
 
-- Latar: hijau zamrud gelap `#04201C` → `#0A3A31`, corak bintang 8 penjuru (khatam) pada opacity 5-7%.
-- Aksen: emas `#E6C36A` (butang utama, teks atas gelap), zamrud terang `#2EC4A0`.
+- Latar: hijau sauk gelap `#04201C` → `#0A3A31`, corak bintang 8 penjuru (khatam) pada opacity 5-7%.
+- Aksen: emas `#E6C36A` (butang utama, teks atas gelap), sauk terang `#2EC4A0`.
 - Teks: `#F2F7F5` (kontras > 12:1 atas latar), muted `#A9C7BF` (> 7:1).
 - Glass: `rgba(255,255,255,.06)` + blur 18px + border `rgba(230,195,106,.22)`.
 - Fon: Sora (tajuk), Inter (isi), Amiri hanya untuk sentuhan kaligrafi kecil.
 - Gerak: easing iOS `cubic-bezier(.32,.72,0,1)`, hanya `transform`/`opacity`, hormati `prefers-reduced-motion`.
 - Bunyi: WebAudio sintetik (klik, pop, berjaya, ralat), boleh dimatikan.
-- Header: logo kiri + nama kecil, dan tajuk wordmark besar "Zamrud" dalam hero.
+- Header: logo kiri + nama kecil, dan tajuk wordmark besar "Sauk" dalam hero.

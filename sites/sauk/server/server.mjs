@@ -1,4 +1,4 @@
-// Zamrud — pelayan muat turun. Tiada dependency npm; perlukan yt-dlp + ffmpeg dalam PATH.
+// Sauk — pelayan muat turun. Tiada dependency npm; perlukan yt-dlp + ffmpeg dalam PATH.
 import http from 'node:http';
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
@@ -26,9 +26,9 @@ for (const d of fs.readdirSync(TMP_DIR)) fs.rmSync(path.join(TMP_DIR, d), { recu
 let ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
 if (!ADMIN_PASSWORD) {
   ADMIN_PASSWORD = crypto.randomBytes(9).toString('base64url');
-  console.log(`[zamrud] ADMIN_PASSWORD tidak ditetapkan. Kata laluan sementara: ${ADMIN_PASSWORD}`);
+  console.log(`[sauk] ADMIN_PASSWORD tidak ditetapkan. Kata laluan sementara: ${ADMIN_PASSWORD}`);
 }
-const SESSION_SECRET = process.env.SESSION_SECRET || crypto.createHash('sha256').update('zamrud:' + ADMIN_PASSWORD).digest('hex');
+const SESSION_SECRET = process.env.SESSION_SECRET || crypto.createHash('sha256').update('sauk:' + ADMIN_PASSWORD).digest('hex');
 const sign = (s) => crypto.createHmac('sha256', SESSION_SECRET).update(s).digest('base64url');
 const safeEq = (a, b) => {
   const ha = crypto.createHash('sha256').update(String(a)).digest();
@@ -56,9 +56,9 @@ const DEFAULT_DB = {
     { id: 'vimeo', name: 'Vimeo', icon: 'video', enabled: false, domains: ['vimeo.com'], note: 'Aktifkan di panel admin' },
   ],
   faq: [
-    { id: 'cara', q: 'Macam mana nak muat turun?', keywords: ['cara', 'macam mana', 'how', 'guna', 'mula', 'download', 'muat turun', 'tutorial'], a: '1) Buka video, tekan Share lalu Salin pautan. 2) Tampal di kotak Zamrud dan tekan Semak. 3) Pilih format dan kualiti. 4) Tekan Muat Turun.' },
+    { id: 'cara', q: 'Macam mana nak muat turun?', keywords: ['cara', 'macam mana', 'how', 'guna', 'mula', 'download', 'muat turun', 'tutorial'], a: '1) Buka video, tekan Share lalu Salin pautan. 2) Tampal di kotak Sauk dan tekan Semak. 3) Pilih format dan kualiti. 4) Tekan Muat Turun.' },
     { id: 'format', q: 'Format apa yang ada?', keywords: ['format', 'mp3', 'mp4', 'mov', 'wav', 'mkv', 'audio', 'video', 'lagu'], a: 'Video: MP4, MOV, MKV. Audio: MP3, M4A, WAV, FLAC. MP4 paling serasi untuk iPhone dan Android.' },
-    { id: 'tiktok', q: 'TikTok ada watermark tak?', keywords: ['tiktok', 'watermark', 'logo', 'tanda air'], a: 'Zamrud ambil sumber TikTok asal tanpa watermark pada kualiti tertinggi yang TikTok sediakan.' },
+    { id: 'tiktok', q: 'TikTok ada watermark tak?', keywords: ['tiktok', 'watermark', 'logo', 'tanda air'], a: 'Sauk ambil sumber TikTok asal tanpa watermark pada kualiti tertinggi yang TikTok sediakan.' },
     { id: 'kualiti', q: 'Macam mana nak kualiti terbaik?', keywords: ['kualiti', 'quality', '4k', '1080', 'hd', 'pecah', 'blur', 'jelas'], a: 'Pilih "Terbaik" untuk kualiti tertinggi. 4K hanya ada jika video asal memang 4K. Untuk iPhone lama, pilih 1080p MP4 supaya terus boleh main.' },
     { id: 'peribadi', q: 'Video peribadi atau private boleh?', keywords: ['private', 'peribadi', 'privasi', 'login', 'umur', 'age', 'berdaftar', 'unlisted'], a: 'Video awam dan unlisted (ada pautan) boleh. Video private atau had umur perlukan akaun, jadi tidak disokong kecuali admin menetapkan cookies.' },
     { id: 'iphone', q: 'Macam mana simpan di iPhone?', keywords: ['iphone', 'ipad', 'apple', 'ios', 'safari', 'simpan', 'galeri', 'photos', 'files'], a: 'Guna Safari. Lepas muat turun, tekan ikon anak panah di bar alamat, pilih fail, lalu Share > Save Video untuk masuk Photos. Atau ia tersimpan dalam app Files.' },
@@ -216,7 +216,7 @@ function startJob({ url, platform, format, quality, ip }) {
     } else {
       job.status = 'error'; job.error = friendly(errBuf);
       record(platform.id, format, quality, false, '');
-      console.error('[zamrud] job gagal:', errBuf.split('\n').filter(Boolean).slice(-2).join(' | '));
+      console.error('[sauk] job gagal:', errBuf.split('\n').filter(Boolean).slice(-2).join(' | '));
     }
     job.timer = setTimeout(() => dropJob(id), JOB_TTL_MS);
   });
@@ -277,7 +277,7 @@ async function api(req, res, url) {
       return send(res, 200, { ...info, platform: { id: r.platform.id, name: r.platform.name }, url: r.url });
     } catch (e) {
       if (e.code === 'ENOENT') return send(res, 500, { error: 'yt-dlp tidak dipasang pada pelayan.' });
-      console.error('[zamrud] info gagal:', (e.stderr || e.message).split('\n').filter(Boolean).slice(-2).join(' | '));
+      console.error('[sauk] info gagal:', (e.stderr || e.message).split('\n').filter(Boolean).slice(-2).join(' | '));
       return send(res, 422, { error: friendly(e.stderr) });
     }
   }
@@ -379,4 +379,4 @@ const server = http.createServer(async (req, res) => {
   }
 });
 server.requestTimeout = 0;
-server.listen(PORT, () => console.log(`[zamrud] berjalan di http://localhost:${PORT}`));
+server.listen(PORT, () => console.log(`[sauk] berjalan di http://localhost:${PORT}`));
