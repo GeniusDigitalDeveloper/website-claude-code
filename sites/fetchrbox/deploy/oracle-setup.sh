@@ -34,7 +34,7 @@ sudo mkdir -p /opt/fetchrbox-data
 ENV_FILE=/opt/fetchrbox.env
 if [ ! -f "$ENV_FILE" ]; then
   ADMIN_PW="$(head -c 18 /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c 20)"
-  printf 'PORT=8080\nADMIN_PASSWORD=%s\nALLOWED_ORIGIN=%s\nMAX_DURATION_MIN=180\nMAX_JOBS=3\n' "$ADMIN_PW" "$ORIGINS" | sudo tee "$ENV_FILE" >/dev/null
+  { printf '%s=%s\n' PORT 8080 ADMIN_PASSWORD "$ADMIN_PW" ALLOWED_ORIGIN "$ORIGINS" MAX_DURATION_MIN 180 MAX_JOBS 3; } | sudo tee "$ENV_FILE" >/dev/null
   sudo chmod 600 "$ENV_FILE"
   echo "Kata laluan admin pelayan (simpan): $ADMIN_PW"
 fi
