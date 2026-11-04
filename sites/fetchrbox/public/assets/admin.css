@@ -13,7 +13,7 @@
 .side .brand b { font-size: 1.15rem; }
 .side nav { display: grid; gap: 0.35rem; }
 .side nav button { display: flex; align-items: center; gap: 0.75rem; min-height: 48px; padding: 0 0.9rem; border-radius: 14px; color: var(--muted); font-family: var(--strong); font-weight: 600; text-align: start; transition: background 0.3s var(--ease), color 0.2s, transform 0.3s var(--ease); }
-.side nav button:hover { background: rgba(11, 92, 255, 0.08); color: var(--ink); }
+.side nav button:hover { background: rgba(var(--b-rgb), 0.08); color: var(--ink); }
 .side nav button:active { transform: scale(0.96); }
 .side nav button[aria-current='page'] { color: #fff; background: var(--grad); }
 .side-foot { margin-top: auto; display: grid; gap: 0.7rem; }
@@ -51,7 +51,7 @@
 .toolbar h1 { font-family: var(--display); font-weight: 800; }
 .list { display: grid; gap: 0.7rem; }
 .row-item { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.1rem; border-radius: 18px; }
-.row-item .pi { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 14px 14px 14px 5px; color: var(--blue-d); background: rgba(11, 92, 255, 0.1); font-size: 1.4rem; flex: none; }
+.row-item .pi { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 14px 14px 14px 5px; color: var(--blue-d); background: rgba(var(--b-rgb), 0.1); font-size: 1.4rem; flex: none; }
 .row-item .txt { flex: 1; min-width: 0; }
 .row-item .txt b { display: block; font-family: var(--strong); font-weight: 600; }
 .row-item .txt small { color: var(--muted); font-weight: 600; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -66,14 +66,14 @@
 [dir='rtl'] .switch input:checked + span::after { transform: translateX(-20px); }
 .switch input:focus-visible + span { outline: 2px solid var(--blue); outline-offset: 3px; }
 .f textarea { width: 100%; min-height: 90px; padding: 0.7rem 1rem; border-radius: 14px; background: #fff; border: 1px solid var(--line); resize: vertical; font-weight: 600; }
-.f textarea:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(11, 92, 255, 0.16); }
+.f textarea:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(var(--b-rgb), 0.16); }
 .f small { color: var(--muted); font-size: 0.78rem; font-weight: 600; }
-.langtag { display: inline-block; margin-inline-end: 0.4rem; padding: 0 0.45rem; border-radius: 6px; background: rgba(11, 92, 255, 0.1); color: var(--blue-d); font-family: var(--strong); font-weight: 700; font-size: 0.7rem; }
+.langtag { display: inline-block; margin-inline-end: 0.4rem; padding: 0 0.45rem; border-radius: 6px; background: rgba(var(--b-rgb), 0.1); color: var(--blue-d); font-family: var(--strong); font-weight: 700; font-size: 0.7rem; }
 .icons { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 .icons label { position: relative; }
 .icons input { position: absolute; opacity: 0; inset: 0; }
 .icons span { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: #fff; border: 1px solid var(--line); font-size: 1.3rem; cursor: pointer; }
-.icons input:checked + span { color: var(--blue-d); border-color: var(--blue); background: rgba(11, 92, 255, 0.12); }
+.icons input:checked + span { color: var(--blue-d); border-color: var(--blue); background: rgba(var(--b-rgb), 0.12); }
 .sheet.wide { width: min(560px, 100%); text-align: start; max-height: 92dvh; overflow-y: auto; }
 .sheet.wide h3 { text-align: center; }
 .settings-card { padding: 1.3rem; max-width: 680px; display: grid; gap: 0.4rem; }
@@ -93,3 +93,5 @@
   .kv { grid-template-columns: 1fr; gap: 0.1rem; }
   .toast { bottom: 100px; }
 }
+
+/* Palet ikut tab admin: guna palet yang sama seperti laman awam */

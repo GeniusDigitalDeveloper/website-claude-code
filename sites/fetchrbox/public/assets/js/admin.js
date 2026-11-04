@@ -63,6 +63,7 @@ $('#tabs').addEventListener('click', (e) => {
 function render() {
   if (!site) return;
   $$('#tabs button').forEach((b) => { if (b.dataset.tab === tab) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+  document.body.dataset.theme = { overview: 'home', platforms: 'cara', faq: 'faq', users: 'profil', admins: 'cara', settings: 'faq' }[tab];
   const c = $('#content');
   c.innerHTML = `<div class="view">${{ overview, platforms, faq, users: usersView, admins: adminsView, settings }[tab]()}</div>`;
   hydrateIcons(c);

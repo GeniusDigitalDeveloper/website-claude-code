@@ -26,6 +26,7 @@ function route() {
   if (v === 'profil' && !st.user) v = 'home';
   $$('.view').forEach((el) => { const on = el.dataset.view === v; if (el.hidden === on) el.hidden = !on; });
   $$('[data-nav]').forEach((a) => { if (a.dataset.nav === v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+  document.body.dataset.theme = v;
   window.scrollTo(0, 0);
 }
 window.addEventListener('hashchange', route);
