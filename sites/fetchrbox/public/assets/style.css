@@ -554,3 +554,19 @@ footer.foot .foot-copy, footer.foot .foot-stats { text-align: center; margin: 0;
 .ntime { display: inline-flex; align-items: center; gap: 0.3rem; margin-top: 0.1rem; color: #66768f; font-size: 0.68rem; font-weight: 600; }
 .ntime .ico { width: 0.85rem; height: 0.85rem; }
 .ntime .ico svg { width: 100%; height: 100%; }
+
+/* ================= Paparan penyelenggaraan (sistem dimatikan oleh admin) ================= */
+.maint { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 1rem; overflow-y: auto; background: radial-gradient(900px 500px at 50% 0%, rgba(var(--b-rgb), 0.18), transparent 60%), rgba(244, 247, 252, 0.92); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); animation: fade 0.5s var(--ease) both; }
+.maint-card { width: min(520px, 100%); padding: 2rem 1.6rem 1.6rem; text-align: center; --r: 28px; --bw: 3px; animation: sheet 0.7s var(--ease) both; }
+.maint-ico { position: relative; width: 112px; height: 112px; margin: 0 auto 1.1rem; display: grid; place-items: center; }
+.maint-ico img { position: relative; z-index: 1; width: 62px; height: 62px; filter: drop-shadow(0 8px 14px rgba(var(--bd-rgb), 0.4)); }
+.maint-ico .gear { position: absolute; inset: 0; display: grid; place-items: center; color: rgba(var(--b-rgb), 0.3); font-size: 7rem; animation: gearSpin 10s linear infinite; }
+.maint-ico .gear svg { width: 1em; height: 1em; stroke-width: 1.1; }
+.maint-card h2 { font-family: var(--display); font-weight: 800; font-size: clamp(1.4rem, 5vw, 1.9rem); line-height: 1.25; }
+.maint-card p { color: var(--ink); font-weight: 600; font-size: 1rem; margin: 0.8rem 0 1.1rem; white-space: pre-line; }
+.maint-bar { height: 8px; max-width: 280px; margin: 0 auto 1rem; border-radius: 99px; background: rgba(11, 27, 51, 0.1); overflow: hidden; }
+.maint-bar i { display: block; width: 40%; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--blue), var(--orange)); animation: barSlide 1.7s var(--ease) infinite; }
+.maint-card small { display: block; margin-bottom: 1.1rem; color: var(--muted); font-weight: 600; font-size: 0.8rem; }
+.maint-card .langs { display: inline-flex; }
+@keyframes gearSpin { to { transform: rotate(360deg); } }
+@keyframes barSlide { 0% { transform: translateX(-100%); } 100% { transform: translateX(350%); } }

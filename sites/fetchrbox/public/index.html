@@ -210,6 +210,21 @@
       <div class="row" id="mActions"></div>
     </div>
   </div>
+  <!-- Paparan penyelenggaraan: menutup keseluruhan laman bila admin matikan sistem -->
+  <div class="maint" id="maint" role="alertdialog" aria-modal="true" aria-labelledby="maintT" aria-describedby="maintM" hidden>
+    <div class="maint-card glass hot">
+      <div class="maint-ico"><img src="assets/logo.svg" alt="" width="64" height="64"><span class="gear" data-ico="settings"></span></div>
+      <h2 id="maintT" data-i18n="maint_title">Sistem Sedang Dikemas Kini</h2>
+      <p id="maintM"></p>
+      <div class="maint-bar" aria-hidden="true"><i></i></div>
+      <small data-i18n="maint_note"></small>
+      <div class="langs" role="group" data-i18n-aria="lang_aria" aria-label="Pilih bahasa">
+        <button type="button" data-lang="ms" aria-pressed="true" lang="ms">BM</button>
+        <button type="button" data-lang="en" aria-pressed="false" lang="en">EN</button>
+        <button type="button" data-lang="ar" aria-pressed="false" lang="ar">AR</button>
+      </div>
+    </div>
+  </div>
   <div class="toast" id="toast" role="status"></div>
 
   <div class="teaser" id="teaser" role="status" hidden>

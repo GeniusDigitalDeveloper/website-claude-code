@@ -38,6 +38,7 @@ export const ICONS = {
   mail: s('<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3.5 7.5l8.5 6 8.5-6"/>'),
   whatsapp: s('<path d="M3.5 20.5l1.3-4.3A8.5 8.5 0 1112 20.5a8.4 8.4 0 01-4.1-1.1z"/><path d="M9 8.5c.2 3 2.6 5.6 5.6 6l1.3-1.5-2-1-.9.8a4 4 0 01-1.9-1.9l.8-.9-1-2z"/>'),
   grid: s('<rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/>'),
+  power: s('<path d="M12 3v8"/><path d="M6.4 6.8a8 8 0 1011.2 0"/>'),
   bell: s('<path d="M6 16V11a6 6 0 1112 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 004 0"/>'),
   eyeOff: s('<path d="M3 3l18 18"/><path d="M10.6 6.2A9.5 9.5 0 0112 6c6.4 0 10 6 10 6a17 17 0 01-3.2 3.9M6.6 7.6A17 17 0 002 12s3.6 6 10 6a9.5 9.5 0 004.1-.9"/><path d="M9.9 9.9a3 3 0 004.2 4.2"/>'),
   back: s('<path d="M15 5l-7 7 7 7"/>'),

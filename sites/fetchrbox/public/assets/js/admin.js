@@ -3,12 +3,14 @@ import { platformIcon } from './icons.js';
 import { sfx } from './sfx.js';
 import { $, $$, esc, hydrateIcons, toast, modal } from './ui.js';
 import { setupPwToggles } from './pw.js';
+import { initSystem, systemView, bindSystem } from './admin-system.js';
 import { initExtra, resetExtra, onChats, chatView, bindChat, notifsView, bindNotifs, paintSent, setSent } from './admin-extra.js';
 
 const TZ = 'Asia/Kuala_Lumpur';
 let tab = 'overview';
 let site = null, summary = {}, daily = [], users = [], admins = [], me = { email: '', owner: false };
 initExtra({ getTab: () => tab, rerender: () => render(), getMe: () => me });
+initSystem({ getSite: () => site, rerender: () => render() });
 let stops = [];
 let clock;
 
@@ -47,7 +49,7 @@ fb.onUser(async (user) => {
 /* ---------- Data masa nyata ---------- */
 function startWatching() {
   stops = [
-    fb.watchSite((s) => { site = s; if (['platforms', 'faq'].includes(tab) || !$('.view')) render(); }),
+    fb.watchSite((s) => { site = s; if (['platforms', 'faq', 'system'].includes(tab) || !$('.view')) render(); }),
     fb.watchSummary((s) => { summary = s; if (tab === 'overview') render(); }),
     fb.watchDaily((d) => { daily = d; if (tab === 'overview') render(); }),
     fb.watchUsers((u) => { users = u; if (['overview', 'users'].includes(tab)) render(); }),
@@ -69,11 +71,11 @@ $('#tabs').addEventListener('click', (e) => {
 function render() {
   if (!site) return;
   $$('#tabs button').forEach((b) => { if (b.dataset.tab === tab) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
-  document.body.dataset.theme = { overview: 'home', platforms: 'cara', faq: 'faq', chat: 'home', notifs: 'profil', users: 'profil', admins: 'cara', settings: 'faq' }[tab];
+  document.body.dataset.theme = { overview: 'home', platforms: 'cara', faq: 'faq', chat: 'home', notifs: 'profil', users: 'profil', admins: 'cara', system: 'faq', settings: 'faq' }[tab];
   const c = $('#content');
-  c.innerHTML = `<div class="view">${{ overview, platforms, faq, chat: chatView, notifs: notifsView, users: usersView, admins: adminsView, settings }[tab]()}</div>`;
+  c.innerHTML = `<div class="view">${{ overview, platforms, faq, chat: chatView, notifs: notifsView, system: systemView, users: usersView, admins: adminsView, settings }[tab]()}</div>`;
   hydrateIcons(c);
-  ({ overview: () => {}, platforms: bindPlatforms, faq: bindFaq, chat: bindChat, notifs: bindNotifs, users: () => {}, admins: bindAdmins, settings: bindSettings }[tab])();
+  ({ overview: () => {}, platforms: bindPlatforms, faq: bindFaq, chat: bindChat, notifs: bindNotifs, system: bindSystem, users: () => {}, admins: bindAdmins, settings: bindSettings }[tab])();
 }
 const guard = async (fn) => {
   try { await fn(); toast('Disimpan'); sfx.success(); }
@@ -235,7 +237,6 @@ function settings() {
   return `<h1>Tetapan</h1><p class="sub2">Pengumuman tiga bahasa dan mod penyelenggaraan.</p>
   <div class="settings-card glass">
     ${LG.map(([l, n]) => `<div class="f"><label for="an_${l}"><span class="langtag">${n}</span>Pengumuman di laman awam</label><input id="an_${l}" value="${esc(val(s.announcement, l))}" maxlength="200" ${l === 'ar' ? 'dir="rtl"' : ''} placeholder="${l === 'ms' ? 'Kosongkan jika tiada' : ''}"></div>`).join('')}
-    <div class="row-item" style="padding:.4rem 0"><div class="txt"><b>Mod penyelenggaraan</b><small>Sekat semua muat turun baharu sementara waktu.</small></div><label class="switch"><input type="checkbox" id="mt" ${s.maintenance ? 'checked' : ''} aria-label="Mod penyelenggaraan"><span></span></label></div>
     <button class="btn gold" id="saveS" style="margin-top:.6rem"><span class="t">Simpan tetapan</span></button>
   </div>
   <div class="settings-card glass" style="margin-top:.9rem">
@@ -248,6 +249,6 @@ function settings() {
   </div>`;
 }
 function bindSettings() {
-  $('#saveS').addEventListener('click', () => guard(() => fb.saveSite({ settings: { announcement: { ms: $('#an_ms').value.trim().slice(0, 200), en: $('#an_en').value.trim().slice(0, 200), ar: $('#an_ar').value.trim().slice(0, 200) }, maintenance: $('#mt').checked } })));
+  $('#saveS').addEventListener('click', () => guard(() => fb.saveSite({ settings: { announcement: { ms: $('#an_ms').value.trim().slice(0, 200), en: $('#an_en').value.trim().slice(0, 200), ar: $('#an_ar').value.trim().slice(0, 200) } } })));
   $('#out').addEventListener('click', () => fb.logout());
 }

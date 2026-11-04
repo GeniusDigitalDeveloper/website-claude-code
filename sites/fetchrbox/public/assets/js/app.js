@@ -58,8 +58,13 @@ function onInsertUrl(u) {
 }
 function paintAnnounce() {
   const el = $('#announce'), s = st.cfg?.settings || {};
-  const text = s.maintenance ? t('maint') : pick(s.announcement);
+  const text = pick(s.announcement);
   el.hidden = !text; el.textContent = text;
+  // Sistem dimatikan oleh admin: paparan penuh skrin yang hilang sendiri bila sistem dihidupkan semula.
+  const on = !!s.maintenance;
+  $('#maint').hidden = !on;
+  document.body.style.overflow = on ? 'hidden' : '';
+  if (on) $('#maintM').textContent = pick(s.maintenanceMsg) || t('maint_default');
 }
 function renderPlatforms() {
   if (!st.cfg) return;
@@ -238,7 +243,7 @@ function resizePhoto(file, size) {
 }
 
 /* ---------- Kesan platform ketika menaip ---------- */
-const hostOf = (v) => { try { return new URL(v.match(/https?:\/\/\S+/)?.[0] || '').hostname.toLowerCase(); } catch { return ''; } };
+function hostOf(v) { try { return new URL(v.match(/https?:\/\/\S+/)?.[0] || '').hostname.toLowerCase(); } catch { return ''; } }
 function detect() {
   if (!st.cfg) return;
   const v = ($('#url').value || '').trim();

@@ -131,3 +131,18 @@
   .chatwrap.has-sel .clist, .chatwrap:not(.has-sel) .cthread { display: none; }
   #cback { display: grid; }
 }
+
+/* Suis sistem */
+.sys { gap: 0.9rem; }
+.sys-status { display: flex; align-items: center; gap: 0.9rem; padding: 1rem; border-radius: 16px; }
+.sys-status.on { background: rgba(10, 122, 77, 0.1); }
+.sys-status.off { background: rgba(198, 40, 40, 0.1); }
+.sys-status b { font-family: var(--strong); font-size: 1.05rem; }
+.sys-status small { display: block; color: var(--muted); font-weight: 600; }
+.sys-status .pulse { flex: none; width: 14px; height: 14px; border-radius: 50%; }
+.sys-status.on .pulse { background: #18a35e; animation: pulseOn 1.8s infinite; }
+.sys-status.off .pulse { background: #e53935; animation: pulseOff 1.8s infinite; }
+@keyframes pulseOn { 0% { box-shadow: 0 0 0 0 rgba(24, 163, 94, 0.6); } 100% { box-shadow: 0 0 0 12px rgba(24, 163, 94, 0); } }
+@keyframes pulseOff { 0% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.6); } 100% { box-shadow: 0 0 0 12px rgba(229, 57, 53, 0); } }
+.sys-btn { width: 100%; min-height: 60px; font-size: 1rem; }
+.sys-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.4rem; }
