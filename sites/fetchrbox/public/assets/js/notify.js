@@ -32,7 +32,8 @@ export function initNotify() {
   const visible = () => notifs.filter((n) => !state[n.id]?.deleted);
   const unread = () => visible().filter((n) => !state[n.id]?.read);
   const loc = () => (getLang() === 'ar' ? 'ar' : getLang() === 'en' ? 'en-GB' : 'ms-MY');
-  const fmt = (ts) => { try { return ts?.toDate ? new Intl.DateTimeFormat(loc(), { timeZone: 'Asia/Kuala_Lumpur', dateStyle: 'medium', timeStyle: 'short' }).format(ts.toDate()) : ''; } catch { return ''; } };
+  // Tarikh dan masa penuh. Notifikasi yang baru dihantar (cap masa pelayan belum sampai) dianggap "sekarang".
+  const fmt = (ts) => { try { const d = ts?.toDate ? ts.toDate() : new Date(); return new Intl.DateTimeFormat(loc(), { timeZone: 'Asia/Kuala_Lumpur', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(d); } catch { return ''; } };
 
   function paint() {
     if (!gotN || !gotS) return;
@@ -40,7 +41,7 @@ export function initNotify() {
     badge.hidden = un.length === 0;
     badge.textContent = un.length > 9 ? '9+' : String(un.length);
     list.innerHTML = all.length
-      ? all.map((n, i) => `<li class="nitem ${state[n.id]?.read ? '' : 'unread'}" style="--i:${Math.min(i, 8)}"><div class="nbody"><b>${esc(pick(n.title))}</b><p>${esc(pick(n.body))}</p><small>${esc(fmt(n.createdAt))}</small></div><button type="button" class="nx" data-del="${esc(n.id)}" aria-label="${esc(t('notif_del'))}">${icon('x')}</button></li>`).join('')
+      ? all.map((n, i) => `<li class="nitem ${state[n.id]?.read ? '' : 'unread'}" style="--i:${Math.min(i, 8)}"><div class="nbody"><b>${esc(pick(n.title))}</b><p>${esc(pick(n.body))}</p><small class="ntime"><span class="ico">${icon('clock')}</span>${esc(fmt(n.createdAt))}</small></div><button type="button" class="nx" data-del="${esc(n.id)}" aria-label="${esc(t('notif_del'))}">${icon('x')}</button></li>`).join('')
       : `<li class="nempty">${esc(t('notif_empty'))}</li>`;
     $('#notifClear').hidden = all.length === 0;
     // Pop-up kekal selagi ada notifikasi belum dibaca dan panel belum dibuka.

@@ -9,7 +9,7 @@ import { initNotify } from './notify.js';
 import { setupPwToggles } from './pw.js';
 
 const VIDEO = ['mp4', 'mov', 'mkv'];
-const AUDIO = ['mp3', 'm4a', 'wav', 'flac'];
+const AUDIO = ['mp3', 'wav', 'm4a', 'flac'];
 const QUALITIES = [['best', null], ['2160', '4K'], ['1440', '1440p'], ['1080', '1080p'], ['720', '720p'], ['480', '480p'], ['360', '360p']];
 const st = { cfg: null, user: null, info: null, mode: 'video', format: 'mp4', quality: 'best', busy: false, registering: false, phase: 'preparing', pct: 0 };
 
@@ -184,8 +184,9 @@ function paintProfile(d) {
   $('#bioText').textContent = bio || t('prof_bio_empty');
   $('#bioText').classList.toggle('muted', !bio);
   const stt = d.stats || {};
-  const mp4 = stt.mp4 || 0, mp3 = stt.mp3 || 0, other = stt.other || 0;
-  $('#stTotal').textContent = nf(stt.total ?? mp4 + mp3 + other);
+  const mp4 = stt.mp4 || 0, mp3 = stt.mp3 || 0, wav = stt.wav || 0, other = stt.other || 0;
+  $('#stTotal').textContent = nf(stt.total ?? mp4 + mp3 + wav + other);
+  $('#stWav').textContent = nf(wav); $('#stWavBox').hidden = wav === 0;
   $('#stMp4').textContent = nf(mp4); $('#stMp3').textContent = nf(mp3);
   $('#stOther').textContent = nf(other); $('#stOtherBox').hidden = other === 0;
   // Senarai muat turun (ditulis oleh pelayan): users/{uid}.recent = [{ title, format, platform, at }]
