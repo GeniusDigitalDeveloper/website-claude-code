@@ -7,6 +7,7 @@ import { $, $$, esc, hydrateIcons, setupReveal, toast, modal, reduced } from './
 import { initChat } from './chat.js';
 import { initNotify } from './notify.js';
 import { setupPwToggles } from './pw.js';
+import { openCropper } from './cropper.js';
 
 const VIDEO = ['mp4', 'mov', 'mkv'];
 const AUDIO = ['mp3', 'wav', 'm4a', 'flac'];
@@ -281,22 +282,14 @@ $('#photoInput').addEventListener('change', async (e) => {
   const file = e.target.files[0]; e.target.value = '';
   if (!file || !st.user) return;
   say('#pfMsg', '');
-  try { await fb.savePhoto(st.user.uid, await resizePhoto(file, 256)); sfx.success(); }
-  catch { say('#pfMsg', 'prof_err'); sfx.error(); }
+  if (!file.type.startsWith('image/')) { say('#pfMsg', 'prof_err'); sfx.error(); return; }
+  try {
+    // Pengguna memilih bahagian gambar (muka, badan dan sebagainya) dengan menyeret dan zum, kemudian tekan Selesai.
+    const cropped = await openCropper(file);
+    if (!cropped) return; // dibatalkan
+    await fb.savePhoto(st.user.uid, cropped);
+  } catch { say('#pfMsg', 'prof_err'); sfx.error(); }
 });
-function resizePhoto(file, size) {
-  return new Promise((resolve, reject) => {
-    const img = new Image(), u = URL.createObjectURL(file);
-    img.onload = () => {
-      const c = document.createElement('canvas'); c.width = c.height = size;
-      const m = Math.min(img.width, img.height), sx = (img.width - m) / 2, sy = (img.height - m) / 2;
-      c.getContext('2d').drawImage(img, sx, sy, m, m, 0, 0, size, size);
-      URL.revokeObjectURL(u); resolve(c.toDataURL('image/jpeg', 0.82));
-    };
-    img.onerror = () => { URL.revokeObjectURL(u); reject(new Error('img')); };
-    img.src = u;
-  });
-}
 
 /* ---------- Kesan platform ketika menaip ---------- */
 function hostOf(v) { try { return new URL(v.match(/https?:\/\/\S+/)?.[0] || '').hostname.toLowerCase(); } catch { return ''; } }
