@@ -584,3 +584,17 @@ footer.foot .foot-copy, footer.foot .foot-stats { text-align: center; margin: 0;
 .terms-note { max-width: 680px; margin: 1.2rem auto 0; }
 .terms { max-width: 680px; margin: 1rem auto 0; padding-inline-start: 1.4rem; display: grid; gap: 0.8rem; font-weight: 600; font-size: 0.92rem; color: var(--muted); line-height: 1.6; }
 .terms li::marker { color: var(--blue); font-weight: 800; }
+
+/* ================= Permohonan kelulusan: tab profil, status, butang ================= */
+.tt-tabs button { position: relative; }
+.tt-tabs { gap: 0.2rem; }
+.tt-tabs .cnt { margin-inline-start: 0.2rem; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 99px; background: #f59e0b; color: #1f1300; font: 700 0.66rem/18px var(--strong); font-style: normal; text-align: center; }
+.dl-row.req-row { grid-template-columns: auto 1fr auto; grid-template-areas: 'fmt ttl act' 'fmt when act'; }
+.dl-row .rq-dl { grid-area: act; align-self: center; min-height: 36px; padding: 0 0.8rem; font-size: 0.7rem; }
+.dl-row .fmt.s-pending { color: #3b2a00; background: linear-gradient(135deg, #ffd666, #f5a524); }
+.dl-row .fmt.s-approved { color: #fff; background: var(--grad); }
+.dl-row .fmt.s-rejected { color: #fff; background: linear-gradient(135deg, #ff6b63, #c62828); }
+.dl-row.req-row .fmt { min-width: 96px; font-size: 0.66rem; line-height: 1.25; }
+.dl-row .when { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tt-tabs button { white-space: nowrap; }
+@media (max-width: 640px) { .tt-tabs button { padding: 0.8rem 0.9rem; font-size: 0.74rem; } }

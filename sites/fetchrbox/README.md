@@ -84,3 +84,9 @@ Tiada cara sebenar untuk mengesahkan status hak cipta sesuatu video daripada met
 Ini usaha terbaik dan **bukan jaminan undang-undang**. Dapatkan nasihat peguam untuk terma dan dasar privasi rasmi.
 
 Ujian tapisan: `node --test server/classify.test.mjs`.
+
+## Kelulusan kandungan berhak cipta (permohonan kepada admin)
+1. Pautan yang ditolak (HTTP 451) memaparkan butang **Mohon kelulusan admin** (dan WhatsApp admin). Pengguna menulis penerangan ringkas, lalu dokumen `requests/{id}` dicipta (`status: pending`).
+2. Panel admin > **Kelulusan**: senarai masa nyata, penapis status, catatan pilihan, butang **Dibenarkan** / **Ditolak**. Keputusan menulis `status`, `adminNote`, `decidedAt`, `decidedBy` dan menghantar notis peribadi tiga bahasa ke `users/{uid}/notices/{id}` (muncul dalam loceng pengguna dengan pop-up merah).
+3. Profil pengguna > tab **Permohonan**: status Menunggu / Dibenarkan / Ditolak. Hanya yang Dibenarkan ada butang **Muat turun**.
+4. Pelayan menghormati kelulusan: permintaan membawa `approvalId` + `idToken`; pelayan membaca `requests/{id}` melalui REST Firestore menggunakan token pengguna itu (rules hanya benarkan pemilik membaca dan hanya admin menukar status) dan menyemak `status == approved` serta `url` sepadan (`server/approval.mjs`, ujian: `node --test server/`). Tiada kunci rahsia diperlukan.

@@ -56,6 +56,26 @@ service cloud.firestore {
         && (!('bio' in request.resource.data) || (request.resource.data.bio is string && request.resource.data.bio.size() <= 80));
       allow delete: if false;
     }
+    // Permohonan kelulusan kandungan berhak cipta: pengguna mohon (status pending), hanya admin boleh putuskan.
+    // Pelayan muat turun membaca status ini menggunakan token pengguna sendiri, jadi tidak boleh dipalsukan.
+    match /requests/{id} {
+      allow read: if isAdmin() || (request.auth != null && resource.data.uid == request.auth.uid);
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.keys().hasOnly(['uid', 'email', 'username', 'url', 'title', 'platform', 'code', 'message', 'status', 'createdAt'])
+        && request.resource.data.url is string && request.resource.data.url.size() <= 2048
+        && request.resource.data.message is string && request.resource.data.message.size() <= 300;
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'adminNote', 'decidedAt', 'decidedBy'])
+        && request.resource.data.status in ['pending', 'approved', 'rejected'];
+      allow delete: if false;
+    }
+    // Notis peribadi (cth keputusan permohonan): admin hantar kepada seorang pengguna, pengguna baca sendiri.
+    match /users/{uid}/notices/{nid} {
+      allow read: if isAdmin() || (request.auth != null && request.auth.uid == uid);
+      allow create: if isAdmin();
+    }
     // Notifikasi: admin hantar, semua pengguna yang log masuk boleh baca. Keadaan baca/padam disimpan per pengguna.
     match /notifications/{id} {
       allow read: if request.auth != null;

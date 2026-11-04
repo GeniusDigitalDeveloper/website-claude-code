@@ -1,7 +1,7 @@
 // Sambungan Firebase (projek fetchr-box-izzul). Kunci web Firebase memang awam; keselamatan dijaga oleh firestore.rules.
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
 import {
-  getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, collection, query, orderBy, limit, serverTimestamp, writeBatch,
+  getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, orderBy, limit, serverTimestamp, writeBatch,
 } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 import {
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
@@ -88,6 +88,18 @@ export const fb = {
   async deleteNotifs(uid, ids) { const b = writeBatch(db); ids.slice(0, 400).forEach((id) => b.set(doc(db, 'users', uid, 'nstate', id), { read: true, deleted: true }, { merge: true })); await b.commit(); },
   sendNotif: (n) => addDoc(collection(db, 'notifications'), { ...n, createdAt: serverTimestamp() }),
   removeNotif: (id) => deleteDoc(doc(db, 'notifications', id)),
+
+  /* ---- Notis peribadi (keputusan permohonan) ---- */
+  watchMyNotices(uid, cb) { return onSnapshot(collection(db, 'users', uid, 'notices'), (s) => cb(s.docs.map((d) => ({ id: 'p_' + d.id, ...d.data() }))), () => cb([])); },
+  sendNotice: (uid, n) => addDoc(collection(db, 'users', uid, 'notices'), { ...n, createdAt: serverTimestamp() }),
+
+  /* ---- Permohonan kelulusan kandungan berhak cipta ---- */
+  /** Token ID pengguna: dihantar kepada pelayan supaya ia boleh menyemak kelulusan atas nama pengguna. */
+  async idToken() { const u = auth.currentUser; return u ? u.getIdToken() : ''; },
+  createRequest: (data) => addDoc(collection(db, 'requests'), { ...data, status: 'pending', createdAt: serverTimestamp() }),
+  watchMyRequests(uid, cb) { return onSnapshot(query(collection(db, 'requests'), where('uid', '==', uid)), (s) => cb(s.docs.map((d) => ({ id: d.id, ...d.data() })).sort((a, b) => (b.createdAt?.seconds || 9e9) - (a.createdAt?.seconds || 9e9))), () => cb([])); },
+  watchRequests(cb) { return onSnapshot(query(collection(db, 'requests'), orderBy('createdAt', 'desc'), limit(200)), (s) => cb(s.docs.map((d) => ({ id: d.id, ...d.data() }))), () => cb([])); },
+  decideRequest: (id, status, note, by) => updateDoc(doc(db, 'requests', id), { status, adminNote: String(note || '').slice(0, 200), decidedAt: serverTimestamp(), decidedBy: by }),
 
   /* ---- Chat pengguna <-> admin ---- */
   watchMyChat(uid, cb) { return onSnapshot(query(collection(db, 'chats', uid, 'messages'), orderBy('at', 'asc'), limit(200)), (s) => cb(s.docs.map((d) => ({ id: d.id, ...d.data() }))), () => cb([])); },

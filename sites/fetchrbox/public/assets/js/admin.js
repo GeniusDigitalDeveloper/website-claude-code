@@ -4,6 +4,7 @@ import { sfx } from './sfx.js';
 import { $, $$, esc, hydrateIcons, toast, modal } from './ui.js';
 import { setupPwToggles } from './pw.js';
 import { initSystem, systemView, bindSystem } from './admin-system.js';
+import { initApprovals, resetApprovals, onRequests, approvalsView, bindApprovals } from './admin-approvals.js';
 import { initExtra, resetExtra, onChats, chatView, bindChat, notifsView, bindNotifs, paintSent, setSent } from './admin-extra.js';
 
 const TZ = 'Asia/Kuala_Lumpur';
@@ -11,6 +12,7 @@ let tab = 'overview';
 let site = null, summary = {}, daily = [], users = [], admins = [], me = { email: '', owner: false };
 initExtra({ getTab: () => tab, rerender: () => render(), getMe: () => me });
 initSystem({ getSite: () => site, rerender: () => render() });
+initApprovals({ getTab: () => tab, getMe: () => me });
 let stops = [];
 let clock;
 
@@ -55,13 +57,14 @@ function startWatching() {
     fb.watchUsers((u) => { users = u; if (['overview', 'users'].includes(tab)) render(); }),
     fb.watchAdmins((a) => { admins = a; if (tab === 'admins') render(); }),
     fb.watchChats(onChats),
+    fb.watchRequests(onRequests),
     fb.watchNotifs((n) => { setSent(n); if (tab === 'notifs') paintSent(); }),
   ];
   let last = todayKey();
   clock = setInterval(() => { const k = todayKey(); if (k !== last) { last = k; if (tab === 'overview') render(); } }, 20000);
   render();
 }
-function stopWatching() { stops.forEach((f) => f && f()); stops = []; clearInterval(clock); resetExtra(); }
+function stopWatching() { stops.forEach((f) => f && f()); stops = []; clearInterval(clock); resetExtra(); resetApprovals(); }
 
 $('#tabs').addEventListener('click', (e) => {
   const b = e.target.closest('button[data-tab]'); if (!b) return;
@@ -71,11 +74,11 @@ $('#tabs').addEventListener('click', (e) => {
 function render() {
   if (!site) return;
   $$('#tabs button').forEach((b) => { if (b.dataset.tab === tab) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
-  document.body.dataset.theme = { overview: 'home', platforms: 'cara', faq: 'faq', chat: 'home', notifs: 'profil', users: 'profil', admins: 'cara', system: 'faq', settings: 'faq' }[tab];
+  document.body.dataset.theme = { overview: 'home', platforms: 'cara', faq: 'faq', chat: 'home', approvals: 'cara', notifs: 'profil', users: 'profil', admins: 'cara', system: 'faq', settings: 'faq' }[tab];
   const c = $('#content');
-  c.innerHTML = `<div class="view">${{ overview, platforms, faq, chat: chatView, notifs: notifsView, system: systemView, users: usersView, admins: adminsView, settings }[tab]()}</div>`;
+  c.innerHTML = `<div class="view">${{ overview, platforms, faq, chat: chatView, approvals: approvalsView, notifs: notifsView, system: systemView, users: usersView, admins: adminsView, settings }[tab]()}</div>`;
   hydrateIcons(c);
-  ({ overview: () => {}, platforms: bindPlatforms, faq: bindFaq, chat: bindChat, notifs: bindNotifs, system: bindSystem, users: () => {}, admins: bindAdmins, settings: bindSettings }[tab])();
+  ({ overview: () => {}, platforms: bindPlatforms, faq: bindFaq, chat: bindChat, approvals: bindApprovals, notifs: bindNotifs, system: bindSystem, users: () => {}, admins: bindAdmins, settings: bindSettings }[tab])();
 }
 const guard = async (fn) => {
   try { await fn(); toast('Disimpan'); sfx.success(); }

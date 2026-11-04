@@ -153,7 +153,61 @@ $('#forgotForm').addEventListener('submit', async (e) => {
 
 $('#logoutBtn').addEventListener('click', () => fb.logout());
 
-let stopProfile = null;
+let stopProfile = null, stopReq = null, requests = [], nRecent = 0, ptab = 'dl';
+
+/* ---------- Permohonan kelulusan admin untuk kandungan berhak cipta ---------- */
+async function approval() { return st.approval ? { id: st.approval, token: await fb.idToken() } : null; }
+function applyTab() {
+  $$('[data-ptab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.ptab === ptab)));
+  $('#dlList').hidden = !(ptab === 'dl' && nRecent > 0);
+  $('#ttEmpty').hidden = !(ptab === 'dl' && nRecent === 0);
+  $('#reqList').hidden = !(ptab === 'req' && requests.length > 0);
+  $('#reqEmpty').hidden = !(ptab === 'req' && requests.length === 0);
+}
+$$('[data-ptab]').forEach((b) => b.addEventListener('click', () => { ptab = b.dataset.ptab; applyTab(); sfx.pop(); }));
+function paintRequests() {
+  const pending = requests.filter((r) => r.status === 'pending').length;
+  $('#reqCnt').hidden = pending === 0; $('#reqCnt').textContent = String(pending);
+  const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return ''; } };
+  $('#reqList').innerHTML = requests.map((r) => {
+    const s = ['approved', 'rejected'].includes(r.status) ? r.status : 'pending';
+    return `<li class="dl-row req-row"><span class="fmt s-${s}">${esc(t('req_' + s))}</span><span class="ttl">${esc(r.title || r.url)}</span><span class="when">${esc([host(r.url), r.adminNote ? t('req_note') + ': ' + r.adminNote : ''].filter(Boolean).join(' · '))}</span>${s === 'approved' ? `<button type="button" class="btn gold sm rq-dl" data-rq="${esc(r.id)}"><span class="ico" data-ico="download"></span><span class="t">${esc(t('req_dl'))}</span></button>` : ''}</li>`;
+  }).join('');
+  hydrateIcons($('#reqList'));
+  applyTab();
+}
+document.addEventListener('langchange', paintRequests);
+$('#reqList').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-rq]');
+  const r = b && requests.find((x) => x.id === b.dataset.rq);
+  if (!r || r.status !== 'approved') return;
+  // Muat turun kandungan yang telah dibenarkan admin: isi pautan, tanda pengakuan dan imbas semula.
+  st.approval = r.id; location.hash = '';
+  $('#url').value = r.url; $('#decl').checked = true; detect();
+  sfx.pop(); setTimeout(() => $('#form').requestSubmit(), 350);
+});
+
+/** Borang permohonan kelulusan selepas pautan ditolak atas sebab hak cipta. */
+function openRequest(err) {
+  const d = err.data || {};
+  const dup = requests.find((r) => r.url === d.url && ['pending', 'approved'].includes(r.status));
+  if (dup) { toast(t('req_dup')); sfx.error(); return; }
+  const f = document.createElement('form'); f.noValidate = true;
+  f.innerHTML = `<div class="f"><label for="rqMsg" class="sr">${esc(t('req_title'))}</label><textarea id="rqMsg" maxlength="300" rows="4" placeholder="${esc(t('req_ph'))}"></textarea></div><p class="msgline" id="rqErr" role="alert"></p>`;
+  f.addEventListener('submit', (e) => e.preventDefault());
+  const close = modal({
+    icon: 'shield', title: t('req_title'), text: t('req_hint'), body: f,
+    actions: [{ label: t('req_send'), cls: 'gold', keep: true, onClick: async () => {
+      const message = $('#rqMsg', f).value.trim();
+      if (message.length < 5) { say('#rqErr', 'req_short'); sfx.error(); return; }
+      try {
+        await fb.createRequest({ uid: st.user.uid, email: st.user.email, username: profile.username || (st.user.email || '').split('@')[0], url: d.url || '', title: String(d.title || '').slice(0, 200), platform: d.platform || '', code: String(err.code || '').replace('copyright_', ''), message });
+        close(); toast(t('req_sent')); sfx.success();
+      } catch { say('#rqErr', 'req_err'); sfx.error(); }
+    } }],
+  });
+}
+
 fb.onUser((user) => {
   if (st.registering) return; // abaikan log masuk sementara semasa pendaftaran
   st.user = user;
@@ -163,10 +217,13 @@ fb.onUser((user) => {
   notifyApi.setUser(user);
   if (chatApi) chatApi.setUser(user);
   if (stopProfile) { stopProfile(); stopProfile = null; }
+  if (stopReq) { stopReq(); stopReq = null; }
+  requests = []; paintRequests();
   if (user) {
     paintProfile({});
     fb.ensureProfile(user, getLang());
     stopProfile = fb.watchProfile(user.uid, paintProfile);
+    stopReq = fb.watchMyRequests(user.uid, (r) => { requests = r; paintRequests(); });
   } else {
     hideResult(); $('#url').value = ''; $('#detected').textContent = '';
     $$('.pchip').forEach((c) => c.classList.toggle('on', false));
@@ -201,8 +258,7 @@ function paintProfile(d) {
     const fmt = String(r.format || '').toLowerCase();
     return `<li class="dl-row"><span class="fmt f-${esc(fmt)}">${esc(fmt.toUpperCase())}</span><span class="ttl">${esc(r.title || '')}</span><span class="when">${esc([r.platform, when(r.at)].filter(Boolean).join(' · '))}</span></li>`;
   }).join('');
-  $('#dlList').hidden = recent.length === 0;
-  $('#ttEmpty').hidden = recent.length > 0;
+  nRecent = recent.length; applyTab();
   const img = $('#avatarImg');
   if (d.photo) { img.src = d.photo; img.hidden = false; $('#avatarInit').hidden = true; } else { img.hidden = true; $('#avatarInit').hidden = false; }
 }
@@ -257,7 +313,7 @@ function detect() {
   else if (!p.enabled) d.textContent = t('det_off', { name: p.name });
   else d.innerHTML = t('det_ok', { name: esc(p.name) });
 }
-$('#url').addEventListener('input', detect);
+$('#url').addEventListener('input', () => { st.approval = null; detect(); }); // menaip semula = kelulusan tidak terpakai lagi
 $('#pasteBtn').addEventListener('click', async () => {
   try {
     const v = await navigator.clipboard.readText();
@@ -274,7 +330,7 @@ $('#form').addEventListener('submit', async (e) => {
   if (!needDecl()) return;
   setBusy($('#checkBtn'), true, t('checking'));
   hideResult();
-  try { st.info = await api.info(url); sfx.pop(); renderResult(st.info); }
+  try { st.info = await api.info(url, await approval()); sfx.pop(); renderResult(st.info); }
   catch (err) { failModal(err); }
   finally { setBusy($('#checkBtn'), false, t('btn_check')); }
 });
@@ -298,7 +354,7 @@ function needDecl() {
 function failModal(err) {
   if (String(err.code || '').startsWith('copyright_')) {
     const key = 'cr_' + err.code.slice('copyright_'.length);
-    return modal({ icon: 'shield', err: true, title: t('cr_title'), text: t(key) === key ? err.message : t(key), actions: [{ label: t('chat_wa'), cls: 'ghost', href: 'https://wa.me/60177977935?text=' + encodeURIComponent(t('wa_text')), keep: false, external: true }] });
+    return modal({ icon: 'shield', err: true, title: t('cr_title'), text: t(key) === key ? err.message : t(key), actions: [{ label: t('cr_apply'), cls: 'gold', keep: true, onClick: () => openRequest(err) }, { label: t('chat_wa'), cls: 'ghost', href: 'https://wa.me/60177977935?text=' + encodeURIComponent(t('wa_text')), external: true }] });
   }
   if (err.offline) modal({ icon: 'alert', err: true, title: t('m_off_title'), text: t('m_off_text') });
   else modal({ icon: 'alert', err: true, title: t('m_fail_title'), text: err.message });
@@ -343,7 +399,7 @@ $('#goBtn').addEventListener('click', async () => {
   setBusy(btn, true, t('preparing'));
   $('#progress').classList.add('show'); setProgress(0, 'preparing');
   try {
-    const { id } = await api.startJob(st.info.url, st.format, st.mode === 'audio' ? 'best' : st.quality);
+    const { id } = await api.startJob(st.info.url, st.format, st.mode === 'audio' ? 'best' : st.quality, await approval());
     for (;;) {
       await new Promise((r) => setTimeout(r, 800));
       const j = await api.job(id);

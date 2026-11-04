@@ -146,3 +146,22 @@
 @keyframes pulseOff { 0% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.6); } 100% { box-shadow: 0 0 0 12px rgba(229, 57, 53, 0); } }
 .sys-btn { width: 100%; min-height: 60px; font-size: 1rem; }
 .sys-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.4rem; }
+
+/* Kelulusan */
+.rq-filter { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.9rem; }
+.rq-filter button { display: inline-flex; align-items: center; gap: 0.4rem; min-height: 38px; padding: 0 0.9rem; border-radius: 99px; background: #fff; box-shadow: 0 0 0 1px rgba(11, 27, 51, 0.1); font-family: var(--strong); font-weight: 600; font-size: 0.82rem; color: var(--muted); transition: background 0.25s, color 0.25s; }
+.rq-filter button em { font-style: normal; font-weight: 700; font-size: 0.72rem; padding: 0 0.4rem; border-radius: 99px; background: rgba(11, 27, 51, 0.08); }
+.rq-filter button[aria-selected='true'] { color: #fff; background: var(--grad); }
+.rq-filter button[aria-selected='true'] em { background: rgba(255, 255, 255, 0.25); }
+.row-item.rq { flex-wrap: wrap; align-items: flex-start; }
+.row-item.rq .txt small { white-space: normal; }
+.rq-link { display: block; margin-top: 0.25rem; font-size: 0.8rem; font-weight: 600; word-break: break-all; }
+.rq-msg { margin: 0.35rem 0; padding: 0.5rem 0.7rem; border-radius: 10px; background: rgba(var(--b-rgb), 0.07); font-size: 0.86rem; font-weight: 600; font-style: italic; }
+.rq-note { width: 100%; min-height: 38px; padding: 0 0.7rem; border-radius: 10px; border: 1px solid var(--line); background: #fff; font-weight: 600; font-size: 0.84rem; }
+.rq-note:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(var(--b-rgb), 0.16); }
+.rq-chip { align-self: center; padding: 0.25rem 0.7rem; border-radius: 99px; font-family: var(--strong); font-weight: 700; font-size: 0.7rem; letter-spacing: 0.03em; }
+.rq-chip.pending { color: #5a3b00; background: #ffe7a8; }
+.rq-chip.approved { color: #fff; background: var(--grad); }
+.rq-chip.rejected { color: #fff; background: linear-gradient(135deg, #ff6b63, #c62828); }
+.rq-acts { align-self: center; }
+@media (max-width: 900px) { .row-item.rq .rq-acts { width: 100%; } .row-item.rq .rq-acts .btn { flex: 1; } }

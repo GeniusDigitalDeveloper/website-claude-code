@@ -7,7 +7,10 @@ import { icon } from './icons.js';
 
 export function initNotify() {
   const bell = $('#bellBtn'), badge = $('#bellBadge'), panel = $('#notifPanel'), list = $('#nList'), pop = $('#notifPop');
-  let uid = null, notifs = [], state = {}, gotN = false, gotS = false, stops = [], isOpen = false, lastUnread = -1;
+  let uid = null, notifs = [], gList = [], pList = [], state = {}, gotN = false, gotS = false, gotP = false, stops = [], isOpen = false, lastUnread = -1;
+  // Notifikasi umum (semua pengguna) digabung dengan notis peribadi (cth keputusan permohonan), terbaharu dahulu.
+  const secs = (n) => n.createdAt?.seconds ?? Date.now() / 1000;
+  const merge = () => { notifs = [...gList, ...pList].sort((a, b) => secs(b) - secs(a)); };
   $('#bellIco').innerHTML = icon('bell');
   $('#npopT').textContent = '';
 
@@ -36,7 +39,7 @@ export function initNotify() {
   const fmt = (ts) => { try { const d = ts?.toDate ? ts.toDate() : new Date(); return new Intl.DateTimeFormat(loc(), { timeZone: 'Asia/Kuala_Lumpur', day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(d); } catch { return ''; } };
 
   function paint() {
-    if (!gotN || !gotS) return;
+    if (!gotN || !gotS || !gotP) return;
     const un = unread(), all = visible();
     badge.hidden = un.length === 0;
     badge.textContent = un.length > 9 ? '9+' : String(un.length);
@@ -85,11 +88,12 @@ export function initNotify() {
   return {
     setUser(user) {
       stops.forEach((s) => s && s()); stops = [];
-      uid = user ? user.uid : null; notifs = []; state = {}; gotN = gotS = false; lastUnread = -1; isOpen = false;
+      uid = user ? user.uid : null; notifs = []; gList = []; pList = []; state = {}; gotN = gotS = gotP = false; lastUnread = -1; isOpen = false;
       panel.hidden = true; pop.hidden = true; bell.hidden = !user;
       if (!user) return;
       stops = [
-        fb.watchNotifs((n) => { notifs = n; gotN = true; paint(); }),
+        fb.watchNotifs((n) => { gList = n; gotN = true; merge(); paint(); }),
+        fb.watchMyNotices(uid, (n) => { pList = n; gotP = true; merge(); paint(); }),
         fb.watchNState(uid, (s) => { state = s; gotS = true; paint(); }),
       ];
     },

@@ -163,6 +163,7 @@ function friendly(stderr = '') {
    2) muzik, filem/siri dan kandungan terhad/berbayar yang jelas dikenal pasti ditolak (kod copyright_*);
    3) selebihnya dibenarkan HANYA jika pengguna mengesahkan pengakuan (declared) dan pengesahan itu direkodkan. */
 import { classify, REJECT_MSG } from './classify.mjs';
+import { checkApproval } from './approval.mjs';
 const verdictCache = new Map(); // url -> { at, verdict }
 function recordBlocked(platform, code) {
   db.stats.blocked = (db.stats.blocked || 0) + 1;
@@ -170,7 +171,8 @@ function recordBlocked(platform, code) {
   db.logs.length = Math.min(db.logs.length, 100);
   saveDb();
 }
-const blockedReply = (verdict) => ({ error: REJECT_MSG[verdict.code], code: 'copyright_' + verdict.code });
+// Respons tolak membawa tajuk/pautan supaya pengguna boleh memohon kelulusan admin (requests/{id}).
+const blockedReply = (verdict, extra = {}) => ({ error: REJECT_MSG[verdict.code], code: 'copyright_' + verdict.code, ...extra });
 const needDeclare = { error: 'Sila sahkan pengakuan hak cipta dahulu.', code: 'declare' };
 
 async function getInfo(url) {
@@ -178,7 +180,7 @@ async function getInfo(url) {
   const j = JSON.parse(out);
   const heights = [...new Set((j.formats || []).map((f) => f.height).filter(Boolean))].sort((a, b) => b - a);
   const verdict = classify(j);
-  verdictCache.set(url, { at: Date.now(), verdict });
+  verdictCache.set(url, { at: Date.now(), verdict, title: j.title || '' });
   return { title: j.title || 'Video', thumbnail: j.thumbnail || '', duration: j.duration || 0, uploader: j.uploader || j.channel || '', maxHeight: heights[0] || 0, isLive: !!j.is_live, verdict };
 }
 
@@ -291,7 +293,9 @@ async function api(req, res, url) {
     if (body.declared !== true) return send(res, 400, needDeclare);
     try {
       const { verdict, ...info } = await getInfo(r.url);
-      if (!verdict.ok) { recordBlocked(r.platform.id, verdict.code); return send(res, 451, blockedReply(verdict)); }
+      // Kelulusan admin (disemak melalui token pengguna) mengatasi tapisan hak cipta untuk pautan ini sahaja.
+      const approved = !verdict.ok && await checkApproval({ idToken: body.idToken, approvalId: body.approvalId, url: r.url });
+      if (!verdict.ok && !approved) { recordBlocked(r.platform.id, verdict.code); return send(res, 451, blockedReply(verdict, { title: info.title, url: r.url, platform: r.platform.name })); }
       if (info.isLive) return send(res, 400, { error: 'Siaran langsung belum boleh dimuat turun. Tunggu ia tamat.' });
       if (info.duration > MAX_DURATION) return send(res, 400, { error: `Video terlalu panjang (had ${MAX_DURATION / 60} minit).` });
       return send(res, 200, { ...info, platform: { id: r.platform.id, name: r.platform.name }, url: r.url });
@@ -312,9 +316,12 @@ async function api(req, res, url) {
     // Semak semula status hak cipta sebelum muat turun (guna keputusan 10 minit terakhir jika ada).
     let cached = verdictCache.get(r.url);
     if (!cached || Date.now() - cached.at > 10 * 60e3) {
-      try { cached = { verdict: (await getInfo(r.url)).verdict }; } catch (e) { return send(res, 422, { error: friendly(e.stderr) }); }
+      try { const gi = await getInfo(r.url); cached = { verdict: gi.verdict, title: gi.title }; } catch (e) { return send(res, 422, { error: friendly(e.stderr) }); }
     }
-    if (!cached.verdict.ok) { recordBlocked(r.platform.id, cached.verdict.code); return send(res, 451, blockedReply(cached.verdict)); }
+    if (!cached.verdict.ok && !(await checkApproval({ idToken: body.idToken, approvalId: body.approvalId, url: r.url }))) {
+      recordBlocked(r.platform.id, cached.verdict.code);
+      return send(res, 451, blockedReply(cached.verdict, { title: cached.title || '', url: r.url, platform: r.platform.name }));
+    }
     const format = String(body.format || 'mp4').toLowerCase();
     const quality = String(body.quality || 'best');
     if (![...VIDEO_FORMATS, ...AUDIO_FORMATS].includes(format) || !QUALITIES.includes(quality)) return send(res, 400, { error: 'Format atau kualiti tidak sah.' });

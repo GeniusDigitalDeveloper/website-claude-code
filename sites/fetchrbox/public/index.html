@@ -202,8 +202,13 @@
             <p class="msgline" id="pfMsg" role="alert"></p>
           </div>
         </div>
-        <div class="tt-tabs" role="tablist"><button type="button" role="tab" aria-selected="true"><span class="ico" data-ico="grid"></span><span data-i18n="prof_tab">Muat turun</span></button></div>
+        <div class="tt-tabs" role="tablist">
+          <button type="button" role="tab" id="ptabDl" data-ptab="dl" aria-selected="true"><span class="ico" data-ico="grid"></span><span data-i18n="prof_tab">Muat turun</span></button>
+          <button type="button" role="tab" id="ptabReq" data-ptab="req" aria-selected="false"><span class="ico" data-ico="shield"></span><span data-i18n="prof_tab_req">Permohonan</span><i class="cnt" id="reqCnt" hidden>0</i></button>
+        </div>
         <ul class="dl-list" id="dlList"></ul>
+        <ul class="dl-list req-list" id="reqList" hidden></ul>
+        <div class="tt-empty" id="reqEmpty" hidden><span class="ico" data-ico="shield"></span><b data-i18n="req_empty">Tiada permohonan</b><span data-i18n="req_empty_sub">Permohonan kelulusan anda akan disenaraikan di sini.</span></div>
         <div class="tt-empty" id="ttEmpty"><span class="ico" data-ico="download"></span><b data-i18n="prof_empty">Belum ada muat turun</b><span data-i18n="prof_empty_sub">Muat turun yang berjaya akan muncul di sini.</span></div>
       </div>
     </section>
