@@ -1,8 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Logo Fetchr Box">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F6DE9A"/><stop offset="1" stop-color="#B8923A"/></linearGradient>
-    <linearGradient id="e" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2EC4A0"/><stop offset="1" stop-color="#0B5F50"/></linearGradient>
-  </defs>
-  <path d="M32 3l6.6 9.4 11.4-1.4-1.4 11.4L58.9 29 49.4 32l9.5 3-9.3 7.6 1.4 11.4-11.4-1.4L32 61l-6.6-9.4-11.4 1.4 1.4-11.4L5.1 35l9.5-3-9.5-3 9.3-7.6-1.4-11.4 11.4 1.4z" fill="url(#e)" stroke="url(#g)" stroke-width="2.2" stroke-linejoin="round"/>
-  <path d="M32 17v20m0 0l-8-8m8 8l8-8M22 45h20" fill="none" stroke="#FFF3CC" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8a6bff"/><stop offset="1" stop-color="#ff4d7d"/></linearGradient></defs>
+  <path d="M32 4l22 12v24L32 52 10 40V16z" fill="url(#g)"/>
+  <path d="M10 16l22 12 22-12M32 28v24" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M32 14v17m0 0l-6-6m6 6l6-6M22 58h20" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

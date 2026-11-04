@@ -1,7 +1,7 @@
 import { api, fileUrl, DEMO } from './api.js';
 import { platformIcon } from './icons.js';
 import { sfx } from './sfx.js';
-import { $, $$, esc, hydrateIcons, setupReveal, setupSound, toast, modal, reduced } from './ui.js';
+import { $, $$, esc, hydrateIcons, setupReveal, toast, modal, reduced } from './ui.js';
 import { initChat } from './chat.js';
 
 const VIDEO = ['mp4', 'mov', 'mkv'];
@@ -13,7 +13,6 @@ const fmtTime = (s) => { if (!s) return ''; const h = Math.floor(s / 3600), m = 
 const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
 hydrateIcons();
-setupSound($('#soundBtn'));
 setupReveal();
 
 /* ---------- Konfigurasi dari pelayan (platform, FAQ, pengumuman) ---------- */

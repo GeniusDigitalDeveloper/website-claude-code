@@ -283,3 +283,49 @@ a { color: #7a5a0c; }
 .wordmark { font-size: clamp(2.8rem, 12.5vw, 8.2rem); flex-wrap: wrap; row-gap: 0; }
 .wordmark .sp { display: inline-block; width: 0.28em; }
 .wordmark .alt span { background: linear-gradient(180deg, #f2d68a 0%, #d4a937 45%, #9a7418 100%); -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 12px 22px rgba(154, 116, 24, 0.28)); }
+
+/* ================= TEMA DIGITAL: violet + koral, cerah (menimpa tema sebelum ini) ================= */
+:root {
+  --bg0: #f6f4ff; --bg1: #fbfaff; --bg2: #e9e4ff;
+  --emerald: #6d4aff; --emerald-d: #4a2fd1; --gold: #ff6b6b; --gold-l: #ff9a9e; --gold-d: #c2255c;
+  --text: #1b1740; --muted: #55527a; --danger: #c62828; --ok: #4a2fd1;
+  --glass: rgba(255, 255, 255, 0.66); --glass-2: rgba(255, 255, 255, 0.9);
+  --line: rgba(109, 74, 255, 0.26); --line-soft: rgba(27, 23, 64, 0.12);
+  --grad: linear-gradient(135deg, #6d3df5 0%, #b02fd1 55%, #d9347a 100%);
+}
+a { color: #4a2fd1; }
+:focus-visible { outline-color: #6d4aff; }
+.bg { background: radial-gradient(1000px 640px at 85% -10%, #ddd3ff, transparent 60%), radial-gradient(900px 600px at 0% 100%, #ffd9e4, transparent 60%), linear-gradient(180deg, #fbfaff, #f3f0ff); }
+.bg::before { opacity: 0.5; background-image: radial-gradient(circle, rgba(109, 74, 255, 0.28) 1.3px, transparent 1.5px); background-size: 44px 44px; }
+.orb.a { background: #b9a7ff; opacity: 0.5; }
+.orb.b { background: #ffb3c7; opacity: 0.55; }
+.glass { box-shadow: 0 22px 50px -28px rgba(74, 47, 209, 0.45), inset 0 1px 0 #fff; }
+.glass::before { background: radial-gradient(circle, rgba(217, 52, 122, 0.14), transparent 65%); }
+.announce { background: linear-gradient(90deg, rgba(109, 74, 255, 0.18), rgba(255, 107, 107, 0.2)); }
+.kicker { color: #4a2fd1; background: rgba(109, 74, 255, 0.12); }
+.kicker > svg, .pchip .ico, .input-wrap .ico, .faq summary .ico { color: #6d4aff; }
+.wordmark span { background: linear-gradient(180deg, #8f72ff 0%, #4a2fd1 62%, #2b1a8f 100%); -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 12px 22px rgba(74, 47, 209, 0.25)); }
+.wordmark .alt span { background: linear-gradient(180deg, #ff9a6b 0%, #ff4d7d 50%, #c2255c 100%); -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 12px 22px rgba(217, 52, 122, 0.28)); }
+.btn.gold { color: #fff; background: var(--grad); box-shadow: 0 12px 28px -10px rgba(109, 61, 245, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.35); }
+.btn.gold:hover { box-shadow: 0 18px 34px -10px rgba(176, 47, 209, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.35); }
+.input-wrap input:focus, .chat form input:focus { border-color: #6d4aff; box-shadow: 0 0 0 4px rgba(109, 74, 255, 0.2); }
+.seg button[aria-pressed='true'] { color: #fff; background: var(--grad); }
+.chip input:checked + span { color: #3b24b3; border-color: #6d4aff; background: rgba(109, 74, 255, 0.14); }
+.pchip.on { border-color: #6d4aff; background: rgba(109, 74, 255, 0.14); }
+.card:hover { border-color: rgba(109, 74, 255, 0.55); }
+.card .badge { color: #4a2fd1; background: linear-gradient(135deg, rgba(109, 74, 255, 0.16), rgba(255, 107, 107, 0.18)); }
+.steps .card::after { color: rgba(109, 74, 255, 0.12); }
+.sheet { background: linear-gradient(160deg, #ffffff, #f1edff); }
+.sheet .big { color: #fff; background: var(--grad); box-shadow: 0 14px 34px -10px rgba(176, 47, 209, 0.6); }
+.sheet .big.err { background: linear-gradient(135deg, #ff8a80, #c62828); }
+.overlay { background: rgba(27, 23, 64, 0.42); }
+.toast { background: #1b1740; color: #fff; border-color: rgba(255, 255, 255, 0.2); }
+.chat { background: linear-gradient(160deg, rgba(255, 255, 255, 0.97), rgba(241, 237, 255, 0.97)); }
+.chat header .av, .fab { color: #fff; background: var(--grad); }
+.fab { box-shadow: 0 16px 36px -10px rgba(176, 47, 209, 0.65); }
+.fab::after { border-color: #b02fd1; }
+.msg.me { color: #fff; background: var(--grad); }
+.typing i { background: #6d4aff; }
+.row-item .pi { color: #4a2fd1; background: rgba(109, 74, 255, 0.1); }
+.thumb { background: linear-gradient(135deg, #6d4aff, #ff6b6b); }
+.btn.gold .spin { border-color: #fff; border-right-color: transparent; }

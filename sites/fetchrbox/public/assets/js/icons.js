@@ -15,8 +15,6 @@ export const ICONS = {
   globe: s('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/>'),
   chat: s('<path d="M21 12a8 8 0 01-11.5 7.2L4 20.5l1.4-4.6A8 8 0 1121 12z"/><path d="M8.5 11h7M8.5 14.5h4"/>'),
   send: s('<path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/>'),
-  soundOn: s('<path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M15.5 9a4 4 0 010 6M18 6.5a8 8 0 010 11"/>'),
-  soundOff: s('<path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/>'),
   dashboard: s('<rect x="3" y="3" width="7.5" height="9" rx="2"/><rect x="13.5" y="3" width="7.5" height="5.5" rx="2"/><rect x="13.5" y="11.5" width="7.5" height="9.5" rx="2"/><rect x="3" y="15" width="7.5" height="6" rx="2"/>'),
   layers: s('<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/>'),
   help: s('<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.6 2.6 0 015 .8c0 1.7-2.5 2-2.5 3.7M12 17v.1"/>'),

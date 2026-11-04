@@ -1,13 +1,12 @@
 import { fb } from './firebase.js';
 import { platformIcon } from './icons.js';
 import { sfx } from './sfx.js';
-import { $, $$, esc, hydrateIcons, setupSound, toast, modal } from './ui.js';
+import { $, $$, esc, hydrateIcons, toast, modal } from './ui.js';
 
 let data = null;
 let tab = 'overview';
 
 hydrateIcons();
-setupSound($('#soundBtn'));
 
 /* ---------- Log masuk (Firebase Auth, Google) ---------- */
 $('#loginBtn').addEventListener('click', async () => {

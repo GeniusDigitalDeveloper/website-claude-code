@@ -32,16 +32,6 @@ export function setupReveal() {
   }, { passive: true });
 }
 
-export function setupSound(btn) {
-  const paint = () => {
-    btn.innerHTML = icon(sfx.enabled ? 'soundOn' : 'soundOff');
-    btn.setAttribute('aria-pressed', String(sfx.enabled));
-    btn.setAttribute('aria-label', sfx.enabled ? 'Matikan bunyi' : 'Hidupkan bunyi');
-  };
-  btn.addEventListener('click', () => { sfx.toggle(); paint(); });
-  paint();
-}
-
 let toastTimer;
 export function toast(msg) {
   const t = $('#toast');

@@ -102,3 +102,10 @@
 .divider { display: flex; align-items: center; gap: 0.7rem; color: var(--muted); font-size: 0.85rem; }
 .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--line-soft); }
 .login form.em { display: grid; gap: 0.7rem; width: 100%; }
+
+/* Tema digital */
+.side nav button[aria-current='page'] { color: #fff; background: var(--grad); }
+.stat b { background: var(--grad); -webkit-background-clip: text; background-clip: text; }
+.icons input:checked + span { color: #3b24b3; border-color: #6d4aff; background: rgba(109, 74, 255, 0.14); }
+.bars i { background: linear-gradient(180deg, #d9347a, #6d3df5); }
+.login input:focus, .f input:focus, .f textarea:focus, .f select:focus { border-color: #6d4aff; box-shadow: 0 0 0 4px rgba(109, 74, 255, 0.2); }
