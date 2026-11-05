@@ -3,7 +3,7 @@
   "storage": { "rules": "storage.rules" },
   "hosting": {
     "public": ".",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**", "scripts/**", "design-system/**", "*.rules", "database.rules.json", "README.md", "preview.html"],
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**", "scripts/**", "design-system/**", "*.rules", "database.rules.json", "README.md"],
     "cleanUrls": false,
     "headers": [
       { "source": "**/*.@(js|css|svg)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=3600" }] },

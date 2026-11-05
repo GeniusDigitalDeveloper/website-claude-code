@@ -5,14 +5,12 @@ HTML + CSS + JavaScript biasa (tiada framework, tiada build). Backend: Firebase 
 ```
 index.html        Website awam (nav, hero, about, products, contact, footer)
 admin.html        Admin Panel (login, dashboard, CRUD produk, upload thumbnail)
-config.js         SATU tempat: Firebase config + maklumat kenalan
+bahagian GENIUS_CONFIG dalam index.html dan admin.html         SATU tempat: Firebase config + maklumat kenalan
 firestore.rules   Rules Firestore          storage.rules    Rules Storage
 database.rules.json  Rules Realtime Database (TIDAK digunakan — lihat nota)
 firebase.json     Konfigurasi deploy rules + hosting
 scripts/set-admin.js  Tetapkan admin (jalankan di komputer anda)
-assets/           logo, favicon, thumbnail SVG QR Me Generator & Malaysia PDF Tools
 design-system/    MASTER.md (warna, font, peraturan reka bentuk)
-preview.html      Preview desktop + mobile
 ```
 
 ## 0. Lihat preview serta-merta (tanpa Firebase)
@@ -20,7 +18,7 @@ preview.html      Preview desktop + mobile
 cd sites/genius-digital
 python3 -m http.server 8000      # kemudian buka http://localhost:8000/preview.html
 ```
-Selagi `config.js` masih placeholder: website memaparkan 2 produk contoh (banner "Mod demo"), dan `admin.html` ada butang **"Lihat UI demo"** (data dalam memori sahaja; hilang automatik bila Firebase dikonfigurasi). Ini bukan login palsu: tiada kata laluan dan tiada akses ke data sebenar.
+Selagi `bahagian GENIUS_CONFIG dalam index.html dan admin.html` masih placeholder: website memaparkan 2 produk contoh (banner "Mod demo"), dan `admin.html` ada butang **"Lihat UI demo"** (data dalam memori sahaja; hilang automatik bila Firebase dikonfigurasi). Ini bukan login palsu: tiada kata laluan dan tiada akses ke data sebenar.
 
 ## 1. Sediakan projek Firebase
 1. https://console.firebase.google.com → **Add project** → nama: `Genius Digital`. Google Analytics boleh dimatikan.
@@ -37,7 +35,7 @@ Selagi `config.js` masih placeholder: website memaparkan 2 produk contoh (banner
 **Build → Storage → Get started.** Nota kos: Google kini mewajibkan pelan **Blaze (bayar ikut guna)** untuk mengaktifkan Cloud Storage pada projek baharu. Ia ada kuota percuma, tetapi kad bayaran diperlukan dan kos boleh timbul jika melebihi kuota. Tiada apa diaktifkan automatik oleh kod ini. Sila semak harga semasa di halaman *Firebase Pricing* sebelum menaik taraf. Jika tidak mahu Blaze, Firestore + Authentication kekal percuma (Spark); thumbnail produk akan guna aset SVG lalai dalam `assets/thumbs/`. Anda boleh set Budget alert di Google Cloud Billing.
 
 ## 5. Masukkan konfigurasi ke dalam kod
-Buka `config.js`, gantikan nilai `firebase: { ... }` dengan `firebaseConfig` anda. Config web Firebase bukan rahsia; keselamatan datang daripada Rules + Auth. Isi juga `contact` (emel, WhatsApp, media sosial) bila sedia. Kosong = dipaparkan "akan dikemas kini", bukan pautan.
+Buka `bahagian GENIUS_CONFIG dalam index.html dan admin.html`, gantikan nilai `firebase: { ... }` dengan `firebaseConfig` anda. Config web Firebase bukan rahsia; keselamatan datang daripada Rules + Auth. Isi juga `contact` (emel, WhatsApp, media sosial) bila sedia. Kosong = dipaparkan "akan dikemas kini", bukan pautan.
 
 Dalam Firebase Console → Authentication → **Settings → Authorized domains**, tambah domain hosting anda (`localhost` sudah ada).
 
@@ -92,7 +90,7 @@ Log masuk admin → bila senarai kosong, tekan **"Muat produk contoh"**. ID doku
 `products/{id}`: `name, slug, category, description, thumbnailURL, thumbnailPath, status (active|coming-soon|hidden), productURL, displayOrder, createdAt, updatedAt`. `thumbnailPath` (tambahan) ialah laluan fail dalam Storage supaya fail lama boleh dipadam bila diganti/dipadam produk.
 
 ## Halaman produk masa depan
-Setiap kad ada `data-slug`. Buat masa ini butang "Explore Product" membuka modal *Product Coming Soon.* (tiada URL direka). Bila halaman produk sedia: set `productPagesEnabled: true` dalam `config.js` dan isi `productURL` pada produk berstatus Active.
+Setiap kad ada `data-slug`. Buat masa ini butang "Explore Product" membuka modal *Product Coming Soon.* (tiada URL direka). Bila halaman produk sedia: set `productPagesEnabled: true` dalam `bahagian GENIUS_CONFIG dalam index.html dan admin.html` dan isi `productURL` pada produk berstatus Active.
 
 ## Had yang diketahui
 - Keunikan slug disemak di klien sahaja (Firestore Rules tidak boleh menyemak dokumen lain).
