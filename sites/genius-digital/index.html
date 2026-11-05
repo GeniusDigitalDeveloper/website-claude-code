@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Genius Digital — Digital Innovation. Intelligent Systems.</title>
+<meta name="description" content="Genius Digital membangunkan dan menawarkan sistem digital pintar, kreatif dan efisien untuk individu, organisasi dan perniagaan.">
+<meta name="theme-color" content="#0B1F4B">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+
+<style>
+/* ============ TOKEN ============ */
+:root{
+  --navy:#0B1F4B; --navy-2:#13306F; --blue:#1553E8; --blue-2:#3B7BFF; --cyan:#00C2E0;
+  --bg:#F4F7FC; --surface:#fff; --text:#0B1F4B; --muted:#41506B; --line:#DCE5F3;
+  --ok:#0E7A4F; --warn:#8A5A00; --danger:#B42318;
+  --radius:20px; --radius-sm:12px;
+  --shadow-sm:0 2px 10px rgba(11,31,75,.06);
+  --shadow:0 12px 34px rgba(11,31,75,.10);
+  --shadow-lg:0 26px 60px rgba(11,31,75,.18);
+  --font-hero:'Bebas Neue','Oswald',Impact,sans-serif;
+  --font-head:'Manrope','Montserrat',system-ui,sans-serif;
+  --font-body:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --gutter:clamp(16px,5vw,40px);
+  --nav-h:68px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;scroll-padding-top:calc(var(--nav-h) + 12px)}
+body{margin:0;font-family:var(--font-body);font-size:16px;line-height:1.65;color:var(--text);background:var(--bg);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+img,svg{max-width:100%;display:block}
+h1,h2,h3,h4{font-family:var(--font-head);line-height:1.15;margin:0;color:var(--navy)}
+p{margin:0}
+a{color:var(--blue)}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--blue-2);outline-offset:3px;border-radius:6px}
+.wrap{width:100%;max-width:1200px;margin-inline:auto;padding-inline:var(--gutter)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;left:12px;top:-60px;background:var(--navy);color:#fff;padding:10px 16px;border-radius:10px;z-index:200}
+.skip:focus{top:12px}
+.icon{width:1.25em;height:1.25em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* ============ BUTANG ============ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.55rem;min-height:48px;padding:.8rem 1.5rem;border-radius:999px;border:1.5px solid transparent;font-family:var(--font-head);font-weight:700;font-size:.97rem;text-decoration:none;transition:transform .2s,box-shadow .2s,background .2s,border-color .2s;-webkit-tap-highlight-color:transparent}
+.btn-primary{background:linear-gradient(135deg,var(--blue),#2D6BFF);color:#fff;box-shadow:0 10px 24px rgba(21,83,232,.32)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(21,83,232,.42)}
+.btn-ghost{background:rgba(255,255,255,.7);color:var(--navy);border-color:var(--line);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.btn-ghost:hover{border-color:var(--blue);color:var(--blue);transform:translateY(-2px)}
+.btn-block{width:100%}
+.btn:active{transform:translateY(0) scale(.98)}
+
+/* ============ NAV ============ */
+.nav{position:fixed;inset:0 0 auto 0;z-index:100;height:var(--nav-h);background:rgba(255,255,255,.72);backdrop-filter:blur(14px) saturate(160%);-webkit-backdrop-filter:blur(14px) saturate(160%);border-bottom:1px solid rgba(220,229,243,.8);transition:box-shadow .25s}
+.nav.scrolled{box-shadow:0 6px 24px rgba(11,31,75,.08)}
+.nav .wrap{height:100%;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.brand{display:flex;align-items:center;gap:.65rem;text-decoration:none;color:var(--navy);font-family:var(--font-head);font-weight:800;letter-spacing:.06em;font-size:1.02rem}
+.brand img{width:38px;height:38px}
+.menu{display:none;list-style:none;margin:0;padding:0;gap:.25rem;align-items:center}
+.menu a{display:inline-flex;align-items:center;min-height:44px;padding:0 .95rem;border-radius:999px;text-decoration:none;color:var(--navy);font-weight:600;font-size:.95rem;transition:background .2s,color .2s}
+.menu a:hover{background:rgba(21,83,232,.08);color:var(--blue)}
+.menu .login{background:var(--navy);color:#fff;margin-left:.5rem}
+.menu .login:hover{background:var(--blue);color:#fff}
+.burger{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:14px;border:1px solid var(--line);background:#fff;color:var(--navy)}
+.drawer{position:fixed;inset:var(--nav-h) 0 auto 0;z-index:99;background:rgba(255,255,255,.96);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--line);box-shadow:var(--shadow);padding:.75rem var(--gutter) 1.25rem;transform:translateY(-12px);opacity:0;visibility:hidden;transition:transform .25s,opacity .25s,visibility .25s}
+.drawer.open{transform:none;opacity:1;visibility:visible}
+.drawer a{display:flex;align-items:center;min-height:52px;padding:0 .5rem;border-bottom:1px solid var(--line);text-decoration:none;color:var(--navy);font-family:var(--font-head);font-weight:700}
+.drawer a.login{margin-top:.9rem;border:0;justify-content:center;background:var(--navy);color:#fff;border-radius:999px}
+@media(min-width:860px){.menu{display:flex}.burger,.drawer{display:none}}
+
+/* ============ HERO ============ */
+.hero{position:relative;isolation:isolate;overflow:hidden;padding:calc(var(--nav-h) + clamp(40px,8vw,96px)) 0 clamp(56px,9vw,110px);background:linear-gradient(180deg,#EAF1FF 0%,var(--bg) 100%)}
+.hero::before{content:"";position:absolute;inset:0;z-index:-2;background-image:linear-gradient(rgba(21,83,232,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(21,83,232,.07) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:radial-gradient(ellipse at 50% 30%,#000 30%,transparent 75%);mask-image:radial-gradient(ellipse at 50% 30%,#000 30%,transparent 75%)}
+.aurora{position:absolute;z-index:-1;border-radius:50%;filter:blur(70px);opacity:.55;will-change:transform;animation:drift 16s ease-in-out infinite alternate}
+.aurora.a{width:46vmax;height:46vmax;max-width:560px;max-height:560px;right:-12%;top:-18%;background:radial-gradient(circle,var(--blue-2),transparent 65%)}
+.aurora.b{width:38vmax;height:38vmax;max-width:480px;max-height:480px;left:-14%;bottom:-24%;background:radial-gradient(circle,var(--cyan),transparent 65%);animation-delay:-6s}
+@keyframes drift{to{transform:translate3d(-40px,30px,0) scale(1.08)}}
+.hero-grid{display:grid;gap:clamp(36px,6vw,64px);align-items:center}
+.eyebrow{display:inline-flex;align-items:center;gap:.5rem;padding:.4rem .9rem;border-radius:999px;background:rgba(255,255,255,.75);border:1px solid var(--line);font-family:var(--font-head);font-weight:700;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.eyebrow .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 0 4px rgba(0,194,224,.25)}
+.hero h1{font-family:var(--font-hero);font-weight:400;font-size:clamp(3.6rem,15vw,8.6rem);line-height:.9;letter-spacing:.015em;margin:1.1rem 0 .5rem;background:linear-gradient(120deg,var(--navy) 20%,var(--blue) 70%,var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+.tagline{font-family:var(--font-head);font-weight:800;font-size:clamp(1.05rem,3.4vw,1.5rem);color:var(--navy)}
+.slogan{margin-top:.9rem;font-size:clamp(1.02rem,2.6vw,1.2rem);color:var(--blue);font-weight:600;font-style:italic;max-width:34rem}
+.intro{margin-top:1rem;max-width:36rem;color:var(--muted);font-size:clamp(1rem,2.2vw,1.08rem)}
+.cta-row{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:1.8rem}
+.cta-row .btn{flex:1 1 220px}
+@media(min-width:560px){.cta-row .btn{flex:0 0 auto}}
+
+/* visual 3D */
+.stage{position:relative;height:clamp(300px,70vw,440px);perspective:1100px;display:grid;place-items:center}
+.stack{position:relative;width:min(340px,80%);height:70%;transform-style:preserve-3d;transform:rotateX(52deg) rotateZ(-34deg);animation:float 7s ease-in-out infinite}
+.layer{position:absolute;inset:0;border-radius:24px;background:rgba(255,255,255,.62);border:1px solid rgba(255,255,255,.9);box-shadow:var(--shadow-lg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.layer.l1{transform:translateZ(0)}
+.layer.l2{transform:translateZ(46px);background:linear-gradient(135deg,rgba(21,83,232,.92),rgba(0,194,224,.85));border-color:rgba(255,255,255,.4)}
+.layer.l3{transform:translateZ(92px)}
+.layer svg{position:absolute;inset:0;width:100%;height:100%}
+@keyframes float{50%{transform:rotateX(52deg) rotateZ(-34deg) translate3d(0,-14px,24px)}}
+.chip{position:absolute;display:flex;align-items:center;gap:.5rem;padding:.55rem .9rem;border-radius:14px;background:rgba(255,255,255,.85);border:1px solid var(--line);box-shadow:var(--shadow);font-family:var(--font-head);font-weight:700;font-size:.82rem;color:var(--navy);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);animation:bob 6s ease-in-out infinite}
+.chip .icon{color:var(--blue)}
+.chip.c1{left:0;top:10%}
+.chip.c2{right:0;bottom:12%;animation-delay:-3s}
+@keyframes bob{50%{transform:translateY(-10px)}}
+@media(min-width:960px){.hero-grid{grid-template-columns:1.1fr .9fr}.stage{height:500px}}
+
+/* ============ SEKSYEN ============ */
+section{position:relative}
+.section{padding:clamp(64px,10vw,120px) 0}
+.sec-head{max-width:46rem;margin-bottom:clamp(32px,5vw,56px)}
+.sec-head.center{margin-inline:auto;text-align:center}
+.kicker{font-family:var(--font-head);font-weight:800;font-size:.8rem;letter-spacing:.18em;text-transform:uppercase;color:var(--blue)}
+.sec-head h2{font-family:var(--font-hero);font-weight:400;font-size:clamp(2.4rem,8vw,4.4rem);letter-spacing:.03em;line-height:1;margin-top:.5rem}
+.sec-head p{margin-top:.9rem;color:var(--muted);font-size:clamp(1rem,2.2vw,1.12rem)}
+.bar{display:block;width:64px;height:5px;border-radius:5px;background:linear-gradient(90deg,var(--blue),var(--cyan));margin-top:1.1rem}
+.sec-head.center .bar{margin-inline:auto}
+
+/* About */
+.about-grid{display:grid;gap:clamp(24px,4vw,48px)}
+.about-copy p{font-size:clamp(1.02rem,2.3vw,1.16rem);color:var(--muted)}
+.pillars{display:grid;gap:16px;margin-top:8px}
+.pillar{position:relative;padding:24px;border-radius:var(--radius);background:rgba(255,255,255,.78);border:1px solid var(--line);box-shadow:var(--shadow-sm);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:transform .25s,box-shadow .25s}
+.pillar:hover{transform:translateY(-5px);box-shadow:var(--shadow)}
+.pillar .ico{display:grid;place-items:center;width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;margin-bottom:16px;box-shadow:0 8px 18px rgba(21,83,232,.28)}
+.pillar .ico .icon{width:26px;height:26px}
+.pillar h3{font-size:1.15rem;margin-bottom:.4rem}
+.pillar p{color:var(--muted);font-size:.97rem}
+@media(min-width:900px){.about-grid{grid-template-columns:1fr 1.25fr;align-items:start}.pillars{grid-template-columns:1fr 1fr}.pillar:first-child{grid-column:1/-1}}
+
+/* Products */
+.products{background:linear-gradient(180deg,var(--bg),#EAF1FF 60%,var(--bg))}
+.grid{display:grid;gap:clamp(18px,3vw,28px);grid-template-columns:1fr}
+@media(min-width:640px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1024px){.grid{grid-template-columns:repeat(3,1fr)}}
+.card{position:relative;display:flex;flex-direction:column;border-radius:var(--radius);background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow-sm);overflow:hidden;transition:box-shadow .3s,border-color .3s;transform-style:preserve-3d;will-change:transform}
+.card::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:2px;background:linear-gradient(135deg,var(--blue),var(--cyan));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .3s;pointer-events:none}
+.card:hover{box-shadow:var(--shadow-lg)}
+.card:hover::after{opacity:1}
+.thumb{position:relative;aspect-ratio:16/10;background:linear-gradient(135deg,var(--navy),var(--blue));overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.card:hover .thumb img{transform:scale(1.05)}
+.badge{position:absolute;top:14px;left:14px;display:inline-flex;align-items:center;gap:.4rem;padding:.35rem .75rem;border-radius:999px;font-family:var(--font-head);font-weight:800;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;background:rgba(255,255,255,.92);box-shadow:var(--shadow-sm)}
+.badge.active{color:var(--ok)}
+.badge.coming-soon{color:var(--warn)}
+.badge i{width:8px;height:8px;border-radius:50%;background:currentColor}
+.body{display:flex;flex-direction:column;flex:1;padding:22px 22px 24px}
+.cat{font-family:var(--font-head);font-weight:800;font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}
+.card h3{font-size:1.4rem;margin:.35rem 0 .6rem}
+.card p{color:var(--muted);font-size:.97rem;flex:1}
+.card .btn{margin-top:1.3rem}
+
+/* state */
+.state{grid-column:1/-1;text-align:center;padding:clamp(36px,6vw,64px) 20px;border-radius:var(--radius);background:rgba(255,255,255,.8);border:1px dashed #B9C8E4}
+.state .ico{display:grid;place-items:center;width:64px;height:64px;margin:0 auto 14px;border-radius:20px;background:rgba(21,83,232,.1);color:var(--blue)}
+.state h3{font-size:1.25rem;margin-bottom:.4rem}
+.state p{color:var(--muted);max-width:30rem;margin:0 auto}
+.state .btn{margin-top:1.1rem}
+.skeleton{border-radius:var(--radius);background:#fff;border:1px solid var(--line);overflow:hidden}
+.skeleton .s-img,.skeleton .s-line{background:linear-gradient(90deg,#E8EEF9 25%,#F4F7FC 50%,#E8EEF9 75%);background-size:200% 100%;animation:shimmer 1.4s linear infinite}
+.skeleton .s-img{aspect-ratio:16/10}
+.skeleton .s-body{padding:22px;display:grid;gap:12px}
+.skeleton .s-line{height:14px;border-radius:7px}
+@keyframes shimmer{to{background-position:-200% 0}}
+.notice{display:flex;gap:.7rem;align-items:flex-start;margin-bottom:22px;padding:14px 16px;border-radius:14px;background:#FFF6DB;border:1px solid #F0D98A;color:#5C4200;font-size:.92rem}
+.notice .icon{margin-top:2px}
+
+/* Contact */
+.contact{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 60%,#0F4AB8 100%);color:#fff;overflow:hidden;isolation:isolate}
+.contact::before{content:"";position:absolute;width:520px;height:520px;right:-160px;top:-200px;border-radius:50%;background:radial-gradient(circle,rgba(0,194,224,.45),transparent 65%);z-index:-1}
+.contact h2,.contact .kicker{color:#fff}
+.contact .kicker{color:var(--cyan)}
+.contact .sec-head p{color:#D2DEF7}
+.contact-grid{display:grid;gap:14px}
+@media(min-width:640px){.contact-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1024px){.contact-grid{grid-template-columns:repeat(4,1fr)}}
+.c-item{display:flex;align-items:center;gap:14px;min-height:76px;padding:16px 18px;border-radius:18px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#fff;text-decoration:none;transition:background .2s,transform .2s;min-width:0}
+a.c-item:hover{background:rgba(255,255,255,.18);transform:translateY(-3px)}
+.c-item .ico{display:grid;place-items:center;width:46px;height:46px;border-radius:14px;background:rgba(0,194,224,.22);color:#7FE6F5;flex:none}
+.c-item small{display:block;color:#BBCBEA;font-size:.78rem;letter-spacing:.04em}
+.c-item strong{display:block;font-family:var(--font-head);font-size:.98rem;overflow-wrap:anywhere}
+.c-item.pending strong{color:#E4ECFB;font-weight:600}
+.social{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+.social .s{display:inline-flex;align-items:center;gap:.5rem;min-height:48px;padding:0 1.1rem;border-radius:999px;border:1px solid rgba(255,255,255,.3);color:#fff;text-decoration:none;font-weight:600;font-size:.92rem;background:rgba(255,255,255,.08)}
+a.s:hover{background:rgba(255,255,255,.2)}
+.s.pending{opacity:.75;cursor:default}
+
+/* Footer */
+footer{background:#061534;color:#C8D5F0;padding:44px 0 32px}
+.f-row{display:flex;flex-direction:column;gap:20px;align-items:flex-start}
+.f-brand{font-family:var(--font-hero);font-size:2rem;letter-spacing:.06em;color:#fff;line-height:1}
+.f-tag{color:#7FE6F5;font-weight:600;margin-top:.3rem}
+.f-links{display:flex;flex-wrap:wrap;gap:6px 20px}
+.f-links a{color:#C8D5F0;text-decoration:none;display:inline-flex;min-height:44px;align-items:center}
+.f-links a:hover{color:#fff}
+.copy{margin-top:26px;padding-top:20px;border-top:1px solid rgba(255,255,255,.12);font-size:.9rem}
+@media(min-width:760px){.f-row{flex-direction:row;justify-content:space-between;align-items:center}}
+
+/* Modal */
+dialog.modal{border:0;padding:0;border-radius:24px;max-width:min(440px,calc(100vw - 32px));width:100%;background:#fff;box-shadow:var(--shadow-lg);color:var(--text)}
+dialog.modal::backdrop{background:rgba(6,21,52,.55);backdrop-filter:blur(4px)}
+.m-inner{padding:34px 28px 28px;text-align:center}
+.m-inner .ico{display:grid;place-items:center;width:68px;height:68px;margin:0 auto 16px;border-radius:22px;background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff}
+.m-inner .ico .icon{width:32px;height:32px}
+.m-inner h3{font-size:1.5rem}
+.m-inner .pname{color:var(--blue);font-family:var(--font-head);font-weight:700;margin:.3rem 0 .7rem}
+.m-inner p{color:var(--muted)}
+.m-inner .btn{margin-top:1.4rem}
+
+/* Reveal */
+.rv{opacity:0;transform:translateY(26px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1);transition-delay:var(--d,0s)}
+.rv.in{opacity:1;transform:none}
+.no-js .rv{opacity:1;transform:none}
+
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition-duration:.01ms!important}
+  .rv{opacity:1;transform:none}
+  .stack{transform:rotateX(52deg) rotateZ(-34deg)}
+}
+</style>
+</head>
+
+<body class="no-js">
+<a class="skip" href="#products">Langkau ke produk</a>
+
+<!-- ================= NAV ================= -->
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="#home" aria-label="Genius Digital — laman utama">
+      <img src="assets/logo.svg" alt="" width="38" height="38">
+      <span>GENIUS DIGITAL</span>
+    </a>
+    <ul class="menu">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#about">About Us</a></li>
+      <li><a href="#products">Products</a></li>
+      <li><a href="#contact">Contact</a></li>
+      <li><a class="login" href="admin.html">Admin Login</a></li>
+    </ul>
+    <button class="burger" id="burger" aria-label="Buka menu" aria-expanded="false" aria-controls="drawer">
+      <svg class="icon" id="burgerIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+  </div>
+</header>
+<nav class="drawer" id="drawer" aria-label="Menu mudah alih">
+  <a href="#home">Home</a>
+  <a href="#about">About Us</a>
+  <a href="#products">Products</a>
+  <a href="#contact">Contact</a>
+  <a class="login" href="admin.html">Admin Login</a>
+</nav>
+
+<main>
+<!-- ================= HERO ================= -->
+<section class="hero" id="home">
+  <div class="aurora a" aria-hidden="true"></div>
+  <div class="aurora b" aria-hidden="true"></div>
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow"><span class="dot"></span>Corporate Digital Products &amp; Systems</span>
+      <h1>GENIUS DIGITAL</h1>
+      <p class="tagline">Digital Innovation. Intelligent Systems.</p>
+      <p class="slogan">“Memacu Inovasi Digital Melalui Sistem Pintar, Kreatif dan Efisien.”</p>
+      <p class="intro">Genius Digital ialah syarikat yang membangunkan dan menawarkan pelbagai penyelesaian sistem digital untuk membantu individu, organisasi dan perniagaan mengurus tugasan dengan lebih mudah, sistematik dan efisien.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#products">Explore Our Products
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn btn-ghost" href="#about">About Genius Digital</a>
+      </div>
+    </div>
+
+    <div class="stage" aria-hidden="true">
+      <div class="stack">
+        <div class="layer l1"></div>
+        <div class="layer l2"></div>
+        <div class="layer l3">
+          <svg viewBox="0 0 340 300" preserveAspectRatio="xMidYMid meet">
+            <rect x="26" y="28" width="120" height="14" rx="7" fill="#0B1F4B" opacity=".85"/>
+            <rect x="26" y="52" width="80" height="10" rx="5" fill="#0B1F4B" opacity=".25"/>
+            <g fill="#1553E8"><rect x="34" y="150" width="30" height="90" rx="8"/><rect x="82" y="120" width="30" height="120" rx="8" fill="#00C2E0"/><rect x="130" y="170" width="30" height="70" rx="8"/><rect x="178" y="96" width="30" height="144" rx="8" fill="#0B1F4B"/><rect x="226" y="132" width="30" height="108" rx="8" fill="#00C2E0"/><rect x="274" y="80" width="30" height="160" rx="8"/></g>
+            <path d="M34 120 120 90l60-30 60 20 64-44" fill="none" stroke="#0B1F4B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity=".55"/>
+          </svg>
+        </div>
+      </div>
+      <div class="chip c1"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M20 20v.01"/></svg>QR System</div>
+      <div class="chip c2"><svg class="icon" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>PDF Tools</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ABOUT ================= -->
+<section class="section" id="about">
+  <div class="wrap about-grid">
+    <div class="sec-head about-copy rv" style="margin-bottom:0">
+      <span class="kicker">Siapa Kami</span>
+      <h2>ABOUT GENIUS DIGITAL</h2>
+      <span class="bar"></span>
+      <p style="margin-top:1.3rem">Genius Digital merupakan sebuah syarikat teknologi digital yang memfokuskan pembangunan sistem, aplikasi web dan penyelesaian digital yang praktikal serta inovatif. Kami komited menghasilkan produk digital yang mesra pengguna, mudah diakses dan mampu membantu meningkatkan kecekapan pengurusan serta produktiviti.</p>
+    </div>
+    <div class="pillars">
+      <article class="pillar rv">
+        <div class="ico"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2V17h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2z"/></svg></div>
+        <h3>Digital Innovation</h3>
+        <p>Idea baharu diterjemah menjadi sistem digital yang berfungsi, berkembang bersama keperluan pengguna dari masa ke semasa.</p>
+      </article>
+      <article class="pillar rv" style="--d:.1s">
+        <div class="ico"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 3 14h8l-1 8 10-12h-8z"/></svg></div>
+        <h3>Smart Solutions</h3>
+        <p>Penyelesaian pintar yang menjimatkan masa dan memudahkan tugasan harian secara sistematik.</p>
+      </article>
+      <article class="pillar rv" style="--d:.2s">
+        <div class="ico"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></div>
+        <h3>User-Centric Technology</h3>
+        <p>Setiap produk direka mesra pengguna, mudah diakses pada telefon, tablet dan komputer.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PRODUCTS ================= -->
+<section class="section products" id="products">
+  <div class="wrap">
+    <div class="sec-head center rv">
+      <span class="kicker">Katalog</span>
+      <h2>OUR DIGITAL PRODUCTS</h2>
+      <span class="bar"></span>
+      <p>Explore our collection of innovative digital systems and tools.</p>
+    </div>
+    <div id="demoNotice" class="notice" hidden>
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+      <span><strong>Mod demo.</strong> Firebase belum disambung (lihat <code>config.js</code>), jadi 2 produk contoh dipaparkan secara tempatan. Selepas konfigurasi diisi, senarai ini diambil terus daripada Cloud Firestore.</span>
+    </div>
+    <div class="grid" id="productGrid" aria-live="polite" aria-busy="true"></div>
+  </div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section class="section contact" id="contact">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="kicker">Hubungi Kami</span>
+      <h2>CONTACT US</h2>
+      <span class="bar"></span>
+      <p>Genius Digital — pembangun sistem digital pintar untuk individu, organisasi dan perniagaan. Hubungi kami untuk pertanyaan, kerjasama atau cadangan produk.</p>
+    </div>
+    <div class="contact-grid rv" id="contactGrid"></div>
+    <div class="social rv" id="socialRow"></div>
+  </div>
+</section>
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="wrap">
+    <div class="f-row">
+      <div>
+        <div class="f-brand">GENIUS DIGITAL</div>
+        <div class="f-tag">Digital Innovation. Intelligent Systems.</div>
+      </div>
+      <nav class="f-links" aria-label="Pautan pantas">
+        <a href="#home">Home</a><a href="#about">About Us</a><a href="#products">Products</a><a href="#contact">Contact</a><a href="admin.html">Admin Login</a>
+      </nav>
+    </div>
+    <p class="copy">© 2026 Genius Digital. All Rights Reserved.</p>
+  </div>
+</footer>
+
+<!-- Modal "Product Coming Soon" -->
+<dialog class="modal" id="soonModal" aria-labelledby="soonTitle">
+  <div class="m-inner">
+    <div class="ico"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+    <h3 id="soonTitle">Product Coming Soon.</h3>
+    <p class="pname" id="soonName"></p>
+    <p>Halaman produk ini sedang disiapkan. Nantikan pengumuman daripada Genius Digital.</p>
+    <button class="btn btn-primary btn-block" id="soonClose" type="button">Faham</button>
+  </div>
+</dialog>
+
+<script src="config.js"></script>
+<script type="module">
+/* =====================================================================
+   GENIUS DIGITAL — index.html (laman awam)
+   Bahagian: 1) utiliti  2) UI (nav, reveal, tilt, modal)  3) contact
+             4) data produk (Firestore / demo)  5) render kad
+   ===================================================================== */
+const CFG = window.GENIUS_CONFIG || {};
+const FB = CFG.firebase || {};
+const firebaseReady = !!FB.apiKey && !/^YOUR_/.test(FB.apiKey) && !/^YOUR_/.test(FB.projectId || "YOUR_");
+const FIREBASE_VER = "11.10.0";
+const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- 1) Utiliti ---------- */
+document.body.classList.remove("no-js");
+const $ = (s, r = document) => r.querySelector(s);
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs = {}, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v == null || v === false) continue;
+    if (k === "class") n.className = v;
+    else if (k === "text") n.textContent = v;
+    else n.setAttribute(k, v === true ? "" : v);
+  }
+  kids.flat().forEach(k => k != null && n.append(k.nodeType ? k : document.createTextNode(k)));
+  return n;
+}
+function icon(paths, size) {
+  const s = document.createElementNS(NS, "svg");
+  s.setAttribute("class", "icon"); s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("aria-hidden", "true");
+  if (size) { s.style.width = s.style.height = size; }
+  const p = document.createElementNS(NS, "path"); p.setAttribute("d", paths); s.append(p); return s;
+}
+const ICONS = {
+  arrow: "M5 12h14M13 6l6 6-6 6",
+  mail: "M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM22 6l-10 7L2 6",
+  chat: "M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.8-.9L3 21l1.9-5.1A8.4 8.4 0 1 1 21 11.5z",
+  link: "M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7",
+  alert: "M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z",
+  box: "M21 8 12 3 3 8v8l9 5 9-5zM3 8l9 5 9-5M12 13v8"
+};
+
+/* ---------- 2) UI ---------- */
+// Nav: bayang bila scroll + hamburger
+const nav = $("#nav"), burger = $("#burger"), drawer = $("#drawer"), burgerIcon = $("#burgerIcon path");
+const onScroll = () => nav.classList.toggle("scrolled", scrollY > 8);
+addEventListener("scroll", onScroll, { passive: true }); onScroll();
+function setDrawer(open) {
+  drawer.classList.toggle("open", open);
+  burger.setAttribute("aria-expanded", String(open));
+  burger.setAttribute("aria-label", open ? "Tutup menu" : "Buka menu");
+  burgerIcon.setAttribute("d", open ? "M6 6l12 12M18 6 6 18" : "M4 7h16M4 12h16M4 17h16");
+}
+burger.addEventListener("click", () => setDrawer(!drawer.classList.contains("open")));
+drawer.querySelectorAll("a").forEach(a => a.addEventListener("click", () => setDrawer(false)));
+addEventListener("keydown", e => { if (e.key === "Escape") setDrawer(false); });
+matchMedia("(min-width:860px)").addEventListener("change", e => e.matches && setDrawer(false));
+
+// Scroll reveal
+const revealObs = "IntersectionObserver" in window
+  ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); revealObs.unobserve(e.target); } }), { threshold: .12, rootMargin: "0px 0px -40px 0px" })
+  : null;
+function observeReveal(root = document) {
+  root.querySelectorAll(".rv:not(.in)").forEach(n => revealObs ? revealObs.observe(n) : n.classList.add("in"));
+}
+observeReveal();
+
+// Tilt 3D kad (penunjuk halus sahaja; tiada pada skrin sentuh / reduced motion)
+const canTilt = matchMedia("(hover:hover) and (pointer:fine)").matches && !reducedMotion;
+function attachTilt(card) {
+  if (!canTilt) return;
+  let raf = 0;
+  card.addEventListener("pointermove", e => {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+      card.style.transform = `perspective(900px) rotateX(${(-y * 6).toFixed(2)}deg) rotateY(${(x * 8).toFixed(2)}deg) translateY(-6px)`;
+    });
+  });
+  card.addEventListener("pointerleave", () => { cancelAnimationFrame(raf); card.style.transform = ""; });
+}
+
+// Modal "Product Coming Soon"
+const modal = $("#soonModal");
+function openComingSoon(name) {
+  $("#soonName").textContent = name || "";
+  if (typeof modal.showModal === "function") modal.showModal(); else modal.setAttribute("open", "");
+}
+$("#soonClose").addEventListener("click", () => modal.close ? modal.close() : modal.removeAttribute("open"));
+modal.addEventListener("click", e => { if (e.target === modal) modal.close(); });
+
+/* ---------- 3) Contact (dari config.js) ---------- */
+(function renderContact() {
+  const c = CFG.contact || {};
+  const grid = $("#contactGrid"), social = $("#socialRow");
+  const items = [
+    { label: "Emel", value: c.email, href: c.email && "mailto:" + c.email, ph: "Emel syarikat — akan dikemas kini", icon: ICONS.mail },
+    { label: "WhatsApp", value: c.whatsapp && "+" + c.whatsapp, href: c.whatsapp && "https://wa.me/" + c.whatsapp.replace(/\D/g, ""), ph: "Nombor WhatsApp — akan dikemas kini", icon: ICONS.chat }
+  ];
+  const socials = [
+    { label: "Facebook", href: c.facebook }, { label: "Instagram", href: c.instagram }, { label: "LinkedIn", href: c.linkedin }
+  ];
+  items.forEach(i => {
+    const body = [el("span", { class: "ico" }, icon(i.icon, "22px")),
+      el("span", {}, el("small", { text: i.label }), el("strong", { text: i.value || i.ph }))];
+    grid.append(i.href ? el("a", { class: "c-item", href: i.href, target: "_blank", rel: "noopener" }, body)
+                       : el("div", { class: "c-item pending" }, body));
+  });
+  const soc = socials.map(s => s.href
+    ? el("a", { class: "s", href: s.href, target: "_blank", rel: "noopener" }, icon(ICONS.link), s.label)
+    : el("span", { class: "s pending", title: "Placeholder — akan dikemas kini" }, icon(ICONS.link), s.label + " (akan datang)"));
+  const pendingCount = socials.filter(s => !s.href).length;
+  // Letak kad Social Media dalam grid
+  grid.append(el("div", { class: "c-item pending" }, el("span", { class: "ico" }, icon(ICONS.link, "22px")),
+    el("span", {}, el("small", { text: "Social Media" }), el("strong", { text: pendingCount === 3 ? "Akaun akan dikemas kini" : "Ikuti kami" }))));
+  social.append(...soc);
+})();
+
+/* ---------- 4) Data produk ---------- */
+const grid = $("#productGrid");
+const DEMO_PRODUCTS = [
+  { id: "demo-qr", name: "QR Me Generator", slug: "qr-me-generator", category: "Digital Tools", status: "active", displayOrder: 1, thumbnailURL: "",
+    description: "Sistem penjana kod QR yang membolehkan pengguna menghasilkan QR Code dengan mudah, pantas dan praktikal untuk pelbagai kegunaan.", productURL: "" },
+  { id: "demo-pdf", name: "Malaysia PDF Tools", slug: "malaysia-pdf-tools", category: "Productivity Tools", status: "coming-soon", displayOrder: 2, thumbnailURL: "",
+    description: "Platform pengurusan dokumen PDF yang menyediakan pelbagai fungsi untuk membantu pengguna mengurus, memproses dan menghasilkan dokumen secara lebih mudah dan efisien.", productURL: "" }
+];
+
+function renderLoading() {
+  grid.setAttribute("aria-busy", "true"); grid.replaceChildren(
+    ...[0, 1, 2].map(() => el("div", { class: "skeleton", "aria-hidden": "true" }, el("div", { class: "s-img" }),
+      el("div", { class: "s-body" }, el("div", { class: "s-line", style: "width:35%" }), el("div", { class: "s-line", style: "width:70%;height:22px" }), el("div", { class: "s-line" }), el("div", { class: "s-line", style: "width:80%" })))));
+  grid.prepend(el("p", { class: "sr-only", text: "Memuatkan produk…" }));
+}
+function renderState(kind, title, text, retry) {
+  grid.setAttribute("aria-busy", "false");
+  const ic = kind === "error" ? ICONS.alert : ICONS.box;
+  grid.replaceChildren(el("div", { class: "state", role: kind === "error" ? "alert" : null },
+    el("div", { class: "ico" }, icon(ic, "30px")), el("h3", { text: title }), el("p", { text }),
+    retry ? el("button", { class: "btn btn-primary", type: "button", onclick: "" , id: "retryBtn" }, "Cuba lagi") : null));
+  if (retry) $("#retryBtn").addEventListener("click", retry);
+}
+// Thumbnail: URL admin → fail aset ikut slug → penjana SVG generik (tiada gambar rosak)
+function genericThumb(name) {
+  const initials = (name || "GD").split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase();
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0B1F4B"/><stop offset=".6" stop-color="#1553E8"/><stop offset="1" stop-color="#00C2E0"/></linearGradient></defs><rect width="800" height="500" fill="url(#g)"/><text x="400" y="300" text-anchor="middle" font-family="Arial,sans-serif" font-weight="800" font-size="190" fill="#fff" fill-opacity=".9">${initials}</text></svg>`;
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+}
+function thumbSrc(p) {
+  if (p.thumbnailURL) return p.thumbnailURL;
+  if (/^[a-z0-9-]+$/.test(p.slug || "")) return `assets/thumbs/${p.slug}.svg`;
+  return genericThumb(p.name);
+}
+function productCard(p, i) {
+  const soon = p.status === "coming-soon";
+  const img = el("img", { src: thumbSrc(p), alt: `Thumbnail ${p.name}`, loading: i > 1 ? "lazy" : "eager", decoding: "async", width: 800, height: 500 });
+  let triedFallback = false;
+  img.addEventListener("error", () => { if (triedFallback) return; triedFallback = true; img.src = genericThumb(p.name); });
+  const btn = el("button", { class: "btn btn-primary", type: "button", "aria-label": `Explore Product: ${p.name}` }, "Explore Product", icon(ICONS.arrow));
+  btn.addEventListener("click", () => openProduct(p));
+  const card = el("article", { class: "card rv", style: `--d:${Math.min(i, 5) * .08}s`, "data-slug": p.slug },
+    el("div", { class: "thumb" }, img, el("span", { class: "badge " + (soon ? "coming-soon" : "active") }, el("i"), soon ? "Coming Soon" : "Available")),
+    el("div", { class: "body" }, el("span", { class: "cat", text: p.category || "Digital Product" }), el("h3", { text: p.name }), el("p", { text: p.description || "" }), btn));
+  attachTilt(card);
+  return card;
+}
+/* Titik sambungan masa depan: bila setiap produk ada halaman sendiri, tukar productPagesEnabled
+   dalam config.js. Buat masa ini semua butang memaparkan "Product Coming Soon." */
+function openProduct(p) {
+  if (CFG.productPagesEnabled && p.status === "active" && p.productURL) {
+    window.open(p.productURL, "_blank", "noopener"); return;
+  }
+  openComingSoon(p.name);
+}
+function renderProducts(list) {
+  const visible = list.filter(p => p.status === "active" || p.status === "coming-soon")
+    .sort((a, b) => (a.displayOrder ?? 9999) - (b.displayOrder ?? 9999) || (a.name || "").localeCompare(b.name || ""));
+  grid.setAttribute("aria-busy", "false");
+  if (!visible.length) return renderState("empty", "Produk akan datang", "Belum ada produk dipaparkan buat masa ini. Sila kembali tidak lama lagi.");
+  grid.replaceChildren(...visible.map(productCard));
+  observeReveal(grid);
+}
+
+async function start() {
+  renderLoading();
+  if (!firebaseReady) {
+    $("#demoNotice").hidden = false;
+    setTimeout(() => renderProducts(DEMO_PRODUCTS), 450); // simulasi muat ringkas
+    return;
+  }
+  try {
+    const base = `https://www.gstatic.com/firebasejs/${FIREBASE_VER}`;
+    const [{ initializeApp }, fs] = await Promise.all([import(`${base}/firebase-app.js`), import(`${base}/firebase-firestore.js`)]);
+    const app = initializeApp(FB);
+    const db = fs.getFirestore(app);
+    // Hanya status yang dibenarkan rules awam (hidden tidak boleh dibaca). Susun di klien: elak indeks komposit.
+    const q = fs.query(fs.collection(db, "products"), fs.where("status", "in", ["active", "coming-soon"]));
+    fs.onSnapshot(q,
+      snap => renderProducts(snap.docs.map(d => ({ id: d.id, ...d.data() }))),
+      err => { console.error(err); renderState("error", "Tidak dapat memuatkan produk", err.code === "permission-denied" ? "Akses ditolak. Semak Firestore Security Rules." : "Sila semak sambungan internet anda dan cuba lagi.", start); });
+  } catch (err) {
+    console.error(err);
+    renderState("error", "Tidak dapat menyambung ke Firebase", "Sila semak sambungan internet atau konfigurasi Firebase dalam config.js.", start);
+  }
+}
+start();
+</script>
+</body>
+</html>

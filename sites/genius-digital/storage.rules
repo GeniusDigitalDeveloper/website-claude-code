@@ -1,0 +1,30 @@
+rules_version = '2';
+
+// Genius Digital — Cloud Storage for Firebase Security Rules
+// Struktur: products/{productId}/{namaFail}
+// Awam boleh MELIHAT thumbnail (diperlukan oleh website). Hanya admin boleh upload/ubah/padam.
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isAdmin() {
+      return request.auth != null && request.auth.token.admin == true;
+    }
+
+    function isValidImage() {
+      return request.resource.size < 2 * 1024 * 1024                         // < 2 MB
+          && request.resource.contentType.matches('image/(jpeg|png|webp)');  // tiada SVG/GIF/fail lain
+    }
+
+    match /products/{productId}/{fileName} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidImage();
+      allow delete: if isAdmin();
+    }
+
+    // Semua laluan lain ditutup.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

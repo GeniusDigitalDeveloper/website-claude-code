@@ -1,0 +1,16 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "publicProducts": {
+      ".read": true,
+      ".write": "auth != null && auth.token.admin === true",
+      "$productId": {
+        ".validate": "newData.hasChildren(['name', 'status'])",
+        "name": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 80" },
+        "status": { ".validate": "newData.val() === 'active' || newData.val() === 'coming-soon'" },
+        "$other": { ".validate": true }
+      }
+    }
+  }
+}

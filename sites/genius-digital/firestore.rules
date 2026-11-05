@@ -1,0 +1,49 @@
+rules_version = '2';
+
+// Genius Digital — Cloud Firestore Security Rules
+// Admin = pengguna Firebase Authentication yang mempunyai custom claim `admin: true`
+// (ditetapkan melalui Admin SDK di server/komputer anda sahaja — lihat scripts/set-admin.js).
+// Klien (browser) TIDAK boleh menetapkan claim ini.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null && request.auth.token.admin == true;
+    }
+
+    function validProduct(d) {
+      return d.keys().hasOnly(['name', 'slug', 'category', 'description', 'thumbnailURL', 'thumbnailPath',
+                               'status', 'productURL', 'displayOrder', 'createdAt', 'updatedAt'])
+        && d.name is string && d.name.size() > 0 && d.name.size() <= 80
+        && d.slug is string && d.slug.matches('^[a-z0-9]+(-[a-z0-9]+)*$') && d.slug.size() <= 80
+        && d.category is string && d.category.size() > 0 && d.category.size() <= 40
+        && d.description is string && d.description.size() > 0 && d.description.size() <= 500
+        && d.thumbnailURL is string && d.thumbnailURL.size() <= 2000
+        && (!('thumbnailPath' in d) || (d.thumbnailPath is string && d.thumbnailPath.size() <= 300))
+        && d.status in ['active', 'coming-soon', 'hidden']
+        && d.productURL is string && d.productURL.size() <= 300
+        && (d.productURL == '' || d.productURL.matches('^https?://.+'))
+        && d.displayOrder is int && d.displayOrder >= 0 && d.displayOrder <= 9999
+        && d.updatedAt is timestamp;
+    }
+
+    match /products/{productId} {
+      // Awam: hanya produk yang dipaparkan (Hidden tidak boleh dibaca).
+      // Query awam MESTI menapis: where('status','in',['active','coming-soon']).
+      allow get, list: if resource.data.status in ['active', 'coming-soon'] || isAdmin();
+
+      // Tulis: admin sahaja + data mesti sah.
+      allow create: if isAdmin() && validProduct(request.resource.data)
+                    && request.resource.data.createdAt is timestamp;
+      allow update: if isAdmin() && validProduct(request.resource.data)
+                    && request.resource.data.createdAt == resource.data.createdAt;
+      allow delete: if isAdmin();
+    }
+
+    // Semua laluan lain ditutup.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

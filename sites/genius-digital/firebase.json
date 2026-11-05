@@ -1,0 +1,13 @@
+{
+  "firestore": { "rules": "firestore.rules" },
+  "storage": { "rules": "storage.rules" },
+  "hosting": {
+    "public": ".",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**", "scripts/**", "design-system/**", "*.rules", "database.rules.json", "README.md", "preview.html"],
+    "cleanUrls": false,
+    "headers": [
+      { "source": "**/*.@(js|css|svg)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=3600" }] },
+      { "source": "admin.html", "headers": [{ "key": "X-Frame-Options", "value": "DENY" }, { "key": "Referrer-Policy", "value": "no-referrer" }] }
+    ]
+  }
+}

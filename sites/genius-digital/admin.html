@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Admin Panel — Genius Digital</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0B1F4B">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --navy:#0B1F4B; --navy-2:#13306F; --blue:#1553E8; --blue-2:#3B7BFF; --cyan:#00C2E0;
+  --bg:#F4F7FC; --surface:#fff; --text:#0B1F4B; --muted:#41506B; --line:#DCE5F3;
+  --ok:#0E7A4F; --ok-bg:#E3F6EC; --warn:#8A5A00; --warn-bg:#FFF1CF; --danger:#B42318; --danger-bg:#FDE8E6; --hid:#41506B; --hid-bg:#E8EDF6;
+  --radius:18px; --shadow-sm:0 2px 10px rgba(11,31,75,.06); --shadow:0 12px 34px rgba(11,31,75,.10); --shadow-lg:0 26px 60px rgba(11,31,75,.22);
+  --font-hero:'Bebas Neue',Impact,sans-serif; --font-head:'Manrope',system-ui,sans-serif; --font-body:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --side:264px; --top:64px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:var(--font-body);font-size:16px;line-height:1.55;color:var(--text);background:var(--bg);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--font-head);margin:0;color:var(--navy);line-height:1.2}
+p{margin:0}
+img,svg{max-width:100%;display:block}
+button{font:inherit;cursor:pointer}
+[hidden]{display:none!important}
+:focus-visible{outline:3px solid var(--blue-2);outline-offset:2px;border-radius:6px}
+.icon{width:1.2em;height:1.2em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* Butang */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:46px;padding:.65rem 1.2rem;border-radius:12px;border:1.5px solid transparent;font-family:var(--font-head);font-weight:700;font-size:.93rem;text-decoration:none;transition:transform .15s,box-shadow .2s,background .2s,border-color .2s;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:scale(.98)}
+.btn[disabled]{opacity:.6;cursor:not-allowed}
+.btn-primary{background:linear-gradient(135deg,var(--blue),#2D6BFF);color:#fff;box-shadow:0 8px 20px rgba(21,83,232,.28)}
+.btn-primary:hover:not([disabled]){box-shadow:0 12px 26px rgba(21,83,232,.4)}
+.btn-ghost{background:#fff;color:var(--navy);border-color:var(--line)}
+.btn-ghost:hover:not([disabled]){border-color:var(--blue);color:var(--blue)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover:not([disabled]){background:#8F1A10}
+.btn-sm{min-height:44px;min-width:44px;padding:.4rem .8rem;font-size:.86rem}
+.btn-icon{padding:0;width:44px}
+.spin{width:1.1em;height:1.1em;border-radius:50%;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;animation:rot .7s linear infinite}
+.btn-ghost .spin{border-color:rgba(11,31,75,.2);border-top-color:var(--blue)}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* Borang */
+label{display:block;font-family:var(--font-head);font-weight:700;font-size:.88rem;margin-bottom:.4rem}
+.req{color:var(--danger)}
+.input,select.input,textarea.input{width:100%;min-height:48px;padding:.7rem .9rem;border-radius:12px;border:1.5px solid #C5D2EA;background:#fff;color:var(--text);font:inherit;font-size:16px;transition:border-color .2s,box-shadow .2s}
+textarea.input{min-height:110px;resize:vertical}
+.input:focus{outline:0;border-color:var(--blue);box-shadow:0 0 0 4px rgba(21,83,232,.15)}
+.input[aria-invalid="true"]{border-color:var(--danger)}
+.hint{font-size:.82rem;color:var(--muted);margin-top:.35rem}
+.err{font-size:.84rem;color:var(--danger);margin-top:.35rem;font-weight:500}
+.field{margin-bottom:16px}
+.row2{display:grid;gap:0 16px}
+@media(min-width:600px){.row2{grid-template-columns:1fr 1fr}}
+
+/* ===== Skrin log masuk ===== */
+.auth{min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:20px;position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(160deg,#EAF1FF,#F4F7FC)}
+.auth::before{content:"";position:absolute;width:60vmax;height:60vmax;max-width:640px;max-height:640px;right:-20%;top:-25%;background:radial-gradient(circle,rgba(59,123,255,.45),transparent 65%);filter:blur(60px);z-index:-1}
+.auth::after{content:"";position:absolute;width:48vmax;height:48vmax;max-width:520px;max-height:520px;left:-18%;bottom:-25%;background:radial-gradient(circle,rgba(0,194,224,.4),transparent 65%);filter:blur(60px);z-index:-1}
+.auth-card{width:100%;max-width:420px;padding:clamp(24px,6vw,36px);border-radius:24px;background:rgba(255,255,255,.82);border:1px solid rgba(255,255,255,.9);box-shadow:var(--shadow-lg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.auth-brand{display:flex;align-items:center;gap:.7rem;margin-bottom:22px}
+.auth-brand img{width:44px;height:44px}
+.auth-brand b{font-family:var(--font-hero);font-weight:400;font-size:1.7rem;letter-spacing:.06em;line-height:1;color:var(--navy)}
+.auth-brand small{display:block;font-size:.78rem;color:var(--muted);letter-spacing:.04em}
+.auth h1{font-size:1.5rem;margin-bottom:.3rem}
+.auth .sub{color:var(--muted);margin-bottom:20px;font-size:.95rem}
+.alert{display:flex;gap:.6rem;align-items:flex-start;padding:12px 14px;border-radius:12px;font-size:.9rem;margin-bottom:16px}
+.alert .icon{margin-top:2px}
+.alert.error{background:var(--danger-bg);color:#7A1409}
+.alert.warn{background:var(--warn-bg);color:#5C4200}
+.alert.info{background:#E6EEFF;color:#0F2F7A}
+.link{background:none;border:0;padding:10px 0;color:var(--blue);font-weight:600;text-decoration:underline;min-height:44px}
+.auth-foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 16px;margin-top:10px;font-size:.9rem}
+.auth-foot a{color:var(--blue);font-weight:600;display:inline-flex;align-items:center;min-height:44px}
+
+/* ===== Shell ===== */
+.shell{min-height:100vh;min-height:100dvh}
+.side{position:fixed;inset:0 auto 0 0;width:var(--side);z-index:60;display:flex;flex-direction:column;padding:20px 14px;background:linear-gradient(180deg,var(--navy),#0A1A40);color:#fff;transform:translateX(-100%);transition:transform .28s cubic-bezier(.2,.7,.2,1);overflow-y:auto}
+.side.open{transform:none;box-shadow:var(--shadow-lg)}
+.scrim{position:fixed;inset:0;background:rgba(6,21,52,.55);backdrop-filter:blur(3px);z-index:55;opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s}
+.scrim.show{opacity:1;visibility:visible}
+.s-brand{display:flex;align-items:center;gap:.65rem;padding:4px 8px 22px}
+.s-brand img{width:38px;height:38px}
+.s-brand b{font-family:var(--font-hero);font-weight:400;font-size:1.45rem;letter-spacing:.07em;line-height:1}
+.s-brand small{display:block;color:#9FB4E0;font-size:.72rem}
+.s-nav{display:grid;gap:4px}
+.s-nav a,.s-nav button{display:flex;align-items:center;gap:.8rem;width:100%;min-height:48px;padding:0 14px;border-radius:12px;border:0;background:transparent;color:#C9D6F2;text-decoration:none;font-family:var(--font-head);font-weight:700;font-size:.95rem;text-align:left;transition:background .2s,color .2s}
+.s-nav a:hover,.s-nav button:hover{background:rgba(255,255,255,.08);color:#fff}
+.s-nav a[aria-current="page"]{background:linear-gradient(135deg,rgba(21,83,232,.9),rgba(0,194,224,.55));color:#fff}
+.s-foot{margin-top:auto;padding-top:16px;border-top:1px solid rgba(255,255,255,.12)}
+.s-user{padding:10px 14px;font-size:.82rem;color:#9FB4E0;overflow-wrap:anywhere}
+.top{position:sticky;top:0;z-index:40;height:var(--top);display:flex;align-items:center;gap:12px;padding:0 16px;background:rgba(255,255,255,.8);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.top h1{font-size:1.1rem;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.main{padding:20px 16px 56px;max-width:1280px}
+@media(min-width:960px){
+  .side{transform:none;box-shadow:none}
+  .scrim{display:none}
+  .top,.main-wrap{margin-left:var(--side)}
+  .top{padding:0 32px}
+  .main{padding:28px 32px 64px}
+  #menuBtn{display:none}
+}
+
+/* Stats */
+.stats{display:grid;gap:14px;grid-template-columns:repeat(2,1fr);margin-bottom:26px}
+@media(min-width:760px){.stats{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:1200px){.stats{grid-template-columns:repeat(5,1fr)}}
+.stat{padding:18px;border-radius:var(--radius);background:#fff;border:1px solid var(--line);box-shadow:var(--shadow-sm);position:relative;overflow:hidden}
+.stat .ico{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;margin-bottom:12px;background:rgba(21,83,232,.1);color:var(--blue)}
+.stat.s-ok .ico{background:var(--ok-bg);color:var(--ok)}
+.stat.s-warn .ico{background:var(--warn-bg);color:var(--warn)}
+.stat.s-hid .ico{background:var(--hid-bg);color:var(--hid)}
+.stat.s-cat .ico{background:#DDF6FA;color:#046B7C}
+.stat b{display:block;font-family:var(--font-head);font-weight:800;font-size:2rem;line-height:1;color:var(--navy)}
+.stat span{display:block;margin-top:6px;color:var(--muted);font-size:.86rem;font-weight:500}
+.stat.load b{color:transparent;background:linear-gradient(90deg,#E8EEF9 25%,#F4F7FC 50%,#E8EEF9 75%);background-size:200% 100%;animation:sh 1.3s linear infinite;border-radius:8px;width:3ch}
+@keyframes sh{to{background-position:-200% 0}}
+
+/* Panel & toolbar */
+.panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-sm)}
+.p-head{display:flex;flex-direction:column;gap:14px;padding:18px;border-bottom:1px solid var(--line)}
+.p-head h2{font-size:1.2rem}
+.tools{display:grid;gap:10px}
+.search{position:relative}
+.search .icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.search .input{padding-left:42px}
+@media(min-width:760px){
+  .p-head{flex-direction:row;align-items:center;justify-content:space-between;padding:20px 22px}
+  .tools{grid-template-columns:minmax(220px,1fr) 190px 170px;flex:1;max-width:760px}
+}
+
+/* Jadual → kad pada mobile */
+.tbl{width:100%;border-collapse:collapse}
+.tbl thead{display:none}
+.tbl tbody{display:grid;gap:12px;padding:14px}
+.tbl tr{display:grid;grid-template-columns:84px 1fr;gap:4px 14px;padding:14px;border:1px solid var(--line);border-radius:16px;background:#fff}
+.tbl td{padding:0;min-width:0}
+.tbl td.c-img{grid-row:span 3}
+.tbl td.c-meta,.tbl td.c-act{grid-column:1/-1}
+.tbl td[data-label]::before{content:attr(data-label)": ";font-size:.78rem;color:var(--muted);font-weight:600}
+.tbl td.c-img::before,.tbl td.c-name::before,.tbl td.c-act::before{content:none}
+.tbl td.c-act{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;padding-top:12px;border-top:1px solid var(--line)}
+.t-img{width:84px;aspect-ratio:16/10;border-radius:10px;object-fit:cover;background:var(--navy)}
+.t-name{font-family:var(--font-head);font-weight:800;color:var(--navy);overflow-wrap:anywhere}
+.t-slug{font-size:.8rem;color:var(--muted);overflow-wrap:anywhere}
+.pill{display:inline-flex;align-items:center;gap:.4rem;padding:.2rem .65rem;border-radius:999px;font-family:var(--font-head);font-weight:800;font-size:.72rem;letter-spacing:.04em;text-transform:uppercase}
+.pill i{width:7px;height:7px;border-radius:50%;background:currentColor}
+.pill.active{background:var(--ok-bg);color:var(--ok)}
+.pill.coming-soon{background:var(--warn-bg);color:var(--warn)}
+.pill.hidden{background:var(--hid-bg);color:var(--hid)}
+@media(min-width:900px){
+  .tbl thead{display:table-header-group}
+  .tbl th{padding:12px 16px;text-align:left;font-family:var(--font-head);font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:#F7F9FD;border-bottom:1px solid var(--line);white-space:nowrap}
+  .tbl tbody{display:table-row-group;padding:0}
+  .tbl tr{display:table-row;border:0;border-radius:0;padding:0}
+  .tbl td{display:table-cell;padding:14px 16px;border-bottom:1px solid var(--line);vertical-align:middle}
+  .tbl td[data-label]::before{content:none}
+  .tbl td.c-act{display:table-cell;border-top:0;margin:0;white-space:nowrap}
+  .tbl td.c-act .acts{display:flex;gap:6px}
+  .tbl td.c-img{width:110px}.t-img{width:96px}
+  .tbl tr:last-child td{border-bottom:0}
+  .tbl tr:hover td{background:#FAFCFF}
+}
+.acts{display:flex;flex-wrap:wrap;gap:8px}
+.tbl td.c-act .acts{display:contents}
+@media(min-width:900px){.tbl td.c-act .acts{display:flex}}
+.state{text-align:center;padding:48px 20px}
+.state .ico{display:grid;place-items:center;width:60px;height:60px;margin:0 auto 14px;border-radius:18px;background:rgba(21,83,232,.1);color:var(--blue)}
+.state h3{font-size:1.15rem;margin-bottom:.35rem}
+.state p{color:var(--muted);max-width:28rem;margin:0 auto 16px}
+.p-foot{padding:12px 22px;font-size:.84rem;color:var(--muted);border-top:1px solid var(--line)}
+
+/* Dialog */
+dialog.dlg{border:0;padding:0;border-radius:22px;width:calc(100vw - 24px);max-width:640px;max-height:calc(100dvh - 24px);background:#fff;box-shadow:var(--shadow-lg);color:var(--text)}
+dialog.dlg::backdrop{background:rgba(6,21,52,.6);backdrop-filter:blur(4px)}
+dialog.dlg[open]{display:flex;flex-direction:column}
+dialog.sm{max-width:440px}
+.d-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px 16px 22px;border-bottom:1px solid var(--line)}
+.d-head h2{font-size:1.2rem}
+.d-body{padding:20px 22px;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.d-foot{display:flex;flex-direction:column-reverse;gap:10px;padding:14px 22px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:#F9FBFF}
+@media(min-width:520px){.d-foot{flex-direction:row;justify-content:flex-end}}
+.up{display:grid;gap:12px}
+.up-prev{aspect-ratio:16/10;border-radius:14px;border:2px dashed #B9C8E4;background:#F4F7FC;display:grid;place-items:center;overflow:hidden;color:var(--muted);text-align:center;font-size:.88rem;padding:10px}
+.up-prev img{width:100%;height:100%;object-fit:cover}
+.up-btns{display:flex;flex-wrap:wrap;gap:8px}
+.prog{height:8px;border-radius:8px;background:#E3EAF7;overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--cyan));transition:width .2s}
+.meta-dates{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:.84rem;color:var(--muted);margin-top:4px}
+.del-body{text-align:center;padding:28px 24px 8px}
+.del-body .ico{display:grid;place-items:center;width:60px;height:60px;margin:0 auto 14px;border-radius:18px;background:var(--danger-bg);color:var(--danger)}
+.del-body p{color:var(--muted);margin-top:.5rem}
+
+/* Toast */
+.toasts{position:fixed;z-index:300;inset:auto 12px calc(12px + env(safe-area-inset-bottom)) 12px;display:grid;gap:8px;justify-items:center;pointer-events:none}
+.toast{pointer-events:auto;display:flex;gap:.6rem;align-items:center;max-width:460px;width:100%;padding:13px 16px;border-radius:14px;background:var(--navy);color:#fff;box-shadow:var(--shadow-lg);font-size:.92rem;animation:tin .25s ease-out}
+.toast.ok{background:#0B5A3A}.toast.err{background:#8F1A10}
+@keyframes tin{from{opacity:0;transform:translateY(10px)}}
+.banner{padding:10px 16px;background:#FFF1CF;color:#5C4200;font-size:.88rem;text-align:center;font-weight:500}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01ms!important}}
+</style>
+</head>
+
+<body>
+<div id="boot" class="auth" role="status"><div class="auth-card" style="text-align:center"><div class="spin" style="margin:0 auto 12px;width:28px;height:28px;border-color:rgba(21,83,232,.2);border-top-color:var(--blue)"></div><p>Memuatkan Admin Panel…</p></div></div>
+
+<!-- ============ LOG MASUK ============ -->
+<main id="authView" class="auth" hidden>
+  <div class="auth-card">
+    <div class="auth-brand"><img src="assets/logo.svg" alt="" width="44" height="44"><div><b>GENIUS DIGITAL</b><small>Admin Panel</small></div></div>
+    <h1>Log masuk admin</h1>
+    <p class="sub">Gunakan akaun Firebase Authentication yang diberi akses admin.</p>
+
+    <div class="alert warn" id="cfgWarn" hidden>
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+      <span>Firebase belum dikonfigurasi. Isi <code>config.js</code> untuk mengaktifkan log masuk sebenar.</span>
+    </div>
+    <div class="alert error" id="authErr" role="alert" hidden></div>
+    <div class="alert info" id="authInfo" role="status" hidden></div>
+
+    <form id="loginForm" novalidate>
+      <div class="field"><label for="email">Emel</label><input class="input" id="email" type="email" autocomplete="username" inputmode="email" required></div>
+      <div class="field"><label for="password">Kata laluan</label><input class="input" id="password" type="password" autocomplete="current-password" required></div>
+      <button class="btn btn-primary" style="width:100%" id="loginBtn" type="submit">Log Masuk</button>
+    </form>
+    <div class="auth-foot">
+      <button class="link" id="resetBtn" type="button">Lupa kata laluan?</button>
+      <a href="index.html">← Ke laman utama</a>
+    </div>
+    <div id="demoEntry" hidden style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line)">
+      <button class="btn btn-ghost" style="width:100%" id="demoBtn" type="button">Lihat UI demo (tanpa Firebase)</button>
+      <p class="hint">Mod demo hanya menyimpan data dalam memori pelayar dan tiada kuasa pada data sebenar. Butang ini hilang sebaik Firebase dikonfigurasi.</p>
+    </div>
+  </div>
+</main>
+
+<!-- ============ APLIKASI ============ -->
+<div class="shell" id="appView" hidden>
+  <aside class="side" id="side" aria-label="Menu admin">
+    <div class="s-brand"><img src="assets/logo.svg" alt="" width="38" height="38"><div><b>GENIUS DIGITAL</b><small>Admin Panel</small></div></div>
+    <nav class="s-nav">
+      <a href="#dashboard" id="navDash" aria-current="page"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Dashboard</a>
+      <a href="#products" id="navProd"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5zM3 8l9 5 9-5M12 13v8"/></svg>Products</a>
+      <a href="index.html" target="_blank" rel="noopener"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h6v6M10 14 21 3M18 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></svg>Lihat Website</a>
+    </nav>
+    <div class="s-foot">
+      <div class="s-user" id="userLabel"></div>
+      <div class="s-nav"><button id="logoutBtn" type="button"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Log Keluar</button></div>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <div class="main-wrap">
+    <div class="banner" id="demoBanner" hidden>Mod demo UI — data tempatan sahaja, tidak disambung ke Firebase.</div>
+    <header class="top">
+      <button class="btn btn-ghost btn-icon" id="menuBtn" type="button" aria-label="Buka menu" aria-expanded="false" aria-controls="side"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <h1 id="pageTitle">Dashboard</h1>
+      <button class="btn btn-primary btn-sm" id="addBtnTop" type="button"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Add Product</span></button>
+    </header>
+
+    <div class="main">
+      <section id="secStats" aria-label="Statistik">
+        <div class="stats" id="stats"></div>
+      </section>
+
+      <section class="panel" id="secProducts" aria-label="Senarai produk">
+        <div class="p-head">
+          <h2>Product Management</h2>
+          <div class="tools">
+            <div class="search"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><label class="sr-only" for="q">Cari produk</label><input class="input" id="q" type="search" placeholder="Cari nama, slug atau kategori" autocomplete="off"></div>
+            <div><label class="sr-only" for="fCat">Tapis kategori</label><select class="input" id="fCat"><option value="">Semua kategori</option></select></div>
+            <div><label class="sr-only" for="fStatus">Tapis status</label><select class="input" id="fStatus"><option value="">Semua status</option><option value="active">Active</option><option value="coming-soon">Coming Soon</option><option value="hidden">Hidden</option></select></div>
+          </div>
+        </div>
+        <div id="listBox" aria-live="polite"></div>
+        <div class="p-foot" id="listFoot"></div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- Modal tambah/edit -->
+<dialog class="dlg" id="formDlg" aria-labelledby="formTitle">
+  <form id="productForm" novalidate method="dialog" style="display:flex;flex-direction:column;min-height:0;flex:1">
+    <div class="d-head"><h2 id="formTitle">Add Product</h2><button class="btn btn-ghost btn-icon" type="button" id="formX" aria-label="Tutup"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <div class="d-body">
+      <div class="alert error" id="formErr" role="alert" hidden></div>
+      <div class="field"><label for="fName">Product Name <span class="req">*</span></label><input class="input" id="fName" maxlength="80" required><div class="err" id="eName" hidden></div></div>
+      <div class="row2">
+        <div class="field"><label for="fSlug">Product Slug <span class="req">*</span></label><input class="input" id="fSlug" maxlength="80" autocapitalize="none" spellcheck="false" required><div class="hint">Huruf kecil, nombor dan sempang. Contoh: qr-me-generator</div><div class="err" id="eSlug" hidden></div></div>
+        <div class="field"><label for="fCategory">Product Category <span class="req">*</span></label><input class="input" id="fCategory" list="catList" maxlength="40" required><datalist id="catList"></datalist><div class="err" id="eCategory" hidden></div></div>
+      </div>
+      <div class="field"><label for="fDesc">Product Description <span class="req">*</span></label><textarea class="input" id="fDesc" maxlength="500" required></textarea><div class="hint"><span id="descCount">0</span>/500</div><div class="err" id="eDesc" hidden></div></div>
+      <div class="row2">
+        <div class="field"><label for="fStatusSel">Product Status</label><select class="input" id="fStatusSel"><option value="active">Active</option><option value="coming-soon">Coming Soon</option><option value="hidden">Hidden</option></select></div>
+        <div class="field"><label for="fOrder">Display Order</label><input class="input" id="fOrder" type="number" inputmode="numeric" min="0" max="9999" step="1" value="1"><div class="err" id="eOrder" hidden></div></div>
+      </div>
+      <div class="field"><label for="fURL">Product URL <span style="font-weight:500;color:var(--muted)">(pilihan)</span></label><input class="input" id="fURL" type="url" inputmode="url" placeholder="https://" maxlength="300"><div class="hint">Belum digunakan di website utama. Boleh dibiarkan kosong.</div><div class="err" id="eURL" hidden></div></div>
+
+      <div class="field">
+        <label for="fFile">Product Thumbnail</label>
+        <div class="up">
+          <div class="up-prev" id="upPrev">Tiada imej dipilih</div>
+          <div class="prog" id="prog" hidden><i id="progBar"></i></div>
+          <div class="up-btns">
+            <label class="btn btn-ghost btn-sm" for="fFile" style="margin:0;cursor:pointer"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg><span id="upLabel">Upload Image</span></label>
+            <input class="sr-only" type="file" id="fFile" accept="image/jpeg,image/png,image/webp">
+            <button class="btn btn-ghost btn-sm" type="button" id="upRemove" hidden><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>Delete Image</button>
+          </div>
+          <div class="hint">JPG, PNG atau WebP · maksimum 2 MB · nisbah 16:10 (cadangan 1200×750). Fail disimpan di Firebase Storage; hanya URL disimpan dalam Firestore.</div>
+          <div class="err" id="eFile" hidden></div>
+        </div>
+      </div>
+
+      <div class="meta-dates" id="metaDates" hidden><span>Created: <b id="mCreated">—</b></span><span>Updated: <b id="mUpdated">—</b></span></div>
+    </div>
+    <div class="d-foot">
+      <button class="btn btn-ghost" type="button" id="formCancel">Batal</button>
+      <button class="btn btn-primary" type="submit" id="formSave">Simpan</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Modal padam -->
+<dialog class="dlg sm" id="delDlg" aria-labelledby="delTitle">
+  <div class="del-body">
+    <div class="ico"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" style="width:28px;height:28px"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg></div>
+    <h2 id="delTitle">Padam produk ini?</h2>
+    <p>“<b id="delName"></b>” akan dipadam secara kekal, termasuk imej thumbnail dalam Storage. Tindakan ini tidak boleh dibatalkan.</p>
+  </div>
+  <div class="d-foot" style="background:#fff;border:0">
+    <button class="btn btn-ghost" type="button" id="delCancel">Batal</button>
+    <button class="btn btn-danger" type="button" id="delOk">Ya, Padam</button>
+  </div>
+</dialog>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="config.js"></script>
+<script type="module">
+/* =====================================================================
+   GENIUS DIGITAL — admin.html
+   Struktur: 1) utiliti  2) lapisan data (Firebase | demo)  3) auth
+             4) dashboard  5) senarai produk  6) borang  7) padam  8) mula
+   Keselamatan sebenar = Firestore/Storage Rules + custom claim `admin`.
+   Pemeriksaan di klien hanyalah untuk UX, bukan sempadan keselamatan.
+   ===================================================================== */
+const CFG = window.GENIUS_CONFIG || {};
+const FB = CFG.firebase || {};
+const firebaseReady = !!FB.apiKey && !/^YOUR_/.test(FB.apiKey) && !/^YOUR_/.test(FB.projectId || "YOUR_");
+const FIREBASE_VER = "11.10.0";
+const MAX_IMG = 2 * 1024 * 1024;
+const IMG_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const STATUS_LABEL = { "active": "Active", "coming-soon": "Coming Soon", "hidden": "Hidden" };
+
+/* ---------- 1) Utiliti ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs = {}, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) { if (v == null || v === false) continue; if (k === "class") n.className = v; else if (k === "text") n.textContent = v; else n.setAttribute(k, v === true ? "" : v); }
+  kids.flat().forEach(k => k != null && n.append(k.nodeType ? k : document.createTextNode(k)));
+  return n;
+}
+function icon(d) { const s = document.createElementNS(NS, "svg"); s.setAttribute("class", "icon"); s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("aria-hidden", "true"); const p = document.createElementNS(NS, "path"); p.setAttribute("d", d); s.append(p); return s; }
+const I = {
+  edit: "M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z",
+  trash: "M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6",
+  up: "M12 19V5M5 12l7-7 7 7", down: "M12 5v14M19 12l-7 7-7-7",
+  box: "M21 8 12 3 3 8v8l9 5 9-5zM3 8l9 5 9-5M12 13v8",
+  check: "M20 6 9 17l-5-5", clock: "M12 7v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0",
+  eyeoff: "M17.9 17.9A10.1 10.1 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.1-5.9M9.9 4.2A9.1 9.1 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.2 3.2M1 1l22 22",
+  tag: "M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8zM7 7h.01",
+  alert: "M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"
+};
+function toast(msg, kind = "") {
+  const t = el("div", { class: "toast " + kind, role: kind === "err" ? "alert" : "status" }, msg);
+  $("#toasts").append(t); setTimeout(() => t.remove(), kind === "err" ? 6500 : 3500);
+}
+function setBusy(btn, busy, label) {
+  btn.disabled = busy;
+  if (busy) { btn.dataset.l = btn.innerHTML; btn.replaceChildren(el("span", { class: "spin" }), label || "Sila tunggu…"); }
+  else if (btn.dataset.l) { btn.innerHTML = btn.dataset.l; delete btn.dataset.l; }
+}
+const slugify = s => s.toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80);
+const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+function fmtDate(ts) {
+  if (!ts) return "Baru sahaja";
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return isNaN(d) ? "—" : d.toLocaleString("ms-MY", { dateStyle: "medium", timeStyle: "short" });
+}
+const SEED = [
+  { name: "QR Me Generator", slug: "qr-me-generator", category: "Digital Tools", description: "Sistem penjana kod QR yang membolehkan pengguna menghasilkan QR Code dengan mudah, pantas dan praktikal untuk pelbagai kegunaan.", status: "active", productURL: "", displayOrder: 1 },
+  { name: "Malaysia PDF Tools", slug: "malaysia-pdf-tools", category: "Productivity Tools", description: "Platform pengurusan dokumen PDF yang menyediakan pelbagai fungsi untuk membantu pengguna mengurus, memproses dan menghasilkan dokumen secara lebih mudah dan efisien.", status: "coming-soon", productURL: "", displayOrder: 2 }
+];
+
+/* ---------- 2) Lapisan data ----------
+   Antara muka sama untuk Firebase dan Demo:
+   onAuth(cb) signIn(e,p) signOut() resetPassword(e)
+   subscribe(cb,errCb)->unsub  save(id|null,data,{file,removeImage,onProgress})  remove(product)
+   reorder([{id,displayOrder}])  seed()->bilangan dimasukkan                                      */
+async function createFirebaseApi() {
+  const base = `https://www.gstatic.com/firebasejs/${FIREBASE_VER}`;
+  const [appM, authM, fsM, stM] = await Promise.all([
+    import(`${base}/firebase-app.js`), import(`${base}/firebase-auth.js`),
+    import(`${base}/firebase-firestore.js`), import(`${base}/firebase-storage.js`)]);
+  const app = appM.initializeApp(FB);
+  const auth = authM.getAuth(app), db = fsM.getFirestore(app), storage = stM.getStorage(app);
+  const col = fsM.collection(db, "products");
+
+  async function uploadThumb(productId, file, onProgress) {
+    const safe = file.name.toLowerCase().replace(/[^a-z0-9.]+/g, "-").slice(-60);
+    const path = `products/${productId}/${Date.now()}-${safe}`;
+    const task = stM.uploadBytesResumable(stM.ref(storage, path), file, { contentType: file.type });
+    await new Promise((res, rej) => task.on("state_changed", s => onProgress && onProgress(s.bytesTransferred / s.totalBytes), rej, res));
+    return { url: await stM.getDownloadURL(task.snapshot.ref), path };
+  }
+  async function deleteThumb(path) {
+    if (!path) return;
+    try { await stM.deleteObject(stM.ref(storage, path)); }
+    catch (e) { if (e.code !== "storage/object-not-found") throw e; }
+  }
+  return {
+    mode: "firebase",
+    onAuth(cb) {
+      return authM.onAuthStateChanged(auth, async user => {
+        if (!user) return cb(null);
+        try {
+          const t = await user.getIdTokenResult(true);        // segarkan claim terkini
+          cb({ email: user.email, isAdmin: t.claims.admin === true });
+        } catch (e) { console.error(e); cb({ email: user.email, isAdmin: false, error: e }); }
+      });
+    },
+    signIn: (e, p) => authM.signInWithEmailAndPassword(auth, e, p),
+    signOut: () => authM.signOut(auth),
+    resetPassword: e => authM.sendPasswordResetEmail(auth, e),
+    subscribe(cb, errCb) {
+      return fsM.onSnapshot(fsM.query(col, fsM.orderBy("displayOrder")), s => cb(s.docs.map(d => ({ id: d.id, ...d.data() }))), errCb);
+    },
+    async save(id, data, { file, removeImage, onProgress, old } = {}) {
+      const ref = id ? fsM.doc(col, id) : fsM.doc(col);        // id baharu dijana dahulu untuk laluan Storage
+      const payload = { ...data, updatedAt: fsM.serverTimestamp() };
+      let uploaded = null;
+      if (file) { uploaded = await uploadThumb(ref.id, file, onProgress); payload.thumbnailURL = uploaded.url; payload.thumbnailPath = uploaded.path; }
+      else if (removeImage) { payload.thumbnailURL = ""; payload.thumbnailPath = ""; }
+      try {
+        if (id) await fsM.updateDoc(ref, payload);
+        else await fsM.setDoc(ref, { thumbnailURL: "", thumbnailPath: "", ...payload, createdAt: fsM.serverTimestamp() });
+      } catch (e) { if (uploaded) await deleteThumb(uploaded.path).catch(() => {}); throw e; } // elak fail yatim
+      if ((file || removeImage) && old?.thumbnailPath) await deleteThumb(old.thumbnailPath).catch(e => console.warn("Imej lama tidak dapat dipadam", e));
+      return ref.id;
+    },
+    async remove(p) {
+      await fsM.deleteDoc(fsM.doc(col, p.id));
+      if (p.thumbnailPath) await deleteThumb(p.thumbnailPath).catch(e => { console.warn(e); toast("Produk dipadam, tetapi imej dalam Storage gagal dipadam.", "err"); });
+    },
+    async reorder(changes) {
+      const b = fsM.writeBatch(db);
+      changes.forEach(c => b.update(fsM.doc(col, c.id), { displayOrder: c.displayOrder, updatedAt: fsM.serverTimestamp() }));
+      await b.commit();
+    },
+    async seed() {                       // idempotent: ID dokumen = slug, hanya ditulis jika belum wujud
+      let n = 0;
+      for (const s of SEED) {
+        const ref = fsM.doc(col, s.slug);
+        if ((await fsM.getDoc(ref)).exists()) continue;
+        await fsM.setDoc(ref, { ...s, thumbnailURL: "", thumbnailPath: "", createdAt: fsM.serverTimestamp(), updatedAt: fsM.serverTimestamp() }); n++;
+      }
+      return n;
+    }
+  };
+}
+
+function createDemoApi() {
+  let list = [], subs = new Set(), n = 0;
+  const now = () => ({ toDate: () => new Date() });
+  const emit = () => subs.forEach(cb => cb(list.map(x => ({ ...x }))));
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  list = SEED.map((s, i) => ({ id: "demo" + i, ...s, thumbnailURL: "", thumbnailPath: "", createdAt: now(), updatedAt: now() }));
+  return {
+    mode: "demo",
+    onAuth(cb) { this._cb = cb; },
+    enter() { this._cb({ email: "demo (tanpa Firebase)", isAdmin: true }); },
+    signIn() { throw Object.assign(new Error("demo"), { code: "demo/no-auth" }); },
+    signOut: async function () { this._cb(null); },
+    resetPassword: async () => {},
+    subscribe(cb) { subs.add(cb); setTimeout(emit, 350); return () => subs.delete(cb); },
+    async save(id, data, { file, removeImage, onProgress } = {}) {
+      for (const p of [.3, .7, 1]) { if (file) { onProgress?.(p); await sleep(120); } }
+      const extra = file ? { thumbnailURL: URL.createObjectURL(file), thumbnailPath: "demo/" + file.name } : removeImage ? { thumbnailURL: "", thumbnailPath: "" } : {};
+      if (id) list = list.map(p => p.id === id ? { ...p, ...data, ...extra, updatedAt: now() } : p);
+      else list.push({ id: "demo-n" + ++n, thumbnailURL: "", thumbnailPath: "", ...data, ...extra, createdAt: now(), updatedAt: now() });
+      emit();
+    },
+    async remove(p) { await sleep(150); list = list.filter(x => x.id !== p.id); emit(); },
+    async reorder(ch) { ch.forEach(c => { const p = list.find(x => x.id === c.id); if (p) p.displayOrder = c.displayOrder; }); list.sort((a, b) => a.displayOrder - b.displayOrder); emit(); },
+    async seed() { const miss = SEED.filter(s => !list.some(p => p.slug === s.slug)); miss.forEach((s, i) => list.push({ id: "demo-s" + i + s.slug, ...s, thumbnailURL: "", thumbnailPath: "", createdAt: now(), updatedAt: now() })); emit(); return miss.length; }
+  };
+}
+
+/* ---------- Keadaan ---------- */
+let api, products = null, unsub = null, currentUser = null;
+const view = { q: "", cat: "", status: "" };
+
+/* ---------- 3) Auth & paparan ---------- */
+const showOnly = id => { ["boot", "authView", "appView"].forEach(x => $("#" + x).hidden = x !== id); };
+function authMsg(kind, msg) {
+  $("#authErr").hidden = kind !== "err"; $("#authInfo").hidden = kind !== "info";
+  if (kind === "err") $("#authErr").replaceChildren(icon(I.alert), el("span", { text: msg }));
+  if (kind === "info") $("#authInfo").textContent = msg;
+}
+const AUTH_ERRORS = {
+  "auth/invalid-credential": "Emel atau kata laluan tidak betul.", "auth/wrong-password": "Emel atau kata laluan tidak betul.",
+  "auth/user-not-found": "Emel atau kata laluan tidak betul.", "auth/invalid-email": "Format emel tidak sah.",
+  "auth/too-many-requests": "Terlalu banyak percubaan. Cuba lagi sebentar lagi.", "auth/network-request-failed": "Tiada sambungan internet.",
+  "auth/user-disabled": "Akaun ini telah dinyahaktifkan.", "auth/operation-not-allowed": "Log masuk emel/kata laluan belum diaktifkan dalam Firebase Console."
+};
+function onUser(user) {
+  currentUser = user;
+  if (unsub) { unsub(); unsub = null; }
+  products = null;
+  if (!user) { showOnly("authView"); return; }
+  if (!user.isAdmin) {
+    showOnly("authView");
+    authMsg("err", `Akaun ${user.email || ""} tidak mempunyai akses admin. Hubungi pemilik sistem. Jika akses baru diberi, log keluar dan log masuk semula.`);
+    api.signOut(); return;
+  }
+  $("#userLabel").textContent = user.email;
+  $("#demoBanner").hidden = api.mode !== "demo";
+  showOnly("appView"); route(); renderAll();
+  unsub = api.subscribe(list => { products = list; renderAll(); },
+    err => { console.error(err); products = []; renderAll(err); });
+}
+$("#loginForm").addEventListener("submit", async e => {
+  e.preventDefault(); authMsg(null);
+  const email = $("#email").value.trim(), pw = $("#password").value;
+  if (!email || !pw) return authMsg("err", "Sila isi emel dan kata laluan.");
+  if (api.mode === "demo") return authMsg("err", "Firebase belum dikonfigurasi, jadi log masuk sebenar tidak tersedia.");
+  const btn = $("#loginBtn"); setBusy(btn, true, "Log masuk…");
+  try { await api.signIn(email, pw); $("#password").value = ""; }
+  catch (err) { authMsg("err", AUTH_ERRORS[err.code] || "Log masuk gagal. Cuba lagi."); }
+  finally { setBusy(btn, false); }
+});
+$("#resetBtn").addEventListener("click", async () => {
+  const email = $("#email").value.trim();
+  if (api.mode === "demo") return authMsg("err", "Firebase belum dikonfigurasi.");
+  if (!email) return authMsg("err", "Taip emel anda dahulu, kemudian tekan 'Lupa kata laluan?'.");
+  try { await api.resetPassword(email); authMsg("info", "Jika emel itu berdaftar, pautan tetapan semula kata laluan telah dihantar."); }
+  catch (err) { authMsg("err", AUTH_ERRORS[err.code] || "Tidak dapat menghantar emel."); }
+});
+$("#logoutBtn").addEventListener("click", () => api.signOut());
+$("#demoBtn").addEventListener("click", () => api.enter());
+
+/* Navigasi / drawer */
+const side = $("#side"), scrim = $("#scrim"), menuBtn = $("#menuBtn");
+function setSide(open) { side.classList.toggle("open", open); scrim.classList.toggle("show", open); menuBtn.setAttribute("aria-expanded", String(open)); menuBtn.setAttribute("aria-label", open ? "Tutup menu" : "Buka menu"); }
+menuBtn.addEventListener("click", () => setSide(!side.classList.contains("open")));
+scrim.addEventListener("click", () => setSide(false));
+side.querySelectorAll("a[href^='#']").forEach(a => a.addEventListener("click", () => setSide(false)));
+addEventListener("keydown", e => { if (e.key === "Escape") setSide(false); });
+function route() {
+  const h = location.hash === "#products" ? "products" : "dashboard";
+  $("#pageTitle").textContent = h === "products" ? "Products" : "Dashboard";
+  $("#navDash").toggleAttribute("aria-current", h === "dashboard"); if (h === "dashboard") $("#navDash").setAttribute("aria-current", "page");
+  $("#navProd").toggleAttribute("aria-current", h === "products"); if (h === "products") $("#navProd").setAttribute("aria-current", "page");
+  $("#secStats").hidden = h === "products";
+  if (h === "products") scrollTo({ top: 0 });
+}
+addEventListener("hashchange", route);
+
+/* ---------- 4) Dashboard ---------- */
+function renderStats() {
+  const box = $("#stats");
+  const cards = [
+    ["Total Products", "box", "", p => p.length], ["Active Products", "check", "s-ok", p => p.filter(x => x.status === "active").length],
+    ["Coming Soon Products", "clock", "s-warn", p => p.filter(x => x.status === "coming-soon").length],
+    ["Hidden Products", "eyeoff", "s-hid", p => p.filter(x => x.status === "hidden").length],
+    ["Total Categories", "tag", "s-cat", p => new Set(p.map(x => (x.category || "").trim().toLowerCase()).filter(Boolean)).size]
+  ];
+  box.replaceChildren(...cards.map(([label, ic, cls, fn]) =>
+    el("div", { class: `stat ${cls} ${products ? "" : "load"}` }, el("div", { class: "ico" }, icon(I[ic])), el("b", { text: products ? String(fn(products)) : "0" }), el("span", { text: label }))));
+}
+
+/* ---------- 5) Senarai produk ---------- */
+function filtered() {
+  const q = view.q.toLowerCase();
+  return (products || []).filter(p =>
+    (!view.cat || p.category === view.cat) && (!view.status || p.status === view.status) &&
+    (!q || [p.name, p.slug, p.category].some(v => (v || "").toLowerCase().includes(q))));
+}
+function renderCategoryOptions() {
+  const cats = [...new Set((products || []).map(p => p.category).filter(Boolean))].sort();
+  const sel = $("#fCat"), keep = view.cat;
+  sel.replaceChildren(el("option", { value: "", text: "Semua kategori" }), ...cats.map(c => el("option", { value: c, text: c })));
+  if (cats.includes(keep)) sel.value = keep; else view.cat = "";
+  $("#catList").replaceChildren(...cats.map(c => el("option", { value: c })));
+}
+function thumbOf(p) { return p.thumbnailURL || (SLUG_RE.test(p.slug || "") ? `assets/thumbs/${p.slug}.svg` : ""); }
+function rowFor(p, idx, all) {
+  const img = el("img", { class: "t-img", src: thumbOf(p), alt: `Thumbnail ${p.name}`, loading: "lazy", width: 96, height: 60 });
+  img.addEventListener("error", () => { img.removeAttribute("src"); img.style.visibility = "hidden"; });
+  const full = (products || []);
+  const pos = full.findIndex(x => x.id === p.id);
+  const mk = (label, ic, fn, extra = {}) => { const b = el("button", { class: "btn btn-ghost btn-sm" + (extra.cls ? " " + extra.cls : ""), type: "button", "aria-label": `${label}: ${p.name}`, title: label, disabled: extra.disabled }, icon(I[ic]), extra.text ? el("span", { text: extra.text }) : null); b.addEventListener("click", fn); return b; };
+  return el("tr", {},
+    el("td", { class: "c-img" }, img),
+    el("td", { class: "c-name" }, el("div", { class: "t-name", text: p.name }), el("div", { class: "t-slug", text: "/" + p.slug })),
+    el("td", { class: "c-meta", "data-label": "Kategori" }, p.category || "—"),
+    el("td", { class: "c-meta", "data-label": "Status" }, el("span", { class: "pill " + p.status }, el("i"), STATUS_LABEL[p.status] || p.status)),
+    el("td", { class: "c-meta", "data-label": "Susunan" }, String(p.displayOrder ?? "—")),
+    el("td", { class: "c-meta", "data-label": "Dikemas kini" }, fmtDate(p.updatedAt)),
+    el("td", { class: "c-act" }, el("div", { class: "acts" },
+      mk("Naik", "up", () => move(p, -1), { disabled: pos <= 0 }),
+      mk("Turun", "down", () => move(p, 1), { disabled: pos === full.length - 1 }),
+      mk("Edit", "edit", () => openForm(p), { text: "Edit" }),
+      mk("Padam", "trash", () => openDelete(p), { text: "Padam", cls: "" }))));
+}
+function renderList(err) {
+  const box = $("#listBox"), foot = $("#listFoot");
+  if (err) {
+    box.replaceChildren(stateBox("alert", "Gagal memuatkan produk", err.code === "permission-denied" ? "Akses ditolak oleh Firestore Rules. Pastikan custom claim admin telah ditetapkan, kemudian log keluar dan masuk semula." : "Sila semak sambungan internet dan cuba lagi.", [btn("Cuba lagi", () => location.reload())]));
+    foot.textContent = ""; return;
+  }
+  if (!products) {
+    box.replaceChildren(el("div", { class: "state", role: "status" }, el("div", { class: "spin", style: "margin:0 auto 12px;width:28px;height:28px;border-color:rgba(21,83,232,.2);border-top-color:#1553E8" }), el("p", { text: "Memuatkan produk…" })));
+    foot.textContent = ""; return;
+  }
+  if (!products.length) {
+    box.replaceChildren(stateBox("box", "Belum ada produk", "Tambah produk pertama anda, atau muat 2 produk contoh (QR Me Generator & Malaysia PDF Tools). Muat contoh tidak akan membuat pendua.", [btn("Add Product", () => openForm(), true), btn("Muat produk contoh", seedNow)]));
+    foot.textContent = ""; return;
+  }
+  const rows = filtered();
+  if (!rows.length) {
+    box.replaceChildren(stateBox("box", "Tiada padanan", "Tiada produk sepadan dengan carian atau tapisan anda.", [btn("Set semula tapisan", () => { view.q = view.cat = view.status = ""; $("#q").value = $("#fCat").value = $("#fStatus").value = ""; renderList(); })]));
+  } else {
+    const table = el("table", { class: "tbl" },
+      el("thead", {}, el("tr", {}, ...["Thumbnail", "Produk", "Kategori", "Status", "Susunan", "Dikemas kini", "Tindakan"].map(h => el("th", { scope: "col", text: h })))),
+      el("tbody", {}, ...rows.map((p, i) => rowFor(p, i, rows))));
+    box.replaceChildren(table);
+  }
+  foot.textContent = `Memaparkan ${rows.length} daripada ${products.length} produk`;
+}
+function btn(text, fn, primary) { const b = el("button", { class: "btn " + (primary ? "btn-primary" : "btn-ghost"), type: "button", text }); b.addEventListener("click", fn); return b; }
+function stateBox(ic, title, text, actions = []) {
+  return el("div", { class: "state" }, el("div", { class: "ico" }, icon(I[ic])), el("h3", { text: title }), el("p", { text }), el("div", { class: "acts", style: "justify-content:center" }, ...actions));
+}
+function renderAll(err) { renderStats(); renderCategoryOptions(); renderList(err); }
+
+$("#q").addEventListener("input", e => { view.q = e.target.value.trim(); renderList(); });
+$("#fCat").addEventListener("change", e => { view.cat = e.target.value; renderList(); });
+$("#fStatus").addEventListener("change", e => { view.status = e.target.value; renderList(); });
+
+async function seedNow(e) {
+  const b = e.currentTarget; setBusy(b, true, "Memuatkan…");
+  try { const n = await api.seed(); toast(n ? `${n} produk contoh dimasukkan.` : "Produk contoh sudah wujud — tiada pendua dibuat.", "ok"); }
+  catch (err) { console.error(err); toast("Gagal memuat produk contoh: " + (err.code || err.message), "err"); setBusy(b, false); }
+}
+async function move(p, dir) {
+  const list = [...products].sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0));
+  const i = list.findIndex(x => x.id === p.id), j = i + dir;
+  if (j < 0 || j >= list.length) return;
+  [list[i], list[j]] = [list[j], list[i]];
+  const changes = list.map((x, k) => ({ id: x.id, displayOrder: k + 1 })).filter(c => products.find(x => x.id === c.id).displayOrder !== c.displayOrder);
+  try { await api.reorder(changes); toast("Susunan dikemas kini.", "ok"); }
+  catch (err) { console.error(err); toast("Gagal menukar susunan: " + (err.code || err.message), "err"); }
+}
+
+/* ---------- 6) Borang tambah / edit ---------- */
+const dlg = $("#formDlg"), form = $("#productForm");
+const F = { name: $("#fName"), slug: $("#fSlug"), cat: $("#fCategory"), desc: $("#fDesc"), status: $("#fStatusSel"), order: $("#fOrder"), url: $("#fURL"), file: $("#fFile") };
+let editing = null, slugTouched = false, pendingFile = null, removeImage = false, previewURL = null;
+
+function fieldErr(key, msg, input) {
+  const e = $("#e" + key); e.hidden = !msg; e.textContent = msg || "";
+  input?.setAttribute("aria-invalid", String(!!msg));
+}
+function setPreview(src) {
+  const prev = $("#upPrev");
+  if (src) { const im = el("img", { src, alt: "Pratonton thumbnail" }); im.addEventListener("error", () => { prev.textContent = "Imej tidak dapat dipaparkan"; }); prev.replaceChildren(im); }
+  else prev.textContent = "Tiada imej dipilih";
+  $("#upRemove").hidden = !src;
+  $("#upLabel").textContent = src ? "Replace Image" : "Upload Image";
+}
+function openForm(p = null) {
+  editing = p; slugTouched = !!p; pendingFile = null; removeImage = false;
+  if (previewURL) { URL.revokeObjectURL(previewURL); previewURL = null; }
+  $("#formTitle").textContent = p ? "Edit Product" : "Add Product";
+  $("#formErr").hidden = true; $("#prog").hidden = true; $("#progBar").style.width = "0";
+  ["Name", "Slug", "Category", "Desc", "Order", "URL", "File"].forEach(k => fieldErr(k, "", null));
+  Object.values(F).forEach(i => i.removeAttribute("aria-invalid"));
+  F.file.value = "";
+  const maxOrder = Math.max(0, ...(products || []).map(x => x.displayOrder || 0));
+  F.name.value = p?.name || ""; F.slug.value = p?.slug || ""; F.cat.value = p?.category || "";
+  F.desc.value = p?.description || ""; F.status.value = p?.status || "active";
+  F.order.value = p ? (p.displayOrder ?? 1) : maxOrder + 1; F.url.value = p?.productURL || "";
+  $("#descCount").textContent = F.desc.value.length;
+  setPreview(p?.thumbnailURL || "");
+  $("#metaDates").hidden = !p; if (p) { $("#mCreated").textContent = fmtDate(p.createdAt); $("#mUpdated").textContent = fmtDate(p.updatedAt); }
+  dlg.showModal(); F.name.focus();
+}
+const closeForm = () => dlg.close();
+$("#addBtnTop").addEventListener("click", () => openForm());
+$("#formX").addEventListener("click", closeForm); $("#formCancel").addEventListener("click", closeForm);
+dlg.addEventListener("click", e => { if (e.target === dlg) closeForm(); });
+F.name.addEventListener("input", () => { if (!slugTouched) F.slug.value = slugify(F.name.value); });
+F.slug.addEventListener("input", () => { slugTouched = true; });
+F.desc.addEventListener("input", () => { $("#descCount").textContent = F.desc.value.length; });
+F.file.addEventListener("change", () => {
+  const f = F.file.files[0]; fieldErr("File", "", null);
+  if (!f) return;
+  if (!IMG_TYPES.includes(f.type)) { F.file.value = ""; return fieldErr("File", "Format tidak disokong. Gunakan JPG, PNG atau WebP."); }
+  if (f.size > MAX_IMG) { F.file.value = ""; return fieldErr("File", `Fail terlalu besar (${(f.size / 1048576).toFixed(1)} MB). Maksimum 2 MB.`); }
+  pendingFile = f; removeImage = false;
+  if (previewURL) URL.revokeObjectURL(previewURL);
+  previewURL = URL.createObjectURL(f); setPreview(previewURL);
+});
+$("#upRemove").addEventListener("click", () => {
+  pendingFile = null; F.file.value = ""; removeImage = !!editing?.thumbnailURL;
+  if (previewURL) { URL.revokeObjectURL(previewURL); previewURL = null; }
+  setPreview("");
+});
+
+function validate() {
+  let ok = true; const bad = (k, m, i) => { fieldErr(k, m, i); ok = false; };
+  const name = F.name.value.trim(), slug = F.slug.value.trim(), cat = F.cat.value.trim(), desc = F.desc.value.trim(), url = F.url.value.trim(), order = Number(F.order.value);
+  fieldErr("Name", "", F.name); fieldErr("Slug", "", F.slug); fieldErr("Category", "", F.cat); fieldErr("Desc", "", F.desc); fieldErr("Order", "", F.order); fieldErr("URL", "", F.url);
+  if (!name) bad("Name", "Nama produk diperlukan.", F.name);
+  if (!slug) bad("Slug", "Slug diperlukan.", F.slug);
+  else if (!SLUG_RE.test(slug)) bad("Slug", "Slug hanya boleh huruf kecil, nombor dan sempang (bukan di hujung).", F.slug);
+  else if ((products || []).some(p => p.slug === slug && p.id !== editing?.id)) bad("Slug", "Slug ini sudah digunakan oleh produk lain.", F.slug);
+  if (!cat) bad("Category", "Kategori diperlukan.", F.cat);
+  if (!desc) bad("Desc", "Penerangan diperlukan.", F.desc);
+  if (!Number.isInteger(order) || order < 0 || order > 9999) bad("Order", "Masukkan nombor bulat 0–9999.", F.order);
+  if (url && !/^https?:\/\/[^\s]+$/i.test(url)) bad("URL", "URL mesti bermula dengan http:// atau https://", F.url);
+  return ok && { name, slug, category: cat, description: desc, status: F.status.value, productURL: url, displayOrder: order };
+}
+form.addEventListener("submit", async e => {
+  e.preventDefault();
+  const data = validate();
+  if (!data) { dlg.querySelector("[aria-invalid='true']")?.focus(); return; }
+  const save = $("#formSave"); setBusy(save, true, pendingFile ? "Memuat naik…" : "Menyimpan…");
+  $("#formErr").hidden = true;
+  if (pendingFile) { $("#prog").hidden = false; }
+  try {
+    await api.save(editing?.id || null, data, { file: pendingFile, removeImage, old: editing, onProgress: r => { $("#progBar").style.width = Math.round(r * 100) + "%"; } });
+    toast(editing ? "Produk dikemas kini." : "Produk ditambah.", "ok"); closeForm();
+  } catch (err) {
+    console.error(err);
+    const msg = err.code === "permission-denied" || err.code === "storage/unauthorized" ? "Akses ditolak. Pastikan anda admin dan rules telah diterbitkan."
+      : err.code === "storage/quota-exceeded" || err.code === "storage/unknown" ? "Storage tidak dapat digunakan. Semak sama ada Cloud Storage telah diaktifkan untuk projek ini."
+      : "Gagal menyimpan: " + (err.code || err.message);
+    $("#formErr").replaceChildren(icon(I.alert), el("span", { text: msg })); $("#formErr").hidden = false;
+    dlg.querySelector(".d-body").scrollTo({ top: 0, behavior: "smooth" });
+  } finally { setBusy(save, false); }
+});
+
+/* ---------- 7) Padam ---------- */
+const delDlg = $("#delDlg"); let toDelete = null;
+function openDelete(p) { toDelete = p; $("#delName").textContent = p.name; delDlg.showModal(); $("#delCancel").focus(); }
+$("#delCancel").addEventListener("click", () => delDlg.close());
+delDlg.addEventListener("click", e => { if (e.target === delDlg) delDlg.close(); });
+$("#delOk").addEventListener("click", async () => {
+  const b = $("#delOk"); setBusy(b, true, "Memadam…");
+  try { await api.remove(toDelete); toast("Produk dipadam.", "ok"); delDlg.close(); }
+  catch (err) { console.error(err); toast("Gagal memadam: " + (err.code || err.message), "err"); }
+  finally { setBusy(b, false); }
+});
+
+/* ---------- 8) Mula ---------- */
+async function init() {
+  try {
+    if (firebaseReady) api = await createFirebaseApi();
+    else { api = createDemoApi(); $("#cfgWarn").hidden = false; $("#demoEntry").hidden = false; }
+    api.onAuth(onUser);
+    if (api.mode === "demo") showOnly("authView");
+  } catch (err) {
+    console.error(err);
+    showOnly("authView"); authMsg("err", "Tidak dapat memuatkan Firebase. Semak sambungan internet dan konfigurasi dalam config.js.");
+    $("#loginBtn").disabled = true;
+  }
+}
+init();
+</script>
+</body>
+</html>
