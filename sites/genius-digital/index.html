@@ -364,14 +364,6 @@
     .modal-x { position: absolute; top: .7rem; inset-inline-end: .7rem; color: var(--head); z-index: 3; width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--glass-3); box-shadow: var(--shadow-sm); display: grid; place-items: center; }
     .modal-x svg { width: 20px; height: 20px; }
 
-    /* ---------- Preview-mode notice ---------- */
-    .demo-note {
-      position: fixed; z-index: 90; left: 1rem; right: 1rem; bottom: calc(1rem + env(safe-area-inset-bottom)); max-width: 520px; margin-inline: auto;
-      display: none; align-items: center; gap: .8rem; padding: .75rem .9rem .75rem 1.1rem; border-radius: 16px; font-size: .82rem; line-height: 1.45;
-      color: #fff; background: rgba(10, 31, 68, .94); box-shadow: var(--shadow-lg); backdrop-filter: blur(10px);
-    }
-    .demo-note.show { display: flex; }
-    .demo-note button { flex: none; min-width: 44px; min-height: 44px; border: 0; border-radius: 10px; background: rgba(255, 255, 255, .14); color: #fff; font-weight: 700; }
 
     /* ---------- Reveal animations (only when JS is active) ---------- */
     .js .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s cubic-bezier(.2, .8, .2, 1); transition-delay: var(--d, 0s); }
@@ -434,7 +426,6 @@
     :root[data-theme="dark"] .thumb::after { background: linear-gradient(180deg, transparent 55%, rgba(0, 0, 0, .3)); }
     :root[data-theme="dark"] .btn-primary { box-shadow: 0 10px 24px rgba(10, 102, 255, .4); }
     :root[data-theme="dark"] .products::before { opacity: .6; }
-    :root[data-theme="dark"] .demo-note { background: rgba(22, 40, 76, .96); border: 1px solid rgba(160, 185, 235, .25); }
     :root[data-theme="dark"] .status-badge.live { color: var(--ok); }
     :root[data-theme="dark"] .site-footer { background: #050C1C; }
     :root[data-theme="dark"] .contact-card { box-shadow: var(--shadow-md), 0 0 0 1px rgba(160, 185, 235, .16); }
@@ -653,11 +644,6 @@
     </div>
   </dialog>
 
-  <!-- Preview-mode notice (hanya muncul jika Firebase belum dikonfigurasi) -->
-  <div class="demo-note" id="demoNote" role="status">
-    <span data-i18n-html="demo.note"><strong>Mod Pratonton.</strong> Firebase belum dikonfigurasi, jadi 2 produk contoh dipaparkan. Isi <code>firebaseConfig</code> dalam index.html untuk memuatkan data sebenar.</span>
-    <button type="button" id="demoNoteClose" data-i18n-attr="aria-label:demo.close" aria-label="Tutup notis">✕</button>
-  </div>
 
   <script type="module">
     /* =====================================================================
@@ -696,17 +682,6 @@
     //    productURL (hanya https://) jika diisi dalam Admin Panel.
     const ENABLE_PRODUCT_LINKS = false;
 
-    // 5) Data contoh — HANYA digunakan dalam Preview Mode (Firebase belum dikonfigurasi).
-    const PREVIEW_PRODUCTS = [
-      { slug: "qr-me-generator", name: "QR Me Generator", category: "Digital Tools", status: "active", displayOrder: 1, thumbnailURL: "", productURL: "",
-        description: "Sistem penjana kod QR yang membolehkan pengguna menghasilkan QR Code dengan mudah, pantas dan praktikal untuk pelbagai kegunaan.",
-        categoryEn: "Digital Tools", descriptionEn: "A QR code generator that lets users create QR codes quickly, easily and practically for a wide range of uses.",
-        categoryAr: "أدوات رقمية", descriptionAr: "نظام لإنشاء رموز الاستجابة السريعة (QR) يتيح للمستخدمين إنشاءها بسهولة وسرعة لمختلف الاستخدامات العملية." },
-      { slug: "malaysia-pdf-tools", name: "Malaysia PDF Tools", category: "Productivity Tools", status: "coming-soon", displayOrder: 2, thumbnailURL: "", productURL: "",
-        description: "Platform pengurusan dokumen PDF yang menyediakan pelbagai fungsi untuk membantu pengguna mengurus, memproses dan menghasilkan dokumen secara lebih mudah dan efisien.",
-        categoryEn: "Productivity Tools", descriptionEn: "A PDF document management platform offering a range of functions to help users manage, process and produce documents more easily and efficiently.",
-        categoryAr: "أدوات الإنتاجية", descriptionAr: "منصة لإدارة مستندات PDF توفّر وظائف متعددة تساعد المستخدمين على إدارة المستندات ومعالجتها وإنشائها بسهولة وكفاءة أكبر." }
-    ];
 
     /* =====================================================================
        Bahagian 2: Utiliti kecil
@@ -794,9 +769,7 @@
         "contact.lead": "<strong>Genius Digital.</strong> Berminat dengan produk kami atau ingin bekerjasama? Hubungi kami melalui saluran di bawah.",
         "contact.email": "E-mel", "contact.whatsapp": "WhatsApp", "contact.social": "Media Sosial",
         "contact.phEmail": "Placeholder: tambah e-mel syarikat", "contact.phWhatsapp": "Placeholder: tambah nombor WhatsApp", "contact.phSocial": "(placeholder)",
-        "footer.copy": "© 2026 Genius Digital. Hak Cipta Terpelihara.",
-        "demo.note": "<strong>Mod Pratonton.</strong> Firebase belum dikonfigurasi, jadi 2 produk contoh dipaparkan. Isi <code>firebaseConfig</code> dalam index.html untuk memuatkan data sebenar.",
-        "demo.close": "Tutup notis"
+        "footer.copy": "© 2026 Genius Digital. Hak Cipta Terpelihara."
       },
 
       en: {
@@ -836,9 +809,7 @@
         "contact.lead": "<strong>Genius Digital.</strong> Interested in our products or looking to collaborate? Reach us through the channels below.",
         "contact.email": "Email", "contact.whatsapp": "WhatsApp", "contact.social": "Social Media",
         "contact.phEmail": "Placeholder: add the company email", "contact.phWhatsapp": "Placeholder: add the WhatsApp number", "contact.phSocial": "(placeholder)",
-        "footer.copy": "© 2026 Genius Digital. All Rights Reserved.",
-        "demo.note": "<strong>Preview Mode.</strong> Firebase isn't configured yet, so two sample products are shown. Fill in <code>firebaseConfig</code> in index.html to load real data.",
-        "demo.close": "Dismiss notice"
+        "footer.copy": "© 2026 Genius Digital. All Rights Reserved."
       },
 
       ar: {
@@ -878,9 +849,7 @@
         "contact.lead": "<strong>جينيوس ديجيتال.</strong> هل أنت مهتم بمنتجاتنا أو ترغب في التعاون معنا؟ تواصل معنا عبر القنوات التالية.",
         "contact.email": "البريد الإلكتروني", "contact.whatsapp": "WhatsApp", "contact.social": "وسائل التواصل الاجتماعي",
         "contact.phEmail": "نص مؤقت: أضف البريد الإلكتروني للشركة", "contact.phWhatsapp": "نص مؤقت: أضف رقم WhatsApp", "contact.phSocial": "(نص مؤقت)",
-        "footer.copy": "© 2026 جينيوس ديجيتال. جميع الحقوق محفوظة.",
-        "demo.note": "<strong>وضع المعاينة.</strong> لم يتم إعداد Firebase بعد، لذلك يُعرض منتجان تجريبيان. أدخل <code>firebaseConfig</code> في ملف index.html لتحميل البيانات الفعلية.",
-        "demo.close": "إغلاق الإشعار"
+        "footer.copy": "© 2026 جينيوس ديجيتال. جميع الحقوق محفوظة."
       }
     };
 
@@ -1049,11 +1018,6 @@
       if (stopListening) { stopListening(); stopListening = null; }
       showLoading();
 
-      if (!isFirebaseConfigured) {                              // Preview Mode (tiada Firebase)
-        setTimeout(() => renderProducts(PREVIEW_PRODUCTS), 450);
-        $("#demoNote").classList.add("show");
-        return;
-      }
 
       let slowTimer;
       try {
@@ -1158,8 +1122,6 @@
       });
       visual.addEventListener("pointerleave", () => { scene.style.removeProperty("--ry"); scene.style.removeProperty("--rx"); });
     }
-
-    $("#demoNoteClose").addEventListener("click", () => $("#demoNote").classList.remove("show"));
 
     /* =====================================================================
        Bahagian 8: Bahasa (BM / BI / BA) dan tema (cerah / gelap)
