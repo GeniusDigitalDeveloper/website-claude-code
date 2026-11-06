@@ -10,8 +10,8 @@
     /* Tetapkan bahasa/arah/tema sebelum paparan pertama. Lalai: BM + mod cerah. Kongsi pilihan dengan index.html. */
     (function () {
       try {
-        var l = localStorage.getItem("gd-lang"), th = localStorage.getItem("gd-theme"), h = document.documentElement;
-        if (l === "en" || l === "ar" || l === "ms") { h.lang = l; h.dir = l === "ar" ? "rtl" : "ltr"; }
+        var th = localStorage.getItem("gd-theme"), h = document.documentElement;
+        h.lang = "ms"; h.dir = "ltr";
         h.setAttribute("data-theme", th === "dark" ? "dark" : "light");
       } catch (e) { document.documentElement.setAttribute("data-theme", "light"); }
     })();
@@ -320,6 +320,29 @@
     .trans fieldset { border: 0; margin: 0 0 .5rem; padding: 0; min-width: 0; }
     .trans legend { padding: 0; margin-bottom: .7rem; font-family: var(--font-head); font-weight: 800; font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
 
+
+    /* ---------- Kata laluan: ikon mata ---------- */
+    .pw-wrap { position: relative; }
+    .pw-wrap .input { padding-inline-end: 3.3rem; }
+    .pw-toggle { position: absolute; inset-inline-end: .35rem; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-radius: 10px; background: transparent; color: var(--muted); }
+    .pw-toggle:hover { color: var(--accent); }
+    .pw-toggle svg { width: 22px; height: 22px; }
+    .pw-toggle .i-eyeoff { display: none; }
+    .pw-toggle[aria-pressed="true"] .i-eye { display: none; }
+    .pw-toggle[aria-pressed="true"] .i-eyeoff { display: block; }
+
+    /* ---------- Tetapan laman ---------- */
+    .logo-row { display: grid; gap: 1rem; margin-bottom: 1.25rem; }
+    .logo-preview { width: 140px; height: 140px; border-radius: 16px; border: 1px dashed var(--dash-border); background: var(--bg-soft); display: grid; place-items: center; overflow: hidden; }
+    .logo-preview svg { width: 72px; height: 72px; }
+    .logo-preview img { width: 100%; height: 100%; object-fit: contain; padding: .6rem; }
+    .logo-actions { display: grid; gap: .6rem; align-content: start; }
+    .logo-actions .btn { justify-self: start; }
+    .tgroup { border: 0; margin: 0 0 1.5rem; padding: 0; min-width: 0; }
+    .tgroup legend { padding: 0; margin-bottom: .8rem; font-family: var(--font-head); font-weight: 800; font-size: .85rem; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+    .set-foot { position: sticky; bottom: 0; z-index: 5; margin-top: 1.25rem; padding: .9rem 0 calc(.9rem + env(safe-area-inset-bottom)); background: linear-gradient(180deg, transparent, var(--bg) 35%); display: flex; justify-content: flex-end; }
+    @media (min-width: 560px) { .logo-row { grid-template-columns: 140px 1fr; align-items: start; } }
+
     /* ---------- Mod gelap: pelarasan khusus ---------- */
     :root[data-theme="dark"] .auth-shell { background: radial-gradient(700px 400px at 90% 0%, rgba(0, 200, 245, .12), transparent 60%), radial-gradient(600px 400px at 0% 100%, rgba(10, 102, 255, .18), transparent 60%), linear-gradient(180deg, var(--surface), var(--bg)); }
     :root[data-theme="dark"] .alert.info { background: rgba(90, 162, 255, .12); border-color: rgba(90, 162, 255, .35); }
@@ -356,6 +379,9 @@
   <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
     <defs>
       <linearGradient id="gdGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0A66FF"/><stop offset="1" stop-color="#00C8F5"/></linearGradient>
+      <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+      <symbol id="i-eyeoff" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 5.2A10.6 10.6 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.2M6.5 6.6A17 17 0 0 0 2 12s3.6 7 10 7c1.7 0 3.2-.4 4.5-1M9.9 9.9a3 3 0 0 0 4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9M15 4v6M9 14v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
       <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.500A8.500 8.500 0 0 1 9.500 4 8.500 8.500 0 1 0 20 14.500z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
       <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.200" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.500v2.200M12 19.300v2.200M2.500 12h2.200M19.300 12h2.200M5.300 5.300l1.500 1.500M17.200 17.200l1.500 1.500M18.700 5.300l-1.500 1.500M6.800 17.200l-1.500 1.500" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
       <symbol id="i-logo" viewBox="0 0 64 64"><path d="M32 3 58 18v28L32 61 6 46V18z" fill="#0A1F44"/><path d="M32 3 58 18v28L32 61 6 46V18z" fill="none" stroke="url(#gdGrad)" stroke-width="3.5" stroke-linejoin="round"/><path d="M43 24a15 15 0 1 0 2 12H32" fill="none" stroke="url(#gdGrad)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="43" cy="24" r="3" fill="#5BE3FF"/></symbol>
@@ -382,11 +408,6 @@
   <!-- ====================== LOGIN ====================== -->
   <main class="auth-shell" id="loginView" hidden>
       <div class="auth-tools">
-        <div class="lang-switch" role="group" data-i18n-attr="aria-label:ui.language" aria-label="Pilih bahasa">
-          <button type="button" data-lang="ms" lang="ms" aria-pressed="true" aria-label="Bahasa Melayu" title="Bahasa Melayu">BM</button>
-          <button type="button" data-lang="en" lang="en" aria-pressed="false" aria-label="English" title="English">BI</button>
-          <button type="button" data-lang="ar" lang="ar" aria-pressed="false" aria-label="العربية" title="العربية">BA</button>
-        </div>
         <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false" aria-label="Tukar ke mod gelap" title="Tukar ke mod gelap"><svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg><svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg></button>
       </div>
     <section class="auth-card" aria-labelledby="loginTitle">
@@ -406,7 +427,7 @@
 
       <form id="loginForm" novalidate>
         <div class="field"><label for="loginEmail" data-i18n="login.email">E-mel</label><input class="input" dir="ltr" id="loginEmail" type="email" autocomplete="username" inputmode="email" autocapitalize="none" required></div>
-        <div class="field"><label for="loginPassword" data-i18n="login.password">Kata Laluan</label><input class="input" dir="ltr" id="loginPassword" type="password" autocomplete="current-password" required></div>
+        <div class="field"><label for="loginPassword" data-i18n="login.password">Kata Laluan</label><div class="pw-wrap"><input class="input" dir="ltr" id="loginPassword" type="password" autocomplete="current-password" required><button class="pw-toggle" id="pwToggle" type="button" aria-pressed="false" aria-label="Tunjuk kata laluan" title="Tunjuk kata laluan"><svg class="i-eye" aria-hidden="true"><use href="#i-eye"/></svg><svg class="i-eyeoff" aria-hidden="true"><use href="#i-eyeoff"/></svg></button></div></div>
         <button class="btn btn-primary btn-block" type="submit" id="loginBtn" data-i18n="login.submit">Log Masuk</button>
       </form>
       <div class="auth-foot">
@@ -425,14 +446,10 @@
       <nav class="side-nav">
         <button class="side-link" type="button" data-nav="dashboard"><svg aria-hidden="true"><use href="#i-dash"/></svg><span data-i18n="nav.dashboard">Papan Pemuka</span></button>
         <button class="side-link" type="button" data-nav="products"><svg aria-hidden="true"><use href="#i-box"/></svg><span data-i18n="nav.products">Produk</span></button>
+        <button class="side-link" type="button" data-nav="settings"><svg aria-hidden="true"><use href="#i-sliders"/></svg><span data-i18n="nav.settings">Tetapan Laman</span></button>
         <a class="side-link" href="index.html" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-globe"/></svg><span data-i18n="nav.viewSite">Lihat Website</span></a>
       </nav>
       <div class="side-spacer"></div>
-      <div class="lang-switch" role="group" data-i18n-attr="aria-label:ui.language" aria-label="Pilih bahasa">
-        <button type="button" data-lang="ms" lang="ms" aria-pressed="true" aria-label="Bahasa Melayu" title="Bahasa Melayu">BM</button>
-        <button type="button" data-lang="en" lang="en" aria-pressed="false" aria-label="English" title="English">BI</button>
-        <button type="button" data-lang="ar" lang="ar" aria-pressed="false" aria-label="العربية" title="العربية">BA</button>
-      </div>
       <div class="side-user"><small id="userRole" data-i18n="nav.role">Admin</small><span class="iso" id="userEmail" dir="auto"></span></div>
       <button class="side-link" type="button" id="signOutBtn"><svg aria-hidden="true"><use href="#i-out"/></svg><span data-i18n="nav.signOut">Log Keluar</span></button>
     </aside>
@@ -462,6 +479,7 @@
             <div class="quick">
               <button class="btn btn-primary" type="button" data-action="add"><svg aria-hidden="true"><use href="#i-plus"/></svg><span data-i18n="act.add">Tambah Produk</span></button>
               <button class="btn btn-ghost" type="button" data-nav="products"><svg aria-hidden="true"><use href="#i-box"/></svg><span data-i18n="act.manage">Urus Produk</span></button>
+              <button class="btn btn-ghost" type="button" data-nav="settings"><svg aria-hidden="true"><use href="#i-sliders"/></svg><span data-i18n="nav.settings">Tetapan Laman</span></button>
               <a class="btn btn-ghost" href="index.html" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-globe"/></svg><span data-i18n="nav.viewSite">Lihat Website</span></a>
             </div>
           </div>
@@ -489,6 +507,45 @@
             </div>
           </div>
           <div id="productsArea" aria-live="polite"></div>
+        </section>
+
+        <!-- Tetapan Laman -->
+        <section id="view-settings" hidden aria-labelledby="setTitle">
+          <div class="view-head"><div><h2 id="setTitle">Tetapan Laman</h2><p>Ubah logo, nama jenama, teks dan maklumat hubungan yang dipaparkan di laman awam. Kosongkan sesuatu medan untuk guna teks asal.</p></div></div>
+          <div class="alert error" id="setError" role="alert" hidden></div>
+          <form id="settingsForm" novalidate>
+            <div class="panel">
+              <h3>Logo &amp; Jenama</h3>
+              <div class="logo-row">
+                <div class="logo-preview"><svg id="logoDefault" aria-hidden="true"><use href="#i-logo"/></svg><img id="logoImg" alt="Pratonton logo" hidden></div>
+                <div class="logo-actions">
+                  <button class="btn btn-ghost" type="button" id="logoPick"><svg aria-hidden="true"><use href="#i-upload"/></svg><span id="logoPickText">Muat Naik Logo</span></button>
+                  <button class="btn btn-ghost" type="button" id="logoRemove" hidden><svg aria-hidden="true"><use href="#i-trash"/></svg><span>Padam Logo (guna logo asal)</span></button>
+                  <input type="file" id="logoFile" accept="image/jpeg,image/png,image/webp" hidden>
+                  <span class="hint">JPG, PNG atau WebP. PNG lutsinar disyorkan. Saiz dikecilkan secara automatik. Logo juga menjadi ikon tab pelayar.</span>
+                  <span class="err" id="eLogo"></span>
+                </div>
+              </div>
+              <div class="row2">
+                <div class="field"><label for="sBrand">Nama Jenama</label><input class="input" id="sBrand" maxlength="60" autocomplete="off" placeholder="Genius Digital"></div>
+                <div class="field"><label for="sTagline">Tagline (tengah muka depan &amp; footer)</label><input class="input" id="sTagline" maxlength="120" autocomplete="off" placeholder="Digital Innovation. Intelligent Systems."></div>
+              </div>
+            </div>
+            <div class="panel">
+              <h3>Hubungi Kami (dipaparkan di footer)</h3>
+              <div class="row2">
+                <div class="field"><label for="sEmail">E-mel</label><input class="input" dir="ltr" id="sEmail" type="email" inputmode="email" autocapitalize="none" autocomplete="off" placeholder="hello@domain-anda.com"><span class="err" id="eEmail"></span></div>
+                <div class="field"><label for="sWa">Nombor WhatsApp</label><input class="input" dir="ltr" id="sWa" inputmode="tel" autocomplete="off" placeholder="60123456789"><span class="hint">Dengan kod negara, tanpa +.</span><span class="err" id="eWa"></span></div>
+              </div>
+              <div class="row2" id="socialsHost"></div>
+            </div>
+            <div class="panel">
+              <h3>Teks Laman Awam</h3>
+              <p class="hint" style="margin-bottom:1rem">Isi dalam Bahasa Melayu. Buka &ldquo;Terjemahan&rdquo; jika mahu teks khas dalam BI / BA. Pada tajuk, letak <code>[[teks]]</code> untuk bahagian berwarna gradient.</p>
+              <div id="textsHost"></div>
+            </div>
+            <div class="set-foot"><button class="btn btn-primary" type="submit" id="setSave">Simpan Tetapan</button></div>
+          </form>
         </section>
       </main>
     </div>
@@ -549,6 +606,7 @@
           <div class="field">
             <label for="fUrl"><span data-i18n="dlg.url">URL Produk</span> <span class="opt" data-i18n="dlg.urlOpt">(pilihan, https://)</span></label>
             <input class="input" dir="ltr" id="fUrl" type="url" inputmode="url" placeholder="https://" autocomplete="off" autocapitalize="none">
+            <span class="hint" data-i18n="dlg.urlHint">Pengguna dibawa ke pautan ini bila menekan butang atau gambar produk di laman awam.</span>
             <span class="err" id="eUrl"></span>
           </div>
           <div class="field">
@@ -684,7 +742,7 @@
        - data-i18n-attr="attr:kunci;attr2:kunci2" → atribut
        ===================================================================== */
     const DEFAULT_LANG = "ms", STORE_LANG = "gd-lang", STORE_THEME = "gd-theme";
-    const LANGS = { ms: { dir: "ltr", locale: "ms-MY" }, en: { dir: "ltr", locale: "en-GB" }, ar: { dir: "rtl", locale: "ar-u-nu-latn" } };
+    const LANGS = { ms: { dir: "ltr", locale: "ms-MY" } };   // Panel admin: Bahasa Melayu sahaja
     let lang = DEFAULT_LANG;
     const readStore = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
     const writeStore = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* storan disekat: abaikan */ } };
@@ -709,7 +767,7 @@
         "login.sdkFail": "Gagal memuatkan Firebase SDK. Semak sambungan internet. ({msg})",
         "reset.needEmail": "Masukkan e-mel anda dahulu, kemudian tekan “Lupa kata laluan?”.",
         "reset.sent": "Jika e-mel itu berdaftar, pautan untuk menetapkan semula kata laluan telah dihantar.",
-        "nav.menu": "Menu", "nav.dashboard": "Papan Pemuka", "nav.products": "Produk", "nav.viewSite": "Lihat Website", "nav.signOut": "Log Keluar", "nav.role": "Admin",
+        "nav.menu": "Menu", "nav.dashboard": "Papan Pemuka", "nav.products": "Produk", "nav.settings": "Tetapan Laman", "nav.viewSite": "Lihat Website", "nav.signOut": "Log Keluar", "nav.role": "Admin",
         "pill.demo": "Demo",
         "demo.banner": "<strong>MOD DEMO.</strong> Data hanya disimpan dalam memori pelayar ini dan hilang apabila halaman dimuat semula. Tiada apa-apa disimpan ke Firebase. Mod ini dimatikan secara automatik apabila Firebase dikonfigurasi.",
         "dash.sub": "Ringkasan produk daripada Firestore (masa nyata).",
@@ -734,7 +792,7 @@
         "dlg.name": "Nama Produk", "dlg.slug": "Slug Produk", "dlg.locked": "(dikunci)",
         "dlg.slugHint": "Huruf kecil, nombor dan sempang sahaja. Slug ialah ID dokumen dan tidak boleh ditukar selepas produk dicipta.",
         "dlg.category": "Kategori Produk", "dlg.status": "Status Produk", "dlg.desc": "Penerangan Produk",
-        "dlg.url": "URL Produk", "dlg.urlOpt": "(pilihan, https://)", "dlg.order": "Susunan Paparan", "dlg.thumb": "Thumbnail Produk",
+        "dlg.url": "Pautan Website Produk", "dlg.urlOpt": "(https://)", "dlg.urlHint": "Pengguna dibawa ke pautan ini bila menekan butang atau gambar produk di laman awam. Kosongkan untuk paparan \u201cProduk Akan Datang\u201d.", "dlg.order": "Susunan Paparan", "dlg.thumb": "Thumbnail Produk",
         "thumb.alt": "Pratonton thumbnail", "thumb.upload": "Muat Naik Imej", "thumb.replace": "Ganti Imej", "thumb.remove": "Padam Imej",
         "thumb.tagPlaceholder": "Imej ganti", "thumb.tagNew": "Imej baharu", "thumb.tagCurrent": "Imej semasa",
         "thumb.hint": "JPG, PNG atau WebP. Imej dipotong ke nisbah 16:10, dimampatkan secara automatik (maksimum kira-kira 100 KB) dan disimpan terus dalam Firestore bersama produk. Firebase Storage tidak diperlukan.",
@@ -762,146 +820,6 @@
         "err.network": "Tiada sambungan internet, atau Firebase tidak dapat dicapai.",
         "err.notAllowed": "Kaedah log masuk E-mel/Kata Laluan belum diaktifkan dalam Firebase Authentication.",
         "err.notFound": "Produk tidak dijumpai.", "err.generic": "Ralat: {msg}"
-      },
-
-      en: {
-        "meta.title": "Admin Panel — GENIUS DIGITAL",
-        "brand.admin": "Admin Panel",
-        "ui.language": "Choose language", "ui.menuOpen": "Open menu", "ui.adminNav": "Admin navigation", "ui.close": "Close", "ui.pleaseWait": "Please wait…",
-        "theme.toDark": "Switch to dark mode", "theme.toLight": "Switch to light mode",
-        "login.title": "Admin Sign In",
-        "login.sub": "Use a Firebase Authentication account that has been granted admin access.",
-        "login.setup": "<strong>Firebase isn't configured yet.</strong> Replace <code>firebaseConfig</code> in admin.html (and index.html) with your project's configuration. See README.md.",
-        "login.demoBtn": "Open Demo Mode (no Firebase)",
-        "login.email": "Email", "login.password": "Password", "login.submit": "Sign In", "login.busy": "Signing in…",
-        "login.forgot": "Forgot your password?", "login.back": "← Back to the website",
-        "login.missing": "Please enter your email and password.",
-        "login.sdkFail": "Couldn't load the Firebase SDK. Check your internet connection. ({msg})",
-        "reset.needEmail": "Enter your email first, then select “Forgot your password?”.",
-        "reset.sent": "If that email is registered, a link to reset your password has been sent.",
-        "nav.menu": "Menu", "nav.dashboard": "Dashboard", "nav.products": "Products", "nav.viewSite": "View Website", "nav.signOut": "Sign Out", "nav.role": "Admin",
-        "pill.demo": "Demo",
-        "demo.banner": "<strong>DEMO MODE.</strong> Data is kept in this browser's memory only and is lost when the page reloads. Nothing is saved to Firebase. This mode switches off automatically once Firebase is configured.",
-        "dash.sub": "A summary of your products from Firestore (real time).",
-        "dash.recent": "Recent updates", "dash.quick": "Quick actions",
-        "dash.loading": "Loading…", "dash.error": "The data couldn't be loaded.", "dash.none": "No products yet.",
-        "stat.total": "Total Products", "stat.active": "Active Products", "stat.soon": "Coming Soon Products", "stat.hidden": "Hidden Products", "stat.categories": "Total Categories",
-        "act.add": "Add Product", "act.manage": "Manage Products",
-        "prod.sub": "Add, edit, reorder and delete the products shown on the website.",
-        "search.label": "Search products", "search.placeholder": "Search by name, slug or category…",
-        "filter.categoryLabel": "Filter by category", "filter.allCategories": "All categories", "filter.statusLabel": "Filter by status", "filter.allStatuses": "All statuses",
-        "status.active": "Active", "status.soon": "Coming Soon", "status.hidden": "Hidden",
-        "th.order": "Order", "th.thumb": "Thumbnail", "th.product": "Product", "th.category": "Category", "th.status": "Status", "th.updated": "Updated",
-        "row.updated": "{category} · Updated {date}", "row.edit": "Edit", "row.editAria": "Edit {name}", "row.deleteAria": "Delete {name}", "row.deleteSr": "Delete",
-        "row.upAria": "Move {name} up", "row.downAria": "Move {name} down", "row.up": "Move up", "row.down": "Move down", "row.reorderBlocked": "Clear the search and filters to reorder",
-        "row.statusAria": "Status of {name}", "row.orderTitle": "Display order", "row.thumbAlt": "{name} thumbnail",
-        "empty.title": "No products yet", "empty.text": "Add your first product, or insert the two sample products (QR Me Generator and Malaysia PDF Tools).",
-        "empty.sample": "Insert sample products", "empty.seeding": "Inserting…",
-        "seed.added": "{n} sample products added.", "seed.exists": "The sample products already exist.",
-        "nomatch.title": "No matches", "nomatch.text": "No products match the current search or filters.", "nomatch.reset": "Reset filters",
-        "loaderr.title": "Couldn't load the products", "retry": "Try Again",
-        "dlg.addTitle": "Add Product", "dlg.editTitle": "Edit Product",
-        "dlg.name": "Product Name", "dlg.slug": "Product Slug", "dlg.locked": "(locked)",
-        "dlg.slugHint": "Lowercase letters, numbers and hyphens only. The slug is the document ID and can't be changed after the product is created.",
-        "dlg.category": "Product Category", "dlg.status": "Product Status", "dlg.desc": "Product Description",
-        "dlg.url": "Product URL", "dlg.urlOpt": "(optional, https://)", "dlg.order": "Display Order", "dlg.thumb": "Product Thumbnail",
-        "thumb.alt": "Thumbnail preview", "thumb.upload": "Upload Image", "thumb.replace": "Replace Image", "thumb.remove": "Delete Image",
-        "thumb.tagPlaceholder": "Placeholder", "thumb.tagNew": "New image", "thumb.tagCurrent": "Current image",
-        "thumb.hint": "JPG, PNG or WebP. The image is cropped to 16:10, compressed automatically (about 100 KB at most) and saved directly in Firestore with the product. Firebase Storage is not required.",
-        "dlg.created": "Created", "dlg.updatedAt": "Last updated", "dlg.cancel": "Cancel", "dlg.save": "Save Product", "dlg.saving": "Saving…",
-        "tr.summary": "Product translations (optional)",
-        "tr.help": "If left empty, the website shows the Malay text entered above.",
-        "tr.en": "English (BI)", "tr.ar": "Arabic (BA)", "tr.name": "Name", "tr.category": "Category", "tr.desc": "Description",
-        "val.name": "The product name is required.", "val.slug": "The slug is required.",
-        "val.slugFormat": "The slug may contain only lowercase letters, numbers and hyphens (for example: qr-me-generator).",
-        "val.slugUsed": "This slug is already in use.", "val.category": "The category is required.",
-        "val.desc": "The description can be at most 1,000 characters.", "val.url": "The URL must start with https://",
-        "val.order": "Enter a whole number between 0 and 100000.",
-        "img.type": "This file type isn't supported. Use JPG, PNG or WebP.",
-        "img.size": "The file is too large (12 MB maximum before compression).",
-        "img.read": "The image couldn't be read. The file may be corrupted.",
-        "img.complex": "This image is too complex to compress to a small size. Try a different image.",
-        "toast.updated": "Product updated.", "toast.added": "Product added.",
-        "toast.status": "“{name}” is now {status}.", "toast.deleted": "“{name}” was deleted.",
-        "del.title": "Delete this product?", "del.body": "You are about to delete {name}. Its thumbnail is deleted with it. This can't be undone.",
-        "del.cancel": "Cancel", "del.confirm": "Yes, Delete", "del.busy": "Deleting…",
-        "err.permission": "The security rules denied this action. Make sure your account has the admin claim (sign out and back in after setting it) and that the rules have been published.",
-        "err.unavailable": "Firebase can't be reached. Check your internet connection.",
-        "err.credential": "The email or password is incorrect.", "err.invalidEmail": "That email address isn't valid.", "err.disabled": "This account has been disabled.",
-        "err.tooMany": "Too many attempts. Please wait a moment and try again.",
-        "err.network": "There's no internet connection, or Firebase can't be reached.",
-        "err.notAllowed": "Email/Password sign-in isn't enabled in Firebase Authentication.",
-        "err.notFound": "The product wasn't found.", "err.generic": "Error: {msg}"
-      },
-
-      ar: {
-        "meta.title": "لوحة الإدارة — GENIUS DIGITAL",
-        "brand.admin": "لوحة الإدارة",
-        "ui.language": "اختيار اللغة", "ui.menuOpen": "فتح القائمة", "ui.adminNav": "قائمة التنقل للمشرف", "ui.close": "إغلاق", "ui.pleaseWait": "يرجى الانتظار…",
-        "theme.toDark": "التبديل إلى الوضع الداكن", "theme.toLight": "التبديل إلى الوضع الفاتح",
-        "login.title": "تسجيل دخول المشرف",
-        "login.sub": "استخدم حساب Firebase Authentication الذي مُنح صلاحية المشرف.",
-        "login.setup": "<strong>لم يتم إعداد Firebase بعد.</strong> استبدل <code>firebaseConfig</code> في الملفين <code>admin.html</code> و<code>index.html</code> بإعدادات مشروعك، وراجع <code>README.md</code> للتفاصيل.",
-        "login.demoBtn": "فتح الوضع التجريبي دون Firebase",
-        "login.email": "البريد الإلكتروني", "login.password": "كلمة المرور", "login.submit": "تسجيل الدخول", "login.busy": "جارٍ تسجيل الدخول…",
-        "login.forgot": "هل نسيت كلمة المرور؟", "login.back": "→ العودة إلى الموقع",
-        "login.missing": "يرجى إدخال البريد الإلكتروني وكلمة المرور.",
-        "login.sdkFail": "تعذّر تحميل Firebase SDK. تحقق من اتصال الإنترنت. ({msg})",
-        "reset.needEmail": "أدخل بريدك الإلكتروني أولاً، ثم اضغط «هل نسيت كلمة المرور؟».",
-        "reset.sent": "إذا كان هذا البريد مسجّلاً لدينا، فقد أُرسل إليه رابط لإعادة تعيين كلمة المرور.",
-        "nav.menu": "القائمة", "nav.dashboard": "لوحة المعلومات", "nav.products": "المنتجات", "nav.viewSite": "عرض الموقع", "nav.signOut": "تسجيل الخروج", "nav.role": "مشرف",
-        "pill.demo": "تجريبي",
-        "demo.banner": "<strong>الوضع التجريبي.</strong> تُحفظ البيانات في ذاكرة هذا المتصفح فقط وتُفقد عند إعادة تحميل الصفحة. لا يُحفظ أي شيء في Firebase. يتوقف هذا الوضع تلقائياً بمجرد إعداد Firebase.",
-        "dash.sub": "ملخص المنتجات من Firestore (آنياً).",
-        "dash.recent": "آخر التحديثات", "dash.quick": "إجراءات سريعة",
-        "dash.loading": "جارٍ التحميل…", "dash.error": "تعذّر تحميل البيانات.", "dash.none": "لا توجد منتجات بعد.",
-        "stat.total": "إجمالي المنتجات", "stat.active": "المنتجات النشطة", "stat.soon": "المنتجات القادمة قريباً", "stat.hidden": "المنتجات المخفية", "stat.categories": "إجمالي الفئات",
-        "act.add": "إضافة منتج", "act.manage": "إدارة المنتجات",
-        "prod.sub": "أضف المنتجات المعروضة في الموقع وعدّلها ورتّبها واحذفها.",
-        "search.label": "البحث في المنتجات", "search.placeholder": "ابحث بالاسم أو المعرّف (slug) أو الفئة…",
-        "filter.categoryLabel": "التصفية حسب الفئة", "filter.allCategories": "كل الفئات", "filter.statusLabel": "التصفية حسب الحالة", "filter.allStatuses": "كل الحالات",
-        "status.active": "نشط", "status.soon": "قريباً", "status.hidden": "مخفي",
-        "th.order": "الترتيب", "th.thumb": "الصورة", "th.product": "المنتج", "th.category": "الفئة", "th.status": "الحالة", "th.updated": "آخر تحديث",
-        "row.updated": "{category} · آخر تحديث {date}", "row.edit": "تعديل", "row.editAria": "تعديل {name}", "row.deleteAria": "حذف {name}", "row.deleteSr": "حذف",
-        "row.upAria": "نقل {name} للأعلى", "row.downAria": "نقل {name} للأسفل", "row.up": "للأعلى", "row.down": "للأسفل", "row.reorderBlocked": "أزل البحث وعوامل التصفية لإعادة الترتيب",
-        "row.statusAria": "حالة {name}", "row.orderTitle": "ترتيب العرض", "row.thumbAlt": "صورة مصغّرة لـ {name}",
-        "empty.title": "لا توجد منتجات بعد", "empty.text": "أضف منتجك الأول، أو أدرج المنتجين التجريبيين (QR Me Generator وMalaysia PDF Tools).",
-        "empty.sample": "إدراج منتجات تجريبية", "empty.seeding": "جارٍ الإدراج…",
-        "seed.added": "أُدرجت {n} منتجات تجريبية.", "seed.exists": "المنتجات التجريبية موجودة بالفعل.",
-        "nomatch.title": "لا توجد نتائج مطابقة", "nomatch.text": "لا توجد منتجات تطابق البحث أو عوامل التصفية الحالية.", "nomatch.reset": "إعادة ضبط عوامل التصفية",
-        "loaderr.title": "تعذّر تحميل المنتجات", "retry": "إعادة المحاولة",
-        "dlg.addTitle": "إضافة منتج", "dlg.editTitle": "تعديل المنتج",
-        "dlg.name": "اسم المنتج", "dlg.slug": "المعرّف (Slug)", "dlg.locked": "(مقفل)",
-        "dlg.slugHint": "أحرف صغيرة وأرقام وشرطات فقط. المعرّف هو مُعرّف المستند ولا يمكن تغييره بعد إنشاء المنتج.",
-        "dlg.category": "فئة المنتج", "dlg.status": "حالة المنتج", "dlg.desc": "وصف المنتج",
-        "dlg.url": "رابط المنتج", "dlg.urlOpt": "(اختياري، https://)", "dlg.order": "ترتيب العرض", "dlg.thumb": "الصورة المصغّرة للمنتج",
-        "thumb.alt": "معاينة الصورة المصغّرة", "thumb.upload": "رفع صورة", "thumb.replace": "استبدال الصورة", "thumb.remove": "حذف الصورة",
-        "thumb.tagPlaceholder": "صورة بديلة", "thumb.tagNew": "صورة جديدة", "thumb.tagCurrent": "الصورة الحالية",
-        "thumb.hint": "JPG أو PNG أو WebP. تُقصّ الصورة بنسبة 16:10 وتُضغط تلقائياً (بحد أقصى نحو 100 كيلوبايت) وتُحفظ مباشرة في Firestore مع المنتج. لا حاجة إلى Firebase Storage.",
-        "dlg.created": "تاريخ الإنشاء", "dlg.updatedAt": "تاريخ آخر تحديث", "dlg.cancel": "إلغاء", "dlg.save": "حفظ المنتج", "dlg.saving": "جارٍ الحفظ…",
-        "tr.summary": "ترجمات المنتج (اختيارية)",
-        "tr.help": "إذا تُرك فارغاً، يعرض الموقع النص المكتوب أعلاه بالملايو.",
-        "tr.en": "الإنجليزية (BI)", "tr.ar": "العربية (BA)", "tr.name": "الاسم", "tr.category": "الفئة", "tr.desc": "الوصف",
-        "val.name": "اسم المنتج مطلوب.", "val.slug": "المعرّف (slug) مطلوب.",
-        "val.slugFormat": "يجب أن يتكوّن المعرّف من أحرف صغيرة وأرقام وشرطات فقط (مثال: qr-me-generator).",
-        "val.slugUsed": "هذا المعرّف مستخدم بالفعل.", "val.category": "الفئة مطلوبة.",
-        "val.desc": "الحد الأقصى للوصف 1000 حرف.", "val.url": "يجب أن يبدأ الرابط بـ https://",
-        "val.order": "أدخل عدداً صحيحاً بين 0 و100000.",
-        "img.type": "نوع الملف غير مدعوم. استخدم JPG أو PNG أو WebP.",
-        "img.size": "الملف كبير جداً (الحد الأقصى 12 ميغابايت قبل الضغط).",
-        "img.read": "تعذّرت قراءة الصورة. قد يكون الملف تالفاً.",
-        "img.complex": "الصورة معقّدة جداً بحيث يتعذّر ضغطها إلى حجم صغير. جرّب صورة أخرى.",
-        "toast.updated": "تم تحديث المنتج.", "toast.added": "تمت إضافة المنتج.",
-        "toast.status": "أصبحت حالة «{name}»: {status}.", "toast.deleted": "تم حذف «{name}».",
-        "del.title": "حذف المنتج؟", "del.body": "أنت على وشك حذف {name}. ستُحذف صورته المصغّرة معه، ولا يمكن التراجع عن هذا الإجراء.",
-        "del.cancel": "إلغاء", "del.confirm": "نعم، احذف", "del.busy": "جارٍ الحذف…",
-        "err.permission": "رفضت قواعد الأمان هذا الإجراء. تأكد من أن حسابك يحمل صلاحية المشرف (سجّل الخروج ثم الدخول بعد تعيينها) ومن نشر القواعد.",
-        "err.unavailable": "تعذّر الوصول إلى Firebase. تحقق من اتصال الإنترنت.",
-        "err.credential": "البريد الإلكتروني أو كلمة المرور غير صحيحة.", "err.invalidEmail": "صيغة البريد الإلكتروني غير صحيحة.", "err.disabled": "تم تعطيل هذا الحساب.",
-        "err.tooMany": "محاولات كثيرة جداً. يرجى الانتظار قليلاً ثم المحاولة مرة أخرى.",
-        "err.network": "لا يوجد اتصال بالإنترنت أو تعذّر الوصول إلى Firebase.",
-        "err.notAllowed": "تسجيل الدخول بالبريد الإلكتروني وكلمة المرور غير مفعّل في Firebase Authentication.",
-        "err.notFound": "لم يتم العثور على المنتج.", "err.generic": "خطأ: {msg}"
       }
     };
 
@@ -1023,7 +941,11 @@
           const batch = FS.writeBatch(db);
           for (const c of changes) batch.update(docRef(c.slug), { displayOrder: c.displayOrder, updatedAt: FS.serverTimestamp() });
           await batch.commit();
-        }
+        },
+        subscribeSettings(onData, onError) {
+          return FS.onSnapshot(FS.doc(db, "genius_site", "main"), (snap) => onData(snap.exists() ? snap.data() : {}), onError);
+        },
+        async saveSettings(data) { await FS.setDoc(FS.doc(db, "genius_site", "main"), { ...data, updatedAt: FS.serverTimestamp() }); }
       };
     }
 
@@ -1046,7 +968,9 @@
         async create(p) { items.push({ ...p, createdAt: Date.now(), updatedAt: Date.now() }); emit(); },
         async update(slug, patch) { const i = items.find(x => x.slug === slug); if (!i) throw new Error(t("err.notFound")); touch(i, patch); emit(); },
         async remove(slug) { items = items.filter(i => i.slug !== slug); emit(); },
-        async reorder(changes) { for (const c of changes) { const i = items.find(x => x.slug === c.slug); if (i) touch(i, { displayOrder: c.displayOrder }); } emit(); }
+        async reorder(changes) { for (const c of changes) { const i = items.find(x => x.slug === c.slug); if (i) touch(i, { displayOrder: c.displayOrder }); } emit(); },
+        subscribeSettings(onData) { queueMicrotask(() => onData({})); return () => {}; },
+        async saveSettings() {}
       };
     }
 
@@ -1111,11 +1035,12 @@
     scrim.addEventListener("click", () => setDrawer(false));
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") setDrawer(false); });
 
-    const updateTopTitle = () => { $("#topTitle").textContent = t(currentView === "products" ? "nav.products" : "nav.dashboard"); };
+    const updateTopTitle = () => { $("#topTitle").textContent = t({ products: "nav.products", settings: "nav.settings" }[currentView] || "nav.dashboard"); };
     function navigate(view) {
-      currentView = view === "products" ? "products" : "dashboard";
+      currentView = ["products", "settings"].includes(view) ? view : "dashboard";
       $("#view-dashboard").hidden = currentView !== "dashboard";
       $("#view-products").hidden = currentView !== "products";
+      $("#view-settings").hidden = currentView !== "settings";
       updateTopTitle();
       $$(".side-link[data-nav]").forEach(b => b.classList.toggle("active", b.dataset.nav === currentView));
       if (location.hash !== "#" + currentView) history.replaceState(null, "", location.pathname + location.search + "#" + currentView);
@@ -1391,13 +1316,127 @@
        ===================================================================== */
     function startData() {
       if (unsubscribe) { unsubscribe(); unsubscribe = null; }
-      dataState = "loading"; dataError = null; renderAll();
+      dataState = "loading"; dataError = null; renderAll(); startSettings();
       try {
         unsubscribe = backend.subscribe(
           (list) => { products = list; dataState = "ready"; renderAll(); },
           (err) => { console.error(err); dataState = "error"; dataError = err; renderAll(); });
       } catch (err) { dataState = "error"; dataError = err; renderAll(); }
     }
+
+    /* =====================================================================
+       Bahagian 11b: Tetapan laman awam (logo, jenama, hubungan, teks)
+       Disimpan dalam Firestore: genius_site/main. Kunci teks guna "_" ganti ".".
+       ===================================================================== */
+    const SOCIALS = ["Facebook", "Instagram", "TikTok", "LinkedIn", "YouTube"];
+    const TEXT_DEFAULTS = {"hero.badge":{"ms":"Portal Produk dan Sistem Digital Korporat","en":"Corporate Digital Products and Systems Portal","ar":"بوابة المنتجات والأنظمة الرقمية للشركات"},"hero.quote":{"ms":"“Memacu Inovasi Digital Melalui Sistem Pintar, Kreatif dan Efisien.”","en":"“Driving digital innovation through smart, creative and efficient systems.”","ar":"“نقود الابتكار الرقمي عبر أنظمة ذكية وإبداعية وكفؤة.”"},"hero.intro":{"ms":"Genius Digital ialah sebuah syarikat yang membangunkan dan menawarkan pelbagai penyelesaian sistem digital untuk membantu individu, organisasi dan perniagaan mengurus tugasan dengan lebih mudah, sistematik dan efisien.","en":"Genius Digital develops and offers a range of digital system solutions that help individuals, organisations and businesses manage their work more simply, systematically and efficiently.","ar":"جينيوس ديجيتال شركة تطوّر وتقدّم مجموعة من الحلول والأنظمة الرقمية التي تساعد الأفراد والمؤسسات والشركات على إدارة مهامهم بسهولة وانتظام وكفاءة أكبر."},"hero.btnProducts":{"ms":"Terokai Produk Kami","en":"Explore Our Products","ar":"اكتشف منتجاتنا"},"hero.btnAbout":{"ms":"Tentang Genius Digital","en":"About Genius Digital","ar":"عن جينيوس ديجيتال"},"hero.p1":{"ms":"Berasaskan web","en":"Web-based","ar":"تعمل عبر الويب"},"hero.p2":{"ms":"Mesra mudah alih","en":"Mobile-first","ar":"مصمّمة للجوال أولاً"},"hero.p3":{"ms":"Sentiasa dipertingkatkan","en":"Continuously improving","ar":"تطوير مستمر"},"about.eyebrow":{"ms":"Tentang Kami","en":"Who We Are","ar":"من نحن"},"about.title":{"ms":"Tentang [[Genius Digital]]","en":"About [[Genius Digital]]","ar":"عن [[جينيوس ديجيتال]]"},"about.text":{"ms":"Genius Digital merupakan sebuah syarikat teknologi digital yang memfokuskan pembangunan sistem, aplikasi web dan penyelesaian digital yang praktikal serta inovatif. Kami komited menghasilkan produk digital yang mesra pengguna, mudah diakses dan mampu meningkatkan kecekapan pengurusan serta produktiviti.","en":"Genius Digital is a digital technology company focused on building practical, innovative systems, web applications and digital solutions. We are committed to creating digital products that are user-friendly, easy to access and able to improve management efficiency and productivity.","ar":"جينيوس ديجيتال شركة تقنية رقمية تُعنى ببناء الأنظمة وتطبيقات الويب والحلول الرقمية العملية والمبتكرة. نلتزم بتقديم منتجات رقمية سهلة الاستخدام ويسهل الوصول إليها، وتسهم في رفع كفاءة الإدارة والإنتاجية."},"about.p1.t":{"ms":"Inovasi Digital","en":"Digital Innovation","ar":"الابتكار الرقمي"},"about.p1.d":{"ms":"Menterjemahkan idea kepada sistem digital yang kreatif dan relevan, serta sentiasa dipertingkatkan dari semasa ke semasa.","en":"We turn ideas into creative, relevant digital systems and keep improving them over time.","ar":"نحوّل الأفكار إلى أنظمة رقمية إبداعية وملائمة، ونواصل تطويرها باستمرار."},"about.p2.t":{"ms":"Penyelesaian Pintar","en":"Smart Solutions","ar":"حلول ذكية"},"about.p2.d":{"ms":"Penyelesaian pintar yang memudahkan tugasan harian dan menjadikan pengurusan lebih sistematik.","en":"Smart solutions that simplify everyday tasks and make management more systematic.","ar":"حلول ذكية تبسّط المهام اليومية وتجعل الإدارة أكثر تنظيماً."},"about.p3.t":{"ms":"Teknologi Berpaksikan Pengguna","en":"User-Centric Technology","ar":"تقنية تتمحور حول المستخدم"},"about.p3.d":{"ms":"Teknologi yang dibina berdasarkan keperluan pengguna: mudah difahami dan boleh diakses pada mana-mana peranti.","en":"Technology built around what users need: easy to understand and accessible on any device.","ar":"تقنية مبنية على احتياجات المستخدمين، سهلة الفهم ويمكن الوصول إليها من أي جهاز."},"products.eyebrow":{"ms":"Katalog Produk","en":"Product Catalogue","ar":"كتالوج المنتجات"},"products.title":{"ms":"Produk [[Digital]] Kami","en":"Our Digital [[Products]]","ar":"منتجاتنا [[الرقمية]]"},"products.sub":{"ms":"Terokai koleksi sistem dan alatan digital inovatif kami.","en":"Explore our collection of innovative digital systems and tools.","ar":"اكتشف مجموعتنا من الأنظمة والأدوات الرقمية المبتكرة."},"contact.h2":{"ms":"Hubungi Kami","en":"Contact Us","ar":"اتصل بنا"},"footer.copy":{"ms":"© 2026 Genius Digital. Hak Cipta Terpelihara.","en":"© 2026 Genius Digital. All Rights Reserved.","ar":"© 2026 جينيوس ديجيتال. جميع الحقوق محفوظة."}};
+    const TEXT_GROUPS = [
+      { title: "Muka depan (Hero)", items: [["hero.badge", "Lencana atas tajuk", "text"], ["hero.quote", "Petikan bawah tajuk", "area"], ["hero.intro", "Perenggan pengenalan", "area"], ["hero.btnProducts", "Butang utama", "text"], ["hero.btnAbout", "Butang kedua", "text"], ["hero.p1", "Ciri 1", "text"], ["hero.p2", "Ciri 2", "text"], ["hero.p3", "Ciri 3", "text"]] },
+      { title: "Tentang Kami", items: [["about.eyebrow", "Label kecil", "text"], ["about.title", "Tajuk", "text"], ["about.text", "Penerangan", "area"], ["about.p1.t", "Kad 1: Tajuk", "text"], ["about.p1.d", "Kad 1: Penerangan", "area"], ["about.p2.t", "Kad 2: Tajuk", "text"], ["about.p2.d", "Kad 2: Penerangan", "area"], ["about.p3.t", "Kad 3: Tajuk", "text"], ["about.p3.d", "Kad 3: Penerangan", "area"]] },
+      { title: "Bahagian Produk", items: [["products.eyebrow", "Label kecil", "text"], ["products.title", "Tajuk", "text"], ["products.sub", "Ayat bawah tajuk", "text"]] },
+      { title: "Footer", items: [["contact.h2", "Tajuk \u201cHubungi Kami\u201d", "text"], ["footer.copy", "Hak cipta", "text"]] }
+    ];
+    const encKey = (k) => k.replace(/\./g, "_");
+    let settings = {}, settingsDirty = false, savingSettings = false, unsubSettings = null;
+    let logo = { dataURL: "", existingURL: "", removed: false };
+
+    function buildSettingsForm() {
+      $("#socialsHost").replaceChildren(...SOCIALS.map((name, i) => el("div", { class: "field" }, [
+        el("label", { for: "sSoc" + i, text: name }), el("input", { class: "input", dir: "ltr", id: "sSoc" + i, type: "url", inputmode: "url", autocapitalize: "none", autocomplete: "off", placeholder: "https://", "data-social": name }),
+        el("span", { class: "err", id: "eSoc" + i })])));
+      $("#textsHost").replaceChildren(...TEXT_GROUPS.map(g => el("fieldset", { class: "tgroup" }, [
+        el("legend", { text: g.title }),
+        ...g.items.map(([key, label, type]) => {
+          const d = TEXT_DEFAULTS[key], id = (lg) => `t-${encKey(key)}-${lg}`;
+          const mk = (lg) => { const a = { class: "input", id: id(lg), "data-key": key, "data-lg": lg, placeholder: d[lg], maxlength: "600" }; if (lg === "ar") { a.dir = "rtl"; a.lang = "ar"; } if (lg === "en") { a.dir = "ltr"; a.lang = "en"; } return el(type === "area" ? "textarea" : "input", a); };
+          return el("div", { class: "field" }, [
+            el("label", { for: id("ms"), text: label }), mk("ms"),
+            el("details", { class: "trans" }, [el("summary", { text: "Terjemahan BI / BA" }),
+              el("div", { class: "field" }, [el("label", { for: id("en"), text: "English (BI)" }), mk("en")]),
+              el("div", { class: "field" }, [el("label", { for: id("ar"), text: "Arab (BA)" }), mk("ar")])])
+          ]);
+        })
+      ])));
+    }
+
+    function refreshLogoUI() {
+      const url = logo.dataURL || (logo.removed ? "" : safeImage(logo.existingURL)), img = $("#logoImg");
+      if (url) { img.src = url; img.hidden = false; } else { img.removeAttribute("src"); img.hidden = true; }
+      $("#logoDefault").toggleAttribute("hidden", !!url);
+      $("#logoPickText").textContent = url ? "Ganti Logo" : "Muat Naik Logo";
+      $("#logoRemove").hidden = !url;
+    }
+
+    function fillSettingsForm() {
+      const c = settings.contact || {}, socMap = Object.fromEntries((Array.isArray(c.socials) ? c.socials : []).map(s => [s.label, s.url]));
+      $("#sBrand").value = settings.brandName || ""; $("#sTagline").value = settings.tagline || "";
+      $("#sEmail").value = c.email || ""; $("#sWa").value = c.whatsapp || "";
+      $$("[data-social]").forEach(i => { i.value = socMap[i.dataset.social] || ""; });
+      $$("#textsHost [data-key]").forEach(i => { const e = settings.texts && settings.texts[encKey(i.dataset.key)]; i.value = (e && e[i.dataset.lg]) || ""; });
+      logo = { dataURL: "", existingURL: settings.logoURL || "", removed: false }; refreshLogoUI();
+    }
+
+    function startSettings() {
+      if (unsubSettings) { unsubSettings(); unsubSettings = null; }
+      try {
+        unsubSettings = backend.subscribeSettings(
+          (data) => { settings = data || {}; if (!settingsDirty) fillSettingsForm(); },
+          (err) => { console.error(err); showAlert($("#setError"), friendlyError(err)); });
+      } catch (err) { console.error(err); }
+    }
+
+    async function processLogo(file) {   // kekalkan nisbah & kelutsinaran (PNG), kecilkan hingga muat dalam had Firestore
+      if (!ALLOWED_TYPES.includes(file.type)) throw new Error(t("img.type"));
+      if (file.size > MAX_INPUT_BYTES) throw new Error(t("img.size"));
+      const url = URL.createObjectURL(file);
+      try {
+        const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error(t("img.read"))); i.src = url; });
+        for (const max of [320, 256, 192, 128]) {
+          const sc = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight)), w = Math.max(1, Math.round(img.naturalWidth * sc)), h = Math.max(1, Math.round(img.naturalHeight * sc));
+          const canvas = document.createElement("canvas"); canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext("2d"); ctx.imageSmoothingQuality = "high"; ctx.drawImage(img, 0, 0, w, h);
+          const d = canvas.toDataURL("image/png");
+          if (d.length <= MAX_THUMB_CHARS) return d;
+        }
+        throw new Error(t("img.complex"));
+      } finally { URL.revokeObjectURL(url); }
+    }
+    $("#logoPick").addEventListener("click", () => $("#logoFile").click());
+    $("#logoFile").addEventListener("change", async (e) => {
+      const file = e.target.files[0]; if (!file) return; $("#eLogo").textContent = "";
+      try { logo.dataURL = await processLogo(file); logo.removed = false; settingsDirty = true; refreshLogoUI(); }
+      catch (err) { $("#eLogo").textContent = err.message; }
+      e.target.value = "";
+    });
+    $("#logoRemove").addEventListener("click", () => { logo.dataURL = ""; logo.removed = true; settingsDirty = true; refreshLogoUI(); });
+    $("#settingsForm").addEventListener("input", () => { settingsDirty = true; });
+
+    function collectSettings() {
+      $$("#settingsForm .err").forEach(n => { if (n.id !== "eLogo") n.textContent = ""; }); showAlert($("#setError"), "");
+      let ok = true;
+      const email = $("#sEmail").value.trim(), wa = $("#sWa").value.replace(/[\s+\-()]/g, "");
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { $("#eEmail").textContent = "Format e-mel tidak sah."; ok = false; }
+      if (wa && !/^\d{7,15}$/.test(wa)) { $("#eWa").textContent = "Nombor tidak sah. Contoh: 60123456789"; ok = false; }
+      const socials = SOCIALS.map((label, i) => {
+        const url = $("#sSoc" + i).value.trim();
+        if (url && !/^https:\/\/[^\s]+$/i.test(url)) { $("#eSoc" + i).textContent = "Pautan mesti bermula dengan https://"; ok = false; }
+        return { label, url };
+      });
+      const texts = {};
+      $$("#textsHost [data-key]").forEach(i => { const v = i.value.trim(); if (v) (texts[encKey(i.dataset.key)] ||= {})[i.dataset.lg] = v; });
+      if (!ok) { const f = $("#settingsForm .err:not(:empty)"); if (f) f.scrollIntoView({ block: "center" }); return null; }
+      return { logoURL: logo.dataURL || (logo.removed ? "" : logo.existingURL || ""), brandName: $("#sBrand").value.trim(), tagline: $("#sTagline").value.trim(), contact: { email, whatsapp: wa, socials }, texts };
+    }
+
+    $("#settingsForm").addEventListener("submit", async (e) => {
+      e.preventDefault(); if (savingSettings) return;
+      const data = collectSettings(); if (!data) return;
+      savingSettings = true; const btn = $("#setSave"); setBusy(btn, true, t("dlg.saving"));
+      try { await backend.saveSettings(data); settingsDirty = false; settings = data; toast("Tetapan disimpan. Laman awam dikemas kini serta-merta.", "ok"); }
+      catch (err) { console.error(err); showAlert($("#setError"), friendlyError(err)); window.scrollTo(0, 0); }
+      finally { savingSettings = false; setBusy(btn, false); }
+    });
+    buildSettingsForm();
 
     /* =====================================================================
        Bahagian 12: Pengesahan (login / logout / semakan admin)
@@ -1407,7 +1446,7 @@
     }
     async function handleAuthState(user) {
       if (!user) {
-        if (unsubscribe) { unsubscribe(); unsubscribe = null; } products = [];
+        if (unsubscribe) { unsubscribe(); unsubscribe = null; } if (unsubSettings) { unsubSettings(); unsubSettings = null; } products = [];
         showOnly("login"); return;
       }
       $("#userEmail").textContent = user.email || "";
@@ -1431,6 +1470,11 @@
       try { await backend.resetPassword(email); } catch (err) { if (err.code !== "auth/user-not-found") { showAlert($("#loginError"), friendlyError(err)); return; } }
       showAlert($("#loginOk"), t("reset.sent"));   // mesej sama untuk elak enumerasi akaun
     });
+    $("#pwToggle").addEventListener("click", () => {
+      const pw = $("#loginPassword"), show = pw.type === "password", b = $("#pwToggle");
+      pw.type = show ? "text" : "password"; b.setAttribute("aria-pressed", String(show));
+      const label = show ? "Sembunyi kata laluan" : "Tunjuk kata laluan"; b.setAttribute("aria-label", label); b.setAttribute("title", label);
+    });
     const doSignOut = async () => { try { await backend.signOut(); } catch (err) { toast(friendlyError(err), "err"); } };
     $("#signOutBtn").addEventListener("click", doSignOut);
 
@@ -1453,7 +1497,6 @@
     function setLang(next, persist = true) {
       if (!LANGS[next]) next = DEFAULT_LANG;
       lang = next; root.lang = next; root.dir = LANGS[next].dir;
-      if (persist) writeStore(STORE_LANG, next);
       applyStatic();
       document.title = t("meta.title");
       $$("[data-lang]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === next)));
@@ -1462,13 +1505,12 @@
       if (!views.app.hidden) renderAll();
     }
     document.addEventListener("click", (e) => {
-      const lb = e.target.closest("[data-lang]"); if (lb) { setLang(lb.dataset.lang); return; }
       if (e.target.closest("[data-theme-toggle]")) setTheme(root.getAttribute("data-theme") === "dark" ? "light" : "dark");
     });
 
     /* ---------- Mula ---------- */
     setTheme(readStore(STORE_THEME) === "dark" ? "dark" : "light", false);
-    setLang(readStore(STORE_LANG), false);
+    setLang("ms", false);
     (async function init() {
       if (!isFirebaseConfigured && !DEMO) { $("#setupNotice").hidden = false; $("#loginForm").hidden = true; $(".auth-foot #resetBtn").hidden = true; showOnly("login"); return; }
       try {

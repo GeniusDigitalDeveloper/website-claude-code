@@ -105,6 +105,18 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // ---------- Koleksi: genius_site (tetapan laman awam Genius Digital) ----------
+    match /genius_site/{docId} {
+      allow read: if true;
+      allow write: if isAdmin() && docId == 'main'
+        && request.resource.data.keys().hasOnly(['logoURL', 'brandName', 'tagline', 'contact', 'texts', 'updatedAt'])
+        && (!('logoURL' in request.resource.data) || isValidThumbnail(request.resource.data.logoURL))
+        && (!('brandName' in request.resource.data) || (request.resource.data.brandName is string && request.resource.data.brandName.size() <= 60))
+        && (!('tagline' in request.resource.data) || (request.resource.data.tagline is string && request.resource.data.tagline.size() <= 120))
+        && (!('contact' in request.resource.data) || request.resource.data.contact is map)
+        && (!('texts' in request.resource.data) || request.resource.data.texts is map);
+    }
+
     // ================= MALAYSIA PDF TOOLS =================
 
     function pdfIsAdmin() {
