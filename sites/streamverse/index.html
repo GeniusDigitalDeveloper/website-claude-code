@@ -371,7 +371,7 @@ body.t-rgb .theme-card.on,body.t-rgb .btn.primary{animation:rgb 6s linear infini
         <label class="f">Password (min 8 aksara, ada huruf &amp; nombor)<input class="in" id="regPass" type="password" autocomplete="new-password" required minlength="8"></label>
         <label class="f">Confirm Password<input class="in" id="regPass2" type="password" autocomplete="new-password" required minlength="8"></label>
         <button class="btn primary" type="submit"><i data-lucide="user-plus"></i>Daftar Akaun</button>
-        <p class="small muted" style="margin:0">Email pengesahan akan dihantar. Dashboard hanya dibuka selepas email disahkan.</p>
+        <p class="small muted" style="margin:0">Selepas daftar, anda terus masuk ke dashboard. Tiada kod atau pengesahan email.</p>
       </form>
       <form id="loginForm" class="col" data-auth-form="login" hidden novalidate>
         <label class="f">Email<input class="in" id="loginEmail" type="email" autocomplete="email" required></label>
@@ -3713,8 +3713,7 @@ function bindAuth() {
     withBusy(b, async () => {
       try {
         const cred = await fb.Au.createUserWithEmailAndPassword(fb.auth, email, p1);
-        await mailVerify(cred.user);
-        authMsg("Akaun dicipta. Semak email untuk link pengesahan.", "ok");
+        authMsg("Akaun dicipta. Memasuki dashboard…", "ok");
       } catch (er) { authMsg(errMsg(er), "err"); }
     });
   };
@@ -3790,8 +3789,7 @@ async function onUser(u) {
   }
   const tok = await u.getIdTokenResult();
   // Claim admin hanya boleh ditetapkan melalui Admin SDK, jadi akaun admin tidak disekat oleh pengesahan email di panel admin.
-  const adminBypass = isAdminApp() && tok.claims.admin === true;
-  if (!u.emailVerified && !adminBypass) { showOnly("verifyView"); $("#verifyEmail").textContent = u.email; icons(); return; }
+  // Tiada pengesahan email: selepas daftar atau log masuk, pengguna terus masuk.
   S.user = u;
   S.isAdmin = tok.claims.admin === true;
   if (qs.get("pair")) return startCompanion(qs.get("pair").toUpperCase(), qs.get("kind") || "video");
