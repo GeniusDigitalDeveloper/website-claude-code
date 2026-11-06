@@ -864,6 +864,7 @@ function needCloud() {
 }
 function cloudBlock(feature) {
   if (!FB_READY) return `<div class="note"><b>${chip("warn", "Firebase Not Configured")}</b><p style="margin:8px 0 0">${esc(feature)} memerlukan Firebase (Auth, Firestore${/AI|Platform|Admin|Pair/i.test(feature) ? ", Cloud Functions" : ""}). Isi <span class="mono">FIREBASE_CONFIG</span> dan deploy backend ikut README.</p></div>`;
+  if (!fb.ready) return `<div class="note">${chip("warn", "Firebase Not Reachable")} ${esc(feature)} perlukan sambungan Firebase. Persekitaran ini (cth. preview) menyekatnya; di domain hosting sebenar ia berfungsi.</div>`;
   if (!S.user) return `<div class="note">${chip("warn", "Sign In Required")} Sila log masuk untuk guna ${esc(feature)}.</div>`;
   return "";
 }
@@ -3235,6 +3236,7 @@ function showAuth(note) {
   showOnly("authView");
   $("#authPanels").hidden = !FB_READY;
   $("#fbMissing").hidden = FB_READY;
+  if (FB_READY && !fb.ready) { const m = $("#authMsg"); m.textContent = "Firebase belum dapat dicapai dari persekitaran ini (cth. preview atau rangkaian menyekat). Di domain hosting sebenar, log masuk berfungsi."; m.className = "small muted"; }
   if (isAdminApp()) {                       // panel admin: log masuk sahaja, tiada pendaftaran
     $$('[data-auth-tab="register"]').forEach(b => b.hidden = true);
     const bt = $(".auth-card .brand-tag"); if (bt) bt.textContent = "Admin Console · log masuk akaun admin";
@@ -3253,12 +3255,14 @@ function bindAuth() {
   $$("[data-auth-tab]").forEach(b => b.onclick = () => authTab(b.dataset.authTab));
   $("#localStudioBtn").onclick = () => { S.local = true; enterApp(); };
   $("#loginForm").onsubmit = e => { e.preventDefault(); const b = e.submitter;
+    if (!fb.ready) return authMsg("Firebase tidak dapat dicapai dari persekitaran ini (cth. preview). Buka app melalui domain hosting sebenar.", "err");
     const email = $("#loginEmail").value.trim(), pass = $("#loginPass").value;
     if (!emailOk(email)) return authMsg("Format email tidak sah.", "err");
     if (!pass) return authMsg("Masukkan password.", "err");
     withBusy(b, async () => { authMsg("Log masuk…"); try { await fb.Au.signInWithEmailAndPassword(fb.auth, email, pass); authMsg(""); } catch (er) { authMsg(errMsg(er), "err"); } });
   };
   $("#registerForm").onsubmit = e => { e.preventDefault(); const b = e.submitter;
+    if (!fb.ready) return authMsg("Firebase tidak dapat dicapai dari persekitaran ini (cth. preview). Buka app melalui domain hosting sebenar.", "err");
     const email = $("#regEmail").value.trim(), p1 = $("#regPass").value, p2 = $("#regPass2").value;
     if (!emailOk(email)) return authMsg("Format email tidak sah.", "err");
     if (p1.length < 8 || !/[A-Za-z]/.test(p1) || !/\d/.test(p1)) return authMsg("Password mesti sekurang-kurangnya 8 aksara dengan huruf dan nombor.", "err");
@@ -3272,6 +3276,7 @@ function bindAuth() {
     });
   };
   $("#forgotForm").onsubmit = e => { e.preventDefault(); const b = e.submitter;
+    if (!fb.ready) return authMsg("Firebase tidak dapat dicapai dari persekitaran ini (cth. preview). Buka app melalui domain hosting sebenar.", "err");
     const email = $("#forgotEmail").value.trim();
     if (!emailOk(email)) return authMsg("Format email tidak sah.", "err");
     withBusy(b, async () => {
@@ -3624,14 +3629,14 @@ async function boot() {
   renderLogos(); bindAuth(); bindEvents(); bindChatEvents(); bindSfx(); bindHoverSfx(); startCompositor();
   const qs = new URLSearchParams(location.search);
   try { await initFirebase(); }
-  catch (e) { console.error(e); toast("Firebase SDK gagal dimuatkan: " + e.message, "err", 9000); }
+  catch (e) { console.warn("Firebase SDK tidak dapat dimuatkan:", e.message); fb.loadError = true; }
   $("#boot").hidden = true;
   const mode = qs.get("mode"), code = qs.get("oobCode");
   if (mode && code) return handleEmailAction(mode, code);
   if (qs.get("live")) return startViewerPage(qs.get("live"));
   if (!fb.ready) {
     if (qs.get("panel") === "chat") { S.local = true; return startChatWindow(); }
-    if (isAdminApp()) {
+    if (isAdminApp() && !FB_READY) {
       showOnly("adminApp");
       $("#adminSide").innerHTML = ADMIN_TABS.map(([k, l, ic]) => `<button class="nav-item ${k === adminTab ? "on" : ""}" disabled><i data-lucide="${ic}"></i>${l}</button>`).join("");
       $("#adminTabSelect").innerHTML = ADMIN_TABS.map(([k, l]) => `<option>${l}</option>`).join(""); $("#adminTabSelect").disabled = true;
