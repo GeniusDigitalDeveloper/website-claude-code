@@ -1,4 +1,4 @@
-// Sambungan Firebase (projek fetchr-box-izzul). Kunci web Firebase memang awam; keselamatan dijaga oleh firestore.rules.
+// Sambungan Firebase (projek GENIUS DIGITAL, aplikasi web FETCHR BOX). Kunci web Firebase memang awam; keselamatan dijaga oleh firestore.rules.
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
 import {
   getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, orderBy, limit, serverTimestamp, writeBatch,
@@ -9,12 +9,13 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyCZi-nFSqEE3vQ-WARpgf0ePuByEmLJjkM',
-  authDomain: 'fetchr-box-izzul.firebaseapp.com',
-  projectId: 'fetchr-box-izzul',
-  storageBucket: 'fetchr-box-izzul.firebasestorage.app',
-  messagingSenderId: '87434149496',
-  appId: '1:87434149496:web:4c990197042a24c783378d',
+  apiKey: 'AIzaSyA6jQBsL6OahJ2FcMBFf38ISoGQiTTYg2s',
+  authDomain: 'genius-digital-40bc9.firebaseapp.com',
+  projectId: 'genius-digital-40bc9',
+  storageBucket: 'genius-digital-40bc9.firebasestorage.app',
+  messagingSenderId: '508099045190',
+  appId: '1:508099045190:web:d17033d9d10451e41e2747',
+  measurementId: 'G-VQWKHHC1WY',
 };
 
 const app = initializeApp(firebaseConfig);

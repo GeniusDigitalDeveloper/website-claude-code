@@ -1,8 +1,5 @@
 {
-  "projects": { "default": "fetchr-box-izzul" },
-  "targets": {
-    "fetchr-box-izzul": {
-      "hosting": { "public": ["fetchr-box-izzul"], "admin": ["fetchrbox-admin-izzul"] }
-    }
+  "projects": {
+    "default": "genius-digital-40bc9"
   }
 }
