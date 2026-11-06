@@ -47,3 +47,53 @@
 .checklist { list-style: none; display: grid; gap: 8px; margin-block-start: 20px; } .checklist li { display: flex; gap: 8px; align-items: flex-start; } .checklist .icon { color: var(--ok); margin-block-start: 4px; }
 @media (max-width: 1023px) { .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .admin-grid { grid-template-columns: 1fr; } .login-wrap { grid-template-columns: 1fr; } }
 @media (max-width: 520px) { .kpi-grid { grid-template-columns: 1fr; } }
+
+/* ===== Reka bentuk semula: log masuk, akaun, papan pemuka ===== */
+.spacer { flex: 1; }
+.admin-title { margin-block-end: 4px; }
+
+/* Log masuk */
+body.auth-page #app { display: block; min-height: 100vh; }
+.auth-wrap { position: relative; isolation: isolate; min-height: 100vh; display: flex; flex-direction: column; background: linear-gradient(160deg, #eef2ff 0%, #f5f3ff 45%, #e0f2fe 100%); overflow: hidden; }
+.auth-wrap::before, .auth-wrap::after { content: ''; position: absolute; z-index: -1; border-radius: 50%; filter: blur(70px); opacity: .55; }
+.auth-wrap::before { width: 520px; height: 520px; inset-block-start: -160px; inset-inline-start: -120px; background: #818cf8; }
+.auth-wrap::after { width: 460px; height: 460px; inset-block-end: -140px; inset-inline-end: -100px; background: #38bdf8; }
+.auth-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px clamp(14px, 4vw, 32px); }
+.auth-main { flex: 1; display: grid; place-items: center; padding: 8px 16px 32px; outline: none; }
+.auth-card { width: 100%; max-width: 440px; background: rgba(255, 255, 255, .88); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, .9); border-radius: 24px; padding: clamp(22px, 6vw, 36px); box-shadow: 0 30px 70px -24px rgba(79, 70, 229, .45), 0 2px 6px rgba(15, 23, 42, .06); display: grid; gap: 10px; }
+.auth-brand { display: grid; justify-items: center; gap: 8px; margin-block-end: 6px; text-align: center; }
+.auth-brand > strong { font-size: 1.35rem; font-weight: 800; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.admin-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; background: #eef2ff; color: var(--primary-600); font-size: .78rem; font-weight: 700; }
+.auth-card h1 { font-size: 1.5rem; text-align: center; }
+.auth-sub { text-align: center; color: var(--muted); margin: 0 0 6px; }
+.auth-form { display: grid; gap: 14px; }
+.afield { display: grid; gap: 6px; } .afield > label { font-size: .85rem; font-weight: 700; color: #334155; }
+.ainput { position: relative; display: flex; align-items: center; }
+.ainput > .icon { position: absolute; inset-inline-start: 14px; color: #64748b; pointer-events: none; }
+.ainput input { width: 100%; height: 52px; padding-inline: 44px 48px; border: 1.5px solid var(--border-strong); border-radius: 14px; background: #fff; font-size: 1rem; transition: border-color .15s, box-shadow .15s; }
+.ainput input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79, 70, 229, .15); }
+.eye { position: absolute; inset-inline-end: 4px; width: 44px; height: 44px; border: 0; background: transparent; color: #475569; border-radius: 10px; display: grid; place-items: center; }
+.eye:hover { background: #f1f5f9; }
+.btn.block { width: 100%; }
+.auth-points { list-style: none; display: grid; gap: 6px; margin-block-start: 8px; padding-block-start: 14px; border-block-start: 1px solid var(--border); font-size: .82rem; color: var(--muted); }
+.auth-points li { display: flex; gap: 8px; align-items: flex-start; } .auth-points .icon { color: var(--ok); margin-block-start: 3px; }
+.auth-wrap .admin-footer { background: transparent; color: var(--muted); } .auth-wrap .footer-copy { color: var(--muted); text-align: center; }
+/* Akaun dalam bar sisi */
+.account-card { margin-block-start: auto; display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface-2); }
+.avatar { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--grad); color: #fff; font-weight: 800; flex: none; }
+.acc-text { display: grid; min-width: 0; flex: 1; } .acc-text strong { font-size: .85rem; } .acc-text small { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account-card .icon-btn { width: 40px; height: 40px; flex: none; } [dir='rtl'] .account-card .icon-btn .icon { transform: scaleX(-1); }
+/* Papan pemuka */
+.welcome { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; justify-content: space-between; padding: clamp(18px, 3vw, 28px); border-radius: 22px; color: #fff; background: var(--grad); box-shadow: var(--shadow-lg); }
+.welcome small { opacity: .9; font-weight: 600; } .welcome h2 { font-size: clamp(1.4rem, 4vw, 2rem); margin: 2px 0 4px; word-break: break-word; } .welcome p { margin: 0; opacity: .92; }
+.quick-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.quick { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 12px; background: rgba(255, 255, 255, .18); border: 1px solid rgba(255, 255, 255, .35); color: #fff; font-weight: 700; font-size: .88rem; text-decoration: none; transition: background .15s, transform .15s; }
+.quick:hover { background: rgba(255, 255, 255, .3); transform: translateY(-1px); }
+.kpi .fstat-ico { background: var(--grad); color: #fff; }
+.admin-card h2.h3 { font-size: 1rem; }
+@media (max-width: 1023px) {
+  .site-header { flex-wrap: nowrap; }
+  .sidebar { display: flex; }
+  .welcome { flex-direction: column; align-items: stretch; } .quick-row { display: grid; grid-template-columns: 1fr 1fr; } .quick { justify-content: center; }
+}
+@media (max-width: 520px) { .auth-top .btn span { display: none; } .auth-top .btn { min-width: 40px; padding: 0 10px; } }

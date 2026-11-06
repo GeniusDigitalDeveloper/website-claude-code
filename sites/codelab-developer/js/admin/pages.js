@@ -10,6 +10,7 @@ import { downloadText } from '../utils/io.js';
 import { t, getLang, LANGS, fmtNum, onLangChange } from '../i18n/i18n.js';
 import { SITE } from '../config.js';
 import { toast } from '../components/toast.js';
+import { logo } from '../components/ui-parts.js';
 
 const card = (titleKey, ...kids) => h('section', { class: 'pane admin-card' }, h('div', { class: 'pane-head' }, h('h2', { class: 'h3', i18n: titleKey })), ...kids);
 const empty = (key, ic = 'database') => h('div', { class: 'empty small' }, icon(ic, 28), h('p', { i18n: key }));
@@ -22,11 +23,13 @@ const resetInfo = () => {
   return h('ul', { class: 'status-list' }, h('li', {}, icon('clock', 16), h('span', { i18n: 'adm.dailyKey' }), d), h('li', {}, icon('calendar-clock', 16), h('span', { i18n: 'adm.monthlyKey' }), m), h('li', {}, icon('chart-column', 16), h('span', { i18n: 'stats.ruleTotal' })));
 };
 
-export async function dashboard() {
+export async function dashboard(state) {
   const s = await adminData.summary().catch(() => ({}));
   const acts = await adminData.listActivity(10).catch(() => []);
   const local = Object.entries(usage.all()).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const qa = (href, ic, k) => h('a', { class: 'quick', href }, icon(ic, 20), h('span', { i18n: k }));
   return h('div', { class: 'admin-grid' },
+    h('section', { class: 'welcome span-all' }, h('div', {}, h('small', { i18n: 'adm.welcome' }), h('h2', { dir: 'ltr' }, (state?.user?.email || '').split('@')[0] || 'Admin'), h('p', { i18n: 'adm.dash.sub' })), h('div', { class: 'quick-row', 'aria-label': 'Quick actions' }, qa('tools.html', 'wrench', 'adm.nav.tools'), qa('statistics.html', 'chart-column', 'adm.nav.statistics'), qa('content.html', 'file-text', 'adm.nav.content'), qa('settings.html', 'settings', 'adm.nav.settings'))),
     h('div', { class: 'kpi-grid span-all' }, kpi('stats.users', 'users', s.registeredUsers), kpi('stats.today', 'activity', s.today), kpi('stats.month', 'calendar-clock', s.month), kpi('stats.total', 'chart-column', s.total)),
     card('adm.dash.popular', local.length ? h('ol', { class: 'rank' }, local.map(([id, n]) => toolById(id) && h('li', {}, h('span', { i18n: `tool.${id}.name` }), h('strong', {}, String(n))))) : empty('adm.dash.noUsage', 'chart-column'), h('p', { class: 'muted small', i18n: 'adm.dash.localNote' })),
     card('adm.dash.system', h('ul', { class: 'status-list' }, statusRow('adm.sys.db', !!s.connected), statusRow('adm.sys.auth', true),
@@ -159,16 +162,19 @@ export async function index() {
 export async function login() {
   const { auth } = await import('./auth.js');
   const err = h('div', { class: 'alert alert-error', role: 'alert', hidden: true });
-  const email = h('input', { id: 'l-email', type: 'email', required: true, autocomplete: 'username', dir: 'ltr' });
+  const email = h('input', { id: 'l-email', type: 'email', required: true, autocomplete: 'username', dir: 'ltr', inputmode: 'email', autocapitalize: 'off', spellcheck: 'false' });
   const pass = h('input', { id: 'l-pass', type: 'password', required: true, autocomplete: 'current-password', dir: 'ltr' });
-  const btn = h('button', { type: 'submit', class: 'btn btn-primary' }, icon('log-in', 16), h('span', { i18n: 'adm.login.submit' }));
-  const form = h('form', { class: 'pane login-card', onsubmit: async (e) => {
-    e.preventDefault(); err.hidden = true; btn.disabled = true;
+  const eye = h('button', { type: 'button', class: 'eye', aria: 'adm.showPass', tip: 'adm.showPass', onclick: () => { const on = pass.type === 'password'; pass.type = on ? 'text' : 'password'; eye.replaceChildren(icon(on ? 'eye' : 'lock', 18)); eye.setAttribute('aria-pressed', String(on)); } }, icon('eye', 18));
+  const label = h('span', { i18n: 'adm.login.submit' });
+  const btn = h('button', { type: 'submit', class: 'btn btn-primary btn-lg block' }, icon('log-in', 18), label);
+  const field = (id, key, ic, input, extra) => h('div', { class: 'afield' }, h('label', { for: id, i18n: key }), h('div', { class: 'ainput' }, icon(ic, 18), input, extra));
+  const form = h('form', { class: 'auth-form', onsubmit: async (e) => {
+    e.preventDefault(); err.hidden = true; btn.disabled = true; setT(label, 'adm.login.wait');
     try { await auth.signIn(email.value.trim(), pass.value); location.replace('dashboard.html'); }
-    catch (x) { const code = String(x.code || ''); err.hidden = false; setT(err, /too-many/.test(code) ? 'adm.login.errMany' : /network/.test(code) ? 'adm.login.errNet' : 'adm.login.errCred'); btn.disabled = false; pass.value = ''; }
-  } },
-    h('div', { class: 'field' }, h('label', { for: 'l-email', i18n: 'adm.login.email' }), email),
-    h('div', { class: 'field' }, h('label', { for: 'l-pass', i18n: 'adm.login.password' }), pass), err, btn,
-    h('p', { class: 'muted small', i18n: 'adm.login.note' }));
-  return h('div', { class: 'login-wrap' }, form, h('div', { class: 'pane' }, h('h2', { class: 'h3', i18n: 'adm.login.whyTitle' }), h('ul', { class: 'checklist' }, [1, 2, 3].map((i) => h('li', {}, icon('shield-check', 16), h('span', { i18n: `adm.login.why${i}` }))))));
+    catch (x) { const code = String(x.code || ''); err.hidden = false; setT(err, /too-many/.test(code) ? 'adm.login.errMany' : /network/.test(code) ? 'adm.login.errNet' : 'adm.login.errCred'); btn.disabled = false; setT(label, 'adm.login.submit'); pass.value = ''; pass.focus(); }
+  } }, field('l-email', 'adm.login.email', 'mail', email), field('l-pass', 'adm.login.password', 'lock', pass, eye), err, btn);
+  return h('section', { class: 'auth-card' },
+    h('div', { class: 'auth-brand' }, logo(64), h('strong', {}, SITE.name), h('span', { class: 'admin-chip' }, icon('shield-check', 14), h('span', { i18n: 'adm.panelName' }))),
+    h('h1', { i18n: 'adm.login.title' }), h('p', { class: 'auth-sub', i18n: 'adm.login.sub' }), form,
+    h('ul', { class: 'auth-points' }, [1, 2, 3].map((i) => h('li', {}, icon('check', 14), h('span', { i18n: `adm.login.why${i}` })))));
 }
