@@ -16,7 +16,7 @@ Platform all-in-one untuk gamer, livestreamer dan content creator. Frontend iala
 | `FIREBASE_CONFIG` | Sudah diisi dalam `index.html` dan `admin.html` |
 | Authentication | Email/Password (dikongsi dengan app lain dalam projek) |
 | Firestore `(default)` | Rules Streamverse **sudah digabung** dalam rules projek. Indexes sudah dideploy |
-| Hosting | Perlu **Site ID** khas Streamverse. Site default `genius-digital-40bc9` menyiarkan Fetchr Box, **jangan deploy ke situ** |
+| Hosting | Site khas Streamverse: **`genius-digital-40bc9-34bd0`** (https://genius-digital-40bc9-34bd0.web.app). Site default `genius-digital-40bc9` menyiarkan Fetchr Box, **jangan deploy ke situ** |
 | Cloud Functions / Storage | Tidak digunakan (`FUNCTIONS_ENABLED = false`, `STORAGE_ENABLED = false`) |
 
 > **Rules Firestore dikongsi 4 app** (Genius Digital, PDF Tools, Fetchr Box, Streamverse). `firebase.json` sengaja tidak merujuk `firestore.rules`. Fail itu rujukan sahaja; mendeploynya terus akan menimpa app lain. Ubah rules melalui Firebase Console.
@@ -42,7 +42,7 @@ Platform all-in-one untuk gamer, livestreamer dan content creator. Frontend iala
 
 ### 3.1 Hosting (Site ID)
 1. Firebase Console → Hosting → *Add another site* (jika belum ada site khas). Sambungkan domain anda ke site itu.
-2. Dalam `firebase.json`, tukar `"site": "GANTI-DENGAN-SITE-ID-STREAMVERSE"` kepada Site ID sebenar.
+2. Dalam `firebase.json`, `"site"` dalam `firebase.json` sudah ditetapkan kepada `genius-digital-40bc9-34bd0`.
 3. `firebase deploy --only hosting` (dalam folder ini). Admin di `https://DOMAIN/admin`.
 4. Authentication → Settings → **Authorized domains**: pastikan domain itu ada.
 

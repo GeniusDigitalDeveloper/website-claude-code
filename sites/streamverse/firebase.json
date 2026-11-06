@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "GANTI-DENGAN-SITE-ID-STREAMVERSE",
+    "site": "genius-digital-40bc9-34bd0",
     "public": ".",
     "ignore": [
       "firebase.json",
