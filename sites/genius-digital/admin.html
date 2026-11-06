@@ -416,24 +416,6 @@
     </section>
   </main>
 
-  <!-- ====================== ACCESS DENIED (log masuk tetapi bukan admin) ====================== -->
-  <main class="auth-shell" id="deniedView" hidden>
-      <div class="auth-tools">
-        <div class="lang-switch" role="group" data-i18n-attr="aria-label:ui.language" aria-label="Pilih bahasa">
-          <button type="button" data-lang="ms" lang="ms" aria-pressed="true" aria-label="Bahasa Melayu" title="Bahasa Melayu">BM</button>
-          <button type="button" data-lang="en" lang="en" aria-pressed="false" aria-label="English" title="English">BI</button>
-          <button type="button" data-lang="ar" lang="ar" aria-pressed="false" aria-label="العربية" title="العربية">BA</button>
-        </div>
-        <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false" aria-label="Tukar ke mod gelap" title="Tukar ke mod gelap"><svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg><svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg></button>
-      </div>
-    <section class="auth-card">
-      <div class="auth-brand"><svg aria-hidden="true"><use href="#i-logo"/></svg><div><b class="keep-ls">GENIUS DIGITAL</b><small data-i18n="brand.admin">Panel Admin</small></div></div>
-      <h1 data-i18n="den.title">Akses Ditolak</h1>
-      <p class="sub" id="deniedLead"></p>
-      <div class="alert info"><span data-i18n="den.help">Jika anda pemilik projek, tetapkan claim admin untuk UID ini menggunakan Firebase Admin SDK (rujuk README.md), kemudian log keluar dan log masuk semula:</span><br><code id="deniedUid"></code></div>
-      <button class="btn btn-primary btn-block" type="button" id="deniedSignOut" data-i18n="den.signOut">Log Keluar</button>
-    </section>
-  </main>
 
   <!-- ====================== APP ====================== -->
   <div class="app" id="appView" hidden>
@@ -727,10 +709,6 @@
         "login.sdkFail": "Gagal memuatkan Firebase SDK. Semak sambungan internet. ({msg})",
         "reset.needEmail": "Masukkan e-mel anda dahulu, kemudian tekan “Lupa kata laluan?”.",
         "reset.sent": "Jika e-mel itu berdaftar, pautan untuk menetapkan semula kata laluan telah dihantar.",
-        "den.title": "Akses Ditolak",
-        "den.lead": "Akaun {email} telah log masuk tetapi bukan akaun admin. Hanya akaun yang mempunyai custom claim admin: true boleh mengurus produk.",
-        "den.help": "Jika anda pemilik projek, tetapkan claim admin untuk UID ini menggunakan Firebase Admin SDK (rujuk README.md), kemudian log keluar dan log masuk semula:",
-        "den.signOut": "Log Keluar", "den.noEmail": "(tiada e-mel)",
         "nav.menu": "Menu", "nav.dashboard": "Papan Pemuka", "nav.products": "Produk", "nav.viewSite": "Lihat Website", "nav.signOut": "Log Keluar", "nav.role": "Admin",
         "pill.demo": "Demo",
         "demo.banner": "<strong>MOD DEMO.</strong> Data hanya disimpan dalam memori pelayar ini dan hilang apabila halaman dimuat semula. Tiada apa-apa disimpan ke Firebase. Mod ini dimatikan secara automatik apabila Firebase dikonfigurasi.",
@@ -801,10 +779,6 @@
         "login.sdkFail": "Couldn't load the Firebase SDK. Check your internet connection. ({msg})",
         "reset.needEmail": "Enter your email first, then select “Forgot your password?”.",
         "reset.sent": "If that email is registered, a link to reset your password has been sent.",
-        "den.title": "Access Denied",
-        "den.lead": "The account {email} is signed in but is not an admin account. Only accounts with the custom claim admin: true can manage products.",
-        "den.help": "If you own this project, set the admin claim for this UID using the Firebase Admin SDK (see README.md), then sign out and sign in again:",
-        "den.signOut": "Sign Out", "den.noEmail": "(no email)",
         "nav.menu": "Menu", "nav.dashboard": "Dashboard", "nav.products": "Products", "nav.viewSite": "View Website", "nav.signOut": "Sign Out", "nav.role": "Admin",
         "pill.demo": "Demo",
         "demo.banner": "<strong>DEMO MODE.</strong> Data is kept in this browser's memory only and is lost when the page reloads. Nothing is saved to Firebase. This mode switches off automatically once Firebase is configured.",
@@ -875,10 +849,6 @@
         "login.sdkFail": "تعذّر تحميل Firebase SDK. تحقق من اتصال الإنترنت. ({msg})",
         "reset.needEmail": "أدخل بريدك الإلكتروني أولاً، ثم اضغط «هل نسيت كلمة المرور؟».",
         "reset.sent": "إذا كان هذا البريد مسجّلاً لدينا، فقد أُرسل إليه رابط لإعادة تعيين كلمة المرور.",
-        "den.title": "تم رفض الوصول",
-        "den.lead": "تم تسجيل الدخول بالحساب {email}، لكنه ليس حساب مشرف. لا يمكن إدارة المنتجات إلا للحسابات التي تحمل الصلاحية المخصصة admin: true.",
-        "den.help": "إذا كنت مالك المشروع، فعيّن صلاحية المشرف لهذا المعرّف UID باستخدام Firebase Admin SDK، وراجع ملف README.md للتفاصيل، ثم سجّل الخروج وأعد تسجيل الدخول:",
-        "den.signOut": "تسجيل الخروج", "den.noEmail": "(بلا بريد إلكتروني)",
         "nav.menu": "القائمة", "nav.dashboard": "لوحة المعلومات", "nav.products": "المنتجات", "nav.viewSite": "عرض الموقع", "nav.signOut": "تسجيل الخروج", "nav.role": "مشرف",
         "pill.demo": "تجريبي",
         "demo.banner": "<strong>الوضع التجريبي.</strong> تُحفظ البيانات في ذاكرة هذا المتصفح فقط وتُفقد عند إعادة تحميل الصفحة. لا يُحفظ أي شيء في Firebase. يتوقف هذا الوضع تلقائياً بمجرد إعداد Firebase.",
@@ -1030,8 +1000,6 @@
         signIn: (email, pw) => Auth.signInWithEmailAndPassword(auth, email, pw),
         signOut: () => Auth.signOut(auth),
         resetPassword: (email) => Auth.sendPasswordResetEmail(auth, email),
-        // Semak custom claim "admin" daripada ID token yang dipaksa refresh.
-        async checkAdmin(user) { const t = await user.getIdTokenResult(true); return t.claims.admin === true; },
 
         subscribe(onData, onError) {
           return FS.onSnapshot(col,
@@ -1073,7 +1041,6 @@
         mode: "demo",
         onAuth: (cb) => { queueMicrotask(() => cb({ email: "demo@preview.local", uid: "demo-uid" })); return () => {}; },
         signIn: async () => {}, signOut: async () => { location.href = "admin.html"; }, resetPassword: async () => {},
-        checkAdmin: async () => true,
         subscribe(onData) { listeners.add(onData); queueMicrotask(emit); return () => listeners.delete(onData); },
         async exists(slug) { return items.some(i => i.slug === slug); },
         async create(p) { items.push({ ...p, createdAt: Date.now(), updatedAt: Date.now() }); emit(); },
@@ -1126,7 +1093,7 @@
     const filters = { q: "", category: "", status: "" };
     let currentView = "dashboard";
 
-    const views = { boot: $("#bootView"), login: $("#loginView"), denied: $("#deniedView"), app: $("#appView") };
+    const views = { boot: $("#bootView"), login: $("#loginView"), app: $("#appView") };
     function showOnly(name) { for (const [k, v] of Object.entries(views)) v.hidden = k !== name; document.body.classList.remove("no-scroll"); }
 
     const sorted = () => [...products].sort((a, b) => a.displayOrder - b.displayOrder || a.name.localeCompare(b.name));
@@ -1435,9 +1402,7 @@
     /* =====================================================================
        Bahagian 12: Pengesahan (login / logout / semakan admin)
        ===================================================================== */
-    let deniedUser = null;
     function refreshRich() {
-      if (deniedUser) setRich($("#deniedLead"), t("den.lead"), "email", deniedUser.email || t("den.noEmail"));
       if (deleting) setRich($("#delBody"), t("del.body"), "name", deleting.name);
     }
     async function handleAuthState(user) {
@@ -1445,13 +1410,6 @@
         if (unsubscribe) { unsubscribe(); unsubscribe = null; } products = [];
         showOnly("login"); return;
       }
-      showOnly("boot");
-      try {
-        if (!(await backend.checkAdmin(user))) {
-          deniedUser = user; refreshRich(); $("#deniedUid").textContent = "UID: " + user.uid;
-          showOnly("denied"); return;
-        }
-      } catch (err) { showOnly("login"); showAlert($("#loginError"), friendlyError(err)); return; }
       $("#userEmail").textContent = user.email || "";
       $("#demoBanner").hidden = $("#modePill").hidden = backend.mode !== "demo";
       showOnly("app"); navigate(location.hash.slice(1)); startData();
@@ -1474,7 +1432,7 @@
       showAlert($("#loginOk"), t("reset.sent"));   // mesej sama untuk elak enumerasi akaun
     });
     const doSignOut = async () => { try { await backend.signOut(); } catch (err) { toast(friendlyError(err), "err"); } };
-    $("#signOutBtn").addEventListener("click", doSignOut); $("#deniedSignOut").addEventListener("click", doSignOut);
+    $("#signOutBtn").addEventListener("click", doSignOut);
 
     /* =====================================================================
        Bahagian 13: Bahasa (BM / BI / BA) dan tema (cerah / gelap)
