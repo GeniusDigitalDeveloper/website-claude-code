@@ -77,7 +77,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .hero{position:relative;isolation:isolate;border-radius:24px;overflow:hidden;color:#fff;padding:clamp(24px,4vw,48px);min-height:440px;display:flex;align-items:center;
   background:radial-gradient(420px 260px at 0% 0%,rgba(25,195,240,.35),transparent 70%),linear-gradient(120deg,#0d2696 0%,#1c45dc 48%,#3a3fe0 100%);
   box-shadow:0 30px 70px -30px rgba(52,62,220,.65)}
-.hero-photo{position:absolute;top:0;bottom:0;right:0;left:40%;z-index:-1;background:url("../hero-bg.jpg") center/cover no-repeat;
+.hero-photo{position:absolute;top:0;bottom:0;right:0;left:52%;z-index:-1;background:url("../hero-bg.jpg") 100% 50%/auto 100% no-repeat;
   -webkit-mask-image:linear-gradient(90deg,transparent 0,rgba(0,0,0,.6) 14%,#000 32%);mask-image:linear-gradient(90deg,transparent 0,rgba(0,0,0,.6) 14%,#000 32%)}
 .hero-in{position:relative;max-width:560px;min-width:0}
 .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:rgba(6,16,80,.35);border:1px solid rgba(255,255,255,.3);padding:6px 12px;border-radius:999px}
@@ -101,7 +101,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .mini.t1{--tint:#2f7bff}.mini.t2{--tint:#12b874}.mini.t3{--tint:#e0457b}.mini.t4{--tint:#8b4cf0}
 @media (max-width:899px){
   .hero{display:block;min-height:0}
-  .hero-photo{position:relative;left:auto;inset:auto;display:block;height:clamp(170px,48vw,260px);margin:calc(-1 * clamp(24px,4vw,48px)) calc(-1 * clamp(24px,4vw,48px)) 18px;background-position:100% 0;background-size:150% auto;
+  .hero-photo{position:relative;left:auto;inset:auto;display:block;height:clamp(170px,48vw,260px);margin:calc(-1 * clamp(24px,4vw,48px)) calc(-1 * clamp(24px,4vw,48px)) 18px;background-position:100% 15%;background-size:230% auto;
     -webkit-mask-image:linear-gradient(180deg,#000 70%,transparent);mask-image:linear-gradient(180deg,#000 70%,transparent);z-index:0}
 }
 .sec-head h2{display:flex;align-items:center;gap:10px}
