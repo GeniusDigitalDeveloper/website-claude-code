@@ -1,4 +1,9 @@
 rules_version = '2';
+// RUJUKAN SAHAJA — JANGAN deploy fail ini terus ke projek GENIUS DIGITAL.
+// Bahagian Streamverse ini sudah digabungkan ke dalam rules Firestore projek (live), bersama rules
+// Genius Digital, Malaysia PDF Tools dan Fetchr Box. Deploy fail ini akan MENIMPA dan memecahkan app-app tersebut.
+// firebase.json sengaja tidak merujuk fail ini.
+//
 // STREAMVERSE — Firestore Security Rules (production). Tiada "allow read, write: if true".
 service cloud.firestore {
   match /databases/{database}/documents {

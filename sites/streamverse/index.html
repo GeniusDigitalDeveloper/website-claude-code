@@ -607,16 +607,22 @@ body.t-rgb .theme-card.on,body.t-rgb .btn.primary{animation:rgb 6s linear infini
    2. Tanpa config, app berjalan dalam "Studio Tempatan": peranti sebenar
       berfungsi, ciri cloud tunjuk status "Firebase Not Configured".
    ===================================================================== */
+// Projek: GENIUS DIGITAL (genius-digital-40bc9) · App web: STREAMVERSE GAMING
+// Config web Firebase bukan rahsia. Keselamatan dijaga oleh Security Rules.
 const FIREBASE_CONFIG = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyA6jQBsL6OahJ2FcMBFf38ISoGQiTTYg2s",
+  authDomain: "genius-digital-40bc9.firebaseapp.com",
+  projectId: "genius-digital-40bc9",
+  storageBucket: "genius-digital-40bc9.firebasestorage.app",
+  messagingSenderId: "508099045190",
+  appId: "1:508099045190:web:b55969464b05e37e1e2747"
 };
 const APP_CHECK_SITE_KEY = "";          // reCAPTCHA v3 site key (Firebase App Check). Kosong = App Check tidak diaktifkan.
 const FUNCTIONS_REGION   = "asia-southeast1";
+// Pelan percuma (Spark): Storage tidak digunakan dan Cloud Functions tidak aktif (perlukan Blaze).
+// Tukar kepada true hanya selepas naik taraf ke Blaze dan deploy functions / aktifkan Storage.
+const STORAGE_ENABLED   = false;
+const FUNCTIONS_ENABLED = false;
 const FIREBASE_SDK       = "10.12.2";
 const DEFAULT_ICE = [{ urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"] }];
 const FB_READY = !!(FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId && FIREBASE_CONFIG.appId);
@@ -832,9 +838,13 @@ const fb = { ready: false };
 async function initFirebase() {
   if (!FB_READY) return;
   const base = `https://www.gstatic.com/firebasejs/${FIREBASE_SDK}/`;
-  const [A, Au, F, St, Fn] = await Promise.all(
-    ["firebase-app.js", "firebase-auth.js", "firebase-firestore.js", "firebase-storage.js", "firebase-functions.js"].map(f => import(base + f))
-  );
+  const mods = ["firebase-app.js", "firebase-auth.js", "firebase-firestore.js"];
+  if (STORAGE_ENABLED) mods.push("firebase-storage.js");
+  if (FUNCTIONS_ENABLED) mods.push("firebase-functions.js");
+  const loaded = await Promise.all(mods.map(f => import(base + f)));
+  const [A, Au, F] = loaded;
+  const St = STORAGE_ENABLED ? loaded[3] : null;
+  const Fn = FUNCTIONS_ENABLED ? loaded[STORAGE_ENABLED ? 4 : 3] : null;
   fb.app = A.initializeApp(FIREBASE_CONFIG);
   if (APP_CHECK_SITE_KEY) {
     const AC = await import(base + "firebase-app-check.js");
@@ -843,8 +853,8 @@ async function initFirebase() {
   fb.auth = Au.getAuth(fb.app);
   await Au.setPersistence(fb.auth, Au.browserLocalPersistence);
   fb.db = F.getFirestore(fb.app);
-  fb.st = St.getStorage(fb.app);
-  fb.fns = Fn.getFunctions(fb.app, FUNCTIONS_REGION);
+  if (St) fb.st = St.getStorage(fb.app);
+  if (Fn) fb.fns = Fn.getFunctions(fb.app, FUNCTIONS_REGION);
   Object.assign(fb, { A, Au, F, St, Fn, ready: true });
 }
 const cloudOK = () => fb.ready && !!S.user;
@@ -857,7 +867,15 @@ function cloudBlock(feature) {
   if (!S.user) return `<div class="note">${chip("warn", "Sign In Required")} Sila log masuk untuk guna ${esc(feature)}.</div>`;
   return "";
 }
-const callFn = async (name, data) => { needCloud(); const r = await fb.Fn.httpsCallable(fb.fns, name, { timeout: 120000 })(data || {}); return r.data; };
+function fnBlock(feature) {
+  if (FUNCTIONS_ENABLED) return "";
+  return `<div class="note"><b>${chip("warn", "Cloud Functions Not Enabled")}</b><p style="margin:8px 0 0">${esc(feature)} memerlukan Cloud Functions (pelan Blaze). Projek ini guna pelan percuma, jadi ciri ini belum aktif. Ciri lain (akaun, scene, community, donation, kill popup manual) berfungsi seperti biasa.</p></div>`;
+}
+const callFn = async (name, data) => {
+  needCloud();
+  if (!FUNCTIONS_ENABLED) { const e = new Error("Cloud Functions belum diaktifkan (perlukan pelan Blaze)."); e.code = "sv/nofunctions"; throw e; }
+  const r = await fb.Fn.httpsCallable(fb.fns, name, { timeout: 120000 })(data || {}); return r.data;
+};
 const D  = (...p) => fb.F.doc(fb.db, ...p);
 const C  = (...p) => fb.F.collection(fb.db, ...p);
 const now = () => fb.F.serverTimestamp();
@@ -1384,7 +1402,7 @@ function addLocalRec(r) {
 
 /* ---------- WHIP streaming (WebRTC ingest) ---------- */
 async function getIceServers() {
-  if (cloudOK()) {
+  if (cloudOK() && FUNCTIONS_ENABLED) {
     try { const r = await callFn("getIceServers"); if (r?.iceServers?.length) return r.iceServers; } catch (e) { console.warn("TURN tidak dikonfigurasi:", e.message); }
   }
   return DEFAULT_ICE;
@@ -1667,7 +1685,7 @@ function editSource(s, connectAfter) {
     ${s.type === "text" ? `<label class="f">Teks<input class="in" id="es_text" maxlength="80" value="${esc(s.text)}"></label><div class="g3"><label class="f">Warna<input class="in" type="color" id="es_color" value="${esc(s.color)}"></label><label class="f">Saiz (% tinggi)<input class="in" type="number" id="es_size" min="2" max="25" value="${s.size}"></label><label class="f">Jajaran<select class="in" id="es_align"><option value="left" ${s.align === "left" ? "selected" : ""}>Kiri</option><option value="center" ${s.align === "center" ? "selected" : ""}>Tengah</option></select></label></div><label class="row small"><span class="switch"><input type="checkbox" id="es_bg" ${s.bgColor && !/00$/.test(s.bgColor) ? "checked" : ""}></span>Latar gelap belakang teks</label>` : ""}
     ${s.type === "killfeed" ? `<label class="f">Label streak (pisah koma: 1 kill, 2, 3, …)<input class="in" id="es_labels" maxlength="160" value="${esc(s.labels)}"></label><div class="g3"><label class="f">Tempoh popup (s)<input class="in" type="number" id="es_dur" min="1" max="8" step="0.2" value="${s.duration}"></label><label class="f">Tempoh streak (s)<input class="in" type="number" id="es_sw" min="2" max="60" value="${s.streakWindow}"></label><label class="f">Bunyi<select class="in" id="es_snd"><option value="1" ${s.sound !== false ? "selected" : ""}>Ya (masuk stream)</option><option value="0" ${s.sound === false ? "selected" : ""}>Tidak</option></select></label></div><label class="row small"><span class="switch"><input type="checkbox" id="es_det" ${s.showDetails !== false ? "checked" : ""}></span>Papar senjata / mangsa (jika game hantar)</label>` : ""}
     ${s.type === "donation" ? `<label class="f">Teks<input class="in" id="es_dtext" maxlength="40" value="${esc(s.text)}"></label><div class="g3"><label class="f">Paparan<select class="in" id="es_mode"><option value="always" ${s.mode === "always" ? "selected" : ""}>Sentiasa</option><option value="interval" ${s.mode === "interval" ? "selected" : ""}>Berkala</option></select></label><label class="f">Setiap (minit)<input class="in" type="number" id="es_every" min="1" max="60" value="${s.every}"></label><label class="f">Selama (saat)<input class="in" type="number" id="es_for" min="5" max="120" value="${s.showFor}"></label></div><p class="small muted" style="margin:0">QR menggunakan link utama di halaman Donation.</p>` : ""}
-    ${s.type === "image" ? `<label class="f">Fail gambar (PNG / JPG / WEBP, maks 5 MB)<input class="in" type="file" id="es_file" accept="image/png,image/jpeg,image/webp"></label><p class="small muted" style="margin:0">${cloudOK() ? "Gambar dimuat naik ke Firebase Storage akaun anda supaya scene boleh dimuat semula." : "Studio Tempatan: gambar hanya kekal untuk sesi ini (tiada Storage)."}</p>` : ""}
+    ${s.type === "image" ? `<label class="f">Fail gambar (PNG / JPG / WEBP, maks 5 MB)<input class="in" type="file" id="es_file" accept="image/png,image/jpeg,image/webp"></label><p class="small muted" style="margin:0">${cloudOK() && STORAGE_ENABLED ? "Gambar dimuat naik ke Firebase Storage akaun anda supaya scene boleh dimuat semula." : "Firebase Storage tidak diaktifkan (pelan percuma): gambar hanya kekal untuk sesi ini. Untuk gambar kekal, tampal URL https:// imej di bawah."}</p>` : ""}
     ${visual && !T.unsupported ? `<div class="g3"><label class="f">Posisi<select class="in" id="es_layout">${Object.keys(LAYOUTS).map(k => `<option ${k === s.layoutName ? "selected" : ""}>${k}</option>`).join("")}</select></label><label class="f">Saiz (lebar %)<input class="in" type="number" id="es_w" min="5" max="100" value="${Math.round(s.layout.w * 100)}"></label><label class="f">Fit<select class="in" id="es_fit"><option value="cover" ${s.fit === "cover" ? "selected" : ""}>Cover</option><option value="contain" ${s.fit === "contain" ? "selected" : ""}>Contain</option><option value="stretch" ${s.fit === "stretch" ? "selected" : ""}>Stretch</option></select></label></div>` : ""}
     ${["webcam", "camera", "phonecam"].includes(s.type) ? `<label class="row small"><span class="switch"><input type="checkbox" id="es_mirror" ${s.mirror ? "checked" : ""}></span>Mirror camera</label>` : ""}
     ${s.type === "gameplay" || s.type === "screen" ? `<div class="note info small">Semasa memilih, tandakan <b>Share audio</b> untuk Game Audio. Audio sistem penuh hanya disokong Chrome/Edge di Windows &amp; ChromeOS; macOS hanya audio tab.</div>` : ""}
@@ -1702,7 +1720,7 @@ async function saveSrcForm(s, sc) {
     if (!/^image\/(png|jpeg|webp)$/.test(f.type)) throw new Error("Jenis fail tidak dibenarkan.");
     if (f.size > 5 * 1024 * 1024) throw new Error("Gambar melebihi 5 MB.");
     s.imageObjectUrl = URL.createObjectURL(f);
-    if (cloudOK()) {
+    if (cloudOK() && STORAGE_ENABLED) {
       const path = `users/${S.user.uid}/overlays/${s.id}.${f.type.split("/")[1]}`;
       const r = fb.St.ref(fb.st, path); await fb.St.uploadBytes(r, f, { contentType: f.type });
       s.storagePath = path; s.imageUrl = await fb.St.getDownloadURL(r);
@@ -1872,6 +1890,7 @@ const PLATFORMS = {
 function platformStatus(p) {
   if (!FB_READY) return ["warn", "Firebase Not Configured"];
   if (!S.user) return ["off", "Sign In Required"];
+  if (!FUNCTIONS_ENABLED) return ["off", "Functions Not Enabled"];
   if (S.sysConfig.platforms && S.sysConfig.platforms[p]?.enabled === false) return ["off", "Disabled by Admin"];
   const d = S.platforms[p];
   if (!d) return ["off", "Not Connected"];
@@ -2178,19 +2197,21 @@ function recItemHTML(r) {
   const media = r.kind === "audio" ? `<audio controls src="${r.url}"></audio>` : `<video controls src="${r.url}" playsinline></video>`;
   return `<div class="rec-item">${media}<div class="col grow" style="gap:4px"><b>${esc(r.name)}</b><span class="small muted">${fmtDur(r.duration)} · ${fmtBytes(r.size)} · <span class="mono">${esc(r.mime)}</span></span>
     <div class="row wrap"><a class="btn sm" href="${r.url}" download="streamverse-${r.id}.${extFor(r.mime)}"><i data-lucide="download"></i>Download</a>
-    <button class="btn sm" data-rec-upload="${r.id}"><i data-lucide="cloud-upload"></i>Save to Firebase Storage</button>
+    ${STORAGE_ENABLED ? `<button class="btn sm" data-rec-upload="${r.id}"><i data-lucide="cloud-upload"></i>Save to Firebase Storage</button>` : ""}
     <button class="btn sm ghost" data-rec-del="${r.id}"><i data-lucide="trash-2"></i>Buang</button></div></div></div>`;
 }
 function renderRecordings() {
   const l = $("#localRecs"); if (!l) return;
   l.innerHTML = S.recs.length ? S.recs.map(recItemHTML).join("") : `<div class="empty">Belum ada rakaman dalam sesi ini. Rakaman tempatan hilang bila tab ditutup kecuali dimuat turun atau disimpan.</div>`;
   const c = $("#cloudRecs");
-  if (!cloudOK()) c.innerHTML = cloudBlock("Simpanan rakaman cloud");
+  if (!STORAGE_ENABLED) c.innerHTML = `<div class="note"><b>${chip("warn", "Cloud Storage Off")}</b><p style="margin:8px 0 0">Simpanan rakaman cloud dimatikan (pelan percuma, tiada Firebase Storage). Guna butang <b>Download</b> pada rakaman untuk simpan fail ke komputer anda.</p></div>`;
+  else if (!cloudOK()) c.innerHTML = cloudBlock("Simpanan rakaman cloud");
   else c.innerHTML = S.cloudRecs.length ? S.cloudRecs.map(r => `<div class="rec-item"><i data-lucide="${r.kind === "audio" ? "music" : "film"}"></i><div class="col grow" style="gap:4px"><b>${esc(r.name)}</b><span class="small muted">${fmtDate(r.createdAt)} · ${fmtBytes(r.size || 0)} · ${fmtDur(r.durationMs || 0)}</span></div><button class="btn sm" data-crec-open="${r.id}"><i data-lucide="download"></i>Buka / Download</button><button class="btn sm ghost" data-crec-del="${r.id}"><i data-lucide="trash-2"></i>Padam</button></div>`).join("") : `<div class="empty">No Data Available</div>`;
   renderRecent(); icons();
 }
 async function uploadRecording(id) {
   const r = S.recs.find(x => x.id === id); if (!r) return;
+  if (!STORAGE_ENABLED) return toast("Firebase Storage tidak diaktifkan (pelan percuma). Guna Download untuk simpan rakaman.", "warn", 6000);
   if (!cloudOK()) return modal({ title: "Simpan ke cloud", body: cloudBlock("Firebase Storage") });
   const limit = r.kind === "audio" ? 200e6 : 1000e6;
   if (r.size > limit) return toast(`Fail melebihi had ${fmtBytes(limit)}. Muat turun sahaja.`, "warn");
@@ -2208,7 +2229,7 @@ async function uploadRecording(id) {
   });
 }
 async function loadCloudRecs() {
-  if (!cloudOK()) return;
+  if (!cloudOK() || !STORAGE_ENABLED) return;
   const snap = await fb.F.getDocs(fb.F.query(C(...uidPath("recordings")), fb.F.orderBy("createdAt", "desc"), fb.F.limit(50)));
   S.cloudRecs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   renderRecordings();
@@ -2224,10 +2245,10 @@ const PLATFORM_NOTES = {
 };
 function renderConnect() {
   const el = $("#connectBody");
-  const block = cloudBlock("StreamVerse Connect (OAuth melalui Cloud Functions)");
+  const block = cloudBlock("StreamVerse Connect (OAuth melalui Cloud Functions)") || fnBlock("StreamVerse Connect (OAuth TikTok / YouTube / Facebook)");
   el.innerHTML = (block ? block : "") + Object.entries(PLATFORMS).map(([k, p]) => {
     const [c, t] = platformStatus(k); const d = S.platforms[k] || {}; const ss = S.streamSettings?.[k] || {};
-    const dis = !cloudOK() || (S.sysConfig.platforms && S.sysConfig.platforms[k]?.enabled === false);
+    const dis = !cloudOK() || !FUNCTIONS_ENABLED || (S.sysConfig.platforms && S.sysConfig.platforms[k]?.enabled === false);
     return `<div class="panel"><div class="panel-h">${p.svg}<h2>${p.name}</h2><span class="grow"></span>${chip(c, t)}</div>
       ${d.accountName && c === "ok" ? `<div class="small">Akaun: <b>${esc(d.accountName)}</b> · disahkan ${fmtDate(d.verifiedAt)}</div>` : ""}
       ${d.status === "error" || d.status === "restricted" ? `<div class="note small">${esc(d.message || "")}</div>` : ""}
@@ -2279,7 +2300,7 @@ async function renderAI() {
   const tabs = $("#aiTabs");
   tabs.innerHTML = Object.entries(AI_TOOLS).map(([k, t]) => `<button class="tab ${k === aiTab ? "on" : ""}" data-ai-tab="${k}">${esc(t.name.replace("AI ", ""))}</button>`).join("");
   const T = AI_TOOLS[aiTab];
-  const block = cloudBlock("AI Stream Creator");
+  const block = cloudBlock("AI Stream Creator") || fnBlock("AI Stream Creator (API key disimpan di backend)");
   $("#aiBody").innerHTML = `${block}<form class="col" id="aiForm">${T.fields.map(([n, l, ph]) => `<label class="f">${l}<input class="in" name="${n}" maxlength="300" placeholder="${esc(ph)}" required></label>`).join("")}
     ${T.image ? `<label class="f">Saiz imej<select class="in" name="size">${T.sizes.map(s => `<option>${s}</option>`).join("")}</select></label>` : ""}
     <div class="row wrap"><button class="btn primary" type="submit" ${block ? "disabled" : ""}><i data-lucide="${T.image ? "image" : "sparkles"}"></i>${T.image ? "Jana Imej" : "Jana Teks"}</button>${T.alsoText ? `<button class="btn" type="button" id="aiOverlayIdea" ${block ? "disabled" : ""}><i data-lucide="lightbulb"></i>Jana Idea Overlay (teks)</button>` : ""}</div></form>
@@ -2350,11 +2371,21 @@ async function loadFeed() {
     } else q = fb.F.query(fb.F.collectionGroup(fb.db, "communityPosts"), fb.F.orderBy("createdAt", "desc"), fb.F.limit(30));
     const snap = await fb.F.getDocs(q);
     const posts = snap.docs.map(d => ({ id: d.id, path: d.ref.path, ...d.data() }));
+    if (!FUNCTIONS_ENABLED) await Promise.all(posts.map(countPost));   // tiada trigger Functions: kira like/komen terus dari Firestore
     const liked = new Set();
     await Promise.all(posts.map(async p => { const l = await fb.F.getDoc(fb.F.doc(fb.db, p.path, "likes", S.user.uid)); if (l.exists()) liked.add(p.id); }));
     list.innerHTML = posts.length ? posts.map(p => postHTML(p, liked.has(p.id))).join("") : `<div class="empty">No Data Available — jadilah yang pertama membuat posting.</div>`;
     icons();
   } catch (e) { list.innerHTML = `<div class="note err">${esc(errMsg(e))}</div>`; }
+}
+async function countPost(p) {
+  try {
+    const [l, c] = await Promise.all([
+      fb.F.getCountFromServer(fb.F.collection(fb.db, p.path, "likes")),
+      fb.F.getCountFromServer(fb.F.collection(fb.db, p.path, "comments"))
+    ]);
+    p.likeCount = l.data().count; p.commentCount = c.data().count;
+  } catch (e) { console.warn("countPost", e.code || e.message); }
 }
 function postHTML(p, liked) {
   const mine = p.ownerUid === S.user.uid;
@@ -2399,9 +2430,21 @@ async function commProfile() {
     <div class="g2"><label class="f">Gaming Interests (pisah koma)<input class="in" name="interests" maxlength="200" value="${esc((p.interests || []).join(", "))}"></label>
     <label class="f">Favourite Games (pisah koma)<input class="in" name="favouriteGames" maxlength="200" value="${esc((p.favouriteGames || []).join(", "))}"></label></div>
     <label class="f">Link channel (pilihan)<input class="in" name="channelUrl" type="url" maxlength="200" value="${esc(p.channelUrl || "")}" placeholder="https://youtube.com/@…"></label>
-    <div class="row wrap small muted">Followers: ${p.followerCount || 0} · Following: ${p.followingCount || 0}</div>
+    ${FUNCTIONS_ENABLED ? `<div class="row wrap small muted">Followers: ${p.followerCount || 0} · Following: ${p.followingCount || 0}</div>` : ""}
     <button class="btn primary" type="submit"><i data-lucide="save"></i>Simpan Profil</button></form>`;
   icons();
+}
+function avatarDataUrl(file, size = 160) {
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file); const img = new Image();
+    img.onload = () => {
+      const c = document.createElement("canvas"); c.width = c.height = size; const x = c.getContext("2d");
+      const m = Math.min(img.width, img.height); x.drawImage(img, (img.width - m) / 2, (img.height - m) / 2, m, m, 0, 0, size, size);
+      URL.revokeObjectURL(url); res(c.toDataURL("image/jpeg", 0.82));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error("Gambar tidak dapat dibaca.")); };
+    img.src = url;
+  });
 }
 async function saveProfile(form) {
   const f = Object.fromEntries(new FormData(form));
@@ -2413,9 +2456,13 @@ async function saveProfile(form) {
   const photo = form.photo.files[0];
   if (photo) {
     if (!/^image\/(png|jpeg|webp)$/.test(photo.type) || photo.size > 2 * 1024 * 1024) throw new Error("Gambar mesti PNG/JPG/WEBP dan ≤ 2 MB.");
-    const ref = fb.St.ref(fb.st, `users/${S.user.uid}/avatar/avatar`);
-    await fb.St.uploadBytes(ref, photo, { contentType: photo.type });
-    data.photoURL = await fb.St.getDownloadURL(ref);
+    if (STORAGE_ENABLED) {
+      const ref = fb.St.ref(fb.st, `users/${S.user.uid}/avatar/avatar`);
+      await fb.St.uploadBytes(ref, photo, { contentType: photo.type });
+      data.photoURL = await fb.St.getDownloadURL(ref);
+    } else {
+      data.photoURL = await avatarDataUrl(photo);   // tanpa Storage: simpan thumbnail kecil (≈10 KB) terus dalam profil
+    }
   }
   const oldLower = S.profile?.usernameLower;
   await fb.F.runTransaction(fb.db, async tx => {
@@ -2437,7 +2484,7 @@ async function viewProfile(uid) {
   const following = f?.exists();
   modal({
     title: p.username || "Gamer",
-    body: `<div class="col"><div class="row"><span class="avatar" style="width:64px;height:64px">${p.photoURL ? `<img src="${esc(p.photoURL)}" alt="" class="avatar" style="width:64px;height:64px">` : esc((p.username || "?")[0])}</span><div><b>${esc(p.username)}</b> ${p.isStreamer ? chip("info", "Streamer") : ""}<div class="small muted">Followers ${p.followerCount || 0} · Following ${p.followingCount || 0}</div></div></div>
+    body: `<div class="col"><div class="row"><span class="avatar" style="width:64px;height:64px">${p.photoURL ? `<img src="${esc(p.photoURL)}" alt="" class="avatar" style="width:64px;height:64px">` : esc((p.username || "?")[0])}</span><div><b>${esc(p.username)}</b> ${p.isStreamer ? chip("info", "Streamer") : ""}${FUNCTIONS_ENABLED ? `<div class="small muted">Followers ${p.followerCount || 0} · Following ${p.followingCount || 0}</div>` : ""}</div></div>
       <p style="margin:0">${esc(p.bio || "")}</p>
       ${p.favouriteGames?.length ? `<div class="small"><b>Favourite games:</b> ${esc(p.favouriteGames.join(", "))}</div>` : ""}
       ${p.interests?.length ? `<div class="small"><b>Interests:</b> ${esc(p.interests.join(", "))}</div>` : ""}
@@ -2556,6 +2603,10 @@ async function adPublicPages() {
   $("#adminBody").innerHTML = snap.empty ? `<div class="empty">No Data Available</div>` : `<div class="tbl-wrap"><table class="t"><thead><tr><th>Streamer</th><th>Link donation</th><th>Status</th><th></th></tr></thead><tbody>${snap.docs.map(d => { const p = d.data(); return `<tr><td><b>${esc(p.displayName)}</b><div class="small muted mono">${esc(p.slug)}</div></td><td class="small">${(p.links || []).map(l => `<div style="word-break:break-all">${esc(l.label)}: ${esc(l.url)}</div>`).join("")}</td><td>${p.disabled ? chip("err", "Disabled") : p.live ? chip("live", "LIVE") : chip("ok", "Active")}</td><td><button class="btn sm ${p.disabled ? "" : "danger"}" data-page-toggle="${d.id}" data-val="${p.disabled ? 0 : 1}">${p.disabled ? "Aktifkan" : "Nyahaktif"}</button></td></tr>`; }).join("")}</tbody></table></div>`;
 }
 async function adUsers(pageToken) {
+  if (!FUNCTIONS_ENABLED) {
+    $("#adminBody").innerHTML = `<div class="note"><b>${chip("warn", "Cloud Functions Not Enabled")}</b><p style="margin:8px 0 0">Senarai pengguna dalam panel ini perlukan Cloud Functions (pelan Blaze). Pada pelan percuma, urus pengguna di <b>Firebase Console → Authentication → Users</b>. Lantik admin dengan skrip <span class="mono">functions/scripts/set-admin.js</span> (tidak perlukan Blaze). Claim <span class="mono">admin</span> ini dikongsi dengan app lain dalam projek GENIUS DIGITAL.</p></div>`;
+    return;
+  }
   const r = await callFn("adminListUsers", { pageToken: pageToken || null });
   $("#adminBody").innerHTML = `<div class="tbl-wrap"><table class="t"><thead><tr><th>Email</th><th>Verified</th><th>Role</th><th>Status</th><th>Dicipta</th><th>Login terakhir</th><th></th></tr></thead><tbody>${r.users.map(u => `<tr><td>${esc(u.email)}<div class="small muted mono">${esc(u.uid)}</div></td><td>${u.emailVerified ? "Ya" : "Tidak"}</td><td>${u.admin ? chip("info", "Admin") : "User"}</td><td>${u.disabled ? chip("err", "Disabled") : chip("ok", "Active")}</td><td class="small">${fmtDate(u.createdAt)}</td><td class="small">${fmtDate(u.lastSignIn)}</td>
     <td><div class="row"><button class="btn sm" data-ad-role="${u.uid}" data-val="${u.admin ? 0 : 1}" ${u.uid === S.user.uid ? "disabled" : ""}>${u.admin ? "Buang admin" : "Jadikan admin"}</button><button class="btn sm" data-ad-disable="${u.uid}" data-val="${u.disabled ? 0 : 1}" ${u.uid === S.user.uid ? "disabled" : ""}>${u.disabled ? "Aktifkan" : "Nyahaktif"}</button></div></td></tr>`).join("")}</tbody></table></div>${r.nextPageToken ? `<button class="btn" data-ad-next="${esc(r.nextPageToken)}">Seterusnya</button>` : ""}`;
@@ -2603,6 +2654,16 @@ async function adReports() {
   $("#adminBody").innerHTML = snap.empty ? `<div class="empty">No Data Available</div>` : `<div class="tbl-wrap"><table class="t"><thead><tr><th>Masa</th><th>Sebab</th><th>Sasaran</th><th>Status</th><th></th></tr></thead><tbody>${snap.docs.map(d => { const r = d.data(); return `<tr><td class="small">${fmtDate(r.createdAt)}</td><td>${esc(r.reason)}<div class="small muted">${esc(r.details)}</div></td><td class="mono small" style="word-break:break-all">${esc(r.targetPath)}</td><td>${chip(r.status === "open" ? "warn" : "ok", r.status)}</td><td><div class="row"><button class="btn sm" data-rep="${d.id}" data-val="resolved">Selesai</button><button class="btn sm" data-rep="${d.id}" data-val="dismissed">Tolak</button><button class="btn sm danger" data-rep-delpost="${esc(r.targetPath)}">Padam posting</button></div></td></tr>`; }).join("")}</tbody></table></div>`;
 }
 async function adStatus() {
+  if (!FUNCTIONS_ENABLED) {
+    $("#adminBody").innerHTML = `<div class="tbl-wrap"><table class="t"><tbody>
+      <tr><td>Projek Firebase</td><td>${esc(FIREBASE_CONFIG.projectId)}</td></tr>
+      <tr><td>Firestore</td><td>${chip("ok", "Connected")}</td></tr>
+      <tr><td>Authentication (Email/Password)</td><td>${chip("ok", "Connected")}</td></tr>
+      <tr><td>Cloud Functions</td><td>${chip("warn", "Not Enabled (pelan percuma)")}</td></tr>
+      <tr><td>Firebase Storage</td><td>${chip("warn", "Not Enabled (pelan percuma)")}</td></tr>
+      <tr><td>App Check</td><td>${APP_CHECK_SITE_KEY ? chip("ok", "Enabled") : chip("off", "Disabled")}</td></tr></tbody></table></div>`;
+    return;
+  }
   const r = await callFn("adminSystemStatus");
   $("#adminBody").innerHTML = `<div class="tbl-wrap"><table class="t"><tbody>${Object.entries(r.checks).map(([k, v]) => `<tr><td>${esc(k)}</td><td>${v === true ? chip("ok", "Configured") : v === false ? chip("warn", "Not Configured") : esc(v)}</td></tr>`).join("")}</tbody></table></div><div class="small muted">Dijana ${fmtDate(r.generatedAt)} · region ${esc(r.region)}</div>`;
 }
@@ -2695,7 +2756,7 @@ async function addKillSource() {
 function renderGames() {
   const el = $("#gamesBody"); if (!el) return;
   const ks = killSource();
-  const hookBlock = cloudBlock("Webhook game (auto kill)");
+  const hookBlock = cloudBlock("Webhook game (auto kill)") || fnBlock("Webhook auto-kill (CS2 / Dota 2 / League of Legends)");
   el.innerHTML = `<div class="g2">
     <div class="panel col"><div class="panel-h"><h3><i data-lucide="crosshair"></i>Kill Popup</h3><span class="grow"></span>${ks ? (ks.visible ? chip("ok", "Aktif dalam scene") : chip("warn", "Hidden")) : chip("off", "Tiada dalam scene")}</div>
       <p class="small muted" style="margin:0">Popup dilukis terus pada video output, jadi ia muncul dalam siaran LIVE dan rakaman. Streak dikira automatik bila kill berturut dalam tempoh yang ditetapkan.</p>
@@ -2949,6 +3010,7 @@ if (bc) bc.onmessage = e => {
 function chatPlatforms() { return ["youtube", "facebook"].filter(p => platformStatus(p)[0] === "ok"); }
 function chatStart() {
   if (!cloudOK()) return toast("Live chat memerlukan Firebase dan platform yang disambung.", "warn");
+  if (!FUNCTIONS_ENABLED) return toast("Live chat perlukan Cloud Functions (pelan Blaze). Belum aktif.", "warn", 6000);
   const ps = chatPlatforms();
   if (!ps.length) { CHAT.st = { youtube: ["off", "Not Connected"], facebook: ["off", "Not Connected"] }; renderChatStatus(); return toast("Sambung YouTube atau Facebook dahulu di StreamVerse Connect.", "warn", 6000); }
   CHAT.running = true;
@@ -3017,7 +3079,7 @@ function renderChatView() {
   const el = $("#chatBody"); if (!el) return;
   CHAT.lists.forEach(l => { if (l.ownerDocument === document) CHAT.lists.delete(l); });
   const pop = Date.now() - CHAT.popoutAt < 9000;
-  el.innerHTML = cloudBlock("Live Chat") + `<div class="note info small">Komen YouTube dan Facebook dibaca melalui API rasmi (perlu platform disambung &amp; siaran aktif). <b>TikTok LIVE tiada API rasmi untuk membaca komen</b>; guna tetingkap komen TikTok LIVE Studio. Kuota YouTube API terhad (~10,000 unit/hari), jadi poll mengikut selang yang ditetapkan YouTube.</div>
+  el.innerHTML = (cloudBlock("Live Chat") || fnBlock("Live Chat YouTube / Facebook")) + `<div class="note info small">Komen YouTube dan Facebook dibaca melalui API rasmi (perlu platform disambung &amp; siaran aktif). <b>TikTok LIVE tiada API rasmi untuk membaca komen</b>; guna tetingkap komen TikTok LIVE Studio. Kuota YouTube API terhad (~10,000 unit/hari), jadi poll mengikut selang yang ditetapkan YouTube.</div>
     ${pop ? `<div class="note small">Chat sedang dibuka di tetingkap pop-out. Panel ini berhenti supaya tidak membaca dua kali.</div>` : ""}
     <div class="panel col">${chatControls()}<div class="chat-list" data-chat-list></div></div>`;
   mountChatList($("[data-chat-list]", el)); renderChatStatus();
@@ -3051,7 +3113,7 @@ async function startChatWindow() {
   showOnly("chatApp");
   document.title = "STREAMVERSE Live Chat";
   const el = $("#chatApp");
-  el.innerHTML = `<div class="chat-window"><div class="row" style="gap:10px"><span data-logo></span><b class="brand-name" style="font-size:15px">LIVE CHAT</b></div>${cloudBlock("Live Chat")}${chatControls()}<div class="chat-list" data-chat-list></div></div>`;
+  el.innerHTML = `<div class="chat-window"><div class="row" style="gap:10px"><span data-logo></span><b class="brand-name" style="font-size:15px">LIVE CHAT</b></div>${cloudBlock("Live Chat") || fnBlock("Live Chat YouTube / Facebook")}${chatControls()}<div class="chat-list" data-chat-list></div></div>`;
   renderLogos(); mountChatList($("[data-chat-list]", el)); renderChatStatus();
   if (cloudOK()) {
     S.unsub.push(fb.F.onSnapshot(C(...uidPath("platformConnections")), snap => { S.platforms = {}; snap.forEach(d => S.platforms[d.id] = d.data()); renderChatStatus(); if (!CHAT.running && chatPlatforms().length) chatStart(); }));
@@ -3173,6 +3235,10 @@ function showAuth(note) {
   showOnly("authView");
   $("#authPanels").hidden = !FB_READY;
   $("#fbMissing").hidden = FB_READY;
+  if (isAdminApp()) {                       // panel admin: log masuk sahaja, tiada pendaftaran
+    $$('[data-auth-tab="register"]').forEach(b => b.hidden = true);
+    const bt = $(".auth-card .brand-tag"); if (bt) bt.textContent = "Admin Console · log masuk akaun admin";
+  }
   if (note) { $("#authMsg").textContent = note; }
   icons();
 }
@@ -3255,9 +3321,11 @@ async function onUser(u) {
     showAuth(qs.get("pair") ? "Log masuk dengan akaun STREAMVERSE yang sama seperti di komputer untuk pairing." : "");
     return;
   }
-  if (!u.emailVerified) { showOnly("verifyView"); $("#verifyEmail").textContent = u.email; icons(); return; }
-  S.user = u;
   const tok = await u.getIdTokenResult();
+  // Claim admin hanya boleh ditetapkan melalui Admin SDK, jadi akaun admin tidak disekat oleh pengesahan email di panel admin.
+  const adminBypass = isAdminApp() && tok.claims.admin === true;
+  if (!u.emailVerified && !adminBypass) { showOnly("verifyView"); $("#verifyEmail").textContent = u.email; icons(); return; }
+  S.user = u;
   S.isAdmin = tok.claims.admin === true;
   if (qs.get("pair")) return startCompanion(qs.get("pair").toUpperCase(), qs.get("kind") || "video");
   if (qs.get("remote") === "kill") return startKillRemote();

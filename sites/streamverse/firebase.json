@@ -3,80 +3,33 @@
     "public": ".",
     "ignore": [
       "firebase.json",
+      "firebase.blaze.json",
       "**/.*",
       "**/node_modules/**",
       "functions/**",
       "design-system/**",
+      "tools/**",
       "*.rules",
       "*.md",
-      "firestore.indexes.json",
-      "tools/**"
+      "firestore.indexes.json"
     ],
     "rewrites": [
-      {
-        "source": "/admin",
-        "destination": "/admin.html"
-      },
-      {
-        "source": "/oauth/callback",
-        "function": {
-          "functionId": "oauthCallback",
-          "region": "asia-southeast1"
-        }
-      },
-      {
-        "source": "/hook/game/**",
-        "function": {
-          "functionId": "gameEvent",
-          "region": "asia-southeast1"
-        }
-      },
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
+      { "source": "/admin", "destination": "/admin.html" },
+      { "source": "**", "destination": "/index.html" }
     ],
     "headers": [
       {
         "source": "**",
         "headers": [
-          {
-            "key": "Permissions-Policy",
-            "value": "camera=(self), microphone=(self), display-capture=(self), fullscreen=(self)"
-          },
-          {
-            "key": "X-Content-Type-Options",
-            "value": "nosniff"
-          },
-          {
-            "key": "Referrer-Policy",
-            "value": "strict-origin-when-cross-origin"
-          },
-          {
-            "key": "X-Frame-Options",
-            "value": "SAMEORIGIN"
-          }
+          { "key": "Permissions-Policy", "value": "camera=(self), microphone=(self), display-capture=(self), fullscreen=(self)" },
+          { "key": "X-Content-Type-Options", "value": "nosniff" },
+          { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+          { "key": "X-Frame-Options", "value": "SAMEORIGIN" }
         ]
       }
     ]
   },
   "firestore": {
-    "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
-  },
-  "storage": {
-    "rules": "storage.rules"
-  },
-  "functions": [
-    {
-      "source": "functions",
-      "codebase": "default",
-      "runtime": "nodejs20",
-      "ignore": [
-        "node_modules",
-        ".git",
-        "*.local"
-      ]
-    }
-  ]
+  }
 }

@@ -4,9 +4,34 @@
 
 Platform all-in-one untuk gamer, livestreamer dan content creator. Frontend ialah **satu fail `index.html`** (HTML + CSS + JavaScript Vanilla dalam `<script type="module">`). Backend: Firebase Auth, Firestore, Storage, Hosting, Cloud Functions, App Check, dan Secret Manager. Tiada VPS.
 
-> **Status sekarang:** `FIREBASE_CONFIG` dalam `index.html` masih **kosong**, jadi app belum disambung ke Firebase. Tanpa config, app buka **Studio Tempatan**. Kamera, mikrofon, screen capture, capture card, mixer, audio processing dan rakaman tempatan berfungsi dengan peranti sebenar. Ciri cloud pula tunjuk status **Firebase Not Configured**.
+> **Status sambungan Firebase (disambung):** projek **GENIUS DIGITAL** (`genius-digital-40bc9`), app web **STREAMVERSE GAMING**
+> (`1:508099045190:web:b55969464b05e37e1e2747`). `FIREBASE_CONFIG` sudah diisi dalam `index.html` dan `admin.html`.
+> Pelan semasa ialah **Spark (percuma)**. Ini maksudnya:
 >
-> **Selepas `FIREBASE_CONFIG` diisi:** butang "Buka Studio Tempatan" dan kad "STUDIO TEMPATAN" hilang dengan sendirinya. Semua fungsi peranti (kamera, mic, mixer, rakaman, scene) **kekal**, cuma kini perlu log masuk dulu dan scene/tetapan disimpan ke Firestore akaun pengguna. Isi config yang **sama** dalam `index.html` dan `admin.html`.
+> | Perkhidmatan | Status |
+> |---|---|
+> | Authentication (Email/Password) | ✅ aktif (dikongsi dengan app lain dalam projek) |
+> | Firestore `(default)` · asia-southeast1 | ✅ aktif. Rules Streamverse **sudah digabung** dalam rules projek |
+> | Firestore indexes (feed, carian game, announcements, halaman live) | ✅ dideploy |
+> | Hosting | ⏳ menunggu site/domain khas Streamverse (site default `genius-digital-40bc9` sedang menyiarkan Fetchr Box; **jangan deploy ke situ**) |
+> | Cloud Functions | ⛔ tidak aktif (perlukan Blaze). `FUNCTIONS_ENABLED = false` |
+> | Firebase Storage | ⛔ tidak digunakan. `STORAGE_ENABLED = false` |
+>
+> **Tanpa Functions:** AI Creator, OAuth TikTok/YouTube/Facebook, webhook auto-kill, Live Chat dan senarai pengguna dalam Admin menunjukkan status
+> "Cloud Functions Not Enabled". Semua yang lain berfungsi: log masuk, scene/source, kill popup manual (butang, hotkey, Kill Remote), donation + halaman live,
+> community (like/komen dikira terus dari Firestore), pairing telefon (signaling melalui Firestore), kamera/mic/mixer/rakaman tempatan.
+> **Tanpa Storage:** avatar disimpan sebagai thumbnail kecil dalam profil; rakaman hanya Download; gambar overlay kekal bila guna URL https://.
+>
+> **PENTING: rules Firestore dikongsi 4 app.** `firebase.json` sengaja **tidak** merujuk `firestore.rules`. Fail itu rujukan sahaja; mendeploynya terus akan
+> menimpa rules Genius Digital, PDF Tools dan Fetchr Box. Ubah rules melalui Firebase Console (rules gabungan) atau gabungkan dahulu.
+>
+> **Studio Tempatan:** kad dan butang "Studio Tempatan" hanya muncul bila `FIREBASE_CONFIG` kosong. Sekarang ia tidak muncul; semua fungsi peranti kekal.
+>
+> **Admin:** `admin.html` guna custom claim `admin` yang sama dengan akaun admin sedia ada (claim ini global untuk semua app dalam projek). Akaun admin tidak disekat
+> pengesahan email di panel admin. Tab Daftar disembunyikan di panel admin.
+>
+> **Naik taraf ke Blaze nanti:** tukar `FUNCTIONS_ENABLED` / `STORAGE_ENABLED` kepada `true` dalam kedua-dua HTML, kemudian
+> `firebase deploy --config firebase.blaze.json --only functions,hosting` (config penuh sudah disediakan; ia juga tidak menyentuh rules).
 
 ---
 
