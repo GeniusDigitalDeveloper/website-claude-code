@@ -8,11 +8,11 @@
 //   stats_daily/{YYYY-MM-DD}  { visits, toolUses: { [toolId]: n } }
 //   stats_monthly/{YYYY-MM}   { visits }
 //   stats/total               { visits, registeredUsers }
-import { provider as statsProvider } from '../statistics/stats.js';
+import { loadSummary } from '../statistics/stats.js';
 
 export class NullAdminData {
   get connected() { return false; }
-  async summary() { return statsProvider.getSummary(); }
+  async summary() { return loadSummary(); }
   async listUsers() { return []; }
   async listActivity() { return []; }
   async dailySeries(/* days */) { return null; }          // [{ key:'2026-11-06', visits: n }, ...]

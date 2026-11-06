@@ -1,65 +1,462 @@
 rules_version = '2';
-
-// Security Rules CodeLab Developer — fasa integrasi Firebase (belum di-deploy).
-// Prinsip: tolak secara lalai; admin ditentukan oleh custom claim `admin == true`
-// yang ditetapkan melalui Firebase Admin SDK (bukan oleh klien).
+// GENIUS DIGITAL (projek Firebase dikongsi) — rules Firestore gabungan 5 aplikasi:
+// Genius Digital (products) | Malaysia PDF Tools | Fetchr Box | Streamverse Gaming | CodeLab Developer
+// Setiap aplikasi mengekalkan peraturan asalnya; fungsi bantu dinamakan semula dengan awalan (pdf/fb/sv/cl).
+// PENTING: fail ini ialah SATU-SATUNYA rules untuk projek. `firebase deploy --only firestore:rules` menggantikan
+// semua; sentiasa mulakan dari rules semasa projek (firebase_get_security_rules) sebelum mengubah.
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function signedIn() { return request.auth != null; }
-    function isAdmin() { return signedIn() && request.auth.token.admin == true; }
 
-    // ---- Statistik ----
-    // Bacaan awam (angka agregat sahaja, tiada data peribadi).
-    // Penulisan klien dihadkan kepada "+1" pada medan visits. Untuk produksi, sambungkan
-    // Firebase App Check atau pindahkan kiraan ke Cloud Function bagi mengelak spam.
-    match /stats/total {
+    // ---------- Helper functions ----------
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Pengesahan (login) sahaja BUKAN bukti admin. Claim "admin" mesti true.
+    function isAdmin() {
+      return isSignedIn() && (request.auth.token.admin == true
+        || request.auth.token.email == 'izzulmedia01@gmail.com');
+    }
+
+    function isValidStatus(value) {
+      return value in ['active', 'coming-soon', 'hidden'];
+    }
+
+    // Medan yang dibenarkan dalam dokumen produk (selain ini ditolak).
+    function hasOnlyAllowedKeys(data) {
+      return data.keys().hasOnly([
+        'name', 'slug', 'category', 'description',
+        'thumbnailURL',
+        'status', 'productURL', 'displayOrder',
+        'nameEn', 'categoryEn', 'descriptionEn',
+        'nameAr', 'categoryAr', 'descriptionAr',
+        'createdAt', 'updatedAt'
+      ]);
+    }
+
+    function hasRequiredKeys(data) {
+      return data.keys().hasAll([
+        'name', 'slug', 'category', 'description',
+        'thumbnailURL', 'status', 'productURL', 'displayOrder',
+        'createdAt', 'updatedAt'
+      ]);
+    }
+
+    // URL kosong atau https:// sahaja (halang javascript: dsb.).
+    function isEmptyOrHttps(value) {
+      return value is string && (value == '' || value.matches('https://.*'));
+    }
+
+    // Teks terjemahan (BI / BA) adalah pilihan; jika ada mestilah string dalam had panjang.
+    function optString(data, key, maxLen) {
+      return !(key in data) || (data[key] is string && data[key].size() <= maxLen);
+    }
+
+    // Thumbnail disimpan terus dalam Firestore (tiada Firebase Storage):
+    // kosong, URL https://, atau data URL imej JPEG/PNG/WebP (dimampatkan ≈100 KB oleh admin.html).
+    function isValidThumbnail(value) {
+      return value is string && value.size() <= 150000
+        && (value == '' || value.matches('https://.*') || value.matches('data:image/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+'));
+    }
+
+    function hasValidFields(data, docId) {
+      return hasOnlyAllowedKeys(data)
+        && hasRequiredKeys(data)
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 120
+        && data.slug is string && data.slug == docId
+        && data.slug.matches('^[a-z0-9]+(-[a-z0-9]+)*$')
+        && data.slug.size() <= 80
+        && data.category is string && data.category.size() > 0 && data.category.size() <= 60
+        && data.description is string && data.description.size() <= 1000
+        && isValidThumbnail(data.thumbnailURL)
+        && optString(data, 'nameEn', 120) && optString(data, 'categoryEn', 60) && optString(data, 'descriptionEn', 1000)
+        && optString(data, 'nameAr', 120) && optString(data, 'categoryAr', 60) && optString(data, 'descriptionAr', 1000)
+        && isValidStatus(data.status)
+        && isEmptyOrHttps(data.productURL) && data.productURL.size() <= 2048
+        && data.displayOrder is number
+        && data.displayOrder >= 0 && data.displayOrder <= 100000
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    // ---------- Koleksi: products ----------
+    match /products/{productId} {
+
+      // Baca satu dokumen: produk awam, atau admin (termasuk hidden).
+      allow get: if isAdmin() || resource.data.status in ['active', 'coming-soon'];
+
+      // Senarai/query: admin boleh semua. Orang awam MESTI query dengan
+      //   where('status', 'in', ['active', 'coming-soon'])
+      allow list: if isAdmin() || resource.data.status in ['active', 'coming-soon'];
+
+      // Cipta: admin sahaja, ID dokumen == slug, createdAt/updatedAt == masa pelayan.
+      allow create: if isAdmin()
+        && hasValidFields(request.resource.data, productId)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+
+      // Kemas kini: admin sahaja, slug & createdAt tidak boleh diubah.
+      allow update: if isAdmin()
+        && hasValidFields(request.resource.data, productId)
+        && request.resource.data.slug == resource.data.slug
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time;
+
+      // Padam: admin sahaja.
+      allow delete: if isAdmin();
+    }
+
+    // ---------- Koleksi: genius_site (tetapan laman awam Genius Digital) ----------
+    match /genius_site/{docId} {
       allow read: if true;
-      allow update: if isAdmin()
-        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['visits'])
-            && request.resource.data.visits == resource.data.visits + 1);
-      allow create, delete: if isAdmin();
-    }
-    match /stats_daily/{day} {          // day = YYYY-MM-DD (waktu Asia/Kuala_Lumpur)
-      allow read: if isAdmin();
-      allow create: if day.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
-        && request.resource.data.keys().hasOnly(['visits']) && request.resource.data.visits == 1;
-      allow update: if isAdmin()
-        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['visits'])
-            && request.resource.data.visits == resource.data.visits + 1);
-      allow delete: if isAdmin();
-    }
-    match /stats_monthly/{month} {      // month = YYYY-MM (waktu Asia/Kuala_Lumpur)
-      allow read: if isAdmin();
-      allow create: if month.matches('^[0-9]{4}-[0-9]{2}$')
-        && request.resource.data.keys().hasOnly(['visits']) && request.resource.data.visits == 1;
-      allow update: if isAdmin()
-        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['visits'])
-            && request.resource.data.visits == resource.data.visits + 1);
-      allow delete: if isAdmin();
+      allow write: if isAdmin() && docId == 'main'
+        && request.resource.data.keys().hasOnly(['logoURL', 'brandName', 'tagline', 'contact', 'texts', 'updatedAt'])
+        && (!('logoURL' in request.resource.data) || isValidThumbnail(request.resource.data.logoURL))
+        && (!('brandName' in request.resource.data) || (request.resource.data.brandName is string && request.resource.data.brandName.size() <= 60))
+        && (!('tagline' in request.resource.data) || (request.resource.data.tagline is string && request.resource.data.tagline.size() <= 120))
+        && (!('contact' in request.resource.data) || request.resource.data.contact is map)
+        && (!('texts' in request.resource.data) || request.resource.data.texts is map);
     }
 
-    // ---- Pengguna ----
-    // registeredUsers pada stats/total dikemas kini oleh Cloud Function (trigger auth.user().onCreate).
+    // ================= MALAYSIA PDF TOOLS =================
+
+    function pdfIsAdmin() {
+      return isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+
+
+    // Senarai pentadbir: pengguna boleh semak dokumen sendiri; tiada tulisan dari klien.
+    match /admins/{uid} {
+      allow read: if isSignedIn() && (request.auth.uid == uid || pdfIsAdmin());
+      allow write: if false;
+    }
+
+    // Tetapan laman awam (pengumuman, alat ditutup / akan datang)
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if pdfIsAdmin()
+        && request.resource.data.keys().hasOnly(['announcement', 'disabledTools', 'comingSoon', 'updatedAt'])
+        && (!('disabledTools' in request.resource.data) || request.resource.data.disabledTools is list)
+        && (!('comingSoon' in request.resource.data) || request.resource.data.comingSoon is list);
+    }
+
+    // Maklum balas tanpa log masuk — disahkan ketat
+    match /feedback/{id} {
+      allow create: if request.resource.data.keys().hasOnly(['type', 'toolId', 'rating', 'message', 'lang', 'createdAt'])
+        && request.resource.data.type in ['feedback', 'bug', 'request']
+        && request.resource.data.toolId is string && request.resource.data.toolId.size() <= 40
+        && request.resource.data.rating is int && request.resource.data.rating >= 1 && request.resource.data.rating <= 5
+        && request.resource.data.message is string
+        && request.resource.data.message.size() > 0 && request.resource.data.message.size() <= 1000
+        && request.resource.data.lang in ['ms', 'en', 'ar']
+        && request.resource.data.createdAt == request.time;
+      allow read, delete: if pdfIsAdmin();
+      allow update: if pdfIsAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
+    }
+
+    // ================= FETCHR BOX =================
+
+    // Pemilik = akaun dengan custom claim admin=true. Admin lain = e-mel yang didaftarkan oleh pemilik dalam koleksi admins.
+    // Dua-dua dinilai di sini (bukan di pelayar), jadi pengguna awam tidak boleh menjadikan diri sendiri admin.
+    function fbIsOwner() {
+      return request.auth != null && request.auth.token.admin == true;
+    }
+    function fbIsAdmin() {
+      return fbIsOwner() || (request.auth != null && request.auth.token.email != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.token.email.lower())));
+    }
+    match /admins/{email} {
+      allow read: if fbIsAdmin();
+      allow write: if fbIsOwner();
+    }
+    // Tetapan awam (platform, FAQ 3 bahasa, pengumuman): semua boleh baca, admin sahaja boleh tulis.
+    match /site/{doc} {
+      allow read: if true;
+      allow write: if fbIsAdmin();
+    }
+    // Statistik: admin baca sahaja. Pelayan muat turun menulis melalui akaun perkhidmatan (tidak tertakluk pada rules).
+    // stats/public = jumlah awam untuk footer (tiada data peribadi). Selebihnya admin sahaja.
+    match /stats/{doc} {
+      allow read: if doc == 'public' || fbIsAdmin();
+      allow write: if false;
+    }
+    match /daily/{day} {
+      allow read: if fbIsAdmin();
+      allow write: if false;
+    }
+    // Nama pengguna unik: dokumen usernames/{nama} dicipta sekali sahaja oleh pemiliknya (tidak boleh diubah atau dipadam).
+    match /usernames/{name} {
+      allow get: if true;
+      allow list: if false;
+      allow create: if request.auth != null
+        && name.matches('^[a-z0-9_.]{3,20}$')
+        && request.resource.data.keys().hasOnly(['uid'])
+        && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if false;
+    }
+    // Profil pengguna berdaftar. Pengguna boleh cipta rekod sendiri dan tukar gambar, bahasa dan bio sahaja.
+    // Jumlah muat turun (stats, recent) hanya ditulis oleh pelayan, jadi tidak boleh dipalsukan oleh pengguna.
     match /users/{uid} {
-      allow read: if isAdmin() || (signedIn() && request.auth.uid == uid);
-      allow create: if signedIn() && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['displayName', 'email', 'createdAt'])
-        && !('role' in request.resource.data) && !('status' in request.resource.data);
-      allow update: if isAdmin()
-        || (signedIn() && request.auth.uid == uid
-            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName']));
-      allow delete: if isAdmin();
+      allow create: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['email', 'createdAt', 'lang', 'photo', 'photoSrc', 'username', 'bio', 'link'])
+        && request.resource.data.email == request.auth.token.email
+        && (!('username' in request.resource.data)
+            || getAfter(/databases/$(database)/documents/usernames/$(request.resource.data.username)).data.uid == uid);
+      allow read: if fbIsAdmin() || (request.auth != null && request.auth.uid == uid);
+      allow update: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['photo', 'photoSrc', 'lang', 'bio', 'link'])
+        && (!('photo' in request.resource.data) || (request.resource.data.photo is string && request.resource.data.photo.size() < 150000))
+        && (!('bio' in request.resource.data) || (request.resource.data.bio is string && request.resource.data.bio.size() <= 150))
+        && (!('photoSrc' in request.resource.data) || (request.resource.data.photoSrc is string && request.resource.data.photoSrc.size() < 260000))
+        && (!('link' in request.resource.data) || (request.resource.data.link is string && request.resource.data.link.size() <= 200 && (request.resource.data.link == '' || request.resource.data.link.matches('^https?://[^ ]+$'))));
+      allow delete: if false;
+    }
+    // Permohonan kelulusan kandungan berhak cipta: pengguna mohon (status pending), hanya admin boleh putuskan.
+    // Pelayan muat turun membaca status ini menggunakan token pengguna sendiri, jadi tidak boleh dipalsukan.
+    match /requests/{id} {
+      allow read: if fbIsAdmin() || (request.auth != null && resource.data.uid == request.auth.uid);
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.keys().hasOnly(['uid', 'email', 'username', 'url', 'title', 'platform', 'code', 'message', 'status', 'createdAt'])
+        && request.resource.data.url is string && request.resource.data.url.size() <= 2048
+        && request.resource.data.message is string && request.resource.data.message.size() <= 300;
+      allow update: if fbIsAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'adminNote', 'decidedAt', 'decidedBy'])
+        && request.resource.data.status in ['pending', 'approved', 'rejected'];
+      allow delete: if false;
+    }
+    // Notis peribadi (cth keputusan permohonan): admin hantar kepada seorang pengguna, pengguna baca sendiri.
+    match /users/{uid}/notices/{nid} {
+      allow read: if fbIsAdmin() || (request.auth != null && request.auth.uid == uid);
+      allow create: if fbIsAdmin();
+    }
+    // Notifikasi: admin hantar, semua pengguna yang log masuk boleh baca. Keadaan baca/padam disimpan per pengguna.
+    match /notifications/{id} {
+      allow read: if request.auth != null;
+      allow create, update, delete: if fbIsAdmin();
+    }
+    match /users/{uid}/nstate/{nid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['read', 'deleted']);
+    }
+    // Chat pengguna <-> admin. Pengguna hanya boleh akses chat sendiri. Admin boleh akses semua dan balas.
+    match /chats/{uid} {
+      allow read: if fbIsAdmin() || (request.auth != null && request.auth.uid == uid);
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['email', 'lang', 'lastText', 'lastFrom', 'lastAt', 'unreadAdmin'])
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.lastFrom == 'user' && request.resource.data.unreadAdmin == true;
+      allow update: if fbIsAdmin() || (request.auth != null && request.auth.uid == uid
+        && ((request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lang', 'lastText', 'lastFrom', 'lastAt', 'unreadAdmin'])
+             && request.resource.data.lastFrom == 'user' && request.resource.data.unreadAdmin == true)
+            || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['unreadUser'])
+             && request.resource.data.unreadUser == false)));
+      match /messages/{mid} {
+        allow read: if fbIsAdmin() || (request.auth != null && request.auth.uid == uid);
+        allow create: if request.auth != null && request.auth.uid == uid
+          && request.resource.data.from == 'user'
+          && request.resource.data.keys().hasOnly(['from', 'text', 'lang', 'at'])
+          && request.resource.data.text is string && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 1000;
+        allow create: if fbIsAdmin() && request.resource.data.from == 'admin';
+        allow update: if fbIsAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['trMs']);
+      }
     }
 
-    // ---- Konfigurasi & kandungan: baca awam, tulis admin sahaja ----
-    match /config/{doc} { allow read: if true; allow write: if isAdmin(); }
-    match /content/{doc} { allow read: if true; allow write: if isAdmin(); }
+    // ================= STREAMVERSE GAMING =================
 
-    // ---- Log aktiviti: admin sahaja ----
-    match /activity/{id} { allow read, write: if isAdmin(); }
+    function verified() { return isSignedIn() && request.auth.token.email_verified == true; }
+    function svOwner(uid) { return verified() && request.auth.uid == uid; }
+    function data() { return request.resource.data; }
+    function str(v, min, max) { return v is string && v.size() >= min && v.size() <= max; }
+    function onlyChanged(keys) { return data().diff(resource.data).affectedKeys().hasOnly(keys); }
 
-    // ---- Tolak semua yang lain ----
-    match /{document=**} { allow read, write: if false; }
+    // ---------- Data peribadi pengguna ----------
+    match /users/{uid} {
+      allow read: if svOwner(uid) || isAdmin();
+      allow create: if svOwner(uid) && data().uid == uid && data().email == request.auth.token.email
+                    && !data().keys().hasAny(['admin', 'role']);
+      allow update: if svOwner(uid) && onlyChanged(['updatedAt', 'lastLoginAt', 'displayName']);
+      allow delete: if false;
+
+      match /settings/{id}      { allow read, write: if svOwner(uid); }
+      match /themes/{id}        { allow read, write: if svOwner(uid); }
+      match /audioSettings/{id} { allow read, write: if svOwner(uid); }
+      match /devices/{id}       { allow read, write: if svOwner(uid); }
+      match /sources/{id}       { allow read, write: if svOwner(uid); }
+      match /scenes/{id} {
+        allow read, delete: if svOwner(uid);
+        allow create, update: if svOwner(uid) && data().ownerUid == uid && str(data().name, 1, 40)
+                              && data().sources is list && data().sources.size() <= 40;
+      }
+      match /streamSettings/{platform} {
+        allow read: if svOwner(uid);
+        allow write: if svOwner(uid) && platform in ['tiktok', 'youtube', 'facebook'] && data().ownerUid == uid
+                     && str(data().title, 0, 100) && str(data().description, 0, 5000);
+      }
+      match /recordings/{id} {
+        allow read, delete: if svOwner(uid);
+        allow create: if svOwner(uid) && data().ownerUid == uid && data().size is int
+                      && data().storagePath.matches('users/' + uid + '/recordings/.*');
+        allow update: if false;
+      }
+      match /activity/{id} {
+        allow read, delete: if svOwner(uid);
+        allow create: if svOwner(uid) && data().ownerUid == uid && str(data().text, 1, 200);
+        allow update: if false;
+      }
+      // WebRTC signaling (pairing telefon) — hanya pemilik akaun (telefon log masuk akaun sama)
+      match /pairings/{code} {
+        allow read, create, update, delete: if svOwner(uid);
+        match /{sub}/{cand} { allow read, create, delete: if svOwner(uid) && sub in ['offerCandidates', 'answerCandidates']; }
+      }
+      // Ditulis oleh Cloud Functions sahaja (token disahkan di backend)
+      match /platformConnections/{platform} { allow read: if svOwner(uid) || isAdmin(); allow write: if false; }
+      match /aiAssets/{id}                  { allow read: if svOwner(uid); allow write: if false; }
+      // Kill events: auto (Functions, dari webhook game) atau manual (Kill Remote milik akaun sama)
+      match /gameEvents/{id} {
+        allow read, delete: if svOwner(uid);
+        allow create: if svOwner(uid) && data().type == 'kill' && data().source == 'manual'
+                      && str(data().game, 1, 20) && data().headshot is bool && data().createdAt == request.time;
+        allow update: if false;
+      }
+      match /followers/{followerUid}        { allow read: if verified(); allow write: if false; }
+      match /notifications/{id} {
+        allow read, delete: if svOwner(uid);
+        allow update: if svOwner(uid) && onlyChanged(['read']) && data().read is bool;
+        allow create: if false;
+      }
+      match /following/{targetUid} {
+        allow read: if svOwner(uid);
+        allow create: if svOwner(uid) && targetUid != uid && data().targetUid == targetUid && data().ownerUid == uid;
+        allow delete: if svOwner(uid);
+        allow update: if false;
+      }
+      match /communityPosts/{postId} {
+        allow read: if verified();
+        allow create: if svOwner(uid) && data().ownerUid == uid && str(data().text, 1, 2000) && str(data().game, 0, 60)
+                      && data().likeCount == 0 && data().commentCount == 0 && data().createdAt == request.time;
+        allow update: if svOwner(uid) && onlyChanged(['text', 'game', 'gameLower']) && str(data().text, 1, 2000);
+        allow delete: if svOwner(uid) || isAdmin();
+        match /likes/{likerUid} {
+          allow read: if verified();
+          allow create: if verified() && likerUid == request.auth.uid && data().ownerUid == likerUid;
+          allow delete: if verified() && likerUid == request.auth.uid;
+          allow update: if false;
+        }
+        match /comments/{commentId} {
+          allow read: if verified();
+          allow create: if verified() && data().ownerUid == request.auth.uid && str(data().text, 1, 500);
+          allow delete: if verified() && (resource.data.ownerUid == request.auth.uid || request.auth.uid == uid || isAdmin());
+          allow update: if false;
+        }
+      }
+    }
+    // Feed global (collection group query)
+    match /{path=**}/communityPosts/{postId} { allow read: if verified(); }
+
+    // ---------- Profil awam gamer ----------
+    match /profiles/{uid} {
+      allow read: if verified();
+      allow create: if svOwner(uid) && data().ownerUid == uid && !data().keys().hasAny(['followerCount', 'followingCount'])
+                    && data().username.matches('^[A-Za-z0-9_]{3,20}$') && str(data().bio, 0, 300);
+      allow update: if svOwner(uid) && !data().diff(resource.data).affectedKeys().hasAny(['followerCount', 'followingCount', 'ownerUid'])
+                    && data().username.matches('^[A-Za-z0-9_]{3,20}$') && str(data().bio, 0, 300);
+      allow delete: if false;
+    }
+    match /usernames/{name} {
+      allow read: if verified();
+      allow create: if verified() && name.matches('^[a-z0-9_]{3,20}$') && data().uid == request.auth.uid;
+      allow update: if verified() && resource.data.uid == request.auth.uid && data().uid == request.auth.uid;
+      allow delete: if verified() && resource.data.uid == request.auth.uid;
+    }
+    match /groups/{gid} {
+      allow read: if verified();
+      allow create: if verified() && data().ownerUid == request.auth.uid && str(data().name, 1, 50) && data().memberCount == 0;
+      allow update: if false;
+      allow delete: if verified() && (resource.data.ownerUid == request.auth.uid || isAdmin());
+      match /members/{memberUid} {
+        allow read: if verified();
+        allow create, delete: if verified() && memberUid == request.auth.uid;
+        allow update: if false;
+      }
+    }
+    // Halaman live awam + link donation (dibaca viewer tanpa login)
+    match /publicPages/{uid} {
+      allow read: if true;
+      allow create: if svOwner(uid) && data().ownerUid == uid && data().disabled == false
+                    && data().slug == get(/databases/$(database)/documents/profiles/$(uid)).data.usernameLower
+                    && data().links is list && data().links.size() <= 8 && str(data().displayName, 1, 40);
+      allow update: if (svOwner(uid) && data().ownerUid == uid && data().disabled == resource.data.disabled
+                        && data().slug == get(/databases/$(database)/documents/profiles/$(uid)).data.usernameLower
+                        && data().links is list && data().links.size() <= 8)
+                    || (isAdmin() && onlyChanged(['disabled']));
+      allow delete: if svOwner(uid) || isAdmin();
+    }
+    match /reports/{id} {
+      allow create: if verified() && data().reporterUid == request.auth.uid && data().status == 'open' && str(data().details, 0, 500);
+      allow read, update, delete: if isAdmin();
+    }
+
+    // ---------- Sistem / admin ----------
+    match /announcements/{id} { allow read: if verified(); allow write: if isAdmin(); }
+    match /config/{id}        { allow read: if verified(); allow write: if isAdmin(); }
+    match /systemLogs/{id}    { allow read: if isAdmin(); allow write: if false; }
+    match /aiUsage/{id}       { allow read, write: if false; }
+    match /_private/{doc=**}  { allow read, write: if false; }   // token OAuth (disulitkan), state OAuth
+
+    // ================= CODELAB DEVELOPER =================
+    // Semua koleksi berawalan `codelab_`. Admin = isAdmin() di atas (custom claim admin=true atau e-mel pemilik).
+    //
+    // Statistik agregat (tiada data peribadi). Bacaan awam untuk footer. Klien awam hanya boleh:
+    //  - mencipta dokumen kiraan dengan visits == 1, atau
+    //  - menaikkan visits sebanyak tepat +1.
+    // Kunci harian/bulanan = tarikh waktu Malaysia (dikira di klien oleh js/statistics/kl-time.js).
+    // Untuk produksi tinggi trafik: aktifkan App Check atau pindahkan ke Cloud Function.
+    function clBump() {
+      return request.resource.data.keys().hasOnly(['visits'])
+        && request.resource.data.visits is int
+        && request.resource.data.visits == resource.data.visits + 1;
+    }
+    function clFirst() {
+      return request.resource.data.keys().hasOnly(['visits']) && request.resource.data.visits == 1;
+    }
+    match /codelab_stats/{doc} {
+      allow read: if true;
+      allow create: if doc == 'total' && clFirst();
+      // registeredUsers hanya boleh diubah oleh admin; orang awam hanya +1 pada visits.
+      allow update: if isAdmin() || (doc == 'total'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['visits'])
+        && request.resource.data.visits == resource.data.visits + 1);
+      allow delete: if isAdmin();
+    }
+    match /codelab_stats_daily/{day} {
+      allow read: if true;
+      allow create: if day.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$') && clFirst();
+      allow update: if isAdmin() || clBump();
+      allow delete: if isAdmin();
+    }
+    match /codelab_stats_monthly/{month} {
+      allow read: if true;
+      allow create: if month.matches('^[0-9]{4}-[0-9]{2}$') && clFirst();
+      allow update: if isAdmin() || clBump();
+      allow delete: if isAdmin();
+    }
+    // Konfigurasi & kandungan awam: baca bebas, tulis admin sahaja.
+    match /codelab_config/{doc}  { allow read: if true; allow write: if isAdmin(); }
+    match /codelab_content/{doc} { allow read: if true; allow write: if isAdmin(); }
+    // Log aktiviti & pengguna CodeLab: admin sahaja.
+    match /codelab_activity/{id} { allow read, write: if isAdmin(); }
+    match /codelab_users/{uid}   { allow read, write: if isAdmin(); }
+
+    // Semua laluan lain ditutup.
+    match /{document=**} {
+      allow read, write: if false;
+    }
   }
 }

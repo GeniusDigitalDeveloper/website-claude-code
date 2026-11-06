@@ -1,49 +1,49 @@
-// PLACEHOLDER — Penyedia Firebase (belum diaktifkan). Lihat /firebase/README.md.
+// Penyedia statistik Firebase (Firestore). Projek: GENIUS DIGITAL (dikongsi) — semua koleksi CodeLab
+// menggunakan awalan `codelab_` supaya tidak berlanggar dengan aplikasi lain dalam projek yang sama.
 //
-// Cara mengaktifkan (fasa akan datang):
-//  1. Cipta projek Firebase (pelan Spark percuma), aktifkan Firestore + Authentication.
-//  2. Salin firebase/firebase-config.example.js → firebase/firebase-config.js dan isi konfigurasi web
-//     (konfigurasi web Firebase BUKAN rahsia; keselamatan dikawal oleh Security Rules).
-//  3. Deploy firebase/firestore.rules.
-//  4. Dalam js/statistics/stats.js tukar `new NullProvider()` kepada `new FirebaseProvider(config)`.
-//  5. Buang `throw` di bawah dan gunakan SDK modular (CDN gstatic atau npm).
-//
-// Kod rujukan di bawah menunjukkan struktur sebenar yang dijangka; ia sengaja belum dijalankan.
+//   codelab_stats/total                { visits, registeredUsers? }
+//   codelab_stats_daily/{YYYY-MM-DD}   { visits }   ← kunci waktu Malaysia → reset automatik 00:00 MYT
+//   codelab_stats_monthly/{YYYY-MM}    { visits }   ← kunci bulan waktu Malaysia
 import { dayKey, monthKey } from './kl-time.js';
 
 export class FirebaseProvider {
-  constructor(config) { this.config = config; }
+  constructor(config) { this.config = config; this._ready = null; this._on = false; }
   get name() { return 'firebase'; }
-  get connected() { return false; } // tukar kepada true selepas disambung
+  get connected() { return this._on; }
 
-  async init() {
-    throw new Error('FirebaseProvider belum diaktifkan. Lihat firebase/README.md');
-    // const { initializeApp } = await import('https://www.gstatic.com/firebasejs/<versi>/firebase-app.js');
-    // const fs = await import('https://www.gstatic.com/firebasejs/<versi>/firebase-firestore.js');
-    // this.db = fs.getFirestore(initializeApp(this.config)); this.fs = fs;
+  init() {
+    this._ready ||= (async () => {
+      const m = await import('../../assets/vendor/firebase-firestore.bundle.js');
+      this.m = m; this.db = m.getFirestore(m.initializeApp(this.config, 'codelab'));
+      this._on = true;
+    })();
+    return this._ready;
   }
 
   async getSummary() {
-    // const { doc, getDoc } = this.fs;
-    // const [total, day, month] = await Promise.all([
-    //   getDoc(doc(this.db, 'stats', 'total')),
-    //   getDoc(doc(this.db, 'stats_daily', dayKey())),      // kunci hari Malaysia
-    //   getDoc(doc(this.db, 'stats_monthly', monthKey())),  // kunci bulan Malaysia
-    // ]);
-    // return {
-    //   registeredUsers: total.data()?.registeredUsers ?? 0,
-    //   today: day.data()?.visits ?? 0,
-    //   month: month.data()?.visits ?? 0,
-    //   total: total.data()?.visits ?? 0,
-    // };
-    void dayKey; void monthKey;
-    throw new Error('not-connected');
+    await this.init();
+    const { doc, getDoc } = this.m;
+    const [total, day, month] = await Promise.all([
+      getDoc(doc(this.db, 'codelab_stats', 'total')),
+      getDoc(doc(this.db, 'codelab_stats_daily', dayKey())),
+      getDoc(doc(this.db, 'codelab_stats_monthly', monthKey())),
+    ]);
+    return {
+      registeredUsers: total.data()?.registeredUsers ?? 0,
+      today: day.data()?.visits ?? 0,
+      month: month.data()?.visits ?? 0,
+      total: total.data()?.visits ?? 0,
+    };
   }
 
+  /** +1 atomik pada tiga dokumen (Security Rules hanya benarkan kenaikan +1 pada medan visits). */
   async recordVisit() {
-    // Gunakan increment() atomik pada tiga dokumen dalam satu writeBatch:
-    //   stats/total.visits, stats_daily/{dayKey()}.visits, stats_monthly/{monthKey()}.visits
-    // Security Rules mesti mengehadkan penulisan kepada +1 sahaja (lihat firestore.rules).
-    throw new Error('not-connected');
+    await this.init();
+    const { doc, writeBatch, increment } = this.m;
+    const b = writeBatch(this.db);
+    for (const ref of [['codelab_stats', 'total'], ['codelab_stats_daily', dayKey()], ['codelab_stats_monthly', monthKey()]]) {
+      b.set(doc(this.db, ...ref), { visits: increment(1) }, { merge: true });
+    }
+    await b.commit();
   }
 }

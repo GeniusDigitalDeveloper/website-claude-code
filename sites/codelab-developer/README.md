@@ -4,7 +4,7 @@ Pusat alat pembangun web serba lengkap: **73 alat** yang berjalan sepenuhnya dal
 vanilla, tanpa framework, tanpa build step). BM (lalai) · English · العربية (RTL).
 
 * Tanpa VPS, tanpa API berbayar, tanpa backend, tanpa langganan, tiada kunci API dalam frontend.
-* Pangkalan data **belum disambungkan** — statistik papar “—”, bukan angka palsu. Struktur Firebase sudah siap.
+* Statistik footer disambung ke **Firestore projek GENIUS DIGITAL** (lihat `firebase/README.md`); jika Firebase tak dapat dicapai, UI papar “—”, bukan angka palsu.
 * Panel Admin berasingan di `/admin/` (UI sahaja; tiada log masuk palsu).
 
 ## Jalankan
@@ -59,8 +59,7 @@ Tambah alat: (1) baris dalam `js/registry.js`, (2) eksport fungsi dengan id yang
 
 * Kunci hari `YYYY-MM-DD` dan bulan `YYYY-MM` dikira dalam **Asia/Kuala_Lumpur** (`js/statistics/kl-time.js`), bukan jam
   peranti → reset tepat 00:00 MYT; bulan baharu bermula 00:00 MYT hari pertama; jumlah keseluruhan terkumpul.
-* UI menunjukkan kunci hari semasa dan kiraan detik ke reset sebenar. Angka pelawat/pengguna = “—” sehingga
-  `NullProvider` ditukar kepada `FirebaseProvider` (lihat `firebase/README.md`). `localStorage` tidak dipakai untuk statistik global.
+* UI menunjukkan kunci hari semasa dan kiraan detik ke reset sebenar. Angka dibaca dari Firestore (`FirebaseProvider`); jika gagal, jatuh kepada “—”. `localStorage` tidak dipakai untuk statistik global.
 * Uji: `node tests/kl-time.test.mjs`.
 
 ## Keselamatan

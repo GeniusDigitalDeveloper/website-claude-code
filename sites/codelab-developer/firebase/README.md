@@ -1,56 +1,26 @@
-# Persediaan integrasi Firebase (fasa akan datang)
+# Integrasi Firebase — projek GENIUS DIGITAL (`genius-digital-40bc9`)
 
-Buat masa ini **pangkalan data belum disambungkan**. Folder ini menyediakan struktur supaya sambungan nanti
-mudah dan selamat. Semua alat berfungsi tanpa Firebase.
+Status: **Firestore disambungkan** untuk statistik footer. App web berdaftar: "CodeLab Developer"
+(`1:508099045190:web:89c17b1f48fd1c231e2747`). Konfigurasi web ada di `firebase/firebase-config.js` (bukan rahsia).
 
-## Apa yang sudah siap
+## Projek dikongsi — baca ini dahulu
+Rules Firestore projek ini ialah **satu fail** untuk 5 aplikasi (Genius Digital, Malaysia PDF Tools, Fetchr Box,
+Streamverse Gaming, CodeLab). `firebase/firestore.rules` ialah gabungan penuh; bahagian CodeLab di hujung dengan
+awalan `codelab_`. `firebase deploy --only firestore:rules` **menggantikan semua** — sebelum mengubah, ambil rules semasa
+projek dahulu supaya perubahan aplikasi lain tidak hilang.
 
-| Fail | Fungsi |
-|---|---|
-| `js/statistics/kl-time.js` | Kunci hari/bulan & kiraan masa reset berdasarkan **Asia/Kuala_Lumpur** (diuji) |
-| `js/statistics/provider.js` | Kontrak penyedia statistik + `NullProvider` (tiada data → UI papar “—”) |
-| `js/statistics/firebase-provider.js` | Kerangka `FirebaseProvider` (kod rujukan, belum aktif) |
-| `js/admin/auth.js` | Kontrak `AuthProvider` + `NullAuth`; tiada log masuk palsu |
-| `js/admin/data.js` | Lapisan data admin + skema koleksi Firestore |
-| `firebase/firestore.rules` | Security Rules (tolak lalai, admin melalui custom claim) |
-| `firebase/firebase-config.example.js` | Templat konfigurasi web (bukan rahsia) |
-
-## Model statistik
-
+## Model data
 ```
-stats/total                { visits, registeredUsers }
-stats_daily/{YYYY-MM-DD}   { visits }   ← kunci waktu Malaysia
-stats_monthly/{YYYY-MM}    { visits }   ← kunci waktu Malaysia
+codelab_stats/total                { visits, registeredUsers? }
+codelab_stats_daily/{YYYY-MM-DD}   { visits }   <- kunci waktu Malaysia (reset 00:00 MYT automatik)
+codelab_stats_monthly/{YYYY-MM}    { visits }   <- kunci bulan waktu Malaysia
+codelab_config / codelab_content / codelab_activity / codelab_users   (admin; sedia untuk fasa admin)
 ```
+Bacaan statistik awam (agregat sahaja). Penulisan awam dihadkan: cipta dengan `visits == 1` atau naik tepat +1.
+Satu lawatan dikira sekali sehari setiap pelayar. `registeredUsers` hanya boleh ditulis admin (CodeLab belum ada pendaftaran, papar 0).
 
-* **Hari ini**: dokumen `stats_daily/<tarikh MYT hari ini>`. Apabila jam MYT melepasi 00:00, kunci bertukar →
-  kiraan bermula dari 0 secara automatik (tiada cron diperlukan).
-* **Bulan ini**: dokumen `stats_monthly/<YYYY-MM MYT>`; bertukar pada 00:00 MYT hari pertama bulan baharu.
-* **Keseluruhan**: `stats/total.visits` terkumpul, tidak pernah direset.
-* **Pengguna berdaftar**: `stats/total.registeredUsers`, dikemas kini oleh Cloud Function pada `auth.user().onCreate`.
-
-`localStorage` **tidak** digunakan untuk statistik global (ia hanya mewakili satu pelayar).
-
-## Langkah sambungan
-
-1. Cipta projek Firebase (pelan Spark percuma), aktifkan **Firestore** dan **Authentication**.
-2. `cp firebase/firebase-config.example.js firebase/firebase-config.js` dan isi konfigurasi web.
-3. Deploy peraturan: `firebase deploy --only firestore:rules`.
-4. Dokumen awal: cipta `stats/total` dengan `{ visits: 0, registeredUsers: 0 }`.
-5. Dalam `js/statistics/firebase-provider.js` buang `throw` dan aktifkan kod rujukan (SDK modular).
-6. Dalam `js/statistics/stats.js` tukar `new NullProvider()` → `new FirebaseProvider(firebaseConfig)`.
-7. Sangat disyorkan: aktifkan **Firebase App Check** dan/atau pindahkan penambahan kiraan ke Cloud Function untuk
-   mengelak pelawat berniat jahat menokok kiraan.
-
-## Keselamatan Admin
-
-* Log masuk **mesti** guna Firebase Authentication (aktifkan MFA).
-* Peranan admin = custom claim `admin: true`, ditetapkan **di pelayan** dengan Admin SDK:
-
-  ```js
-  // skrip Node.js dipercayai (JANGAN jalankan dalam pelayar)
-  await getAuth().setCustomUserClaims(uid, { admin: true });
-  ```
-* Security Rules menyemak `request.auth.token.admin == true` bagi setiap data admin. Mengubah URL ke `/admin/…` atau
-  menyahsembunyi butang **tidak** memberi akses data kerana pelayan akan menolak.
-* Jangan commit `firebase-config.js` yang mengandungi kunci perkhidmatan, atau fail service-account.
+## Baki tugas keselamatan
+* Hadkan API key kepada domain tapak (Google Cloud Console → Credentials) dan aktifkan **App Check** supaya kiraan tak boleh disepam.
+* Panel Admin masih pratonton UI (`NullAuth`). Sambungan Firebase Authentication + custom claim `admin` ialah fasa seterusnya;
+  `isAdmin()` dalam rules sudah menyemak claim tersebut.
+* SDK ialah bundle setempat `assets/vendor/firebase-firestore.bundle.js` (Apache-2.0); CSP hanya benarkan `firestore.googleapis.com`.
