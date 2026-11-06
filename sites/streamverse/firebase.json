@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "streamverse",
     "public": ".",
     "ignore": [
       "firebase.json",
