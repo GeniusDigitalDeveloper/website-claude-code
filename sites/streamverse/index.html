@@ -109,6 +109,12 @@ table.t th,table.t td{text-align:left;padding:8px;border-bottom:1px solid var(--
 .auth-card{width:min(440px,100%);display:flex;flex-direction:column;gap:14px}
 .auth-card .panel{padding:22px}
 .auth-card{margin-inline:auto}
+input[type=file].in{padding:8px;cursor:pointer;font-size:13px}
+input[type=file]::file-selector-button{margin-right:12px;padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--panel2);color:var(--text);font:700 13px var(--f-body);cursor:pointer;transition:border-color .25s var(--ease-ios)}
+input[type=file]::file-selector-button:hover{border-color:var(--gold)}
+.prof-top{align-items:center;gap:14px}
+.prof-top .grow{min-width:min(100%,220px)}
+@media (max-width:520px){ .prof-top{flex-direction:column;align-items:stretch} .prof-top > .avatar{align-self:center} .tabs{gap:6px} .tab{flex:1 1 auto;text-align:center} .panel{padding:12px} .view-h h1{font-size:23px} .hub-bottom,.g2,.g3{gap:12px} .btn{white-space:normal} .ctrl-row .btn,.row.wrap > .btn{flex:1 1 140px} table.t{font-size:12px} .modal{padding:14px} }
 #authTabs{display:flex;gap:6px}
 #authTabs .tab{flex:1;text-align:center;padding:9px 12px;font-size:14px}
 .linkbtn{background:none;border:0;padding:2px 0;color:var(--ink);font:600 13px var(--f-body);cursor:pointer;text-decoration:underline;text-underline-offset:3px;align-self:flex-start;border-radius:4px}
@@ -344,7 +350,7 @@ body.t-rgb .theme-card.on,body.t-rgb .btn.primary{animation:rgb 6s linear infini
   .admin-shell .top-actions .btn{padding:6px 8px} #adminTabSelect{order:5;flex:1 1 100%}
   .welcome h1{font-size:24px} .view-h h1{font-size:25px}
 }
-@media (max-width:420px){ .brand-name{font-size:16px} .logo{width:34px;height:34px} .themes-grid{grid-template-columns:repeat(2,minmax(0,1fr))} .status-row{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:420px){ .brand-name{font-size:16px} .logo{width:34px;height:34px} .themes-grid{grid-template-columns:repeat(2,minmax(0,1fr))} .status-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px} .stat{padding:10px;gap:8px} .stat .ic{width:32px;height:32px} .stat b{font-size:12.5px} .stat span{font-size:11px} }
 @media (prefers-reduced-motion:reduce){ *,*::before,*::after{animation:none!important;transition:none!important} html{scroll-behavior:auto} }
 </style>
 </head>
@@ -418,7 +424,6 @@ body.t-rgb .theme-card.on,body.t-rgb .btn.primary{animation:rgb 6s linear infini
     </nav>
     <div class="top-actions" style="margin-left:auto">
       <button class="btn icon ghost" id="notifBtn" aria-label="Notifikasi" style="position:relative"><i data-lucide="bell"></i><span class="badge-dot" id="notifCount" hidden></span></button>
-      <button class="btn icon ghost" id="sfxBtn" aria-label="Bunyi UI"><i data-lucide="volume-2"></i></button>
       <button class="btn icon ghost" id="helpBtn" aria-label="Bantuan"><i data-lucide="circle-help"></i></button>
       <button class="profile-btn" id="profileBtn" aria-label="Menu profil"><span class="avatar" id="topAvatar">?</span><span class="pmeta"><b id="topName" style="font-family:var(--f-head);font-weight:800;font-size:14px;display:block">—</b><span class="small muted" id="topRole">—</span></span><i data-lucide="chevron-down"></i></button>
     </div>
@@ -1226,7 +1231,7 @@ async function connectSource(src, opts = {}) {
       if (!stream) { r.status = "idle"; renderAll(); return; }
     } else if (src.type === "image") {
       if (!src.imageUrl && !src.imageObjectUrl) { r.status = "idle"; renderAll(); editSource(src); return; }
-      r.img = await loadImage(src.imageObjectUrl || src.imageUrl);
+      r.img = shrinkImage(await loadImage(src.imageObjectUrl || src.imageUrl));
       r.status = "connected"; renderAll(); return;
     } else if (src.type === "text" || src.type === "killfeed" || src.type === "donation") {
       r.status = "connected"; renderAll(); return;
@@ -1263,6 +1268,13 @@ function disconnectSource(src, quiet) {
   mixerRemove(src.id);
   Object.assign(r, { status: "idle", stream: null, video: null, img: null, error: "", label: "", settings: null });
   if (!quiet) { renderAll(); logActivity("source", `${src.name} diputuskan`); }
+}
+function shrinkImage(img, max = 2048) {
+  const w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+  if (Math.max(w, h) <= max) return img;
+  const k = max / Math.max(w, h), c = document.createElement("canvas");
+  c.width = Math.round(w * k); c.height = Math.round(h * k); c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+  return c;
 }
 function loadImage(url) {
   return new Promise((res, rej) => { const i = new Image(); i.crossOrigin = "anonymous"; i.onload = () => res(i); i.onerror = () => rej(new Error("Gambar gagal dimuatkan (semak CORS Storage).")); i.src = url; });
@@ -1329,7 +1341,7 @@ function drawFrame() {
       const r = rt(s.id); const L = s.layout || LAYOUTS.full;
       const x = L.x * W, y = L.y * H, w = L.w * W, h = L.h * H;
       if (r.video && r.video.readyState >= 2 && r.video.videoWidth) { drawMedia(r.video, r.video.videoWidth, r.video.videoHeight, x, y, w, h, s.fit, s.mirror); drew = true; }
-      else if (s.type === "image" && r.img) { drawMedia(r.img, r.img.naturalWidth, r.img.naturalHeight, x, y, w, h, s.fit, false); drew = true; }
+      else if (s.type === "image" && r.img) { drawMedia(r.img, r.img.naturalWidth || r.img.width, r.img.naturalHeight || r.img.height, x, y, w, h, s.fit, false); drew = true; }
       else if (s.type === "text" && r.status === "connected") { drawText(s, x, y, w, h); drew = true; }
       else if (s.type === "killfeed") { if (drawKill(s, x, y, w, h)) drew = true; }
       else if (s.type === "donation") { if (drawDonation(s, x, y, w, h)) drew = true; }
@@ -1843,7 +1855,7 @@ function editSource(s, connectAfter) {
     ${s.type === "text" ? `<label class="f">Teks<input class="in" id="es_text" maxlength="80" value="${esc(s.text)}"></label><div class="g3"><label class="f">Warna<input class="in" type="color" id="es_color" value="${esc(s.color)}"></label><label class="f">Saiz (% tinggi)<input class="in" type="number" id="es_size" min="2" max="25" value="${s.size}"></label><label class="f">Jajaran<select class="in" id="es_align"><option value="left" ${s.align === "left" ? "selected" : ""}>Kiri</option><option value="center" ${s.align === "center" ? "selected" : ""}>Tengah</option></select></label></div><label class="row small"><span class="switch"><input type="checkbox" id="es_bg" ${s.bgColor && !/00$/.test(s.bgColor) ? "checked" : ""}></span>Latar gelap belakang teks</label>` : ""}
     ${s.type === "killfeed" ? `<label class="f">Label streak (pisah koma: 1 kill, 2, 3, …)<input class="in" id="es_labels" maxlength="160" value="${esc(s.labels)}"></label><div class="g3"><label class="f">Tempoh popup (s)<input class="in" type="number" id="es_dur" min="1" max="8" step="0.2" value="${s.duration}"></label><label class="f">Tempoh streak (s)<input class="in" type="number" id="es_sw" min="2" max="60" value="${s.streakWindow}"></label><label class="f">Bunyi<select class="in" id="es_snd"><option value="1" ${s.sound !== false ? "selected" : ""}>Ya (masuk stream)</option><option value="0" ${s.sound === false ? "selected" : ""}>Tidak</option></select></label></div><label class="row small"><span class="switch"><input type="checkbox" id="es_det" ${s.showDetails !== false ? "checked" : ""}></span>Papar senjata / mangsa (jika game hantar)</label>` : ""}
     ${s.type === "donation" ? `<label class="f">Teks<input class="in" id="es_dtext" maxlength="40" value="${esc(s.text)}"></label><div class="g3"><label class="f">Paparan<select class="in" id="es_mode"><option value="always" ${s.mode === "always" ? "selected" : ""}>Sentiasa</option><option value="interval" ${s.mode === "interval" ? "selected" : ""}>Berkala</option></select></label><label class="f">Setiap (minit)<input class="in" type="number" id="es_every" min="1" max="60" value="${s.every}"></label><label class="f">Selama (saat)<input class="in" type="number" id="es_for" min="5" max="120" value="${s.showFor}"></label></div><p class="small muted" style="margin:0">QR menggunakan link utama di halaman Donation.</p>` : ""}
-    ${s.type === "image" ? `<label class="f">Fail gambar (PNG / JPG / WEBP, maks 5 MB)<input class="in" type="file" id="es_file" accept="image/png,image/jpeg,image/webp"></label><p class="small muted" style="margin:0">${cloudOK() && STORAGE_ENABLED ? "Gambar dimuat naik ke Firebase Storage akaun anda supaya scene boleh dimuat semula." : "Firebase Storage tidak diaktifkan (pelan percuma): gambar hanya kekal untuk sesi ini. Untuk gambar kekal, tampal URL https:// imej di bawah."}</p>` : ""}
+    ${s.type === "image" ? `<label class="f">Fail gambar (apa-apa gambar, apa-apa saiz)<input class="in" type="file" id="es_file" accept="image/*"></label><p class="small muted" style="margin:0">${cloudOK() && STORAGE_ENABLED ? "Gambar dimuat naik ke Firebase Storage akaun anda supaya scene boleh dimuat semula." : "Firebase Storage tidak diaktifkan (pelan percuma): gambar hanya kekal untuk sesi ini. Untuk gambar kekal, tampal URL https:// imej di bawah."}</p>` : ""}
     ${visual && !T.unsupported ? `<div class="g3"><label class="f">Posisi<select class="in" id="es_layout">${Object.keys(LAYOUTS).map(k => `<option ${k === s.layoutName ? "selected" : ""}>${k}</option>`).join("")}</select></label><label class="f">Saiz (lebar %)<input class="in" type="number" id="es_w" min="5" max="100" value="${Math.round(s.layout.w * 100)}"></label><label class="f">Fit<select class="in" id="es_fit"><option value="cover" ${s.fit === "cover" ? "selected" : ""}>Cover</option><option value="contain" ${s.fit === "contain" ? "selected" : ""}>Contain</option><option value="stretch" ${s.fit === "stretch" ? "selected" : ""}>Stretch</option></select></label></div>` : ""}
     ${["webcam", "camera", "phonecam"].includes(s.type) ? `<label class="row small"><span class="switch"><input type="checkbox" id="es_mirror" ${s.mirror ? "checked" : ""}></span>Mirror camera</label>` : ""}
     ${s.type === "gameplay" || s.type === "screen" ? `<div class="note info small">Semasa memilih, tandakan <b>Share audio</b> untuk Game Audio. Audio sistem penuh hanya disokong Chrome/Edge di Windows &amp; ChromeOS; macOS hanya audio tab.</div>` : ""}
@@ -1875,8 +1887,7 @@ async function saveSrcForm(s, sc) {
   if ($("#es_dtext")) { s.text = v("es_dtext"); s.mode = v("es_mode"); s.every = Math.min(60, Math.max(1, Number(v("es_every")) || 5)); s.showFor = Math.min(120, Math.max(5, Number(v("es_for")) || 20)); }
   const f = $("#es_file")?.files?.[0];
   if (f) {
-    if (!/^image\/(png|jpeg|webp)$/.test(f.type)) throw new Error("Jenis fail tidak dibenarkan.");
-    if (f.size > 5 * 1024 * 1024) throw new Error("Gambar melebihi 5 MB.");
+    if (!f.type.startsWith("image/")) throw new Error("Fail mesti gambar.");
     s.imageObjectUrl = URL.createObjectURL(f);
     if (cloudOK() && STORAGE_ENABLED) {
       const path = `users/${S.user.uid}/overlays/${s.id}.${f.type.split("/")[1]}`;
@@ -2794,8 +2805,8 @@ async function postAction(btn) {
 async function commProfile() {
   const v = $("#commView"); const p = S.profile || {};
   v.innerHTML = `<form class="panel col" id="profileForm">
-    <div class="row wrap"><span class="avatar" style="width:72px;height:72px;font-size:26px">${p.photoURL ? `<img src="${esc(p.photoURL)}" alt="Foto profil" class="avatar" style="width:72px;height:72px">` : esc(myName()[0].toUpperCase())}</span>
-    <label class="f grow">Profile Picture (PNG/JPG/WEBP, maks 2 MB)<input class="in" type="file" name="photo" accept="image/png,image/jpeg,image/webp"></label></div>
+    <div class="row wrap prof-top"><span class="avatar" style="width:72px;height:72px;font-size:26px">${p.photoURL ? `<img src="${esc(p.photoURL)}" alt="Foto profil" class="avatar" style="width:72px;height:72px">` : esc(myName()[0].toUpperCase())}</span>
+    <label class="f grow">Profile Picture (apa-apa gambar, apa-apa saiz)<input class="in" type="file" name="photo" accept="image/*"></label></div>
     <div class="g2"><label class="f">Username (3–20, huruf/nombor/_)<input class="in" name="username" pattern="[A-Za-z0-9_]{3,20}" value="${esc(p.username || "")}" required></label>
     <label class="f">Streamer Profile<select class="in" name="isStreamer"><option value="0">Gamer</option><option value="1" ${p.isStreamer ? "selected" : ""}>Streamer / Creator</option></select></label></div>
     <label class="f">Bio<textarea class="in" name="bio" maxlength="300">${esc(p.bio || "")}</textarea></label>
@@ -2806,7 +2817,7 @@ async function commProfile() {
     <button class="btn primary" type="submit"><i data-lucide="save"></i>Simpan Profil</button></form>`;
   icons();
 }
-function avatarDataUrl(file, size = 160) {
+function avatarDataUrl(file, size = 256) {
   return new Promise((res, rej) => {
     const url = URL.createObjectURL(file); const img = new Image();
     img.onload = () => {
@@ -2814,7 +2825,7 @@ function avatarDataUrl(file, size = 160) {
       const m = Math.min(img.width, img.height); x.drawImage(img, (img.width - m) / 2, (img.height - m) / 2, m, m, 0, 0, size, size);
       URL.revokeObjectURL(url); res(c.toDataURL("image/jpeg", 0.82));
     };
-    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error("Gambar tidak dapat dibaca.")); };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error("Gambar ini tidak dapat dibaca oleh browser. Cuba format lain (JPG, PNG, WEBP).")); };
     img.src = url;
   });
 }
@@ -2827,7 +2838,7 @@ async function saveProfile(form) {
   data.favouriteGamesLower = data.favouriteGames.map(g => g.toLowerCase());
   const photo = form.photo.files[0];
   if (photo) {
-    if (!/^image\/(png|jpeg|webp)$/.test(photo.type) || photo.size > 2 * 1024 * 1024) throw new Error("Gambar mesti PNG/JPG/WEBP dan ≤ 2 MB.");
+    if (!photo.type.startsWith("image/")) throw new Error("Fail mesti gambar.");
     if (STORAGE_ENABLED) {
       const ref = fb.St.ref(fb.st, `users/${S.user.uid}/avatar/avatar`);
       await fb.St.uploadBytes(ref, photo, { contentType: photo.type });
