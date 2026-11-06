@@ -12,5 +12,5 @@ Sebelum deploy, ambil rules semasa (`firebase_get_security_rules`) dan pastikan 
 
 ```bash
 firebase deploy --only firestore:rules,database --project genius-digital-40bc9
-firebase deploy --only hosting --project genius-digital-40bc9
+firebase deploy --only hosting   # site: malaysia-image-tools (https://malaysia-image-tools.web.app)
 ```

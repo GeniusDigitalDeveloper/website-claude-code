@@ -448,10 +448,15 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
     // Konfigurasi & kandungan awam: baca bebas, tulis admin sahaja.
-    match /codelab_config/{doc}  { allow read: if true; allow write: if isAdmin(); }
+    match /codelab_config/{doc} {
+      allow read: if true;
+      allow write: if isAdmin() && doc in ['tools', 'site']
+        && request.resource.data.keys().hasOnly(['disabled', 'name', 'logo', 'slogan', 'footer', 'languages', 'defaultLang', 'maintenance', 'brand', 'updatedAt'])
+        && (!('disabled' in request.resource.data) || (request.resource.data.disabled is list && request.resource.data.disabled.size() <= 200));
+    }
     match /codelab_content/{doc} { allow read: if true; allow write: if isAdmin(); }
     // Log aktiviti & pengguna CodeLab: admin sahaja.
-    match /codelab_activity/{id} { allow read, write: if isAdmin(); }
+    match /codelab_activity/{id} { allow read: if isAdmin(); allow create: if isAdmin() && request.resource.data.keys().hasOnly(['type', 'detail', 'actor', 'at']); allow update, delete: if false; }
     match /codelab_users/{uid}   { allow read, write: if isAdmin(); }
 
     // ================= MALAYSIA IMAGE TOOLS (koleksi berawalan mit_) =================
