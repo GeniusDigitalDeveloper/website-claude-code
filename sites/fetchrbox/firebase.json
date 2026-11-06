@@ -11,6 +11,7 @@
     }
   },
   "hosting": {
+    "site": "genius-digital-40bc9",
     "public": "public",
     "ignore": [
       "firebase.json",
