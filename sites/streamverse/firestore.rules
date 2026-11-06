@@ -1,0 +1,128 @@
+rules_version = '2';
+// STREAMVERSE — Firestore Security Rules (production). Tiada "allow read, write: if true".
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function verified() { return signedIn() && request.auth.token.email_verified == true; }
+    function isOwner(uid) { return verified() && request.auth.uid == uid; }
+    function isAdmin() { return signedIn() && request.auth.token.admin == true; }
+    function data() { return request.resource.data; }
+    function str(v, min, max) { return v is string && v.size() >= min && v.size() <= max; }
+    function onlyChanged(keys) { return data().diff(resource.data).affectedKeys().hasOnly(keys); }
+
+    // ---------- Data peribadi pengguna ----------
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid) && data().uid == uid && data().email == request.auth.token.email
+                    && !data().keys().hasAny(['admin', 'role']);
+      allow update: if isOwner(uid) && onlyChanged(['updatedAt', 'lastLoginAt', 'displayName']);
+      allow delete: if false;
+
+      match /settings/{id}      { allow read, write: if isOwner(uid); }
+      match /themes/{id}        { allow read, write: if isOwner(uid); }
+      match /audioSettings/{id} { allow read, write: if isOwner(uid); }
+      match /devices/{id}       { allow read, write: if isOwner(uid); }
+      match /sources/{id}       { allow read, write: if isOwner(uid); }
+      match /scenes/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && data().ownerUid == uid && str(data().name, 1, 40)
+                              && data().sources is list && data().sources.size() <= 40;
+      }
+      match /streamSettings/{platform} {
+        allow read: if isOwner(uid);
+        allow write: if isOwner(uid) && platform in ['tiktok', 'youtube', 'facebook'] && data().ownerUid == uid
+                     && str(data().title, 0, 100) && str(data().description, 0, 5000);
+      }
+      match /recordings/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create: if isOwner(uid) && data().ownerUid == uid && data().size is int
+                      && data().storagePath.matches('users/' + uid + '/recordings/.*');
+        allow update: if false;
+      }
+      match /activity/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create: if isOwner(uid) && data().ownerUid == uid && str(data().text, 1, 200);
+        allow update: if false;
+      }
+      // WebRTC signaling (pairing telefon) — hanya pemilik akaun (telefon log masuk akaun sama)
+      match /pairings/{code} {
+        allow read, create, update, delete: if isOwner(uid);
+        match /{sub}/{cand} { allow read, create, delete: if isOwner(uid) && sub in ['offerCandidates', 'answerCandidates']; }
+      }
+      // Ditulis oleh Cloud Functions sahaja (token disahkan di backend)
+      match /platformConnections/{platform} { allow read: if isOwner(uid) || isAdmin(); allow write: if false; }
+      match /aiAssets/{id}                  { allow read: if isOwner(uid); allow write: if false; }
+      match /followers/{followerUid}        { allow read: if verified(); allow write: if false; }
+      match /notifications/{id} {
+        allow read, delete: if isOwner(uid);
+        allow update: if isOwner(uid) && onlyChanged(['read']) && data().read is bool;
+        allow create: if false;
+      }
+      match /following/{targetUid} {
+        allow read: if isOwner(uid);
+        allow create: if isOwner(uid) && targetUid != uid && data().targetUid == targetUid && data().ownerUid == uid;
+        allow delete: if isOwner(uid);
+        allow update: if false;
+      }
+      match /communityPosts/{postId} {
+        allow read: if verified();
+        allow create: if isOwner(uid) && data().ownerUid == uid && str(data().text, 1, 2000) && str(data().game, 0, 60)
+                      && data().likeCount == 0 && data().commentCount == 0 && data().createdAt == request.time;
+        allow update: if isOwner(uid) && onlyChanged(['text', 'game', 'gameLower']) && str(data().text, 1, 2000);
+        allow delete: if isOwner(uid) || isAdmin();
+        match /likes/{likerUid} {
+          allow read: if verified();
+          allow create: if verified() && likerUid == request.auth.uid && data().ownerUid == likerUid;
+          allow delete: if verified() && likerUid == request.auth.uid;
+          allow update: if false;
+        }
+        match /comments/{commentId} {
+          allow read: if verified();
+          allow create: if verified() && data().ownerUid == request.auth.uid && str(data().text, 1, 500);
+          allow delete: if verified() && (resource.data.ownerUid == request.auth.uid || request.auth.uid == uid || isAdmin());
+          allow update: if false;
+        }
+      }
+    }
+    // Feed global (collection group query)
+    match /{path=**}/communityPosts/{postId} { allow read: if verified(); }
+
+    // ---------- Profil awam gamer ----------
+    match /profiles/{uid} {
+      allow read: if verified();
+      allow create: if isOwner(uid) && data().ownerUid == uid && !data().keys().hasAny(['followerCount', 'followingCount'])
+                    && data().username.matches('^[A-Za-z0-9_]{3,20}$') && str(data().bio, 0, 300);
+      allow update: if isOwner(uid) && !data().diff(resource.data).affectedKeys().hasAny(['followerCount', 'followingCount', 'ownerUid'])
+                    && data().username.matches('^[A-Za-z0-9_]{3,20}$') && str(data().bio, 0, 300);
+      allow delete: if false;
+    }
+    match /usernames/{name} {
+      allow read: if verified();
+      allow create: if verified() && name.matches('^[a-z0-9_]{3,20}$') && data().uid == request.auth.uid;
+      allow update: if verified() && resource.data.uid == request.auth.uid && data().uid == request.auth.uid;
+      allow delete: if verified() && resource.data.uid == request.auth.uid;
+    }
+    match /groups/{gid} {
+      allow read: if verified();
+      allow create: if verified() && data().ownerUid == request.auth.uid && str(data().name, 1, 50) && data().memberCount == 0;
+      allow update: if false;
+      allow delete: if verified() && (resource.data.ownerUid == request.auth.uid || isAdmin());
+      match /members/{memberUid} {
+        allow read: if verified();
+        allow create, delete: if verified() && memberUid == request.auth.uid;
+        allow update: if false;
+      }
+    }
+    match /reports/{id} {
+      allow create: if verified() && data().reporterUid == request.auth.uid && data().status == 'open' && str(data().details, 0, 500);
+      allow read, update, delete: if isAdmin();
+    }
+
+    // ---------- Sistem / admin ----------
+    match /announcements/{id} { allow read: if verified(); allow write: if isAdmin(); }
+    match /config/{id}        { allow read: if verified(); allow write: if isAdmin(); }
+    match /systemLogs/{id}    { allow read: if isAdmin(); allow write: if false; }
+    match /aiUsage/{id}       { allow read, write: if false; }
+    match /_private/{doc=**}  { allow read, write: if false; }   // token OAuth (disulitkan), state OAuth
+  }
+}
