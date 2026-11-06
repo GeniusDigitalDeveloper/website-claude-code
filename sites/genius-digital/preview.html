@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Genius Digital Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* Layout: toolbar atas, pentas pratonton di bawah. Peranti dipaparkan pada saiz sebenar lalu diskala ke lebar pentas. */
+  :root {
+    --bg: #E9EEF7; --panel: #FFFFFF; --fg: #0B1B3A; --muted: #51607F; --line: rgba(10, 31, 68, .14);
+    --accent: #0A66FF; --accent-ink: #FFFFFF; --cyan: #00A9D6; --chrome: #0A1F44; --chrome-fg: #DCE6FA; --shadow: 0 18px 50px rgba(10, 31, 68, .20);
+    --font-hero: "Bebas Neue", Impact, "Arial Narrow Bold", sans-serif;
+    --font-head: "Montserrat", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #0B1426; --panel: #111D36; --fg: #E6EDFB; --muted: #93A3C4; --line: rgba(160, 185, 235, .18); --accent: #4C93FF; --accent-ink: #06142E; --cyan: #5BE3FF; --chrome: #050C1C; --chrome-fg: #B9C8E6; --shadow: 0 18px 50px rgba(0, 0, 0, .55); color-scheme: dark; }
+  }
+  :root[data-theme="dark"] { --bg: #0B1426; --panel: #111D36; --fg: #E6EDFB; --muted: #93A3C4; --line: rgba(160, 185, 235, .18); --accent: #4C93FF; --accent-ink: #06142E; --cyan: #5BE3FF; --chrome: #050C1C; --chrome-fg: #B9C8E6; --shadow: 0 18px 50px rgba(0, 0, 0, .55); color-scheme: dark; }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.5; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 20px 40px; }
+  .wrap { max-width: 1760px; margin-inline: auto; display: grid; gap: 20px; }
+  header.bar { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px; }
+  .title { min-width: 0; }
+  .title small { font-family: var(--font-head); font-weight: 800; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--cyan); }
+  .title h1 { margin: 2px 0 0; font-family: var(--font-hero); font-weight: 400; font-size: clamp(34px, 6vw, 52px); line-height: 1; letter-spacing: .04em; }
+  .title p { margin: 4px 0 0; color: var(--muted); max-width: 60ch; }
+  .controls { display: flex; flex-wrap: wrap; gap: 12px; }
+  .seg { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); }
+  .seg button { min-height: 40px; padding: 0 14px; border: 0; border-radius: 9px; background: transparent; color: var(--muted); font: 600 13px/1 var(--font-head); letter-spacing: .02em; cursor: pointer; }
+  .seg button:hover { color: var(--fg); }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+  .seg button:focus-visible, .open-link:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+  .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; color: var(--muted); font-size: 13px; }
+  .meta b { color: var(--fg); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .open-link { color: var(--accent); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; min-height: 24px; }
+  .stage { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: center; gap: 32px; min-width: 0; }
+  figure.device { margin: 0; display: grid; gap: 10px; justify-items: center; min-width: 0; }
+  figure.device figcaption { font: 700 11px/1 var(--font-head); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+  .box { position: relative; overflow: hidden; background: #fff; box-shadow: var(--shadow); }
+  .box.browser { border-radius: 12px; border: 1px solid var(--line); }
+  .box.phone { border-radius: 44px; border: 10px solid var(--chrome); }
+  .box.tablet { border-radius: 28px; border: 12px solid var(--chrome); }
+  .chrome-bar { position: absolute; z-index: 2; inset: 0 0 auto 0; height: 34px; display: flex; align-items: center; gap: 6px; padding: 0 12px; background: var(--chrome); color: var(--chrome-fg); font: 500 12px/1 var(--font-body); }
+  .chrome-bar i { width: 10px; height: 10px; border-radius: 50%; background: #FF6B6B; }
+  .chrome-bar i:nth-child(2) { background: #FFC24B; } .chrome-bar i:nth-child(3) { background: #3DDC97; }
+  .chrome-bar span { margin-left: 10px; padding: 5px 12px; border-radius: 999px; background: rgba(255, 255, 255, .1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .view { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+  .view iframe { display: block; width: 100%; height: 100%; border: 0; background: #fff; }
+  .note { max-width: 70ch; color: var(--muted); font-size: 13px; }
+  @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="bar">
+    <div class="title">
+      <small>Pratonton Reka Bentuk</small>
+      <h1>Genius Digital</h1>
+      <p>Website sebenar dalam bingkai desktop dan mobile. Skrol, klik dan buka menu terus di dalam bingkai.</p>
+    </div>
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Halaman">
+        <button type="button" data-page="website" aria-pressed="true">Website</button>
+        <button type="button" data-page="admin" aria-pressed="false">Admin Panel (demo)</button>
+      </div>
+      <div class="seg" role="group" aria-label="Paparan peranti">
+        <button type="button" data-layout="both" aria-pressed="true">Desktop + Mobile</button>
+        <button type="button" data-layout="phone" aria-pressed="false">320 px</button>
+        <button type="button" data-layout="tablet" aria-pressed="false">768 px</button>
+        <button type="button" data-layout="laptop" aria-pressed="false">1366 px</button>
+        <button type="button" data-layout="desktop" aria-pressed="false">1920 px</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="meta" id="meta" aria-live="polite"></div>
+  <main class="stage" id="stage"></main>
+  <p class="note">Pratonton ini berjalan dalam Preview Mode: Firebase belum disambungkan, jadi website memaparkan dua produk contoh dan Admin Panel memaparkan data demo dalam memori. Selepas anda mengisi <code>firebaseConfig</code>, kedua-dua halaman membaca dan menulis data sebenar.</p>
+</div>
+
+<script>
+  const PAGES = { website: { src: "index.html", label: "index.html" }, admin: { src: "admin.html?demo=1", label: "admin.html (demo)" } };
+  const DEVICES = {
+    desktop: { name: "Desktop", kind: "browser", w: 1366, h: 820 },
+    mobile:  { name: "iPhone · 390 px", kind: "phone", w: 390, h: 800 },
+    phone:   { name: "Smartphone kecil · 320 px", kind: "phone", w: 320, h: 640 },
+    tablet:  { name: "Tablet · 768 px", kind: "tablet", w: 768, h: 1024 },
+    laptop:  { name: "Laptop · 1366 px", kind: "browser", w: 1366, h: 768 },
+    big:     { name: "Desktop · 1920 px", kind: "browser", w: 1920, h: 1080 }
+  };
+  const LAYOUTS = { both: ["desktop", "mobile"], phone: ["phone"], tablet: ["tablet"], laptop: ["laptop"], desktop: ["big"] };
+  const state = { page: "website", layout: "both" };
+  try { const saved = JSON.parse(localStorage.getItem("gd-preview") || "{}"); if (PAGES[saved.page]) state.page = saved.page; if (LAYOUTS[saved.layout]) state.layout = saved.layout; } catch (e) {}
+
+  const stage = document.getElementById("stage"), meta = document.getElementById("meta");
+  const bar = (n) => (n.kind === "browser" ? 34 : 0), frame = (n) => (n.kind === "phone" ? 10 : n.kind === "tablet" ? 12 : 1);
+
+  function scales(keys, avail) {
+    const gap = 32;
+    if (keys.length === 2) {                       // desktop + mobile
+      const phone = DEVICES[keys[1]], desk = DEVICES[keys[0]];
+      const sp = Math.min(.85, (avail - 2 * frame(phone)) / phone.w);
+      if (avail >= 1100) { const sd = Math.min(1, (avail - gap - 12 - (phone.w * sp + 2 * frame(phone)) - 2 * frame(desk)) / desk.w); return [sd, sp]; }
+      return [Math.min(1, (avail - 2 * frame(desk)) / desk.w), Math.min(1, (avail - 2 * frame(phone)) / phone.w)];
+    }
+    const d = DEVICES[keys[0]];
+    return [Math.min(1, (avail - 2 * frame(d)) / d.w)];
+  }
+
+  function build() {
+    const keys = LAYOUTS[state.layout];
+    const avail = Math.max(260, stage.clientWidth || document.body.clientWidth - 32);
+    const sc = scales(keys, avail);
+    stage.replaceChildren();
+    const info = [];
+    keys.forEach((k, i) => {
+      const d = DEVICES[k], s = sc[i], b = bar(d), f = frame(d);
+      const fig = document.createElement("figure"); fig.className = "device";
+      const box = document.createElement("div"); box.className = "box " + d.kind;
+      box.style.width = Math.round(d.w * s + 2 * f) + "px"; box.style.height = Math.round((d.h + b) * s + 2 * f) + "px";
+      if (b) { const c = document.createElement("div"); c.className = "chrome-bar"; c.innerHTML = "<i></i><i></i><i></i>"; const u = document.createElement("span"); u.textContent = PAGES[state.page].label; c.append(u); box.append(c); c.style.width = Math.round(d.w) + "px"; c.style.transformOrigin = "0 0"; c.style.transform = "scale(" + s + ")"; }
+      const v = document.createElement("div"); v.className = "view"; v.style.width = d.w + "px"; v.style.height = d.h + "px"; v.style.top = Math.round(b * s) + "px"; v.style.transform = "scale(" + s + ")";
+      const fr = document.createElement("iframe"); fr.title = d.name + " — " + PAGES[state.page].label; fr.src = PAGES[state.page].src; fr.loading = "lazy"; v.append(fr); box.append(v);
+      const cap = document.createElement("figcaption"); cap.textContent = d.name;
+      fig.append(box, cap); stage.append(fig);
+      info.push(d.w + " × " + d.h + " px pada " + Math.round(s * 100) + "%");
+    });
+    meta.innerHTML = "";
+    const a = document.createElement("a"); a.className = "open-link"; a.href = PAGES[state.page].src; a.target = "_blank"; a.rel = "noopener"; a.textContent = "Buka " + PAGES[state.page].label + " dalam tab penuh";
+    const t = document.createElement("span"); t.innerHTML = "Skala: <b>" + info.join("</b> · <b>") + "</b>";
+    meta.append(t, a);
+  }
+
+  function sync() {
+    document.querySelectorAll("[data-page]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.page === state.page)));
+    document.querySelectorAll("[data-layout]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.layout === state.layout)));
+    try { localStorage.setItem("gd-preview", JSON.stringify(state)); } catch (e) {}
+    build();
+  }
+  document.addEventListener("click", (e) => {
+    const p = e.target.closest("[data-page]"), l = e.target.closest("[data-layout]");
+    if (p) { state.page = p.dataset.page; sync(); } else if (l) { state.layout = l.dataset.layout; sync(); }
+  });
+  let lastW = 0, timer;
+  new ResizeObserver(() => { const w = stage.clientWidth; if (Math.abs(w - lastW) < 2) return; lastW = w; clearTimeout(timer); timer = setTimeout(build, 120); }).observe(stage);
+  sync();
+</script>
+</body>
+</html>

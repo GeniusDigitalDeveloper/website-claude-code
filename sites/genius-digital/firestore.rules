@@ -1,0 +1,122 @@
+rules_version = '2';
+
+// =====================================================================
+// GENIUS DIGITAL — Cloud Firestore Security Rules
+// ---------------------------------------------------------------------
+// - Orang awam: BOLEH baca produk berstatus "active" / "coming-soon" sahaja.
+// - Produk "hidden": hanya admin boleh baca.
+// - Tulis (create / update / delete): HANYA admin (custom claim admin == true).
+// - Status admin TIDAK boleh ditetapkan dari frontend. Claim hanya boleh
+//   ditetapkan melalui Firebase Admin SDK (lihat README.md & tools/set-admin-claim.js).
+// - Tiada Firebase Storage: thumbnail disimpan sebagai data URL kecil (≤150000 aksara)
+//   dalam medan thumbnailURL, atau URL https:// biasa.
+// - Semua koleksi/dokumen lain ditolak secara lalai.
+// =====================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- Helper functions ----------
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Pengesahan (login) sahaja BUKAN bukti admin. Claim "admin" mesti true.
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.admin == true;
+    }
+
+    function isValidStatus(value) {
+      return value in ['active', 'coming-soon', 'hidden'];
+    }
+
+    // Medan yang dibenarkan dalam dokumen produk (selain ini ditolak).
+    function hasOnlyAllowedKeys(data) {
+      return data.keys().hasOnly([
+        'name', 'slug', 'category', 'description',
+        'thumbnailURL',
+        'status', 'productURL', 'displayOrder',
+        'nameEn', 'categoryEn', 'descriptionEn',
+        'nameAr', 'categoryAr', 'descriptionAr',
+        'createdAt', 'updatedAt'
+      ]);
+    }
+
+    function hasRequiredKeys(data) {
+      return data.keys().hasAll([
+        'name', 'slug', 'category', 'description',
+        'thumbnailURL', 'status', 'productURL', 'displayOrder',
+        'createdAt', 'updatedAt'
+      ]);
+    }
+
+    // URL kosong atau https:// sahaja (halang javascript: dsb.).
+    function isEmptyOrHttps(value) {
+      return value is string && (value == '' || value.matches('https://.*'));
+    }
+
+    // Teks terjemahan (BI / BA) adalah pilihan; jika ada mestilah string dalam had panjang.
+    function optString(data, key, maxLen) {
+      return !(key in data) || (data[key] is string && data[key].size() <= maxLen);
+    }
+
+    // Thumbnail disimpan terus dalam Firestore (tiada Firebase Storage):
+    // kosong, URL https://, atau data URL imej JPEG/PNG/WebP (dimampatkan ≈100 KB oleh admin.html).
+    function isValidThumbnail(value) {
+      return value is string && value.size() <= 150000
+        && (value == '' || value.matches('https://.*') || value.matches('data:image/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+'));
+    }
+
+    function hasValidFields(data, docId) {
+      return hasOnlyAllowedKeys(data)
+        && hasRequiredKeys(data)
+        && data.name is string && data.name.size() > 0 && data.name.size() <= 120
+        && data.slug is string && data.slug == docId
+        && data.slug.matches('^[a-z0-9]+(-[a-z0-9]+)*$')
+        && data.slug.size() <= 80
+        && data.category is string && data.category.size() > 0 && data.category.size() <= 60
+        && data.description is string && data.description.size() <= 1000
+        && isValidThumbnail(data.thumbnailURL)
+        && optString(data, 'nameEn', 120) && optString(data, 'categoryEn', 60) && optString(data, 'descriptionEn', 1000)
+        && optString(data, 'nameAr', 120) && optString(data, 'categoryAr', 60) && optString(data, 'descriptionAr', 1000)
+        && isValidStatus(data.status)
+        && isEmptyOrHttps(data.productURL) && data.productURL.size() <= 2048
+        && data.displayOrder is number
+        && data.displayOrder >= 0 && data.displayOrder <= 100000
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    // ---------- Koleksi: products ----------
+    match /products/{productId} {
+
+      // Baca satu dokumen: produk awam, atau admin (termasuk hidden).
+      allow get: if isAdmin() || resource.data.status in ['active', 'coming-soon'];
+
+      // Senarai/query: admin boleh semua. Orang awam MESTI query dengan
+      //   where('status', 'in', ['active', 'coming-soon'])
+      allow list: if isAdmin() || resource.data.status in ['active', 'coming-soon'];
+
+      // Cipta: admin sahaja, ID dokumen == slug, createdAt/updatedAt == masa pelayan.
+      allow create: if isAdmin()
+        && hasValidFields(request.resource.data, productId)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+
+      // Kemas kini: admin sahaja, slug & createdAt tidak boleh diubah.
+      allow update: if isAdmin()
+        && hasValidFields(request.resource.data, productId)
+        && request.resource.data.slug == resource.data.slug
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time;
+
+      // Padam: admin sahaja.
+      allow delete: if isAdmin();
+    }
+
+    // ---------- Tolak semua yang lain ----------
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

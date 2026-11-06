@@ -1,0 +1,68 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "publicProducts": {
+      ".read": true,
+      ".indexOn": ["displayOrder", "status"],
+
+      "$productId": {
+        ".write": "auth != null && auth.token.admin === true",
+        ".validate": "newData.hasChildren(['name', 'slug', 'category', 'status', 'displayOrder'])",
+
+        "name": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 120"
+        },
+        "slug": {
+          ".validate": "newData.isString() && newData.val() === $productId && newData.val().matches(/^[a-z0-9]+(-[a-z0-9]+)*$/)"
+        },
+        "category": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 60"
+        },
+        "description": {
+          ".validate": "newData.isString() && newData.val().length <= 1000"
+        },
+        "thumbnailURL": {
+          ".validate": "newData.isString() && (newData.val() === '' || newData.val().matches(/^https:\\/\\/.*/))"
+        },
+        "nameEn": {
+          ".validate": "newData.isString() && newData.val().length <= 120"
+        },
+        "categoryEn": {
+          ".validate": "newData.isString() && newData.val().length <= 60"
+        },
+        "descriptionEn": {
+          ".validate": "newData.isString() && newData.val().length <= 1000"
+        },
+        "nameAr": {
+          ".validate": "newData.isString() && newData.val().length <= 120"
+        },
+        "categoryAr": {
+          ".validate": "newData.isString() && newData.val().length <= 60"
+        },
+        "descriptionAr": {
+          ".validate": "newData.isString() && newData.val().length <= 1000"
+        },
+        "status": {
+          ".validate": "newData.isString() && (newData.val() === 'active' || newData.val() === 'coming-soon' || newData.val() === 'hidden')"
+        },
+        "productURL": {
+          ".validate": "newData.isString() && (newData.val() === '' || newData.val().matches(/^https:\\/\\/.*/))"
+        },
+        "displayOrder": {
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000"
+        },
+        "createdAt": {
+          ".validate": "newData.isNumber()"
+        },
+        "updatedAt": {
+          ".validate": "newData.isNumber()"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    }
+  }
+}

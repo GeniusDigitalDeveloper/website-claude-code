@@ -1,0 +1,15 @@
+# Rahsia — JANGAN commit
+serviceAccount*.json
+*-firebase-adminsdk-*.json
+.env
+.env.*
+
+# Alatan
+node_modules/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+.firebase/
+
+# Tangkapan skrin ujian
+shots/
