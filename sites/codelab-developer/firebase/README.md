@@ -24,3 +24,9 @@ Satu lawatan dikira sekali sehari setiap pelayar. `registeredUsers` hanya boleh 
 * Panel Admin masih pratonton UI (`NullAuth`). Sambungan Firebase Authentication + custom claim `admin` ialah fasa seterusnya;
   `isAdmin()` dalam rules sudah menyemak claim tersebut.
 * SDK ialah bundle setempat `assets/vendor/firebase-firestore.bundle.js` (Apache-2.0); CSP hanya benarkan `firestore.googleapis.com`.
+
+## Hosting & Admin (semasa)
+* Hosting: site `genius-digital-40bc9-db0cc` (khas CodeLab) — `https://genius-digital-40bc9-db0cc.web.app` · deploy: `firebase deploy --only hosting`.
+* Admin: `/admin/` — log masuk e-mel/kata laluan Firebase Auth. Akses data admin dikuatkuasakan oleh `isAdmin()` dalam rules.
+  Admin menyimpan konfigurasi alat (`codelab_config/tools` → alat disembunyikan di panel awam), tetapan (`codelab_config/site`),
+  kandungan (`codelab_content`) dan log (`codelab_activity`).
