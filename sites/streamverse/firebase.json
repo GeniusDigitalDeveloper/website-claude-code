@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "streamverse",
+    "site": "GANTI-DENGAN-SITE-ID-STREAMVERSE",
     "public": ".",
     "ignore": [
       "firebase.json",
