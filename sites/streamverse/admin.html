@@ -109,6 +109,17 @@ table.t th,table.t td{text-align:left;padding:8px;border-bottom:1px solid var(--
 .auth-card{width:min(440px,100%);display:flex;flex-direction:column;gap:14px}
 .auth-card .panel{padding:22px}
 .auth-card{margin-inline:auto}
+/* Mesra sentuhan: iPhone / Android / iPad / tablet / TV / PC */
+html{overflow-x:clip;max-width:100%;overscroll-behavior-x:none;-webkit-text-size-adjust:100%;text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+html,body{touch-action:pan-y pinch-zoom;overscroll-behavior-x:none;position:relative;max-width:100%}
+body{overflow-x:clip}
+.topnav,.tbl-wrap,pre,textarea,input[type=range],.tabs{touch-action:pan-x pan-y}
+img,video,canvas,svg{max-width:100%}
+.btn,button,.tab,.nav-item,summary{touch-action:manipulation}
+@media (pointer:coarse){ input,select,textarea,.in{font-size:16px !important} .btn,.tab,.nav-item{min-height:44px} }
+@media (min-width:1900px){ html{font-size:18px} main{max-width:1800px;margin-inline:auto} }
+@media (min-width:2500px){ html{font-size:22px} }
+@media (hover:none) and (pointer:fine), (min-width:1200px) and (pointer:coarse){ .btn:focus-visible,.tab:focus-visible,.nav-item:focus-visible,a:focus-visible,button:focus-visible{outline:3px solid var(--gold);outline-offset:3px} }
 input[type=file].in{padding:8px;cursor:pointer;font-size:13px}
 input[type=file]::file-selector-button{margin-right:12px;padding:8px 14px;border:1px solid var(--border);border-radius:8px;background:var(--panel2);color:var(--text);font:700 13px var(--f-body);cursor:pointer;transition:border-color .25s var(--ease-ios)}
 input[type=file]::file-selector-button:hover{border-color:var(--gold)}
@@ -2998,7 +3009,7 @@ function renderSettings() {
       <input class="in mono" id="turnUrls" placeholder="turn:host:3478,turns:host:5349" value="${esc((ls.get("turn", {}) || {}).urls || "")}">
       <div class="g2"><input class="in" id="turnUser" placeholder="username" value="${esc((ls.get("turn", {}) || {}).username || "")}"><input class="in" id="turnCred" type="password" placeholder="credential" value="${esc((ls.get("turn", {}) || {}).credential || "")}"></div>
       <button class="btn" id="turnSave"><i data-lucide="save"></i>Simpan TURN</button></div>
-    <div class="panel col" style="margin-top:6px"><b>Bunyi UI (gaming)</b>
+    <div class="panel col" style="margin-top:6px;display:none"><b>Bunyi UI (gaming)</b>
       <label class="row small"><span class="switch"><input type="checkbox" id="sfxOn" ${SFX.on ? "checked" : ""}></span>Bunyi klik, hover, popup &amp; notifikasi</label>
       <label class="f">Volume bunyi UI<input type="range" id="sfxVol" min="0" max="100" value="${Math.round(SFX.vol * 100)}"></label>
       <p class="small muted" style="margin:0">Bunyi UI dimainkan pada speaker/headphone anda sahaja dan <b>tidak</b> masuk ke siaran atau rakaman.</p></div>
@@ -3671,6 +3682,7 @@ function setSfx(on, silent) {
   if (on && !silent) sfx("toggleOn");
 }
 function sfx(type) {
+  return; // bunyi UI dimatikan atas permintaan (tiada bunyi klik / hover / popup)
   if (!SFX.on || !SFX.vol) return;
   if (type === "hover") { const n = performance.now(); if (n - SFX.lastHover < 70) return; SFX.lastHover = n; }
   try {
