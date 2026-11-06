@@ -45,6 +45,7 @@ svg.lucide{width:18px;height:18px;stroke-width:2;flex:none}
 /* ---------- Buttons & inputs ---------- */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:9px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);
   background:color-mix(in srgb,var(--panel2) 85%,transparent);cursor:pointer;font-family:var(--f-head);font-weight:600;font-size:15px;transition:transform .15s,border-color .2s,box-shadow .2s,background .2s;white-space:nowrap}
+a.btn{text-decoration:none;color:inherit}
 .btn:hover{border-color:var(--primary);box-shadow:var(--glow)}
 .btn:active{transform:translateY(1px)}
 .btn[disabled]{opacity:.5;cursor:not-allowed;box-shadow:none}
@@ -154,7 +155,7 @@ main{padding:16px max(16px,env(safe-area-inset-right,0px)) 90px max(16px,env(saf
 .stat span{font-size:12.5px;font-weight:600;display:block;line-height:1.25;overflow-wrap:anywhere}
 .stat b{line-height:1.2}
 .stat > div:last-child{min-width:0}
-.studio{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:14px}
+.studio{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:14px;align-items:start}
 .preview-wrap{border-radius:12px;overflow:hidden;border:1px solid var(--border);background:#000;position:relative}
 .preview-host{aspect-ratio:16/9;max-width:100%;display:grid;place-items:center;background:#05030b}
 .preview-host canvas{width:100%;height:100%;display:block}
@@ -240,6 +241,32 @@ details.acc > div{padding:10px 0;font-size:13.5px}
 .menu hr{border:0;border-top:1px solid var(--border);margin:4px 0}
 .notif-panel{position:fixed;z-index:60;top:64px;right:max(16px,env(safe-area-inset-right,0px));width:min(360px,calc(100vw - 32px));max-height:70vh;overflow:auto}
 
+/* Admin shell */
+.admin-shell .topbar{border-bottom:2px solid var(--warn)}
+.admin-badge{font-family:var(--f-head);font-weight:700;font-size:12px;letter-spacing:.12em;padding:3px 10px;border-radius:6px;background:var(--warn);color:#1a1200}
+.admin-shell .nav-item.on{background:linear-gradient(90deg,color-mix(in srgb,var(--warn) 45%,transparent),color-mix(in srgb,var(--warn) 12%,transparent));border-color:var(--warn);box-shadow:none}
+#adminTabSelect{display:none;width:auto}
+/* Live chat */
+.chat-list{--chat-size:22px;height:min(62vh,640px);overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding:10px;border-radius:12px;border:1px solid var(--border);background:color-mix(in srgb,var(--bg) 85%,transparent);font-size:var(--chat-size);line-height:1.35}
+.chat-list.pip{height:100vh;border:0;border-radius:0}
+.chat-window{display:flex;flex-direction:column;gap:10px;height:100vh;padding:12px max(12px,env(safe-area-inset-right,0px)) 12px max(12px,env(safe-area-inset-left,0px))}
+.chat-window .chat-list{flex:1;height:auto}
+.chat-msg{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;padding:6px 10px;border-radius:10px;background:color-mix(in srgb,var(--panel2) 70%,transparent);word-break:break-word}
+.chat-msg.paid{border:1px solid var(--warn);background:color-mix(in srgb,var(--warn) 14%,var(--panel))}
+.chat-msg b{color:var(--ink)} .chat-msg b[data-badge="owner"]{color:var(--warn)} .chat-msg b[data-badge="mod"]{color:var(--ok)}
+.chat-msg time{margin-left:auto;font-size:.55em;color:var(--muted)}
+.chat-pf{font-size:.5em;font-weight:800;padding:2px 5px;border-radius:4px;color:#fff;align-self:center}
+.chat-pf.youtube{background:#e00} .chat-pf.facebook{background:#1877f2}
+.chat-empty{margin:auto;color:var(--muted);font-size:14px;text-align:center}
+/* Viewer page */
+.viewer{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:14px;padding:16px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px))}
+.viewer-stage{position:relative;aspect-ratio:16/9;max-width:100%;border-radius:14px;overflow:hidden;border:1px solid var(--border);background:#05030b}
+.viewer-stage iframe{width:100%;height:100%;border:0;display:block}
+.viewer-empty{position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:8px;color:var(--muted);padding:16px;text-align:center}
+.viewer-empty svg.lucide{width:40px;height:40px}
+.donate-fab{position:absolute;right:14px;bottom:14px;display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border:0;border-radius:99px;cursor:pointer;font-family:var(--f-brand);font-weight:900;font-size:16px;letter-spacing:.06em;color:#1a0d00;background:linear-gradient(135deg,#ffb800,#ff6a00);box-shadow:0 8px 30px rgba(255,120,0,.5);animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.06)}}
+
 /* RGB Arena dynamic accent */
 body.t-rgb .nav-item.on,body.t-rgb .theme-card.on,body.t-rgb .btn.primary{animation:rgb 6s linear infinite}
 @keyframes rgb{to{filter:hue-rotate(360deg)}}
@@ -248,6 +275,7 @@ body.t-rgb .nav-item.on,body.t-rgb .theme-card.on,body.t-rgb .btn.primary{animat
 @media (max-width:1380px){ .hub{grid-template-columns:minmax(0,1fr) 320px} .status-row{grid-template-columns:repeat(3,minmax(0,1fr))} .studio{grid-template-columns:minmax(0,1fr) 250px} }
 @media (max-width:1180px){ .hub{grid-template-columns:minmax(0,1fr)} .hub-side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))} .hub-side > :last-child{grid-column:1/-1} .cap-layout{grid-template-columns:minmax(0,1fr)} }
 @media (max-width:1024px){
+  #adminTabSelect{display:block}
   .shell{grid-template-columns:minmax(0,1fr)} .sidebar{display:none} .topnav{display:none}
   .mobilenav{display:flex;position:fixed;z-index:40;left:0;right:0;bottom:0;justify-content:space-around;padding:6px max(8px,env(safe-area-inset-right,0px)) max(6px,env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(12px);border-top:1px solid var(--border)}
   .mobilenav button{display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:none;color:var(--muted);font-size:10.5px;font-weight:600;padding:6px 4px;cursor:pointer;border-radius:10px;min-width:56px}
@@ -259,9 +287,11 @@ body.t-rgb .nav-item.on,body.t-rgb .theme-card.on,body.t-rgb .btn.primary{animat
   .studio,.hub-bottom,.g2,.g3{grid-template-columns:minmax(0,1fr)} .hub-side{grid-template-columns:minmax(0,1fr)}
   .status-row{grid-template-columns:repeat(2,minmax(0,1fr))}
   .profile-btn .pmeta{display:none} .brand-tag{display:none}
+  .topbar{gap:10px;flex-wrap:wrap} .profile-btn > svg.lucide{display:none} .top-actions{gap:4px}
+  .admin-shell .top-actions .btn{padding:6px 8px} #adminTabSelect{order:5;flex:1 1 100%}
   .welcome h1{font-size:24px} .view-h h1{font-size:25px}
 }
-@media (max-width:420px){ .brand-name{font-size:18px} .themes-grid{grid-template-columns:repeat(2,minmax(0,1fr))} .status-row{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:420px){ .brand-name{font-size:16px} .logo{width:34px;height:34px} .themes-grid{grid-template-columns:repeat(2,minmax(0,1fr))} .status-row{grid-template-columns:minmax(0,1fr)} }
 @media (prefers-reduced-motion:reduce){ *,*::before,*::after{animation:none!important;transition:none!important} }
 </style>
 </head>
@@ -344,13 +374,16 @@ body.t-rgb .nav-item.on,body.t-rgb .theme-card.on,body.t-rgb .btn.primary{animat
     <button class="nav-item" data-go="audio"><i data-lucide="audio-lines"></i>Audio Studio</button>
     <button class="nav-item" data-go="ai"><i data-lucide="bot"></i>AI Stream Creator</button>
     <button class="nav-item" data-go="connect"><i data-lucide="radio"></i>StreamVerse Connect</button>
+    <button class="nav-item" data-go="games"><i data-lucide="crosshair"></i>Game Connect &amp; Kill</button>
+    <button class="nav-item" data-go="donation"><i data-lucide="hand-coins"></i>Donation</button>
+    <button class="nav-item" data-go="chat"><i data-lucide="messages-square"></i>Live Chat</button>
     <button class="nav-item" data-go="themes"><i data-lucide="gamepad-2"></i>Gaming Themes</button>
     <button class="nav-item" data-go="community"><i data-lucide="users"></i>Gamer Community</button>
     <button class="nav-item" data-go="recordings"><i data-lucide="film"></i>Recordings</button>
     <button class="nav-item" data-go="settings"><i data-lucide="settings"></i>Settings</button>
     <div id="adminNav" hidden>
       <div class="side-label">ADMIN</div>
-      <button class="nav-item" data-go="admin"><i data-lucide="crown" style="color:var(--warn)"></i>Admin Panel</button>
+      <button class="nav-item" id="openAdminBtn"><i data-lucide="crown" style="color:var(--warn)"></i>Admin Panel <i data-lucide="external-link" style="margin-left:auto;width:14px"></i></button>
     </div>
     <div class="side-card" id="sideCard"></div>
   </aside>
@@ -475,10 +508,20 @@ body.t-rgb .nav-item.on,body.t-rgb .theme-card.on,body.t-rgb .btn.primary{animat
       </div>
     </section>
 
-    <!-- ===== ADMIN ===== -->
-    <section class="view" data-view="admin">
-      <div class="view-h"><div><h1>Admin Panel</h1><p>Akses disahkan melalui custom claim <span class="mono">admin</span> dan Security Rules.</p></div></div>
-      <div class="panel"><div class="tabs" id="adminTabs"></div><div id="adminBody" class="col"></div></div>
+    <!-- ===== GAME CONNECT ===== -->
+    <section class="view" data-view="games">
+      <div class="view-h"><div><h1>Game Connect &amp; Kill Popup</h1><p>Popup kill pada siaran: automatik untuk game yang ada API rasmi, manual / remote / Stream Deck untuk game lain.</p></div></div>
+      <div id="gamesBody" class="col" style="gap:14px"></div>
+    </section>
+    <!-- ===== DONATION ===== -->
+    <section class="view" data-view="donation">
+      <div class="view-h"><div><h1>Donation</h1><p>Sociabuzz, Saweria, Trakteer, Ko-fi, PayPal atau link lain: viewer donate terus dari paparan live.</p></div></div>
+      <div id="donationBody" class="col" style="gap:14px"></div>
+    </section>
+    <!-- ===== LIVE CHAT ===== -->
+    <section class="view" data-view="chat">
+      <div class="view-h"><div><h1>Live Chat</h1><p>Komen live platform dalam satu tetingkap. Pop-out ke skrin kedua atau "always on top".</p></div></div>
+      <div id="chatBody" class="col" style="gap:14px"></div>
     </section>
   </main>
 
@@ -490,6 +533,25 @@ body.t-rgb .nav-item.on,body.t-rgb .theme-card.on,body.t-rgb .btn.primary{animat
     <button id="moreBtn"><i data-lucide="menu"></i>Lagi</button>
   </nav>
 </div>
+
+<!-- ================= ADMIN PANEL (berasingan) ================= -->
+<div id="adminApp" class="shell admin-shell" hidden>
+  <header class="topbar">
+    <div class="brand"><span data-logo></span><div><div class="brand-name">STREAMVERSE</div><div class="brand-tag">Admin Console</div></div></div>
+    <span class="admin-badge">ADMIN</span>
+    <select class="in" id="adminTabSelect" aria-label="Seksyen admin"></select>
+    <div class="top-actions" style="margin-left:auto"><span class="small muted pmeta" id="adminEmail"></span>
+      <a class="btn sm" id="adminToStudio" href="?"><i data-lucide="monitor-play"></i>Studio</a>
+      <button class="btn sm ghost" id="adminLogout"><i data-lucide="log-out"></i>Logout</button></div>
+  </header>
+  <aside class="sidebar" id="adminSide" aria-label="Menu admin"></aside>
+  <main><div class="view on"><div class="view-h"><div><h1 id="adminTitle">Admin</h1><p>Akses disahkan melalui custom claim <span class="mono">admin</span>, Security Rules dan Cloud Functions.</p></div></div>
+    <div class="panel"><div id="adminBody" class="col"></div></div></div></main>
+</div>
+<!-- ================= LIVE CHAT WINDOW (pop-out) ================= -->
+<section id="chatApp" hidden></section>
+<!-- ================= HALAMAN LIVE AWAM (viewer) ================= -->
+<section id="viewerApp" hidden></section>
 
 <div id="modalRoot"></div>
 <div id="toasts" aria-live="polite"></div>
@@ -823,12 +885,15 @@ const SRC_TYPES = {
   phonemic:  { label: "Phone Microphone (Wireless)", icon: "smartphone", kind: "audio", group: "Mic", pair: "audio" },
   image:     { label: "Image Overlay",              icon: "image",       kind: "overlay" },
   text:      { label: "Text Overlay",               icon: "type",        kind: "overlay" },
+  killfeed:  { label: "Kill Popup",                 icon: "crosshair",   kind: "overlay" },
+  donation:  { label: "QR Donation",                icon: "hand-coins",  kind: "overlay" },
   browser:   { label: "Browser Source",             icon: "globe",       kind: "overlay", unsupported: "Canvas browser tidak boleh melukis iframe laman lain (sekatan cross-origin). Guna Image/Text Overlay, atau OBS untuk browser source." }
 };
 const LAYOUTS = {
   full: { x: 0, y: 0, w: 1, h: 1 }, "bottom-left": { x: .02, y: .6, w: .3, h: .36 }, "bottom-right": { x: .68, y: .6, w: .3, h: .36 },
   "top-left": { x: .02, y: .04, w: .3, h: .36 }, "top-right": { x: .68, y: .04, w: .3, h: .36 }, center: { x: .2, y: .2, w: .6, h: .6 },
-  "lower-third": { x: .04, y: .78, w: .7, h: .14 }, title: { x: .1, y: .38, w: .8, h: .24 }
+  "lower-third": { x: .04, y: .78, w: .7, h: .14 }, title: { x: .1, y: .38, w: .8, h: .24 },
+  "top-center": { x: .2, y: .1, w: .6, h: .2 }, "qr-corner": { x: .72, y: .04, w: .26, h: .2 }
 };
 function newSource(type, extra = {}) {
   const t = SRC_TYPES[type];
@@ -837,14 +902,16 @@ function newSource(type, extra = {}) {
   if (["webcam", "camera", "phonecam"].includes(type)) base.layoutName = "bottom-left";
   if (type === "text") Object.assign(base, { layoutName: "lower-third", text: "STREAMVERSE", color: "#ffffff", size: 6, bgColor: "#00000088", align: "left" });
   if (type === "image") Object.assign(base, { fit: "contain", imageUrl: "", storagePath: "" });
+  if (type === "killfeed") Object.assign(base, { layoutName: "top-center", labels: KILL_LABELS, duration: 2.4, streakWindow: 10, sound: true, showDetails: true });
+  if (type === "donation") Object.assign(base, { layoutName: "qr-corner", mode: "always", every: 5, showFor: 20, text: "Scan untuk donate" });
   if (t.kind === "audio") { base.layoutName = "full"; base.proc = { ns: type !== "audioin", ec: type !== "audioin", agc: false, enh: false }; }
   base.layout = { ...LAYOUTS[base.layoutName] };
   return Object.assign(base, extra);
 }
 const SCENE_TEMPLATES = {
-  gaming:   { name: "Gaming Live",     icon: "gamepad-2", sources: () => [newSource("webcam"), newSource("gameplay"), newSource("mic", { name: "Condenser Mic (Main)" })] },
+  gaming:   { name: "Gaming Live",     icon: "gamepad-2", sources: () => [newSource("killfeed"), newSource("webcam"), newSource("gameplay"), newSource("mic", { name: "Condenser Mic (Main)" })] },
   chatting: { name: "Just Chatting",   icon: "message-square", sources: () => [newSource("webcam", { layoutName: "full", layout: { ...LAYOUTS.full } }), newSource("mic", { name: "Condenser Mic (Main)" })] },
-  mobile:   { name: "Mobile Gaming",   icon: "smartphone", sources: () => [newSource("camera"), newSource("phonegame"), newSource("phonemic")] },
+  mobile:   { name: "Mobile Gaming",   icon: "smartphone", sources: () => [newSource("killfeed"), newSource("camera"), newSource("phonegame"), newSource("phonemic")] },
   webcam:   { name: "Webcam",          icon: "webcam", sources: () => [newSource("webcam", { layoutName: "full", layout: { ...LAYOUTS.full } }), newSource("mic")] },
   starting: { name: "Starting Soon",   icon: "timer", sources: () => [newSource("text", { name: "Tajuk", text: "STARTING SOON", layoutName: "title", layout: { ...LAYOUTS.title }, size: 12, align: "center", bgColor: "#00000000" }), newSource("mic")] },
   ending:   { name: "Ending",          icon: "flag", sources: () => [newSource("text", { name: "Tajuk", text: "TERIMA KASIH KERANA MENONTON", layoutName: "title", layout: { ...LAYOUTS.title }, size: 8, align: "center", bgColor: "#00000000" })] },
@@ -930,7 +997,7 @@ async function connectSource(src, opts = {}) {
       if (!src.imageUrl && !src.imageObjectUrl) { r.status = "idle"; renderAll(); editSource(src); return; }
       r.img = await loadImage(src.imageObjectUrl || src.imageUrl);
       r.status = "connected"; renderAll(); return;
-    } else if (src.type === "text") {
+    } else if (src.type === "text" || src.type === "killfeed" || src.type === "donation") {
       r.status = "connected"; renderAll(); return;
     }
     r.stream = stream;
@@ -1015,6 +1082,8 @@ function drawFrame() {
       if (r.video && r.video.readyState >= 2 && r.video.videoWidth) { drawMedia(r.video, r.video.videoWidth, r.video.videoHeight, x, y, w, h, s.fit, s.mirror); drew = true; }
       else if (s.type === "image" && r.img) { drawMedia(r.img, r.img.naturalWidth, r.img.naturalHeight, x, y, w, h, s.fit, false); drew = true; }
       else if (s.type === "text" && r.status === "connected") { drawText(s, x, y, w, h); drew = true; }
+      else if (s.type === "killfeed") { if (drawKill(s, x, y, w, h)) drew = true; }
+      else if (s.type === "donation") { if (drawDonation(s, x, y, w, h)) drew = true; }
     }
   }
   if (!drew) {
@@ -1277,7 +1346,7 @@ async function startStreaming() {
     });
     pc.onconnectionstatechange = () => {
       const st = pc.connectionState;
-      if (st === "connected") { S.stream.state = "live"; S.stream.startedAt = Date.now(); logActivity("stream", "Streaming LIVE melalui WHIP"); toast("Anda LIVE.", "ok"); }
+      if (st === "connected") { S.stream.state = "live"; S.stream.startedAt = Date.now(); setLiveFlag(true); logActivity("stream", "Streaming LIVE melalui WHIP"); toast("Anda LIVE.", "ok"); }
       if (st === "failed" || st === "disconnected") { S.stream.state = "error"; S.stream.error = "Sambungan WebRTC ke server WHIP " + st + "."; toast(S.stream.error, "err"); }
       renderAll();
     };
@@ -1304,6 +1373,7 @@ async function stopStreaming() {
     const headers = S.whip.token ? { Authorization: "Bearer " + S.whip.token } : {};
     fetch(st.resource, { method: "DELETE", headers }).catch(() => {});
   }
+  if (st.state === "live") setLiveFlag(false);
   if (st.state === "live") logActivity("stream", `Streaming tamat (${fmtDur(Date.now() - st.startedAt)})`);
   S.stream = { state: "idle", pc: null, resource: null, startedAt: 0, error: "" };
   renderAll();
@@ -1380,16 +1450,16 @@ function pairDevice(kind, src) {
 /* =====================================================================
    UI RENDERING: Streamer Hub, Capture Studio, Audio Studio
    ===================================================================== */
-const VIEWS = ["hub", "capture", "audio", "ai", "connect", "themes", "community", "recordings", "settings", "admin"];
+const VIEWS = ["hub", "capture", "audio", "ai", "connect", "games", "donation", "chat", "themes", "community", "recordings", "settings"];
 function go(view) {
   if (!VIEWS.includes(view)) view = "hub";
-  if (view === "admin" && !S.isAdmin) { toast("Admin Panel hanya untuk akaun dengan role admin.", "err"); view = "hub"; }
+  if (view === "admin") { if (S.isAdmin) openAdminPanel(); else toast("Admin Panel hanya untuk akaun dengan role admin.", "err"); return; }
   S.view = view;
   $$(".view").forEach(v => v.classList.toggle("on", v.dataset.view === view));
   $$("[data-go]").forEach(b => b.classList.toggle("on", b.dataset.go === view));
   try { history.replaceState(null, "", "#sv-" + view); } catch { /* hash disekat */ }
   mountPreview();
-  ({ ai: renderAI, connect: renderConnect, community: renderCommunity, recordings: renderRecordings, settings: renderSettings, admin: renderAdmin, themes: renderThemes, capture: renderCaptureExtras, audio: renderAudioExtras })[view]?.();
+  ({ ai: renderAI, connect: renderConnect, community: renderCommunity, recordings: renderRecordings, settings: renderSettings, games: renderGames, donation: renderDonation, chat: renderChatView, themes: renderThemes, capture: renderCaptureExtras, audio: renderAudioExtras })[view]?.();
   cacheMeters(); icons();
   window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
 }
@@ -1486,7 +1556,7 @@ function toggleVis(id) { const { s, sc } = findSource(id); if (!s) return; s.vis
 function moveSrc(sc, i, d) { const j = i + d; if (j < 0 || j >= sc.sources.length) return; [sc.sources[i], sc.sources[j]] = [sc.sources[j], sc.sources[i]]; saveSceneSoon(sc); renderAll(); }
 function addSourceModal(preset) {
   const sc = activeScene(); if (!sc) { toast("Tambah scene dahulu.", "warn"); return addSceneModal(); }
-  const groups = [["Gameplay", ["gameplay", "screen", "capture", "phonegame"]], ["Camera", ["webcam", "camera", "phonecam"]], ["Audio", ["mic", "audioin", "phonemic"]], ["Overlay", ["image", "text", "browser"]]];
+  const groups = [["Gameplay", ["gameplay", "screen", "capture", "phonegame"]], ["Camera", ["webcam", "camera", "phonecam"]], ["Audio", ["mic", "audioin", "phonemic"]], ["Overlay", ["killfeed", "donation", "image", "text", "browser"]]];
   modal({
     title: "Add Source", wide: true,
     body: groups.map(([g, list]) => `<div class="small muted" style="margin:10px 0 6px;font-weight:600;letter-spacing:.08em">${g.toUpperCase()}</div><div class="qa-grid">${list.map(t => {
@@ -1504,7 +1574,7 @@ async function createSource(type, extra = {}) {
   if (SRC_TYPES[type].kind === "audio" || ["webcam", "camera", "capture"].includes(type)) sc.sources.push(sc.sources.shift());
   await store.saveScene(sc).catch(e => toast(errMsg(e), "err"));
   renderAll();
-  if (type === "text") connectSource(s);
+  if (["text", "killfeed", "donation"].includes(type)) connectSource(s);
   else if (["screen", "gameplay"].includes(type) || SRC_TYPES[type].pair) connectSource(s);
   else if (!SRC_TYPES[type].unsupported) editSource(s, true);
   return s;
@@ -1522,6 +1592,8 @@ function editSource(s, connectAfter) {
     ${isCam ? `<div class="g2"><label class="f">Resolution<select class="in" id="es_res">${["640x360", "1280x720", "1920x1080", "2560x1440", "3840x2160"].map(r => `<option ${r === s.res ? "selected" : ""}>${r}</option>`).join("")}</select></label><label class="f">Frame rate<select class="in" id="es_fps">${[15, 24, 30, 60].map(f => `<option ${f == s.fps ? "selected" : ""}>${f}</option>`).join("")}</select></label></div>` : ""}
     ${isAud ? `<label class="f">Input device<select class="in" id="es_dev">${deviceOptions("audioinput", s.deviceId)}</select></label>` : ""}
     ${s.type === "text" ? `<label class="f">Teks<input class="in" id="es_text" maxlength="80" value="${esc(s.text)}"></label><div class="g3"><label class="f">Warna<input class="in" type="color" id="es_color" value="${esc(s.color)}"></label><label class="f">Saiz (% tinggi)<input class="in" type="number" id="es_size" min="2" max="25" value="${s.size}"></label><label class="f">Jajaran<select class="in" id="es_align"><option value="left" ${s.align === "left" ? "selected" : ""}>Kiri</option><option value="center" ${s.align === "center" ? "selected" : ""}>Tengah</option></select></label></div><label class="row small"><span class="switch"><input type="checkbox" id="es_bg" ${s.bgColor && !/00$/.test(s.bgColor) ? "checked" : ""}></span>Latar gelap belakang teks</label>` : ""}
+    ${s.type === "killfeed" ? `<label class="f">Label streak (pisah koma: 1 kill, 2, 3, …)<input class="in" id="es_labels" maxlength="160" value="${esc(s.labels)}"></label><div class="g3"><label class="f">Tempoh popup (s)<input class="in" type="number" id="es_dur" min="1" max="8" step="0.2" value="${s.duration}"></label><label class="f">Tempoh streak (s)<input class="in" type="number" id="es_sw" min="2" max="60" value="${s.streakWindow}"></label><label class="f">Bunyi<select class="in" id="es_snd"><option value="1" ${s.sound !== false ? "selected" : ""}>Ya (masuk stream)</option><option value="0" ${s.sound === false ? "selected" : ""}>Tidak</option></select></label></div><label class="row small"><span class="switch"><input type="checkbox" id="es_det" ${s.showDetails !== false ? "checked" : ""}></span>Papar senjata / mangsa (jika game hantar)</label>` : ""}
+    ${s.type === "donation" ? `<label class="f">Teks<input class="in" id="es_dtext" maxlength="40" value="${esc(s.text)}"></label><div class="g3"><label class="f">Paparan<select class="in" id="es_mode"><option value="always" ${s.mode === "always" ? "selected" : ""}>Sentiasa</option><option value="interval" ${s.mode === "interval" ? "selected" : ""}>Berkala</option></select></label><label class="f">Setiap (minit)<input class="in" type="number" id="es_every" min="1" max="60" value="${s.every}"></label><label class="f">Selama (saat)<input class="in" type="number" id="es_for" min="5" max="120" value="${s.showFor}"></label></div><p class="small muted" style="margin:0">QR menggunakan link utama di halaman Donation.</p>` : ""}
     ${s.type === "image" ? `<label class="f">Fail gambar (PNG / JPG / WEBP, maks 5 MB)<input class="in" type="file" id="es_file" accept="image/png,image/jpeg,image/webp"></label><p class="small muted" style="margin:0">${cloudOK() ? "Gambar dimuat naik ke Firebase Storage akaun anda supaya scene boleh dimuat semula." : "Studio Tempatan: gambar hanya kekal untuk sesi ini (tiada Storage)."}</p>` : ""}
     ${visual && !T.unsupported ? `<div class="g3"><label class="f">Posisi<select class="in" id="es_layout">${Object.keys(LAYOUTS).map(k => `<option ${k === s.layoutName ? "selected" : ""}>${k}</option>`).join("")}</select></label><label class="f">Saiz (lebar %)<input class="in" type="number" id="es_w" min="5" max="100" value="${Math.round(s.layout.w * 100)}"></label><label class="f">Fit<select class="in" id="es_fit"><option value="cover" ${s.fit === "cover" ? "selected" : ""}>Cover</option><option value="contain" ${s.fit === "contain" ? "selected" : ""}>Contain</option><option value="stretch" ${s.fit === "stretch" ? "selected" : ""}>Stretch</option></select></label></div>` : ""}
     ${["webcam", "camera", "phonecam"].includes(s.type) ? `<label class="row small"><span class="switch"><input type="checkbox" id="es_mirror" ${s.mirror ? "checked" : ""}></span>Mirror camera</label>` : ""}
@@ -1550,6 +1622,8 @@ async function saveSrcForm(s, sc) {
     L.x = Math.min(L.x, 1 - L.w); L.y = Math.min(L.y, 1 - L.h); s.layout = L; s.fit = v("es_fit");
   }
   if ($("#es_mirror")) s.mirror = $("#es_mirror").checked;
+  if ($("#es_labels")) { s.labels = v("es_labels") || KILL_LABELS; s.duration = Math.min(8, Math.max(1, Number(v("es_dur")) || 2.4)); s.streakWindow = Math.min(60, Math.max(2, Number(v("es_sw")) || 10)); s.sound = v("es_snd") === "1"; s.showDetails = $("#es_det").checked; }
+  if ($("#es_dtext")) { s.text = v("es_dtext"); s.mode = v("es_mode"); s.every = Math.min(60, Math.max(1, Number(v("es_every")) || 5)); s.showFor = Math.min(120, Math.max(5, Number(v("es_for")) || 20)); }
   const f = $("#es_file")?.files?.[0];
   if (f) {
     if (!/^image\/(png|jpeg|webp)$/.test(f.type)) throw new Error("Jenis fail tidak dibenarkan.");
@@ -1750,6 +1824,9 @@ const QUICK = [
   ["cable", "HDMI Capture", "Cable", () => { go("capture"); gpTab("wired"); }],
   ["users", "Community", "", () => go("community")],
   ["bot", "AI Creator", "", () => go("ai")],
+  ["crosshair", "Kill Popup", "Test / Game", () => go("games")],
+  ["hand-coins", "Donation", "QR & Popup", () => go("donation")],
+  ["messages-square", "Live Chat", "Skrin kedua", () => go("chat")],
   ["settings", "Platform Settings", "", () => go("connect")]
 ];
 function renderQuick() {
@@ -2369,13 +2446,20 @@ function renderSettings() {
 /* =====================================================================
    ADMIN PANEL (custom claim admin; dikuatkuasakan juga oleh Rules & Functions)
    ===================================================================== */
-const ADMIN_TABS = [["users", "Users"], ["community", "Community"], ["themes", "Themes"], ["platforms", "Platform Settings"], ["ai", "AI Provider"], ["announce", "Announcements"], ["logs", "System Logs"], ["reports", "Reports"], ["status", "System Status"]];
+const ADMIN_TABS = [["users", "Users", "users"], ["community", "Community", "message-square"], ["publicpages", "Donation Pages", "hand-coins"], ["reports", "Reports", "flag"], ["announce", "Announcements", "megaphone"], ["themes", "Themes", "palette"], ["platforms", "Platform Settings", "radio"], ["ai", "AI Provider", "bot"], ["logs", "System Logs", "scroll-text"], ["status", "System Status", "activity"]];
 let adminTab = "users";
 function renderAdmin() {
   if (!S.isAdmin) { $("#adminBody").innerHTML = `<div class="note err">Akses ditolak.</div>`; return; }
-  $("#adminTabs").innerHTML = ADMIN_TABS.map(([k, l]) => `<button class="tab ${k === adminTab ? "on" : ""}" data-admin-tab="${k}">${l}</button>`).join("");
+  $("#adminSide").innerHTML = ADMIN_TABS.map(([k, l, ic]) => `<button class="nav-item ${k === adminTab ? "on" : ""}" data-admin-tab="${k}"><i data-lucide="${ic}"></i>${l}</button>`).join("");
+  $("#adminTabSelect").innerHTML = ADMIN_TABS.map(([k, l]) => `<option value="${k}" ${k === adminTab ? "selected" : ""}>${l}</option>`).join("");
+  $("#adminTitle").textContent = ADMIN_TABS.find(x => x[0] === adminTab)[1];
+  icons();
   const b = $("#adminBody"); b.innerHTML = `<div class="small muted">Memuatkan…</div>`;
-  ({ users: adUsers, community: adCommunity, themes: adThemes, platforms: adPlatforms, ai: adAI, announce: adAnnounce, logs: adLogs, reports: adReports, status: adStatus })[adminTab]().catch(e => b.innerHTML = `<div class="note err">${esc(errMsg(e))}</div>`);
+  ({ users: adUsers, community: adCommunity, publicpages: adPublicPages, themes: adThemes, platforms: adPlatforms, ai: adAI, announce: adAnnounce, logs: adLogs, reports: adReports, status: adStatus })[adminTab]().catch(e => b.innerHTML = `<div class="note err">${esc(errMsg(e))}</div>`);
+}
+async function adPublicPages() {
+  const snap = await fb.F.getDocs(fb.F.query(C("publicPages"), fb.F.orderBy("updatedAt", "desc"), fb.F.limit(50)));
+  $("#adminBody").innerHTML = snap.empty ? `<div class="empty">No Data Available</div>` : `<div class="tbl-wrap"><table class="t"><thead><tr><th>Streamer</th><th>Link donation</th><th>Status</th><th></th></tr></thead><tbody>${snap.docs.map(d => { const p = d.data(); return `<tr><td><b>${esc(p.displayName)}</b><div class="small muted mono">${esc(p.slug)}</div></td><td class="small">${(p.links || []).map(l => `<div style="word-break:break-all">${esc(l.label)}: ${esc(l.url)}</div>`).join("")}</td><td>${p.disabled ? chip("err", "Disabled") : p.live ? chip("live", "LIVE") : chip("ok", "Active")}</td><td><button class="btn sm ${p.disabled ? "" : "danger"}" data-page-toggle="${d.id}" data-val="${p.disabled ? 0 : 1}">${p.disabled ? "Aktifkan" : "Nyahaktif"}</button></td></tr>`; }).join("")}</tbody></table></div>`;
 }
 async function adUsers(pageToken) {
   const r = await callFn("adminListUsers", { pageToken: pageToken || null });
@@ -2430,9 +2514,489 @@ async function adStatus() {
 }
 
 /* =====================================================================
+   KILL POPUP + GAME CONNECT
+   ===================================================================== */
+const GAMES = [
+  { id: "cs2", name: "Counter-Strike 2", method: "gsi", note: "Game State Integration rasmi Valve. Letak fail config dalam folder cfg game. Kill, streak dalam round, headshot dan senjata dikesan automatik." },
+  { id: "dota2", name: "Dota 2", method: "gsi", note: "Game State Integration rasmi Valve. Perlu launch option -gamestateintegration. Kill dan kill streak dikesan automatik." },
+  { id: "lol", name: "League of Legends", method: "bridge", note: "Live Client Data API rasmi Riot hanya boleh dibaca di PC yang sama (127.0.0.1:2999). Jalankan tools/game-bridge.mjs untuk hantar kill ke STREAMVERSE." },
+  { id: "generic", name: "Webhook umum (Stream Deck, Touch Portal, Bitfocus Companion, mod / skrip sendiri)", method: "webhook", note: "Mana-mana alat yang boleh hantar HTTP POST boleh trigger kill popup, untuk game apa sahaja." },
+  { id: "valorant", name: "Valorant", method: "manual", note: "Riot tidak membuka API kill masa nyata untuk Valorant. Guna butang, hotkey K, Kill Remote atau Stream Deck." },
+  { id: "mlbb", name: "Mobile Legends: Bang Bang", method: "manual", note: "Tiada API rasmi. Guna Kill Remote di telefon/tablet kedua, butang, atau Stream Deck." },
+  { id: "pubgm", name: "PUBG Mobile", method: "manual", note: "Tiada API rasmi. Guna Kill Remote / butang / Stream Deck." },
+  { id: "freefire", name: "Free Fire", method: "manual", note: "Tiada API rasmi. Guna Kill Remote / butang / Stream Deck." },
+  { id: "codm", name: "Call of Duty: Mobile", method: "manual", note: "Tiada API rasmi. Guna Kill Remote / butang / Stream Deck." },
+  { id: "fortnite", name: "Fortnite", method: "manual", note: "Tiada API kill masa nyata yang rasmi. Guna butang / hotkey / Stream Deck." },
+  { id: "apex", name: "Apex Legends", method: "manual", note: "Tiada API kill masa nyata yang rasmi. Guna butang / hotkey / Stream Deck." },
+  { id: "minecraft", name: "Minecraft / Roblox / game lain", method: "webhook", note: "Boleh automatik jika mod/plugin/skrip game menghantar POST ke Webhook URL. Jika tidak, guna manual." }
+];
+const METHOD_CHIP = { gsi: ["ok", "Official API (auto)"], bridge: ["info", "Official API + bridge PC"], webhook: ["info", "Webhook"], manual: ["warn", "Manual sahaja"] };
+const KF = { popups: [], streak: 0, lastAt: 0, warned: false, gameLast: {}, hookUrl: "", game: ls.get("kfGame", "cs2"), hotkey: ls.get("kfHotkey", true) };
+const KILL_LABELS = "KILL,DOUBLE KILL,TRIPLE KILL,QUADRA KILL,PENTA KILL,UNSTOPPABLE";
+function killLabel(src, n) { const l = (src?.labels || KILL_LABELS).split(",").map(x => x.trim()).filter(Boolean); return l[Math.min(n, l.length) - 1] || "KILL"; }
+function killSource() { const sc = activeScene(); return sc?.sources.find(s => s.type === "killfeed") || null; }
+function triggerKill(ev = {}) {
+  const src = killSource();
+  if (!src || !src.visible) {
+    if (!KF.warned) { toast("Kill diterima, tetapi scene aktif tiada source Kill Popup yang visible. Tambah di Game Connect.", "warn", 7000); KF.warned = true; }
+    return;
+  }
+  const nowMs = Date.now(); const win = (src.streakWindow || 10) * 1000;
+  KF.streak = ev.streak ? Number(ev.streak) : (nowMs - KF.lastAt < win ? KF.streak + 1 : 1);
+  KF.lastAt = nowMs;
+  const bits = [];
+  if (src.showDetails !== false) { if (ev.weapon) bits.push(String(ev.weapon).toUpperCase()); if (ev.victim) bits.push("× " + String(ev.victim)); }
+  KF.popups = [{ start: performance.now(), label: killLabel(src, KF.streak), sub: bits.join("   "), headshot: !!ev.headshot, streak: KF.streak, dur: (src.duration || 2.4) * 1000 }];
+  if (src.sound !== false) killSound(KF.streak);
+  if (ev.game) { KF.gameLast[ev.game] = nowMs; if (S.view === "games") renderGames(); }
+}
+function killSound(n) {
+  try {
+    const ctx = ensureAudio(); const t = ctx.currentTime;
+    const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.35, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
+    const o = ctx.createOscillator(); o.type = "sawtooth"; o.frequency.setValueAtTime(380 + Math.min(n, 6) * 70, t); o.frequency.exponentialRampToValueAtTime(140, t + 0.4);
+    const f = ctx.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = 2400;
+    o.connect(f); f.connect(g); g.connect(mixer.master); o.start(t); o.stop(t + 0.5);
+  } catch { /* audio tidak tersedia */ }
+}
+function drawKill(s, x, y, w, h) {
+  const p = KF.popups[0]; if (!p) return false;
+  const t = (performance.now() - p.start) / p.dur;
+  if (t >= 1) { KF.popups = []; return false; }
+  const ctx = comp.ctx;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const alpha = t < .1 ? t / .1 : t > .82 ? (1 - t) / .18 : 1;
+  const sc = reduce ? 1 : t < .08 ? .55 + (t / .08) * .55 : t < .16 ? 1.1 - ((t - .08) / .08) * .1 : 1;
+  const cx = x + w / 2, cy = y + h / 2;
+  const [c1, c2] = fx.colors;
+  ctx.save(); ctx.globalAlpha = Math.max(0, alpha); ctx.translate(cx, cy); ctx.scale(sc, sc);
+  const bw = w * .9, bh = h * .62, sk = bh * .35;
+  const g = ctx.createLinearGradient(-bw / 2, 0, bw / 2, 0);
+  g.addColorStop(0, c1 + "00"); g.addColorStop(.18, c1 + "ee"); g.addColorStop(.82, c2 + "ee"); g.addColorStop(1, c2 + "00");
+  ctx.fillStyle = "rgba(5,3,12,.72)";
+  ctx.beginPath(); ctx.moveTo(-bw / 2 + sk, -bh / 2); ctx.lineTo(bw / 2, -bh / 2); ctx.lineTo(bw / 2 - sk, bh / 2); ctx.lineTo(-bw / 2, bh / 2); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = g; ctx.fillRect(-bw / 2, -bh / 2 - 3, bw, 3); ctx.fillRect(-bw / 2, bh / 2, bw, 3);
+  const fs = bh * (p.label.length > 10 ? .42 : .52);
+  ctx.font = `900 ${fs}px Orbitron, Rajdhani, sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.shadowColor = c1; ctx.shadowBlur = fs * .5; ctx.fillStyle = "#ffffff";
+  ctx.fillText(p.label, p.headshot ? fs * .45 : 0, p.sub ? -bh * .1 : 0, bw * .8);
+  ctx.shadowBlur = 0;
+  if (p.headshot) {
+    const tw = Math.min(ctx.measureText(p.label).width, bw * .8); const hx = -tw / 2 - fs * .25, r = fs * .32;
+    ctx.strokeStyle = "#ff3d5a"; ctx.lineWidth = Math.max(2, fs * .07);
+    ctx.beginPath(); ctx.arc(hx, p.sub ? -bh * .1 : 0, r, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); const yy = p.sub ? -bh * .1 : 0; ctx.moveTo(hx - r * 1.4, yy); ctx.lineTo(hx + r * 1.4, yy); ctx.moveTo(hx, yy - r * 1.4); ctx.lineTo(hx, yy + r * 1.4); ctx.stroke();
+  }
+  if (p.sub) { ctx.font = `700 ${bh * .17}px Rajdhani, Inter, sans-serif`; ctx.fillStyle = c2; ctx.fillText(p.sub, 0, bh * .28, bw * .7); }
+  if (p.streak > 1) { ctx.font = `900 ${bh * .2}px Orbitron, sans-serif`; ctx.fillStyle = c2; ctx.textAlign = "right"; ctx.fillText(`×${p.streak}`, bw / 2 - sk - 6, -bh * .3); }
+  ctx.restore();
+  return true;
+}
+async function addKillSource() {
+  if (killSource()) { toast("Scene ini sudah ada Kill Popup.", "info"); return killSource(); }
+  const s = await createSourceQuiet("killfeed"); const sc = activeScene();
+  sc.sources.splice(sc.sources.indexOf(s), 1); sc.sources.unshift(s); await store.saveScene(sc);
+  rt(s.id).status = "connected"; renderAll(); if (S.view === "games") renderGames(); toast("Kill Popup ditambah pada scene aktif.", "ok"); return s;
+}
+function renderGames() {
+  const el = $("#gamesBody"); if (!el) return;
+  const ks = killSource();
+  const hookBlock = cloudBlock("Webhook game (auto kill)");
+  el.innerHTML = `<div class="g2">
+    <div class="panel col"><div class="panel-h"><h3><i data-lucide="crosshair"></i>Kill Popup</h3><span class="grow"></span>${ks ? (ks.visible ? chip("ok", "Aktif dalam scene") : chip("warn", "Hidden")) : chip("off", "Tiada dalam scene")}</div>
+      <p class="small muted" style="margin:0">Popup dilukis terus pada video output, jadi ia muncul dalam siaran LIVE dan rakaman. Streak dikira automatik bila kill berturut dalam tempoh yang ditetapkan.</p>
+      <label class="f">Game sedang dimainkan<select class="in" id="kfGame">${GAMES.map(g => `<option value="${g.id}" ${g.id === KF.game ? "selected" : ""}>${esc(g.name)}</option>`).join("")}</select></label>
+      <div class="row wrap">${ks ? `<button class="btn" data-src-menu="${ks.id}"><i data-lucide="settings-2"></i>Tetapan popup</button>` : `<button class="btn primary" id="kfAdd"><i data-lucide="plus"></i>Tambah Kill Popup ke scene</button>`}</div>
+      <div class="row wrap"><button class="btn danger" data-kill="0" style="font-size:20px;padding:14px 26px"><i data-lucide="crosshair"></i>KILL</button><button class="btn" data-kill="1"><i data-lucide="target"></i>Kill + Headshot</button><button class="btn ghost" id="kfReset"><i data-lucide="rotate-ccw"></i>Reset streak (${KF.streak})</button></div>
+      <label class="row small"><span class="switch"><input type="checkbox" id="kfHotkey" ${KF.hotkey ? "checked" : ""}></span>Hotkey <b class="mono">K</b> = kill, <b class="mono">H</b> = headshot (berfungsi bila tetingkap STREAMVERSE difokus)</label>
+    </div>
+    <div class="panel col"><div class="panel-h"><h3><i data-lucide="webhook"></i>Webhook URL (auto kill)</h3></div>${hookBlock || `
+      <p class="small muted" style="margin:0">URL rahsia untuk akaun anda. Digunakan oleh config CS2/Dota 2, game-bridge (League of Legends) dan Stream Deck. Jangan kongsi URL ini.</p>
+      ${KF.hookUrl ? `<input class="in mono" readonly value="${esc(KF.hookUrl)}" id="hookUrl"><div class="row wrap"><button class="btn sm" id="hookCopy"><i data-lucide="copy"></i>Salin</button><button class="btn sm" id="hookNew"><i data-lucide="refresh-cw"></i>Jana semula</button><button class="btn sm ghost" id="hookOff"><i data-lucide="trash-2"></i>Batalkan</button></div>
+        <details class="acc"><summary><i data-lucide="terminal"></i>Contoh webhook umum</summary><div><pre class="mono small" style="white-space:pre-wrap;word-break:break-all">POST ${esc(KF.hookUrl)}
+Content-Type: application/json
+
+{"type":"kill","game":"mlbb","headshot":false,"weapon":"","victim":"","streak":0}</pre>Stream Deck: plugin "Web Requests" / "API Ninja" → POST URL di atas dengan body JSON tersebut. Satu butang = satu kill.</div></details>`
+      : `<button class="btn primary" id="hookNew"><i data-lucide="link"></i>Jana Webhook URL</button>`}`}
+    </div></div>
+    <div class="panel"><div class="panel-h"><h3><i data-lucide="gamepad-2"></i>Sambungan Game</h3></div>
+      <div class="tbl-wrap"><table class="t"><thead><tr><th>Game</th><th>Kaedah</th><th>Status</th><th></th></tr></thead><tbody>${GAMES.map(g => {
+        const last = KF.gameLast[g.id]; const st = g.method === "manual" ? chip("off", "Manual") : last ? chip("ok", "Receiving · " + new Date(last).toLocaleTimeString("ms-MY")) : KF.hookUrl ? chip("warn", "Waiting for event") : chip("off", "Not Connected");
+        return `<tr><td><b>${esc(g.name)}</b><div class="small muted">${esc(g.note)}</div></td><td>${chip(...METHOD_CHIP[g.method])}</td><td>${st}</td><td>${g.method === "manual" ? "" : `<button class="btn sm" data-game-setup="${g.id}">Setup</button>`}</td></tr>`;
+      }).join("")}</tbody></table></div>
+      <p class="small muted">Pengesanan kill melalui OCR skrin tidak disediakan kerana tidak tepat dan berbeza ikut game. Semua status "Receiving" hanya muncul selepas event sebenar diterima.</p></div>
+    <div class="panel"><div class="panel-h"><h3><i data-lucide="smartphone"></i>Kill Remote (telefon / tablet)</h3></div>${cloudBlock("Kill Remote") || `
+      <div class="row wrap" style="align-items:flex-start;gap:16px"><div class="qr-box" id="remoteQr"></div><div class="col grow"><p class="small" style="margin:0">Imbas dengan telefon kedua, log masuk akaun sama, kemudian tekan butang KILL besar setiap kali anda dapat kill (sesuai untuk MLBB, PUBG Mobile, Free Fire, Valorant).</p><div class="small mono" style="word-break:break-all">${esc(remoteUrl())}</div><button class="btn sm" id="remoteCopy"><i data-lucide="copy"></i>Salin link</button></div></div>`}</div>`;
+  icons();
+  const q = $("#remoteQr"); if (q) { try { new window.QRCode(q, { text: remoteUrl(), width: 140, height: 140 }); } catch { q.textContent = "QR tidak tersedia"; } }
+  const on = (id, fn) => { const b = $("#" + id); if (b) b.onclick = e => fn(e.currentTarget); };
+  on("kfAdd", () => addKillSource());
+  on("kfReset", () => { KF.streak = 0; KF.lastAt = 0; renderGames(); });
+  on("remoteCopy", () => copyText(remoteUrl()));
+  on("hookCopy", () => copyText(KF.hookUrl));
+  on("hookNew", b => withBusy(b, async () => { if (KF.hookUrl && !(await confirmBox("Jana semula?", "URL lama akan berhenti berfungsi. Kemas kini config game anda.", "Jana"))) return; const r = await callFn("gameHookCreate"); KF.hookUrl = r.url; renderGames(); }));
+  on("hookOff", b => withBusy(b, async () => { if (!(await confirmBox("Batalkan webhook?", "Auto kill dari game akan berhenti.", "Batalkan"))) return; await callFn("gameHookRevoke"); KF.hookUrl = ""; renderGames(); }));
+  $("#kfGame").onchange = e => { KF.game = e.target.value; ls.set("kfGame", KF.game); };
+  $("#kfHotkey").onchange = e => { KF.hotkey = e.target.checked; ls.set("kfHotkey", KF.hotkey); };
+}
+const remoteUrl = () => `${location.origin}${location.pathname}?remote=kill`;
+function gameSetup(id) {
+  const g = GAMES.find(x => x.id === id); const url = KF.hookUrl || "(jana Webhook URL dahulu)";
+  const cfg = id === "cs2" || id === "dota2" ? `"STREAMVERSE"
+{
+  "uri" "${url}"
+  "timeout" "5.0"
+  "buffer" "0.1"
+  "throttle" "0.1"
+  "heartbeat" "30.0"
+  "auth" { "token" "streamverse" }
+  "data"
+  {
+    "provider" "1"
+    "map" "1"
+${id === "cs2" ? `    "player_id" "1"
+    "player_state" "1"
+    "player_match_stats" "1"
+    "player_weapons" "1"` : `    "player" "1"
+    "hero" "1"`}
+  }
+}` : "";
+  const body = id === "cs2" ? `<ol class="small"><li>Buka folder: <span class="mono">Steam/steamapps/common/Counter-Strike Global Offensive/game/csgo/cfg/</span></li><li>Cipta fail <b class="mono">gamestate_integration_streamverse.cfg</b> dengan kandungan di bawah.</li><li>Restart CS2. Kill anda (bukan semasa spectate) akan mencetuskan popup.</li><li>Jika game tidak menghantar ke HTTPS di PC anda, tukar <span class="mono">uri</span> kepada <span class="mono">http://127.0.0.1:3000/</span> dan jalankan <span class="mono">node tools/game-bridge.mjs --forward URL</span>.</li></ol>`
+    : id === "dota2" ? `<ol class="small"><li>Steam → Dota 2 → Properties → Launch Options: tambah <span class="mono">-gamestateintegration</span>.</li><li>Folder: <span class="mono">steamapps/common/dota 2 beta/game/dota/cfg/gamestate_integration/</span> (cipta jika tiada).</li><li>Cipta <b class="mono">gamestate_integration_streamverse.cfg</b> dengan kandungan di bawah, kemudian restart Dota 2.</li><li>Jika perlu, guna bridge seperti CS2.</li></ol>`
+    : id === "lol" ? `<ol class="small"><li>Pasang Node.js 18+ di PC gaming.</li><li>Muat turun <span class="mono">tools/game-bridge.mjs</span> dari projek STREAMVERSE.</li><li>Jalankan: <pre class="mono small" style="white-space:pre-wrap;word-break:break-all">node game-bridge.mjs --lol --forward "${esc(url)}"</pre></li><li>Masuk perlawanan. Bridge membaca kill anda dari Live Client Data API (127.0.0.1:2999) dan menghantarnya.</li></ol>`
+    : `<p class="small">Hantar <b>HTTP POST</b> JSON ke Webhook URL:</p><pre class="mono small" style="white-space:pre-wrap;word-break:break-all">{"type":"kill","game":"${id}","headshot":false,"weapon":"","victim":""}</pre><p class="small">Contoh: Stream Deck (Web Requests), Touch Portal (HTTP GET/POST), Bitfocus Companion (Generic HTTP), mod Minecraft / skrip Roblox Studio (HttpService) atau AutoHotkey.</p>`;
+  modal({ title: `Setup — ${g.name}`, wide: true, body: `<div class="col">${body}${cfg ? `<textarea class="in mono" readonly style="min-height:260px" id="gsiCfg">${esc(cfg)}</textarea><div><button class="btn sm" id="gsiCopy"><i data-lucide="copy"></i>Salin config</button></div>` : ""}</div>`,
+    onMount: bg => { const c = $("#gsiCopy", bg); if (c) c.onclick = () => copyText(cfg); } });
+}
+async function loadGameHook() {
+  if (!cloudOK()) return;
+  try { const s = await fb.F.getDoc(D(...uidPath("settings", "gameHook"))); KF.hookUrl = s.exists() ? s.data().url || "" : ""; } catch { KF.hookUrl = ""; }
+}
+function startGameListener() {
+  const since = fb.F.Timestamp.now();
+  S.unsub.push(fb.F.onSnapshot(fb.F.query(C(...uidPath("gameEvents")), fb.F.where("createdAt", ">", since), fb.F.orderBy("createdAt", "asc"), fb.F.limit(50)), snap => {
+    snap.docChanges().forEach(ch => { if (ch.type === "added") { const e = ch.doc.data(); if (e.type === "kill") triggerKill(e); } });
+  }, e => console.warn("gameEvents", e)));
+}
+document.addEventListener("keydown", e => {
+  if (!KF.hotkey || $("#app").hidden || e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.target.closest("input, textarea, select, [contenteditable]")) return;
+  const k = e.key.toLowerCase();
+  if (k === "k" || k === "h") { e.preventDefault(); triggerKill({ game: KF.game, headshot: k === "h", source: "hotkey" }); }
+});
+async function startKillRemote() {
+  showOnly("companionView");
+  const p = $("#companionPanel");
+  p.innerHTML = `<div class="brand"><span data-logo></span><div><div class="brand-name">STREAMVERSE</div><div class="brand-tag" style="display:block">Kill Remote</div></div></div>
+    <label class="f">Game<select class="in" id="krGame">${GAMES.map(g => `<option value="${g.id}" ${g.id === KF.game ? "selected" : ""}>${esc(g.name)}</option>`).join("")}</select></label>
+    <button class="btn danger" id="krKill" style="font-size:34px;padding:40px 10px;font-family:var(--f-brand)"><i data-lucide="crosshair" style="width:40px;height:40px"></i>KILL</button>
+    <button class="btn" id="krHs" style="padding:18px"><i data-lucide="target"></i>KILL + HEADSHOT</button>
+    <div id="krStatus" class="small muted">Setiap tekanan menghantar 1 kill ke studio anda (${esc(S.user.email)}).</div>
+    <button class="btn ghost sm" id="krLogout"><i data-lucide="log-out"></i>Logout</button>`;
+  renderLogos(); icons();
+  let n = 0;
+  const send = (hs, btn) => withBusy(btn, async () => {
+    await fb.F.addDoc(C(...uidPath("gameEvents")), { type: "kill", source: "manual", game: $("#krGame").value, headshot: hs, createdAt: now() });
+    n++; $("#krStatus").textContent = `${n} kill dihantar · terakhir ${new Date().toLocaleTimeString("ms-MY")}`;
+    try { navigator.vibrate?.(40); } catch { /* */ }
+  });
+  $("#krKill").onclick = e => send(false, e.currentTarget);
+  $("#krHs").onclick = e => send(true, e.currentTarget);
+  $("#krLogout").onclick = () => fb.Au.signOut(fb.auth);
+}
+
+/* =====================================================================
+   DONATION (Sociabuzz, Saweria, Trakteer, Ko-fi, PayPal, lain-lain)
+   ===================================================================== */
+const DONATE_TYPES = {
+  sociabuzz: { name: "Sociabuzz", color: "#ff6a00", host: /(^|\.)sociabuzz\.com$/ },
+  saweria:   { name: "Saweria", color: "#faae2b", host: /(^|\.)saweria\.co$/ },
+  trakteer:  { name: "Trakteer", color: "#be1e2d", host: /(^|\.)trakteer\.id$/ },
+  kofi:      { name: "Ko-fi", color: "#29abe0", host: /(^|\.)ko-fi\.com$/ },
+  paypal:    { name: "PayPal", color: "#003087", host: /(^|\.)paypal\.(me|com)$/ },
+  bmc:       { name: "Buy Me a Coffee", color: "#ffdd00", host: /(^|\.)buymeacoffee\.com$/ },
+  other:     { name: "Link lain", color: "#7c5cff", host: null }
+};
+const DN = { links: [], pageOn: true, youtubeChannelId: "", tiktokUser: "", loaded: false };
+function safeUrl(u) { try { const x = new URL(u); return x.protocol === "https:" ? x.href : null; } catch { return null; } }
+function linkWarn(l) { const T = DONATE_TYPES[l.type]; const u = safeUrl(l.url); if (!u) return "URL mesti bermula dengan https://"; if (T?.host && !T.host.test(new URL(u).hostname)) return `URL ini bukan domain ${T.name}.`; return ""; }
+const primaryLink = () => DN.links.find(l => l.primary && safeUrl(l.url)) || DN.links.find(l => safeUrl(l.url)) || null;
+const viewerSlug = () => S.profile?.usernameLower || "";
+const viewerUrl = () => viewerSlug() ? `${location.origin}${location.pathname}?live=${encodeURIComponent(viewerSlug())}` : "";
+async function loadDonation() {
+  if (DN.loaded) return;
+  if (cloudOK()) {
+    try { const s = await fb.F.getDoc(D("publicPages", S.user.uid)); if (s.exists()) { const d = s.data(); Object.assign(DN, { links: d.links || [], pageOn: d.enabled !== false, youtubeChannelId: d.youtubeChannelId || "", tiktokUser: d.tiktokUser || "", disabled: !!d.disabled }); } }
+    catch (e) { console.warn(e); }
+  } else Object.assign(DN, ls.get("donation", {}));
+  if (!DN.youtubeChannelId && S.platforms.youtube?.accountId) DN.youtubeChannelId = S.platforms.youtube.accountId;
+  DN.loaded = true;
+}
+async function saveDonation() {
+  const bad = DN.links.map(linkWarn).find(Boolean);
+  if (bad) throw new Error(bad);
+  DN.links = DN.links.slice(0, 8).map(l => ({ type: l.type, label: clipStr(l.label || DONATE_TYPES[l.type].name, 40), url: safeUrl(l.url), primary: !!l.primary }));
+  ls.set("donation", { links: DN.links, youtubeChannelId: DN.youtubeChannelId, tiktokUser: DN.tiktokUser, pageOn: DN.pageOn });
+  if (cloudOK()) {
+    if (!viewerSlug()) throw new Error("Tetapkan username di Profil Gamer dahulu (digunakan sebagai link halaman live).");
+    await fb.F.setDoc(D("publicPages", S.user.uid), { ownerUid: S.user.uid, slug: viewerSlug(), displayName: S.profile.username, photoURL: S.profile.photoURL || "", bio: clipStr(S.profile.bio || "", 300),
+      links: DN.links, youtubeChannelId: clipStr(DN.youtubeChannelId, 40), tiktokUser: clipStr(DN.tiktokUser.replace(/^@/, ""), 40), enabled: DN.pageOn, disabled: !!DN.disabled, live: S.stream.state === "live", updatedAt: now() }, { merge: true });
+  }
+  qrCache.clear();
+  toast(cloudOK() ? "Donation disimpan. Halaman live awam dikemas kini." : "Donation disimpan dalam browser (QR overlay). Halaman awam perlukan Firebase.", "ok");
+}
+const clipStr = (s, n) => String(s || "").slice(0, n);
+async function renderDonation() {
+  const el = $("#donationBody"); if (!el) return;
+  await loadDonation();
+  const vurl = viewerUrl();
+  const ds = activeScene()?.sources.find(s => s.type === "donation");
+  el.innerHTML = `<div class="note info small"><b>Penting:</b> dalam app TikTok, YouTube dan Facebook, video live tidak boleh mengandungi butang yang viewer boleh klik. STREAMVERSE memberi dua cara terus dari paparan live: <b>(1) QR Donation</b> dilukis pada skrin siaran, viewer imbas terus; <b>(2) Halaman Live STREAMVERSE</b> anda: siaran YouTube terbenam + butang <b>DONATE</b> yang membuka popup. Letak link halaman ini dalam pinned comment / description, bukan hanya di bio.</div>
+    <div class="g2">
+      <div class="panel col"><div class="panel-h"><h3><i data-lucide="hand-coins"></i>Link Donation</h3><span class="grow"></span><button class="btn sm" id="dnAdd" ${DN.links.length >= 8 ? "disabled" : ""}><i data-lucide="plus"></i>Tambah</button></div>
+        <div id="dnRows" class="col">${DN.links.length ? DN.links.map((l, i) => `<div class="post" style="gap:6px"><div class="row wrap"><select class="in" data-dn="${i}" data-k="type" style="width:auto">${Object.entries(DONATE_TYPES).map(([k, t]) => `<option value="${k}" ${k === l.type ? "selected" : ""}>${t.name}</option>`).join("")}</select><input class="in grow" data-dn="${i}" data-k="label" maxlength="40" placeholder="Label butang" value="${esc(l.label)}"><button class="btn icon sm ghost" data-dn-del="${i}" aria-label="Buang link"><i data-lucide="trash-2"></i></button></div>
+          <input class="in" data-dn="${i}" data-k="url" type="url" placeholder="https://sociabuzz.com/username/tribe" value="${esc(l.url)}"><div class="row between wrap"><label class="row small"><input type="radio" name="dnPrimary" data-dn-primary="${i}" ${l.primary ? "checked" : ""}> Link utama (untuk QR)</label><span class="small st-err">${esc(l.url ? linkWarn(l) : "")}</span></div></div>`).join("") : `<div class="empty">Belum ada link. Tekan Tambah, kemudian tampal link Sociabuzz / Saweria / Trakteer / Ko-fi / PayPal anda.</div>`}</div>
+        <button class="btn primary" id="dnSave"><i data-lucide="save"></i>Simpan Donation</button></div>
+      <div class="col" style="gap:14px">
+        <div class="panel col"><div class="panel-h"><h3><i data-lucide="qr-code"></i>QR Donation pada skrin live</h3><span class="grow"></span>${ds ? chip(ds.visible ? "ok" : "warn", ds.visible ? "Dalam scene" : "Hidden") : chip("off", "Tiada dalam scene")}</div>
+          <p class="small muted" style="margin:0">Overlay QR + teks "Scan untuk donate" untuk link utama. Boleh dipapar sentiasa atau berkala (cth. 20 saat setiap 5 minit).</p>
+          <div class="row wrap">${ds ? `<button class="btn" data-src-menu="${ds.id}"><i data-lucide="settings-2"></i>Tetapan overlay</button>` : `<button class="btn primary" id="dnOverlay" ${primaryLink() ? "" : "disabled"}><i data-lucide="plus"></i>Tambah QR ke scene aktif</button>`}<button class="btn" id="dnPreview" ${DN.links.length ? "" : "disabled"}><i data-lucide="eye"></i>Pratonton popup viewer</button></div></div>
+        <div class="panel col"><div class="panel-h"><h3><i data-lucide="tv"></i>Halaman Live awam</h3></div>${cloudBlock("Halaman live awam") || (!viewerSlug() ? `<div class="note">Tetapkan username di <button class="btn sm" data-act="edit-profile">Profil Gamer</button> dahulu.</div>` : `
+          ${DN.disabled ? `<div class="note err small">Halaman ini dinyahaktifkan oleh admin.</div>` : ""}
+          <label class="row small"><span class="switch"><input type="checkbox" id="dnPageOn" ${DN.pageOn ? "checked" : ""}></span>Halaman awam aktif</label>
+          <label class="f">YouTube Channel ID (untuk benam siaran live)<input class="in" id="dnYt" maxlength="40" placeholder="UCxxxxxxxx" value="${esc(DN.youtubeChannelId)}"></label>
+          <label class="f">TikTok username (butang "Tonton di TikTok")<input class="in" id="dnTt" maxlength="40" placeholder="@username" value="${esc(DN.tiktokUser)}"></label>
+          <div class="small mono" style="word-break:break-all">${esc(vurl)}</div>
+          <div class="row wrap"><button class="btn sm" id="dnCopy"><i data-lucide="copy"></i>Salin link</button><a class="btn sm" href="${esc(vurl)}" target="_blank" rel="noopener"><i data-lucide="external-link"></i>Buka halaman</a></div>`)}</div>
+      </div></div>`;
+  icons();
+  const on = (id, fn) => { const b = $("#" + id); if (b) b.onclick = e => fn(e.currentTarget); };
+  on("dnAdd", () => { DN.links.push({ type: "sociabuzz", label: "Donate via Sociabuzz", url: "", primary: !DN.links.length }); renderDonation(); });
+  on("dnSave", b => withBusy(b, async () => { const y = $("#dnYt"), t = $("#dnTt"), p = $("#dnPageOn"); if (y) DN.youtubeChannelId = y.value.trim(); if (t) DN.tiktokUser = t.value.trim(); if (p) DN.pageOn = p.checked; await saveDonation(); renderDonation(); }));
+  on("dnOverlay", async () => { const s = await createSourceQuiet("donation"); const sc = activeScene(); sc.sources.splice(sc.sources.indexOf(s), 1); sc.sources.unshift(s); await store.saveScene(sc); rt(s.id).status = "connected"; renderAll(); renderDonation(); toast("QR Donation ditambah.", "ok"); });
+  on("dnPreview", () => donatePopup({ displayName: S.profile?.username || "Streamer", links: DN.links.filter(l => safeUrl(l.url)) }));
+  on("dnCopy", () => copyText(vurl));
+}
+function donatePopup(page) {
+  const links = (page.links || []).filter(l => safeUrl(l.url));
+  const pl = links.find(l => l.primary) || links[0];
+  modal({
+    title: `Donate kepada ${page.displayName || "streamer"}`,
+    body: links.length ? `<div class="col"><p class="small muted" style="margin:0">Pilih platform. Pembayaran diproses oleh platform tersebut, bukan STREAMVERSE.</p>
+      ${links.map(l => { const T = DONATE_TYPES[l.type] || DONATE_TYPES.other; return `<a class="btn" style="justify-content:flex-start;padding:14px 16px;border-color:${T.color}" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener noreferrer"><span style="width:12px;height:12px;border-radius:50%;background:${T.color}"></span><span class="grow" style="text-align:left">${esc(l.label || T.name)}<span class="small muted" style="display:block;font-family:var(--f-body)">${esc(new URL(l.url).hostname)}</span></span><i data-lucide="external-link"></i></a>`; }).join("")}
+      ${pl ? `<div class="row" style="gap:14px"><div class="qr-box" id="dnQr"></div><div class="small muted">Atau imbas QR dengan telefon (${esc((DONATE_TYPES[pl.type] || DONATE_TYPES.other).name)}).</div></div>` : ""}</div>` : `<div class="empty">Streamer belum menetapkan link donation.</div>`,
+    onMount: bg => { const q = $("#dnQr", bg); if (q && pl) { try { new window.QRCode(q, { text: safeUrl(pl.url), width: 120, height: 120 }); } catch { /* */ } } }
+  });
+}
+const qrCache = new Map();
+function qrCanvas(text) {
+  if (qrCache.has(text)) return qrCache.get(text);
+  const d = document.createElement("div"); let c = null;
+  try { new window.QRCode(d, { text, width: 256, height: 256, correctLevel: window.QRCode.CorrectLevel.M }); c = d.querySelector("canvas"); } catch { c = null; }
+  qrCache.set(text, c); return c;
+}
+function drawDonation(s, x, y, w, h) {
+  const pl = primaryLink(); if (!pl) return false;
+  if (s.mode === "interval") { const per = (s.every || 5) * 60000, show = (s.showFor || 20) * 1000; if (Date.now() % per > show) return false; }
+  const q = qrCanvas(safeUrl(pl.url)); if (!q) return false;
+  const ctx = comp.ctx; const pad = Math.min(w, h) * .06; const qs = Math.min(h - pad * 2, w * .42);
+  ctx.save(); ctx.fillStyle = "rgba(8,5,18,.82)"; ctx.strokeStyle = fx.colors[0]; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x, y, w, h, pad) : ctx.rect(x, y, w, h); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = "#fff"; ctx.fillRect(x + pad, y + (h - qs) / 2, qs, qs);
+  ctx.imageSmoothingEnabled = false; ctx.drawImage(q, x + pad + qs * .06, y + (h - qs) / 2 + qs * .06, qs * .88, qs * .88); ctx.imageSmoothingEnabled = true;
+  const tx = x + pad * 2 + qs, tw = w - (tx - x) - pad;
+  ctx.textAlign = "left"; ctx.textBaseline = "top"; ctx.fillStyle = fx.colors[1];
+  ctx.font = `900 ${h * .17}px Orbitron, sans-serif`; ctx.fillText("DONATE", tx, y + h * .16, tw);
+  ctx.fillStyle = "#fff"; ctx.font = `700 ${h * .11}px Rajdhani, Inter, sans-serif`; ctx.fillText(s.text || "Scan untuk donate", tx, y + h * .42, tw);
+  ctx.fillStyle = "#cfc8ee"; ctx.font = `600 ${h * .085}px Inter, sans-serif`; ctx.fillText((pl.label || "").slice(0, 32), tx, y + h * .62, tw);
+  ctx.restore();
+  return true;
+}
+async function setLiveFlag(live) {
+  if (!cloudOK() || !viewerSlug()) return;
+  try { await fb.F.updateDoc(D("publicPages", S.user.uid), { live, liveSince: live ? now() : null, updatedAt: now() }); } catch { /* halaman belum dicipta */ }
+}
+
+/* ---------- Halaman Live awam (viewer, tanpa login) ---------- */
+async function startViewerPage(slug) {
+  showOnly("viewerApp");
+  const el = $("#viewerApp");
+  if (!fb.ready) { el.innerHTML = `<div class="auth-card" style="margin:40px auto">${cloudBlock("Halaman live")}</div>`; return; }
+  el.innerHTML = `<div class="muted" style="padding:40px;text-align:center">Memuatkan…</div>`;
+  let page = null;
+  try {
+    const snap = await fb.F.getDocs(fb.F.query(C("publicPages"), fb.F.where("slug", "==", slug.toLowerCase()), fb.F.where("enabled", "==", true), fb.F.where("disabled", "==", false), fb.F.limit(1)));
+    page = snap.docs[0]?.data() || null;
+  } catch (e) { el.innerHTML = `<div class="auth-card" style="margin:40px auto"><div class="note err">${esc(errMsg(e))}</div></div>`; return; }
+  if (!page) { el.innerHTML = `<div class="auth-card" style="margin:40px auto"><div class="panel"><h2>Halaman tidak dijumpai</h2><p class="muted">Streamer ini tiada halaman live aktif.</p></div></div>`; return; }
+  document.title = `${page.displayName} — STREAMVERSE`;
+  const yt = /^UC[\w-]{10,}$/.test(page.youtubeChannelId || "") ? page.youtubeChannelId : "";
+  const tt = (page.tiktokUser || "").replace(/[^\w.]/g, "");
+  el.innerHTML = `<div class="viewer">
+    <header class="row" style="gap:12px"><span data-logo></span><span class="brand-name" style="font-size:16px">STREAMVERSE</span><span class="grow"></span>${page.live ? chip("live", "LIVE") : chip("off", "Offline")}</header>
+    <div class="row" style="gap:14px"><span class="avatar" style="width:56px;height:56px">${page.photoURL ? `<img src="${esc(page.photoURL)}" alt="" class="avatar" style="width:56px;height:56px">` : esc(page.displayName[0])}</span><div class="grow"><h1 style="font-size:26px">${esc(page.displayName)}</h1><div class="small muted">${esc(page.bio || "")}</div></div></div>
+    <div class="viewer-stage">${yt ? `<iframe src="https://www.youtube.com/embed/live_stream?channel=${yt}&autoplay=1&mute=1" title="Siaran live ${esc(page.displayName)}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>` : `<div class="viewer-empty"><i data-lucide="tv"></i><span>Siaran tidak dibenamkan. Tonton di platform streamer.</span></div>`}
+      <button class="donate-fab" id="vDonate"><i data-lucide="hand-coins"></i>DONATE</button></div>
+    <div class="row wrap">${yt ? `<a class="btn" href="https://www.youtube.com/channel/${yt}/live" target="_blank" rel="noopener noreferrer"><i data-lucide="play"></i>Tonton di YouTube</a>` : ""}${tt ? `<a class="btn" href="https://www.tiktok.com/@${tt}/live" target="_blank" rel="noopener noreferrer"><i data-lucide="music-2"></i>Tonton di TikTok</a>` : ""}<span class="grow"></span><button class="btn primary" id="vDonate2"><i data-lucide="hand-coins"></i>Donate</button></div>
+    <p class="small muted">Donation diproses oleh platform pilihan streamer (cth. Sociabuzz). STREAMVERSE tidak menyimpan maklumat pembayaran anda.</p></div>`;
+  renderLogos(); icons();
+  $("#vDonate").onclick = $("#vDonate2").onclick = () => donatePopup(page);
+}
+
+/* =====================================================================
+   LIVE CHAT (YouTube & Facebook melalui API rasmi; pop-out / skrin kedua / PiP)
+   ===================================================================== */
+const CHAT = { running: false, timers: {}, cur: { youtube: {}, facebook: {} }, st: {}, msgs: [], seen: new Set(), lists: new Set(), size: ls.get("chatSize", 22), filter: "all", popoutAt: 0 };
+const isChatWindow = () => new URLSearchParams(location.search).get("panel") === "chat";
+const bc = "BroadcastChannel" in window ? new BroadcastChannel("sv-chat") : null;
+if (bc) bc.onmessage = e => {
+  if (e.data?.t === "alive" && !isChatWindow()) { CHAT.popoutAt = Date.now(); if (CHAT.running) chatStop(); if (S.view === "chat") renderChatView(); }
+};
+function chatPlatforms() { return ["youtube", "facebook"].filter(p => platformStatus(p)[0] === "ok"); }
+function chatStart() {
+  if (!cloudOK()) return toast("Live chat memerlukan Firebase dan platform yang disambung.", "warn");
+  const ps = chatPlatforms();
+  if (!ps.length) { CHAT.st = { youtube: ["off", "Not Connected"], facebook: ["off", "Not Connected"] }; renderChatStatus(); return toast("Sambung YouTube atau Facebook dahulu di StreamVerse Connect.", "warn", 6000); }
+  CHAT.running = true;
+  ps.forEach(p => { CHAT.st[p] = ["warn", "Menyambung"]; chatPoll(p); });
+  renderChatStatus();
+  if (isChatWindow() && bc) { bc.postMessage({ t: "alive" }); CHAT.timers.alive = setInterval(() => bc.postMessage({ t: "alive" }), 4000); }
+}
+function chatStop() { CHAT.running = false; Object.values(CHAT.timers).forEach(t => { clearTimeout(t); clearInterval(t); }); CHAT.timers = {}; Object.keys(CHAT.st).forEach(k => CHAT.st[k] = ["off", "Stopped"]); renderChatStatus(); }
+async function chatPoll(p) {
+  if (!CHAT.running) return;
+  let wait = 5000;
+  try {
+    const r = await callFn("platformChatPoll", { platform: p, ...CHAT.cur[p] });
+    if (r.status === "no-live") { CHAT.st[p] = ["off", "Tiada siaran aktif"]; CHAT.cur[p] = {}; wait = r.pollMs || 20000; }
+    else { CHAT.st[p] = ["ok", "Live chat aktif"]; CHAT.cur[p] = r.cursor || {}; wait = r.pollMs || 5000; (r.messages || []).forEach(addChatMsg); }
+  } catch (e) { CHAT.st[p] = ["err", errMsg(e)]; wait = 30000; }
+  renderChatStatus();
+  if (CHAT.running) CHAT.timers[p] = setTimeout(() => chatPoll(p), Math.max(3000, wait));
+}
+function addChatMsg(m) {
+  if (!m?.id || CHAT.seen.has(m.id)) return;
+  CHAT.seen.add(m.id); CHAT.msgs.push(m);
+  if (CHAT.msgs.length > 400) { const old = CHAT.msgs.shift(); CHAT.seen.delete(old.id); }
+  CHAT.lists.forEach(list => appendMsg(list, m));
+}
+function msgNode(doc, m) {
+  const d = doc.createElement("div"); d.className = "chat-msg" + (m.amount ? " paid" : ""); d.dataset.platform = m.platform;
+  const tag = doc.createElement("span"); tag.className = "chat-pf " + m.platform; tag.textContent = m.platform === "youtube" ? "YT" : "FB";
+  const who = doc.createElement("b"); who.textContent = m.author || "Viewer"; if (m.badge) who.dataset.badge = m.badge;
+  const txt = doc.createElement("span"); txt.className = "chat-text"; txt.textContent = (m.amount ? `[${m.amount}] ` : "") + (m.text || "");
+  const tm = doc.createElement("time"); tm.textContent = m.at ? new Date(m.at).toLocaleTimeString("ms-MY", { hour: "2-digit", minute: "2-digit" }) : "";
+  d.append(tag, who, txt, tm);
+  if (CHAT.filter !== "all" && m.platform !== CHAT.filter) d.hidden = true;
+  return d;
+}
+function appendMsg(list, m) {
+  const atBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 80;
+  list.querySelector(".chat-empty")?.remove();
+  list.append(msgNode(list.ownerDocument, m));
+  while (list.children.length > 400) list.firstElementChild.remove();
+  if (atBottom) list.scrollTop = list.scrollHeight;
+}
+function mountChatList(list) {
+  list.style.setProperty("--chat-size", CHAT.size + "px");
+  list.innerHTML = CHAT.msgs.length ? "" : `<div class="chat-empty">Belum ada komen. Komen dari YouTube &amp; Facebook akan muncul di sini bila live.</div>`;
+  CHAT.msgs.forEach(m => list.append(msgNode(list.ownerDocument, m)));
+  list.scrollTop = list.scrollHeight; CHAT.lists.add(list);
+}
+function renderChatStatus() {
+  const html = ["youtube", "facebook"].map(p => { const [c, t] = CHAT.st[p] || (platformStatus(p)[0] === "ok" ? ["off", "Sedia"] : ["off", platformStatus(p)[1]]); return `<span class="row small" style="gap:6px"><b>${p === "youtube" ? "YouTube" : "Facebook"}</b>${chip(c, t)}</span>`; }).join("")
+    + `<span class="row small" style="gap:6px"><b>TikTok</b>${chip("err", "Unsupported")}</span>`;
+  $$("[data-chat-status]").forEach(el => el.innerHTML = html);
+  $$("[data-chat-toggle]").forEach(b => { b.innerHTML = CHAT.running ? `<i data-lucide="square"></i>Stop Chat` : `<i data-lucide="play"></i>Start Chat`; });
+  icons();
+}
+function chatControls() {
+  return `<div class="row wrap" style="gap:8px"><button class="btn primary sm" data-chat-toggle></button>
+    ${isChatWindow() ? "" : `<button class="btn sm" data-chat-pop><i data-lucide="external-link"></i>Pop-out (skrin kedua)</button>`}
+    <button class="btn sm" data-chat-pip><i data-lucide="picture-in-picture-2"></i>Always on top</button>
+    <label class="row small" style="gap:6px">Saiz<input type="range" min="14" max="44" value="${CHAT.size}" data-chat-size style="width:100px" aria-label="Saiz teks chat"></label>
+    <select class="in" data-chat-filter style="width:auto;padding:5px 8px" aria-label="Tapis platform"><option value="all">Semua</option><option value="youtube" ${CHAT.filter === "youtube" ? "selected" : ""}>YouTube</option><option value="facebook" ${CHAT.filter === "facebook" ? "selected" : ""}>Facebook</option></select>
+    <button class="btn sm ghost" data-chat-clear><i data-lucide="eraser"></i>Kosongkan</button></div>
+    <div class="row wrap" data-chat-status style="gap:12px"></div>`;
+}
+function renderChatView() {
+  const el = $("#chatBody"); if (!el) return;
+  CHAT.lists.forEach(l => { if (l.ownerDocument === document) CHAT.lists.delete(l); });
+  const pop = Date.now() - CHAT.popoutAt < 9000;
+  el.innerHTML = cloudBlock("Live Chat") + `<div class="note info small">Komen YouTube dan Facebook dibaca melalui API rasmi (perlu platform disambung &amp; siaran aktif). <b>TikTok LIVE tiada API rasmi untuk membaca komen</b>; guna tetingkap komen TikTok LIVE Studio. Kuota YouTube API terhad (~10,000 unit/hari), jadi poll mengikut selang yang ditetapkan YouTube.</div>
+    ${pop ? `<div class="note small">Chat sedang dibuka di tetingkap pop-out. Panel ini berhenti supaya tidak membaca dua kali.</div>` : ""}
+    <div class="panel col">${chatControls()}<div class="chat-list" data-chat-list></div></div>`;
+  mountChatList($("[data-chat-list]", el)); renderChatStatus();
+}
+async function openChatWindow() {
+  let feat = "popup,width=460,height=820";
+  try {
+    if ("getScreenDetails" in window) {
+      const sd = await window.getScreenDetails();
+      const other = sd.screens.find(s => s !== sd.currentScreen);
+      if (other) feat = `popup,left=${other.availLeft + 40},top=${other.availTop + 40},width=${Math.min(560, other.availWidth - 80)},height=${other.availHeight - 80}`;
+    }
+  } catch { /* permission window-management ditolak: buka biasa */ }
+  const w = window.open(`${location.pathname}?panel=chat`, "svchat", feat);
+  if (!w) return toast("Popup disekat browser. Benarkan pop-up untuk laman ini.", "err", 7000);
+  if (feat.includes("left=")) toast("Chat dibuka di skrin kedua.", "ok"); else toast("Chat dibuka di tetingkap baru. Seret ke skrin kedua.", "info", 6000);
+  if (CHAT.running) chatStop();
+}
+async function chatPiP() {
+  if (!("documentPictureInPicture" in window)) return toast("Always on top (Document Picture-in-Picture) hanya disokong Chrome/Edge 116+ desktop.", "warn", 7000);
+  const pip = await window.documentPictureInPicture.requestWindow({ width: 420, height: 640 });
+  document.querySelectorAll('style, link[rel="stylesheet"]').forEach(n => pip.document.head.append(n.cloneNode(true)));
+  pip.document.documentElement.style.cssText = document.documentElement.style.cssText;
+  pip.document.body.style.margin = "0";
+  const list = pip.document.createElement("div"); list.className = "chat-list pip"; pip.document.body.append(list);
+  mountChatList(list);
+  pip.addEventListener("pagehide", () => CHAT.lists.delete(list));
+  if (!CHAT.running) chatStart();
+}
+async function startChatWindow() {
+  showOnly("chatApp");
+  document.title = "STREAMVERSE Live Chat";
+  const el = $("#chatApp");
+  el.innerHTML = `<div class="chat-window"><div class="row" style="gap:10px"><span data-logo></span><b class="brand-name" style="font-size:15px">LIVE CHAT</b></div>${cloudBlock("Live Chat")}${chatControls()}<div class="chat-list" data-chat-list></div></div>`;
+  renderLogos(); mountChatList($("[data-chat-list]", el)); renderChatStatus();
+  if (cloudOK()) {
+    S.unsub.push(fb.F.onSnapshot(C(...uidPath("platformConnections")), snap => { S.platforms = {}; snap.forEach(d => S.platforms[d.id] = d.data()); renderChatStatus(); if (!CHAT.running && chatPlatforms().length) chatStart(); }));
+  }
+}
+function bindChatEvents() {
+  document.addEventListener("click", e => {
+    const t = e.target.closest("[data-chat-toggle],[data-chat-pop],[data-chat-pip],[data-chat-clear]"); if (!t) return;
+    if (t.hasAttribute("data-chat-toggle")) return CHAT.running ? chatStop() : chatStart();
+    if (t.hasAttribute("data-chat-pop")) return openChatWindow();
+    if (t.hasAttribute("data-chat-pip")) return chatPiP().catch(er => toast(errMsg(er), "err"));
+    if (t.hasAttribute("data-chat-clear")) { CHAT.msgs = []; CHAT.seen.clear(); CHAT.lists.forEach(l => mountChatList(l)); }
+  });
+  document.addEventListener("input", e => { if (e.target.hasAttribute("data-chat-size")) { CHAT.size = Number(e.target.value); ls.set("chatSize", CHAT.size); CHAT.lists.forEach(l => l.style.setProperty("--chat-size", CHAT.size + "px")); } });
+  document.addEventListener("change", e => { if (e.target.hasAttribute("data-chat-filter")) { CHAT.filter = e.target.value; CHAT.lists.forEach(l => [...l.children].forEach(c => { if (c.dataset.platform) c.hidden = CHAT.filter !== "all" && c.dataset.platform !== CHAT.filter; })); } });
+}
+
+/* =====================================================================
+   ADMIN SHELL (panel berasingan: ?panel=admin)
+   ===================================================================== */
+function openAdminPanel() { window.open(`${location.pathname}?panel=admin`, "_blank", "noopener"); }
+async function enterAdmin() {
+  showOnly("adminApp");
+  document.title = "STREAMVERSE Admin";
+  $("#adminEmail").textContent = S.user?.email || "";
+  if (!S.isAdmin) {
+    $("#adminSide").innerHTML = "";
+    $("#adminTitle").textContent = "Akses ditolak";
+    $("#adminBody").innerHTML = `<div class="note err">Akaun ini tiada role admin (custom claim). Panel admin hanya untuk admin.</div><a class="btn" href="${location.pathname}"><i data-lucide="arrow-left"></i>Kembali ke Studio</a>`;
+    icons(); return;
+  }
+  try { const [th, pf] = await Promise.all([fb.F.getDoc(D("config", "themes")), fb.F.getDoc(D("config", "platforms"))]); if (th.exists()) S.sysConfig.themes = th.data(); if (pf.exists()) S.sysConfig.platforms = pf.data(); } catch { /* */ }
+  renderAdmin();
+}
+
+/* =====================================================================
    AUTH (Firebase email/password sahaja — tiada social login)
    ===================================================================== */
-function showOnly(id) { ["authView", "verifyView", "companionView", "app"].forEach(x => $("#" + x).hidden = x !== id); }
+function showOnly(id) { ["authView", "verifyView", "companionView", "app", "adminApp", "chatApp", "viewerApp"].forEach(x => $("#" + x).hidden = x !== id); }
 function showAuth(note) {
   showOnly("authView");
   $("#authPanels").hidden = !FB_READY;
@@ -2524,6 +3088,9 @@ async function onUser(u) {
   const tok = await u.getIdTokenResult();
   S.isAdmin = tok.claims.admin === true;
   if (qs.get("pair")) return startCompanion(qs.get("pair").toUpperCase(), qs.get("kind") || "video");
+  if (qs.get("remote") === "kill") return startKillRemote();
+  if (qs.get("panel") === "admin") return enterAdmin();
+  if (qs.get("panel") === "chat") return startChatWindow();
   enterApp();
 }
 
@@ -2558,10 +3125,10 @@ async function enterApp() {
   if (S.user) await loadStreamSettings().catch(() => {});
   await refreshDevices();
   // Muat semula overlay teks & imej yang tersimpan (tiada permission diperlukan)
-  allSources().forEach(({ s }) => { if (s.type === "text" || (s.type === "image" && s.imageUrl)) connectSource(s, { silent: true }); });
+  allSources().forEach(({ s }) => { if (["text", "killfeed", "donation"].includes(s.type) || (s.type === "image" && s.imageUrl)) connectSource(s, { silent: true }); });
   $("#adminNav").hidden = !S.isAdmin;
   renderTopUser(); renderQuick(); renderAll(); startWelcomeFx();
-  if (cloudOK()) startListeners();
+  if (cloudOK()) { startListeners(); startGameListener(); await loadGameHook(); }
   const h = (location.hash || "").replace("#sv-", "");
   go(VIEWS.includes(h) ? h : "hub");
   const qs = new URLSearchParams(location.search);
@@ -2728,13 +3295,17 @@ function bindEvents() {
       modal({ title: "Live session dicipta", body: `<div class="col small"><div>ID: <span class="mono">${esc(r.id)}</span></div><label class="f">Ingest URL (RTMP)<input class="in mono" readonly value="${esc(r.ingestUrl)}"></label><label class="f">Stream key<input class="in mono" type="password" readonly value="${esc(r.streamKey)}" id="skIn"></label><div class="row"><button class="btn sm" id="skShow">Tunjuk</button><button class="btn sm" id="skCopy">Salin stream key</button></div><div class="note">Masukkan URL + key ini sebagai RTMP output pada media gateway anda (atau OBS). Jangan kongsi stream key. Key tidak disimpan di Firestore.</div>${r.watchUrl ? `<a href="${esc(r.watchUrl)}" target="_blank" rel="noopener">${esc(r.watchUrl)}</a>` : ""}</div>`, onMount: bg => { $("#skShow", bg).onclick = () => $("#skIn", bg).type = "text"; $("#skCopy", bg).onclick = () => copyText(r.streamKey); } });
     });
     if (d.aiTab) { aiTab = d.aiTab; return renderAI(); }
+    if (d.kill !== undefined && t.hasAttribute("data-kill")) return triggerKill({ game: KF.game, headshot: d.kill === "1", source: "button" });
+    if (d.gameSetup) return gameSetup(d.gameSetup);
+    if (d.dnDel !== undefined && t.hasAttribute("data-dn-del")) { DN.links.splice(Number(d.dnDel), 1); return renderDonation(); }
+    if (d.pageToggle) return withBusy(t, async () => { await fb.F.updateDoc(D("publicPages", d.pageToggle), { disabled: d.val === "1" }); adPublicPages(); });
     if (t.id === "aiOverlayIdea") return withBusy(t, () => runAI($("#aiForm"), true));
     if (d.aiOverlay) { const s = await createSourceQuiet("image", { imageUrl: d.aiOverlay, name: "AI Overlay", layoutName: "full", layout: { ...LAYOUTS.full } }); await connectSource(s); toast("Ditambah sebagai Image Overlay pada scene aktif.", "ok"); return; }
     if (d.commTab) { commTab = d.commTab; return renderCommunity(); }
     if (d.viewProfile) return withBusy(t, () => viewProfile(d.viewProfile));
     if (t.closest("[data-post]") && (t.hasAttribute("data-post-like") || t.hasAttribute("data-post-comments") || t.hasAttribute("data-post-del") || t.hasAttribute("data-post-report"))) return postAction(t).catch(er => toast(errMsg(er), "err"));
     if (d.groupJoin) return withBusy(t, async () => { const ref = D("groups", d.groupJoin, "members", S.user.uid); if (d.joined === "1") await fb.F.deleteDoc(ref); else await fb.F.setDoc(ref, { uid: S.user.uid, joinedAt: now() }); commGroups(); });
-    if (d.groupDel) { if (!(await confirmBox("Padam group?", "Group ini akan dipadam.", "Padam"))) return; return withBusy(t, async () => { await fb.F.deleteDoc(D("groups", d.groupDel)); S.view === "admin" ? renderAdmin() : commGroups(); }); }
+    if (d.groupDel) { if (!(await confirmBox("Padam group?", "Group ini akan dipadam.", "Padam"))) return; return withBusy(t, async () => { await fb.F.deleteDoc(D("groups", d.groupDel)); $("#adminApp").hidden ? commGroups() : renderAdmin(); }); }
     if (d.adminTab) { adminTab = d.adminTab; return renderAdmin(); }
     if (d.adRole) return withBusy(t, async () => { await callFn("adminSetRole", { uid: d.adRole, admin: d.val === "1" }); toast("Role dikemas kini. Pengguna perlu log masuk semula.", "ok"); adUsers(); });
     if (d.adDisable) return withBusy(t, async () => { await callFn("adminSetDisabled", { uid: d.adDisable, disabled: d.val === "1" }); adUsers(); });
@@ -2757,6 +3328,8 @@ function bindEvents() {
     if (t.hasAttribute("data-proc-target")) { S.procTarget = t.value; renderProcessing(); icons(); }
     if (t.id === "modeSelect") return pickTheme(S.prefs.theme, t.value);
     if (t.id === "feedFollowing") return loadFeed();
+    if (t.dataset.dn !== undefined && t.hasAttribute("data-dn")) { DN.links[Number(t.dataset.dn)][t.dataset.k] = t.value.trim(); if (t.dataset.k !== "label") renderDonation(); return; }
+    if (t.hasAttribute("data-dn-primary")) { DN.links.forEach((l, i) => l.primary = i === Number(t.dataset.dnPrimary)); qrCache.clear(); return; }
   });
   document.addEventListener("submit", e => {
     const f = e.target;
@@ -2794,8 +3367,12 @@ function bindEvents() {
   ]); };
   $("#moreBtn").onclick = e => { e.stopPropagation(); menu(e.currentTarget, [
     { icon: "bot", label: "AI Stream Creator", onClick: () => go("ai") }, { icon: "radio", label: "StreamVerse Connect", onClick: () => go("connect") },
+    { icon: "crosshair", label: "Game Connect & Kill", onClick: () => go("games") }, { icon: "hand-coins", label: "Donation", onClick: () => go("donation") }, { icon: "messages-square", label: "Live Chat", onClick: () => go("chat") },
     { icon: "palette", label: "Gaming Themes", onClick: () => go("themes") }, { icon: "film", label: "Recordings", onClick: () => go("recordings") },
-    { icon: "settings", label: "Settings", onClick: () => go("settings") }].concat(S.isAdmin ? [{ icon: "crown", label: "Admin Panel", onClick: () => go("admin") }] : [])); };
+    { icon: "settings", label: "Settings", onClick: () => go("settings") }].concat(S.isAdmin ? [{ icon: "crown", label: "Admin Panel", onClick: openAdminPanel }] : [])); };
+  $("#openAdminBtn").onclick = openAdminPanel;
+  $("#adminLogout").onclick = () => fb.ready && fb.Au.signOut(fb.auth);
+  $("#adminTabSelect").onchange = e => { adminTab = e.target.value; renderAdmin(); };
   window.addEventListener("beforeunload", e => { if (S.rec.state !== "idle" || S.stream.state !== "idle") { e.preventDefault(); e.returnValue = ""; } });
 }
 
@@ -2804,14 +3381,24 @@ function bindEvents() {
    ===================================================================== */
 async function boot() {
   applyTheme(ls.get("theme", "neon"), ls.get("mode", "dark"));
-  renderLogos(); bindAuth(); bindEvents(); startCompositor();
+  renderLogos(); bindAuth(); bindEvents(); bindChatEvents(); startCompositor();
   const qs = new URLSearchParams(location.search);
   try { await initFirebase(); }
   catch (e) { console.error(e); toast("Firebase SDK gagal dimuatkan: " + e.message, "err", 9000); }
   $("#boot").hidden = true;
   const mode = qs.get("mode"), code = qs.get("oobCode");
   if (mode && code) return handleEmailAction(mode, code);
+  if (qs.get("live")) return startViewerPage(qs.get("live"));
   if (!fb.ready) {
+    if (qs.get("panel") === "chat") { S.local = true; return startChatWindow(); }
+    if (qs.get("panel") === "admin") {
+      showOnly("adminApp");
+      $("#adminSide").innerHTML = ADMIN_TABS.map(([k, l, ic]) => `<button class="nav-item ${k === adminTab ? "on" : ""}" disabled><i data-lucide="${ic}"></i>${l}</button>`).join("");
+      $("#adminTabSelect").innerHTML = ADMIN_TABS.map(([k, l]) => `<option>${l}</option>`).join(""); $("#adminTabSelect").disabled = true;
+      $("#adminTitle").textContent = "Admin Console";
+      $("#adminBody").innerHTML = cloudBlock("Admin Panel (custom claim admin + Cloud Functions)") + `<p class="small muted">Admin Panel ialah aplikasi berasingan dari studio pengguna. Hanya akaun yang mempunyai custom claim <span class="mono">admin</span> boleh masuk; pengguna biasa nampak "Akses ditolak".</p>`;
+      icons(); return;
+    }
     showAuth();
     if (qs.get("pair")) $("#fbMissing").insertAdjacentHTML("afterbegin", `<p><b>Pairing telefon memerlukan Firebase</b> untuk signaling WebRTC.</p>`);
     return;

@@ -31,7 +31,15 @@ Platform all-in-one untuk gamer, livestreamer dan content creator. Frontend iala
 | TikTok / YouTube / Facebook connect | ✓ | – | – | – | Cloud Functions + app developer platform |
 | AI Stream Creator | ✓ | – | – | – | Cloud Functions + API key (Anthropic / OpenAI) |
 | Community | ✓ | – | – | – | Firestore + Functions (kiraan & notifikasi) |
-| Admin Panel | ✓ | – | – | – | Custom claim `admin` + Functions |
+| Admin Panel (aplikasi berasingan `?panel=admin`) | ✓ | – | – | – | Custom claim `admin` + Functions |
+| Kill Popup (dalam siaran & rakaman) | ✓ | ✓ manual / hotkey | – | – | Auto: webhook (Functions) |
+| Game Connect auto (CS2, Dota 2) | ✓ | – | – | – | Functions + config GSI dalam game |
+| Game Connect (League of Legends) | ✓ | – | – | PC gaming jalankan bridge | Functions + `tools/game-bridge.mjs` |
+| Valorant, MLBB, PUBG M, Free Fire, CODM, Fortnite, Apex | ✓ | ✓ manual | – | Telefon kedua (Kill Remote) / Stream Deck | **Tiada API kill rasmi**: manual sahaja |
+| QR Donation pada skrin live | ✓ | ✓ | – | – | – |
+| Halaman live awam + butang DONATE (popup) | ✓ | – | – | – | Firestore (`publicPages`) |
+| Live Chat YouTube / Facebook (pop-out, skrin kedua, always-on-top) | ✓ | – | Window management (pilihan) | Skrin kedua (pilihan) | Functions + platform disambung |
+| Live Chat TikTok | – | – | – | – | **Unsupported**: tiada API rasmi |
 
 ---
 
@@ -49,6 +57,8 @@ sites/streamverse/
     package.json
     .env.example          # APP_URL, ENFORCE_APP_CHECK
     scripts/set-admin.js  # Lantik admin pertama
+  tools/
+    game-bridge.mjs       # Relay GSI + bridge League of Legends (jalan di PC gaming)
 ```
 
 ## 2. Firebase Configuration
@@ -146,7 +156,7 @@ gcloud projects add-iam-policy-binding PROJECT_ID \
   --role="roles/secretmanager.secretAccessor"
 ```
 
-Senarai fungsi: `getIceServers`, `aiProviderStatus`, `aiGenerateText`, `aiGenerateImage`, `platformAuthUrl`, `oauthCallback` (HTTP, via Hosting `/oauth/callback`), `platformVerify`, `platformDisconnect`, `platformCreateLive`, `adminListUsers`, `adminSetRole`, `adminSetDisabled`, `adminSystemStatus`, trigger community (`onLike*`, `onComment*`, `onFollow*`, `onMember*`), `cleanupPairings` (setiap 30 minit).
+Senarai fungsi: `gameHookCreate`, `gameHookRevoke`, `gameEvent` (HTTP, via Hosting `/hook/game/**`), `platformChatPoll`, `cleanupGameEvents`, `getIceServers`, `aiProviderStatus`, `aiGenerateText`, `aiGenerateImage`, `platformAuthUrl`, `oauthCallback` (HTTP, via Hosting `/oauth/callback`), `platformVerify`, `platformDisconnect`, `platformCreateLive`, `adminListUsers`, `adminSetRole`, `adminSetDisabled`, `adminSystemStatus`, trigger community (`onLike*`, `onComment*`, `onFollow*`, `onMember*`), `cleanupPairings` (setiap 30 minit).
 
 **Admin pertama:**
 ```bash
@@ -241,6 +251,35 @@ Setiap tindakan async melalui `withBusy()` (loading state pada butang, toast suc
 5. **Peranti:** uji USB mic, audio interface (48V di hardware), capture card. Semak meter bergerak hanya bila ada bunyi.
 6. **Browser:** Chrome/Edge (sokongan penuh), Firefox (tiada audio screen share), Safari (MP4, sokongan getDisplayMedia terhad).
 7. Responsif: 375 / 768 / 1440 px.
+
+## 21a. Panel Admin berasingan
+Admin Panel ialah aplikasi berasingan dalam fail yang sama: `https://DOMAIN/?panel=admin`, dengan topbar, sidebar dan aksen tersendiri. Studio pengguna tidak memuatkan admin. Butang "Admin Panel" (hanya untuk admin) membuka tab baru. Akses disemak oleh custom claim `admin` di frontend, Security Rules dan setiap Cloud Function admin. Pengguna biasa nampak "Akses ditolak". Seksyen: Users, Community, Donation Pages (nyahaktif halaman yang menyalahgunakan link), Reports, Announcements, Themes, Platform Settings, AI Provider, System Logs, System Status.
+
+## 21b. Kill Popup & Game Connect
+- Popup dilukis pada canvas output, jadi ia **masuk ke siaran dan rakaman**. Tambah source **Kill Popup** (templat Gaming / Mobile Gaming sudah ada). Tetapan: label streak, tempoh, tempoh streak, bunyi (masuk mixer), papar senjata/mangsa.
+- **Manual (semua game):** butang KILL, hotkey `K` / `H` (headshot) bila STREAMVERSE difokus, **Kill Remote** (`?remote=kill`) di telefon/tablet kedua, atau Stream Deck → Webhook.
+- **Webhook URL:** jana di Game Connect (`gameHookCreate`). URL ini rahsia (token 48 hex). Hosting rewrite `/hook/game/**` → function `gameEvent`.
+- **CS2 / Dota 2:** salin config dari butang Setup ke folder `cfg` (Dota 2 perlu `-gamestateintegration`). Function membandingkan `match_stats.kills` / `player.kills` dengan keadaan sebelumnya; kill semasa spectate diabaikan. Jika game tidak menghantar ke HTTPS di PC anda, guna relay: `node tools/game-bridge.mjs --forward URL` dan tukar `uri` kepada `http://127.0.0.1:3000/`.
+- **League of Legends:** `node tools/game-bridge.mjs --lol --forward URL` di PC gaming (membaca Live Client Data API rasmi pada `127.0.0.1:2999`).
+- **Webhook umum:** `POST URL` dengan `{"type":"kill","game":"mlbb","headshot":false,"weapon":"","victim":"","streak":0}`.
+- Game tanpa API rasmi (Valorant, MLBB, PUBG Mobile, Free Fire, CODM, Fortnite, Apex) dilabel **Manual sahaja**. Pengesanan OCR skrin tidak disediakan.
+- `gameEvents` lama dipadam oleh `cleanupGameEvents`.
+
+## 21c. Donation (Sociabuzz dan lain-lain)
+- Streamer tambah sehingga 8 link: Sociabuzz, Saweria, Trakteer, Ko-fi, PayPal, Buy Me a Coffee atau link lain (mesti `https://`, domain disemak ikut jenis).
+- **Dalam app TikTok/YouTube/Facebook, video live tidak boleh ada butang yang boleh diklik.** Jadi viewer donate terus dari paparan live melalui:
+  1. **QR Donation** (source overlay) dilukis pada siaran. Viewer imbas QR dari skrin dan terus ke halaman Sociabuzz. Mod: sentiasa atau berkala.
+  2. **Halaman Live awam** `https://DOMAIN/?live=<username>`: siaran YouTube terbenam (Channel ID), butang **DONATE** terapung di atas video yang membuka popup senarai link + QR, serta butang "Tonton di TikTok/YouTube". Status LIVE hanya bila stream STREAMVERSE benar-benar connected.
+- Letak link halaman live dalam pinned comment / description. Pembayaran diproses sepenuhnya oleh platform donation; STREAMVERSE tidak menyentuh wang atau data kad.
+- Data di `publicPages/{uid}` (baca awam, tulis pemilik; admin boleh nyahaktif).
+
+## 21d. Live Chat (pop-out & skrin kedua)
+- YouTube: `liveBroadcasts?broadcastStatus=active` → `liveChatId` → `liveChat/messages` (ikut `pollingIntervalMillis`, min 5 s). Super Chat ditonjolkan. Kuota YouTube Data API ~10,000 unit/hari; minta tambahan kuota jika live lama.
+- Facebook: live video aktif pada Page → `/{live_video_id}/comments?live_filter=no_filter` setiap 4 s.
+- TikTok: **tiada API rasmi** untuk membaca komen LIVE. Guna tetingkap komen TikTok LIVE Studio.
+- **Pop-out (skrin kedua):** membuka `?panel=chat` dalam tetingkap berasingan. Jika browser menyokong Window Management API (Chrome/Edge) dan permission diberi, tetingkap terus diletak pada skrin kedua; jika tidak, seret sendiri. Bila pop-out aktif, panel dalam app berhenti (BroadcastChannel) supaya tidak poll dua kali.
+- **Always on top:** Document Picture-in-Picture (Chrome/Edge 116+ desktop). Chat terapung di atas game/OBS.
+- Saiz teks boleh dibesarkan (14–44 px) dan ditapis ikut platform.
 
 ## 22. Production Deployment Checklist
 - [ ] Pelan Blaze + budget alert

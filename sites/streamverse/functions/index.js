@@ -445,3 +445,129 @@ exports.cleanupPairings = onSchedule("every 30 minutes", async () => {
   for (const d of snap.docs) await db.recursiveDelete(d.ref);
   if (snap.size) await log("info", "cleanup.pairings", `${snap.size} pairing dipadam`);
 });
+
+/* =====================================================================
+   GAME CONNECT — webhook kill (CS2 / Dota 2 GSI, game-bridge, Stream Deck)
+   ===================================================================== */
+const hookCol = () => db.collection("_private").doc("gameHooks").collection("items");
+exports.gameHookCreate = onCall(CALL, async req => {
+  const uid = needUser(req);
+  if (!APP_URL()) throw new HttpsError("failed-precondition", "APP_URL belum ditetapkan dalam functions/.env.");
+  const old = await hookCol().where("uid", "==", uid).get();
+  const batch = db.batch(); old.forEach(d => batch.delete(d.ref));
+  const token = crypto.randomBytes(24).toString("hex");
+  const url = `${APP_URL()}/hook/game/${token}`;
+  batch.set(hookCol().doc(token), { uid, createdAt: Date.now(), state: {}, lastAt: 0 });
+  batch.set(db.doc(`users/${uid}/settings/gameHook`), { url, createdAt: FieldValue.serverTimestamp() });
+  await batch.commit();
+  await log("info", "game.hook", "Webhook game dijana", { uid });
+  return { url };
+});
+exports.gameHookRevoke = onCall(CALL, async req => {
+  const uid = needUser(req);
+  const old = await hookCol().where("uid", "==", uid).get();
+  const batch = db.batch(); old.forEach(d => batch.delete(d.ref)); batch.delete(db.doc(`users/${uid}/settings/gameHook`));
+  await batch.commit();
+  return { ok: true };
+});
+function parseCS2(b, prev) {
+  const p = b.player, prov = b.provider; const ev = [];
+  if (!p || !prov || p.steamid !== prov.steamid) return { ev, state: prev };       // spectate / data tidak lengkap
+  const kills = p.match_stats?.kills, rk = p.state?.round_kills || 0, rhs = p.state?.round_killhs || 0;
+  if (typeof kills !== "number") return { ev, state: prev };
+  if (typeof prev.kills === "number" && kills > prev.kills && kills - prev.kills <= 5 && (b.map?.phase || "live") === "live") {
+    const n = kills - prev.kills; const hsGain = Math.max(0, rhs - (prev.rhs || 0));
+    const w = Object.values(p.weapons || {}).find(x => x.state === "active");
+    for (let i = 0; i < n; i++) ev.push({ game: "cs2", streak: rk ? Math.max(1, rk - n + i + 1) : null, headshot: i >= n - hsGain, weapon: (w?.name || "").replace(/^weapon_/, "") });
+  }
+  return { ev, state: { kills, rhs } };
+}
+function parseDota(b, prev) {
+  const p = b.player; const ev = [];
+  if (!p || typeof p.kills !== "number") return { ev, state: prev };
+  if (typeof prev.kills === "number" && p.kills > prev.kills && p.kills - prev.kills <= 5) {
+    for (let i = 0; i < p.kills - prev.kills; i++) ev.push({ game: "dota2", streak: p.kill_streak || null, headshot: false, weapon: b.hero?.name?.replace(/^npc_dota_hero_/, "") || "" });
+  }
+  return { ev, state: { kills: p.kills } };
+}
+exports.gameEvent = onRequest({ cors: false, maxInstances: 20 }, async (req, res) => {
+  if (req.method !== "POST") return res.status(405).send("POST sahaja");
+  const token = String(req.path.split("/").filter(Boolean).pop() || "");
+  if (!/^[a-f0-9]{48}$/.test(token)) return res.status(404).send("not found");
+  const ref = hookCol().doc(token);
+  let body = req.body;
+  if (typeof body === "string" || Buffer.isBuffer(body)) { try { body = JSON.parse(body.toString()); } catch { return res.status(400).send("JSON tidak sah"); } }
+  if (!body || typeof body !== "object") return res.status(400).send("tiada body");
+  try {
+    const out = await db.runTransaction(async tx => {
+      const s = await tx.get(ref); if (!s.exists) return null;
+      const d = s.data(); const nowMs = Date.now();
+      let ev = [], state = d.state || {};
+      const appid = body.provider?.appid;
+      if (appid === 730) { const r = parseCS2(body, state.cs2 || {}); ev = r.ev; state = { ...state, cs2: r.state }; }
+      else if (appid === 570) { const r = parseDota(body, state.dota2 || {}); ev = r.ev; state = { ...state, dota2: r.state }; }
+      else if (body.type === "kill") {
+        if (nowMs - (d.lastAt || 0) < 150) return { uid: d.uid, ev: [] };              // had kadar asas
+        ev = [{ game: clip(body.game || "generic", 20), streak: Number(body.streak) > 0 ? Math.min(99, Number(body.streak)) : null, headshot: body.headshot === true, weapon: clip(body.weapon, 40), victim: clip(body.victim, 40) }];
+      }
+      tx.update(ref, { state, lastAt: ev.length ? nowMs : d.lastAt || 0, lastSeen: nowMs });
+      return { uid: d.uid, ev };
+    });
+    if (!out) return res.status(404).send("not found");
+    for (const e of out.ev.slice(0, 5)) {
+      await db.collection("users").doc(out.uid).collection("gameEvents").add({ type: "kill", source: "webhook", ...e, createdAt: FieldValue.serverTimestamp() });
+    }
+    return res.status(200).send("ok");
+  } catch (e) { console.error(e); return res.status(500).send("error"); }
+});
+
+/* =====================================================================
+   LIVE CHAT — YouTube liveChatMessages & Facebook live comments (API rasmi)
+   ===================================================================== */
+exports.platformChatPoll = onCall({ ...CALL, timeoutSeconds: 30 }, async req => {
+  const uid = needUser(req); const p = req.data?.platform;
+  if (p === "tiktok") throw new HttpsError("failed-precondition", "TikTok tidak menyediakan API rasmi untuk membaca komen LIVE.");
+  if (!["youtube", "facebook"].includes(p)) throw new HttpsError("invalid-argument", "Platform tidak sah.");
+  const { P, id, sec } = await providerCreds(p);
+  const conn = (await connRef(uid, p).get()).data();
+  if (!conn || conn.status !== "connected") throw new HttpsError("failed-precondition", "Platform belum disambung dan disahkan.");
+  const tok = await loadToken(uid, p, P, id, sec);
+  try {
+    if (p === "youtube") {
+      const H = { Authorization: `Bearer ${tok.access_token}` };
+      let chatId = clip(req.data.chatId, 200);
+      if (!chatId) {
+        const r = await fetchJSON("https://www.googleapis.com/youtube/v3/liveBroadcasts?part=snippet&broadcastStatus=active&broadcastType=all&maxResults=1", { headers: H });
+        chatId = r.items?.[0]?.snippet?.liveChatId;
+        if (!chatId) return { status: "no-live", pollMs: 30000 };
+      }
+      const q = new URLSearchParams({ liveChatId: chatId, part: "snippet,authorDetails", maxResults: "200" });
+      if (req.data.pageToken) q.set("pageToken", clip(req.data.pageToken, 300));
+      const r = await fetchJSON(`https://www.googleapis.com/youtube/v3/liveChat/messages?${q}`, { headers: H });
+      const messages = (r.items || []).map(m => ({ id: "yt_" + m.id, platform: "youtube", author: m.authorDetails?.displayName, text: m.snippet?.displayMessage || "", at: m.snippet?.publishedAt,
+        badge: m.authorDetails?.isChatOwner ? "owner" : m.authorDetails?.isChatModerator ? "mod" : m.authorDetails?.isChatSponsor ? "member" : "", amount: m.snippet?.superChatDetails?.amountDisplayString || m.snippet?.superStickerDetails?.amountDisplayString || "" }));
+      return { status: "ok", messages, cursor: { chatId, pageToken: r.nextPageToken }, pollMs: Math.max(5000, r.pollingIntervalMillis || 5000) };
+    }
+    const pages = await fetchJSON(`https://graph.facebook.com/v19.0/me/accounts?fields=id,access_token&access_token=${encodeURIComponent(tok.access_token)}`);
+    const page = pages.data?.find(x => x.id === conn.pageId) || pages.data?.[0];
+    if (!page) return { status: "no-live", pollMs: 60000 };
+    let liveId = clip(req.data.liveId, 60);
+    if (!liveId) {
+      const lv = await fetchJSON(`https://graph.facebook.com/v19.0/${page.id}/live_videos?broadcast_status=${encodeURIComponent('["LIVE"]')}&fields=id&limit=1&access_token=${encodeURIComponent(page.access_token)}`);
+      liveId = lv.data?.[0]?.id;
+      if (!liveId) return { status: "no-live", pollMs: 30000 };
+    }
+    const c = await fetchJSON(`https://graph.facebook.com/v19.0/${liveId}/comments?live_filter=no_filter&order=reverse_chronological&fields=id,from{name},message,created_time&limit=50&access_token=${encodeURIComponent(page.access_token)}`);
+    const messages = (c.data || []).reverse().map(m => ({ id: "fb_" + m.id, platform: "facebook", author: m.from?.name || "Viewer", text: m.message || "", at: m.created_time }));
+    return { status: "ok", messages, cursor: { liveId }, pollMs: 4000 };
+  } catch (e) {
+    if (e.status === 403 || e.status === 404) return { status: "no-live", pollMs: 30000 };
+    throw new HttpsError("unavailable", `${p}: ${e.message}`);
+  }
+});
+
+exports.cleanupGameEvents = onSchedule("every 6 hours", async () => {
+  const cut = admin.firestore.Timestamp.fromMillis(Date.now() - 24 * 3600 * 1000);
+  const snap = await db.collectionGroup("gameEvents").where("createdAt", "<", cut).limit(500).get();
+  const batch = db.batch(); snap.forEach(d => batch.delete(d.ref)); if (snap.size) await batch.commit();
+});
