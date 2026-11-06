@@ -105,9 +105,19 @@ table.t th,table.t td{text-align:left;padding:8px;border-bottom:1px solid var(--
 
 /* ---------- Boot / Auth ---------- */
 #boot{position:fixed;inset:0;display:grid;place-items:center;gap:12px;font-family:var(--f-brand);letter-spacing:.2em;color:var(--muted)}
-.auth{min-height:100%;display:grid;place-items:center;padding:24px max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px))}
+.auth{min-height:100vh;min-height:100dvh;width:100%;display:grid;place-items:center;padding:24px max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px))}
 .auth-card{width:min(440px,100%);display:flex;flex-direction:column;gap:14px}
 .auth-card .panel{padding:22px}
+.auth-card{margin-inline:auto}
+#authTabs{display:flex;gap:6px}
+#authTabs .tab{flex:1;text-align:center;padding:9px 12px;font-size:14px}
+.linkbtn{background:none;border:0;padding:2px 0;color:var(--ink);font:600 13px var(--f-body);cursor:pointer;text-decoration:underline;text-underline-offset:3px;align-self:flex-start;border-radius:4px}
+.linkbtn:hover{color:var(--text)}
+.pw{position:relative;display:block;width:100%}
+.pw > input{padding-right:46px}
+.pw-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:34px;height:34px;display:grid;place-items:center;border:0;background:transparent;color:var(--muted);cursor:pointer;border-radius:8px;padding:0;transition:color .25s var(--ease-ios),background .25s var(--ease-ios)}
+.pw-eye:hover{color:var(--text);background:var(--nav-hover)}
+.pw-eye svg{width:20px;height:20px;display:block}
 .brand{display:flex;align-items:center;gap:10px}
 .brand-name{font-family:var(--f-brand);font-weight:900;font-size:21px;letter-spacing:.01em;font-style:italic;line-height:1}
 .brand-tag{font-family:var(--f-head);font-size:8.5px;font-weight:700;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
@@ -168,12 +178,12 @@ html{scroll-behavior:smooth}
 .welcome p{margin:0;color:var(--muted);font-size:16px;position:relative;z-index:1}
 .welcome canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.9;pointer-events:none}
 .welcome > *:not(canvas){position:relative;z-index:1}
-.status-row{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.status-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:10px}
 .stat{display:flex;align-items:center;gap:10px;padding:12px;border-radius:12px;border:1px solid var(--border);background:color-mix(in srgb,var(--panel) 90%,transparent);min-width:0}
 .stat .ic{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex:none;background:color-mix(in srgb,currentColor 14%,transparent)}
 .stat .ic svg.lucide{width:22px;height:22px}
 .stat b{display:block;font-family:var(--f-head);font-weight:800;font-size:13.5px;color:var(--text)}
-.stat span{font-size:11.5px;font-weight:600;display:block;line-height:1.25;overflow-wrap:anywhere}
+.stat span{font-size:11.5px;font-weight:600;display:block;line-height:1.25;overflow-wrap:break-word}
 .stat b{line-height:1.2}
 .stat > div:last-child{min-width:0}
 .studio{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:14px;align-items:start}
@@ -352,26 +362,28 @@ body.t-rgb .theme-card.on,body.t-rgb .btn.primary{animation:rgb 6s linear infini
     </div>
     <div id="actionPanel" class="panel" hidden></div>
     <div id="authPanels" class="panel">
-      <div class="tabs" role="tablist">
-        <button class="tab on" data-auth-tab="login" role="tab">Log Masuk</button>
-        <button class="tab" data-auth-tab="register" role="tab">Daftar</button>
-        <button class="tab" data-auth-tab="forgot" role="tab">Lupa Password</button>
+      <div class="tabs" role="tablist" id="authTabs">
+        <button class="tab on" data-auth-tab="register" role="tab">Daftar</button>
+        <button class="tab" data-auth-tab="login" role="tab">Log Masuk</button>
       </div>
-      <form id="loginForm" class="col" data-auth-form="login" novalidate>
-        <label class="f">Email<input class="in" id="loginEmail" type="email" autocomplete="email" required></label>
-        <label class="f">Password<input class="in" id="loginPass" type="password" autocomplete="current-password" required minlength="8"></label>
-        <button class="btn primary" type="submit"><i data-lucide="log-in"></i>Log Masuk</button>
-      </form>
-      <form id="registerForm" class="col" data-auth-form="register" hidden novalidate>
+      <form id="registerForm" class="col" data-auth-form="register" novalidate>
         <label class="f">Email<input class="in" id="regEmail" type="email" autocomplete="email" required></label>
         <label class="f">Password (min 8 aksara, ada huruf &amp; nombor)<input class="in" id="regPass" type="password" autocomplete="new-password" required minlength="8"></label>
         <label class="f">Confirm Password<input class="in" id="regPass2" type="password" autocomplete="new-password" required minlength="8"></label>
         <button class="btn primary" type="submit"><i data-lucide="user-plus"></i>Daftar Akaun</button>
         <p class="small muted" style="margin:0">Email pengesahan akan dihantar. Dashboard hanya dibuka selepas email disahkan.</p>
       </form>
+      <form id="loginForm" class="col" data-auth-form="login" hidden novalidate>
+        <label class="f">Email<input class="in" id="loginEmail" type="email" autocomplete="email" required></label>
+        <label class="f">Password<input class="in" id="loginPass" type="password" autocomplete="current-password" required minlength="8"></label>
+        <button type="button" class="linkbtn" id="forgotLink">Lupa password?</button>
+        <button class="btn primary" type="submit"><i data-lucide="log-in"></i>Log Masuk</button>
+      </form>
       <form id="forgotForm" class="col" data-auth-form="forgot" hidden novalidate>
+        <p class="small muted" style="margin:0">Masukkan email akaun anda. Kami akan hantar email berisi link untuk menetapkan password baharu.</p>
         <label class="f">Email akaun<input class="in" id="forgotEmail" type="email" autocomplete="email" required></label>
-        <button class="btn primary" type="submit"><i data-lucide="mail"></i>Hantar Link Reset Password</button>
+        <button class="btn primary" type="submit"><i data-lucide="mail"></i>Hantar Email Reset Password</button>
+        <button type="button" class="linkbtn" id="forgotBack">Kembali ke log masuk</button>
       </form>
       <p id="authMsg" class="small" role="status" style="margin:10px 0 0"></p>
     </div>
@@ -437,7 +449,7 @@ body.t-rgb .theme-card.on,body.t-rgb .btn.primary{animation:rgb 6s linear infini
     <section class="view" data-view="hub">
       <div class="hub">
         <div class="hub-main">
-          <div class="panel welcome"><canvas id="welcomeFx" aria-hidden="true"></canvas><h1 id="welcomeTitle">Selamat kembali</h1><p>Sedia untuk stream, rakam dan hasilkan content gaming.</p><div id="announceBox" class="col" style="margin-top:8px"></div></div>
+          <div class="panel welcome"><canvas id="welcomeFx" aria-hidden="true"></canvas><h1 id="welcomeTitle">Selamat kembali</h1><p id="welcomeSub">Sedia untuk stream, rakam dan hasilkan content gaming.</p><div id="siteBanner" class="col" style="margin-top:8px"></div><div id="announceBox" class="col" style="margin-top:8px"></div></div>
           <div class="status-row" id="statusRow"></div>
           <div class="panel">
             <div class="panel-h"><h2><i data-lucide="monitor-play"></i>Capture Studio</h2><span class="grow"></span><label class="row small muted">Scene:<select class="in" style="width:auto;padding:5px 8px" data-slot="scene-select" aria-label="Pilih scene"></select></label></div>
@@ -512,14 +524,14 @@ body.t-rgb .theme-card.on,body.t-rgb .btn.primary{animation:rgb 6s linear infini
 
     <!-- ===== AI CREATOR ===== -->
     <section class="view" data-view="ai">
-      <div class="view-h"><div><h1>AI Stream Creator</h1><p>Poster, thumbnail, overlay, copywriting, jadual, content plan dan branding. API key hanya di Cloud Functions.</p></div></div>
+      <div class="view-h"><div><h1>AI Stream Creator</h1><p>Poster, thumbnail, overlay, copywriting, jadual, content plan dan branding. Percuma, tanpa API key.</p></div></div>
       <div id="aiStatus"></div>
       <div class="panel"><div class="tabs" id="aiTabs"></div><div id="aiBody" class="col"></div></div>
     </section>
 
     <!-- ===== CONNECT ===== -->
     <section class="view" data-view="connect">
-      <div class="view-h"><div><h1>StreamVerse Connect</h1><p>TikTok LIVE, YouTube Gaming dan Facebook Gaming melalui API rasmi. Status "Connected" hanya selepas token disahkan oleh backend.</p></div></div>
+      <div class="view-h"><div><h1>StreamVerse Connect</h1><p>TikTok LIVE, YouTube Gaming dan Facebook Gaming melalui API rasmi. Status "Connected" hanya selepas akaun disahkan oleh platform.</p></div></div>
       <div id="connectBody" class="col" style="gap:14px"></div>
     </section>
 
@@ -598,6 +610,152 @@ body.t-rgb .theme-card.on,body.t-rgb .btn.primary{animation:rgb 6s linear infini
 <section id="viewerApp" hidden></section>
 
 <div id="modalRoot"></div>
+<script type="text/plain" id="bridgeSrc">
+#!/usr/bin/env node
+/* STREAMVERSE Game Bridge (percuma, jalan di PC gaming anda, Node.js 18+).
+   Tiada server, tiada VPS, tiada Firebase Functions.
+
+   Fungsi:
+   1) Terima Game State Integration (CS2 / Dota 2) di http://127.0.0.1:3000/
+   2) --lol : baca Live Client Data API rasmi League of Legends (https://127.0.0.1:2999)
+   3) POST http://127.0.0.1:3000/kill  (Stream Deck, Touch Portal, skrip / mod sendiri)
+   4) Hantar semua kill ke STREAMVERSE (dalam browser) melalui http://127.0.0.1:3000/events
+
+   Guna:
+     node game-bridge.mjs
+     node game-bridge.mjs --lol
+     node game-bridge.mjs --port 3100
+*/
+import http from "node:http";
+import https from "node:https";
+
+const args = process.argv.slice(2);
+const opt = n => { const i = args.indexOf(n); return i > -1 ? args[i + 1] : null; };
+const PORT = Number(opt("--port") || 3000);
+const clients = new Set();
+const state = { cs2: {}, dota2: {}, lastGeneric: 0 };
+
+const CORS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Private-Network": "true",
+  "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+  "Access-Control-Allow-Headers": "*"
+};
+
+function emit(ev) {
+  const line = "data: " + JSON.stringify(ev) + "\n\n";
+  clients.forEach(res => res.write(line));
+  console.log("KILL ->", ev.game, ev.headshot ? "(headshot)" : "", ev.weapon || ev.victim || "", "| pelayar disambung:", clients.size);
+}
+
+function parseCS2(b) {
+  const p = b.player, prov = b.provider;
+  if (!p || !prov || p.steamid !== prov.steamid) return [];          // spectate / data tidak lengkap
+  const kills = p.match_stats && p.match_stats.kills;
+  if (typeof kills !== "number") return [];
+  const prev = state.cs2;
+  const rk = (p.state && p.state.round_kills) || 0;
+  const rhs = (p.state && p.state.round_killhs) || 0;
+  const out = [];
+  if (typeof prev.kills === "number" && kills > prev.kills && kills - prev.kills <= 5) {
+    const n = kills - prev.kills;
+    const hs = Math.max(0, rhs - (prev.rhs || 0));
+    const w = Object.values(p.weapons || {}).find(x => x.state === "active");
+    for (let i = 0; i < n; i++) {
+      out.push({ type: "kill", game: "cs2", streak: rk ? Math.max(1, rk - n + i + 1) : null, headshot: i >= n - hs, weapon: ((w && w.name) || "").replace(/^weapon_/, "") });
+    }
+  }
+  state.cs2 = { kills, rhs };
+  return out;
+}
+
+function parseDota(b) {
+  const p = b.player;
+  if (!p || typeof p.kills !== "number") return [];
+  const prev = state.dota2;
+  const out = [];
+  if (typeof prev.kills === "number" && p.kills > prev.kills && p.kills - prev.kills <= 5) {
+    const hero = ((b.hero && b.hero.name) || "").replace(/^npc_dota_hero_/, "");
+    for (let i = 0; i < p.kills - prev.kills; i++) out.push({ type: "kill", game: "dota2", streak: p.kill_streak || null, headshot: false, weapon: hero });
+  }
+  state.dota2 = { kills: p.kills };
+  return out;
+}
+
+function handlePost(req, res) {
+  let body = "";
+  req.on("data", c => { body += c; if (body.length > 1e6) req.destroy(); });
+  req.on("end", () => {
+    res.writeHead(200, { "Content-Type": "text/plain" });
+    res.end("ok");
+    let j;
+    try { j = JSON.parse(body); } catch { return; }
+    if (!j || typeof j !== "object") return;
+    const appid = j.provider && j.provider.appid;
+    if (appid === 730) return parseCS2(j).forEach(emit);
+    if (appid === 570) return parseDota(j).forEach(emit);
+    if (j.type === "kill") {
+      const now = Date.now();
+      if (now - state.lastGeneric < 150) return;                      // had kadar asas
+      state.lastGeneric = now;
+      emit({
+        type: "kill",
+        game: String(j.game || "generic").slice(0, 20),
+        streak: Number(j.streak) > 0 ? Math.min(99, Number(j.streak)) : null,
+        headshot: j.headshot === true,
+        weapon: String(j.weapon || "").slice(0, 40),
+        victim: String(j.victim || "").slice(0, 40)
+      });
+    }
+  });
+}
+
+http.createServer((req, res) => {
+  Object.entries(CORS).forEach(([k, v]) => res.setHeader(k, v));
+  if (req.method === "OPTIONS") { res.writeHead(204); return res.end(); }
+  if (req.method === "GET" && req.url.startsWith("/events")) {
+    res.writeHead(200, { "Content-Type": "text/event-stream", "Cache-Control": "no-cache", Connection: "keep-alive" });
+    res.write('data: {"type":"hello"}\n\n');
+    clients.add(res);
+    req.on("close", () => clients.delete(res));
+    return;
+  }
+  if (req.method === "POST") return handlePost(req, res);
+  res.writeHead(200, { "Content-Type": "text/plain" });
+  res.end("STREAMVERSE Game Bridge OK");
+}).listen(PORT, "127.0.0.1", () => {
+  console.log("STREAMVERSE Game Bridge sedia di http://127.0.0.1:" + PORT);
+  console.log("  Pelayar  : tekan Connect Bridge dalam STREAMVERSE > Game Connect & Kill");
+  console.log("  CS2/Dota : set uri config GSI kepada http://127.0.0.1:" + PORT + "/");
+  console.log("  Webhook  : POST http://127.0.0.1:" + PORT + "/kill  {\"type\":\"kill\",\"game\":\"mlbb\"}");
+});
+
+setInterval(() => clients.forEach(r => r.write(": ping\n\n")), 15000);
+
+if (args.includes("--lol")) {
+  // Sijil Riot pada 127.0.0.1:2999 ialah self-signed; hanya sambungan loopback ini yang tidak disahkan sijilnya.
+  const agent = new https.Agent({ rejectUnauthorized: false });
+  const get = path => new Promise((res, rej) => https.get({ host: "127.0.0.1", port: 2999, path, agent }, r => {
+    let d = ""; r.on("data", c => d += c); r.on("end", () => { try { res(JSON.parse(d)); } catch (e) { rej(e); } });
+  }).on("error", rej));
+  let lastId = -1, me = null, gameOn = false;
+  console.log("  LoL      : menunggu perlawanan League of Legends...");
+  setInterval(async () => {
+    try {
+      if (!me) me = await get("/liveclientdata/activeplayername");
+      const ev = await get("/liveclientdata/eventdata");
+      const list = ev.Events || [];
+      if (!gameOn) { gameOn = true; lastId = list.length ? list[list.length - 1].EventID : -1; console.log("  LoL      : perlawanan dikesan, pemain:", me); return; }
+      for (const e of list) {
+        if (e.EventID <= lastId) continue;
+        lastId = e.EventID;
+        const mine = e.KillerName === me || e.KillerName === String(me).split("#")[0];
+        if (e.EventName === "ChampionKill" && mine) emit({ type: "kill", game: "lol", streak: null, headshot: false, weapon: "", victim: e.VictimName || "" });
+      }
+    } catch { if (gameOn) { console.log("  LoL      : perlawanan tamat / API tidak tersedia."); gameOn = false; me = null; } }
+  }, 1000);
+}
+</script>
 <div id="toasts" aria-live="polite"></div>
 <script type="module">
 /* =====================================================================
@@ -1403,10 +1561,9 @@ function addLocalRec(r) {
 
 /* ---------- WHIP streaming (WebRTC ingest) ---------- */
 async function getIceServers() {
-  if (cloudOK() && FUNCTIONS_ENABLED) {
-    try { const r = await callFn("getIceServers"); if (r?.iceServers?.length) return r.iceServers; } catch (e) { console.warn("TURN tidak dikonfigurasi:", e.message); }
-  }
-  return DEFAULT_ICE;
+  const list = [...DEFAULT_ICE]; const t = ls.get("turn", null);
+  if (t && t.urls && t.username && t.credential) list.push({ urls: t.urls.split(",").map(x => x.trim()).filter(Boolean), username: t.username, credential: t.credential });
+  return list;
 }
 function waitIce(pc, ms = 3000) {
   return new Promise(res => {
@@ -1419,7 +1576,7 @@ async function startStreaming() {
   if (!SUP.rtc) throw unsupported("WebRTC");
   if (S.stream.state === "connecting" || S.stream.state === "live") return;
   const url = (S.whip.url || "").trim();
-  if (!/^https:\/\//i.test(url)) { go("capture"); setTimeout(() => $("#whipUrl")?.focus(), 200); toast("Isi WHIP endpoint (https://) dalam Stream Output dahulu. Browser tidak boleh hantar RTMP terus.", "warn", 7000); return; }
+  if (!/^https:\/\//i.test(url)) { streamFreeGuide(); return; }
   const live = sceneHasLive();
   if (!live.video) { toast("Scene aktif tiada source video tersambung.", "warn"); return; }
   if (live.audio) ensureAudio();
@@ -1751,7 +1908,7 @@ function renderStatus() {
     ["video", "Camera", cams.length ? ["ok", cams.length > 1 ? `${cams.length} Connected` : "Connected"] : ["off", "Not Connected"], "cam", cams[0]?.name],
     ["mic", "Microphone", mics.length ? ["ok", mics[0].name] : ["off", "Not Connected"], "mic"],
     ["gamepad-2", "Gameplay", games.length ? ["ok", games[0].name] : ["off", "Not Connected"], "game"],
-    ["link", "Platforms", !FB_READY ? ["warn", "Firebase Not Configured"] : !S.user ? ["off", "Sign In Required"] : pc ? ["ok", `${pc} Connected`] : ["off", "Platform Not Connected"], "plat"]
+    ["link", "Platforms", pc ? ["ok", `${pc} Connected`] : ["off", "Platform Not Connected"], "plat"]
   ];
   el.innerHTML = cards.map(([ic, t, [c, v]]) => `<div class="stat st-${c === "live" ? "live" : c}"><div class="ic"><i data-lucide="${ic}"></i></div><div><b>${t}</b><span class="st-${c}">${esc(v)}</span></div></div>`).join("");
 }
@@ -1888,18 +2045,6 @@ const PLATFORMS = {
   youtube:  { name: "YouTube Gaming",  svg: `<svg class="pl-logo" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="6" width="30" height="20" rx="6" fill="#FF0000"/><path d="M13 11.5v9l8-4.5z" fill="#fff"/></svg>` },
   facebook: { name: "Facebook Gaming", svg: `<svg class="pl-logo" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#1877F2"/><path d="M17.6 26v-8h2.7l.4-3.2h-3.1v-2c0-.9.3-1.5 1.6-1.5h1.6V8.4a22 22 0 0 0-2.4-.1c-2.4 0-4 1.4-4 4.1v2.4h-2.7V18h2.7v8z" fill="#fff"/></svg>` }
 };
-function platformStatus(p) {
-  if (!FB_READY) return ["warn", "Firebase Not Configured"];
-  if (!S.user) return ["off", "Sign In Required"];
-  if (!FUNCTIONS_ENABLED) return ["off", "Functions Not Enabled"];
-  if (S.sysConfig.platforms && S.sysConfig.platforms[p]?.enabled === false) return ["off", "Disabled by Admin"];
-  const d = S.platforms[p];
-  if (!d) return ["off", "Not Connected"];
-  if (d.status === "connected" && d.verifiedAt) return ["ok", "Connected"];
-  if (d.status === "restricted") return ["warn", "Access Restricted"];
-  if (d.status === "error") return ["err", "Error"];
-  return ["off", "Not Connected"];
-}
 function renderPlatformsMini() {
   $$('[data-slot="platforms-mini"]').forEach(el => {
     el.innerHTML = Object.entries(PLATFORMS).map(([k, p]) => { const [c, t] = platformStatus(k); return `<div class="platform">${p.svg}<b>${p.name}</b><span class="small st-${c}" style="font-weight:600">${esc(t)}</span><button class="btn sm" data-go="connect">${c === "ok" ? "Manage" : "Connect"}</button></div>`; }).join("");
@@ -2006,13 +2151,37 @@ function renderOutputSettings() {
 function renderStreamOutput() {
   const el = $("#streamOutput"); if (!el) return;
   const st = S.stream.state;
-  el.innerHTML = `<div class="note info small">Browser <b>tidak boleh</b> hantar RTMP terus ke TikTok/YouTube/Facebook. STREAMVERSE menghantar video melalui <b>WHIP (WebRTC ingest)</b> ke media gateway (cth. Cloudflare Stream Live, Dolby.io, OvenMediaEngine, MediaMTX) yang kemudian restream ke RTMP platform. Firebase Functions bukan media server.</div>
-    <label class="f">WHIP endpoint URL<input class="in" id="whipUrl" type="url" placeholder="https://…/whip" value="${esc(S.whip.url)}" autocomplete="off"></label>
-    <label class="f">Bearer token / stream key (hanya dalam memori, tidak disimpan)<input class="in" id="whipToken" type="password" value="${esc(S.whip.token)}" autocomplete="off"></label>
-    <div class="row wrap">Status: ${st === "live" ? chip("live", "LIVE") : st === "connecting" ? chip("warn", "Connecting") : st === "error" ? chip("err", "Error") : chip("off", "Not Streaming")} ${!SUP.rtc ? chip("err", "WebRTC Unsupported") : ""}</div>
+  el.innerHTML = `<div class="note info small"><b>Cara percuma (disyorkan): OBS Studio.</b> Browser tidak boleh menghantar RTMP terus ke TikTok / YouTube / Facebook. Buka <b>Program Output</b>, tangkap tetingkapnya dengan <b>OBS Studio</b> (percuma) dan siarkan. Stream key YouTube / Facebook dijana di StreamVerse Connect (Create Live Session). TikTok guna stream key dari TikTok LIVE Studio / LIVE Center.</div>
+    <div class="row wrap"><button class="btn primary" id="progWin"><i data-lucide="app-window"></i>Buka Program Output (untuk OBS)</button><button class="btn" data-go="connect"><i data-lucide="radio"></i>StreamVerse Connect</button></div>
+    <details class="acc"><summary><i data-lucide="webhook"></i>Lanjutan: WHIP gateway (jika anda sudah ada)</summary><div class="col">
+      <label class="f">WHIP endpoint URL<input class="in" id="whipUrl" type="url" placeholder="https://…/whip" value="${esc(S.whip.url)}" autocomplete="off"></label>
+      <label class="f">Bearer token / stream key (hanya dalam memori, tidak disimpan)<input class="in" id="whipToken" type="password" value="${esc(S.whip.token)}" autocomplete="off"></label>
+      <div class="small muted">WHIP ialah WebRTC ingest ke media gateway pihak ketiga. Kebanyakan gateway berbayar atau perlukan server sendiri, jadi ia tidak diperlukan untuk mod percuma.</div></div></details>
+    <div class="row wrap">Status WHIP: ${st === "live" ? chip("live", "LIVE") : st === "connecting" ? chip("warn", "Connecting") : st === "error" ? chip("err", "Error") : chip("off", "Not Streaming")} ${!SUP.rtc ? chip("err", "WebRTC Unsupported") : ""}</div>
     ${S.stream.error ? `<div class="note err small">${esc(S.stream.error)}</div>` : ""}`;
   const sync = () => { S.whip.url = $("#whipUrl").value.trim(); S.whip.token = $("#whipToken").value.trim(); ls.set("whipUrl", S.whip.url); };
   $("#whipUrl").onchange = sync; $("#whipToken").onchange = sync;
+  $("#progWin").onclick = () => openProgramWindow();
+}
+function openProgramWindow() {
+  let stream;
+  try { if (sceneHasLive().audio || mixer.ctx) ensureAudio(); stream = outputStream(); } catch (e) { return toast(errMsg(e), "err"); }
+  const w = window.open("", "svprogram", "popup,width=960,height=540");
+  if (!w) return toast("Popup disekat browser. Benarkan pop-up untuk laman ini.", "err", 7000);
+  w.document.open();
+  w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>STREAMVERSE Program Output</title><style>html,body{margin:0;height:100%;background:#000;overflow:hidden}video{width:100%;height:100%;object-fit:contain;display:block}</style></head><body><video autoplay playsinline muted></video></body></html>');
+  w.document.close();
+  const v = w.document.querySelector("video"); v.srcObject = stream; v.play().catch(() => {});
+  w.document.addEventListener("click", () => { v.muted = !v.muted; });
+  w.document.addEventListener("dblclick", () => { if (w.document.documentElement.requestFullscreen) w.document.documentElement.requestFullscreen(); });
+  toast("Program Output dibuka. Dalam OBS: tambah Window Capture → 'STREAMVERSE Program Output'. Klik tetingkap untuk hidup/matikan bunyi mixer.", "ok", 9000);
+}
+function streamFreeGuide() {
+  modal({ title: "Mula siaran (percuma)", wide: true,
+    body: `<div class="col small"><p style="margin:0">Browser tidak boleh menghantar RTMP terus ke platform. Cara percuma tanpa server:</p>
+      <ol style="margin:0;padding-left:18px"><li>Dalam <b>StreamVerse Connect</b>, sambung YouTube / Facebook dan tekan <b>Create Live Session</b> untuk dapat RTMP URL dan stream key (TikTok: ambil dari TikTok LIVE Studio).</li><li>Tekan <b>Buka Program Output</b> di bawah.</li><li>Dalam <b>OBS Studio</b> (percuma): tambah <b>Window Capture</b> → "STREAMVERSE Program Output". Settings → Stream → Custom → tampal RTMP URL dan stream key → Start Streaming.</li></ol>
+      <div class="note small">Jika anda ada WHIP gateway sendiri, isi dalam Capture Studio → Stream Output → Lanjutan, kemudian tekan Start Streaming semula.</div></div>`,
+    actions: [{ label: "Tutup" }, { label: "StreamVerse Connect", onClick: c => { c(); go("connect"); } }, { label: "Buka Program Output", cls: "primary", onClick: c => { c(); openProgramWindow(); } }] });
 }
 function gpTab(tab) {
   S.gpTab = tab;
@@ -2021,7 +2190,7 @@ function gpTab(tab) {
   if (tab === "wireless") {
     el.innerHTML = `<div class="g2">
       <div class="col"><h4>Method A — Wi-Fi yang sama</h4><p class="small muted" style="margin:0">Telefon buka Companion Page melalui QR / Pairing Code. Media dihantar peer-to-peer dengan WebRTC (biasanya terus dalam LAN). Signaling melalui Firestore. Perlukan HTTPS.</p></div>
-      <div class="col"><h4>Method B — Mobile Data / Internet</h4><p class="small muted" style="margin:0">Aliran sama, tetapi NAT operator telco sering menyekat sambungan terus. Konfigurasikan TURN server (secret <span class="mono">TURN_*</span>) supaya media boleh di-relay.</p></div></div>
+      <div class="col"><h4>Method B — Mobile Data / Internet</h4><p class="small muted" style="margin:0">Aliran sama, tetapi NAT operator telco sering menyekat sambungan terus. Boleh tetapkan TURN percuma di Settings supaya media boleh di-relay.</p></div></div>
       <div class="note small">Browser tidak boleh mengimbas semua peranti dalam LAN secara automatik. Pairing hanya melalui kod. Screen capture di telefon: Android Chrome dan iOS Safari umumnya <b>tidak</b> menyokong getDisplayMedia, jadi Phone Gameplay wireless biasanya UNSUPPORTED. Untuk gameplay telefon, guna kaedah Wired (HDMI capture).</div>
       <div class="row wrap"><button class="btn primary" data-pair="phonecam"><i data-lucide="smartphone"></i>Pair Phone Camera</button><button class="btn" data-pair="phonegame"><i data-lucide="gamepad-2"></i>Pair Phone Gameplay</button><button class="btn" data-pair="phonemic"><i data-lucide="mic"></i>Pair Phone Mic</button></div>
       <div id="pairedList"></div>`;
@@ -2237,54 +2406,230 @@ async function loadCloudRecs() {
 }
 
 /* =====================================================================
-   STREAMVERSE CONNECT (platform integration via Cloud Functions)
+   STREAMVERSE CONNECT (percuma, terus dari browser, tiada backend)
    ===================================================================== */
 const PLATFORM_NOTES = {
-  tiktok: "TikTok LIVE API tidak dibuka untuk semua akaun. Login Kit boleh mengesahkan akaun, tetapi stream key / LIVE hanya untuk akaun yang layak (umur, follower, wilayah) dan app yang diluluskan TikTok. Jika akaun anda layak, dapatkan Server URL + Stream Key dari TikTok LIVE Studio / LIVE Center dan masukkan pada media gateway, bukan di sini.",
-  youtube: "Menggunakan YouTube Data API v3 (liveBroadcasts + liveStreams). Saluran mesti mempunyai live streaming diaktifkan (verifikasi telefon, tunggu 24 jam). Backend mencipta broadcast dan memulangkan RTMP ingest untuk media gateway.",
-  facebook: "Menggunakan Meta Graph API (/live_videos). Untuk Page perlukan kebenaran pages_manage_posts / publish_video dan App Review Meta. Backend memulangkan stream URL untuk media gateway."
+  tiktok: "TikTok tidak membuka API LIVE atau log masuk 'Connect' untuk web app tanpa server dan kelulusan TikTok, jadi TikTok tidak boleh disambung secara terus. Cara percuma: ambil Server URL + Stream Key dari TikTok LIVE Studio / LIVE Center dan siarkan melalui OBS. Simpan username TikTok di halaman Donation supaya butang 'Tonton di TikTok' muncul pada halaman live anda.",
+  youtube: "Log masuk Google rasmi (Google Identity Services) terus dari browser. Guna YouTube Data API v3 dalam kuota percuma 10,000 unit/hari. Saluran mesti mempunyai live streaming diaktifkan (verifikasi telefon, tunggu 24 jam).",
+  facebook: "Log masuk Facebook rasmi (Facebook JS SDK) terus dari browser dan Graph API. Siaran melalui Facebook Page. Kebenaran pages_manage_posts / publish_video: dalam mod Development hanya admin / tester app Meta; untuk orang awam perlukan App Review Meta (percuma)."
 };
+const PFX = { yt: { token: "", exp: 0 }, fb: { token: "", exp: 0, init: false, pages: [] } };
+const YT_SCOPE = "https://www.googleapis.com/auth/youtube";
+const FB_SCOPE = "pages_show_list,pages_read_engagement,pages_manage_posts,publish_video";
+const scriptCache = {};
+function loadScript(src) {
+  if (!scriptCache[src]) scriptCache[src] = new Promise((res, rej) => {
+    const el = document.createElement("script"); el.src = src; el.async = true; el.onload = res;
+    el.onerror = () => { delete scriptCache[src]; rej(new Error("Gagal memuatkan skrip log masuk platform. Semak internet atau matikan pemblokir iklan untuk laman ini.")); };
+    document.head.append(el);
+  });
+  return scriptCache[src];
+}
+function pfClientId(p) {
+  const local = ls.get("pfIds", {})[p];
+  const cfg = S.sysConfig.platforms || {};
+  return String(local || (p === "youtube" ? cfg.youtubeClientId : cfg.facebookAppId) || "").trim();
+}
+function preloadPlatformSdks() {
+  if (pfClientId("youtube")) loadScript("https://accounts.google.com/gsi/client").catch(() => {});
+  if (pfClientId("facebook")) loadScript("https://connect.facebook.net/en_US/sdk.js").catch(() => {});
+}
+function pfRefresh() { renderStatus(); renderPlatformsMini(); renderChatStatus(); if (S.view === "connect") renderConnect(); icons(); }
+function pfSet(p, d) { S.platforms[p] = { ...d, verifiedAt: Date.now() }; pfRefresh(); }
+function pfFail(p, message) { S.platforms[p] = { status: "error", message }; pfRefresh(); }
+
+/* ---------- YouTube (Google Identity Services + YouTube Data API v3) ---------- */
+async function ytConnect() {
+  const cid = pfClientId("youtube");
+  if (!cid) throw new Error("YouTube OAuth Client ID belum ditetapkan. Lihat 'Setup Client ID' di bawah.");
+  if (!window.google || !window.google.accounts || !window.google.accounts.oauth2) await loadScript("https://accounts.google.com/gsi/client");
+  const tok = await new Promise((res, rej) => {
+    const client = window.google.accounts.oauth2.initTokenClient({
+      client_id: cid, scope: YT_SCOPE,
+      callback: r => r.error ? rej(new Error(r.error_description || r.error)) : res(r),
+      error_callback: e => rej(new Error(e.type === "popup_closed" ? "Tetingkap Google ditutup sebelum selesai." : e.type === "popup_failed_to_open" ? "Popup disekat browser. Benarkan pop-up untuk laman ini." : (e.message || e.type || "Log masuk Google gagal.")))
+    });
+    client.requestAccessToken({ prompt: ls.get("ytConsent", false) ? "" : "consent" });
+  });
+  if (!window.google.accounts.oauth2.hasGrantedAllScopes(tok, YT_SCOPE)) throw new Error("Kebenaran YouTube tidak diberikan. Tekan Connect semula dan benarkan akses.");
+  PFX.yt = { token: tok.access_token, exp: Date.now() + (Number(tok.expires_in) || 3600) * 1000 - 60000 };
+  await ytVerify();
+  ls.set("ytConsent", true);
+}
+async function ytApi(path, opts = {}) {
+  if (!PFX.yt.token || Date.now() > PFX.yt.exp) { pfFail("youtube", "Sesi YouTube tamat. Tekan Connect semula."); throw new Error("Sesi YouTube tamat. Tekan Connect semula."); }
+  const r = await fetch("https://www.googleapis.com/youtube/v3/" + path, { ...opts, headers: { Authorization: "Bearer " + PFX.yt.token, "Content-Type": "application/json", ...(opts.headers || {}) } });
+  const t = await r.text(); let j = {}; try { j = JSON.parse(t); } catch { /* bukan JSON */ }
+  if (!r.ok) {
+    const msg = (j.error && j.error.message) || t.slice(0, 200);
+    if (r.status === 401) { PFX.yt.exp = 0; pfFail("youtube", "Sesi YouTube tamat. Tekan Connect semula."); }
+    const e = new Error(/quota/i.test(msg) ? "Kuota harian YouTube API (percuma) telah habis. Cuba lagi esok." : "YouTube: " + msg); e.status = r.status; throw e;
+  }
+  return j;
+}
+async function ytVerify() {
+  const r = await ytApi("channels?part=snippet&mine=true");
+  const ch = r.items && r.items[0];
+  if (!ch) { pfFail("youtube", "Akaun Google ini tiada saluran YouTube."); throw new Error("Akaun Google ini tiada saluran YouTube. Cipta saluran dahulu."); }
+  pfSet("youtube", { status: "connected", accountName: ch.snippet.title, accountId: ch.id });
+}
+async function ytCreateLive(s) {
+  const start = s.schedule ? new Date(s.schedule).toISOString() : new Date(Date.now() + 60000).toISOString();
+  const b = await ytApi("liveBroadcasts?part=snippet,status,contentDetails", { method: "POST", body: JSON.stringify({
+    snippet: { title: (s.title || "STREAMVERSE Live").slice(0, 100), description: (s.description || "").slice(0, 5000), scheduledStartTime: start },
+    status: { privacyStatus: ["public", "unlisted", "private"].includes(s.privacy) ? s.privacy : "unlisted", selfDeclaredMadeForKids: false },
+    contentDetails: { enableAutoStart: true, enableAutoStop: true } }) });
+  const st = await ytApi("liveStreams?part=snippet,cdn,contentDetails", { method: "POST", body: JSON.stringify({ snippet: { title: "STREAMVERSE " + b.id }, cdn: { ingestionType: "rtmp", resolution: "variable", frameRate: "variable" } }) });
+  await ytApi("liveBroadcasts/bind?id=" + b.id + "&part=id,contentDetails&streamId=" + st.id, { method: "POST" });
+  return { id: b.id, ingestUrl: st.cdn.ingestionInfo.ingestionAddress, streamKey: st.cdn.ingestionInfo.streamName, watchUrl: "https://youtu.be/" + b.id };
+}
+async function ytChatPoll(cur) {
+  try {
+    let chatId = cur.chatId;
+    if (!chatId) {
+      const r = await ytApi("liveBroadcasts?part=snippet&broadcastStatus=active&broadcastType=all&maxResults=1");
+      chatId = r.items && r.items[0] && r.items[0].snippet.liveChatId;
+      if (!chatId) return { status: "no-live", pollMs: 30000 };
+    }
+    const q = new URLSearchParams({ liveChatId: chatId, part: "snippet,authorDetails", maxResults: "200" });
+    if (cur.pageToken) q.set("pageToken", cur.pageToken);
+    const r = await ytApi("liveChat/messages?" + q);
+    const messages = (r.items || []).map(m => ({
+      id: "yt_" + m.id, platform: "youtube", author: m.authorDetails && m.authorDetails.displayName, text: (m.snippet && m.snippet.displayMessage) || "", at: m.snippet && m.snippet.publishedAt,
+      badge: m.authorDetails && m.authorDetails.isChatOwner ? "owner" : m.authorDetails && m.authorDetails.isChatModerator ? "mod" : m.authorDetails && m.authorDetails.isChatSponsor ? "member" : "",
+      amount: (m.snippet && ((m.snippet.superChatDetails && m.snippet.superChatDetails.amountDisplayString) || (m.snippet.superStickerDetails && m.snippet.superStickerDetails.amountDisplayString))) || ""
+    }));
+    return { status: "ok", messages, cursor: { chatId, pageToken: r.nextPageToken }, pollMs: Math.max(10000, r.pollingIntervalMillis || 10000) };
+  } catch (e) {
+    if ((e.status === 403 || e.status === 404) && !/Kuota/.test(e.message)) return { status: "no-live", pollMs: 30000 };
+    throw e;
+  }
+}
+
+/* ---------- Facebook (Facebook JS SDK + Graph API) ---------- */
+async function fbConnect() {
+  const appId = pfClientId("facebook");
+  if (!appId) throw new Error("Facebook App ID belum ditetapkan. Lihat 'Setup Client ID' di bawah.");
+  if (!window.FB) await loadScript("https://connect.facebook.net/en_US/sdk.js");
+  if (!PFX.fb.init) { window.FB.init({ appId, version: "v19.0", cookie: false, xfbml: false }); PFX.fb.init = true; }
+  const r = await new Promise(res => window.FB.login(res, { scope: FB_SCOPE }));
+  if (!r || !r.authResponse) throw new Error("Log masuk Facebook dibatalkan.");
+  PFX.fb.token = r.authResponse.accessToken; PFX.fb.exp = Date.now() + (Number(r.authResponse.expiresIn) || 3600) * 1000 - 60000;
+  await fbVerify();
+}
+async function fbApi(path, { method = "GET", params = {}, token } = {}) {
+  const t = token || PFX.fb.token;
+  if (!t || (!token && Date.now() > PFX.fb.exp)) { pfFail("facebook", "Sesi Facebook tamat. Tekan Connect semula."); throw new Error("Sesi Facebook tamat. Tekan Connect semula."); }
+  const qs = new URLSearchParams({ ...params, access_token: t });
+  const r = method === "GET" ? await fetch("https://graph.facebook.com/v19.0/" + path + "?" + qs) : await fetch("https://graph.facebook.com/v19.0/" + path, { method, body: qs });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || j.error) { const e = new Error("Facebook: " + ((j.error && j.error.message) || r.status)); e.status = r.status; throw e; }
+  return j;
+}
+const fbPage = () => PFX.fb.pages.find(x => x.id === (S.platforms.facebook || {}).pageId) || PFX.fb.pages[0];
+async function fbVerify() {
+  const me = await fbApi("me", { params: { fields: "id,name" } });
+  const pg = await fbApi("me/accounts", { params: { fields: "id,name,access_token" } });
+  PFX.fb.pages = pg.data || [];
+  if (!PFX.fb.pages.length) pfSet("facebook", { status: "restricted", accountName: me.name, accountId: me.id, message: "Akaun disahkan, tetapi tiada Facebook Page yang diberi kebenaran. Live melalui API perlukan Page. Pilih Page semasa log masuk, dan pastikan anda admin / tester app Meta (mod Development) atau app sudah lulus App Review." });
+  else pfSet("facebook", { status: "connected", accountName: me.name + " · Page: " + PFX.fb.pages[0].name, accountId: me.id, pageId: PFX.fb.pages[0].id });
+}
+async function fbCreateLive(s) {
+  const page = fbPage(); if (!page) throw new Error("Tiada Facebook Page dengan kebenaran live.");
+  const lv = await fbApi(page.id + "/live_videos", { method: "POST", token: page.access_token, params: { title: (s.title || "STREAMVERSE Live").slice(0, 100), description: (s.description || "").slice(0, 5000), status: "UNPUBLISHED" } });
+  const url = lv.secure_stream_url || lv.stream_url; const i = url.lastIndexOf("/");
+  return { id: lv.id, ingestUrl: url.slice(0, i + 1), streamKey: url.slice(i + 1), watchUrl: "https://www.facebook.com/" + page.id + "/videos/" + lv.id };
+}
+async function fbChatPoll(cur) {
+  const page = fbPage(); if (!page) return { status: "no-live", pollMs: 60000 };
+  try {
+    let liveId = cur.liveId;
+    if (!liveId) {
+      const lv = await fbApi(page.id + "/live_videos", { token: page.access_token, params: { broadcast_status: '["LIVE"]', fields: "id", limit: "1" } });
+      liveId = lv.data && lv.data[0] && lv.data[0].id;
+      if (!liveId) return { status: "no-live", pollMs: 30000 };
+    }
+    const c = await fbApi(liveId + "/comments", { token: page.access_token, params: { live_filter: "no_filter", order: "reverse_chronological", fields: "id,from{name},message,created_time", limit: "50" } });
+    const messages = (c.data || []).reverse().map(m => ({ id: "fb_" + m.id, platform: "facebook", author: (m.from && m.from.name) || "Viewer", text: m.message || "", at: m.created_time }));
+    return { status: "ok", messages, cursor: { liveId }, pollMs: 5000 };
+  } catch (e) {
+    if (e.status === 400 || e.status === 403 || e.status === 404) return { status: "no-live", pollMs: 30000 };
+    throw e;
+  }
+}
+
+/* ---------- Penghala platform ---------- */
+async function platformConnect(p) {
+  if (p === "youtube") await ytConnect(); else if (p === "facebook") await fbConnect(); else throw new Error("Platform ini tidak menyokong log masuk terus.");
+  toast((p === "youtube" ? "YouTube" : "Facebook") + " disambung dan disahkan.", "ok");
+}
+function pfVerify(p) { return p === "youtube" ? ytVerify() : fbVerify(); }
+function pfCreateLive(p) { return p === "youtube" ? ytCreateLive(S.streamSettings[p] || {}) : fbCreateLive(S.streamSettings[p] || {}); }
+function pfChatPoll(p, cur) { return p === "youtube" ? ytChatPoll(cur || {}) : fbChatPoll(cur || {}); }
+function pfDisconnect(p) {
+  if (p === "youtube") { try { if (PFX.yt.token && window.google && window.google.accounts) window.google.accounts.oauth2.revoke(PFX.yt.token, () => {}); } catch { /* abaikan */ } PFX.yt = { token: "", exp: 0 }; ls.set("ytConsent", false); }
+  if (p === "facebook") { try { if (window.FB && PFX.fb.init) window.FB.logout(() => {}); } catch { /* abaikan */ } PFX.fb = { token: "", exp: 0, init: PFX.fb.init, pages: [] }; }
+  delete S.platforms[p]; pfRefresh();
+}
+function platformStatus(p) {
+  if (p === "tiktok") return ["info", "Manual · tiada API"];
+  if (S.sysConfig.platforms && S.sysConfig.platforms[p] && S.sysConfig.platforms[p].enabled === false) return ["off", "Disabled by Admin"];
+  const d = S.platforms[p];
+  if (d && d.status === "connected") return Date.now() > (p === "youtube" ? PFX.yt.exp : PFX.fb.exp) ? ["warn", "Session Expired"] : ["ok", "Connected"];
+  if (d && d.status === "restricted") return ["warn", "Access Restricted"];
+  if (d && d.status === "error") return ["err", "Error"];
+  if (!pfClientId(p)) return ["off", "Setup Required"];
+  return ["off", "Not Connected"];
+}
 function renderConnect() {
-  const el = $("#connectBody");
-  const block = cloudBlock("StreamVerse Connect (OAuth melalui Cloud Functions)") || fnBlock("StreamVerse Connect (OAuth TikTok / YouTube / Facebook)");
-  el.innerHTML = (block ? block : "") + Object.entries(PLATFORMS).map(([k, p]) => {
-    const [c, t] = platformStatus(k); const d = S.platforms[k] || {}; const ss = S.streamSettings?.[k] || {};
-    const dis = !cloudOK() || !FUNCTIONS_ENABLED || (S.sysConfig.platforms && S.sysConfig.platforms[k]?.enabled === false);
+  const el = $("#connectBody"); if (!el) return;
+  preloadPlatformSdks();
+  const cfg = S.sysConfig.platforms || {};
+  const ids = ls.get("pfIds", {});
+  const panels = Object.entries(PLATFORMS).map(([k, p]) => {
+    const [c, t] = platformStatus(k); const d = S.platforms[k] || {}; const ss = (S.streamSettings || {})[k] || {};
+    if (k === "tiktok") return `<div class="panel"><div class="panel-h">${p.svg}<h2>${p.name}</h2><span class="grow"></span>${chip(c, t)}</div>
+      <p class="small muted">${PLATFORM_NOTES.tiktok}</p>
+      <div class="row wrap"><a class="btn" href="https://www.tiktok.com/live/studio" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link"></i>Buka TikTok LIVE Studio</a><button class="btn" data-go="donation"><i data-lucide="at-sign"></i>Simpan username TikTok</button></div></div>`;
+    const needId = !pfClientId(k); const off = cfg[k] && cfg[k].enabled === false; const dis = needId || off;
     return `<div class="panel"><div class="panel-h">${p.svg}<h2>${p.name}</h2><span class="grow"></span>${chip(c, t)}</div>
-      ${d.accountName && c === "ok" ? `<div class="small">Akaun: <b>${esc(d.accountName)}</b> · disahkan ${fmtDate(d.verifiedAt)}</div>` : ""}
+      ${d.accountName && (c === "ok" || c === "warn") ? `<div class="small">Akaun: <b>${esc(d.accountName)}</b> · disahkan ${fmtDate(d.verifiedAt)}</div>` : ""}
       ${d.status === "error" || d.status === "restricted" ? `<div class="note small">${esc(d.message || "")}</div>` : ""}
+      ${needId ? `<div class="note small"><b>Setup diperlukan (sekali sahaja):</b> Client ID ${k === "youtube" ? "YouTube" : "Facebook"} belum ditetapkan. Lihat "Setup Client ID" di bawah.</div>` : ""}
       <p class="small muted">${PLATFORM_NOTES[k]}</p>
       <div class="row wrap" style="margin-bottom:12px">
-        ${c === "ok" ? `<button class="btn" data-pf-verify="${k}" ${dis ? "disabled" : ""}><i data-lucide="refresh-cw"></i>Verify</button><button class="btn danger" data-pf-disconnect="${k}" ${dis ? "disabled" : ""}><i data-lucide="unplug"></i>Disconnect Platform</button>`
-          : `<button class="btn primary" data-pf-connect="${k}" ${dis ? "disabled" : ""}><i data-lucide="link"></i>Connect Platform</button>`}
+        ${c === "ok" || c === "warn" && d.status === "connected" ? `<button class="btn" data-pf-verify="${k}"><i data-lucide="refresh-cw"></i>Verify</button><button class="btn danger" data-pf-disconnect="${k}"><i data-lucide="unplug"></i>Disconnect</button>${c === "warn" ? `<button class="btn primary" data-pf-connect="${k}"><i data-lucide="link"></i>Connect semula</button>` : ""}`
+          : `<button class="btn primary" data-pf-connect="${k}" ${dis ? "disabled" : ""}><i data-lucide="link"></i>Connect ${k === "youtube" ? "dengan Google" : "dengan Facebook"}</button>`}
       </div>
       <details class="acc"><summary><i data-lucide="sliders-horizontal"></i>Stream Settings</summary><div><form class="col" data-pf-form="${k}">
-        <label class="f">Stream Destination<select class="in" name="destination"><option value="gateway" ${ss.destination !== "platform" ? "selected" : ""}>Melalui media gateway (WHIP → RTMP)</option><option value="platform" ${ss.destination === "platform" ? "selected" : ""}>Ingest platform (RTMP dari gateway / OBS)</option></select></label>
+        <label class="f">Stream Destination<select class="in" name="destination"><option value="gateway" ${ss.destination !== "platform" ? "selected" : ""}>Melalui OBS (RTMP)</option><option value="platform" ${ss.destination === "platform" ? "selected" : ""}>Melalui WHIP gateway (lanjutan)</option></select></label>
         <label class="f">Stream Title<input class="in" name="title" maxlength="100" value="${esc(ss.title || "")}" required></label>
         <label class="f">Stream Description<textarea class="in" name="description" maxlength="5000">${esc(ss.description || "")}</textarea></label>
         <div class="g2"><label class="f">Stream Category<input class="in" name="category" maxlength="60" value="${esc(ss.category || "")}" placeholder="cth: Mobile Legends"></label>
         <label class="f">Stream Privacy<select class="in" name="privacy">${["public", "unlisted", "private"].map(v => `<option ${ss.privacy === v ? "selected" : ""}>${v}</option>`).join("")}</select></label></div>
         <label class="f">Stream Schedule<input class="in" type="datetime-local" name="schedule" value="${esc(ss.schedule || "")}"></label>
-        <div class="row wrap"><button class="btn" type="submit" ${dis ? "disabled" : ""}><i data-lucide="save"></i>Simpan Settings</button>${k !== "tiktok" ? `<button class="btn primary" type="button" data-pf-live="${k}" ${dis || c !== "ok" ? "disabled" : ""}><i data-lucide="radio"></i>Create Live Session</button>` : ""}</div>
+        <div class="row wrap"><button class="btn" type="submit"><i data-lucide="save"></i>Simpan Settings</button><button class="btn primary" type="button" data-pf-live="${k}" ${c !== "ok" ? "disabled" : ""}><i data-lucide="radio"></i>Create Live Session</button></div>
       </form></div></details></div>`;
   }).join("");
+  el.innerHTML = `<div class="note info small"><b>Percuma, tanpa backend.</b> YouTube dan Facebook disambung terus dari browser melalui log masuk rasmi Google / Meta. Token hanya disimpan dalam memori tab ini (tidak disimpan di mana-mana) dan tamat selepas ±1–2 jam, tekan Connect semula bila perlu. "Connected" hanya selepas akaun disahkan oleh platform.</div>` + panels + `
+    <details class="acc"><summary><i data-lucide="key-round"></i>Setup Client ID (sekali sahaja, percuma)</summary><div class="col">
+      <p class="small muted" style="margin:0">Google dan Meta mewajibkan setiap web app didaftarkan. Client ID / App ID bukan rahsia. Admin boleh menetapkannya sekali untuk semua pengguna di <b>Admin → Platform Settings</b>, atau anda boleh tampal ID sendiri di bawah (disimpan dalam browser ini sahaja).</p>
+      <details class="acc"><summary>Langkah YouTube</summary><div class="small"><ol style="margin:0;padding-left:18px"><li>console.cloud.google.com → pilih / cipta projek.</li><li>APIs &amp; Services → Library → aktifkan <b>YouTube Data API v3</b>.</li><li>OAuth consent screen → External → isi nama app; tambah email anda di <b>Test users</b> (atau terbitkan).</li><li>Credentials → Create credentials → <b>OAuth client ID</b> → Web application → <b>Authorized JavaScript origins</b>: <span class="mono">${esc(location.origin)}</span></li><li>Salin Client ID (berakhir <span class="mono">.apps.googleusercontent.com</span>).</li></ol><p style="margin:6px 0 0">Skop YouTube ialah skop sensitif: sebelum disahkan Google, skrin "app belum disahkan" muncul dan hanya Test users (maks 100) boleh log masuk.</p></div></details>
+      <details class="acc"><summary>Langkah Facebook</summary><div class="small"><ol style="margin:0;padding-left:18px"><li>developers.facebook.com → My Apps → Create App (jenis Business).</li><li>Add product → <b>Facebook Login</b> → Settings: aktifkan <b>Login with the JavaScript SDK</b>, dan letak <span class="mono">${esc(location.origin)}</span> di <b>Allowed Domains for the JavaScript SDK</b>.</li><li>Salin <b>App ID</b> (Settings → Basic).</li><li>Mod Development: hanya admin / tester app boleh log masuk. Untuk umum: App Review bagi pages_manage_posts &amp; publish_video.</li></ol></div></details>
+      <form class="col" id="pfIdForm"><div class="g2"><label class="f">YouTube OAuth Client ID<input class="in mono" name="youtube" value="${esc(ids.youtube || "")}" placeholder="${esc(cfg.youtubeClientId ? "(ditetapkan oleh admin)" : "xxxx.apps.googleusercontent.com")}"></label>
+      <label class="f">Facebook App ID<input class="in mono" name="facebook" value="${esc(ids.facebook || "")}" placeholder="${esc(cfg.facebookAppId ? "(ditetapkan oleh admin)" : "1234567890123456")}"></label></div>
+      <button class="btn" type="submit"><i data-lucide="save"></i>Simpan ID dalam browser ini</button></form>
+    </div></details>`;
   icons();
 }
-async function platformConnect(p, btn) {
-  await withBusy(btn, async () => {
-    const r = await callFn("platformAuthUrl", { platform: p, returnUrl: location.origin + location.pathname });
-    if (!r?.url) throw new Error("Backend tidak memulangkan URL OAuth.");
-    location.assign(r.url);
-  });
-}
 async function loadStreamSettings() {
-  if (!cloudOK()) return;
+  if (!cloudOK()) { S.streamSettings = ls.get("streamSettings", {}); return; }
   const snap = await fb.F.getDocs(C(...uidPath("streamSettings")));
   S.streamSettings = {}; snap.forEach(d => S.streamSettings[d.id] = d.data());
 }
 
 /* =====================================================================
-   AI STREAM CREATOR (Cloud Functions; tiada API key di frontend)
+   AI STREAM CREATOR (percuma melalui Pollinations, tanpa API key)
    ===================================================================== */
 const AI_TOOLS = {
   poster:    { name: "AI Poster Creator", image: true, fields: [["event", "Nama event / livestream", "Tournament MLBB Raya Cup"], ["details", "Butiran (tarikh, hadiah, platform)", "15 Dis, 9 malam, hadiah RM500, live di YouTube"], ["style", "Gaya visual", "neon cyberpunk, gelap, dramatik"]], sizes: ["1024x1536", "1024x1024"] },
@@ -2295,50 +2640,76 @@ const AI_TOOLS = {
   planner:   { name: "AI Content Planner", fields: [["niche", "Niche", "gaming mobile Malaysia"], ["platforms", "Platform", "TikTok, YouTube, Facebook"], ["period", "Tempoh", "4 minggu"]] },
   branding:  { name: "AI Gaming Branding", fields: [["about", "Tentang anda", "streamer FPS, suka gaya lawak, peminat anime"], ["keywords", "Kata kunci", "pantas, garang, malam"]] }
 };
+const TEXT_PROMPTS = {
+  copy: i => `Tulis copywriting gaming untuk: "${i.topic}". Platform: ${i.platform}. Nada: ${i.tone}. Beri: 3 pilihan title, 1 caption/description, dan 15 hashtag relevan.`,
+  schedule: i => `Rancang jadual livestream mingguan. Game: ${i.games}. Masa tersedia: ${i.hours}. Matlamat: ${i.goal}. Beri jadual hari/masa, tema setiap sesi, dan tips konsistensi. Gunakan jadual ringkas.`,
+  planner: i => `Hasilkan content plan untuk niche "${i.niche}" di ${i.platforms} bagi tempoh ${i.period}. Untuk setiap minggu: idea video, format, hook, CTA, dan platform utama.`,
+  branding: i => `Bantu bina identiti streamer. Tentang: ${i.about}. Kata kunci: ${i.keywords}. Beri 10 cadangan nama, 5 tagline, cadangan palet warna (hex), gaya font, dan personaliti brand.`,
+  overlayIdea: i => `Cadangkan reka bentuk overlay livestream. Tema: ${i.theme}. Elemen: ${i.elements}. Beri susun atur (posisi webcam, bar, alert), palet warna hex, font, animasi, dan senarai aset yang perlu dibuat.`
+};
+const IMAGE_PROMPTS = {
+  poster: i => `Gaming livestream event poster, vertical. Event: "${i.event}". Details to display as text: ${i.details}. Visual style: ${i.style}. Bold esports typography, high contrast, professional composition.`,
+  thumbnail: i => `YouTube gaming thumbnail, 16:9. Game: ${i.game}. Video title concept: "${i.title}". Style: ${i.style}. Large readable short text, dramatic lighting, high contrast, eye-catching.`,
+  overlay: i => `Livestream overlay design mockup, 16:9, frame on dark background. Theme: ${i.theme}. Elements: ${i.elements}. Clean HUD, webcam frame, lower bar, alert area.`
+};
+const aiClean = input => Object.fromEntries(Object.entries(input || {}).filter(([k]) => k !== "size").slice(0, 8).map(([k, v]) => [String(k).slice(0, 30), String(v || "").slice(0, 300)]));
+function aiErr(e) {
+  const m = String(e.message || e);
+  if (/402|429/.test(m)) return "Had penggunaan percuma Pollinations dicapai buat sementara. Cuba lagi dalam beberapa minit.";
+  if (/403/.test(m)) return "Pollinations menolak permintaan ini. Ia tidak berfungsi dari localhost; buka app melalui domain hosting sebenar.";
+  return "Perkhidmatan AI percuma tidak dapat dicapai atau sedang sibuk (" + (e.name === "AbortError" ? "tamat masa" : m) + "). Cuba lagi sebentar.";
+}
+async function pollText(prompt) {
+  const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 60000);
+  try {
+    const r = await fetch("https://text.pollinations.ai/openai", { method: "POST", headers: { "Content-Type": "application/json" }, signal: ctl.signal, body: JSON.stringify({ model: "openai", messages: [
+      { role: "system", content: "Anda pembantu kreatif untuk gamer dan livestreamer Malaysia. Jawab dalam Bahasa Melayu santai kecuali diminta lain. Jangan reka statistik atau fakta tentang pengguna." },
+      { role: "user", content: prompt }] }) });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const j = await r.json(); const t = j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content;
+    if (!t) throw new Error("tiada jawapan");
+    return t;
+  } catch (e) { throw new Error(aiErr(e)); }
+  finally { clearTimeout(to); }
+}
+async function pollImage(prompt, size) {
+  const [w, h] = size.split("x").map(Number);
+  const url = "https://image.pollinations.ai/prompt/" + encodeURIComponent(prompt) + "?width=" + w + "&height=" + h + "&nologo=true&seed=" + Math.floor(Math.random() * 1e6);
+  const ctl = new AbortController(); const to = setTimeout(() => ctl.abort(), 120000);
+  try {
+    const r = await fetch(url, { signal: ctl.signal });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const blob = await r.blob(); if (!/^image\//.test(blob.type)) throw new Error("respons bukan imej");
+    return { url, objectUrl: URL.createObjectURL(blob) };
+  } catch (e) { throw new Error(aiErr(e)); }
+  finally { clearTimeout(to); }
+}
 let aiTab = "poster";
-let aiStatusCache = null;
 async function renderAI() {
   const tabs = $("#aiTabs");
   tabs.innerHTML = Object.entries(AI_TOOLS).map(([k, t]) => `<button class="tab ${k === aiTab ? "on" : ""}" data-ai-tab="${k}">${esc(t.name.replace("AI ", ""))}</button>`).join("");
   const T = AI_TOOLS[aiTab];
-  const block = cloudBlock("AI Stream Creator") || fnBlock("AI Stream Creator (API key disimpan di backend)");
-  $("#aiBody").innerHTML = `${block}<form class="col" id="aiForm">${T.fields.map(([n, l, ph]) => `<label class="f">${l}<input class="in" name="${n}" maxlength="300" placeholder="${esc(ph)}" required></label>`).join("")}
+  $("#aiStatus").innerHTML = `<div class="note info small"><b>AI percuma</b> melalui Pollinations (teks dan imej sebenar, tanpa API key, tiada bayaran). Prompt anda dihantar ke pollinations.ai. Perkhidmatan percuma boleh perlahan atau sibuk; had dan kualiti ditentukan oleh mereka. Imej ambil 10–60 saat.</div>`;
+  $("#aiBody").innerHTML = `<form class="col" id="aiForm">${T.fields.map(([n, l, ph]) => `<label class="f">${l}<input class="in" name="${n}" maxlength="300" placeholder="${esc(ph)}" required></label>`).join("")}
     ${T.image ? `<label class="f">Saiz imej<select class="in" name="size">${T.sizes.map(s => `<option>${s}</option>`).join("")}</select></label>` : ""}
-    <div class="row wrap"><button class="btn primary" type="submit" ${block ? "disabled" : ""}><i data-lucide="${T.image ? "image" : "sparkles"}"></i>${T.image ? "Jana Imej" : "Jana Teks"}</button>${T.alsoText ? `<button class="btn" type="button" id="aiOverlayIdea" ${block ? "disabled" : ""}><i data-lucide="lightbulb"></i>Jana Idea Overlay (teks)</button>` : ""}</div></form>
+    <div class="row wrap"><button class="btn primary" type="submit"><i data-lucide="${T.image ? "image" : "sparkles"}"></i>${T.image ? "Jana Imej" : "Jana Teks"}</button>${T.alsoText ? `<button class="btn" type="button" id="aiOverlayIdea"><i data-lucide="lightbulb"></i>Jana Idea Overlay (teks)</button>` : ""}</div></form>
     <div id="aiOut" class="col"></div><div id="aiAssets"></div>`;
   icons();
-  if (block) { $("#aiStatus").innerHTML = ""; return; }
-  if (!aiStatusCache) { try { aiStatusCache = await callFn("aiProviderStatus"); } catch (e) { aiStatusCache = { error: errMsg(e) }; } }
-  const s = aiStatusCache;
-  $("#aiStatus").innerHTML = s.error ? `<div class="note err">${chip("err", "Backend Unavailable")} ${esc(s.error)}</div>`
-    : `<div class="row wrap">Teks: ${s.text?.configured ? chip("ok", `${s.text.provider} · ${s.text.model}`) : chip("warn", "Text Provider Not Configured")} Imej: ${s.image?.configured ? chip("ok", `${s.image.provider} · ${s.image.model}`) : chip("warn", "Image Provider Not Configured")}</div>`;
-  loadAiAssets();
 }
 async function runAI(form, textOnly) {
-  const T = AI_TOOLS[aiTab]; const data = Object.fromEntries(new FormData(form));
+  const T = AI_TOOLS[aiTab]; const data = Object.fromEntries(new FormData(form)); const input = aiClean(data);
   const out = $("#aiOut");
   if (T.image && !textOnly) {
-    if (!aiStatusCache?.image?.configured) return toast("Image generation provider belum dikonfigurasi oleh admin.", "warn", 6000);
-    out.innerHTML = `<div class="small muted">Menjana imej… (boleh ambil 20–60 saat)</div>`;
-    const r = await callFn("aiGenerateImage", { tool: aiTab, input: data, size: data.size });
-    out.innerHTML = `<img class="ai-img" src="${esc(r.url)}" alt="${esc(T.name)}: ${esc(Object.values(data).join(", "))}"><div class="row wrap"><a class="btn sm" href="${esc(r.url)}" target="_blank" rel="noopener"><i data-lucide="external-link"></i>Buka saiz penuh</a><button class="btn sm" data-ai-overlay="${esc(r.url)}"><i data-lucide="layers"></i>Guna sebagai Image Overlay</button></div>`;
+    out.innerHTML = `<div class="small muted">Menjana imej… (10–60 saat)</div>`;
+    const r = await pollImage(IMAGE_PROMPTS[aiTab](input), data.size || T.sizes[0]);
+    out.innerHTML = `<img class="ai-img" src="${esc(r.objectUrl)}" alt="${esc(T.name)}"><div class="row wrap"><a class="btn sm" href="${esc(r.objectUrl)}" download="streamverse-${aiTab}.jpg"><i data-lucide="download"></i>Muat turun</a><a class="btn sm" href="${esc(r.url)}" target="_blank" rel="noopener"><i data-lucide="external-link"></i>Buka saiz penuh</a><button class="btn sm" data-ai-overlay="${esc(r.url)}"><i data-lucide="layers"></i>Guna sebagai Image Overlay</button></div>`;
   } else {
-    if (!aiStatusCache?.text?.configured) return toast("Text provider belum dikonfigurasi oleh admin.", "warn", 6000);
     out.innerHTML = `<div class="small muted">Menjana…</div>`;
-    const r = await callFn("aiGenerateText", { tool: textOnly ? "overlayIdea" : aiTab, input: data });
-    out.innerHTML = `<div class="ai-out" id="aiText">${esc(r.text)}</div><div><button class="btn sm" id="aiCopy"><i data-lucide="copy"></i>Salin</button></div>`;
-    $("#aiCopy").onclick = () => copyText(r.text);
+    const text = await pollText(TEXT_PROMPTS[textOnly ? "overlayIdea" : aiTab](input));
+    out.innerHTML = `<div class="ai-out" id="aiText">${esc(text)}</div><div><button class="btn sm" id="aiCopy"><i data-lucide="copy"></i>Salin</button></div>`;
+    $("#aiCopy").onclick = () => copyText(text);
   }
-  icons(); loadAiAssets();
-}
-async function loadAiAssets() {
-  if (!cloudOK()) return;
-  try {
-    const snap = await fb.F.getDocs(fb.F.query(C(...uidPath("aiAssets")), fb.F.orderBy("createdAt", "desc"), fb.F.limit(8)));
-    const items = snap.docs.map(d => d.data());
-    $("#aiAssets").innerHTML = items.length ? `<h4 style="margin:10px 0 6px">Hasil terkini</h4><div class="list">${items.map(a => `<div class="li"><i data-lucide="${a.type === "image" ? "image" : "file-text"}"></i><span class="name">${esc(a.toolName || a.tool)} — ${esc((a.prompt || a.text || "").slice(0, 80))}</span><span class="small muted">${fmtDate(a.createdAt)}</span>${a.url ? `<a class="btn sm" href="${esc(a.url)}" target="_blank" rel="noopener">Buka</a>` : ""}</div>`).join("")}</div>` : "";
-    icons();
-  } catch (e) { console.warn(e); }
+  icons();
 }
 
 /* =====================================================================
@@ -2573,11 +2944,17 @@ function renderSettings() {
     </tbody></table></div>
     <details class="acc"><summary>Format rakaman disokong browser ini</summary><div class="small">${supportedMimes().map(([t, ok]) => `<div>${ok ? "✓" : "✗"} <span class="mono">${t}</span></div>`).join("") || "MediaRecorder tidak disokong."}</div></details>
     <button class="btn primary" id="permBtn"><i data-lucide="shield-check"></i>Minta permission kamera &amp; mikrofon</button>
+    <div class="panel col" style="margin-top:6px"><b>TURN (pilihan, untuk pairing telefon guna data mudah alih)</b>
+      <p class="small muted" style="margin:0">Pairing telefon guna STUN percuma Google. Jika sambungan gagal pada data mudah alih, tampal TURN percuma (cth. akaun percuma di metered.ca / Open Relay). Disimpan dalam browser ini sahaja.</p>
+      <input class="in mono" id="turnUrls" placeholder="turn:host:3478,turns:host:5349" value="${esc((ls.get("turn", {}) || {}).urls || "")}">
+      <div class="g2"><input class="in" id="turnUser" placeholder="username" value="${esc((ls.get("turn", {}) || {}).username || "")}"><input class="in" id="turnCred" type="password" placeholder="credential" value="${esc((ls.get("turn", {}) || {}).credential || "")}"></div>
+      <button class="btn" id="turnSave"><i data-lucide="save"></i>Simpan TURN</button></div>
     <div class="panel col" style="margin-top:6px"><b>Bunyi UI (gaming)</b>
       <label class="row small"><span class="switch"><input type="checkbox" id="sfxOn" ${SFX.on ? "checked" : ""}></span>Bunyi klik, hover, popup &amp; notifikasi</label>
       <label class="f">Volume bunyi UI<input type="range" id="sfxVol" min="0" max="100" value="${Math.round(SFX.vol * 100)}"></label>
       <p class="small muted" style="margin:0">Bunyi UI dimainkan pada speaker/headphone anda sahaja dan <b>tidak</b> masuk ke siaran atau rakaman.</p></div>
     <p class="small muted" style="margin:0">Permission hanya diminta bila anda tekan butang. Jika ditolak, buka ikon kunci di bar alamat untuk benarkan semula.</p>`;
+  $("#turnSave").onclick = () => { ls.set("turn", { urls: $("#turnUrls").value.trim(), username: $("#turnUser").value.trim(), credential: $("#turnCred").value }); toast("TURN disimpan.", "ok"); };
   $("#sfxOn").onchange = e => setSfx(e.target.checked);
   $("#sfxVol").oninput = e => { SFX.vol = e.target.value / 100; ls.set("sfxVol", SFX.vol); };
   $("#sfxVol").onchange = () => sfx("click");
@@ -2588,7 +2965,7 @@ function renderSettings() {
 /* =====================================================================
    ADMIN PANEL (custom claim admin; dikuatkuasakan juga oleh Rules & Functions)
    ===================================================================== */
-const ADMIN_TABS = [["users", "Users", "users"], ["community", "Community", "message-square"], ["publicpages", "Donation Pages", "hand-coins"], ["reports", "Reports", "flag"], ["announce", "Announcements", "megaphone"], ["themes", "Themes", "palette"], ["platforms", "Platform Settings", "radio"], ["ai", "AI Provider", "bot"], ["logs", "System Logs", "scroll-text"], ["status", "System Status", "activity"]];
+const ADMIN_TABS = [["users", "Users", "users"], ["community", "Community", "message-square"], ["publicpages", "Donation Pages", "hand-coins"], ["reports", "Reports", "flag"], ["announce", "Announcements", "megaphone"], ["site", "Site Settings", "sliders-horizontal"], ["themes", "Themes", "palette"], ["platforms", "Platform Settings", "radio"], ["ai", "AI Provider", "bot"], ["logs", "System Logs", "scroll-text"], ["status", "System Status", "activity"]];
 let adminTab = "users";
 function renderAdmin() {
   if (!S.isAdmin) { $("#adminBody").innerHTML = `<div class="note err">Akses ditolak.</div>`; return; }
@@ -2597,20 +2974,17 @@ function renderAdmin() {
   $("#adminTitle").textContent = ADMIN_TABS.find(x => x[0] === adminTab)[1];
   icons();
   const b = $("#adminBody"); b.innerHTML = `<div class="small muted">Memuatkan…</div>`;
-  ({ users: adUsers, community: adCommunity, publicpages: adPublicPages, themes: adThemes, platforms: adPlatforms, ai: adAI, announce: adAnnounce, logs: adLogs, reports: adReports, status: adStatus })[adminTab]().catch(e => b.innerHTML = `<div class="note err">${esc(errMsg(e))}</div>`);
+  ({ users: adUsers, community: adCommunity, publicpages: adPublicPages, themes: adThemes, platforms: adPlatforms, ai: adAI, announce: adAnnounce, site: adSite, logs: adLogs, reports: adReports, status: adStatus })[adminTab]().catch(e => b.innerHTML = `<div class="note err">${esc(errMsg(e))}</div>`);
 }
 async function adPublicPages() {
   const snap = await fb.F.getDocs(fb.F.query(C("publicPages"), fb.F.orderBy("updatedAt", "desc"), fb.F.limit(50)));
   $("#adminBody").innerHTML = snap.empty ? `<div class="empty">No Data Available</div>` : `<div class="tbl-wrap"><table class="t"><thead><tr><th>Streamer</th><th>Link donation</th><th>Status</th><th></th></tr></thead><tbody>${snap.docs.map(d => { const p = d.data(); return `<tr><td><b>${esc(p.displayName)}</b><div class="small muted mono">${esc(p.slug)}</div></td><td class="small">${(p.links || []).map(l => `<div style="word-break:break-all">${esc(l.label)}: ${esc(l.url)}</div>`).join("")}</td><td>${p.disabled ? chip("err", "Disabled") : p.live ? chip("live", "LIVE") : chip("ok", "Active")}</td><td><button class="btn sm ${p.disabled ? "" : "danger"}" data-page-toggle="${d.id}" data-val="${p.disabled ? 0 : 1}">${p.disabled ? "Aktifkan" : "Nyahaktif"}</button></td></tr>`; }).join("")}</tbody></table></div>`;
 }
-async function adUsers(pageToken) {
-  if (!FUNCTIONS_ENABLED) {
-    $("#adminBody").innerHTML = `<div class="note"><b>${chip("warn", "Cloud Functions Not Enabled")}</b><p style="margin:8px 0 0">Senarai pengguna dalam panel ini perlukan Cloud Functions (pelan Blaze). Pada pelan percuma, urus pengguna di <b>Firebase Console → Authentication → Users</b>. Lantik admin dengan skrip <span class="mono">functions/scripts/set-admin.js</span> (tidak perlukan Blaze). Claim <span class="mono">admin</span> ini dikongsi dengan app lain dalam projek GENIUS DIGITAL.</p></div>`;
-    return;
-  }
-  const r = await callFn("adminListUsers", { pageToken: pageToken || null });
-  $("#adminBody").innerHTML = `<div class="tbl-wrap"><table class="t"><thead><tr><th>Email</th><th>Verified</th><th>Role</th><th>Status</th><th>Dicipta</th><th>Login terakhir</th><th></th></tr></thead><tbody>${r.users.map(u => `<tr><td>${esc(u.email)}<div class="small muted mono">${esc(u.uid)}</div></td><td>${u.emailVerified ? "Ya" : "Tidak"}</td><td>${u.admin ? chip("info", "Admin") : "User"}</td><td>${u.disabled ? chip("err", "Disabled") : chip("ok", "Active")}</td><td class="small">${fmtDate(u.createdAt)}</td><td class="small">${fmtDate(u.lastSignIn)}</td>
-    <td><div class="row"><button class="btn sm" data-ad-role="${u.uid}" data-val="${u.admin ? 0 : 1}" ${u.uid === S.user.uid ? "disabled" : ""}>${u.admin ? "Buang admin" : "Jadikan admin"}</button><button class="btn sm" data-ad-disable="${u.uid}" data-val="${u.disabled ? 0 : 1}" ${u.uid === S.user.uid ? "disabled" : ""}>${u.disabled ? "Aktifkan" : "Nyahaktif"}</button></div></td></tr>`).join("")}</tbody></table></div>${r.nextPageToken ? `<button class="btn" data-ad-next="${esc(r.nextPageToken)}">Seterusnya</button>` : ""}`;
+async function adUsers() {
+  const snap = await fb.F.getDocs(fb.F.query(C("users"), fb.F.limit(100)));
+  const rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  $("#adminBody").innerHTML = `<div class="note info small">Senarai dibaca dari Firestore (percuma). Menyahaktif akaun dibuat di <b>Firebase Console → Authentication → Users</b>. Melantik admin guna skrip <span class="mono">tools/set-admin.js</span> (percuma, tiada Blaze). Claim <span class="mono">admin</span> dikongsi dengan app lain dalam projek GENIUS DIGITAL.</div>`
+    + (rows.length ? `<div class="tbl-wrap"><table class="t"><thead><tr><th>Email</th><th>App</th><th>Dicipta</th><th>Login terakhir</th></tr></thead><tbody>${rows.map(u => `<tr><td>${esc(u.email || "—")}<div class="small muted mono">${esc(u.id)}</div></td><td>${u.uid ? chip("info", "Streamverse") : chip("off", "App lain")}</td><td class="small">${fmtDate(u.createdAt)}</td><td class="small">${fmtDate(u.lastLoginAt)}</td></tr>`).join("")}</tbody></table></div>` : `<div class="empty">No Data Available</div>`);
 }
 async function adCommunity() {
   const [posts, groups] = await Promise.all([fb.F.getDocs(fb.F.query(fb.F.collectionGroup(fb.db, "communityPosts"), fb.F.orderBy("createdAt", "desc"), fb.F.limit(30))), fb.F.getDocs(fb.F.query(C("groups"), fb.F.orderBy("createdAt", "desc"), fb.F.limit(30)))]);
@@ -2619,32 +2993,76 @@ async function adCommunity() {
   icons();
 }
 async function adThemes() {
-  const s = await fb.F.getDoc(D("config", "themes")); const en = s.exists() ? s.data().enabled : THEMES.map(t => t.id);
-  $("#adminBody").innerHTML = `<div class="col">${THEMES.map(t => `<label class="row"><input type="checkbox" data-ad-theme="${t.id}" ${en.includes(t.id) ? "checked" : ""}><span class="theme-card" style="width:60px;border-width:1px"><span class="sw" style="height:24px;background:${t.sw}"></span></span>${esc(t.name)}</label>`).join("")}<button class="btn primary" id="adThemeSave">Simpan</button></div>`;
-  $("#adThemeSave").onclick = e => withBusy(e.currentTarget, async () => { const ids = $$("[data-ad-theme]").filter(i => i.checked).map(i => i.dataset.adTheme); if (!ids.length) throw new Error("Sekurang-kurangnya satu tema mesti aktif."); await fb.F.setDoc(D("config", "themes"), { enabled: ids, updatedAt: now(), updatedBy: S.user.uid }); S.sysConfig.themes = { enabled: ids }; toast("Tema disimpan.", "ok"); });
+  const s = await fb.F.getDoc(D("config", "themes")); const c = s.exists() ? s.data() : {}; const en = c.enabled || THEMES.map(t => t.id);
+  $("#adminBody").innerHTML = `<div class="col">${THEMES.map(t => `<label class="row"><input type="checkbox" data-ad-theme="${t.id}" ${en.includes(t.id) ? "checked" : ""}><span class="theme-card" style="width:60px;border-width:1px"><span class="sw" style="height:24px;background:${t.sw}"></span></span>${esc(t.name)}</label>`).join("")}
+    <label class="f">Tema lalai untuk pengguna baharu<select class="in" id="adThemeDef">${THEMES.map(t => `<option value="${t.id}" ${(c.default || "neon") === t.id ? "selected" : ""}>${esc(t.name)}</option>`).join("")}</select></label>
+    <button class="btn primary" id="adThemeSave">Simpan</button></div>`;
+  $("#adThemeSave").onclick = e => withBusy(e.currentTarget, async () => {
+    const ids = $$("[data-ad-theme]").filter(i => i.checked).map(i => i.dataset.adTheme); const def = $("#adThemeDef").value;
+    if (!ids.length) throw new Error("Sekurang-kurangnya satu tema mesti aktif.");
+    if (!ids.includes(def)) throw new Error("Tema lalai mesti ada dalam senarai tema aktif.");
+    await fb.F.setDoc(D("config", "themes"), { enabled: ids, default: def, updatedAt: now(), updatedBy: S.user.uid }); S.sysConfig.themes = { enabled: ids, default: def }; toast("Tema disimpan.", "ok");
+  });
 }
 async function adPlatforms() {
   const s = await fb.F.getDoc(D("config", "platforms")); const c = s.exists() ? s.data() : {};
-  $("#adminBody").innerHTML = `<div class="col">${Object.entries(PLATFORMS).map(([k, p]) => `<label class="row"><span class="switch"><input type="checkbox" data-ad-pf="${k}" ${c[k]?.enabled !== false ? "checked" : ""}></span>${p.name}</label>`).join("")}
-    <div class="note small">Client ID / Client Secret / App Secret <b>tidak</b> disimpan di Firestore. Tetapkan melalui Secret Manager:<pre class="mono small" style="white-space:pre-wrap">firebase functions:secrets:set YOUTUBE_CLIENT_SECRET\nfirebase functions:secrets:set META_APP_SECRET\nfirebase functions:secrets:set TIKTOK_CLIENT_SECRET</pre></div><button class="btn primary" id="adPfSave">Simpan</button></div>`;
-  $("#adPfSave").onclick = e => withBusy(e.currentTarget, async () => { const d = {}; $$("[data-ad-pf]").forEach(i => d[i.dataset.adPf] = { enabled: i.checked }); await fb.F.setDoc(D("config", "platforms"), { ...d, updatedAt: now(), updatedBy: S.user.uid }); S.sysConfig.platforms = d; toast("Disimpan.", "ok"); });
+  $("#adminBody").innerHTML = `<div class="col">
+    <div class="note info small"><b>Client ID bukan rahsia.</b> Ia disimpan dalam Firestore (config/platforms) supaya semua streamer boleh klik Connect terus. Tiada secret atau token disimpan.</div>
+    ${Object.entries(PLATFORMS).map(([k, p]) => `<label class="row"><span class="switch"><input type="checkbox" data-ad-pf="${k}" ${c[k] && c[k].enabled === false ? "" : "checked"}></span>${p.name} aktif</label>`).join("")}
+    <label class="f">YouTube OAuth Client ID<input class="in mono" id="adYtId" value="${esc(c.youtubeClientId || "")}" placeholder="xxxx.apps.googleusercontent.com"></label>
+    <label class="f">Facebook (Meta) App ID<input class="in mono" id="adFbId" value="${esc(c.facebookAppId || "")}" placeholder="1234567890123456"></label>
+    <details class="acc"><summary>Langkah setup (sekali sahaja, percuma)</summary><div class="small">
+      <b>YouTube:</b> console.cloud.google.com → aktifkan <b>YouTube Data API v3</b> → OAuth consent screen (External, tambah Test users) → Credentials → OAuth client ID (Web application) → Authorized JavaScript origins: domain hosting anda (cth. <span class="mono">${esc(location.origin)}</span>) → salin Client ID.<br>
+      <b>Facebook:</b> developers.facebook.com → Create App (Business) → Facebook Login → aktifkan Login with the JavaScript SDK dan letak domain anda di Allowed Domains → salin App ID.<br>
+      <b>TikTok:</b> tiada log masuk terus (tiada API LIVE untuk web app). Streamer guna stream key dari TikTok LIVE Studio.</div></details>
+    <button class="btn primary" id="adPfSave">Simpan</button></div>`;
+  $("#adPfSave").onclick = e => withBusy(e.currentTarget, async () => {
+    const yt = $("#adYtId").value.trim(), fbid = $("#adFbId").value.trim();
+    if (yt && !/^[\w.-]+\.apps\.googleusercontent\.com$/.test(yt)) throw new Error("YouTube Client ID tidak sah (mesti berakhir .apps.googleusercontent.com).");
+    if (fbid && !/^\d{8,20}$/.test(fbid)) throw new Error("Facebook App ID mesti nombor sahaja.");
+    const d = { youtubeClientId: yt, facebookAppId: fbid }; $$("[data-ad-pf]").forEach(i => d[i.dataset.adPf] = { enabled: i.checked });
+    await fb.F.setDoc(D("config", "platforms"), { ...d, updatedAt: now(), updatedBy: S.user.uid }); S.sysConfig.platforms = d; toast("Disimpan.", "ok");
+  });
 }
 async function adAI() {
-  const s = await fb.F.getDoc(D("config", "ai")); const c = s.exists() ? s.data() : {};
-  $("#adminBody").innerHTML = `<form class="col" id="adAiForm"><div class="g2"><label class="f">Text provider<select class="in" name="textProvider"><option value="anthropic" ${c.textProvider !== "openai" ? "selected" : ""}>Anthropic (Claude)</option><option value="openai" ${c.textProvider === "openai" ? "selected" : ""}>OpenAI</option></select></label><label class="f">Text model<input class="in" name="textModel" value="${esc(c.textModel || "claude-sonnet-5-5")}"></label></div>
-    <div class="g2"><label class="f">Image provider<select class="in" name="imageProvider"><option value="openai">OpenAI Images</option></select></label><label class="f">Image model<input class="in" name="imageModel" value="${esc(c.imageModel || "gpt-image-1")}"></label></div>
-    <label class="f">Had permintaan setiap pengguna / hari<input class="in" type="number" name="dailyLimit" min="1" max="500" value="${c.dailyLimit || 20}"></label>
-    <label class="row"><span class="switch"><input type="checkbox" name="enabled" ${c.enabled !== false ? "checked" : ""}></span>AI Creator aktif</label>
-    <div class="note small">API key hanya melalui Secret Manager: <span class="mono">firebase functions:secrets:set ANTHROPIC_API_KEY</span> dan <span class="mono">OPENAI_API_KEY</span>.</div>
-    <button class="btn primary" type="submit">Simpan</button></form>`;
-  $("#adAiForm").onsubmit = e => { e.preventDefault(); withBusy(e.submitter, async () => { const f = Object.fromEntries(new FormData(e.target)); await fb.F.setDoc(D("config", "ai"), { textProvider: f.textProvider, textModel: f.textModel.trim(), imageProvider: f.imageProvider, imageModel: f.imageModel.trim(), dailyLimit: Math.min(500, Math.max(1, Number(f.dailyLimit) || 20)), enabled: !!f.enabled, updatedAt: now(), updatedBy: S.user.uid }); aiStatusCache = null; toast("Tetapan AI disimpan.", "ok"); }); };
+  $("#adminBody").innerHTML = `<div class="note info"><b>AI Creator percuma.</b> Menggunakan Pollinations (teks dan imej) terus dari browser pengguna. Tiada API key, tiada bayaran, tiada tetapan di sini. Perkhidmatan percuma boleh perlahan atau sibuk dan dikawal oleh pihak Pollinations.</div>`;
 }
 async function adAnnounce() {
   const snap = await fb.F.getDocs(fb.F.query(C("announcements"), fb.F.orderBy("createdAt", "desc"), fb.F.limit(30)));
+  S.adAnn = {}; snap.docs.forEach(d => S.adAnn[d.id] = d.data());
   $("#adminBody").innerHTML = `<form class="col panel" id="adAnnForm"><input class="in" name="title" maxlength="100" placeholder="Tajuk" required><textarea class="in" name="body" maxlength="1000" placeholder="Mesej" required></textarea><button class="btn primary" type="submit"><i data-lucide="megaphone"></i>Terbitkan</button></form>`
-    + (snap.empty ? `<div class="empty">No Data Available</div>` : `<div class="list">${snap.docs.map(d => { const a = d.data(); return `<div class="li"><span class="name"><b>${esc(a.title)}</b> — ${esc(a.body)}</span>${a.active ? chip("ok", "Active") : chip("off", "Hidden")}<button class="btn sm" data-ann-toggle="${d.id}" data-val="${a.active ? 0 : 1}">${a.active ? "Sembunyi" : "Aktifkan"}</button><button class="btn sm ghost" data-ann-del="${d.id}" aria-label="Padam"><i data-lucide="trash-2"></i></button></div>`; }).join("")}</div>`);
+    + (snap.empty ? `<div class="empty">No Data Available</div>` : `<div class="list">${snap.docs.map(d => { const a = d.data(); return `<div class="li"><span class="name"><b>${esc(a.title)}</b> — ${esc(a.body)}</span>${a.active ? chip("ok", "Active") : chip("off", "Hidden")}<button class="btn sm" data-ann-edit="${d.id}"><i data-lucide="pencil"></i>Edit</button><button class="btn sm" data-ann-toggle="${d.id}" data-val="${a.active ? 0 : 1}">${a.active ? "Sembunyi" : "Aktifkan"}</button><button class="btn sm ghost" data-ann-del="${d.id}" aria-label="Padam"><i data-lucide="trash-2"></i></button></div>`; }).join("")}</div>`);
   icons();
   $("#adAnnForm").onsubmit = e => { e.preventDefault(); withBusy(e.submitter, async () => { const f = Object.fromEntries(new FormData(e.target)); await fb.F.addDoc(C("announcements"), { title: f.title, body: f.body, active: true, createdBy: S.user.uid, createdAt: now() }); adAnnounce(); }); };
+}
+function annEditModal(id) {
+  const a = (S.adAnn || {})[id]; if (!a) return;
+  modal({ title: "Edit pengumuman", body: `<div class="col"><label class="f">Tajuk<input class="in" id="aeT" maxlength="100" value="${esc(a.title)}"></label><label class="f">Mesej<textarea class="in" id="aeB" maxlength="1000">${esc(a.body)}</textarea></label><label class="row small"><span class="switch"><input type="checkbox" id="aeA" ${a.active ? "checked" : ""}></span>Aktif</label></div>`,
+    actions: [{ label: "Batal" }, { label: "Simpan", cls: "primary", onClick: async c => {
+      const t = $("#aeT").value.trim(), b = $("#aeB").value.trim(); if (!t || !b) throw new Error("Tajuk dan mesej wajib diisi.");
+      await fb.F.updateDoc(D("announcements", id), { title: t.slice(0, 100), body: b.slice(0, 1000), active: $("#aeA").checked, updatedAt: now(), updatedBy: S.user.uid }); c(); adAnnounce();
+    } }] });
+}
+async function adSite() {
+  const s = await fb.F.getDoc(D("config", "site")); const c = s.exists() ? s.data() : {};
+  $("#adminBody").innerHTML = `<form class="col" id="adSiteForm">
+    <div class="note info small">Tetapan ini dipaparkan kepada semua pengguna dalam Streamer Hub.</div>
+    <label class="f">Teks sambutan di Streamer Hub<input class="in" name="welcome" maxlength="120" value="${esc(c.welcome || "")}" placeholder="Sedia untuk stream, rakam dan hasilkan content gaming."></label>
+    <label class="row"><span class="switch"><input type="checkbox" name="bannerOn" ${c.bannerOn ? "checked" : ""}></span>Papar banner untuk semua pengguna</label>
+    <label class="f">Teks banner<input class="in" name="banner" maxlength="200" value="${esc(c.banner || "")}"></label>
+    <label class="f">Pautan sokongan (https://, pilihan, muncul dalam Bantuan)<input class="in" name="support" type="url" maxlength="200" value="${esc(c.support || "")}" placeholder="https://wa.me/60123456789"></label>
+    <button class="btn primary" type="submit">Simpan</button></form>`;
+  $("#adSiteForm").onsubmit = e => { e.preventDefault(); withBusy(e.submitter, async () => {
+    const f = Object.fromEntries(new FormData(e.target)); const support = f.support.trim();
+    if (support && !/^https:\/\//i.test(support)) throw new Error("Pautan sokongan mesti bermula dengan https://");
+    const d = { welcome: f.welcome.trim(), banner: f.banner.trim(), bannerOn: !!f.bannerOn, support };
+    await fb.F.setDoc(D("config", "site"), { ...d, updatedAt: now(), updatedBy: S.user.uid }); S.sysConfig.site = d; toast("Tetapan site disimpan.", "ok");
+  }); };
+}
+function applySiteConfig() {
+  const c = S.sysConfig.site || {};
+  const w = $("#welcomeSub"); if (w) w.textContent = c.welcome || "Sedia untuk stream, rakam dan hasilkan content gaming.";
+  const b = $("#siteBanner"); if (b) b.innerHTML = c.bannerOn && c.banner ? `<div class="note small">${esc(c.banner)}</div>` : "";
 }
 async function adLogs() {
   const snap = await fb.F.getDocs(fb.F.query(C("systemLogs"), fb.F.orderBy("createdAt", "desc"), fb.F.limit(100)));
@@ -2652,7 +3070,14 @@ async function adLogs() {
 }
 async function adReports() {
   const snap = await fb.F.getDocs(fb.F.query(C("reports"), fb.F.orderBy("createdAt", "desc"), fb.F.limit(50)));
-  $("#adminBody").innerHTML = snap.empty ? `<div class="empty">No Data Available</div>` : `<div class="tbl-wrap"><table class="t"><thead><tr><th>Masa</th><th>Sebab</th><th>Sasaran</th><th>Status</th><th></th></tr></thead><tbody>${snap.docs.map(d => { const r = d.data(); return `<tr><td class="small">${fmtDate(r.createdAt)}</td><td>${esc(r.reason)}<div class="small muted">${esc(r.details)}</div></td><td class="mono small" style="word-break:break-all">${esc(r.targetPath)}</td><td>${chip(r.status === "open" ? "warn" : "ok", r.status)}</td><td><div class="row"><button class="btn sm" data-rep="${d.id}" data-val="resolved">Selesai</button><button class="btn sm" data-rep="${d.id}" data-val="dismissed">Tolak</button><button class="btn sm danger" data-rep-delpost="${esc(r.targetPath)}">Padam posting</button></div></td></tr>`; }).join("")}</tbody></table></div>`;
+  S.adRep = {}; snap.docs.forEach(d => S.adRep[d.id] = d.data());
+  $("#adminBody").innerHTML = snap.empty ? `<div class="empty">No Data Available</div>` : `<div class="tbl-wrap"><table class="t"><thead><tr><th>Masa</th><th>Sebab</th><th>Sasaran</th><th>Status</th><th></th></tr></thead><tbody>${snap.docs.map(d => { const r = d.data(); return `<tr><td class="small">${fmtDate(r.createdAt)}</td><td>${esc(r.reason)}<div class="small muted">${esc(r.details)}</div>${r.adminNote ? `<div class="small" style="margin-top:4px"><b>Catatan admin:</b> ${esc(r.adminNote)}</div>` : ""}</td><td class="mono small" style="word-break:break-all">${esc(r.targetPath)}</td><td>${chip(r.status === "open" ? "warn" : "ok", r.status)}</td><td><div class="row wrap"><button class="btn sm" data-rep="${d.id}" data-val="resolved">Selesai</button><button class="btn sm" data-rep="${d.id}" data-val="dismissed">Tolak</button><button class="btn sm" data-rep="${d.id}" data-val="open">Buka semula</button><button class="btn sm" data-rep-note="${d.id}"><i data-lucide="pencil"></i>Catatan</button><button class="btn sm danger" data-rep-delpost="${esc(r.targetPath)}">Padam posting</button></div></td></tr>`; }).join("")}</tbody></table></div>`;
+  icons();
+}
+function repNoteModal(id) {
+  const r = (S.adRep || {})[id]; if (!r) return;
+  modal({ title: "Catatan admin", body: `<label class="f">Catatan<textarea class="in" id="rnT" maxlength="500">${esc(r.adminNote || "")}</textarea></label>`,
+    actions: [{ label: "Batal" }, { label: "Simpan", cls: "primary", onClick: async c => { await fb.F.updateDoc(D("reports", id), { adminNote: $("#rnT").value.trim().slice(0, 500), handledBy: S.user.uid, handledAt: now() }); c(); adReports(); } }] });
 }
 async function adStatus() {
   if (!FUNCTIONS_ENABLED) {
@@ -2660,8 +3085,8 @@ async function adStatus() {
       <tr><td>Projek Firebase</td><td>${esc(FIREBASE_CONFIG.projectId)}</td></tr>
       <tr><td>Firestore</td><td>${chip("ok", "Connected")}</td></tr>
       <tr><td>Authentication (Email/Password)</td><td>${chip("ok", "Connected")}</td></tr>
-      <tr><td>Cloud Functions</td><td>${chip("warn", "Not Enabled (pelan percuma)")}</td></tr>
-      <tr><td>Firebase Storage</td><td>${chip("warn", "Not Enabled (pelan percuma)")}</td></tr>
+      <tr><td>Cloud Functions</td><td>${chip("off", "Tidak digunakan (mod percuma)")}</td></tr>
+      <tr><td>Firebase Storage</td><td>${chip("off", "Tidak digunakan (mod percuma)")}</td></tr>
       <tr><td>App Check</td><td>${APP_CHECK_SITE_KEY ? chip("ok", "Enabled") : chip("off", "Disabled")}</td></tr></tbody></table></div>`;
     return;
   }
@@ -2673,10 +3098,10 @@ async function adStatus() {
    KILL POPUP + GAME CONNECT
    ===================================================================== */
 const GAMES = [
-  { id: "cs2", name: "Counter-Strike 2", method: "gsi", note: "Game State Integration rasmi Valve. Letak fail config dalam folder cfg game. Kill, streak dalam round, headshot dan senjata dikesan automatik." },
-  { id: "dota2", name: "Dota 2", method: "gsi", note: "Game State Integration rasmi Valve. Perlu launch option -gamestateintegration. Kill dan kill streak dikesan automatik." },
-  { id: "lol", name: "League of Legends", method: "bridge", note: "Live Client Data API rasmi Riot hanya boleh dibaca di PC yang sama (127.0.0.1:2999). Jalankan tools/game-bridge.mjs untuk hantar kill ke STREAMVERSE." },
-  { id: "generic", name: "Webhook umum (Stream Deck, Touch Portal, Bitfocus Companion, mod / skrip sendiri)", method: "webhook", note: "Mana-mana alat yang boleh hantar HTTP POST boleh trigger kill popup, untuk game apa sahaja." },
+  { id: "cs2", name: "Counter-Strike 2", method: "gsi", note: "Game State Integration rasmi Valve → Game Bridge di PC anda. Kill, headshot dan senjata dikesan automatik." },
+  { id: "dota2", name: "Dota 2", method: "gsi", note: "Game State Integration rasmi Valve (launch option -gamestateintegration) → Game Bridge. Kill dan kill streak dikesan automatik." },
+  { id: "lol", name: "League of Legends", method: "gsi", note: "Live Client Data API rasmi Riot (127.0.0.1:2999) dibaca oleh Game Bridge dengan --lol." },
+  { id: "generic", name: "Webhook tempatan (Stream Deck, Touch Portal, Bitfocus Companion, skrip / mod sendiri)", method: "webhook", note: "POST ke http://127.0.0.1:3000/kill pada PC yang sama. Untuk game apa sahaja." },
   { id: "valorant", name: "Valorant", method: "manual", note: "Riot tidak membuka API kill masa nyata untuk Valorant. Guna butang, hotkey K, Kill Remote atau Stream Deck." },
   { id: "mlbb", name: "Mobile Legends: Bang Bang", method: "manual", note: "Tiada API rasmi. Guna Kill Remote di telefon/tablet kedua, butang, atau Stream Deck." },
   { id: "pubgm", name: "PUBG Mobile", method: "manual", note: "Tiada API rasmi. Guna Kill Remote / butang / Stream Deck." },
@@ -2684,9 +3109,9 @@ const GAMES = [
   { id: "codm", name: "Call of Duty: Mobile", method: "manual", note: "Tiada API rasmi. Guna Kill Remote / butang / Stream Deck." },
   { id: "fortnite", name: "Fortnite", method: "manual", note: "Tiada API kill masa nyata yang rasmi. Guna butang / hotkey / Stream Deck." },
   { id: "apex", name: "Apex Legends", method: "manual", note: "Tiada API kill masa nyata yang rasmi. Guna butang / hotkey / Stream Deck." },
-  { id: "minecraft", name: "Minecraft / Roblox / game lain", method: "webhook", note: "Boleh automatik jika mod/plugin/skrip game menghantar POST ke Webhook URL. Jika tidak, guna manual." }
+  { id: "minecraft", name: "Minecraft / Roblox / game lain", method: "webhook", note: "Mod / plugin / skrip game boleh POST ke http://127.0.0.1:3000/kill. Jika tidak, guna manual." }
 ];
-const METHOD_CHIP = { gsi: ["ok", "Official API (auto)"], bridge: ["info", "Official API + bridge PC"], webhook: ["info", "Webhook"], manual: ["warn", "Manual sahaja"] };
+const METHOD_CHIP = { gsi: ["ok", "Official API + Bridge PC"], webhook: ["info", "Webhook tempatan"], manual: ["warn", "Manual sahaja"] };
 const KF = { popups: [], streak: 0, lastAt: 0, warned: false, gameLast: {}, hookUrl: "", game: ls.get("kfGame", "cs2"), hotkey: ls.get("kfHotkey", true) };
 const KILL_LABELS = "KILL,DOUBLE KILL,TRIPLE KILL,QUADRA KILL,PENTA KILL,UNSTOPPABLE";
 function killLabel(src, n) { const l = (src?.labels || KILL_LABELS).split(",").map(x => x.trim()).filter(Boolean); return l[Math.min(n, l.length) - 1] || "KILL"; }
@@ -2757,7 +3182,6 @@ async function addKillSource() {
 function renderGames() {
   const el = $("#gamesBody"); if (!el) return;
   const ks = killSource();
-  const hookBlock = cloudBlock("Webhook game (auto kill)") || fnBlock("Webhook auto-kill (CS2 / Dota 2 / League of Legends)");
   el.innerHTML = `<div class="g2">
     <div class="panel col"><div class="panel-h"><h3><i data-lucide="crosshair"></i>Kill Popup</h3><span class="grow"></span>${ks ? (ks.visible ? chip("ok", "Aktif dalam scene") : chip("warn", "Hidden")) : chip("off", "Tiada dalam scene")}</div>
       <p class="small muted" style="margin:0">Popup dilukis terus pada video output, jadi ia muncul dalam siaran LIVE dan rakaman. Streak dikira automatik bila kill berturut dalam tempoh yang ditetapkan.</p>
@@ -2766,18 +3190,18 @@ function renderGames() {
       <div class="row wrap"><button class="btn danger" data-kill="0" style="font-size:20px;padding:14px 26px"><i data-lucide="crosshair"></i>KILL</button><button class="btn" data-kill="1"><i data-lucide="target"></i>Kill + Headshot</button><button class="btn ghost" id="kfReset"><i data-lucide="rotate-ccw"></i>Reset streak (${KF.streak})</button></div>
       <label class="row small"><span class="switch"><input type="checkbox" id="kfHotkey" ${KF.hotkey ? "checked" : ""}></span>Hotkey <b class="mono">K</b> = kill, <b class="mono">H</b> = headshot (berfungsi bila tetingkap STREAMVERSE difokus)</label>
     </div>
-    <div class="panel col"><div class="panel-h"><h3><i data-lucide="webhook"></i>Webhook URL (auto kill)</h3></div>${hookBlock || `
-      <p class="small muted" style="margin:0">URL rahsia untuk akaun anda. Digunakan oleh config CS2/Dota 2, game-bridge (League of Legends) dan Stream Deck. Jangan kongsi URL ini.</p>
-      ${KF.hookUrl ? `<input class="in mono" readonly value="${esc(KF.hookUrl)}" id="hookUrl"><div class="row wrap"><button class="btn sm" id="hookCopy"><i data-lucide="copy"></i>Salin</button><button class="btn sm" id="hookNew"><i data-lucide="refresh-cw"></i>Jana semula</button><button class="btn sm ghost" id="hookOff"><i data-lucide="trash-2"></i>Batalkan</button></div>
-        <details class="acc"><summary><i data-lucide="terminal"></i>Contoh webhook umum</summary><div><pre class="mono small" style="white-space:pre-wrap;word-break:break-all">POST ${esc(KF.hookUrl)}
-Content-Type: application/json
-
-{"type":"kill","game":"mlbb","headshot":false,"weapon":"","victim":"","streak":0}</pre>Stream Deck: plugin "Web Requests" / "API Ninja" → POST URL di atas dengan body JSON tersebut. Satu butang = satu kill.</div></details>`
-      : `<button class="btn primary" id="hookNew"><i data-lucide="link"></i>Jana Webhook URL</button>`}`}
+    <div class="panel col"><div class="panel-h"><h3><i data-lucide="plug-zap"></i>Game Bridge (PC)</h3><span class="grow"></span>${KF.bridge.state === "on" ? chip("ok", "Connected") : KF.bridge.state === "connecting" ? chip("warn", "Connecting") : chip("off", "Not Connected")}</div>
+      <p class="small muted" style="margin:0">Skrip kecil percuma yang dijalankan di PC gaming anda (Node.js). Ia menerima kill dari CS2 / Dota 2 / League of Legends / Stream Deck dan menghantarnya ke STREAMVERSE. Tiada server atau VPS.</p>
+      <ol class="small" style="margin:0;padding-left:18px"><li>Pasang <b>Node.js 18+</b> (nodejs.org, percuma).</li><li>Muat turun skrip di bawah dan simpan sebagai <span class="mono">game-bridge.mjs</span>.</li><li>Buka Terminal dan jalankan <span class="mono">node game-bridge.mjs</span> (tambah <span class="mono">--lol</span> untuk League of Legends).</li><li>Tekan <b>Connect Bridge</b>.</li></ol>
+      <div class="row wrap"><button class="btn" id="brDl"><i data-lucide="download"></i>Muat turun skrip</button><button class="btn" id="brCopy"><i data-lucide="copy"></i>Salin skrip</button></div>
+      <label class="f">Alamat bridge<input class="in mono" id="brUrl" value="${esc(KF.bridge.url)}"></label>
+      <div class="row wrap">${KF.bridge.state === "on" ? `<button class="btn danger" id="brOff"><i data-lucide="unplug"></i>Disconnect Bridge</button>` : `<button class="btn primary" id="brConnect"><i data-lucide="plug"></i>Connect Bridge</button>`}</div>
+      ${KF.bridge.msg ? `<div class="note small">${esc(KF.bridge.msg)}</div>` : ""}
+      <div class="small muted">Chrome / Edge / Firefox membenarkan laman HTTPS bercakap dengan 127.0.0.1. Safari menyekatnya. Chrome mungkin minta kebenaran "akses rangkaian tempatan": pilih Allow.</div>
     </div></div>
     <div class="panel"><div class="panel-h"><h3><i data-lucide="gamepad-2"></i>Sambungan Game</h3></div>
       <div class="tbl-wrap"><table class="t"><thead><tr><th>Game</th><th>Kaedah</th><th>Status</th><th></th></tr></thead><tbody>${GAMES.map(g => {
-        const last = KF.gameLast[g.id]; const st = g.method === "manual" ? chip("off", "Manual") : last ? chip("ok", "Receiving · " + new Date(last).toLocaleTimeString("ms-MY")) : KF.hookUrl ? chip("warn", "Waiting for event") : chip("off", "Not Connected");
+        const last = KF.gameLast[g.id]; const st = g.method === "manual" ? chip("off", "Manual") : last ? chip("ok", "Receiving · " + new Date(last).toLocaleTimeString("ms-MY")) : KF.bridge.state === "on" ? chip("warn", "Waiting for event") : chip("off", "Bridge Not Running");
         return `<tr><td><b>${esc(g.name)}</b><div class="small muted">${esc(g.note)}</div></td><td>${chip(...METHOD_CHIP[g.method])}</td><td>${st}</td><td>${g.method === "manual" ? "" : `<button class="btn sm" data-game-setup="${g.id}">Setup</button>`}</td></tr>`;
       }).join("")}</tbody></table></div>
       <p class="small muted">Pengesanan kill melalui OCR skrin tidak disediakan kerana tidak tepat dan berbeza ikut game. Semua status "Receiving" hanya muncul selepas event sebenar diterima.</p></div>
@@ -2789,15 +3213,16 @@ Content-Type: application/json
   on("kfAdd", () => addKillSource());
   on("kfReset", () => { KF.streak = 0; KF.lastAt = 0; renderGames(); });
   on("remoteCopy", () => copyText(remoteUrl()));
-  on("hookCopy", () => copyText(KF.hookUrl));
-  on("hookNew", b => withBusy(b, async () => { if (KF.hookUrl && !(await confirmBox("Jana semula?", "URL lama akan berhenti berfungsi. Kemas kini config game anda.", "Jana"))) return; const r = await callFn("gameHookCreate"); KF.hookUrl = r.url; renderGames(); }));
-  on("hookOff", b => withBusy(b, async () => { if (!(await confirmBox("Batalkan webhook?", "Auto kill dari game akan berhenti.", "Batalkan"))) return; await callFn("gameHookRevoke"); KF.hookUrl = ""; renderGames(); }));
+  on("brDl", () => { const t = $("#bridgeSrc").textContent.replace(/^\n/, ""); const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([t], { type: "text/javascript" })); a.download = "game-bridge.mjs"; document.body.append(a); a.click(); a.remove(); });
+  on("brCopy", () => copyText($("#bridgeSrc").textContent.replace(/^\n/, "")));
+  on("brConnect", () => { KF.bridge.url = $("#brUrl").value.trim() || "http://127.0.0.1:3000"; ls.set("bridgeUrl", KF.bridge.url); try { bridgeConnect(); } catch (e) { KF.bridge.msg = e.message; renderGames(); } });
+  on("brOff", () => bridgeDisconnect());
   $("#kfGame").onchange = e => { KF.game = e.target.value; ls.set("kfGame", KF.game); };
   $("#kfHotkey").onchange = e => { KF.hotkey = e.target.checked; ls.set("kfHotkey", KF.hotkey); };
 }
 const remoteUrl = () => `${location.origin}${location.pathname}?remote=kill`;
 function gameSetup(id) {
-  const g = GAMES.find(x => x.id === id); const url = KF.hookUrl || "(jana Webhook URL dahulu)";
+  const g = GAMES.find(x => x.id === id); const url = KF.bridge.url.replace(/\/+$/, "") + "/";
   const cfg = id === "cs2" || id === "dota2" ? `"STREAMVERSE"
 {
   "uri" "${url}"
@@ -2805,7 +3230,6 @@ function gameSetup(id) {
   "buffer" "0.1"
   "throttle" "0.1"
   "heartbeat" "30.0"
-  "auth" { "token" "streamverse" }
   "data"
   {
     "provider" "1"
@@ -2817,16 +3241,31 @@ ${id === "cs2" ? `    "player_id" "1"
     "hero" "1"`}
   }
 }` : "";
-  const body = id === "cs2" ? `<ol class="small"><li>Buka folder: <span class="mono">Steam/steamapps/common/Counter-Strike Global Offensive/game/csgo/cfg/</span></li><li>Cipta fail <b class="mono">gamestate_integration_streamverse.cfg</b> dengan kandungan di bawah.</li><li>Restart CS2. Kill anda (bukan semasa spectate) akan mencetuskan popup.</li><li>Jika game tidak menghantar ke HTTPS di PC anda, tukar <span class="mono">uri</span> kepada <span class="mono">http://127.0.0.1:3000/</span> dan jalankan <span class="mono">node tools/game-bridge.mjs --forward URL</span>.</li></ol>`
-    : id === "dota2" ? `<ol class="small"><li>Steam → Dota 2 → Properties → Launch Options: tambah <span class="mono">-gamestateintegration</span>.</li><li>Folder: <span class="mono">steamapps/common/dota 2 beta/game/dota/cfg/gamestate_integration/</span> (cipta jika tiada).</li><li>Cipta <b class="mono">gamestate_integration_streamverse.cfg</b> dengan kandungan di bawah, kemudian restart Dota 2.</li><li>Jika perlu, guna bridge seperti CS2.</li></ol>`
-    : id === "lol" ? `<ol class="small"><li>Pasang Node.js 18+ di PC gaming.</li><li>Muat turun <span class="mono">tools/game-bridge.mjs</span> dari projek STREAMVERSE.</li><li>Jalankan: <pre class="mono small" style="white-space:pre-wrap;word-break:break-all">node game-bridge.mjs --lol --forward "${esc(url)}"</pre></li><li>Masuk perlawanan. Bridge membaca kill anda dari Live Client Data API (127.0.0.1:2999) dan menghantarnya.</li></ol>`
-    : `<p class="small">Hantar <b>HTTP POST</b> JSON ke Webhook URL:</p><pre class="mono small" style="white-space:pre-wrap;word-break:break-all">{"type":"kill","game":"${id}","headshot":false,"weapon":"","victim":""}</pre><p class="small">Contoh: Stream Deck (Web Requests), Touch Portal (HTTP GET/POST), Bitfocus Companion (Generic HTTP), mod Minecraft / skrip Roblox Studio (HttpService) atau AutoHotkey.</p>`;
+  const start = `<li>Jalankan Game Bridge: <span class="mono">node game-bridge.mjs${id === "lol" ? " --lol" : ""}</span> (lihat panel Game Bridge).</li><li>Dalam STREAMVERSE tekan <b>Connect Bridge</b>.</li>`;
+  const body = id === "cs2" ? `<ol class="small"><li>Buka folder: <span class="mono">Steam/steamapps/common/Counter-Strike Global Offensive/game/csgo/cfg/</span></li><li>Cipta fail <b class="mono">gamestate_integration_streamverse.cfg</b> dengan kandungan di bawah.</li>${start}<li>Restart CS2. Kill anda (bukan semasa spectate) akan mencetuskan popup.</li></ol>`
+    : id === "dota2" ? `<ol class="small"><li>Steam → Dota 2 → Properties → Launch Options: tambah <span class="mono">-gamestateintegration</span>.</li><li>Folder: <span class="mono">steamapps/common/dota 2 beta/game/dota/cfg/gamestate_integration/</span> (cipta jika tiada).</li><li>Cipta <b class="mono">gamestate_integration_streamverse.cfg</b> dengan kandungan di bawah.</li>${start}<li>Restart Dota 2.</li></ol>`
+    : id === "lol" ? `<ol class="small">${start}<li>Masuk perlawanan. Bridge membaca kill anda dari Live Client Data API rasmi (127.0.0.1:2999) dan menghantarnya.</li></ol>`
+    : `<p class="small">Selepas Game Bridge berjalan, hantar <b>HTTP POST</b> JSON ke <span class="mono">${esc(url)}kill</span>:</p><pre class="mono small" style="white-space:pre-wrap;word-break:break-all">{"type":"kill","game":"${id}","headshot":false,"weapon":"","victim":""}</pre><p class="small">Contoh: Stream Deck (plugin Web Requests), Touch Portal (HTTP), Bitfocus Companion (Generic HTTP), mod Minecraft / skrip Roblox Studio (HttpService) atau AutoHotkey. Semuanya pada PC yang sama dengan bridge.</p>`;
   modal({ title: `Setup — ${g.name}`, wide: true, body: `<div class="col">${body}${cfg ? `<textarea class="in mono" readonly style="min-height:260px" id="gsiCfg">${esc(cfg)}</textarea><div><button class="btn sm" id="gsiCopy"><i data-lucide="copy"></i>Salin config</button></div>` : ""}</div>`,
     onMount: bg => { const c = $("#gsiCopy", bg); if (c) c.onclick = () => copyText(cfg); } });
 }
-async function loadGameHook() {
-  if (!cloudOK()) return;
-  try { const s = await fb.F.getDoc(D(...uidPath("settings", "gameHook"))); KF.hookUrl = s.exists() ? s.data().url || "" : ""; } catch { KF.hookUrl = ""; }
+async function loadGameHook() { /* tiada webhook awan dalam mod percuma */ }
+KF.bridge = { url: ls.get("bridgeUrl", "http://127.0.0.1:3000"), state: "off", es: null, msg: "" };
+function bridgeRefresh() { if (S.view === "games") renderGames(); renderStatus(); }
+function bridgeConnect() {
+  bridgeDisconnect(true);
+  const url = KF.bridge.url.replace(/\/+$/, "");
+  if (!/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(url)) throw new Error("Alamat bridge mesti http://127.0.0.1:PORT (PC anda sendiri).");
+  KF.bridge.state = "connecting"; KF.bridge.msg = ""; bridgeRefresh();
+  const es = new EventSource(url + "/events"); KF.bridge.es = es;
+  es.onopen = () => { KF.bridge.state = "on"; KF.bridge.msg = ""; ls.set("bridgeOn", true); bridgeRefresh(); toast("Game Bridge disambung.", "ok"); };
+  es.onmessage = ev => { try { const d = JSON.parse(ev.data); if (d.type === "kill") triggerKill({ ...d, source: "bridge" }); } catch { /* abaikan data tidak sah */ } };
+  es.onerror = () => { KF.bridge.state = "off"; KF.bridge.msg = "Bridge tidak berjalan pada alamat ini, atau disekat browser (cth. Safari / kebenaran rangkaian tempatan ditolak). Pastikan 'node game-bridge.mjs' sedang berjalan."; bridgeRefresh(); };
+}
+function bridgeDisconnect(silent) {
+  if (KF.bridge.es) KF.bridge.es.close();
+  KF.bridge.es = null; KF.bridge.state = "off";
+  if (!silent) { ls.set("bridgeOn", false); bridgeRefresh(); }
 }
 function startGameListener() {
   const since = fb.F.Timestamp.now();
@@ -2882,7 +3321,7 @@ const viewerUrl = () => viewerSlug() ? `${location.origin}${location.pathname}?l
 async function loadDonation() {
   if (DN.loaded) return;
   if (cloudOK()) {
-    try { const s = await fb.F.getDoc(D("publicPages", S.user.uid)); if (s.exists()) { const d = s.data(); Object.assign(DN, { links: d.links || [], pageOn: d.enabled !== false, youtubeChannelId: d.youtubeChannelId || "", tiktokUser: d.tiktokUser || "", disabled: !!d.disabled }); } }
+    try { const s = await fb.F.getDoc(D("publicPages", S.user.uid)); if (s.exists()) { const d = s.data(); Object.assign(DN, { live: !!d.live, links: d.links || [], pageOn: d.enabled !== false, youtubeChannelId: d.youtubeChannelId || "", tiktokUser: d.tiktokUser || "", disabled: !!d.disabled }); } }
     catch (e) { console.warn(e); }
   } else Object.assign(DN, ls.get("donation", {}));
   if (!DN.youtubeChannelId && S.platforms.youtube?.accountId) DN.youtubeChannelId = S.platforms.youtube.accountId;
@@ -2923,7 +3362,7 @@ async function renderDonation() {
           <label class="f">YouTube Channel ID (untuk benam siaran live)<input class="in" id="dnYt" maxlength="40" placeholder="UCxxxxxxxx" value="${esc(DN.youtubeChannelId)}"></label>
           <label class="f">TikTok username (butang "Tonton di TikTok")<input class="in" id="dnTt" maxlength="40" placeholder="@username" value="${esc(DN.tiktokUser)}"></label>
           <div class="small mono" style="word-break:break-all">${esc(vurl)}</div>
-          <div class="row wrap"><button class="btn sm" id="dnCopy"><i data-lucide="copy"></i>Salin link</button><a class="btn sm" href="${esc(vurl)}" target="_blank" rel="noopener"><i data-lucide="external-link"></i>Buka halaman</a></div>`)}</div>
+          <label class="row small"><span class="switch"><input type="checkbox" id="dnLive" ${DN.live ? "checked" : ""}></span>Tandakan halaman saya sedang LIVE (manual)</label><div class="row wrap"><button class="btn sm" id="dnCopy"><i data-lucide="copy"></i>Salin link</button><a class="btn sm" href="${esc(vurl)}" target="_blank" rel="noopener"><i data-lucide="external-link"></i>Buka halaman</a></div>`)}</div>
       </div></div>`;
   icons();
   const on = (id, fn) => { const b = $("#" + id); if (b) b.onclick = e => fn(e.currentTarget); };
@@ -2932,6 +3371,7 @@ async function renderDonation() {
   on("dnOverlay", async () => { const s = await createSourceQuiet("donation"); const sc = activeScene(); sc.sources.splice(sc.sources.indexOf(s), 1); sc.sources.unshift(s); await store.saveScene(sc); rt(s.id).status = "connected"; renderAll(); renderDonation(); toast("QR Donation ditambah.", "ok"); });
   on("dnPreview", () => donatePopup({ displayName: S.profile?.username || "Streamer", links: DN.links.filter(l => safeUrl(l.url)) }));
   on("dnCopy", () => copyText(vurl));
+  const lv = $("#dnLive"); if (lv) lv.onchange = e => { DN.live = e.target.checked; setLiveFlag(DN.live); };
 }
 function donatePopup(page) {
   const links = (page.links || []).filter(l => safeUrl(l.url));
@@ -3002,40 +3442,43 @@ async function startViewerPage(slug) {
 /* =====================================================================
    LIVE CHAT (YouTube & Facebook melalui API rasmi; pop-out / skrin kedua / PiP)
    ===================================================================== */
-const CHAT = { running: false, timers: {}, cur: { youtube: {}, facebook: {} }, st: {}, msgs: [], seen: new Set(), lists: new Set(), size: ls.get("chatSize", 22), filter: "all", popoutAt: 0 };
+const CHAT = { running: false, timers: {}, cur: { youtube: {}, facebook: {} }, st: {}, msgs: [], seen: new Set(), lists: new Set(), size: ls.get("chatSize", 22), filter: "all", gotBacklog: false };
 const isChatWindow = () => new URLSearchParams(location.search).get("panel") === "chat";
 const bc = "BroadcastChannel" in window ? new BroadcastChannel("sv-chat") : null;
 if (bc) bc.onmessage = e => {
-  if (e.data?.t === "alive" && !isChatWindow()) { CHAT.popoutAt = Date.now(); if (CHAT.running) chatStop(); if (S.view === "chat") renderChatView(); }
+  const d = e.data || {};
+  if (isChatWindow()) {
+    if (d.t === "msg") addChatMsg(d.m, true);
+    else if (d.t === "backlog") { CHAT.gotBacklog = true; (d.msgs || []).forEach(m => addChatMsg(m, true)); CHAT.st = d.st || {}; CHAT.running = !!d.running; renderChatStatus(); }
+    else if (d.t === "status") { CHAT.st = d.st || {}; CHAT.running = !!d.running; renderChatStatus(); }
+  } else if (d.t === "hello") bc.postMessage({ t: "backlog", msgs: CHAT.msgs, st: CHAT.st, running: CHAT.running });
 };
 function chatPlatforms() { return ["youtube", "facebook"].filter(p => platformStatus(p)[0] === "ok"); }
 function chatStart() {
-  if (!cloudOK()) return toast("Live chat memerlukan Firebase dan platform yang disambung.", "warn");
-  if (!FUNCTIONS_ENABLED) return toast("Live chat perlukan Cloud Functions (pelan Blaze). Belum aktif.", "warn", 6000);
   const ps = chatPlatforms();
   if (!ps.length) { CHAT.st = { youtube: ["off", "Not Connected"], facebook: ["off", "Not Connected"] }; renderChatStatus(); return toast("Sambung YouTube atau Facebook dahulu di StreamVerse Connect.", "warn", 6000); }
   CHAT.running = true;
   ps.forEach(p => { CHAT.st[p] = ["warn", "Menyambung"]; chatPoll(p); });
   renderChatStatus();
-  if (isChatWindow() && bc) { bc.postMessage({ t: "alive" }); CHAT.timers.alive = setInterval(() => bc.postMessage({ t: "alive" }), 4000); }
 }
 function chatStop() { CHAT.running = false; Object.values(CHAT.timers).forEach(t => { clearTimeout(t); clearInterval(t); }); CHAT.timers = {}; Object.keys(CHAT.st).forEach(k => CHAT.st[k] = ["off", "Stopped"]); renderChatStatus(); }
 async function chatPoll(p) {
   if (!CHAT.running) return;
-  let wait = 5000;
+  let wait = 8000;
   try {
-    const r = await callFn("platformChatPoll", { platform: p, ...CHAT.cur[p] });
-    if (r.status === "no-live") { CHAT.st[p] = ["off", "Tiada siaran aktif"]; CHAT.cur[p] = {}; wait = r.pollMs || 20000; }
-    else { CHAT.st[p] = ["ok", "Live chat aktif"]; CHAT.cur[p] = r.cursor || {}; wait = r.pollMs || 5000; (r.messages || []).forEach(addChatMsg); }
+    const r = await pfChatPoll(p, CHAT.cur[p]);
+    if (r.status === "no-live") { CHAT.st[p] = ["off", "Tiada siaran aktif"]; CHAT.cur[p] = {}; wait = r.pollMs || 30000; }
+    else { CHAT.st[p] = ["ok", "Live chat aktif"]; CHAT.cur[p] = r.cursor || {}; wait = r.pollMs || 8000; (r.messages || []).forEach(m => addChatMsg(m)); }
   } catch (e) { CHAT.st[p] = ["err", errMsg(e)]; wait = 30000; }
   renderChatStatus();
-  if (CHAT.running) CHAT.timers[p] = setTimeout(() => chatPoll(p), Math.max(3000, wait));
+  if (CHAT.running) CHAT.timers[p] = setTimeout(() => chatPoll(p), Math.max(4000, wait));
 }
-function addChatMsg(m) {
-  if (!m?.id || CHAT.seen.has(m.id)) return;
+function addChatMsg(m, fromBc) {
+  if (!m || !m.id || CHAT.seen.has(m.id)) return;
   CHAT.seen.add(m.id); CHAT.msgs.push(m);
   if (CHAT.msgs.length > 400) { const old = CHAT.msgs.shift(); CHAT.seen.delete(old.id); }
   CHAT.lists.forEach(list => appendMsg(list, m));
+  if (!fromBc && !isChatWindow() && bc) bc.postMessage({ t: "msg", m });
 }
 function msgNode(doc, m) {
   const d = doc.createElement("div"); d.className = "chat-msg" + (m.amount ? " paid" : ""); d.dataset.platform = m.platform;
@@ -3049,28 +3492,29 @@ function msgNode(doc, m) {
 }
 function appendMsg(list, m) {
   const atBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 80;
-  list.querySelector(".chat-empty")?.remove();
+  const emp = list.querySelector(".chat-empty"); if (emp) emp.remove();
   list.append(msgNode(list.ownerDocument, m));
   while (list.children.length > 400) list.firstElementChild.remove();
   if (atBottom) list.scrollTop = list.scrollHeight;
 }
 function mountChatList(list) {
   list.style.setProperty("--chat-size", CHAT.size + "px");
-  list.innerHTML = CHAT.msgs.length ? "" : `<div class="chat-empty">Belum ada komen. Komen dari YouTube &amp; Facebook akan muncul di sini bila live.</div>`;
+  list.innerHTML = CHAT.msgs.length ? "" : `<div class="chat-empty">${isChatWindow() ? "Belum ada komen. Pastikan tetingkap STREAMVERSE utama masih terbuka dan Start Chat telah ditekan." : "Belum ada komen. Komen dari YouTube &amp; Facebook akan muncul di sini bila live."}</div>`;
   CHAT.msgs.forEach(m => list.append(msgNode(list.ownerDocument, m)));
   list.scrollTop = list.scrollHeight; CHAT.lists.add(list);
 }
 function renderChatStatus() {
-  const html = ["youtube", "facebook"].map(p => { const [c, t] = CHAT.st[p] || (platformStatus(p)[0] === "ok" ? ["off", "Sedia"] : ["off", platformStatus(p)[1]]); return `<span class="row small" style="gap:6px"><b>${p === "youtube" ? "YouTube" : "Facebook"}</b>${chip(c, t)}</span>`; }).join("")
+  const html = ["youtube", "facebook"].map(p => { const [c, t] = CHAT.st[p] || (isChatWindow() ? ["off", "Menunggu tetingkap utama"] : platformStatus(p)[0] === "ok" ? ["off", "Sedia"] : ["off", platformStatus(p)[1]]); return `<span class="row small" style="gap:6px"><b>${p === "youtube" ? "YouTube" : "Facebook"}</b>${chip(c, t)}</span>`; }).join("")
     + `<span class="row small" style="gap:6px"><b>TikTok</b>${chip("err", "Unsupported")}</span>`;
   $$("[data-chat-status]").forEach(el => el.innerHTML = html);
   $$("[data-chat-toggle]").forEach(b => { b.innerHTML = CHAT.running ? `<i data-lucide="square"></i>Stop Chat` : `<i data-lucide="play"></i>Start Chat`; });
+  if (bc && !isChatWindow()) bc.postMessage({ t: "status", st: CHAT.st, running: CHAT.running });
   icons();
 }
-function chatControls() {
-  return `<div class="row wrap" style="gap:8px"><button class="btn primary sm" data-chat-toggle></button>
-    ${isChatWindow() ? "" : `<button class="btn sm" data-chat-pop><i data-lucide="external-link"></i>Pop-out (skrin kedua)</button>`}
-    <button class="btn sm" data-chat-pip><i data-lucide="picture-in-picture-2"></i>Always on top</button>
+function chatControls(popup) {
+  return `<div class="row wrap" style="gap:8px">${popup ? "" : `<button class="btn primary sm" data-chat-toggle></button>
+    <button class="btn sm" data-chat-pop><i data-lucide="external-link"></i>Pop-out (skrin kedua)</button>
+    <button class="btn sm" data-chat-pip><i data-lucide="picture-in-picture-2"></i>Always on top</button>`}
     <label class="row small" style="gap:6px">Saiz<input type="range" min="14" max="44" value="${CHAT.size}" data-chat-size style="width:100px" aria-label="Saiz teks chat"></label>
     <select class="in" data-chat-filter style="width:auto;padding:5px 8px" aria-label="Tapis platform"><option value="all">Semua</option><option value="youtube" ${CHAT.filter === "youtube" ? "selected" : ""}>YouTube</option><option value="facebook" ${CHAT.filter === "facebook" ? "selected" : ""}>Facebook</option></select>
     <button class="btn sm ghost" data-chat-clear><i data-lucide="eraser"></i>Kosongkan</button></div>
@@ -3079,10 +3523,8 @@ function chatControls() {
 function renderChatView() {
   const el = $("#chatBody"); if (!el) return;
   CHAT.lists.forEach(l => { if (l.ownerDocument === document) CHAT.lists.delete(l); });
-  const pop = Date.now() - CHAT.popoutAt < 9000;
-  el.innerHTML = (cloudBlock("Live Chat") || fnBlock("Live Chat YouTube / Facebook")) + `<div class="note info small">Komen YouTube dan Facebook dibaca melalui API rasmi (perlu platform disambung &amp; siaran aktif). <b>TikTok LIVE tiada API rasmi untuk membaca komen</b>; guna tetingkap komen TikTok LIVE Studio. Kuota YouTube API terhad (~10,000 unit/hari), jadi poll mengikut selang yang ditetapkan YouTube.</div>
-    ${pop ? `<div class="note small">Chat sedang dibuka di tetingkap pop-out. Panel ini berhenti supaya tidak membaca dua kali.</div>` : ""}
-    <div class="panel col">${chatControls()}<div class="chat-list" data-chat-list></div></div>`;
+  el.innerHTML = `<div class="note info small">Komen YouTube dan Facebook dibaca terus dari browser anda melalui API rasmi (platform mesti disambung dan siaran aktif). <b>TikTok LIVE tiada API rasmi untuk membaca komen</b>; guna tetingkap komen TikTok LIVE Studio. Chat YouTube dikemas kini setiap ±10 saat supaya kuota percuma (10,000 unit/hari) cukup untuk beberapa jam siaran. Tetingkap pop-out menerima komen daripada tetingkap ini, jadi biarkan tetingkap ini terbuka.</div>
+    <div class="panel col">${chatControls(false)}<div class="chat-list" data-chat-list></div></div>`;
   mountChatList($("[data-chat-list]", el)); renderChatStatus();
 }
 async function openChatWindow() {
@@ -3097,7 +3539,7 @@ async function openChatWindow() {
   const w = window.open(`${location.pathname}?panel=chat`, "svchat", feat);
   if (!w) return toast("Popup disekat browser. Benarkan pop-up untuk laman ini.", "err", 7000);
   if (feat.includes("left=")) toast("Chat dibuka di skrin kedua.", "ok"); else toast("Chat dibuka di tetingkap baru. Seret ke skrin kedua.", "info", 6000);
-  if (CHAT.running) chatStop();
+  if (!CHAT.running && chatPlatforms().length) chatStart();
 }
 async function chatPiP() {
   if (!("documentPictureInPicture" in window)) return toast("Always on top (Document Picture-in-Picture) hanya disokong Chrome/Edge 116+ desktop.", "warn", 7000);
@@ -3108,17 +3550,16 @@ async function chatPiP() {
   const list = pip.document.createElement("div"); list.className = "chat-list pip"; pip.document.body.append(list);
   mountChatList(list);
   pip.addEventListener("pagehide", () => CHAT.lists.delete(list));
-  if (!CHAT.running) chatStart();
+  if (!CHAT.running && chatPlatforms().length) chatStart();
 }
 async function startChatWindow() {
   showOnly("chatApp");
+  const bootEl = $("#boot"); if (bootEl) bootEl.hidden = true;
   document.title = "STREAMVERSE Live Chat";
   const el = $("#chatApp");
-  el.innerHTML = `<div class="chat-window"><div class="row" style="gap:10px"><span data-logo></span><b class="brand-name" style="font-size:15px">LIVE CHAT</b></div>${cloudBlock("Live Chat") || fnBlock("Live Chat YouTube / Facebook")}${chatControls()}<div class="chat-list" data-chat-list></div></div>`;
-  renderLogos(); mountChatList($("[data-chat-list]", el)); renderChatStatus();
-  if (cloudOK()) {
-    S.unsub.push(fb.F.onSnapshot(C(...uidPath("platformConnections")), snap => { S.platforms = {}; snap.forEach(d => S.platforms[d.id] = d.data()); renderChatStatus(); if (!CHAT.running && chatPlatforms().length) chatStart(); }));
-  }
+  el.innerHTML = `<div class="chat-window"><div class="row" style="gap:10px"><span data-logo></span><b class="brand-name" style="font-size:15px">LIVE CHAT</b></div>${chatControls(true)}<div class="chat-list" data-chat-list></div></div>`;
+  renderLogos(); mountChatList($("[data-chat-list]", el)); renderChatStatus(); icons();
+  if (bc) bc.postMessage({ t: "hello" });
 }
 function bindChatEvents() {
   document.addEventListener("click", e => {
@@ -3236,11 +3677,11 @@ function showAuth(note) {
   showOnly("authView");
   $("#authPanels").hidden = !FB_READY;
   $("#fbMissing").hidden = FB_READY;
-  if (FB_READY && !fb.ready) { const m = $("#authMsg"); m.textContent = "Firebase belum dapat dicapai dari persekitaran ini (cth. preview atau rangkaian menyekat). Di domain hosting sebenar, log masuk berfungsi."; m.className = "small muted"; }
-  if (isAdminApp()) {                       // panel admin: log masuk sahaja, tiada pendaftaran
-    $$('[data-auth-tab="register"]').forEach(b => b.hidden = true);
+  if (isAdminApp()) {                       // panel admin: log masuk sahaja, tiada pendaftaran / tab
+    $("#authTabs").hidden = true; authTab("login");
     const bt = $(".auth-card .brand-tag"); if (bt) bt.textContent = "Admin Console · log masuk akaun admin";
   }
+  if (FB_READY && !fb.ready) { const m = $("#authMsg"); m.textContent = "Firebase belum dapat dicapai dari persekitaran ini (cth. preview atau rangkaian menyekat). Di domain hosting sebenar, log masuk berfungsi."; m.className = "small muted"; }
   if (note) { $("#authMsg").textContent = note; }
   icons();
 }
@@ -3253,6 +3694,8 @@ const authMsg = (m, type) => { const el = $("#authMsg"); el.textContent = m; el.
 const emailOk = e => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
 function bindAuth() {
   $$("[data-auth-tab]").forEach(b => b.onclick = () => authTab(b.dataset.authTab));
+  $("#forgotLink").onclick = () => { $("#forgotEmail").value = $("#loginEmail").value; authTab("forgot"); setTimeout(() => $("#forgotEmail").focus(), 50); };
+  $("#forgotBack").onclick = () => authTab("login");
   $("#localStudioBtn").onclick = () => { S.local = true; enterApp(); };
   $("#loginForm").onsubmit = e => { e.preventDefault(); const b = e.submitter;
     if (!fb.ready) return authMsg("Firebase tidak dapat dicapai dari persekitaran ini (cth. preview). Buka app melalui domain hosting sebenar.", "err");
@@ -3270,7 +3713,7 @@ function bindAuth() {
     withBusy(b, async () => {
       try {
         const cred = await fb.Au.createUserWithEmailAndPassword(fb.auth, email, p1);
-        await fb.Au.sendEmailVerification(cred.user, { url: location.origin + location.pathname });
+        await mailVerify(cred.user);
         authMsg("Akaun dicipta. Semak email untuk link pengesahan.", "ok");
       } catch (er) { authMsg(errMsg(er), "err"); }
     });
@@ -3280,7 +3723,7 @@ function bindAuth() {
     const email = $("#forgotEmail").value.trim();
     if (!emailOk(email)) return authMsg("Format email tidak sah.", "err");
     withBusy(b, async () => {
-      try { await fb.Au.sendPasswordResetEmail(fb.auth, email, { url: location.origin + location.pathname }); authMsg("Jika email ini berdaftar, link reset password telah dihantar.", "ok"); }
+      try { await mailReset(email); authMsg("Jika email ini berdaftar, link reset password telah dihantar.", "ok"); }
       catch (er) { authMsg(er.code === "auth/user-not-found" ? "Jika email ini berdaftar, link reset password telah dihantar." : errMsg(er), er.code === "auth/user-not-found" ? "ok" : "err"); }
     });
   };
@@ -3289,7 +3732,7 @@ function bindAuth() {
     if (fb.auth.currentUser.emailVerified) { await fb.auth.currentUser.getIdToken(true); onUser(fb.auth.currentUser); }
     else $("#verifyMsg").textContent = "Email belum disahkan. Semak inbox / folder spam.";
   });
-  $("#verifyResend").onclick = e => withBusy(e.currentTarget, async () => { await fb.Au.sendEmailVerification(fb.auth.currentUser, { url: location.origin + location.pathname }); $("#verifyMsg").textContent = "Email pengesahan dihantar semula."; });
+  $("#verifyResend").onclick = e => withBusy(e.currentTarget, async () => { await mailVerify(fb.auth.currentUser); $("#verifyMsg").textContent = "Email pengesahan dihantar semula."; });
   $("#verifyLogout").onclick = () => fb.Au.signOut(fb.auth);
 }
 async function handleEmailAction(mode, code) {
@@ -3318,6 +3761,25 @@ async function handleEmailAction(mode, code) {
   }
   const t = $("#toLogin"); if (t) t.onclick = () => { clean(); location.reload(); };
 }
+const EYE_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYE_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-6.4 0-10-7-10-7a18.5 18.5 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c6.4 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="m1 1 22 22"/></svg>';
+function enhancePasswords(root) {
+  (root || document).querySelectorAll('input[type="password"]:not([data-pw])').forEach(inp => {
+    inp.dataset.pw = "1";
+    const w = document.createElement("span"); w.className = "pw";
+    inp.parentNode.insertBefore(w, inp); w.append(inp);
+    const b = document.createElement("button"); b.type = "button"; b.className = "pw-eye"; b.innerHTML = EYE_ON;
+    b.setAttribute("aria-label", "Tunjuk password"); b.setAttribute("aria-pressed", "false");
+    b.onclick = () => { const show = inp.type === "password"; inp.type = show ? "text" : "password"; b.innerHTML = show ? EYE_OFF : EYE_ON; b.setAttribute("aria-label", show ? "Sembunyi password" : "Tunjuk password"); b.setAttribute("aria-pressed", String(show)); inp.focus(); };
+    w.append(b);
+  });
+}
+function watchPasswords() {
+  let q = 0;
+  new MutationObserver(() => { if (q) return; q = requestAnimationFrame(() => { q = 0; enhancePasswords(); }); }).observe(document.body, { childList: true, subtree: true });
+}
+const mailVerify = u => fb.Au.sendEmailVerification(u, { url: location.origin + location.pathname }).catch(er => { if (/continue-uri/.test(er.code || "")) return fb.Au.sendEmailVerification(u); throw er; });
+const mailReset = email => fb.Au.sendPasswordResetEmail(fb.auth, email, { url: location.origin + location.pathname }).catch(er => { if (/continue-uri/.test(er.code || "")) return fb.Au.sendPasswordResetEmail(fb.auth, email); throw er; });
 async function onUser(u) {
   const qs = new URLSearchParams(location.search);
   if (!u) {
@@ -3354,9 +3816,11 @@ async function enterApp() {
       const ps = await fb.F.getDoc(D("profiles", S.user.uid)); S.profile = ps.exists() ? ps.data() : null;
       const [th, pf] = await Promise.all([fb.F.getDoc(D("config", "themes")), fb.F.getDoc(D("config", "platforms"))]).catch(() => [null, null]);
       if (th?.exists()) S.sysConfig.themes = th.data(); if (pf?.exists()) S.sysConfig.platforms = pf.data();
+      try { const st = await fb.F.getDoc(D("config", "site")); if (st.exists()) S.sysConfig.site = st.data(); } catch { /* tiada tetapan site */ }
     }
     const prefs = await store.loadPrefs();
     if (prefs) { applyTheme(prefs.theme || S.prefs.theme, prefs.mode || S.prefs.mode); S.activeSceneId = prefs.activeSceneId || null; }
+    else if (S.sysConfig.themes && S.sysConfig.themes.default) applyTheme(S.sysConfig.themes.default, S.prefs.mode);
     const scenes = await store.loadScenes();
     if (scenes && scenes.length) S.scenes = scenes.map(s => ({ ...s, sources: (s.sources || []).map(x => ({ ...newSource(x.type), ...x })) }));
     else {
@@ -3367,13 +3831,14 @@ async function enterApp() {
     if (!S.scenes.find(s => s.id === S.activeSceneId)) S.activeSceneId = S.scenes[0]?.id || null;
   } catch (e) { console.error(e); toast("Gagal memuatkan data akaun: " + errMsg(e), "err", 8000); }
   S.whip.url = ls.get("whipUrl", "");
-  if (S.user) await loadStreamSettings().catch(() => {});
+  await loadStreamSettings().catch(() => {});
   await refreshDevices();
   // Muat semula overlay teks & imej yang tersimpan (tiada permission diperlukan)
   allSources().forEach(({ s }) => { if (["text", "killfeed", "donation"].includes(s.type) || (s.type === "image" && s.imageUrl)) connectSource(s, { silent: true }); });
   $("#adminNav").hidden = !S.isAdmin;
-  renderTopUser(); renderQuick(); renderAll(); startWelcomeFx();
-  if (cloudOK()) { startListeners(); startGameListener(); await loadGameHook(); }
+  renderTopUser(); renderQuick(); renderAll(); startWelcomeFx(); applySiteConfig();
+  if (cloudOK()) { startListeners(); startGameListener(); }
+  if (ls.get("bridgeOn", false)) { try { bridgeConnect(); } catch { /* alamat tidak sah */ } }
   const h = (location.hash || "").replace("#sv-", "");
   go(VIEWS.includes(h) ? h : "hub");
   const qs = new URLSearchParams(location.search);
@@ -3395,10 +3860,6 @@ function startListeners() {
     const n = S.notifs.filter(x => !x.read).length; const b = $("#notifCount"); b.hidden = !n; b.textContent = n > 9 ? "9+" : n;
     if (S.view === "community" && commTab === "notifs") commNotifs();
   }, e => console.warn("notifs", e)));
-  S.unsub.push(fb.F.onSnapshot(C(...uidPath("platformConnections")), snap => {
-    S.platforms = {}; snap.forEach(d => S.platforms[d.id] = d.data());
-    renderStatus(); renderPlatformsMini(); if (S.view === "connect") renderConnect(); icons();
-  }, e => console.warn("platforms", e)));
   S.unsub.push(fb.F.onSnapshot(fb.F.query(C("announcements"), fb.F.where("active", "==", true), fb.F.orderBy("createdAt", "desc"), fb.F.limit(3)), snap => {
     $("#announceBox").innerHTML = snap.docs.map(d => { const a = d.data(); return `<div class="note info small"><b>${esc(a.title)}</b> — ${esc(a.body)}</div>`; }).join("");
   }, e => console.warn("announcements", e)));
@@ -3503,11 +3964,11 @@ async function runAct(act, btn) {
 function helpModal() {
   modal({ title: "Bantuan STREAMVERSE", wide: true, body: `<div class="col small">
     <div><b>Status:</b> ${chip("ok", "Connected")} stream/peranti sebenar aktif · ${chip("off", "Not Connected")} belum disambung · ${chip("warn", "Permission Required")} perlukan kebenaran browser · ${chip("err", "Unsupported")} browser/hardware tidak menyokong · ${chip("warn", "Firebase Not Configured")} backend belum disediakan.</div>
-    <div><b>Berfungsi tanpa backend:</b> kamera, webcam, capture card, screen capture, mikrofon, mixer, audio processing, rakaman tempatan, scene &amp; source (localStorage).</div>
-    <div><b>Perlukan Firebase:</b> akaun, simpanan cloud, community, pairing telefon (signaling), AI (Cloud Functions + API key), platform OAuth, admin.</div>
+    <div><b>Terus dari browser:</b> kamera, webcam, capture card, screen capture, mikrofon, mixer, audio processing, rakaman, scene &amp; source, log masuk YouTube / Facebook, live chat, AI percuma, kill popup (manual / hotkey).</div>
+    <div><b>Perlukan Firebase:</b> akaun, simpanan scene, community, pairing telefon (signaling WebRTC), admin. Semua percuma (pelan Spark), tiada Blaze atau VPS.</div>
     <div><b>Perlukan hardware:</b> capture card untuk HDMI, audio interface untuk XLR, phantom power 48V pada interface.</div>
-    <div><b>Perlukan media gateway:</b> streaming ke TikTok/YouTube/Facebook (WHIP → RTMP). Browser tidak boleh hantar RTMP.</div>
-    <div><b>Setup Firebase:</b> lihat README.md: isi FIREBASE_CONFIG, deploy rules &amp; functions, set secrets.</div></div>` });
+    <div><b>Perlukan media gateway:</b> streaming ke TikTok/YouTube/Facebook: guna OBS (percuma) melalui Program Output, atau WHIP gateway jika ada.</div>
+    <div><b>Setup Firebase:</b> lihat README.md (mod percuma, tiada Blaze).</div>${(S.sysConfig.site || {}).support ? `<div><b>Sokongan:</b> <a href="${esc(S.sysConfig.site.support)}" target="_blank" rel="noopener noreferrer">${esc(S.sysConfig.site.support)}</a></div>` : ""}</div>` });
 }
 function bindEvents() {
   document.addEventListener("click", async e => {
@@ -3532,12 +3993,12 @@ function bindEvents() {
     if (d.recDel) { const i = S.recs.findIndex(r => r.id === d.recDel); if (i > -1) { URL.revokeObjectURL(S.recs[i].url); S.recs.splice(i, 1); renderRecordings(); } return; }
     if (d.crecOpen) return withBusy(t, async () => { const r = S.cloudRecs.find(x => x.id === d.crecOpen); const url = await fb.St.getDownloadURL(fb.St.ref(fb.st, r.storagePath)); window.open(url, "_blank", "noopener"); });
     if (d.crecDel) { const r = S.cloudRecs.find(x => x.id === d.crecDel); if (!(await confirmBox("Padam rakaman cloud?", `"${r.name}" akan dipadam dari Storage.`, "Padam"))) return; return withBusy(t, async () => { await fb.St.deleteObject(fb.St.ref(fb.st, r.storagePath)).catch(er => { if (er.code !== "storage/object-not-found") throw er; }); await fb.F.deleteDoc(D(...uidPath("recordings", r.id))); await loadCloudRecs(); }); }
-    if (d.pfConnect) return platformConnect(d.pfConnect, t);
-    if (d.pfDisconnect) { if (!(await confirmBox("Disconnect platform?", "Token akan dibatalkan di backend.", "Disconnect"))) return; return withBusy(t, async () => { await callFn("platformDisconnect", { platform: d.pfDisconnect }); toast("Platform diputuskan.", "ok"); }); }
-    if (d.pfVerify) return withBusy(t, async () => { const r = await callFn("platformVerify", { platform: d.pfVerify }); toast(r.ok ? "Token sah." : "Token tidak sah: " + r.message, r.ok ? "ok" : "err"); });
+    if (d.pfConnect) return withBusy(t, () => platformConnect(d.pfConnect));
+    if (d.pfDisconnect) { if (!(await confirmBox("Disconnect platform?", "Token dalam memori akan dibuang dan akses dibatalkan.", "Disconnect"))) return; pfDisconnect(d.pfDisconnect); toast("Platform diputuskan.", "ok"); return; }
+    if (d.pfVerify) return withBusy(t, async () => { await pfVerify(d.pfVerify); toast("Akaun disahkan semula.", "ok"); });
     if (d.pfLive) return withBusy(t, async () => {
-      const r = await callFn("platformCreateLive", { platform: d.pfLive });
-      modal({ title: "Live session dicipta", body: `<div class="col small"><div>ID: <span class="mono">${esc(r.id)}</span></div><label class="f">Ingest URL (RTMP)<input class="in mono" readonly value="${esc(r.ingestUrl)}"></label><label class="f">Stream key<input class="in mono" type="password" readonly value="${esc(r.streamKey)}" id="skIn"></label><div class="row"><button class="btn sm" id="skShow">Tunjuk</button><button class="btn sm" id="skCopy">Salin stream key</button></div><div class="note">Masukkan URL + key ini sebagai RTMP output pada media gateway anda (atau OBS). Jangan kongsi stream key. Key tidak disimpan di Firestore.</div>${r.watchUrl ? `<a href="${esc(r.watchUrl)}" target="_blank" rel="noopener">${esc(r.watchUrl)}</a>` : ""}</div>`, onMount: bg => { $("#skShow", bg).onclick = () => $("#skIn", bg).type = "text"; $("#skCopy", bg).onclick = () => copyText(r.streamKey); } });
+      const r = await pfCreateLive(d.pfLive);
+      modal({ title: "Live session dicipta", body: `<div class="col small"><div>ID: <span class="mono">${esc(r.id)}</span></div><label class="f">Ingest URL (RTMP)<input class="in mono" readonly value="${esc(r.ingestUrl)}"></label><label class="f">Stream key<input class="in mono" type="password" readonly value="${esc(r.streamKey)}" id="skIn"></label><div class="row"><button class="btn sm" id="skShow">Tunjuk</button><button class="btn sm" id="skCopy">Salin stream key</button></div><div class="note">Tampal URL + key ini dalam OBS Studio (Settings → Stream → Custom). Jangan kongsi stream key. Key tidak disimpan di mana-mana.</div>${r.watchUrl ? `<a href="${esc(r.watchUrl)}" target="_blank" rel="noopener">${esc(r.watchUrl)}</a>` : ""}</div>`, onMount: bg => { $("#skShow", bg).onclick = () => $("#skIn", bg).type = "text"; $("#skCopy", bg).onclick = () => copyText(r.streamKey); } });
     });
     if (d.aiTab) { aiTab = d.aiTab; return renderAI(); }
     if (d.kill !== undefined && t.hasAttribute("data-kill")) return triggerKill({ game: KF.game, headshot: d.kill === "1", source: "button" });
@@ -3555,6 +4016,8 @@ function bindEvents() {
     if (d.adRole) return withBusy(t, async () => { await callFn("adminSetRole", { uid: d.adRole, admin: d.val === "1" }); toast("Role dikemas kini. Pengguna perlu log masuk semula.", "ok"); adUsers(); });
     if (d.adDisable) return withBusy(t, async () => { await callFn("adminSetDisabled", { uid: d.adDisable, disabled: d.val === "1" }); adUsers(); });
     if (d.adNext) return withBusy(t, () => adUsers(d.adNext));
+    if (d.annEdit) return annEditModal(d.annEdit);
+    if (d.repNote) return repNoteModal(d.repNote);
     if (d.annToggle) return withBusy(t, async () => { await fb.F.updateDoc(D("announcements", d.annToggle), { active: d.val === "1" }); adAnnounce(); });
     if (d.annDel) return withBusy(t, async () => { await fb.F.deleteDoc(D("announcements", d.annDel)); adAnnounce(); });
     if (d.rep) return withBusy(t, async () => { await fb.F.updateDoc(D("reports", d.rep), { status: d.val, handledBy: S.user.uid, handledAt: now() }); adReports(); });
@@ -3578,7 +4041,8 @@ function bindEvents() {
   });
   document.addEventListener("submit", e => {
     const f = e.target;
-    if (f.dataset.pfForm) { e.preventDefault(); return withBusy(e.submitter, async () => { needCloud(); const v = Object.fromEntries(new FormData(f)); const data = { destination: v.destination, title: v.title.slice(0, 100), description: v.description.slice(0, 5000), category: v.category.slice(0, 60), privacy: v.privacy, schedule: v.schedule }; await fb.F.setDoc(D(...uidPath("streamSettings", f.dataset.pfForm)), { ...data, ownerUid: S.user.uid, updatedAt: now() }); S.streamSettings = { ...(S.streamSettings || {}), [f.dataset.pfForm]: data }; toast("Stream settings disimpan.", "ok"); }); }
+    if (f.dataset.pfForm) { e.preventDefault(); return withBusy(e.submitter, async () => { const v = Object.fromEntries(new FormData(f)); const data = { destination: v.destination, title: v.title.slice(0, 100), description: v.description.slice(0, 5000), category: v.category.slice(0, 60), privacy: v.privacy, schedule: v.schedule }; if (cloudOK()) await fb.F.setDoc(D(...uidPath("streamSettings", f.dataset.pfForm)), { ...data, ownerUid: S.user.uid, updatedAt: now() }); S.streamSettings = { ...(S.streamSettings || {}), [f.dataset.pfForm]: data }; ls.set("streamSettings", S.streamSettings); toast("Stream settings disimpan.", "ok"); }); }
+    if (f.id === "pfIdForm") { e.preventDefault(); const v = Object.fromEntries(new FormData(f)); const ids = {}; if (v.youtube.trim()) ids.youtube = v.youtube.trim(); if (v.facebook.trim()) ids.facebook = v.facebook.trim(); ls.set("pfIds", ids); toast("ID disimpan dalam browser ini.", "ok"); renderConnect(); return; }
     if (f.id === "aiForm") { e.preventDefault(); return withBusy(e.submitter, () => runAI(f, false)); }
     if (f.id === "postForm") { e.preventDefault(); return withBusy(e.submitter, async () => { const v = Object.fromEntries(new FormData(f)); const text = v.text.trim(); if (!text) return; await fb.F.addDoc(C(...uidPath("communityPosts")), { ownerUid: S.user.uid, authorName: myName(), authorPhoto: S.profile?.photoURL || "", text: text.slice(0, 2000), game: v.game.trim().slice(0, 60), gameLower: v.game.trim().toLowerCase().slice(0, 60), likeCount: 0, commentCount: 0, createdAt: now() }); f.reset(); toast("Posting diterbitkan.", "ok"); loadFeed(); }); }
     if (f.hasAttribute("data-comment-form")) { e.preventDefault(); const art = f.closest("[data-post]"); return withBusy(e.submitter, async () => { const text = f.text.value.trim(); if (!text) return; await fb.F.addDoc(fb.F.collection(fb.db, art.dataset.post, "comments"), { ownerUid: S.user.uid, authorName: myName(), text: text.slice(0, 500), createdAt: now() }); const box = $("[data-comments]", art); box.hidden = true; postAction($("[data-post-comments]", art)); }); }
@@ -3626,8 +4090,9 @@ function bindEvents() {
    ===================================================================== */
 async function boot() {
   applyTheme(ls.get("theme", "neon"), ls.get("mode", "dark"));
-  renderLogos(); bindAuth(); bindEvents(); bindChatEvents(); bindSfx(); bindHoverSfx(); startCompositor();
+  renderLogos(); enhancePasswords(); watchPasswords(); bindAuth(); bindEvents(); bindChatEvents(); bindSfx(); bindHoverSfx(); startCompositor();
   const qs = new URLSearchParams(location.search);
+  if (qs.get("panel") === "chat") return startChatWindow();      // pop-out chat tidak memerlukan Firebase
   try { await initFirebase(); }
   catch (e) { console.warn("Firebase SDK tidak dapat dimuatkan:", e.message); fb.loadError = true; }
   $("#boot").hidden = true;

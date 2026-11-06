@@ -1,6 +1,6 @@
-// Jadikan pengguna pertama admin (custom claim). Jalankan sekali:
+// Jadikan pengguna pertama admin (custom claim). Percuma (Admin SDK + Auth tidak perlukan Blaze). Jalankan sekali:
 //   gcloud auth application-default login
-//   GOOGLE_CLOUD_PROJECT=your-project node scripts/set-admin.js email@domain.com
+//   cd tools && npm i firebase-admin && GOOGLE_CLOUD_PROJECT=genius-digital-40bc9 node set-admin.js email@domain.com
 const admin = require("firebase-admin");
 admin.initializeApp({ projectId: process.env.GOOGLE_CLOUD_PROJECT });
 (async () => {
