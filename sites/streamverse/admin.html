@@ -178,8 +178,16 @@ html{scroll-behavior:smooth}
 .stat > div:last-child{min-width:0}
 .studio{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:14px;align-items:start}
 .preview-wrap{border-radius:12px;overflow:hidden;border:1px solid var(--border);background:#000;position:relative}
-.preview-host{aspect-ratio:16/9;max-width:100%;display:grid;place-items:center;background:#05030b}
-.preview-host canvas{width:100%;height:100%;display:block}
+.preview-host{aspect-ratio:var(--out-ar,16/9);max-width:100%;display:grid;place-items:center;background:#05030b}
+.preview-wrap.portrait{display:flex;flex-direction:column;align-items:center;background:repeating-linear-gradient(135deg,var(--panel2) 0 12px,var(--panel) 12px 24px)}
+.preview-wrap.portrait .preview-host{outline:1px solid var(--gold);box-shadow:0 0 0 6px rgba(0,0,0,.35)}
+.preview-wrap.portrait .preview-host{height:min(64vh,640px);width:calc(min(64vh,640px) * 9 / 16);max-width:100%}
+.preview-wrap.portrait .preview-bar{align-self:stretch}
+.orient{display:inline-flex;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.orient button{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border:0;background:transparent;color:var(--muted);font:700 12.5px var(--f-head);cursor:pointer;transition:background .3s var(--ease-ios),color .3s var(--ease-ios)}
+.orient button:hover{background:var(--nav-hover);color:var(--text)}
+.orient button[aria-pressed="true"]{background:var(--nav-on);color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
+.preview-host canvas{width:100%;height:100%;display:block;object-fit:contain;min-width:0}
 .preview-bar{display:flex;align-items:center;gap:14px;padding:8px 12px;background:color-mix(in srgb,var(--bg) 90%,transparent);border-top:1px solid var(--border);font-size:13px;flex-wrap:wrap}
 .live-pill{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:5px;font-weight:700;font-size:12px;background:color-mix(in srgb,var(--muted) 25%,transparent);color:var(--muted)}
 .live-pill.on{background:var(--live);color:#fff;box-shadow:0 0 14px var(--live)}
@@ -810,7 +818,7 @@ const S = {
   runtime: new Map(),
   devices: { audioinput: [], videoinput: [], audiooutput: [], labelsHidden: true, supported: !!navigator.mediaDevices?.enumerateDevices },
   perm: { camera: "unknown", microphone: "unknown" },
-  out: Object.assign({ w: 1280, h: 720, fps: 30, bitrate: 4500 }, ls.get("out", {})),
+  out: Object.assign({ w: 1920, h: 1080, fps: 60, bitrate: 8000 }, ls.get("out", {})),
   whip: { url: "", token: "" },
   stream: { state: "idle", pc: null, resource: null, startedAt: 0, error: "" },
   rec: { state: "idle", mr: null, chunks: [], startedAt: 0, pausedMs: 0, pauseAt: 0 },
@@ -1023,7 +1031,7 @@ async function connectSource(src, opts = {}) {
     let stream = null;
     if (src.type === "screen" || src.type === "gameplay") {
       if (!SUP.gdm) throw unsupported("Screen Capture (getDisplayMedia)");
-      stream = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: { ideal: S.out.fps }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }, selfBrowserSurface: "exclude", systemAudio: "include" });
+      stream = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: { ideal: S.out.fps }, width: { ideal: Math.max(S.out.w, S.out.h) }, height: { ideal: Math.min(S.out.w, S.out.h) } }, audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }, selfBrowserSurface: "exclude", systemAudio: "include" });
     } else if (["webcam", "camera", "capture"].includes(src.type)) {
       if (!SUP.gum) throw unsupported("getUserMedia");
       const [w, h] = src.res.split("x").map(Number);
@@ -1105,8 +1113,22 @@ function startCompositor() {
     comp.timer = setInterval(drawFrame, 1000 / S.out.fps);
   }
 }
+const OUT_RES = [[1280, 720, "720p"], [1920, 1080, "1080p"], [2560, 1440, "1440p (2K)"], [3840, 2160, "2160p (4K)"]];
+const OUT_FPS = [24, 30, 60, 90, 120, 144, 165, 200];
+const OUT_PRESETS = [
+  { id: "tt-land", label: "TikTok Melintang", w: 1920, h: 1080, fps: 60, br: 8000 },
+  { id: "tt-port", label: "TikTok Menegak", w: 1080, h: 1920, fps: 60, br: 8000 },
+  { id: "yt-4k", label: "YouTube 4K", w: 3840, h: 2160, fps: 60, br: 35000 },
+  { id: "fb", label: "Facebook 1080p", w: 1920, h: 1080, fps: 60, br: 8000 }
+];
+const isPortrait = () => S.out.h > S.out.w;
+function applyOrientationUI() {
+  document.documentElement.style.setProperty("--out-ar", `${S.out.w}/${S.out.h}`);
+  $$(".preview-wrap").forEach(w => w.classList.toggle("portrait", isPortrait()));
+}
 function setOutputSize() {
   comp.canvas.width = S.out.w; comp.canvas.height = S.out.h;
+  applyOrientationUI();
   if (comp.worker) comp.worker.postMessage(1000 / S.out.fps);
   else if (comp.timer) { clearInterval(comp.timer); comp.timer = setInterval(drawFrame, 1000 / S.out.fps); }
 }
@@ -1116,6 +1138,10 @@ function mountPreview() {
 }
 function drawFrame() {
   const { ctx, canvas } = comp; if (!ctx) return;
+  comp.frames = (comp.frames || 0) + 1;
+  const tnow = performance.now();
+  if (!comp.fpsAt) comp.fpsAt = tnow;
+  if (tnow - comp.fpsAt >= 1000) { comp.realFps = Math.round(comp.frames * 1000 / (tnow - comp.fpsAt)); comp.frames = 0; comp.fpsAt = tnow; $$("[data-real-fps]").forEach(e => e.textContent = comp.realFps); }
   const W = canvas.width, H = canvas.height;
   ctx.globalAlpha = 1; ctx.fillStyle = "#05030b"; ctx.fillRect(0, 0, W, H);
   const sc = activeScene();
@@ -1138,9 +1164,9 @@ function drawFrame() {
     for (let gy = 0; gy < H; gy += H / 9) ctx.fillRect(0, gy, W, 1);
     ctx.textAlign = "center"; ctx.fillStyle = "#e9e4ff";
     ctx.font = `700 ${Math.round(H * .055)}px Montserrat, sans-serif`;
-    ctx.fillText(sc ? "NO SOURCE CONNECTED" : "TIADA SCENE", W / 2, H / 2 - H * .01);
+    ctx.fillText(sc ? "NO SOURCE CONNECTED" : "TIADA SCENE", W / 2, H / 2 - H * .01, W * .9);
     ctx.fillStyle = "#a59cc4"; ctx.font = `500 ${Math.round(H * .03)}px Montserrat, sans-serif`;
-    ctx.fillText(sc ? "Sambung source dalam senarai Sources untuk scene ini" : "Tambah scene untuk mula", W / 2, H / 2 + H * .05);
+    ctx.fillText(sc ? "Sambung source dalam senarai Sources untuk scene ini" : "Tambah scene untuk mula", W / 2, H / 2 + H * .05, W * .9);
   }
 }
 function drawMedia(el, mw, mh, x, y, w, h, fit, mirror) {
@@ -1636,7 +1662,7 @@ function editSource(s, connectAfter) {
     ${S.devices.labelsHidden && (isCam || isAud) ? `<div class="note small">Nama peranti tersembunyi sehingga permission diberi. <button class="btn sm" type="button" id="es_perm">Benarkan akses</button></div>` : ""}
     ${isCam ? `<label class="f">${s.type === "capture" ? "Capture device (video)" : "Kamera"}<select class="in" id="es_dev">${deviceOptions("videoinput", s.deviceId)}</select></label>` : ""}
     ${s.type === "capture" ? `<label class="f">Capture Card Audio / HDMI Audio (pilihan)<select class="in" id="es_adev"><option value="">Tiada audio</option>${(S.devices.audioinput).map((d, i) => `<option value="${esc(d.deviceId)}" ${d.deviceId === s.audioDeviceId ? "selected" : ""}>${esc(devLabel(d, i, "audioinput"))}</option>`).join("")}</select></label>` : ""}
-    ${isCam ? `<div class="g2"><label class="f">Resolution<select class="in" id="es_res">${["640x360", "1280x720", "1920x1080", "2560x1440", "3840x2160"].map(r => `<option ${r === s.res ? "selected" : ""}>${r}</option>`).join("")}</select></label><label class="f">Frame rate<select class="in" id="es_fps">${[15, 24, 30, 60].map(f => `<option ${f == s.fps ? "selected" : ""}>${f}</option>`).join("")}</select></label></div>` : ""}
+    ${isCam ? `<div class="g2"><label class="f">Resolution<select class="in" id="es_res">${["640x360", "1280x720", "1920x1080", "2560x1440", "3840x2160"].map(r => `<option ${r === s.res ? "selected" : ""}>${r}</option>`).join("")}</select></label><label class="f">Frame rate<select class="in" id="es_fps">${[15, 24, 30, 60, 90, 120, 144, 165, 200].map(f => `<option ${f == s.fps ? "selected" : ""}>${f}</option>`).join("")}</select></label></div>` : ""}
     ${isAud ? `<label class="f">Input device<select class="in" id="es_dev">${deviceOptions("audioinput", s.deviceId)}</select></label>` : ""}
     ${s.type === "text" ? `<label class="f">Teks<input class="in" id="es_text" maxlength="80" value="${esc(s.text)}"></label><div class="g3"><label class="f">Warna<input class="in" type="color" id="es_color" value="${esc(s.color)}"></label><label class="f">Saiz (% tinggi)<input class="in" type="number" id="es_size" min="2" max="25" value="${s.size}"></label><label class="f">Jajaran<select class="in" id="es_align"><option value="left" ${s.align === "left" ? "selected" : ""}>Kiri</option><option value="center" ${s.align === "center" ? "selected" : ""}>Tengah</option></select></label></div><label class="row small"><span class="switch"><input type="checkbox" id="es_bg" ${s.bgColor && !/00$/.test(s.bgColor) ? "checked" : ""}></span>Latar gelap belakang teks</label>` : ""}
     ${s.type === "killfeed" ? `<label class="f">Label streak (pisah koma: 1 kill, 2, 3, …)<input class="in" id="es_labels" maxlength="160" value="${esc(s.labels)}"></label><div class="g3"><label class="f">Tempoh popup (s)<input class="in" type="number" id="es_dur" min="1" max="8" step="0.2" value="${s.duration}"></label><label class="f">Tempoh streak (s)<input class="in" type="number" id="es_sw" min="2" max="60" value="${s.streakWindow}"></label><label class="f">Bunyi<select class="in" id="es_snd"><option value="1" ${s.sound !== false ? "selected" : ""}>Ya (masuk stream)</option><option value="0" ${s.sound === false ? "selected" : ""}>Tidak</option></select></label></div><label class="row small"><span class="switch"><input type="checkbox" id="es_det" ${s.showDetails !== false ? "checked" : ""}></span>Papar senjata / mangsa (jika game hantar)</label>` : ""}
@@ -1728,7 +1754,7 @@ function renderPreviewBars() {
       <span class="live-pill ${live ? "on" : ""}">● LIVE</span>${rec ? `<span class="live-pill on" style="background:var(--err)">● REC</span>` : ""}
       <span class="row" style="gap:6px"><i data-lucide="clock"></i><span data-timer class="mono">00:00:00</span></span>
       <span class="mini-meter" data-meter="master" title="Output audio level">${"<i></i>".repeat(16)}</span>
-      <span class="small muted">${S.out.w}×${S.out.h} · ${S.out.fps}fps</span><span class="grow"></span>
+      <span class="small muted">${isPortrait() ? "Menegak" : "Melintang"} ${S.out.w}×${S.out.h} · sasaran ${S.out.fps}fps · sebenar <b data-real-fps>${comp.realFps || "—"}</b>fps</span><span class="grow"></span>
       <button class="btn icon ghost sm" data-act="output-settings" aria-label="Output settings"><i data-lucide="settings"></i></button>
       <button class="btn icon ghost sm" data-act="fullscreen" aria-label="Fullscreen preview"><i data-lucide="maximize"></i></button>`;
   });
@@ -1929,18 +1955,32 @@ function renderCaptureExtras() { renderOutputSettings(); renderStreamOutput(); g
 function renderOutputSettings() {
   const el = $("#outputSettings"); if (!el) return;
   const mime = pickMime("video");
-  el.innerHTML = `<div class="g2"><label class="f">Resolution<select class="in" id="outRes">${["854x480", "1280x720", "1920x1080"].map(r => `<option ${r === `${S.out.w}x${S.out.h}` ? "selected" : ""}>${r}</option>`).join("")}</select></label>
-    <label class="f">Frame Rate<select class="in" id="outFps">${[24, 30, 60].map(f => `<option ${f == S.out.fps ? "selected" : ""}>${f}</option>`).join("")}</select></label></div>
-    <label class="f">Bitrate video (kbps) — rakaman &amp; WHIP<input class="in" type="number" id="outBr" min="500" max="12000" step="100" value="${S.out.bitrate}"></label>
+  const port = isPortrait();
+  const base = port ? [S.out.h, S.out.w] : [S.out.w, S.out.h];
+  el.innerHTML = `<div class="row wrap" style="gap:8px"><span class="small muted">Orientasi</span><div class="orient" role="group" aria-label="Orientasi output">
+      <button type="button" data-orient="land" aria-pressed="${!port}"><i data-lucide="rectangle-horizontal"></i>Melintang 16:9</button>
+      <button type="button" data-orient="port" aria-pressed="${port}"><i data-lucide="rectangle-vertical"></i>Menegak 9:16</button></div></div>
+    <div class="row wrap" style="gap:6px"><span class="small muted">Preset</span>${OUT_PRESETS.map(p => `<button type="button" class="btn sm ${p.w === S.out.w && p.h === S.out.h ? "primary" : ""}" data-preset="${p.id}">${p.label} <span class="muted small">${p.w}×${p.h}</span></button>`).join("")}</div>
+    <div class="g2"><label class="f">Resolution (maks 4K)<select class="in" id="outRes">${OUT_RES.map(([w, h, l]) => { const v = port ? `${h}x${w}` : `${w}x${h}`; return `<option value="${v}" ${w === base[0] && h === base[1] ? "selected" : ""}>${l} · ${v.replace("x", "×")}</option>`; }).join("")}</select></label>
+    <label class="f">Frame Rate (maks 200)<select class="in" id="outFps">${OUT_FPS.map(f => `<option ${f == S.out.fps ? "selected" : ""}>${f}</option>`).join("")}</select></label></div>
+    <label class="f">Bitrate video (kbps) — rakaman &amp; WHIP<input class="in" type="number" id="outBr" min="500" max="60000" step="500" value="${S.out.bitrate}"></label>
+    <div class="note small">FPS dan resolusi sebenar <b>bergantung pada peranti</b>: CPU/GPU, kamera / capture card (kebanyakan webcam maks 30–60fps), refresh rate monitor dan had platform (TikTok/YouTube biasanya terima sehingga 60fps). Bar preview menunjukkan fps sebenar yang dicapai: <b data-real-fps>${comp.realFps || "—"}</b>fps.</div>
     <div class="small">Format rakaman: ${mime ? `<span class="mono">${esc(mime)}</span>` : chip("err", "MediaRecorder Unsupported")}</div>
-    <div class="small muted">Browser merakam WebM (Chrome/Firefox/Edge) atau MP4 (Safari). MP3/WAV tidak dirakam secara native.</div>
     <button class="btn primary" id="outSave"><i data-lucide="save"></i>Simpan Output</button>`;
+  icons();
+  const apply = (o, msg) => {
+    Object.assign(S.out, o); ls.set("out", S.out); setOutputSize(); renderPreviewBars(); renderOutputSettings(); icons(); cacheMeters();
+    if (S.rec.state !== "idle" || S.stream.state === "live") toast("Tetapan baru berkuat kuasa pada rakaman/stream seterusnya.", "warn");
+    else toast(msg || "Output disimpan.", "ok");
+  };
+  $$("[data-orient]", el).forEach(b => b.onclick = () => {
+    const want = b.dataset.orient === "port"; if (want === isPortrait()) return;
+    apply({ w: S.out.h, h: S.out.w }, want ? `Menegak ${S.out.h}×${S.out.w}` : `Melintang ${S.out.h}×${S.out.w}`);
+  });
+  $$("[data-preset]", el).forEach(b => b.onclick = () => { const p = OUT_PRESETS.find(x => x.id === b.dataset.preset); apply({ w: p.w, h: p.h, fps: p.fps, bitrate: p.br }, `${p.label}: ${p.w}×${p.h} @ ${p.fps}fps`); });
   $("#outSave").onclick = () => {
     const [w, h] = $("#outRes").value.split("x").map(Number);
-    Object.assign(S.out, { w, h, fps: Number($("#outFps").value), bitrate: Math.min(12000, Math.max(500, Number($("#outBr").value) || 4500)) });
-    ls.set("out", S.out); setOutputSize(); renderPreviewBars(); icons(); cacheMeters();
-    if (S.rec.state !== "idle" || S.stream.state === "live") toast("Tetapan baru berkuat kuasa pada rakaman/stream seterusnya.", "warn");
-    else toast("Output disimpan.", "ok");
+    apply({ w, h, fps: Number($("#outFps").value), bitrate: Math.min(60000, Math.max(500, Number($("#outBr").value) || 8000)) });
   };
 }
 function renderStreamOutput() {
@@ -1997,8 +2037,8 @@ function renderCameraPanel() {
   el.innerHTML = `${!SUP.gum ? chip("err", "getUserMedia Unsupported") : ""}
     ${S.devices.labelsHidden ? `<div class="note small">Nama kamera tersembunyi sehingga permission diberi. <button class="btn sm" id="camPerm">Benarkan kamera</button></div>` : ""}
     <label class="f">Camera Selector<select class="in" id="camDev">${deviceOptions("videoinput", s?.deviceId)}</select></label>
-    <div class="g2"><label class="f">Resolution<select class="in" id="camRes">${["640x360", "1280x720", "1920x1080", "3840x2160"].map(x => `<option ${x === (s?.res || "1280x720") ? "selected" : ""}>${x}</option>`).join("")}</select></label>
-    <label class="f">Frame Rate<select class="in" id="camFps">${[15, 24, 30, 60].map(f => `<option ${f == (s?.fps || 30) ? "selected" : ""}>${f}</option>`).join("")}</select></label></div>
+    <div class="g2"><label class="f">Resolution<select class="in" id="camRes">${["640x360", "1280x720", "1920x1080", "2560x1440", "3840x2160"].map(x => `<option ${x === (s?.res || "1280x720") ? "selected" : ""}>${x}</option>`).join("")}</select></label>
+    <label class="f">Frame Rate<select class="in" id="camFps">${[15, 24, 30, 60, 90, 120, 144, 165, 200].map(f => `<option ${f == (s?.fps || 30) ? "selected" : ""}>${f}</option>`).join("")}</select></label></div>
     <label class="f">Camera Position<select class="in" id="camPos">${Object.keys(LAYOUTS).map(k => `<option ${k === (s?.layoutName || "bottom-left") ? "selected" : ""}>${k}</option>`).join("")}</select></label>
     <label class="row small"><span class="switch"><input type="checkbox" id="camMirror" ${s?.mirror !== false ? "checked" : ""}></span>Mirror Camera</label>
     <div class="row wrap">Status: ${s ? chip(...srcStatus(s)) : chip("off", "Not Connected")}${st ? `<span class="small mono">${st.width}×${st.height} @ ${Math.round(st.frameRate || 0)}fps</span>` : ""}</div>
