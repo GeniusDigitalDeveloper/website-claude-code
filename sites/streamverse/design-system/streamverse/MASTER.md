@@ -217,7 +217,9 @@ Before delivering any UI code, verify:
 
 ## Override projek (keputusan pengguna)
 
-- **Font:** Orbitron (brand/logo), Rajdhani (tajuk & UI), Inter (body), ikut brief STREAMVERSE. Ini menggantikan Russo One / Chakra Petch.
+- **Font:** Montserrat sahaja (atas permintaan ustaz): tajuk & navigasi 800, body 400–600, wordmark 900 italic. Menggantikan Orbitron/Rajdhani/Inter.
 - **Tema:** 10 tema gaming (Neon Cyberpunk default) ditakrif sebagai token CSS dalam `index.html` (`THEMES`). Setiap tema ada mod dark + light.
 - **Layout rujukan:** gambar contoh ustaz: topbar + sidebar, Streamer Hub dengan Capture Studio, Audio Mixer, Audio Processing, Themes, Connect dan Quick Actions.
 - **Ikon:** lucide (UMD), tiada emoji.
+- **Motion:** easing iOS `cubic-bezier(.32,.72,0,1)` + spring `cubic-bezier(.34,1.4,.64,1)`; hanya transform/opacity; glow cursor ikut rAF (refresh rate skrin) dengan pelicinan eksponen; popup scale+fade masuk/keluar; panel dashboard masuk berperingkat (stagger 45ms). Semua dimatikan bila prefers-reduced-motion.
+- **Bunyi UI:** Web Audio sintesis (klik, nav, hover, buka/tutup popup, toggle, success/error), AudioContext berasingan, tidak masuk siaran. Boleh dimatikan (butang speaker di topbar / Settings).
