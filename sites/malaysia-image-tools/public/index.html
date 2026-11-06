@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ms" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Malaysia Image Tools</title>
+<meta name="description" content="MALAYSIA IMAGE TOOLS — Alat gambar percuma: tukar format, mampat, ubah saiz, potong, sunting dan banyak lagi. Semua diproses dalam browser anda.">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&family=Anton&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app" id="app">
+  <aside class="sidebar" id="sidebar" aria-label="Navigasi alat">
+    <a class="brand" href="#">
+      <span class="brand-mark" data-logo="b1"></span>
+      <span class="wm"><b>Malaysia</b><em>Image Tools</em><small>Alat gambar percuma</small></span>
+    </a>
+    <div class="side-search"><label class="search"><span class="sr">Cari alat</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="navSearch" type="search" placeholder="Cari alat..." autocomplete="off"><kbd>/</kbd></label></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="side-foot">
+      <div class="privacy-pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>Gambar tidak dimuat naik ke server</div>
+      <button class="btn sm block" id="fbBtn" type="button">Hantar Maklum Balas</button>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+  <div class="main">
+    <header class="topbar">
+      <button class="icon-btn" id="menuBtn" type="button" aria-label="Buka menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <a class="brand" href="#"><span class="brand-mark" data-logo="b2"></span><span class="wm"><b>Malaysia</b><em>Image Tools</em></span></a>
+    </header>
+    <main class="content" id="view" tabindex="-1"></main>
+  </div>
+</div>
+<div class="progress" aria-hidden="true"><i id="progressBar"></i></div>
+<div class="busy" id="busy" hidden><span class="spin"></span><span id="busyText">Memproses...</span></div>
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+<canvas class="loupe" id="loupe" width="110" height="110"></canvas>
+
+<script src="firebase-config.js"></script>
+<script src="js/core.js"></script>
+<script src="js/tools-1.js"></script>
+<script src="js/tools-2.js"></script>
+<script src="js/tools-3.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

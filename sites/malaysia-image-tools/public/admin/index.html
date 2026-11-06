@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ms" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Malaysia Image Tools Admin</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#ffffff;--soft:#f5f6fc;--soft-2:#eef0f9;--line:#e3e6f2;--ink:#0e1530;--ink-2:#2b3352;--muted:#626b88;
+  --blue:#2457f5;--blue-50:#edf2ff;--violet:#7b3fe4;--violet-50:#f3eeff;--grad:linear-gradient(135deg,#2457f5 0%,#7b3fe4 100%);
+  --ok:#0f9d63;--ok-50:#e7f8f0;--warn:#b86e00;--warn-50:#fff5e1;--bad:#d6334a;--bad-50:#ffecef;
+  --shadow:0 1px 2px rgba(20,30,80,.06),0 8px 24px -12px rgba(20,30,80,.18);--shadow-lg:0 24px 60px -20px rgba(36,60,180,.35);
+  --font:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--soft);color:var(--ink)}
+body{font-family:var(--font);font-size:14.5px;line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--bg)}
+[hidden]{display:none!important}
+h1,h2,h3{margin:0;line-height:1.2;text-wrap:balance}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+svg.i{width:18px;height:18px;flex:none}
+.mono{font-family:var(--mono)}
+.login{min-height:100vh;display:grid;place-items:center;padding-block:24px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:radial-gradient(700px 320px at 85% 0%,rgba(123,63,228,.14),transparent 70%),radial-gradient(600px 300px at 0% 100%,rgba(36,87,245,.12),transparent 70%),var(--soft)}
+.login-card{width:min(440px,100%);background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow-lg);padding:28px;display:grid;gap:16px}
+.brand{display:flex;gap:11px;align-items:center}
+.brand-mark{width:44px;height:44px;flex:none;display:block}.brand-mark svg{width:100%;height:100%;display:block}
+.brand b{display:block;font-size:14px;letter-spacing:.06em;font-weight:800}
+.brand small{display:block;font-size:12px;color:var(--muted);font-weight:600}
+.fld{display:grid;gap:6px;font-size:13px;font-weight:600;color:var(--ink-2)}
+.inp{height:42px;border:1px solid var(--line);border-radius:10px;padding:0 12px;background:#fff;width:100%;outline:none;font-weight:500}
+textarea.inp{height:auto;min-height:84px;padding:10px 12px;resize:vertical}
+.inp:focus{border-color:var(--blue);box-shadow:0 0 0 4px var(--blue-50)}
+.pw{position:relative}
+.pw .inp{padding-right:46px}
+.eye{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:36px;height:36px;border:0;background:none;border-radius:8px;display:grid;place-items:center;cursor:pointer;color:var(--muted)}
+.eye:hover{background:var(--soft);color:var(--blue)}
+.eye svg{width:20px;height:20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:40px;padding:0 16px;border-radius:10px;border:1px solid var(--line);background:#fff;font-weight:650;font-size:13.5px;cursor:pointer;white-space:nowrap;color:var(--ink)}
+.btn:hover{background:var(--soft);border-color:#bcc6ea}
+.btn.primary{background:var(--grad);color:#fff;border-color:transparent;box-shadow:0 8px 20px -10px rgba(60,70,230,.8)}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn.danger{color:var(--bad)}.btn.danger:hover{background:var(--bad-50);border-color:#f3c0c8}
+.btn.sm{height:32px;padding:0 11px;font-size:12.5px;border-radius:8px}
+.btn.block{width:100%}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.link{background:none;border:0;color:var(--blue);font-weight:650;cursor:pointer;padding:0;font-size:13px}
+.msg{font-size:13px;border-radius:10px;padding:10px 12px;border:1px solid}
+.msg.err{background:var(--bad-50);border-color:#f6c2cb;color:var(--bad)}
+.msg.ok{background:var(--ok-50);border-color:#bfe9d4;color:var(--ok)}
+.msg.info{background:var(--blue-50);border-color:#cfdcff;color:#1d3fb8}
+.msg.warn{background:var(--warn-50);border-color:#f3dba8;color:var(--warn)}
+code{font-family:var(--mono);font-size:12px;background:var(--soft-2);padding:1px 5px;border-radius:5px}
+.console{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100vh}
+.side{background:#fff;border-right:1px solid var(--line);padding:18px 12px;display:flex;flex-direction:column;gap:14px;position:sticky;top:0;height:100vh;padding-left:max(12px,env(safe-area-inset-left,0px))}
+.side nav{display:grid;gap:2px}
+.side nav button{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:9px;border:0;background:none;cursor:pointer;font-weight:600;color:var(--ink-2);text-align:left;font-size:13.5px}
+.side nav button:hover{background:var(--soft)}
+.side nav button.on{background:var(--blue-50);color:var(--blue)}
+.side nav button .badge{margin-left:auto;background:var(--bad);color:#fff;font-size:11px;border-radius:999px;padding:0 7px;font-weight:700}
+.side .who{margin-top:auto;border-top:1px solid var(--line);padding-top:12px;font-size:12px;color:var(--muted);display:grid;gap:8px;word-break:break-all}
+.main{min-width:0;padding-block:24px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+@media (min-width:900px){.main{padding-left:32px;padding-right:32px}}
+.wrap{max-width:1100px;margin:0 auto;display:grid;gap:18px}
+.head{display:flex;align-items:end;gap:12px;flex-wrap:wrap;justify-content:space-between}
+.head h1{font-size:24px;font-weight:800;letter-spacing:-.01em}
+.head p{margin:3px 0 0;color:var(--muted);font-size:13.5px}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+.card-h{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.card-h h2{font-size:15px;font-weight:750;flex:1}
+.card-b{padding:16px;display:grid;gap:14px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{padding:16px}
+.kpi span{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.kpi b{display:block;font-size:28px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin-top:4px}
+.kpi small{color:var(--muted);font-size:12px}
+.grid2{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px}
+@media (max-width:980px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.chart{width:100%;height:auto;display:block}
+.bars{display:grid;gap:9px}
+.bar-row{display:grid;grid-template-columns:minmax(0,170px) minmax(0,1fr) 54px;gap:10px;align-items:center;font-size:13px}
+.bar-row .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.bar-row .t{height:10px;background:var(--soft-2);border-radius:99px;overflow:hidden}
+.bar-row .t i{display:block;height:100%;background:var(--grad);border-radius:99px}
+.bar-row .v{font:600 12.5px var(--mono);text-align:right}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+th{background:var(--soft);font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.pill{display:inline-flex;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:999px}
+.pill.convert{background:var(--blue-50);color:var(--blue)}.pill.edit{background:var(--violet-50);color:var(--violet)}.pill.util{background:var(--soft-2);color:#4b4be8}
+.pill.new{background:var(--bad-50);color:var(--bad)}.pill.read{background:var(--soft-2);color:var(--muted)}
+.switch{position:relative;width:42px;height:24px;flex:none;display:inline-block}
+.switch input{opacity:0;width:0;height:0;position:absolute}
+.switch span{position:absolute;inset:0;background:#cdd3e6;border-radius:99px;cursor:pointer;transition:.15s}
+.switch span::after{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.switch input:checked+span{background:var(--blue)}
+.switch input:checked+span::after{transform:translateX(18px)}
+.switch input:focus-visible+span{outline:2px solid var(--blue);outline-offset:2px}
+.toggle-row{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:12px 14px;border:1px solid var(--line);border-radius:12px}
+.toggle-row b{display:block;font-size:14px}.toggle-row small{color:var(--muted);font-size:12.5px}
+.fb{padding:14px 16px;border-bottom:1px solid var(--line);display:grid;gap:6px}
+.fb:last-child{border-bottom:0}
+.fb .top{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+.fb .top b{color:var(--ink);font-size:13.5px}
+.fb p{margin:0;white-space:pre-wrap;word-break:break-word}
+.fb .acts{display:flex;gap:6px;flex-wrap:wrap}
+.stars{color:#e8a200;letter-spacing:1px}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{height:32px;padding:0 11px;border-radius:8px;border:1px solid var(--line);background:#fff;font-size:12.5px;font-weight:650;cursor:pointer}
+.seg button.on{background:var(--blue-50);border-color:var(--blue);color:var(--blue)}
+.preview-banner{display:flex;gap:10px;align-items:flex-start;border-radius:12px;padding:11px 14px;font-size:13.5px;border:1px solid}
+.preview-banner.info{background:var(--blue-50);border-color:#cfdcff;color:#1d3fb8}
+.preview-banner.warning{background:var(--warn-50);border-color:#f6dca6;color:var(--warn)}
+.preview-banner.success{background:var(--ok-50);border-color:#b8ead2;color:var(--ok)}
+.toasts{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));display:grid;gap:8px;z-index:100;width:min(340px,calc(100vw - 32px))}
+.toast{background:#fff;border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:12px;padding:11px 13px;box-shadow:var(--shadow-lg);font-size:13.5px}
+.toast.success{border-left-color:var(--ok)}.toast.error{border-left-color:var(--bad)}
+@media (max-width:860px){
+  .console{grid-template-columns:minmax(0,1fr)}
+  .side{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);padding:12px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px))}
+  .side nav{grid-auto-flow:column;grid-auto-columns:max-content;overflow-x:auto;scrollbar-width:none}
+  .side .who{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-top:0}
+  .bar-row{grid-template-columns:minmax(0,110px) minmax(0,1fr) 46px}
+}
+</style>
+</head>
+<body>
+<!-- ============ LOG MASUK ============ -->
+<section class="login" id="loginView">
+  <div class="login-card">
+    <div class="brand"><span class="brand-mark" id="logoLogin"></span><span><b>MALAYSIA IMAGE TOOLS</b><small>Panel Pentadbir</small></span></div>
+    <form id="loginForm" style="display:grid;gap:12px">
+      <label class="fld">E-mel<input class="inp" id="email" type="email" autocomplete="username" required></label>
+      <div class="fld"><label for="pass">Kata laluan</label>
+        <div class="pw"><input class="inp" id="pass" type="password" autocomplete="current-password" required minlength="6">
+          <button class="eye" id="eyeBtn" type="button" aria-label="Tunjuk kata laluan" aria-pressed="false"></button></div></div>
+      <div id="loginMsg" hidden></div>
+      <button class="btn primary block" type="submit" id="loginBtn">Log Masuk</button>
+      <button class="link" type="button" id="resetBtn" style="justify-self:start">Lupa kata laluan?</button>
+    </form>
+  </div>
+</section>
+
+<!-- ============ KONSOL ============ -->
+<div class="console" id="consoleView" hidden>
+  <aside class="side">
+    <div class="brand"><span class="brand-mark" id="logoSide"></span><span><b>MIT ADMIN</b><small>Malaysia Image Tools</small></span></div>
+    <nav id="tabs">
+      <button type="button" data-tab="overview" class="on">Ringkasan</button>
+      <button type="button" data-tab="site">Tetapan Laman</button>
+      <button type="button" data-tab="tools">Urus Alat</button>
+      <button type="button" data-tab="feedback">Maklum Balas <span class="badge" id="fbBadge" hidden>0</span></button>
+      <button type="button" data-tab="data">Data &amp; Privasi</button>
+    </nav>
+    <div class="who"><span id="whoText"></span><button class="btn sm" id="logoutBtn" type="button">Log Keluar</button></div>
+  </aside>
+  <main class="main"><div class="wrap">
+    <section data-panel="overview" style="display:grid;gap:16px">
+      <div class="head"><div><h1>Ringkasan</h1><p>Statistik penggunaan alat (dikira setiap kali pengguna memuat turun hasil). Tiada gambar disimpan.</p></div><button class="btn sm" id="refreshBtn" type="button">Muat Semula</button></div>
+      <div class="kpis">
+        <div class="card kpi"><span>Jumlah penggunaan</span><b id="kTotal">–</b><small>sejak mula</small></div>
+        <div class="card kpi"><span>Hari ini</span><b id="kToday">–</b><small id="kTodayDate"></small></div>
+        <div class="card kpi"><span>Alat aktif</span><b id="kActive">–</b><small id="kActiveOf"></small></div>
+        <div class="card kpi"><span>Maklum balas baharu</span><b id="kFb">–</b><small>belum dibaca</small></div>
+      </div>
+      <div class="kpis">
+        <div class="card kpi"><span>Jumlah pengguna</span><b id="vUsers">–</b><small>pengguna unik sejak mula</small></div>
+        <div class="card kpi"><span>Pelawat hari ini</span><b id="vToday">–</b><small>set semula 12:00 malam (MYT)</small></div>
+        <div class="card kpi"><span>Pelawat bulan ini</span><b id="vMonth">–</b><small>set semula awal bulan</small></div>
+        <div class="card kpi"><span>Keseluruhan lawatan</span><b id="vTotal">–</b><small>campuran semua hari</small></div>
+      </div>
+      <div class="grid2">
+        <div class="card"><div class="card-h"><h2>Penggunaan 7 hari terakhir</h2></div><div class="card-b"><svg class="chart" id="chart" viewBox="0 0 560 240" role="img" aria-label="Carta penggunaan 7 hari"></svg></div></div>
+        <div class="card"><div class="card-h"><h2>Alat paling popular</h2></div><div class="card-b"><div class="bars" id="topTools"></div></div></div>
+      </div>
+    </section>
+
+    <section data-panel="site" hidden style="display:grid;gap:16px">
+      <div class="head"><div><h1>Tetapan Laman</h1><p>Pengumuman dipaparkan di bahagian atas setiap halaman utama.</p></div></div>
+      <form class="card" id="siteForm"><div class="card-h"><h2>Pengumuman</h2></div><div class="card-b">
+        <div class="toggle-row"><div><b>Papar pengumuman</b><small>Hidupkan untuk tunjuk mesej kepada semua pengunjung</small></div><label class="switch"><input type="checkbox" id="annOn"><span></span></label></div>
+        <label class="fld">Teks pengumuman (maks 300 aksara)<textarea class="inp" id="annText" maxlength="300" placeholder="cth: Alat baharu! Cuba Passport Photo Layout Generator."></textarea></label>
+        <div class="fld"><span>Jenis</span><div class="seg" id="annType"><button type="button" data-v="info" class="on">Info</button><button type="button" data-v="success">Berita baik</button><button type="button" data-v="warning">Amaran</button></div></div>
+        <div class="fld"><span>Pratonton</span><div id="annPreview" class="preview-banner info">—</div></div>
+      </div>
+      <div class="card-h" style="border-top:1px solid var(--line)"><h2>Penyelenggaraan</h2></div><div class="card-b">
+        <div class="toggle-row"><div><b>Mod penyelenggaraan</b><small>Papar amaran penyelenggaraan (menggantikan pengumuman). Alat masih boleh digunakan.</small></div><label class="switch"><input type="checkbox" id="mOn"><span></span></label></div>
+        <label class="fld">Mesej penyelenggaraan<input class="inp" id="mText" maxlength="300" placeholder="Penyelenggaraan pada 10 malam ini."></label>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn primary" type="submit">Simpan Tetapan</button><span id="siteMeta" style="font-size:12.5px;color:var(--muted)"></span></div>
+      </div></form>
+    </section>
+
+    <section data-panel="tools" hidden style="display:grid;gap:16px">
+      <div class="head"><div><h1>Urus Alat</h1><p>Matikan alat buat sementara atau tandakan sebagai "Pilihan" di halaman utama. Perubahan disimpan serta-merta.</p></div></div>
+      <div class="card"><div class="tbl-wrap"><table><thead><tr><th>Alat</th><th>Kategori</th><th>Penggunaan</th><th>Aktif</th><th>Pilihan</th></tr></thead><tbody id="toolRows"></tbody></table></div></div>
+    </section>
+
+    <section data-panel="feedback" hidden style="display:grid;gap:16px">
+      <div class="head"><div><h1>Maklum Balas</h1><p>Mesej yang dihantar melalui borang "Hantar Maklum Balas".</p></div><div class="seg" id="fbFilter"><button type="button" data-v="all" class="on">Semua</button><button type="button" data-v="new">Baharu</button><button type="button" data-v="read">Dibaca</button></div></div>
+      <div class="card" id="fbList"></div>
+    </section>
+
+    <section data-panel="data" hidden style="display:grid;gap:16px">
+      <div class="head"><div><h1>Data &amp; Privasi</h1><p>Apa yang disimpan oleh sistem ini (projek Firebase GENIUS DIGITAL).</p></div></div>
+      <div class="card"><div class="card-b">
+        <div class="msg ok"><b>Gambar pengguna tidak pernah dimuat naik.</b> Semua pemprosesan berlaku dalam browser pengunjung. Firebase Storage tidak digunakan.</div>
+        <div class="tbl-wrap"><table><thead><tr><th>Lokasi</th><th>Data</th><th>Siapa boleh baca/tulis</th></tr></thead><tbody>
+          <tr><td>Firestore <code>mit_settings/site</code></td><td>Pengumuman &amp; mod penyelenggaraan</td><td>Semua boleh baca · admin sahaja tulis</td></tr>
+          <tr><td>Firestore <code>mit_tools/{id}</code></td><td>Status aktif &amp; pilihan</td><td>Semua boleh baca · admin sahaja tulis</td></tr>
+          <tr><td>Firestore <code>mit_feedback/{id}</code></td><td>Nama (pilihan), mesej, penilaian</td><td>Semua boleh cipta · admin sahaja baca/ubah/padam</td></tr>
+          <tr><td>Firestore <code>admins/{uid}</code></td><td>Senarai admin (dikongsi dengan Malaysia PDF Tools)</td><td>Dicipta manual di konsol Firebase</td></tr>
+          <tr><td>Realtime DB <code>visits/…</code></td><td>Kiraan pelawat (nombor sahaja)</td><td>Semua boleh baca &amp; tambah +1 · admin sahaja boleh set semula</td></tr>
+          <tr><td>Realtime DB <code>stats/…</code></td><td>Kiraan penggunaan (nombor sahaja)</td><td>Admin sahaja baca · semua boleh tambah +1</td></tr>
+        </tbody></table></div>
+      </div></div>
+      <div class="card"><div class="card-h"><h2>Set semula statistik</h2></div><div class="card-b">
+        <p style="margin:0;color:var(--muted)">Padam semua kiraan penggunaan alat <b>dan</b> statistik pelawat dalam Realtime Database. Tindakan ini tidak boleh dibatalkan.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap" id="resetArea"><button class="btn danger" type="button" id="resetStats">Set Semula Statistik</button></div>
+      </div></div>
+    </section>
+  </div></main>
+</div>
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-app-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-auth-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.12.2/firebase-database-compat.js"></script>
+<script src="../firebase-config.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
