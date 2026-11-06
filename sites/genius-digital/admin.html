@@ -1,0 +1,1526 @@
+<!DOCTYPE html>
+<html lang="ms" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Admin Panel — GENIUS DIGITAL</title>
+  <meta name="theme-color" content="#FFFFFF">
+  <script>
+    /* Tetapkan bahasa/arah/tema sebelum paparan pertama. Lalai: BM + mod cerah. Kongsi pilihan dengan index.html. */
+    (function () {
+      try {
+        var l = localStorage.getItem("gd-lang"), th = localStorage.getItem("gd-theme"), h = document.documentElement;
+        if (l === "en" || l === "ar" || l === "ms") { h.lang = l; h.dir = l === "ar" ? "rtl" : "ltr"; }
+        h.setAttribute("data-theme", th === "dark" ? "dark" : "light");
+      } catch (e) { document.documentElement.setAttribute("data-theme", "light"); }
+    })();
+  </script>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%230A66FF'/%3E%3Cstop offset='1' stop-color='%2300C8F5'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M32 3 58 18v28L32 61 6 46V18z' fill='%230A1F44'/%3E%3Cpath d='M32 3 58 18v28L32 61 6 46V18z' fill='none' stroke='url(%23g)' stroke-width='4'/%3E%3Cpath d='M43 24a15 15 0 1 0 2 12H32' fill='none' stroke='url(%23g)' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cairo:wght@400;600;700;800&family=Inter:wght@400;500;600&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* =====================================================================
+       GENIUS DIGITAL — Admin Panel styles (mobile-first)
+       ===================================================================== */
+    :root {
+      --navy-950: #061430; --navy-900: #0A1F44; --navy-800: #0F2A5C; --navy-700: #14346E;
+      --blue-500: #0A66FF; --blue-400: #3B87FF; --cyan-400: #00C8F5; --cyan-300: #5BE3FF;
+      --bg: #F4F7FC; --bg-soft: #EAF0FA; --white: #fff; --text: #0B1B3A; --muted: #51607F;
+      --surface: #FFFFFF; --head: #0A1F44; --head-2: #14346E; --accent: #0A66FF;
+      --glass-2: rgba(255, 255, 255, .85); --glass-3: rgba(255, 255, 255, .92);
+      --sk-1: #E7ECF6; --sk-2: #F5F8FD; --plate-border: rgba(255, 255, 255, .9);
+      --input-border: rgba(10, 31, 68, .18); --dash-border: rgba(10, 31, 68, .25); --row-hover: #FAFCFF; --toast-bg: #0A1F44;
+      --alert-err-fg: #8F2323; --alert-ok-fg: #0B6B4A;
+      color-scheme: light;
+      --line: rgba(10, 31, 68, .12);
+      --ok: #0E9F6E; --warn: #B7791F; --danger: #D64545;
+      --shadow-sm: 0 2px 8px rgba(10, 31, 68, .06); --shadow-md: 0 10px 30px rgba(10, 31, 68, .10); --shadow-lg: 0 24px 60px rgba(10, 31, 68, .18);
+      --radius: 16px; --sidebar-w: 270px; --topbar-h: 64px;
+      --font-brand: "Bebas Neue", Impact, "Arial Narrow Bold", sans-serif;
+      --font-hero: "Bebas Neue", Impact, "Arial Narrow Bold", sans-serif;
+      --font-head: "Montserrat", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    /* ---------- Mod gelap ---------- */
+    :root[data-theme="dark"] {
+      --bg: #0A1326; --bg-soft: #0F1C38; --white: #112042; --surface: #112042;
+      --text: #E4ECFB; --muted: #9DB0D3; --line: rgba(160, 185, 235, .18);
+      --head: #F1F5FF; --head-2: #C3D4F5; --accent: #5AA2FF;
+      --glass-2: rgba(10, 19, 38, .85); --glass-3: rgba(17, 32, 66, .92);
+      --sk-1: #17294D; --sk-2: #20386A; --plate-border: rgba(120, 160, 230, .28);
+      --input-border: rgba(160, 185, 235, .3); --dash-border: rgba(160, 185, 235, .3); --row-hover: #15274D; --toast-bg: #1C2F58;
+      --alert-err-fg: #FFB4B4; --alert-ok-fg: #7EE3BC;
+      --ok: #3DD6A0; --warn: #F2B35A; --danger: #FF6B6B;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, .35); --shadow-md: 0 10px 30px rgba(0, 0, 0, .45); --shadow-lg: 0 24px 60px rgba(0, 0, 0, .55);
+      color-scheme: dark;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; font-family: var(--font-body); font-size: 1rem; line-height: 1.55; color: var(--text); background: var(--bg); overflow-x: clip; -webkit-font-smoothing: antialiased; }
+    body.no-scroll { overflow: hidden; }
+    h1, h2, h3 { font-family: var(--font-head); margin: 0; line-height: 1.2; letter-spacing: -.01em; }
+    p { margin: 0; }
+    a { color: inherit; text-decoration: none; }
+    img, svg { max-width: 100%; display: block; }
+    button, input, select, textarea { font: inherit; color: inherit; }
+    button { cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    [hidden] { display: none !important; }
+    :focus-visible { outline: 3px solid var(--cyan-400); outline-offset: 2px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+    /* ---------- Buttons ---------- */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 46px; padding: .65rem 1.2rem; border-radius: 12px; border: 1.5px solid transparent; font-family: var(--font-head); font-weight: 700; font-size: .85rem; letter-spacing: .03em; transition: transform .15s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease; text-align: center; }
+    .btn:disabled { opacity: .55; cursor: not-allowed; transform: none !important; }
+    .btn svg { width: 18px; height: 18px; flex: none; }
+    .btn-primary { color: #fff; background: linear-gradient(135deg, var(--blue-500), #1B4FD8 70%); box-shadow: 0 8px 20px rgba(10, 102, 255, .28); }
+    .btn-primary:not(:disabled):hover { transform: translateY(-1px); box-shadow: 0 12px 26px rgba(10, 102, 255, .38); }
+    .btn-ghost { background: var(--surface); border-color: var(--line); color: var(--head); }
+    .btn-ghost:not(:disabled):hover { border-color: var(--blue-500); color: var(--accent); }
+    .btn-danger { color: #fff; background: var(--danger); box-shadow: 0 8px 20px rgba(214, 69, 69, .25); }
+    .btn-danger:not(:disabled):hover { background: #BF3535; }
+    .btn-block { width: 100%; }
+    .btn .spin { width: 16px; height: 16px; border-radius: 50%; border: 2.5px solid rgba(255, 255, 255, .4); border-top-color: #fff; animation: spin .7s linear infinite; }
+    .btn-ghost .spin { border-color: rgba(10, 31, 68, .2); border-top-color: var(--blue-500); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .icon-btn { width: 44px; height: 44px; display: inline-grid; place-items: center; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--head); flex: none; transition: background .15s, border-color .15s, color .15s; }
+    .icon-btn:not(:disabled):hover { border-color: var(--blue-500); color: var(--accent); }
+    .icon-btn:disabled { opacity: .35; cursor: not-allowed; }
+    .icon-btn svg { width: 20px; height: 20px; }
+    .icon-btn.danger:hover { border-color: var(--danger); color: var(--danger); background: rgba(214, 69, 69, .06); }
+
+    /* ---------- Forms ---------- */
+    .field { display: grid; gap: .4rem; margin-bottom: 1rem; }
+    .field > label, .field > .label { font-family: var(--font-head); font-weight: 700; font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; color: var(--head-2); display: flex; justify-content: space-between; gap: .5rem; }
+    .field .opt { font-family: var(--font-body); font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--muted); }
+    .input, select.input, textarea.input { width: 100%; min-height: 48px; padding: .7rem .9rem; border-radius: 12px; border: 1.5px solid var(--input-border); background: var(--surface); font-size: 16px; /* 16px: elak auto-zoom iOS */ transition: border-color .15s, box-shadow .15s; }
+    textarea.input { min-height: 110px; resize: vertical; line-height: 1.5; }
+    .input:focus { outline: none; border-color: var(--blue-500); box-shadow: 0 0 0 4px rgba(10, 102, 255, .14); }
+    .input[readonly] { background: var(--bg-soft); color: var(--muted); }
+    .input.invalid { border-color: var(--danger); box-shadow: 0 0 0 4px rgba(214, 69, 69, .12); }
+    .err { color: var(--danger); font-size: .82rem; min-height: 0; }
+    .hint { color: var(--muted); font-size: .8rem; }
+    .row2 { display: grid; gap: 0 1rem; grid-template-columns: 1fr; }
+
+    /* ---------- Boot / Login ---------- */
+    .boot { min-height: 100dvh; display: grid; place-items: center; background: var(--bg); }
+    .loader { width: 46px; height: 46px; border-radius: 50%; border: 4px solid var(--bg-soft); border-top-color: var(--blue-500); animation: spin .8s linear infinite; }
+    .auth-shell {
+      min-height: 100dvh; display: grid; place-items: center; padding: 1.25rem; position: relative; overflow: hidden;
+      background: radial-gradient(700px 400px at 90% 0%, rgba(0, 200, 245, .22), transparent 60%), radial-gradient(600px 400px at 0% 100%, rgba(10, 102, 255, .16), transparent 60%), linear-gradient(180deg, var(--surface), var(--bg));
+    }
+    .auth-card { width: min(100%, 440px); padding: 2rem 1.5rem; border-radius: 24px; background: var(--glass-3); backdrop-filter: blur(14px); border: 1px solid var(--plate-border); box-shadow: var(--shadow-lg); }
+    .auth-brand { display: flex; align-items: center; gap: .7rem; margin-bottom: 1.5rem; }
+    .auth-brand svg { width: 46px; height: 46px; }
+    .auth-brand b { display: block; font-family: var(--font-brand); font-weight: 400; font-size: 1.9rem; letter-spacing: .08em; line-height: 1; color: var(--head); }
+    .auth-brand small { font-family: var(--font-head); font-weight: 700; font-size: .66rem; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); }
+    .auth-card h1 { font-size: 1.4rem; color: var(--head); }
+    .auth-card .sub { margin: .4rem 0 1.5rem; color: var(--muted); font-size: .95rem; }
+    .alert { padding: .8rem 1rem; border-radius: 12px; font-size: .9rem; margin-bottom: 1rem; border: 1px solid; }
+    .alert.error { color: var(--alert-err-fg); background: rgba(214, 69, 69, .08); border-color: rgba(214, 69, 69, .35); }
+    .alert.info { color: var(--head-2); background: rgba(10, 102, 255, .07); border-color: rgba(10, 102, 255, .3); }
+    .alert.ok { color: var(--alert-ok-fg); background: rgba(14, 159, 110, .08); border-color: rgba(14, 159, 110, .35); }
+    .alert code, .code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .82em; background: rgba(10, 31, 68, .07); padding: .1rem .4rem; border-radius: 6px; word-break: normal; }
+    .link-btn { background: none; border: 0; padding: .5rem 0; min-height: 44px; color: var(--accent); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+    .auth-foot { margin-top: 1rem; text-align: center; font-size: .9rem; color: var(--muted); }
+    .auth-foot a { color: var(--accent); font-weight: 600; }
+
+    /* ---------- App shell ---------- */
+    .app { min-height: 100dvh; }
+    .sidebar {
+      position: fixed; z-index: 70; inset-block: 0; inset-inline-start: 0; width: min(86vw, var(--sidebar-w)); display: flex; flex-direction: column; padding: 1.1rem 1rem calc(1rem + env(safe-area-inset-bottom));
+      color: #fff; background: linear-gradient(180deg, var(--navy-950), var(--navy-900) 60%, var(--navy-800)); transform: translateX(-102%); transition: transform .28s cubic-bezier(.2, .8, .2, 1); overflow-y: auto; box-shadow: var(--shadow-lg);
+    }
+    .sidebar.open { transform: none; }
+    .scrim { position: fixed; inset: 0; z-index: 60; background: rgba(6, 20, 48, .55); backdrop-filter: blur(3px); opacity: 0; pointer-events: none; transition: opacity .25s; }
+    .scrim.show { opacity: 1; pointer-events: auto; }
+    .side-brand { display: flex; align-items: center; gap: .7rem; padding: .4rem .5rem 1.2rem; }
+    .side-brand svg { width: 40px; height: 40px; }
+    .side-brand b { display: block; font-family: var(--font-brand); font-weight: 400; font-size: 1.55rem; letter-spacing: .08em; line-height: 1; }
+    .side-brand small { font-family: var(--font-head); font-weight: 700; font-size: .6rem; letter-spacing: .22em; text-transform: uppercase; color: var(--cyan-300); }
+    .side-label { padding: .8rem .8rem .4rem; font-family: var(--font-head); font-size: .66rem; letter-spacing: .2em; text-transform: uppercase; color: rgba(255, 255, 255, .45); font-weight: 700; }
+    .side-nav { display: grid; gap: .25rem; }
+    .side-link { display: flex; align-items: center; gap: .85rem; min-height: 48px; padding: 0 .9rem; border-radius: 12px; border: 0; background: none; color: rgba(255, 255, 255, .8); font-weight: 600; font-size: .95rem; width: 100%; text-align: start; transition: background .15s, color .15s; }
+    .side-link svg { width: 21px; height: 21px; flex: none; }
+    .side-link:hover { background: rgba(255, 255, 255, .08); color: #fff; }
+    .side-link.active { background: linear-gradient(135deg, rgba(10, 102, 255, .85), rgba(0, 200, 245, .45)); color: #fff; box-shadow: 0 8px 20px rgba(10, 102, 255, .3); }
+    .side-spacer { flex: 1; min-height: 1.5rem; }
+    .side-user { padding: .9rem; border-radius: 14px; background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .1); margin-bottom: .6rem; font-size: .8rem; }
+    .side-user small { display: block; color: var(--cyan-300); font-weight: 600; letter-spacing: .12em; text-transform: uppercase; font-size: .62rem; }
+    .side-user span { display: block; word-break: break-all; }
+
+    .topbar { position: sticky; top: 0; z-index: 50; height: var(--topbar-h); display: flex; align-items: center; gap: .75rem; padding: 0 1rem; background: var(--glass-2); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+    .topbar h1 { font-size: 1.1rem; color: var(--head); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mode-pill { flex: none; padding: .25rem .65rem; border-radius: 999px; font-family: var(--font-head); font-size: .66rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; background: rgba(183, 121, 31, .14); color: var(--warn); }
+    .main { padding: 1.1rem 1rem calc(3rem + env(safe-area-inset-bottom)); max-width: 1280px; margin-inline: auto; }
+    .demo-banner { margin-bottom: 1rem; }
+    .view-head { display: flex; flex-direction: column; gap: .8rem; margin-bottom: 1.25rem; }
+    .view-head h2 { font-size: 1.5rem; color: var(--head); }
+    .view-head p { color: var(--muted); font-size: .95rem; }
+
+    /* ---------- Dashboard ---------- */
+    .stats { display: grid; gap: .9rem; grid-template-columns: repeat(2, 1fr); }
+    .stat { position: relative; overflow: hidden; padding: 1.1rem; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-sm); }
+    .stat::after { content: ""; position: absolute; inset-inline-end: -24px; top: -24px; width: 90px; height: 90px; border-radius: 50%; background: radial-gradient(circle, var(--tint, rgba(10, 102, 255, .16)), transparent 70%); }
+    .stat small { display: block; font-family: var(--font-head); font-weight: 700; font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+    .stat strong { display: block; margin-top: .35rem; font-family: var(--font-hero); font-weight: 400; font-size: 2.8rem; line-height: 1; color: var(--head); letter-spacing: .02em; }
+    .stat.total { grid-column: 1 / -1; background: linear-gradient(135deg, var(--navy-900), var(--navy-700)); border: 0; }
+    .stat.total small { color: var(--cyan-300); } .stat.total strong { color: #fff; font-size: 3.4rem; }
+    .stat.s-active { --tint: rgba(14, 159, 110, .22); } .stat.s-soon { --tint: rgba(242, 169, 59, .25); } .stat.s-hidden { --tint: rgba(81, 96, 127, .22); } .stat.s-cat { --tint: rgba(0, 200, 245, .25); }
+    .panel { margin-top: 1.25rem; padding: 1.1rem; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-sm); }
+    .panel h3 { font-size: 1rem; color: var(--head); margin-bottom: .8rem; }
+    .recent { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
+    .recent li { display: flex; align-items: center; gap: .8rem; padding: .55rem; border-radius: 12px; background: var(--bg); }
+    .recent img { width: 64px; height: 40px; object-fit: cover; border-radius: 8px; flex: none; background: var(--navy-900); }
+    .recent .meta { flex: 1; min-width: 0; } .recent .meta b { display: block; font-family: var(--font-head); font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .recent .meta small { color: var(--muted); }
+    .quick { display: flex; flex-direction: column; gap: .7rem; }
+
+    /* ---------- Toolbar + Table ---------- */
+    .toolbar { display: grid; gap: .7rem; margin-bottom: 1rem; }
+    .search-wrap { position: relative; }
+    .search-wrap svg { position: absolute; inset-inline-start: .9rem; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; color: var(--muted); pointer-events: none; }
+    .search-wrap .input { padding-inline-start: 2.8rem; }
+    .toolbar-filters { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; }
+    .table-card { border-radius: var(--radius); background: transparent; }
+    table.ptable { width: 100%; border-collapse: separate; border-spacing: 0; }
+    .ptable thead { display: none; }
+    .ptable tbody { display: grid; gap: .9rem; }
+    .ptable tr.prow { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem .9rem; padding: 1rem; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-sm); }
+    .ptable td { padding: 0; min-width: 0; }
+    .c-cat, .c-date { display: none; }
+    .c-thumb { order: 1; flex: none; align-self: flex-start; } .c-name { order: 2; flex: 1 1 calc(100% - 120px); } .c-status { order: 3; flex: none; } .c-order { order: 4; margin-inline-start: auto; flex: none; } .c-actions { order: 5; flex: 1 0 100%; padding-top: .35rem; border-top: 1px dashed var(--line); margin-top: .1rem; }
+    .c-actions .inner { display: flex; gap: .6rem; width: 100%; margin-top: .75rem; }
+    .c-actions .inner .btn:first-child { flex: 1; }
+    .pmeta { display: block; margin-top: .3rem; font-size: .82rem; color: var(--muted); }
+    .pthumb { width: 96px; height: auto; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 10px; background: var(--navy-900); border: 1px solid var(--line); }
+    .pname { font-family: var(--font-head); font-weight: 700; color: var(--head); word-break: break-word; }
+    .pslug { direction: ltr; unicode-bidi: isolate; display: block; font-size: .78rem; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; word-break: break-all; }
+    .pcat { font-size: .85rem; color: var(--accent); font-weight: 600; }
+    .order-ctl { display: inline-flex; align-items: center; gap: .3rem; }
+    .order-ctl .num { min-width: 1.8rem; text-align: center; font-family: var(--font-hero); font-size: 1.4rem; color: var(--head); }
+    .order-ctl .icon-btn { width: 40px; height: 40px; border-radius: 10px; }
+    .status-select { min-height: 44px; padding: .3rem 2rem .3rem .75rem; border-radius: 999px; border: 1.5px solid; font-family: var(--font-head); font-weight: 700; font-size: .75rem; letter-spacing: .06em; text-transform: uppercase; appearance: none; -webkit-appearance: none; cursor: pointer; background-repeat: no-repeat; background-position: right .6rem center; background-size: 10px; max-width: 100%; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='m1 1 4 4 4-4' fill='none' stroke='%2351607F' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E"); }
+    .status-select.active { color: var(--ok); border-color: rgba(14, 159, 110, .45); background-color: rgba(14, 159, 110, .08); }
+    .status-select.coming-soon { color: var(--warn); border-color: rgba(183, 121, 31, .45); background-color: rgba(242, 169, 59, .1); }
+    .status-select.hidden-s { color: var(--muted); border-color: rgba(81, 96, 127, .4); background-color: rgba(81, 96, 127, .08); }
+
+    .state-box { text-align: center; padding: 2.5rem 1.25rem; border-radius: var(--radius); background: var(--surface); border: 1px dashed var(--dash-border); }
+    .state-box h3 { font-size: 1.15rem; color: var(--head); } .state-box p { margin: .5rem auto 1rem; color: var(--muted); max-width: 46ch; }
+    .state-box .btn { margin: .25rem; }
+    .state-box.error { border-color: rgba(214, 69, 69, .5); }
+
+    .sk-row { height: 150px; border-radius: var(--radius); background: linear-gradient(100deg, var(--sk-1) 30%, var(--sk-2) 50%, var(--sk-1) 70%); background-size: 200% 100%; animation: shimmer 1.4s infinite linear; margin-bottom: .9rem; }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    /* ---------- Dialogs ---------- */
+    dialog.dlg { width: 100%; max-width: 100%; height: 100dvh; max-height: 100dvh; margin: 0; padding: 0; border: 0; background: var(--surface); color: var(--text); overflow: hidden; }
+    dialog.dlg[open] { display: flex; flex-direction: column; animation: sheet .28s cubic-bezier(.2, .8, .2, 1); }
+    dialog.dlg::backdrop { background: rgba(6, 20, 48, .6); backdrop-filter: blur(4px); }
+    @keyframes sheet { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+    .dlg form { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+    .dlg-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .9rem 1rem .9rem 1.25rem; border-bottom: 1px solid var(--line); padding-top: calc(.9rem + env(safe-area-inset-top)); }
+    .dlg-head h2 { font-size: 1.15rem; color: var(--head); }
+    .dlg-body { flex: 1; overflow-y: auto; padding: 1.25rem; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+    .dlg-foot { display: flex; flex-direction: column-reverse; gap: .6rem; padding: .9rem 1.25rem calc(.9rem + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: var(--surface); }
+    dialog.dlg.small { height: auto; max-height: calc(100dvh - 2rem); width: min(calc(100% - 2rem), 440px); margin: auto; border-radius: 22px; box-shadow: var(--shadow-lg); }
+    dialog.dlg.small .dlg-body { text-align: center; padding: 1.75rem 1.5rem 1rem; }
+    dialog.dlg.small .dlg-head { display: none; }
+    .del-ico { width: 64px; height: 64px; margin: 0 auto 1rem; border-radius: 20px; display: grid; place-items: center; color: var(--danger); background: rgba(214, 69, 69, .1); }
+    .del-ico svg { width: 32px; height: 32px; }
+    .dlg.small h2 { font-size: 1.25rem; margin-bottom: .6rem; color: var(--head); } .dlg.small p { color: var(--muted); font-size: .95rem; }
+
+    .thumb-field { display: grid; gap: .8rem; }
+    .thumb-preview { position: relative; aspect-ratio: 16 / 10; border-radius: 14px; overflow: hidden; background: var(--navy-900); border: 1px solid var(--line); }
+    .thumb-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .thumb-preview .tag { position: absolute; inset-inline-start: .6rem; top: .6rem; padding: .2rem .6rem; border-radius: 999px; background: var(--glass-3); color: var(--head); font-size: .68rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; font-family: var(--font-head); }
+    .thumb-actions { display: flex; flex-wrap: wrap; gap: .6rem; }
+    .thumb-actions .btn { flex: 1; min-width: 140px; }
+    .progress { height: 8px; border-radius: 8px; background: var(--bg-soft); overflow: hidden; }
+    .progress i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--blue-500), var(--cyan-400)); transition: width .15s; }
+    .readonly-dates { display: grid; gap: .3rem; padding: .8rem 1rem; border-radius: 12px; background: var(--bg); font-size: .85rem; color: var(--muted); }
+    .readonly-dates b { color: var(--head); }
+
+    /* ---------- Toasts ---------- */
+    .toasts { position: fixed; z-index: 300; left: 1rem; right: 1rem; bottom: calc(1rem + env(safe-area-inset-bottom)); display: grid; gap: .5rem; justify-items: center; pointer-events: none; }
+    .toast { pointer-events: auto; max-width: 480px; width: 100%; padding: .85rem 1rem; border-radius: 14px; color: #fff; font-size: .92rem; background: var(--toast-bg); box-shadow: var(--shadow-lg); animation: toastIn .25s ease; display: flex; gap: .7rem; align-items: flex-start; }
+    .toast.ok { background: #0B6B4A; } .toast.err { background: #A62F2F; }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+    /* ---------- Breakpoints ---------- */
+    @media (min-width: 560px) {
+      .row2 { grid-template-columns: 1fr 1fr; }
+      .view-head { flex-direction: row; align-items: center; justify-content: space-between; }
+      .quick { flex-direction: row; }
+      .stats { grid-template-columns: repeat(3, 1fr); }
+      .stat.total { grid-column: auto; }
+      .toolbar { grid-template-columns: 1fr auto; }
+      .toolbar-filters { grid-template-columns: 1fr 1fr; min-width: 340px; }
+      dialog.dlg { width: min(calc(100% - 2rem), 640px); height: auto; max-height: calc(100dvh - 2rem); margin: auto; border-radius: 22px; box-shadow: var(--shadow-lg); }
+      .dlg-foot { flex-direction: row; justify-content: flex-end; }
+      .dlg-foot .btn { min-width: 140px; }
+    }
+    @media (min-width: 960px) {
+      .sidebar { transform: none; box-shadow: none; width: var(--sidebar-w); }
+      .scrim { display: none; }
+      #menuBtn { display: none; }
+      .shell { margin-inline-start: var(--sidebar-w); }
+      .main { padding: 1.75rem 2rem 3rem; }
+      .stats { grid-template-columns: repeat(5, 1fr); }
+      .topbar { padding: 0 2rem; }
+    }
+    @media (min-width: 1100px) {
+      /* Paparan jadual penuh */
+      .ptable thead { display: table-header-group; }
+      .ptable thead th { text-align: start; padding: .8rem 1rem; font-family: var(--font-head); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); background: var(--bg-soft); border-bottom: 1px solid var(--line); }
+      .ptable thead th:first-child { border-top-left-radius: var(--radius); } .ptable thead th:last-child { border-top-right-radius: var(--radius); }
+      .table-card { background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-sm); overflow: hidden; }
+      .ptable tbody { display: table-row-group; }
+      .ptable tr.prow { display: table-row; padding: 0; border: 0; box-shadow: none; border-radius: 0; background: var(--surface); }
+      .ptable td { display: table-cell; padding: .8rem 1rem; border-bottom: 1px solid var(--line); vertical-align: middle; }
+      .ptable tr.prow:last-child td { border-bottom: 0; }
+      .ptable tr.prow:hover td { background: var(--row-hover); }
+      .c-cat, .c-date { display: table-cell; }
+      .c-order { margin-inline-start: 0; }
+      .c-date { font-size: .85rem; white-space: nowrap; color: var(--muted); }
+      .c-actions { border-top: 0; margin: 0; padding: .8rem 1rem; }
+      .c-actions .inner { justify-content: flex-end; width: auto; gap: .5rem; margin-top: 0; }
+      .c-actions .inner .btn:first-child { flex: none; }
+      .pmeta { display: none; }
+      .pthumb { width: 84px; }
+    }
+    @media (max-width: 380px) { .toolbar-filters { grid-template-columns: 1fr; } .pthumb { width: 80px; } .c-name { flex-basis: calc(100% - 104px); } }
+
+    /* ---------- Kawalan bahasa + tema ---------- */
+    .theme-toggle { width: 44px; height: 44px; flex: none; display: inline-grid; place-items: center; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--head); -webkit-tap-highlight-color: transparent; }
+    .theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+    .theme-toggle svg { width: 21px; height: 21px; }
+    .theme-toggle .i-sun { display: none; }
+    :root[data-theme="dark"] .theme-toggle .i-sun { display: block; }
+    :root[data-theme="dark"] .theme-toggle .i-moon { display: none; }
+    .lang-switch { direction: ltr; display: flex; gap: 2px; padding: 3px; border-radius: 12px; background: var(--bg-soft); border: 1px solid var(--line); }
+    .lang-switch button { flex: 1; min-width: 44px; min-height: 40px; padding: 0 .7rem; border: 0; border-radius: 9px; background: transparent; color: var(--head-2); font-family: var(--font-head); font-weight: 800; font-size: .8rem; letter-spacing: .06em; }
+    .lang-switch button:hover { color: var(--accent); }
+    .lang-switch button[aria-pressed="true"] { background: linear-gradient(135deg, var(--blue-500), #1B4FD8); color: #fff; box-shadow: 0 4px 12px rgba(10, 102, 255, .35); }
+    .sidebar .lang-switch { background: rgba(255, 255, 255, .08); border-color: rgba(255, 255, 255, .14); margin-bottom: .6rem; }
+    .sidebar .lang-switch button { color: rgba(255, 255, 255, .8); }
+    .sidebar .lang-switch button:hover { color: #fff; }
+    .auth-tools { position: absolute; top: max(1rem, env(safe-area-inset-top)); inset-inline-end: 1rem; display: flex; align-items: center; gap: .5rem; z-index: 2; }
+    .iso { unicode-bidi: isolate; }
+    #deniedUid { display: block; margin-top: .4rem; word-break: break-all; }
+    .code, code { direction: ltr; unicode-bidi: isolate; }
+
+    /* ---------- Terjemahan produk ---------- */
+    .trans { border: 1px solid var(--line); border-radius: 12px; padding: 0 1rem; margin-bottom: 1rem; background: var(--bg); }
+    .trans > summary { min-height: 48px; display: flex; align-items: center; cursor: pointer; font-family: var(--font-head); font-weight: 700; font-size: .85rem; color: var(--head-2); list-style-position: inside; }
+    .trans[open] > summary { border-bottom: 1px solid var(--line); margin-bottom: 1rem; }
+    .trans .hint { display: block; margin-bottom: 1rem; }
+    .trans fieldset { border: 0; margin: 0 0 .5rem; padding: 0; min-width: 0; }
+    .trans legend { padding: 0; margin-bottom: .7rem; font-family: var(--font-head); font-weight: 800; font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+
+    /* ---------- Mod gelap: pelarasan khusus ---------- */
+    :root[data-theme="dark"] .auth-shell { background: radial-gradient(700px 400px at 90% 0%, rgba(0, 200, 245, .12), transparent 60%), radial-gradient(600px 400px at 0% 100%, rgba(10, 102, 255, .18), transparent 60%), linear-gradient(180deg, var(--surface), var(--bg)); }
+    :root[data-theme="dark"] .alert.info { background: rgba(90, 162, 255, .12); border-color: rgba(90, 162, 255, .35); }
+    :root[data-theme="dark"] .alert.error { background: rgba(255, 107, 107, .12); }
+    :root[data-theme="dark"] .alert.ok { background: rgba(61, 214, 160, .12); }
+    :root[data-theme="dark"] .stat.total { background: linear-gradient(135deg, #0A1F44, #14346E); border: 1px solid rgba(160, 185, 235, .2); }
+    :root[data-theme="dark"] .sidebar { background: linear-gradient(180deg, #050C1C, #0A1633 60%, #0D1D42); }
+    :root[data-theme="dark"] .state-box.error { border-color: rgba(255, 107, 107, .5); }
+    :root[data-theme="dark"] .btn-ghost .spin { border-color: rgba(160, 185, 235, .3); border-top-color: var(--accent); }
+    :root[data-theme="dark"] .input[readonly] { color: var(--muted); }
+
+    /* ---------- RTL (Bahasa Arab) ---------- */
+    @media (max-width: 959px) { [dir="rtl"] .sidebar:not(.open) { transform: translateX(102%); } }
+    [dir="rtl"] .input[dir="ltr"] { text-align: right; }
+    [dir="rtl"] .pslug { text-align: right; }
+    [dir="rtl"] #userEmail { display: block; text-align: right; }
+    [dir="rtl"] .status-select { background-position: left .6rem center; padding: .3rem .75rem .3rem 2rem; }
+
+    /* ---------- Tipografi Arab: Cairo; tiada jarak huruf / huruf besar pada skrip Arab ---------- */
+    [lang="ar"] { --font-hero: "Cairo", system-ui, "Segoe UI", Tahoma, sans-serif; --font-head: "Cairo", system-ui, "Segoe UI", Tahoma, sans-serif; --font-body: "Cairo", system-ui, "Segoe UI", Tahoma, sans-serif; }
+    [lang="ar"] :not(.keep-ls):not(.keep-ls *) { letter-spacing: normal !important; text-transform: none !important; }
+    [lang="ar"] body { line-height: 1.75; }
+    [lang="ar"] .stat small, [lang="ar"] .field > label, [lang="ar"] .field > .label { font-size: .88rem; }
+    [lang="ar"] .btn { font-size: .95rem; }
+    [lang="ar"] .status-select { font-size: .85rem; }
+    [lang="ar"] .ptable thead th { font-size: .8rem; }
+    [lang="ar"] .hint, [lang="ar"] .err { font-size: .9rem; }
+    .keep-ls { unicode-bidi: isolate; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+  </style>
+</head>
+<body>
+  <!-- Icon sprite -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="gdGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0A66FF"/><stop offset="1" stop-color="#00C8F5"/></linearGradient>
+      <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.500A8.500 8.500 0 0 1 9.500 4 8.500 8.500 0 1 0 20 14.500z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.200" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.500v2.200M12 19.300v2.200M2.500 12h2.200M19.300 12h2.200M5.300 5.300l1.500 1.500M17.200 17.200l1.500 1.500M18.700 5.300l-1.500 1.500M6.800 17.200l-1.500 1.500" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-logo" viewBox="0 0 64 64"><path d="M32 3 58 18v28L32 61 6 46V18z" fill="#0A1F44"/><path d="M32 3 58 18v28L32 61 6 46V18z" fill="none" stroke="url(#gdGrad)" stroke-width="3.5" stroke-linejoin="round"/><path d="M43 24a15 15 0 1 0 2 12H32" fill="none" stroke="url(#gdGrad)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="43" cy="24" r="3" fill="#5BE3FF"/></symbol>
+      <symbol id="i-dash" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="3" width="8" height="6" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="11" width="8" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="15" width="8" height="6" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+      <symbol id="i-box" viewBox="0 0 24 24"><path d="M12 2.5 21 7.5v9l-9 5-9-5v-9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M3.5 7.8 12 12.5l8.5-4.7M12 12.5v9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+      <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 12h18M12 3c2.800 2.700 4 5.700 4 9s-1.200 6.300-4 9c-2.800-2.700-4-5.700-4-9s1.200-6.300 4-9z" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+      <symbol id="i-out" viewBox="0 0 24 24"><path d="M9 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4M16 8l4 4-4 4M20 12H9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.500" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4.500 4.500" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.800 2.800 0 0 0-4-4L4 16z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-up" viewBox="0 0 24 24"><path d="m6 14 6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 10 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 17v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2 20h20z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 10v4.500M12 17.300v.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    </defs>
+  </svg>
+
+  <!-- ====================== BOOT ====================== -->
+  <div class="boot" id="bootView" role="status" aria-label="Memuatkan"><div class="loader"></div></div>
+
+  <!-- ====================== LOGIN ====================== -->
+  <main class="auth-shell" id="loginView" hidden>
+      <div class="auth-tools">
+        <div class="lang-switch" role="group" data-i18n-attr="aria-label:ui.language" aria-label="Pilih bahasa">
+          <button type="button" data-lang="ms" lang="ms" aria-pressed="true" aria-label="Bahasa Melayu" title="Bahasa Melayu">BM</button>
+          <button type="button" data-lang="en" lang="en" aria-pressed="false" aria-label="English" title="English">BI</button>
+          <button type="button" data-lang="ar" lang="ar" aria-pressed="false" aria-label="العربية" title="العربية">BA</button>
+        </div>
+        <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false" aria-label="Tukar ke mod gelap" title="Tukar ke mod gelap"><svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg><svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg></button>
+      </div>
+    <section class="auth-card" aria-labelledby="loginTitle">
+      <div class="auth-brand">
+        <svg aria-hidden="true"><use href="#i-logo"/></svg>
+        <div><b class="keep-ls">GENIUS DIGITAL</b><small data-i18n="brand.admin">Panel Admin</small></div>
+      </div>
+      <h1 id="loginTitle" data-i18n="login.title">Log Masuk Admin</h1>
+      <p class="sub" data-i18n="login.sub">Gunakan akaun Firebase Authentication yang telah diberi akses admin.</p>
+
+      <div class="alert info" id="setupNotice" hidden>
+        <span data-i18n-html="login.setup"><strong>Firebase belum dikonfigurasi.</strong> Gantikan <code>firebaseConfig</code> dalam admin.html (dan index.html) dengan konfigurasi projek anda. Rujuk README.md.</span>
+        <div style="margin-top:.6rem"><a class="btn btn-ghost btn-block" href="?demo=1" data-i18n="login.demoBtn">Buka Mod Demo (tanpa Firebase)</a></div>
+      </div>
+      <div class="alert error" id="loginError" role="alert" hidden></div>
+      <div class="alert ok" id="loginOk" role="status" hidden></div>
+
+      <form id="loginForm" novalidate>
+        <div class="field"><label for="loginEmail" data-i18n="login.email">E-mel</label><input class="input" dir="ltr" id="loginEmail" type="email" autocomplete="username" inputmode="email" autocapitalize="none" required></div>
+        <div class="field"><label for="loginPassword" data-i18n="login.password">Kata Laluan</label><input class="input" dir="ltr" id="loginPassword" type="password" autocomplete="current-password" required></div>
+        <button class="btn btn-primary btn-block" type="submit" id="loginBtn" data-i18n="login.submit">Log Masuk</button>
+      </form>
+      <div class="auth-foot">
+        <button class="link-btn" type="button" id="resetBtn" data-i18n="login.forgot">Lupa kata laluan?</button><br>
+        <a href="index.html" data-i18n="login.back">← Kembali ke website</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ====================== ACCESS DENIED (log masuk tetapi bukan admin) ====================== -->
+  <main class="auth-shell" id="deniedView" hidden>
+      <div class="auth-tools">
+        <div class="lang-switch" role="group" data-i18n-attr="aria-label:ui.language" aria-label="Pilih bahasa">
+          <button type="button" data-lang="ms" lang="ms" aria-pressed="true" aria-label="Bahasa Melayu" title="Bahasa Melayu">BM</button>
+          <button type="button" data-lang="en" lang="en" aria-pressed="false" aria-label="English" title="English">BI</button>
+          <button type="button" data-lang="ar" lang="ar" aria-pressed="false" aria-label="العربية" title="العربية">BA</button>
+        </div>
+        <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false" aria-label="Tukar ke mod gelap" title="Tukar ke mod gelap"><svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg><svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg></button>
+      </div>
+    <section class="auth-card">
+      <div class="auth-brand"><svg aria-hidden="true"><use href="#i-logo"/></svg><div><b class="keep-ls">GENIUS DIGITAL</b><small data-i18n="brand.admin">Panel Admin</small></div></div>
+      <h1 data-i18n="den.title">Akses Ditolak</h1>
+      <p class="sub" id="deniedLead"></p>
+      <div class="alert info"><span data-i18n="den.help">Jika anda pemilik projek, tetapkan claim admin untuk UID ini menggunakan Firebase Admin SDK (rujuk README.md), kemudian log keluar dan log masuk semula:</span><br><code id="deniedUid"></code></div>
+      <button class="btn btn-primary btn-block" type="button" id="deniedSignOut" data-i18n="den.signOut">Log Keluar</button>
+    </section>
+  </main>
+
+  <!-- ====================== APP ====================== -->
+  <div class="app" id="appView" hidden>
+    <aside class="sidebar" id="sidebar" data-i18n-attr="aria-label:ui.adminNav" aria-label="Navigasi admin">
+      <div class="side-brand"><svg aria-hidden="true"><use href="#i-logo"/></svg><div><b class="keep-ls">GENIUS DIGITAL</b><small data-i18n="brand.admin">Panel Admin</small></div></div>
+      <div class="side-label" data-i18n="nav.menu">Menu</div>
+      <nav class="side-nav">
+        <button class="side-link" type="button" data-nav="dashboard"><svg aria-hidden="true"><use href="#i-dash"/></svg><span data-i18n="nav.dashboard">Papan Pemuka</span></button>
+        <button class="side-link" type="button" data-nav="products"><svg aria-hidden="true"><use href="#i-box"/></svg><span data-i18n="nav.products">Produk</span></button>
+        <a class="side-link" href="index.html" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-globe"/></svg><span data-i18n="nav.viewSite">Lihat Website</span></a>
+      </nav>
+      <div class="side-spacer"></div>
+      <div class="lang-switch" role="group" data-i18n-attr="aria-label:ui.language" aria-label="Pilih bahasa">
+        <button type="button" data-lang="ms" lang="ms" aria-pressed="true" aria-label="Bahasa Melayu" title="Bahasa Melayu">BM</button>
+        <button type="button" data-lang="en" lang="en" aria-pressed="false" aria-label="English" title="English">BI</button>
+        <button type="button" data-lang="ar" lang="ar" aria-pressed="false" aria-label="العربية" title="العربية">BA</button>
+      </div>
+      <div class="side-user"><small id="userRole" data-i18n="nav.role">Admin</small><span class="iso" id="userEmail" dir="auto"></span></div>
+      <button class="side-link" type="button" id="signOutBtn"><svg aria-hidden="true"><use href="#i-out"/></svg><span data-i18n="nav.signOut">Log Keluar</span></button>
+    </aside>
+    <div class="scrim" id="scrim"></div>
+
+    <div class="shell">
+      <header class="topbar">
+        <button class="icon-btn" id="menuBtn" type="button" data-i18n-attr="aria-label:ui.menuOpen" aria-label="Buka menu" aria-controls="sidebar" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
+        <h1 id="topTitle">Dashboard</h1>
+        <span class="mode-pill" id="modePill" data-i18n="pill.demo" hidden>Demo</span>
+        <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false" aria-label="Tukar ke mod gelap" title="Tukar ke mod gelap"><svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg><svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg></button>
+      </header>
+
+      <main class="main" id="main">
+        <div class="alert info demo-banner" id="demoBanner" data-i18n-html="demo.banner" hidden></div>
+
+        <!-- Dashboard -->
+        <section id="view-dashboard" hidden aria-labelledby="dashTitle">
+          <div class="view-head"><div><h2 id="dashTitle" data-i18n="nav.dashboard">Papan Pemuka</h2><p data-i18n="dash.sub">Ringkasan produk daripada Firestore (masa nyata).</p></div></div>
+          <div class="stats" id="stats"></div>
+          <div class="panel">
+            <h3 data-i18n="dash.recent">Kemas kini terkini</h3>
+            <ul class="recent" id="recentList"></ul>
+          </div>
+          <div class="panel">
+            <h3 data-i18n="dash.quick">Tindakan pantas</h3>
+            <div class="quick">
+              <button class="btn btn-primary" type="button" data-action="add"><svg aria-hidden="true"><use href="#i-plus"/></svg><span data-i18n="act.add">Tambah Produk</span></button>
+              <button class="btn btn-ghost" type="button" data-nav="products"><svg aria-hidden="true"><use href="#i-box"/></svg><span data-i18n="act.manage">Urus Produk</span></button>
+              <a class="btn btn-ghost" href="index.html" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-globe"/></svg><span data-i18n="nav.viewSite">Lihat Website</span></a>
+            </div>
+          </div>
+        </section>
+
+        <!-- Products -->
+        <section id="view-products" hidden aria-labelledby="prodTitle">
+          <div class="view-head">
+            <div><h2 id="prodTitle" data-i18n="nav.products">Produk</h2><p data-i18n="prod.sub">Tambah, edit, susun dan padam produk yang dipaparkan di website.</p></div>
+            <button class="btn btn-primary" type="button" data-action="add"><svg aria-hidden="true"><use href="#i-plus"/></svg><span data-i18n="act.add">Tambah Produk</span></button>
+          </div>
+          <div class="toolbar">
+            <div class="search-wrap">
+              <svg aria-hidden="true"><use href="#i-search"/></svg>
+              <label class="sr-only" for="searchInput" data-i18n="search.label">Cari produk</label>
+              <input class="input" id="searchInput" type="search" data-i18n-attr="placeholder:search.placeholder" placeholder="Cari nama, slug atau kategori…" autocomplete="off">
+            </div>
+            <div class="toolbar-filters">
+              <label class="sr-only" for="categoryFilter" data-i18n="filter.categoryLabel">Tapis mengikut kategori</label>
+              <select class="input" id="categoryFilter"><option value="" data-i18n="filter.allCategories">Semua kategori</option></select>
+              <label class="sr-only" for="statusFilter" data-i18n="filter.statusLabel">Tapis mengikut status</label>
+              <select class="input" id="statusFilter">
+                <option value="" data-i18n="filter.allStatuses">Semua status</option><option value="active" data-i18n="status.active">Aktif</option><option value="coming-soon" data-i18n="status.soon">Akan Datang</option><option value="hidden" data-i18n="status.hidden">Tersembunyi</option>
+              </select>
+            </div>
+          </div>
+          <div id="productsArea" aria-live="polite"></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- ====================== ADD / EDIT PRODUCT ====================== -->
+  <dialog class="dlg" id="productDialog" aria-labelledby="pdTitle">
+    <form id="productForm" novalidate>
+      <div class="dlg-head"><h2 id="pdTitle" data-i18n="dlg.addTitle">Tambah Produk</h2><button class="icon-btn" type="button" id="pdClose" data-i18n-attr="aria-label:ui.close" aria-label="Tutup"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
+      <div class="dlg-body">
+        <div class="alert error" id="pdError" role="alert" hidden></div>
+
+        <div class="field">
+          <label for="fName" data-i18n="dlg.name">Nama Produk</label>
+          <input class="input" id="fName" maxlength="120" autocomplete="off" required>
+          <span class="err" id="eName"></span>
+        </div>
+        <div class="field">
+          <label for="fSlug"><span data-i18n="dlg.slug">Slug Produk</span> <span class="opt" id="slugNote"></span></label>
+          <input class="input" dir="ltr" id="fSlug" maxlength="80" autocomplete="off" autocapitalize="none" spellcheck="false" required>
+          <span class="hint" data-i18n="dlg.slugHint">Huruf kecil, nombor dan sempang sahaja. Slug ialah ID dokumen dan tidak boleh ditukar selepas produk dicipta.</span>
+          <span class="err" id="eSlug"></span>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="fCategory" data-i18n="dlg.category">Kategori Produk</label>
+            <input class="input" id="fCategory" list="categoryList" maxlength="60" autocomplete="off" required>
+            <datalist id="categoryList"></datalist>
+            <span class="err" id="eCategory"></span>
+          </div>
+          <div class="field">
+            <label for="fStatus" data-i18n="dlg.status">Status Produk</label>
+            <select class="input" id="fStatus"><option value="active" data-i18n="status.active">Aktif</option><option value="coming-soon" data-i18n="status.soon">Akan Datang</option><option value="hidden" data-i18n="status.hidden">Tersembunyi</option></select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="fDesc"><span data-i18n="dlg.desc">Penerangan Produk</span> <span class="opt" id="descCount">0/1000</span></label>
+          <textarea class="input" id="fDesc" maxlength="1000"></textarea>
+          <span class="err" id="eDesc"></span>
+        </div>
+        <details class="trans" id="transBox">
+          <summary data-i18n="tr.summary">Terjemahan produk (pilihan)</summary>
+          <span class="hint" data-i18n="tr.help">Jika dikosongkan, website memaparkan teks Bahasa Melayu yang ditulis di atas.</span>
+          <fieldset lang="en">
+            <legend data-i18n="tr.en">Bahasa Inggeris (BI)</legend>
+            <div class="field"><label for="fNameEn" data-i18n="tr.name">Nama</label><input class="input" id="fNameEn" dir="ltr" lang="en" maxlength="120" autocomplete="off"></div>
+            <div class="field"><label for="fCatEn" data-i18n="tr.category">Kategori</label><input class="input" id="fCatEn" dir="ltr" lang="en" maxlength="60" autocomplete="off"></div>
+            <div class="field"><label for="fDescEn" data-i18n="tr.desc">Penerangan</label><textarea class="input" id="fDescEn" dir="ltr" lang="en" maxlength="1000"></textarea></div>
+          </fieldset>
+          <fieldset lang="ar">
+            <legend data-i18n="tr.ar">Bahasa Arab (BA)</legend>
+            <div class="field"><label for="fNameAr" data-i18n="tr.name">Nama</label><input class="input" id="fNameAr" dir="rtl" lang="ar" maxlength="120" autocomplete="off"></div>
+            <div class="field"><label for="fCatAr" data-i18n="tr.category">Kategori</label><input class="input" id="fCatAr" dir="rtl" lang="ar" maxlength="60" autocomplete="off"></div>
+            <div class="field"><label for="fDescAr" data-i18n="tr.desc">Penerangan</label><textarea class="input" id="fDescAr" dir="rtl" lang="ar" maxlength="1000"></textarea></div>
+          </fieldset>
+        </details>
+        <div class="row2">
+          <div class="field">
+            <label for="fUrl"><span data-i18n="dlg.url">URL Produk</span> <span class="opt" data-i18n="dlg.urlOpt">(pilihan, https://)</span></label>
+            <input class="input" dir="ltr" id="fUrl" type="url" inputmode="url" placeholder="https://" autocomplete="off" autocapitalize="none">
+            <span class="err" id="eUrl"></span>
+          </div>
+          <div class="field">
+            <label for="fOrder" data-i18n="dlg.order">Susunan Paparan</label>
+            <input class="input" dir="ltr" id="fOrder" type="number" inputmode="numeric" min="0" max="100000" step="1">
+            <span class="err" id="eOrder"></span>
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="label" data-i18n="dlg.thumb">Thumbnail Produk</span>
+          <div class="thumb-field">
+            <div class="thumb-preview"><img id="thumbImg" data-i18n-attr="alt:thumb.alt" alt="Pratonton thumbnail" width="640" height="400"><span class="tag" id="thumbTag">Imej ganti</span></div>
+            <div class="thumb-actions">
+              <button class="btn btn-ghost" type="button" id="thumbPick"><svg aria-hidden="true"><use href="#i-upload"/></svg><span id="thumbPickText">Muat Naik Imej</span></button>
+              <button class="btn btn-ghost" type="button" id="thumbRemove" hidden><svg aria-hidden="true"><use href="#i-trash"/></svg><span data-i18n="thumb.remove">Padam Imej</span></button>
+            </div>
+            <input type="file" id="thumbFile" accept="image/jpeg,image/png,image/webp" hidden>
+            <span class="hint" data-i18n="thumb.hint">JPG, PNG atau WebP. Imej dipotong ke nisbah 16:10, dimampatkan secara automatik (maksimum kira-kira 100 KB) dan disimpan terus dalam Firestore bersama produk. Firebase Storage tidak diperlukan.</span>
+            <span class="err" id="eThumb"></span>
+          </div>
+        </div>
+
+        <div class="readonly-dates" id="datesBox" hidden>
+          <span><span data-i18n="dlg.created">Tarikh Dicipta</span>: <b id="dCreated">—</b></span>
+          <span><span data-i18n="dlg.updatedAt">Tarikh Dikemas kini</span>: <b id="dUpdated">—</b></span>
+        </div>
+      </div>
+      <div class="dlg-foot">
+        <button class="btn btn-ghost" type="button" id="pdCancel" data-i18n="dlg.cancel">Batal</button>
+        <button class="btn btn-primary" type="submit" id="pdSave" data-i18n="dlg.save">Simpan Produk</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ====================== DELETE CONFIRMATION ====================== -->
+  <dialog class="dlg small" id="deleteDialog" aria-labelledby="delTitle">
+    <form method="dialog" id="deleteForm">
+      <div class="dlg-body">
+        <div class="del-ico"><svg aria-hidden="true"><use href="#i-trash"/></svg></div>
+        <h2 id="delTitle" data-i18n="del.title">Padam produk?</h2>
+        <p id="delBody"></p>
+        <div class="alert error" id="delError" role="alert" hidden style="margin-top:1rem;text-align:start"></div>
+      </div>
+      <div class="dlg-foot">
+        <button class="btn btn-ghost" type="button" id="delCancel" data-i18n="del.cancel">Batal</button>
+        <button class="btn btn-danger" type="button" id="delConfirm" data-i18n="del.confirm">Ya, Padam</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <script type="module">
+    /* =====================================================================
+       GENIUS DIGITAL — admin.html script
+       Bahagian 1: KONFIGURASI
+       ===================================================================== */
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",   // tidak digunakan (tiada Firebase Storage); boleh dibiarkan
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+    const FIREBASE_SDK_VERSION = "12.12.0";   // mesti sama dengan index.html
+
+    const statusLabel = (st) => ({ "active": t("status.active"), "coming-soon": t("status.soon"), "hidden": t("status.hidden") }[st] || st);
+    const SAMPLE_PRODUCTS = [   // digunakan oleh butang "Masukkan produk contoh" (hanya jika belum wujud)
+      { slug: "qr-me-generator", name: "QR Me Generator", category: "Digital Tools", status: "active", displayOrder: 1,
+        description: "Sistem penjana kod QR yang membolehkan pengguna menghasilkan QR Code dengan mudah, pantas dan praktikal untuk pelbagai kegunaan.",
+        categoryEn: "Digital Tools", descriptionEn: "A QR code generator that lets users create QR codes quickly, easily and practically for a wide range of uses.",
+        categoryAr: "أدوات رقمية", descriptionAr: "نظام لإنشاء رموز الاستجابة السريعة (QR) يتيح للمستخدمين إنشاءها بسهولة وسرعة لمختلف الاستخدامات العملية." },
+      { slug: "malaysia-pdf-tools", name: "Malaysia PDF Tools", category: "Productivity Tools", status: "coming-soon", displayOrder: 2,
+        description: "Platform pengurusan dokumen PDF yang menyediakan pelbagai fungsi untuk membantu pengguna mengurus, memproses dan menghasilkan dokumen secara lebih mudah dan efisien.",
+        categoryEn: "Productivity Tools", descriptionEn: "A PDF document management platform offering a range of functions to help users manage, process and produce documents more easily and efficiently.",
+        categoryAr: "أدوات الإنتاجية", descriptionAr: "منصة لإدارة مستندات PDF توفّر وظائف متعددة تساعد المستخدمين على إدارة المستندات ومعالجتها وإنشائها بسهولة وكفاءة أكبر." }
+    ];
+
+    const isFirebaseConfigured = ["apiKey", "authDomain", "projectId", "appId"].every(k => typeof firebaseConfig[k] === "string" && !firebaseConfig[k].startsWith("YOUR_"));
+    const DEMO = !isFirebaseConfigured && new URLSearchParams(location.search).get("demo") === "1";   // Demo hanya jika Firebase BELUM dikonfigurasi
+
+    /* =====================================================================
+       Bahagian 2: Utiliti
+       ===================================================================== */
+    const $ = (s, r = document) => r.querySelector(s);
+    const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+    const SVG_NS = "http://www.w3.org/2000/svg";
+    function el(tag, props = {}, children = []) {
+      const n = document.createElement(tag);
+      for (const [k, v] of Object.entries(props)) {
+        if (k === "class") n.className = v; else if (k === "text") n.textContent = v;
+        else if (k.startsWith("on")) n.addEventListener(k.slice(2), v); else if (v !== false && v != null) n.setAttribute(k, v === true ? "" : v);
+      }
+      for (const c of [].concat(children)) if (c != null) n.append(c);
+      return n;
+    }
+    function icon(id) { const s = document.createElementNS(SVG_NS, "svg"); s.setAttribute("aria-hidden", "true"); const u = document.createElementNS(SVG_NS, "use"); u.setAttribute("href", "#" + id); s.append(u); return s; }
+    const safeHttps = (u) => typeof u === "string" && /^https:\/\//i.test(u.trim()) ? u.trim() : "";
+    // Imej thumbnail: URL https:// ATAU data URL imej (JPEG/PNG/WebP) yang disimpan dalam Firestore.
+    const safeImage = (u) => typeof u === "string" && /^(https:\/\/|data:image\/(jpeg|png|webp);base64,)/i.test(u.trim()) ? u.trim() : "";
+    const fmtDate = (ms) => ms ? new Date(ms).toLocaleString(LANGS[lang].locale, { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—";
+    const fmtDay = (ms) => ms ? new Date(ms).toLocaleDateString(LANGS[lang].locale, { day: "2-digit", month: "short", year: "numeric" }) : "—";
+    const slugify = (s) => s.toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80);
+    const SLUG_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
+    function toast(message, kind = "") {
+      const node = el("div", { class: "toast " + kind, role: kind === "err" ? "alert" : "status", text: message });
+      $("#toasts").append(node);
+      setTimeout(() => node.remove(), kind === "err" ? 7000 : 3500);
+    }
+    function showAlert(node, message) { node.textContent = message; node.hidden = !message; }
+    function setBusy(btn, busy, label) {
+      if (busy) { btn.dataset.label = btn.innerHTML; btn.disabled = true; btn.replaceChildren(el("span", { class: "spin" }), label || t("ui.pleaseWait")); }
+      else { btn.disabled = false; if (btn.dataset.label) btn.innerHTML = btn.dataset.label; }
+    }
+    function friendlyError(err) {
+      const code = (err && (err.code || err.message)) || String(err);
+      const map = {
+        "permission-denied": "err.permission", "unavailable": "err.unavailable",
+        "auth/invalid-credential": "err.credential", "auth/wrong-password": "err.credential", "auth/user-not-found": "err.credential",
+        "auth/invalid-email": "err.invalidEmail", "auth/user-disabled": "err.disabled", "auth/too-many-requests": "err.tooMany",
+        "auth/network-request-failed": "err.network", "auth/operation-not-allowed": "err.notAllowed"
+      };
+      return map[code] ? t(map[code]) : t("err.generic", { msg: err && err.message ? err.message : code });
+    }
+
+    /* =====================================================================
+       Bahagian 2b: Enjin bahasa
+       - data-i18n="kunci"        → textContent
+       - data-i18n-html="kunci"   → innerHTML (kandungan daripada kamus sahaja, bukan data pengguna)
+       - data-i18n-attr="attr:kunci;attr2:kunci2" → atribut
+       ===================================================================== */
+    const DEFAULT_LANG = "ms", STORE_LANG = "gd-lang", STORE_THEME = "gd-theme";
+    const LANGS = { ms: { dir: "ltr", locale: "ms-MY" }, en: { dir: "ltr", locale: "en-GB" }, ar: { dir: "rtl", locale: "ar-u-nu-latn" } };
+    let lang = DEFAULT_LANG;
+    const readStore = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+    const writeStore = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* storan disekat: abaikan */ } };
+
+    /* =====================================================================
+       Kamus bahasa (i18n). Kunci yang sama wujud dalam ms, en dan ar.
+       ms = Bahasa Melayu (lalai), en = English (BI), ar = العربية (BA, RTL)
+       ===================================================================== */
+    const I18N = {
+      ms: {
+        "meta.title": "Panel Admin — GENIUS DIGITAL",
+        "brand.admin": "Panel Admin",
+        "ui.language": "Pilih bahasa", "ui.menuOpen": "Buka menu", "ui.adminNav": "Navigasi admin", "ui.close": "Tutup", "ui.pleaseWait": "Sila tunggu…",
+        "theme.toDark": "Tukar ke mod gelap", "theme.toLight": "Tukar ke mod cerah",
+        "login.title": "Log Masuk Admin",
+        "login.sub": "Gunakan akaun Firebase Authentication yang telah diberi akses admin.",
+        "login.setup": "<strong>Firebase belum dikonfigurasi.</strong> Gantikan <code>firebaseConfig</code> dalam admin.html (dan index.html) dengan konfigurasi projek anda. Rujuk README.md.",
+        "login.demoBtn": "Buka Mod Demo (tanpa Firebase)",
+        "login.email": "E-mel", "login.password": "Kata Laluan", "login.submit": "Log Masuk", "login.busy": "Sedang log masuk…",
+        "login.forgot": "Lupa kata laluan?", "login.back": "← Kembali ke website",
+        "login.missing": "Sila masukkan e-mel dan kata laluan.",
+        "login.sdkFail": "Gagal memuatkan Firebase SDK. Semak sambungan internet. ({msg})",
+        "reset.needEmail": "Masukkan e-mel anda dahulu, kemudian tekan “Lupa kata laluan?”.",
+        "reset.sent": "Jika e-mel itu berdaftar, pautan untuk menetapkan semula kata laluan telah dihantar.",
+        "den.title": "Akses Ditolak",
+        "den.lead": "Akaun {email} telah log masuk tetapi bukan akaun admin. Hanya akaun yang mempunyai custom claim admin: true boleh mengurus produk.",
+        "den.help": "Jika anda pemilik projek, tetapkan claim admin untuk UID ini menggunakan Firebase Admin SDK (rujuk README.md), kemudian log keluar dan log masuk semula:",
+        "den.signOut": "Log Keluar", "den.noEmail": "(tiada e-mel)",
+        "nav.menu": "Menu", "nav.dashboard": "Papan Pemuka", "nav.products": "Produk", "nav.viewSite": "Lihat Website", "nav.signOut": "Log Keluar", "nav.role": "Admin",
+        "pill.demo": "Demo",
+        "demo.banner": "<strong>MOD DEMO.</strong> Data hanya disimpan dalam memori pelayar ini dan hilang apabila halaman dimuat semula. Tiada apa-apa disimpan ke Firebase. Mod ini dimatikan secara automatik apabila Firebase dikonfigurasi.",
+        "dash.sub": "Ringkasan produk daripada Firestore (masa nyata).",
+        "dash.recent": "Kemas kini terkini", "dash.quick": "Tindakan pantas",
+        "dash.loading": "Memuatkan…", "dash.error": "Data tidak dapat dimuatkan.", "dash.none": "Belum ada produk.",
+        "stat.total": "Jumlah Produk", "stat.active": "Produk Aktif", "stat.soon": "Produk Akan Datang", "stat.hidden": "Produk Tersembunyi", "stat.categories": "Jumlah Kategori",
+        "act.add": "Tambah Produk", "act.manage": "Urus Produk",
+        "prod.sub": "Tambah, edit, susun dan padam produk yang dipaparkan di website.",
+        "search.label": "Cari produk", "search.placeholder": "Cari nama, slug atau kategori…",
+        "filter.categoryLabel": "Tapis mengikut kategori", "filter.allCategories": "Semua kategori", "filter.statusLabel": "Tapis mengikut status", "filter.allStatuses": "Semua status",
+        "status.active": "Aktif", "status.soon": "Akan Datang", "status.hidden": "Tersembunyi",
+        "th.order": "Susunan", "th.thumb": "Imej", "th.product": "Produk", "th.category": "Kategori", "th.status": "Status", "th.updated": "Dikemas kini",
+        "row.updated": "{category} · Dikemas kini {date}", "row.edit": "Edit", "row.editAria": "Edit {name}", "row.deleteAria": "Padam {name}", "row.deleteSr": "Padam",
+        "row.upAria": "Naikkan {name}", "row.downAria": "Turunkan {name}", "row.up": "Naik", "row.down": "Turun", "row.reorderBlocked": "Kosongkan carian dan penapis untuk menyusun semula",
+        "row.statusAria": "Status {name}", "row.orderTitle": "Susunan paparan", "row.thumbAlt": "Imej thumbnail {name}",
+        "empty.title": "Belum ada produk", "empty.text": "Tambah produk pertama anda, atau masukkan 2 produk contoh (QR Me Generator dan Malaysia PDF Tools).",
+        "empty.sample": "Masukkan produk contoh", "empty.seeding": "Sedang memasukkan…",
+        "seed.added": "{n} produk contoh dimasukkan.", "seed.exists": "Produk contoh sudah wujud.",
+        "nomatch.title": "Tiada padanan", "nomatch.text": "Tiada produk yang sepadan dengan carian atau penapis semasa.", "nomatch.reset": "Set semula penapis",
+        "loaderr.title": "Produk tidak dapat dimuatkan", "retry": "Cuba Lagi",
+        "dlg.addTitle": "Tambah Produk", "dlg.editTitle": "Edit Produk",
+        "dlg.name": "Nama Produk", "dlg.slug": "Slug Produk", "dlg.locked": "(dikunci)",
+        "dlg.slugHint": "Huruf kecil, nombor dan sempang sahaja. Slug ialah ID dokumen dan tidak boleh ditukar selepas produk dicipta.",
+        "dlg.category": "Kategori Produk", "dlg.status": "Status Produk", "dlg.desc": "Penerangan Produk",
+        "dlg.url": "URL Produk", "dlg.urlOpt": "(pilihan, https://)", "dlg.order": "Susunan Paparan", "dlg.thumb": "Thumbnail Produk",
+        "thumb.alt": "Pratonton thumbnail", "thumb.upload": "Muat Naik Imej", "thumb.replace": "Ganti Imej", "thumb.remove": "Padam Imej",
+        "thumb.tagPlaceholder": "Imej ganti", "thumb.tagNew": "Imej baharu", "thumb.tagCurrent": "Imej semasa",
+        "thumb.hint": "JPG, PNG atau WebP. Imej dipotong ke nisbah 16:10, dimampatkan secara automatik (maksimum kira-kira 100 KB) dan disimpan terus dalam Firestore bersama produk. Firebase Storage tidak diperlukan.",
+        "dlg.created": "Tarikh Dicipta", "dlg.updatedAt": "Tarikh Dikemas kini", "dlg.cancel": "Batal", "dlg.save": "Simpan Produk", "dlg.saving": "Sedang menyimpan…",
+        "tr.summary": "Terjemahan produk (pilihan)",
+        "tr.help": "Jika dikosongkan, website memaparkan teks Bahasa Melayu yang ditulis di atas.",
+        "tr.en": "Bahasa Inggeris (BI)", "tr.ar": "Bahasa Arab (BA)", "tr.name": "Nama", "tr.category": "Kategori", "tr.desc": "Penerangan",
+        "val.name": "Nama produk diperlukan.", "val.slug": "Slug diperlukan.",
+        "val.slugFormat": "Slug hanya boleh mengandungi huruf kecil, nombor dan sempang (contoh: qr-me-generator).",
+        "val.slugUsed": "Slug ini sudah digunakan.", "val.category": "Kategori diperlukan.",
+        "val.desc": "Penerangan maksimum 1000 aksara.", "val.url": "URL mesti bermula dengan https://",
+        "val.order": "Masukkan nombor bulat antara 0 dan 100000.",
+        "img.type": "Jenis fail tidak disokong. Gunakan JPG, PNG atau WebP.",
+        "img.size": "Fail terlalu besar (maksimum 12 MB sebelum dimampatkan).",
+        "img.read": "Imej tidak dapat dibaca. Fail mungkin rosak.",
+        "img.complex": "Imej terlalu kompleks untuk dimampatkan ke saiz kecil. Cuba imej lain.",
+        "toast.updated": "Produk dikemas kini.", "toast.added": "Produk ditambah.",
+        "toast.status": "Status “{name}” ditukar kepada {status}.", "toast.deleted": "“{name}” telah dipadam.",
+        "del.title": "Padam produk?", "del.body": "Anda akan memadam {name}. Imej thumbnail turut dipadam bersama produk. Tindakan ini tidak boleh dibatalkan.",
+        "del.cancel": "Batal", "del.confirm": "Ya, Padam", "del.busy": "Sedang memadam…",
+        "err.permission": "Akses ditolak oleh Security Rules. Pastikan akaun anda mempunyai claim admin (log keluar dan log masuk semula selepas menetapkannya) dan rules telah diterbitkan.",
+        "err.unavailable": "Firebase tidak dapat dicapai. Semak sambungan internet.",
+        "err.credential": "E-mel atau kata laluan tidak betul.", "err.invalidEmail": "Format e-mel tidak sah.", "err.disabled": "Akaun ini telah dinyahaktifkan.",
+        "err.tooMany": "Terlalu banyak percubaan. Sila tunggu seketika, kemudian cuba lagi.",
+        "err.network": "Tiada sambungan internet, atau Firebase tidak dapat dicapai.",
+        "err.notAllowed": "Kaedah log masuk E-mel/Kata Laluan belum diaktifkan dalam Firebase Authentication.",
+        "err.notFound": "Produk tidak dijumpai.", "err.generic": "Ralat: {msg}"
+      },
+
+      en: {
+        "meta.title": "Admin Panel — GENIUS DIGITAL",
+        "brand.admin": "Admin Panel",
+        "ui.language": "Choose language", "ui.menuOpen": "Open menu", "ui.adminNav": "Admin navigation", "ui.close": "Close", "ui.pleaseWait": "Please wait…",
+        "theme.toDark": "Switch to dark mode", "theme.toLight": "Switch to light mode",
+        "login.title": "Admin Sign In",
+        "login.sub": "Use a Firebase Authentication account that has been granted admin access.",
+        "login.setup": "<strong>Firebase isn't configured yet.</strong> Replace <code>firebaseConfig</code> in admin.html (and index.html) with your project's configuration. See README.md.",
+        "login.demoBtn": "Open Demo Mode (no Firebase)",
+        "login.email": "Email", "login.password": "Password", "login.submit": "Sign In", "login.busy": "Signing in…",
+        "login.forgot": "Forgot your password?", "login.back": "← Back to the website",
+        "login.missing": "Please enter your email and password.",
+        "login.sdkFail": "Couldn't load the Firebase SDK. Check your internet connection. ({msg})",
+        "reset.needEmail": "Enter your email first, then select “Forgot your password?”.",
+        "reset.sent": "If that email is registered, a link to reset your password has been sent.",
+        "den.title": "Access Denied",
+        "den.lead": "The account {email} is signed in but is not an admin account. Only accounts with the custom claim admin: true can manage products.",
+        "den.help": "If you own this project, set the admin claim for this UID using the Firebase Admin SDK (see README.md), then sign out and sign in again:",
+        "den.signOut": "Sign Out", "den.noEmail": "(no email)",
+        "nav.menu": "Menu", "nav.dashboard": "Dashboard", "nav.products": "Products", "nav.viewSite": "View Website", "nav.signOut": "Sign Out", "nav.role": "Admin",
+        "pill.demo": "Demo",
+        "demo.banner": "<strong>DEMO MODE.</strong> Data is kept in this browser's memory only and is lost when the page reloads. Nothing is saved to Firebase. This mode switches off automatically once Firebase is configured.",
+        "dash.sub": "A summary of your products from Firestore (real time).",
+        "dash.recent": "Recent updates", "dash.quick": "Quick actions",
+        "dash.loading": "Loading…", "dash.error": "The data couldn't be loaded.", "dash.none": "No products yet.",
+        "stat.total": "Total Products", "stat.active": "Active Products", "stat.soon": "Coming Soon Products", "stat.hidden": "Hidden Products", "stat.categories": "Total Categories",
+        "act.add": "Add Product", "act.manage": "Manage Products",
+        "prod.sub": "Add, edit, reorder and delete the products shown on the website.",
+        "search.label": "Search products", "search.placeholder": "Search by name, slug or category…",
+        "filter.categoryLabel": "Filter by category", "filter.allCategories": "All categories", "filter.statusLabel": "Filter by status", "filter.allStatuses": "All statuses",
+        "status.active": "Active", "status.soon": "Coming Soon", "status.hidden": "Hidden",
+        "th.order": "Order", "th.thumb": "Thumbnail", "th.product": "Product", "th.category": "Category", "th.status": "Status", "th.updated": "Updated",
+        "row.updated": "{category} · Updated {date}", "row.edit": "Edit", "row.editAria": "Edit {name}", "row.deleteAria": "Delete {name}", "row.deleteSr": "Delete",
+        "row.upAria": "Move {name} up", "row.downAria": "Move {name} down", "row.up": "Move up", "row.down": "Move down", "row.reorderBlocked": "Clear the search and filters to reorder",
+        "row.statusAria": "Status of {name}", "row.orderTitle": "Display order", "row.thumbAlt": "{name} thumbnail",
+        "empty.title": "No products yet", "empty.text": "Add your first product, or insert the two sample products (QR Me Generator and Malaysia PDF Tools).",
+        "empty.sample": "Insert sample products", "empty.seeding": "Inserting…",
+        "seed.added": "{n} sample products added.", "seed.exists": "The sample products already exist.",
+        "nomatch.title": "No matches", "nomatch.text": "No products match the current search or filters.", "nomatch.reset": "Reset filters",
+        "loaderr.title": "Couldn't load the products", "retry": "Try Again",
+        "dlg.addTitle": "Add Product", "dlg.editTitle": "Edit Product",
+        "dlg.name": "Product Name", "dlg.slug": "Product Slug", "dlg.locked": "(locked)",
+        "dlg.slugHint": "Lowercase letters, numbers and hyphens only. The slug is the document ID and can't be changed after the product is created.",
+        "dlg.category": "Product Category", "dlg.status": "Product Status", "dlg.desc": "Product Description",
+        "dlg.url": "Product URL", "dlg.urlOpt": "(optional, https://)", "dlg.order": "Display Order", "dlg.thumb": "Product Thumbnail",
+        "thumb.alt": "Thumbnail preview", "thumb.upload": "Upload Image", "thumb.replace": "Replace Image", "thumb.remove": "Delete Image",
+        "thumb.tagPlaceholder": "Placeholder", "thumb.tagNew": "New image", "thumb.tagCurrent": "Current image",
+        "thumb.hint": "JPG, PNG or WebP. The image is cropped to 16:10, compressed automatically (about 100 KB at most) and saved directly in Firestore with the product. Firebase Storage is not required.",
+        "dlg.created": "Created", "dlg.updatedAt": "Last updated", "dlg.cancel": "Cancel", "dlg.save": "Save Product", "dlg.saving": "Saving…",
+        "tr.summary": "Product translations (optional)",
+        "tr.help": "If left empty, the website shows the Malay text entered above.",
+        "tr.en": "English (BI)", "tr.ar": "Arabic (BA)", "tr.name": "Name", "tr.category": "Category", "tr.desc": "Description",
+        "val.name": "The product name is required.", "val.slug": "The slug is required.",
+        "val.slugFormat": "The slug may contain only lowercase letters, numbers and hyphens (for example: qr-me-generator).",
+        "val.slugUsed": "This slug is already in use.", "val.category": "The category is required.",
+        "val.desc": "The description can be at most 1,000 characters.", "val.url": "The URL must start with https://",
+        "val.order": "Enter a whole number between 0 and 100000.",
+        "img.type": "This file type isn't supported. Use JPG, PNG or WebP.",
+        "img.size": "The file is too large (12 MB maximum before compression).",
+        "img.read": "The image couldn't be read. The file may be corrupted.",
+        "img.complex": "This image is too complex to compress to a small size. Try a different image.",
+        "toast.updated": "Product updated.", "toast.added": "Product added.",
+        "toast.status": "“{name}” is now {status}.", "toast.deleted": "“{name}” was deleted.",
+        "del.title": "Delete this product?", "del.body": "You are about to delete {name}. Its thumbnail is deleted with it. This can't be undone.",
+        "del.cancel": "Cancel", "del.confirm": "Yes, Delete", "del.busy": "Deleting…",
+        "err.permission": "The security rules denied this action. Make sure your account has the admin claim (sign out and back in after setting it) and that the rules have been published.",
+        "err.unavailable": "Firebase can't be reached. Check your internet connection.",
+        "err.credential": "The email or password is incorrect.", "err.invalidEmail": "That email address isn't valid.", "err.disabled": "This account has been disabled.",
+        "err.tooMany": "Too many attempts. Please wait a moment and try again.",
+        "err.network": "There's no internet connection, or Firebase can't be reached.",
+        "err.notAllowed": "Email/Password sign-in isn't enabled in Firebase Authentication.",
+        "err.notFound": "The product wasn't found.", "err.generic": "Error: {msg}"
+      },
+
+      ar: {
+        "meta.title": "لوحة الإدارة — GENIUS DIGITAL",
+        "brand.admin": "لوحة الإدارة",
+        "ui.language": "اختيار اللغة", "ui.menuOpen": "فتح القائمة", "ui.adminNav": "قائمة التنقل للمشرف", "ui.close": "إغلاق", "ui.pleaseWait": "يرجى الانتظار…",
+        "theme.toDark": "التبديل إلى الوضع الداكن", "theme.toLight": "التبديل إلى الوضع الفاتح",
+        "login.title": "تسجيل دخول المشرف",
+        "login.sub": "استخدم حساب Firebase Authentication الذي مُنح صلاحية المشرف.",
+        "login.setup": "<strong>لم يتم إعداد Firebase بعد.</strong> استبدل <code>firebaseConfig</code> في الملفين <code>admin.html</code> و<code>index.html</code> بإعدادات مشروعك، وراجع <code>README.md</code> للتفاصيل.",
+        "login.demoBtn": "فتح الوضع التجريبي دون Firebase",
+        "login.email": "البريد الإلكتروني", "login.password": "كلمة المرور", "login.submit": "تسجيل الدخول", "login.busy": "جارٍ تسجيل الدخول…",
+        "login.forgot": "هل نسيت كلمة المرور؟", "login.back": "→ العودة إلى الموقع",
+        "login.missing": "يرجى إدخال البريد الإلكتروني وكلمة المرور.",
+        "login.sdkFail": "تعذّر تحميل Firebase SDK. تحقق من اتصال الإنترنت. ({msg})",
+        "reset.needEmail": "أدخل بريدك الإلكتروني أولاً، ثم اضغط «هل نسيت كلمة المرور؟».",
+        "reset.sent": "إذا كان هذا البريد مسجّلاً لدينا، فقد أُرسل إليه رابط لإعادة تعيين كلمة المرور.",
+        "den.title": "تم رفض الوصول",
+        "den.lead": "تم تسجيل الدخول بالحساب {email}، لكنه ليس حساب مشرف. لا يمكن إدارة المنتجات إلا للحسابات التي تحمل الصلاحية المخصصة admin: true.",
+        "den.help": "إذا كنت مالك المشروع، فعيّن صلاحية المشرف لهذا المعرّف UID باستخدام Firebase Admin SDK، وراجع ملف README.md للتفاصيل، ثم سجّل الخروج وأعد تسجيل الدخول:",
+        "den.signOut": "تسجيل الخروج", "den.noEmail": "(بلا بريد إلكتروني)",
+        "nav.menu": "القائمة", "nav.dashboard": "لوحة المعلومات", "nav.products": "المنتجات", "nav.viewSite": "عرض الموقع", "nav.signOut": "تسجيل الخروج", "nav.role": "مشرف",
+        "pill.demo": "تجريبي",
+        "demo.banner": "<strong>الوضع التجريبي.</strong> تُحفظ البيانات في ذاكرة هذا المتصفح فقط وتُفقد عند إعادة تحميل الصفحة. لا يُحفظ أي شيء في Firebase. يتوقف هذا الوضع تلقائياً بمجرد إعداد Firebase.",
+        "dash.sub": "ملخص المنتجات من Firestore (آنياً).",
+        "dash.recent": "آخر التحديثات", "dash.quick": "إجراءات سريعة",
+        "dash.loading": "جارٍ التحميل…", "dash.error": "تعذّر تحميل البيانات.", "dash.none": "لا توجد منتجات بعد.",
+        "stat.total": "إجمالي المنتجات", "stat.active": "المنتجات النشطة", "stat.soon": "المنتجات القادمة قريباً", "stat.hidden": "المنتجات المخفية", "stat.categories": "إجمالي الفئات",
+        "act.add": "إضافة منتج", "act.manage": "إدارة المنتجات",
+        "prod.sub": "أضف المنتجات المعروضة في الموقع وعدّلها ورتّبها واحذفها.",
+        "search.label": "البحث في المنتجات", "search.placeholder": "ابحث بالاسم أو المعرّف (slug) أو الفئة…",
+        "filter.categoryLabel": "التصفية حسب الفئة", "filter.allCategories": "كل الفئات", "filter.statusLabel": "التصفية حسب الحالة", "filter.allStatuses": "كل الحالات",
+        "status.active": "نشط", "status.soon": "قريباً", "status.hidden": "مخفي",
+        "th.order": "الترتيب", "th.thumb": "الصورة", "th.product": "المنتج", "th.category": "الفئة", "th.status": "الحالة", "th.updated": "آخر تحديث",
+        "row.updated": "{category} · آخر تحديث {date}", "row.edit": "تعديل", "row.editAria": "تعديل {name}", "row.deleteAria": "حذف {name}", "row.deleteSr": "حذف",
+        "row.upAria": "نقل {name} للأعلى", "row.downAria": "نقل {name} للأسفل", "row.up": "للأعلى", "row.down": "للأسفل", "row.reorderBlocked": "أزل البحث وعوامل التصفية لإعادة الترتيب",
+        "row.statusAria": "حالة {name}", "row.orderTitle": "ترتيب العرض", "row.thumbAlt": "صورة مصغّرة لـ {name}",
+        "empty.title": "لا توجد منتجات بعد", "empty.text": "أضف منتجك الأول، أو أدرج المنتجين التجريبيين (QR Me Generator وMalaysia PDF Tools).",
+        "empty.sample": "إدراج منتجات تجريبية", "empty.seeding": "جارٍ الإدراج…",
+        "seed.added": "أُدرجت {n} منتجات تجريبية.", "seed.exists": "المنتجات التجريبية موجودة بالفعل.",
+        "nomatch.title": "لا توجد نتائج مطابقة", "nomatch.text": "لا توجد منتجات تطابق البحث أو عوامل التصفية الحالية.", "nomatch.reset": "إعادة ضبط عوامل التصفية",
+        "loaderr.title": "تعذّر تحميل المنتجات", "retry": "إعادة المحاولة",
+        "dlg.addTitle": "إضافة منتج", "dlg.editTitle": "تعديل المنتج",
+        "dlg.name": "اسم المنتج", "dlg.slug": "المعرّف (Slug)", "dlg.locked": "(مقفل)",
+        "dlg.slugHint": "أحرف صغيرة وأرقام وشرطات فقط. المعرّف هو مُعرّف المستند ولا يمكن تغييره بعد إنشاء المنتج.",
+        "dlg.category": "فئة المنتج", "dlg.status": "حالة المنتج", "dlg.desc": "وصف المنتج",
+        "dlg.url": "رابط المنتج", "dlg.urlOpt": "(اختياري، https://)", "dlg.order": "ترتيب العرض", "dlg.thumb": "الصورة المصغّرة للمنتج",
+        "thumb.alt": "معاينة الصورة المصغّرة", "thumb.upload": "رفع صورة", "thumb.replace": "استبدال الصورة", "thumb.remove": "حذف الصورة",
+        "thumb.tagPlaceholder": "صورة بديلة", "thumb.tagNew": "صورة جديدة", "thumb.tagCurrent": "الصورة الحالية",
+        "thumb.hint": "JPG أو PNG أو WebP. تُقصّ الصورة بنسبة 16:10 وتُضغط تلقائياً (بحد أقصى نحو 100 كيلوبايت) وتُحفظ مباشرة في Firestore مع المنتج. لا حاجة إلى Firebase Storage.",
+        "dlg.created": "تاريخ الإنشاء", "dlg.updatedAt": "تاريخ آخر تحديث", "dlg.cancel": "إلغاء", "dlg.save": "حفظ المنتج", "dlg.saving": "جارٍ الحفظ…",
+        "tr.summary": "ترجمات المنتج (اختيارية)",
+        "tr.help": "إذا تُرك فارغاً، يعرض الموقع النص المكتوب أعلاه بالملايو.",
+        "tr.en": "الإنجليزية (BI)", "tr.ar": "العربية (BA)", "tr.name": "الاسم", "tr.category": "الفئة", "tr.desc": "الوصف",
+        "val.name": "اسم المنتج مطلوب.", "val.slug": "المعرّف (slug) مطلوب.",
+        "val.slugFormat": "يجب أن يتكوّن المعرّف من أحرف صغيرة وأرقام وشرطات فقط (مثال: qr-me-generator).",
+        "val.slugUsed": "هذا المعرّف مستخدم بالفعل.", "val.category": "الفئة مطلوبة.",
+        "val.desc": "الحد الأقصى للوصف 1000 حرف.", "val.url": "يجب أن يبدأ الرابط بـ https://",
+        "val.order": "أدخل عدداً صحيحاً بين 0 و100000.",
+        "img.type": "نوع الملف غير مدعوم. استخدم JPG أو PNG أو WebP.",
+        "img.size": "الملف كبير جداً (الحد الأقصى 12 ميغابايت قبل الضغط).",
+        "img.read": "تعذّرت قراءة الصورة. قد يكون الملف تالفاً.",
+        "img.complex": "الصورة معقّدة جداً بحيث يتعذّر ضغطها إلى حجم صغير. جرّب صورة أخرى.",
+        "toast.updated": "تم تحديث المنتج.", "toast.added": "تمت إضافة المنتج.",
+        "toast.status": "أصبحت حالة «{name}»: {status}.", "toast.deleted": "تم حذف «{name}».",
+        "del.title": "حذف المنتج؟", "del.body": "أنت على وشك حذف {name}. ستُحذف صورته المصغّرة معه، ولا يمكن التراجع عن هذا الإجراء.",
+        "del.cancel": "إلغاء", "del.confirm": "نعم، احذف", "del.busy": "جارٍ الحذف…",
+        "err.permission": "رفضت قواعد الأمان هذا الإجراء. تأكد من أن حسابك يحمل صلاحية المشرف (سجّل الخروج ثم الدخول بعد تعيينها) ومن نشر القواعد.",
+        "err.unavailable": "تعذّر الوصول إلى Firebase. تحقق من اتصال الإنترنت.",
+        "err.credential": "البريد الإلكتروني أو كلمة المرور غير صحيحة.", "err.invalidEmail": "صيغة البريد الإلكتروني غير صحيحة.", "err.disabled": "تم تعطيل هذا الحساب.",
+        "err.tooMany": "محاولات كثيرة جداً. يرجى الانتظار قليلاً ثم المحاولة مرة أخرى.",
+        "err.network": "لا يوجد اتصال بالإنترنت أو تعذّر الوصول إلى Firebase.",
+        "err.notAllowed": "تسجيل الدخول بالبريد الإلكتروني وكلمة المرور غير مفعّل في Firebase Authentication.",
+        "err.notFound": "لم يتم العثور على المنتج.", "err.generic": "خطأ: {msg}"
+      }
+    };
+
+    function t(key, params) {
+      let str = (I18N[lang] && I18N[lang][key]);
+      if (str === undefined) str = I18N[DEFAULT_LANG][key];
+      if (str === undefined) return key;
+      if (params) for (const [k, v] of Object.entries(params)) str = str.split("{" + k + "}").join(v);
+      return str;
+    }
+    function applyStatic(scope = document) {
+      $$("[data-i18n]", scope).forEach(n => { n.textContent = t(n.dataset.i18n); });
+      $$("[data-i18n-html]", scope).forEach(n => { n.innerHTML = t(n.dataset.i18nHtml); });
+      $$("[data-i18n-attr]", scope).forEach(n => n.dataset.i18nAttr.split(";").forEach(pair => { const [attr, key] = pair.split(":"); n.setAttribute(attr.trim(), t(key.trim())); }));
+    }
+    // Teks dengan nilai tebal di dalamnya (cth. e-mel / nama produk) dibina melalui DOM, bukan innerHTML.
+    function setRich(node, template, token, value) {
+      const parts = template.split("{" + token + "}");
+      node.replaceChildren();
+      parts.forEach((txt, i) => {
+        node.append(document.createTextNode(txt));
+        if (i < parts.length - 1) { const b = document.createElement("strong"); b.className = "iso"; b.dir = "auto"; b.textContent = value; node.append(b); }
+      });
+    }
+
+    /* =====================================================================
+       Bahagian 3: Thumbnail placeholder (SVG)
+       ===================================================================== */
+    function seededRandom(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
+    function hashString(str) { let h = 2166136261; for (const ch of str) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+    function thumbQR(seed) {
+      const rnd = seededRandom(seed), n = 21, cell = 9, ox = 224, oy = 62; let cells = "";
+      const inF = (x, y) => (x < 8 && y < 8) || (x > n - 9 && y < 8) || (x < 8 && y > n - 9);
+      for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (!inF(x, y) && rnd() > .5) cells += `<rect x="${ox + x * cell}" y="${oy + y * cell}" width="${cell - 1}" height="${cell - 1}" rx="1.5"/>`;
+      const f = (fx, fy) => `<rect x="${ox + fx * cell}" y="${oy + fy * cell}" width="${7 * cell - 1}" height="${7 * cell - 1}" rx="5" fill="none" stroke="#0A1F44" stroke-width="${cell - 1}"/><rect x="${ox + (fx + 2) * cell}" y="${oy + (fy + 2) * cell}" width="${3 * cell - 1}" height="${3 * cell - 1}" rx="3" fill="#0A66FF"/>`;
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400"><defs><linearGradient id="a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#061430"/><stop offset=".6" stop-color="#14346E"/><stop offset="1" stop-color="#0A66FF"/></linearGradient></defs><rect width="640" height="400" fill="url(#a)"/><circle cx="560" cy="60" r="150" fill="#00C8F5" opacity=".13"/><rect x="204" y="42" width="232" height="232" rx="22" fill="#fff"/><g fill="#0A1F44">${cells}${f(0, 0)}${f(n - 7, 0)}${f(0, n - 7)}</g><g font-family="Montserrat,Arial,sans-serif" font-weight="800" fill="#fff" text-anchor="middle"><text x="320" y="326" font-size="26" letter-spacing="6">QR CODE</text><rect x="232" y="344" width="176" height="26" rx="13" fill="#00C8F5"/><text x="320" y="362" font-size="13" fill="#061430" letter-spacing="3">GENERATOR</text></g></svg>`;
+    }
+    function thumbPDF() {
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400"><defs><linearGradient id="a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0A1F44"/><stop offset=".55" stop-color="#0A4FD8"/><stop offset="1" stop-color="#00A8E8"/></linearGradient></defs><rect width="640" height="400" fill="url(#a)"/><circle cx="70" cy="60" r="140" fill="#00C8F5" opacity=".18"/><g transform="rotate(-9 250 200)"><rect x="150" y="70" width="190" height="240" rx="18" fill="#fff" opacity=".35"/></g><g transform="rotate(7 400 200)"><rect x="310" y="60" width="190" height="240" rx="18" fill="#fff" opacity=".55"/></g><path d="M215 50h130l60 60v210a18 18 0 0 1-18 18H215a18 18 0 0 1-18-18V68a18 18 0 0 1 18-18z" fill="#fff"/><path d="M345 50l60 60h-42a18 18 0 0 1-18-18z" fill="#C9D8F5"/><rect x="225" y="130" width="86" height="40" rx="10" fill="#0A66FF"/><text x="268" y="159" font-family="Montserrat,Arial,sans-serif" font-weight="800" font-size="22" fill="#fff" text-anchor="middle" letter-spacing="2">PDF</text><rect x="225" y="200" width="120" height="8" rx="4" fill="#C9D8F5"/><rect x="225" y="222" width="90" height="8" rx="4" fill="#C9D8F5"/><rect x="225" y="244" width="110" height="8" rx="4" fill="#C9D8F5"/><circle cx="372" cy="294" r="26" fill="#00C8F5"/><path d="M372 281v18m-9-8 9 9 9-9" fill="none" stroke="#061430" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><text x="320" y="372" font-family="Montserrat,Arial,sans-serif" font-weight="800" font-size="20" fill="#fff" text-anchor="middle" letter-spacing="6" opacity=".92">DOCUMENT TOOLS</text></svg>`;
+    }
+    function thumbGeneric(seed) {
+      const rnd = seededRandom(seed);
+      const hexes = Array.from({ length: 14 }, () => { const x = 40 + rnd() * 560, y = 30 + rnd() * 340, r = 18 + rnd() * 38; return `<path d="M${x} ${y - r}l${r * .87} ${r * .5}v${r}l${-r * .87} ${r * .5}l${-r * .87} ${-r * .5}v${-r}z" fill="#fff" opacity="${(.05 + rnd() * .12).toFixed(2)}"/>`; }).join("");
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400"><defs><linearGradient id="a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#061430"/><stop offset=".6" stop-color="#14346E"/><stop offset="1" stop-color="#0A66FF"/></linearGradient><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0A66FF"/><stop offset="1" stop-color="#00C8F5"/></linearGradient></defs><rect width="640" height="400" fill="url(#a)"/>${hexes}<g transform="translate(320 200)"><path d="M0-96 83-48v96L0 96-83 48v-96z" fill="#0A1F44" stroke="url(#g)" stroke-width="8"/><path d="M30-26a42 42 0 1 0 6 34H0" fill="none" stroke="url(#g)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/></g></svg>`;
+    }
+    function placeholderThumbURL(p) {
+      const key = `${p.slug || ""} ${p.name || ""}`.toLowerCase(), seed = hashString(key);
+      const svg = /\bqr\b|qr-/.test(key) ? thumbQR(seed) : /pdf/.test(key) ? thumbPDF() : thumbGeneric(seed);
+      return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    }
+    function thumbImg(p, cls = "", alt = "") {
+      const img = el("img", { class: cls, alt, decoding: "async", width: "640", height: "400" });
+      img.loading = "lazy";
+      const fb = placeholderThumbURL(p);
+      img.addEventListener("error", () => { if (img.src !== fb) img.src = fb; }, { once: true });
+      img.src = safeImage(p.thumbnailURL) || fb;
+      return img;
+    }
+
+    /* =====================================================================
+       Bahagian 4: Lapisan data (backend)
+       Dua pelaksanaan dengan antaramuka yang sama:
+         - createFirebaseBackend()  → Firebase Auth + Firestore (sebenar)
+         - createDemoBackend()      → memori sahaja (hanya untuk pratonton UI)
+       ===================================================================== */
+    const toMillis = (v) => (v && typeof v.toMillis === "function") ? v.toMillis() : (typeof v === "number" ? v : null);
+    function normalizeDoc(id, data) {
+      return {
+        slug: id, name: data.name || "", category: data.category || "", description: data.description || "",
+        thumbnailURL: data.thumbnailURL || "", status: data.status || "hidden",
+        nameEn: data.nameEn || "", categoryEn: data.categoryEn || "", descriptionEn: data.descriptionEn || "",
+        nameAr: data.nameAr || "", categoryAr: data.categoryAr || "", descriptionAr: data.descriptionAr || "",
+        productURL: data.productURL || "", displayOrder: Number(data.displayOrder) || 0,
+        createdAt: toMillis(data.createdAt), updatedAt: toMillis(data.updatedAt)
+      };
+    }
+
+    async function createFirebaseBackend() {
+      const base = `https://www.gstatic.com/firebasejs/${FIREBASE_SDK_VERSION}/`;
+      const [A, Auth, FS] = await Promise.all([
+        import(base + "firebase-app.js"), import(base + "firebase-auth.js"), import(base + "firebase-firestore.js")
+      ]);
+      const app = A.getApps().length ? A.getApps()[0] : A.initializeApp(firebaseConfig);
+      const auth = Auth.getAuth(app), db = FS.getFirestore(app);
+      // Ujian setempat sahaja: http://localhost/admin.html?emulator=1 → guna Firebase Emulator Suite (bukan data sebenar).
+      if (["localhost", "127.0.0.1"].includes(location.hostname) && new URLSearchParams(location.search).get("emulator") === "1") {
+        Auth.connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
+        FS.connectFirestoreEmulator(db, "127.0.0.1", 8080);
+      }
+      const col = FS.collection(db, "products");
+      const docRef = (slug) => FS.doc(db, "products", slug);
+
+      return {
+        mode: "firebase",
+        onAuth: (cb) => Auth.onAuthStateChanged(auth, cb),
+        signIn: (email, pw) => Auth.signInWithEmailAndPassword(auth, email, pw),
+        signOut: () => Auth.signOut(auth),
+        resetPassword: (email) => Auth.sendPasswordResetEmail(auth, email),
+        // Semak custom claim "admin" daripada ID token yang dipaksa refresh.
+        async checkAdmin(user) { const t = await user.getIdTokenResult(true); return t.claims.admin === true; },
+
+        subscribe(onData, onError) {
+          return FS.onSnapshot(col,
+            (snap) => onData(snap.docs.map(d => normalizeDoc(d.id, d.data({ serverTimestamps: "estimate" })))),
+            onError);
+        },
+        async exists(slug) { return (await FS.getDoc(docRef(slug))).exists(); },
+        async create(p) {
+          await FS.setDoc(docRef(p.slug), {
+            name: p.name, slug: p.slug, category: p.category, description: p.description,
+            thumbnailURL: p.thumbnailURL || "",
+            nameEn: p.nameEn || "", categoryEn: p.categoryEn || "", descriptionEn: p.descriptionEn || "",
+            nameAr: p.nameAr || "", categoryAr: p.categoryAr || "", descriptionAr: p.descriptionAr || "",
+            status: p.status, productURL: p.productURL || "", displayOrder: p.displayOrder,
+            createdAt: FS.serverTimestamp(), updatedAt: FS.serverTimestamp()
+          });
+        },
+        async update(slug, patch) { await FS.updateDoc(docRef(slug), { ...patch, updatedAt: FS.serverTimestamp() }); },
+        async remove(slug) { await FS.deleteDoc(docRef(slug)); },
+        async reorder(changes) {   // changes: [{slug, displayOrder}]
+          const batch = FS.writeBatch(db);
+          for (const c of changes) batch.update(docRef(c.slug), { displayOrder: c.displayOrder, updatedAt: FS.serverTimestamp() });
+          await batch.commit();
+        }
+      };
+    }
+
+    function createDemoBackend() {
+      const now = Date.now();
+      let items = [
+        { ...SAMPLE_PRODUCTS[0], thumbnailURL: "", productURL: "", createdAt: now - 86400000 * 5, updatedAt: now - 86400000 * 2 },
+        { ...SAMPLE_PRODUCTS[1], thumbnailURL: "", productURL: "", createdAt: now - 86400000 * 4, updatedAt: now - 3600000 * 5 },
+        { slug: "sample-hidden-product", name: "Sample Hidden Product", category: "Digital Tools", description: "Contoh produk berstatus Hidden — tidak dipaparkan di website awam.", status: "hidden", displayOrder: 3, thumbnailURL: "", productURL: "", createdAt: now - 86400000, updatedAt: now - 86400000 }
+      ];
+      const listeners = new Set();
+      const emit = () => listeners.forEach(cb => cb(items.map(i => ({ ...i }))));
+      const touch = (i, patch) => Object.assign(i, patch, { updatedAt: Date.now() });
+      return {
+        mode: "demo",
+        onAuth: (cb) => { queueMicrotask(() => cb({ email: "demo@preview.local", uid: "demo-uid" })); return () => {}; },
+        signIn: async () => {}, signOut: async () => { location.href = "admin.html"; }, resetPassword: async () => {},
+        checkAdmin: async () => true,
+        subscribe(onData) { listeners.add(onData); queueMicrotask(emit); return () => listeners.delete(onData); },
+        async exists(slug) { return items.some(i => i.slug === slug); },
+        async create(p) { items.push({ ...p, createdAt: Date.now(), updatedAt: Date.now() }); emit(); },
+        async update(slug, patch) { const i = items.find(x => x.slug === slug); if (!i) throw new Error(t("err.notFound")); touch(i, patch); emit(); },
+        async remove(slug) { items = items.filter(i => i.slug !== slug); emit(); },
+        async reorder(changes) { for (const c of changes) { const i = items.find(x => x.slug === c.slug); if (i) touch(i, { displayOrder: c.displayOrder }); } emit(); }
+      };
+    }
+
+    /* =====================================================================
+       Bahagian 5: Pemprosesan imej — crop 16:10, mampat JPEG, jadikan data URL
+       Imej disimpan terus dalam dokumen Firestore (medan thumbnailURL), jadi
+       ia mesti kecil. Had dokumen Firestore ialah 1 MiB; sasaran kami ≈ 100 KB.
+       ===================================================================== */
+    const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+    const MAX_INPUT_BYTES = 12 * 1024 * 1024;
+    const MAX_THUMB_CHARS = 135000;                        // ≈ 100 KB (mesti ≤ had dalam firestore.rules: 150000)
+    const THUMB_SIZES = [[640, 400], [480, 300], [320, 200]];
+    const THUMB_QUALITIES = [0.82, 0.72, 0.62, 0.52, 0.42];
+    async function processImage(file) {
+      if (!ALLOWED_TYPES.includes(file.type)) throw new Error(t("img.type"));
+      if (file.size > MAX_INPUT_BYTES) throw new Error(t("img.size"));
+      const url = URL.createObjectURL(file);
+      try {
+        const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error(t("img.read"))); i.src = url; });
+        for (const [W, H] of THUMB_SIZES) {
+          const canvas = document.createElement("canvas"); canvas.width = W; canvas.height = H;
+          const ctx = canvas.getContext("2d");
+          ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, W, H);
+          const scale = Math.max(W / img.naturalWidth, H / img.naturalHeight);   // "cover"
+          const dw = img.naturalWidth * scale, dh = img.naturalHeight * scale;
+          ctx.imageSmoothingQuality = "high";
+          ctx.drawImage(img, (W - dw) / 2, (H - dh) / 2, dw, dh);
+          for (const q of THUMB_QUALITIES) {
+            const dataURL = canvas.toDataURL("image/jpeg", q);
+            if (dataURL.startsWith("data:image/jpeg;base64,") && dataURL.length <= MAX_THUMB_CHARS) return dataURL;
+          }
+        }
+        throw new Error(t("img.complex"));
+      } finally { URL.revokeObjectURL(url); }
+    }
+
+    /* =====================================================================
+       Bahagian 6: Keadaan aplikasi
+       ===================================================================== */
+    let backend = null, unsubscribe = null;
+    let products = [];                 // semua produk (admin nampak semua status)
+    let dataState = "loading";         // loading | ready | error
+    let dataError = null;
+    const filters = { q: "", category: "", status: "" };
+    let currentView = "dashboard";
+
+    const views = { boot: $("#bootView"), login: $("#loginView"), denied: $("#deniedView"), app: $("#appView") };
+    function showOnly(name) { for (const [k, v] of Object.entries(views)) v.hidden = k !== name; document.body.classList.remove("no-scroll"); }
+
+    const sorted = () => [...products].sort((a, b) => a.displayOrder - b.displayOrder || a.name.localeCompare(b.name));
+    const categories = () => [...new Set(products.map(p => p.category).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+
+    /* =====================================================================
+       Bahagian 7: Navigasi & sidebar (drawer pada mobile)
+       ===================================================================== */
+    const sidebar = $("#sidebar"), scrim = $("#scrim"), menuBtn = $("#menuBtn");
+    function setDrawer(open) {
+      sidebar.classList.toggle("open", open); scrim.classList.toggle("show", open);
+      menuBtn.setAttribute("aria-expanded", String(open));
+    }
+    menuBtn.addEventListener("click", () => setDrawer(!sidebar.classList.contains("open")));
+    scrim.addEventListener("click", () => setDrawer(false));
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") setDrawer(false); });
+
+    const updateTopTitle = () => { $("#topTitle").textContent = t(currentView === "products" ? "nav.products" : "nav.dashboard"); };
+    function navigate(view) {
+      currentView = view === "products" ? "products" : "dashboard";
+      $("#view-dashboard").hidden = currentView !== "dashboard";
+      $("#view-products").hidden = currentView !== "products";
+      updateTopTitle();
+      $$(".side-link[data-nav]").forEach(b => b.classList.toggle("active", b.dataset.nav === currentView));
+      if (location.hash !== "#" + currentView) history.replaceState(null, "", location.pathname + location.search + "#" + currentView);
+      setDrawer(false); window.scrollTo(0, 0);
+      renderAll();
+    }
+    document.addEventListener("click", (e) => {
+      const nav = e.target.closest("[data-nav]"); if (nav) { navigate(nav.dataset.nav); return; }
+      if (e.target.closest("[data-action='add']")) openProductDialog(null);
+    });
+    window.addEventListener("hashchange", () => { if (!views.app.hidden) navigate(location.hash.slice(1)); });
+
+    /* =====================================================================
+       Bahagian 8: Render — Dashboard & senarai produk
+       ===================================================================== */
+    function renderAll() { renderStats(); renderRecent(); renderCategoryFilter(); renderProducts(); }
+
+    function renderStats() {
+      const total = products.length, active = products.filter(p => p.status === "active").length,
+            soon = products.filter(p => p.status === "coming-soon").length, hidden = products.filter(p => p.status === "hidden").length;
+      const cards = [
+        ["total", t("stat.total"), total], ["s-active", t("stat.active"), active], ["s-soon", t("stat.soon"), soon],
+        ["s-hidden", t("stat.hidden"), hidden], ["s-cat", t("stat.categories"), categories().length]
+      ];
+      const ph = dataState === "loading" ? "…" : null;
+      $("#stats").replaceChildren(...cards.map(([cls, label, n]) => el("div", { class: "stat " + cls }, [el("small", { text: label }), el("strong", { text: ph ?? String(n) })])));
+    }
+
+    function renderRecent() {
+      const ul = $("#recentList");
+      if (dataState === "loading") { ul.replaceChildren(el("li", { text: t("dash.loading") })); return; }
+      if (dataState === "error") { ul.replaceChildren(el("li", { text: t("dash.error") })); return; }
+      const recent = [...products].sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0)).slice(0, 5);
+      if (!recent.length) { ul.replaceChildren(el("li", { text: t("dash.none") })); return; }
+      ul.replaceChildren(...recent.map(p => el("li", {}, [
+        thumbImg(p),
+        el("div", { class: "meta" }, [el("b", { text: p.name }), el("small", { text: `${statusLabel(p.status)} · ${fmtDate(p.updatedAt)}` })])
+      ])));
+    }
+
+    function renderCategoryFilter() {
+      const sel = $("#categoryFilter"), cur = filters.category, cats = categories();
+      sel.replaceChildren(el("option", { value: "", text: t("filter.allCategories") }), ...cats.map(c => el("option", { value: c, text: c })));
+      if (cats.includes(cur)) sel.value = cur; else { filters.category = ""; sel.value = ""; }
+      $("#categoryList").replaceChildren(...cats.map(c => el("option", { value: c })));
+    }
+
+    function filteredProducts() {
+      const q = filters.q.trim().toLowerCase();
+      return sorted().filter(p =>
+        (!filters.category || p.category === filters.category) &&
+        (!filters.status || p.status === filters.status) &&
+        (!q || [p.name, p.slug, p.category, p.description].some(v => (v || "").toLowerCase().includes(q))));
+    }
+
+    function stateBox(kind, title, message, buttons = []) {
+      return el("div", { class: "state-box " + kind, role: kind === "error" ? "alert" : "status" }, [el("h3", { text: title }), el("p", { text: message }), ...buttons]);
+    }
+
+    async function seedSamples(btn) {
+      setBusy(btn, true, t("empty.seeding"));
+      try {
+        let added = 0;
+        for (const s of SAMPLE_PRODUCTS) {
+          if (await backend.exists(s.slug)) continue;     // tiada duplikasi
+          await backend.create({ ...s, thumbnailURL: "", productURL: "" }); added++;
+        }
+        toast(added ? t("seed.added", { n: added }) : t("seed.exists"), "ok");
+      } catch (err) { toast(friendlyError(err), "err"); }
+      finally { setBusy(btn, false); }
+    }
+
+    function renderProducts() {
+      const area = $("#productsArea");
+      if (dataState === "loading") { area.replaceChildren(el("div", { class: "sk-row" }), el("div", { class: "sk-row" }), el("div", { class: "sk-row" })); return; }
+      if (dataState === "error") {
+        area.replaceChildren(stateBox("error", t("loaderr.title"), friendlyError(dataError), [el("button", { class: "btn btn-primary", type: "button", text: t("retry"), onclick: startData })]));
+        return;
+      }
+      if (!products.length) {
+        area.replaceChildren(stateBox("empty", t("empty.title"), t("empty.text"), [
+          el("button", { class: "btn btn-primary", type: "button", onclick: () => openProductDialog(null) }, [icon("i-plus"), t("act.add")]),
+          el("button", { class: "btn btn-ghost", type: "button", text: t("empty.sample"), onclick: (e) => seedSamples(e.currentTarget) })
+        ]));
+        return;
+      }
+      const rows = filteredProducts();
+      if (!rows.length) { area.replaceChildren(stateBox("empty", t("nomatch.title"), t("nomatch.text"), [el("button", { class: "btn btn-ghost", type: "button", text: t("nomatch.reset"), onclick: resetFilters })])); return; }
+
+      const full = sorted(), canReorder = !filters.q && !filters.category && !filters.status;
+      const tbody = el("tbody", {}, rows.map(p => {
+        const idx = full.findIndex(x => x.slug === p.slug);
+        const sel = el("select", { class: "status-select " + (p.status === "hidden" ? "hidden-s" : p.status), "aria-label": t("row.statusAria", { name: p.name }) },
+          ["active", "coming-soon", "hidden"].map((v) => el("option", { value: v, text: statusLabel(v), selected: v === p.status })));
+        sel.addEventListener("change", () => changeStatus(p, sel));
+        const up = el("button", { class: "icon-btn", type: "button", "aria-label": t("row.upAria", { name: p.name }), title: canReorder ? t("row.up") : t("row.reorderBlocked"), disabled: !canReorder || idx === 0, onclick: () => moveProduct(p.slug, -1) }, icon("i-up"));
+        const down = el("button", { class: "icon-btn", type: "button", "aria-label": t("row.downAria", { name: p.name }), title: canReorder ? t("row.down") : t("row.reorderBlocked"), disabled: !canReorder || idx === full.length - 1, onclick: () => moveProduct(p.slug, 1) }, icon("i-down"));
+        return el("tr", { class: "prow", "data-slug": p.slug }, [
+          el("td", { class: "c-order" }, el("div", { class: "order-ctl" }, [up, el("span", { class: "num", text: String(p.displayOrder), title: t("row.orderTitle") }), down])),
+          el("td", { class: "c-thumb" }, thumbImg(p, "pthumb", t("row.thumbAlt", { name: p.name }))),
+          el("td", { class: "c-name" }, [el("span", { class: "pname", text: p.name }), el("span", { class: "pslug", text: p.slug }), el("span", { class: "pmeta", text: t("row.updated", { category: p.category, date: fmtDay(p.updatedAt) }) })]),
+          el("td", { class: "c-cat" }, el("span", { class: "pcat", text: p.category })),
+          el("td", { class: "c-status" }, sel),
+          el("td", { class: "c-date", text: fmtDay(p.updatedAt) }),
+          el("td", { class: "c-actions" }, el("div", { class: "inner" }, [
+            el("button", { class: "btn btn-ghost", type: "button", "aria-label": t("row.editAria", { name: p.name }), onclick: () => openProductDialog(p) }, [icon("i-edit"), t("row.edit")]),
+            el("button", { class: "btn btn-ghost icon-btn danger", type: "button", style: "width:auto;padding:0 1rem", "aria-label": t("row.deleteAria", { name: p.name }), onclick: () => openDeleteDialog(p) }, [icon("i-trash"), el("span", { class: "sr-only", text: t("row.deleteSr") })])
+          ]))
+        ]);
+      }));
+      const thead = el("thead", {}, el("tr", {}, ["th.order", "th.thumb", "th.product", "th.category", "th.status", "th.updated", ""].map(k => el("th", { scope: "col", text: k ? t(k) : "" }))));
+      area.replaceChildren(el("div", { class: "table-card" }, el("table", { class: "ptable" }, [thead, tbody])));
+    }
+
+    function resetFilters() {
+      filters.q = ""; filters.category = ""; filters.status = "";
+      $("#searchInput").value = ""; $("#categoryFilter").value = ""; $("#statusFilter").value = "";
+      renderProducts();
+    }
+    let searchTimer;
+    $("#searchInput").addEventListener("input", (e) => { clearTimeout(searchTimer); searchTimer = setTimeout(() => { filters.q = e.target.value; renderProducts(); }, 120); });
+    $("#categoryFilter").addEventListener("change", (e) => { filters.category = e.target.value; renderProducts(); });
+    $("#statusFilter").addEventListener("change", (e) => { filters.status = e.target.value; renderProducts(); });
+
+    /* ---------- Tukar status & susunan ---------- */
+    async function changeStatus(p, sel) {
+      const next = sel.value; sel.disabled = true;
+      try { await backend.update(p.slug, { status: next }); toast(t("toast.status", { name: p.name, status: statusLabel(next) }), "ok"); }
+      catch (err) { sel.value = p.status; toast(friendlyError(err), "err"); }
+      finally { sel.disabled = false; }
+    }
+    async function moveProduct(slug, dir) {
+      const list = sorted(), i = list.findIndex(p => p.slug === slug), j = i + dir;
+      if (i < 0 || j < 0 || j >= list.length) return;
+      [list[i], list[j]] = [list[j], list[i]];
+      const changes = list.map((p, k) => ({ slug: p.slug, displayOrder: k + 1 })).filter((c, k) => list[k].displayOrder !== c.displayOrder);
+      try { await backend.reorder(changes); }
+      catch (err) { toast(friendlyError(err), "err"); }
+    }
+
+    /* =====================================================================
+       Bahagian 9: Dialog Tambah / Edit produk
+       ===================================================================== */
+    const pd = $("#productDialog"), form = $("#productForm");
+    const F = { name: $("#fName"), slug: $("#fSlug"), category: $("#fCategory"), status: $("#fStatus"), desc: $("#fDesc"), url: $("#fUrl"), order: $("#fOrder"),
+                nameEn: $("#fNameEn"), catEn: $("#fCatEn"), descEn: $("#fDescEn"), nameAr: $("#fNameAr"), catAr: $("#fCatAr"), descAr: $("#fDescAr") };
+    let editing = null;               // produk yang sedang diedit (null = baharu)
+    let slugTouched = false, saving = false;
+    let thumb = { dataURL: "", existingURL: "", removed: false };
+
+    function clearErrors() { $$(".err", form).forEach(n => n.textContent = ""); $$(".input.invalid", form).forEach(n => n.classList.remove("invalid")); showAlert($("#pdError"), ""); }
+    function fieldError(input, errId, msg) { $(errId).textContent = msg; input.classList.add("invalid"); }
+
+    function refreshThumbUI() {
+      const img = $("#thumbImg"), pseudo = { slug: F.slug.value || "new", name: F.name.value || "new", thumbnailURL: "" };
+      let src = "", tag = t("thumb.tagPlaceholder");
+      if (thumb.dataURL) { src = thumb.dataURL; tag = t("thumb.tagNew"); }
+      else if (!thumb.removed && safeImage(thumb.existingURL)) { src = thumb.existingURL; tag = t("thumb.tagCurrent"); }
+      img.onerror = () => { img.onerror = null; img.src = placeholderThumbURL(pseudo); };
+      img.src = src || placeholderThumbURL(pseudo);
+      $("#thumbTag").textContent = tag;
+      const hasImage = !!thumb.dataURL || (!thumb.removed && !!thumb.existingURL);
+      $("#thumbPickText").textContent = t(hasImage ? "thumb.replace" : "thumb.upload");
+      $("#thumbRemove").hidden = !hasImage;
+    }
+
+    function updateDialogTexts() {
+      $("#pdTitle").textContent = t(editing ? "dlg.editTitle" : "dlg.addTitle");
+      $("#slugNote").textContent = editing ? t("dlg.locked") : "";
+    }
+    function openProductDialog(p) {
+      editing = p; slugTouched = !!p; saving = false; clearErrors();
+      thumb = { dataURL: "", existingURL: p ? p.thumbnailURL : "", removed: false };
+      updateDialogTexts();
+      F.name.value = p ? p.name : ""; F.slug.value = p ? p.slug : ""; F.slug.readOnly = !!p;
+      F.category.value = p ? p.category : ""; F.status.value = p ? p.status : "active"; F.desc.value = p ? p.description : "";
+      F.url.value = p ? p.productURL : "";
+      F.order.value = p ? p.displayOrder : (products.reduce((m, x) => Math.max(m, x.displayOrder), 0) + 1);
+      F.nameEn.value = p ? p.nameEn : ""; F.catEn.value = p ? p.categoryEn : ""; F.descEn.value = p ? p.descriptionEn : "";
+      F.nameAr.value = p ? p.nameAr : ""; F.catAr.value = p ? p.categoryAr : ""; F.descAr.value = p ? p.descriptionAr : "";
+      $("#transBox").open = !!p && [p.nameEn, p.categoryEn, p.descriptionEn, p.nameAr, p.categoryAr, p.descriptionAr].some(Boolean);
+      $("#descCount").textContent = `${F.desc.value.length}/1000`;
+      $("#datesBox").hidden = !p; if (p) { $("#dCreated").textContent = fmtDate(p.createdAt); $("#dUpdated").textContent = fmtDate(p.updatedAt); }
+      $("#thumbFile").value = "";
+      refreshThumbUI();
+      pd.showModal(); document.body.classList.add("no-scroll");
+      form.querySelector(".dlg-body").scrollTop = 0; F.name.focus({ preventScroll: true });
+    }
+    function closeProductDialog() { if (saving) return; if (pd.open) pd.close(); }
+    pd.addEventListener("close", () => document.body.classList.remove("no-scroll"));
+    pd.addEventListener("cancel", (e) => { if (saving) e.preventDefault(); });
+    $("#pdClose").addEventListener("click", closeProductDialog); $("#pdCancel").addEventListener("click", closeProductDialog);
+
+    F.name.addEventListener("input", () => { if (!slugTouched) { F.slug.value = slugify(F.name.value); } refreshThumbUI(); });
+    F.slug.addEventListener("input", () => { slugTouched = true; F.slug.value = F.slug.value.toLowerCase().replace(/[^a-z0-9-]/g, ""); });
+    F.desc.addEventListener("input", () => { $("#descCount").textContent = `${F.desc.value.length}/1000`; });
+
+    $("#thumbPick").addEventListener("click", () => $("#thumbFile").click());
+    $("#thumbFile").addEventListener("change", async (e) => {
+      const file = e.target.files[0]; if (!file) return;
+      $("#eThumb").textContent = "";
+      try {
+        thumb.dataURL = await processImage(file); thumb.removed = false;
+        refreshThumbUI();
+      } catch (err) { $("#eThumb").textContent = err.message; }
+      e.target.value = "";
+    });
+    $("#thumbRemove").addEventListener("click", () => { thumb.dataURL = ""; thumb.removed = true; refreshThumbUI(); });
+
+    function validateForm() {
+      clearErrors(); let ok = true;
+      const name = F.name.value.trim(), slug = F.slug.value.trim(), cat = F.category.value.trim(), desc = F.desc.value.trim(), url = F.url.value.trim();
+      const order = F.order.value === "" ? NaN : Number(F.order.value);
+      if (!name) { fieldError(F.name, "#eName", t("val.name")); ok = false; }
+      if (!slug) { fieldError(F.slug, "#eSlug", t("val.slug")); ok = false; }
+      else if (!SLUG_RE.test(slug)) { fieldError(F.slug, "#eSlug", t("val.slugFormat")); ok = false; }
+      else if (!editing && products.some(p => p.slug === slug)) { fieldError(F.slug, "#eSlug", t("val.slugUsed")); ok = false; }
+      if (!cat) { fieldError(F.category, "#eCategory", t("val.category")); ok = false; }
+      if (desc.length > 1000) { fieldError(F.desc, "#eDesc", t("val.desc")); ok = false; }
+      if (url && !/^https:\/\/[^\s]+$/i.test(url)) { fieldError(F.url, "#eUrl", t("val.url")); ok = false; }
+      if (!Number.isInteger(order) || order < 0 || order > 100000) { fieldError(F.order, "#eOrder", t("val.order")); ok = false; }
+      if (!ok) { const first = form.querySelector(".invalid"); if (first) first.focus(); }
+      const tr = (i) => i.value.trim();
+      return ok ? { name, slug, category: cat, description: desc, status: F.status.value, productURL: url, displayOrder: order,
+        nameEn: tr(F.nameEn), categoryEn: tr(F.catEn), descriptionEn: tr(F.descEn), nameAr: tr(F.nameAr), categoryAr: tr(F.catAr), descriptionAr: tr(F.descAr) } : null;
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault(); if (saving) return;
+      const data = validateForm(); if (!data) return;
+      saving = true; const btn = $("#pdSave"); setBusy(btn, true, t("dlg.saving"));
+      [$("#pdClose"), $("#pdCancel"), $("#thumbPick"), $("#thumbRemove")].forEach(b => b.disabled = true);
+      try {
+        if (!editing && await backend.exists(data.slug)) throw Object.assign(new Error(t("val.slugUsed")), { code: "slug-exists" });
+
+        // Imej disimpan terus dalam Firestore (medan thumbnailURL): imej baharu / kekal / dikosongkan.
+        const thumbnailURL = thumb.dataURL || (thumb.removed ? "" : thumb.existingURL);
+        if (editing) { const { slug, ...patch } = data; await backend.update(editing.slug, { ...patch, thumbnailURL }); }
+        else await backend.create({ ...data, thumbnailURL });
+        toast(t(editing ? "toast.updated" : "toast.added"), "ok");
+        saving = false; pd.close();
+      } catch (err) {
+        console.error(err);
+        if (err.code === "slug-exists") fieldError(F.slug, "#eSlug", err.message); else showAlert($("#pdError"), friendlyError(err));
+        form.querySelector(".dlg-body").scrollTop = 0;
+      } finally {
+        saving = false; setBusy(btn, false);
+        [$("#pdClose"), $("#pdCancel"), $("#thumbPick"), $("#thumbRemove")].forEach(b => b.disabled = false);
+      }
+    });
+
+    /* =====================================================================
+       Bahagian 10: Padam produk (dengan pengesahan)
+       ===================================================================== */
+    const dd = $("#deleteDialog"); let deleting = null, delBusy = false;
+    function openDeleteDialog(p) { deleting = p; delBusy = false; setRich($("#delBody"), t("del.body"), "name", p.name); showAlert($("#delError"), ""); dd.showModal(); document.body.classList.add("no-scroll"); $("#delCancel").focus(); }
+    dd.addEventListener("close", () => { document.body.classList.remove("no-scroll"); deleting = null; });
+    dd.addEventListener("cancel", (e) => { if (delBusy) e.preventDefault(); });
+    $("#delCancel").addEventListener("click", () => { if (!delBusy) dd.close(); });
+    $("#delConfirm").addEventListener("click", async (e) => {
+      if (!deleting || delBusy) return;
+      const btn = e.currentTarget, p = deleting; delBusy = true; setBusy(btn, true, t("del.busy")); $("#delCancel").disabled = true;
+      try {
+        await backend.remove(p.slug);                                   // dokumen (termasuk imej di dalamnya) dipadam
+        delBusy = false; dd.close(); toast(t("toast.deleted", { name: p.name }), "ok");
+      } catch (err) { showAlert($("#delError"), friendlyError(err)); }
+      finally { delBusy = false; setBusy(btn, false); $("#delCancel").disabled = false; }
+    });
+    for (const d of [pd, dd]) d.addEventListener("click", (e) => { if (e.target === d && !saving && !delBusy) d.close(); });   // klik backdrop
+
+    /* =====================================================================
+       Bahagian 11: Langganan data masa nyata
+       ===================================================================== */
+    function startData() {
+      if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+      dataState = "loading"; dataError = null; renderAll();
+      try {
+        unsubscribe = backend.subscribe(
+          (list) => { products = list; dataState = "ready"; renderAll(); },
+          (err) => { console.error(err); dataState = "error"; dataError = err; renderAll(); });
+      } catch (err) { dataState = "error"; dataError = err; renderAll(); }
+    }
+
+    /* =====================================================================
+       Bahagian 12: Pengesahan (login / logout / semakan admin)
+       ===================================================================== */
+    let deniedUser = null;
+    function refreshRich() {
+      if (deniedUser) setRich($("#deniedLead"), t("den.lead"), "email", deniedUser.email || t("den.noEmail"));
+      if (deleting) setRich($("#delBody"), t("del.body"), "name", deleting.name);
+    }
+    async function handleAuthState(user) {
+      if (!user) {
+        if (unsubscribe) { unsubscribe(); unsubscribe = null; } products = [];
+        showOnly("login"); return;
+      }
+      showOnly("boot");
+      try {
+        if (!(await backend.checkAdmin(user))) {
+          deniedUser = user; refreshRich(); $("#deniedUid").textContent = "UID: " + user.uid;
+          showOnly("denied"); return;
+        }
+      } catch (err) { showOnly("login"); showAlert($("#loginError"), friendlyError(err)); return; }
+      $("#userEmail").textContent = user.email || "";
+      $("#demoBanner").hidden = $("#modePill").hidden = backend.mode !== "demo";
+      showOnly("app"); navigate(location.hash.slice(1)); startData();
+    }
+
+    $("#loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault(); showAlert($("#loginError"), ""); showAlert($("#loginOk"), "");
+      const email = $("#loginEmail").value.trim(), pw = $("#loginPassword").value;
+      if (!email || !pw) { showAlert($("#loginError"), t("login.missing")); return; }
+      const btn = $("#loginBtn"); setBusy(btn, true, t("login.busy"));
+      try { await backend.signIn(email, pw); $("#loginPassword").value = ""; }
+      catch (err) { showAlert($("#loginError"), friendlyError(err)); }
+      finally { setBusy(btn, false); }
+    });
+    $("#resetBtn").addEventListener("click", async () => {
+      showAlert($("#loginError"), ""); showAlert($("#loginOk"), "");
+      const email = $("#loginEmail").value.trim();
+      if (!email) { showAlert($("#loginError"), t("reset.needEmail")); $("#loginEmail").focus(); return; }
+      try { await backend.resetPassword(email); } catch (err) { if (err.code !== "auth/user-not-found") { showAlert($("#loginError"), friendlyError(err)); return; } }
+      showAlert($("#loginOk"), t("reset.sent"));   // mesej sama untuk elak enumerasi akaun
+    });
+    const doSignOut = async () => { try { await backend.signOut(); } catch (err) { toast(friendlyError(err), "err"); } };
+    $("#signOutBtn").addEventListener("click", doSignOut); $("#deniedSignOut").addEventListener("click", doSignOut);
+
+    /* =====================================================================
+       Bahagian 13: Bahasa (BM / BI / BA) dan tema (cerah / gelap)
+       Pilihan disimpan dalam localStorage (dikongsi dengan index.html). Lalai: BM dan mod cerah.
+       ===================================================================== */
+    const root = document.documentElement;
+    function updateThemeButtons() {
+      const dark = root.getAttribute("data-theme") === "dark", label = t(dark ? "theme.toLight" : "theme.toDark");
+      $$("[data-theme-toggle]").forEach(b => { b.setAttribute("aria-label", label); b.setAttribute("title", label); b.setAttribute("aria-pressed", String(dark)); });
+    }
+    function setTheme(next, persist = true) {
+      const dark = next === "dark";
+      root.setAttribute("data-theme", dark ? "dark" : "light");
+      const meta = $('meta[name="theme-color"]'); if (meta) meta.setAttribute("content", dark ? "#0A1326" : "#FFFFFF");
+      if (persist) writeStore(STORE_THEME, dark ? "dark" : "light");
+      updateThemeButtons();
+    }
+    function setLang(next, persist = true) {
+      if (!LANGS[next]) next = DEFAULT_LANG;
+      lang = next; root.lang = next; root.dir = LANGS[next].dir;
+      if (persist) writeStore(STORE_LANG, next);
+      applyStatic();
+      document.title = t("meta.title");
+      $$("[data-lang]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === next)));
+      updateThemeButtons(); updateTopTitle(); updateDialogTexts(); refreshRich();
+      if (pd.open) refreshThumbUI();
+      if (!views.app.hidden) renderAll();
+    }
+    document.addEventListener("click", (e) => {
+      const lb = e.target.closest("[data-lang]"); if (lb) { setLang(lb.dataset.lang); return; }
+      if (e.target.closest("[data-theme-toggle]")) setTheme(root.getAttribute("data-theme") === "dark" ? "light" : "dark");
+    });
+
+    /* ---------- Mula ---------- */
+    setTheme(readStore(STORE_THEME) === "dark" ? "dark" : "light", false);
+    setLang(readStore(STORE_LANG), false);
+    (async function init() {
+      if (!isFirebaseConfigured && !DEMO) { $("#setupNotice").hidden = false; $("#loginForm").hidden = true; $(".auth-foot #resetBtn").hidden = true; showOnly("login"); return; }
+      try {
+        backend = DEMO ? createDemoBackend() : await createFirebaseBackend();
+        backend.onAuth(handleAuthState);
+      } catch (err) {
+        console.error(err); showOnly("login");
+        showAlert($("#loginError"), t("login.sdkFail", { msg: err.message || err }));
+      }
+    })();
+  </script>
+</body>
+</html>
