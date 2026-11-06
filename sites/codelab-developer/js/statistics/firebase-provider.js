@@ -7,14 +7,16 @@
 import { dayKey, monthKey } from './kl-time.js';
 
 export class FirebaseProvider {
-  constructor(config) { this.config = config; this._ready = null; this._on = false; }
+  constructor(config, bundle = '../../assets/vendor/firebase-firestore.bundle.js') { this.config = config; this.bundle = bundle; this._ready = null; this._on = false; }
   get name() { return 'firebase'; }
   get connected() { return this._on; }
 
   init() {
     this._ready ||= (async () => {
-      const m = await import('../../assets/vendor/firebase-firestore.bundle.js');
-      this.m = m; this.db = m.getFirestore(m.initializeApp(this.config, 'codelab'));
+      const m = await import(/* @vite-ignore */ new URL(this.bundle, import.meta.url).href);
+      this.m = m;
+      this.app = m.getApps().find((a) => a.name === 'codelab') || m.initializeApp(this.config, 'codelab');
+      this.db = m.getFirestore(this.app);
       this._on = true;
     })();
     return this._ready;
@@ -34,6 +36,13 @@ export class FirebaseProvider {
       month: month.data()?.visits ?? 0,
       total: total.data()?.visits ?? 0,
     };
+  }
+
+  /** Senarai id alat yang dinyahaktifkan admin (dokumen awam codelab_config/tools). */
+  async getDisabledTools() {
+    await this.init();
+    const s = await this.m.getDoc(this.m.doc(this.db, 'codelab_config', 'tools'));
+    return (s.exists() && Array.isArray(s.data().disabled)) ? s.data().disabled : [];
   }
 
   /** +1 atomik pada tiga dokumen (Security Rules hanya benarkan kenaikan +1 pada medan visits). */

@@ -3,7 +3,6 @@ import { h, clear, setT } from '../utils/dom.js';
 import { icon } from '../utils/icons.js';
 import { TOOLS, CATEGORIES, toolById } from '../registry.js';
 import { adminData } from './data.js';
-import { auth } from './auth.js';
 import { barChart } from './charts.js';
 import { usage, store } from '../utils/storage.js';
 import { dayKey, monthKey, msUntilNextDay, msUntilNextMonth, fmtCountdown, nextMonthStart } from '../statistics/kl-time.js';
@@ -25,20 +24,25 @@ const resetInfo = () => {
 
 export async function dashboard() {
   const s = await adminData.summary().catch(() => ({}));
+  const acts = await adminData.listActivity(10).catch(() => []);
   const local = Object.entries(usage.all()).sort((a, b) => b[1] - a[1]).slice(0, 5);
   return h('div', { class: 'admin-grid' },
     h('div', { class: 'kpi-grid span-all' }, kpi('stats.users', 'users', s.registeredUsers), kpi('stats.today', 'activity', s.today), kpi('stats.month', 'calendar-clock', s.month), kpi('stats.total', 'chart-column', s.total)),
     card('adm.dash.popular', local.length ? h('ol', { class: 'rank' }, local.map(([id, n]) => toolById(id) && h('li', {}, h('span', { i18n: `tool.${id}.name` }), h('strong', {}, String(n))))) : empty('adm.dash.noUsage', 'chart-column'), h('p', { class: 'muted small', i18n: 'adm.dash.localNote' })),
-    card('adm.dash.system', h('ul', { class: 'status-list' }, statusRow('adm.sys.db', adminData.connected), statusRow('adm.sys.auth', auth.connected),
+    card('adm.dash.system', h('ul', { class: 'status-list' }, statusRow('adm.sys.db', !!s.connected), statusRow('adm.sys.auth', true),
       h('li', {}, h('span', { class: 'dot on' }), h('span', { i18n: 'adm.sys.tools' }), h('strong', {}, `${TOOLS.length} / ${CATEGORIES.length}`)), h('li', {}, h('span', { class: 'dot on' }), h('span', { i18n: 'adm.sys.langs' }), h('strong', {}, 'BM · EN · AR'))), resetInfo()),
-    card('adm.dash.activity', empty('adm.dash.noActivity', 'history')));
+    card('adm.dash.activity', acts.length ? h('ul', { class: 'status-list' }, acts.map((a) => h('li', {}, icon('activity', 16), h('code', {}, a.type), h('span', {}, a.detail), h('strong', { dir: 'ltr' }, a.at ? a.at.toLocaleString('en-GB', { timeZone: 'Asia/Kuala_Lumpur' }) : '')))) : empty('adm.dash.noActivity', 'history')));
 }
 
 export async function tools() {
-  const draft = new Set(store.get('admin.disabledTools', []));
+  const cfg = await adminData.getConfig('tools').catch(() => null);
+  const draft = new Set((cfg && cfg.disabled) || []);
   const q = h('input', { type: 'search', class: 'filter-input', ph: 'search.placeholder', aria: 'search.label' });
   const cat = h('select', { class: 'filter-input narrow', aria: 'adm.tools.category' }, h('option', { value: 'all', i18n: 'common.all' }), CATEGORIES.map((c) => h('option', { value: c.id, i18n: `cat.${c.id}.name` })));
   const body = h('tbody'); const count = h('p', { class: 'muted small' });
+  const saveMsg = h('span', { class: 'muted small' });
+  const saveBtn = h('button', { type: 'button', class: 'btn btn-primary', disabled: true, onclick: async () => { saveBtn.disabled = true; try { await adminData.saveTools([...draft]); dirty(false); setT(saveMsg, 'adm.saved'); toast('adm.saved'); } catch { setT(saveMsg, 'adm.saveFailed'); saveBtn.disabled = false; } } }, icon('send', 16), h('span', { i18n: 'adm.saveDb' }));
+  const dirty = (v) => { saveBtn.disabled = !v; if (v) saveMsg.textContent = ''; };
   const dlg = h('dialog', { class: 'dlg' }); document.body.append(dlg);
   const paint = () => {
     const term = q.value.trim().toLowerCase();
@@ -46,7 +50,7 @@ export async function tools() {
     clear(body);
     rows.forEach((x) => {
       const off = draft.has(x.id);
-      const sw = h('input', { type: 'checkbox', role: 'switch', checked: !off, aria: 'adm.tools.toggle', onchange: (e) => { if (e.target.checked) draft.delete(x.id); else draft.add(x.id); store.set('admin.disabledTools', [...draft]); paint(); } });
+      const sw = h('input', { type: 'checkbox', role: 'switch', checked: !off, aria: 'adm.tools.toggle', onchange: (e) => { if (e.target.checked) draft.delete(x.id); else draft.add(x.id); dirty(true); paint(); } });
       body.append(h('tr', {}, h('td', {}, h('strong', { i18n: `tool.${x.id}.name` }), h('br'), h('code', { class: 'muted' }, x.id)), h('td', { i18n: `cat.${x.cat}.name` }),
         h('td', {}, h('span', { class: `pill ${off ? 'off' : 'on'}`, i18n: off ? 'adm.tools.disabled' : 'adm.tools.enabled' })),
         h('td', {}, h('label', { class: 'switch' }, sw, h('span', { class: 'track' }))),
@@ -60,9 +64,9 @@ export async function tools() {
       h('form', { method: 'dialog' }, h('button', { class: 'btn btn-primary', i18n: 'adm.close' }))); dlg.showModal();
   }
   q.addEventListener('input', paint); cat.addEventListener('change', paint); onLangChange(paint); paint();
-  return h('div', {}, h('div', { class: 'alert alert-warn' }, icon('info', 16), h('span', { i18n: 'adm.tools.draftNote' })), h('div', { class: 'filters row' }, q, cat), count,
+  return h('div', {}, h('div', { class: 'alert alert-warn' }, icon('info', 16), h('span', { i18n: 'adm.tools.liveNote' })), h('div', { class: 'filters row' }, q, cat), count,
     h('div', { class: 'table-wrap' }, h('table', { class: 'table' }, h('thead', {}, h('tr', {}, ['adm.tools.col.tool', 'adm.tools.col.cat', 'adm.tools.col.status', 'adm.tools.col.enable', 'adm.tools.col.info'].map((k) => h('th', { scope: 'col', i18n: k })))), body)),
-    h('div', { class: 'toolbar' }, h('button', { type: 'button', class: 'btn btn-primary', disabled: true, 'aria-disabled': 'true' }, icon('send', 16), h('span', { i18n: 'adm.saveDb' })), h('span', { class: 'muted small', i18n: 'adm.needsFirebase' })));
+    h('div', { class: 'toolbar' }, saveBtn, saveMsg));
 }
 
 export async function statistics() {
@@ -94,12 +98,15 @@ export async function users() {
 }
 
 export async function settings() {
-  const def = { name: SITE.name, logo: 'assets/logo.svg', slogan: t('footer.slogan'), footer: t('footer.copyright', { brand: SITE.brand, year: SITE.year }), langs: ['ms', 'en', 'ar'], defaultLang: 'ms', maintenance: false };
+  const saved = await adminData.getConfig('site').catch(() => null) || {};
+  const def0 = { name: SITE.name, logo: 'assets/logo.svg', slogan: t('footer.slogan'), footer: t('footer.copyright', { brand: SITE.brand, year: SITE.year }), langs: ['ms', 'en', 'ar'], defaultLang: 'ms', maintenance: false };
+  const def = { ...def0, ...saved, langs: saved.languages || def0.langs };
   const f = (key, label, val, ph) => { const i = h('input', { type: 'text', value: val, id: `s-${key}`, ph }); return { i, el: h('div', { class: 'field' }, h('label', { for: `s-${key}`, i18n: label }), i) }; };
   const name = f('name', 'adm.set.name', def.name), logoF = f('logo', 'adm.set.logo', def.logo), slogan = f('slogan', 'adm.set.slogan', def.slogan), footer = f('footer', 'adm.set.footer', def.footer);
-  const langChecks = Object.entries(LANGS).map(([c, l]) => ({ c, el: h('input', { type: 'checkbox', checked: true, value: c, 'aria-label': l.name }) }));
-  const dlang = h('select', { id: 's-dlang' }, Object.entries(LANGS).map(([c, l]) => h('option', { value: c }, l.name)));
-  const maint = h('input', { type: 'checkbox' });
+  const langChecks = Object.entries(LANGS).map(([c, l]) => ({ c, el: h('input', { type: 'checkbox', checked: def.langs.includes(c), value: c, 'aria-label': l.name }) }));
+  const dlang = h('select', { id: 's-dlang' }, Object.entries(LANGS).map(([c, l]) => h('option', { value: c, selected: c === def.defaultLang }, l.name)));
+  const maint = h('input', { type: 'checkbox', checked: !!def.maintenance });
+  const msg = h('span', { class: 'muted small' });
   const err = h('ul', { class: 'alert alert-error', hidden: true });
   const collect = () => {
     const errs = [];
@@ -112,19 +119,19 @@ export async function settings() {
     return errs.length ? null : { name: name.i.value.trim(), logo: logoF.i.value.trim(), slogan: slogan.i.value.trim(), footer: footer.i.value.trim(), languages: langs, defaultLang: dlang.value, maintenance: maint.checked, brand: SITE.brand };
   };
   return h('form', { class: 'admin-form', onsubmit: (e) => e.preventDefault() },
-    h('div', { class: 'alert alert-warn' }, icon('info', 16), h('span', { i18n: 'adm.set.note' })),
+    h('div', { class: 'alert alert-warn' }, icon('info', 16), h('span', { i18n: 'adm.set.noteLive' })),
     h('div', { class: 'controls' }, name.el, logoF.el, slogan.el, footer.el,
       h('div', { class: 'field' }, h('span', { class: 'lbl', i18n: 'adm.set.langs' }), h('div', { class: 'checks' }, langChecks.map((x) => h('label', { class: 'check' }, x.el, h('span', {}, LANGS[x.c].name))))),
       h('div', { class: 'field' }, h('label', { for: 's-dlang', i18n: 'adm.set.defaultLang' }), dlang), h('label', { class: 'check' }, maint, h('span', { i18n: 'adm.set.maintenance' }))),
     err, h('p', { class: 'muted small' }, icon('shield-check', 14), ' ', h('span', { i18n: 'adm.set.brandLocked' })),
     h('div', { class: 'toolbar' }, h('button', { type: 'button', class: 'btn btn-ghost', onclick: () => { const v = collect(); if (v) { downloadText(JSON.stringify(v, null, 2), 'site-settings.json', 'application/json'); toast('toast.downloaded'); } } }, icon('download', 16), h('span', { i18n: 'adm.set.export' })),
-      h('button', { type: 'button', class: 'btn btn-primary', disabled: true }, icon('send', 16), h('span', { i18n: 'adm.saveDb' })), h('span', { class: 'muted small', i18n: 'adm.needsFirebase' })));
+      h('button', { type: 'button', class: 'btn btn-primary', onclick: async () => { const v = collect(); if (!v) return; try { await adminData.saveSettings(v); setT(msg, 'adm.saved'); toast('adm.saved'); } catch { setT(msg, 'adm.saveFailed'); } } }, icon('send', 16), h('span', { i18n: 'adm.saveDb' })), msg));
 }
 
 export async function content() {
   const TYPES = { guide: ['page.guide.title', 'page.guide.p1', 'guide.'], about: ['page.about.'], privacy: ['page.privacy.'], terms: ['page.terms.'], faq: ['guide.q', 'guide.a'] };
   let type = 'about', lang = getLang();
-  const host = h('div', { class: 'content-editor' });
+  const host = h('div', { class: 'content-editor' }); const cmsg = h('span', { class: 'muted small' });
   const typeSel = h('select', { class: 'filter-input narrow', aria: 'adm.content.type', onchange: (e) => { type = e.target.value; load(); } }, Object.keys(TYPES).map((k) => h('option', { value: k, i18n: `adm.content.${k}` })));
   const langSel = h('select', { class: 'filter-input narrow', aria: 'adm.content.lang', onchange: (e) => { lang = e.target.value; load(); } }, Object.entries(LANGS).map(([c, l]) => h('option', { value: c, selected: c === lang }, l.name)));
   let current = {};
@@ -133,12 +140,13 @@ export async function content() {
     const dict = await (await fetch(new URL(`../../locales/${lang}.json`, import.meta.url))).json();
     const pre = TYPES[type]; current = {};
     Object.keys(dict).filter((k) => pre.some((p) => k.startsWith(p))).forEach((k) => { current[k] = dict[k]; });
+    const over = await adminData.getContent(type, lang).catch(() => null); if (over) for (const k of Object.keys(current)) if (k in over) current[k] = over[k];
     host.replaceChildren(...Object.entries(current).map(([k, v]) => h('div', { class: 'field field-wide' }, h('label', { for: `c-${k}` }, h('code', {}, k)), h('textarea', { id: `c-${k}`, rows: v.length > 120 ? 4 : 2, dir: LANGS[lang].dir, oninput: (e) => { current[k] = e.target.value; } }, v))));
   }
   load();
-  return h('div', {}, h('div', { class: 'alert alert-warn' }, icon('info', 16), h('span', { i18n: 'adm.content.note' })), h('div', { class: 'filters row' }, typeSel, langSel), host,
+  return h('div', {}, h('div', { class: 'alert alert-warn' }, icon('info', 16), h('span', { i18n: 'adm.content.noteLive' })), h('div', { class: 'filters row' }, typeSel, langSel), host,
     h('div', { class: 'toolbar' }, h('button', { type: 'button', class: 'btn btn-ghost', onclick: () => { downloadText(JSON.stringify(current, null, 2), `content-${type}-${lang}.json`, 'application/json'); toast('toast.downloaded'); } }, icon('download', 16), h('span', { i18n: 'adm.content.export' })),
-      h('button', { type: 'button', class: 'btn btn-primary', disabled: true }, icon('send', 16), h('span', { i18n: 'adm.saveDb' })), h('span', { class: 'muted small', i18n: 'adm.needsFirebase' })));
+      h('button', { type: 'button', class: 'btn btn-primary', onclick: async () => { try { await adminData.saveContent(type, lang, current); setT(cmsg, 'adm.saved'); toast('adm.saved'); } catch { setT(cmsg, 'adm.saveFailed'); } } }, icon('send', 16), h('span', { i18n: 'adm.saveDb' })), cmsg));
 }
 
 export async function index() {
@@ -149,11 +157,18 @@ export async function index() {
 }
 
 export async function login() {
-  return h('div', { class: 'login-wrap' },
-    h('form', { class: 'pane login-card', onsubmit: (e) => e.preventDefault(), 'aria-describedby': 'login-note' },
-      h('div', { class: 'field' }, h('label', { for: 'l-email', i18n: 'adm.login.email' }), h('input', { id: 'l-email', type: 'email', disabled: true, autocomplete: 'username' })),
-      h('div', { class: 'field' }, h('label', { for: 'l-pass', i18n: 'adm.login.password' }), h('input', { id: 'l-pass', type: 'password', disabled: true, autocomplete: 'current-password' })),
-      h('button', { type: 'submit', class: 'btn btn-primary', disabled: true }, icon('log-in', 16), h('span', { i18n: 'adm.login.submit' })),
-      h('p', { id: 'login-note', class: 'muted small', i18n: 'adm.login.note' })),
-    h('div', { class: 'pane' }, h('h2', { class: 'h3', i18n: 'adm.login.stepsTitle' }), h('ol', { class: 'steps-compact' }, [1, 2, 3, 4, 5].map((i) => h('li', { i18n: `adm.login.step${i}` })))));
+  const { auth } = await import('./auth.js');
+  const err = h('div', { class: 'alert alert-error', role: 'alert', hidden: true });
+  const email = h('input', { id: 'l-email', type: 'email', required: true, autocomplete: 'username', dir: 'ltr' });
+  const pass = h('input', { id: 'l-pass', type: 'password', required: true, autocomplete: 'current-password', dir: 'ltr' });
+  const btn = h('button', { type: 'submit', class: 'btn btn-primary' }, icon('log-in', 16), h('span', { i18n: 'adm.login.submit' }));
+  const form = h('form', { class: 'pane login-card', onsubmit: async (e) => {
+    e.preventDefault(); err.hidden = true; btn.disabled = true;
+    try { await auth.signIn(email.value.trim(), pass.value); location.replace('dashboard.html'); }
+    catch (x) { const code = String(x.code || ''); err.hidden = false; setT(err, /too-many/.test(code) ? 'adm.login.errMany' : /network/.test(code) ? 'adm.login.errNet' : 'adm.login.errCred'); btn.disabled = false; pass.value = ''; }
+  } },
+    h('div', { class: 'field' }, h('label', { for: 'l-email', i18n: 'adm.login.email' }), email),
+    h('div', { class: 'field' }, h('label', { for: 'l-pass', i18n: 'adm.login.password' }), pass), err, btn,
+    h('p', { class: 'muted small', i18n: 'adm.login.note' }));
+  return h('div', { class: 'login-wrap' }, form, h('div', { class: 'pane' }, h('h2', { class: 'h3', i18n: 'adm.login.whyTitle' }), h('ul', { class: 'checklist' }, [1, 2, 3].map((i) => h('li', {}, icon('shield-check', 16), h('span', { i18n: `adm.login.why${i}` }))))));
 }

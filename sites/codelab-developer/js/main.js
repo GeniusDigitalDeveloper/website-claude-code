@@ -6,7 +6,8 @@ import { createSidebar } from './components/sidebar.js';
 import { createFooter } from './components/footer.js';
 import * as P from './pages.js';
 import { toolById } from './registry.js';
-import { trackVisit } from './statistics/stats.js';
+import { trackVisit, provider } from './statistics/stats.js';
+import { applyDisabled } from './registry.js';
 import { SITE } from './config.js';
 
 const main = h('main', { id: 'main', tabindex: '-1' });
@@ -65,6 +66,8 @@ async function boot() {
     app.replaceChildren(h('div', { class: 'boot-error', role: 'alert' }, h('h1', {}, SITE.name), h('p', {}, 'Tidak dapat memuatkan fail terjemahan (locales/*.json). Buka laman melalui pelayan HTTP (cth. GitHub Pages atau `python3 -m http.server`), bukan terus dari fail.'), h('p', {}, 'Could not load locale files. Please serve the site over HTTP.')));
     console.error(e); return;
   }
+  // Konfigurasi alat daripada admin (had masa 2.5s; jika gagal, semua alat kekal aktif)
+  try { applyDisabled(await Promise.race([provider.getDisabledTools(), new Promise((_, r) => setTimeout(r, 2500))])); } catch { /* kekal */ }
   overlay = h('div', { class: 'drawer-overlay', hidden: true, onclick: () => openDrawer(false) });
   const skip = h('a', { class: 'skip-link', href: '#main', i18n: 'a11y.skip' });
   app.replaceChildren(skip, createHeader({ onMenu: () => openDrawer(!document.body.classList.contains('drawer-open')) }), createSidebar(), overlay, main, createFooter());

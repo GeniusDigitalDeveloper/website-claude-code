@@ -117,3 +117,9 @@ export async function loadTool(id) {
   const mod = await modCache[m];
   return mod.tools[id] || null;
 }
+
+/** Buang alat yang dinyahaktifkan admin (codelab_config/tools) daripada senarai awam. */
+export function applyDisabled(ids) {
+  const off = new Set(ids || []);
+  for (let i = TOOLS.length - 1; i >= 0; i--) if (off.has(TOOLS[i].id)) TOOLS.splice(i, 1);
+}
