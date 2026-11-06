@@ -15,6 +15,7 @@
 /* Layout: topbar + sidebar (desktop) / bottom nav (phone); 12-col dashboard grid like pro streaming software.
    Theme tokens below are the "Neon Cyberpunk" defaults; JS rewrites them per selected theme + mode. */
 :root{
+  --gold:#f5c542; --gold-glow:rgba(245,197,66,.45); --nav-hover:rgba(0,0,0,.28); --nav-on:rgba(0,0,0,.4);
   --bg:#0e0820; --bg2:#150b2c; --panel:#1a1033; --panel2:#22143f; --border:#3a2370;
   --primary:#a855f7; --secondary:#22d3ee; --on-primary:#ffffff; --ink:#c084fc;
   --text:#ece8ff; --muted:#a59cc4; --ok:#34d399; --warn:#fbbf24; --err:#f87171; --live:#ef233c;
@@ -119,8 +120,9 @@ table.t th,table.t td{text-align:left;padding:8px;border-bottom:1px solid var(--
 .topnav{display:flex;gap:4px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
 .topnav button{display:flex;align-items:center;gap:8px;padding:10px 14px;border:0;background:none;cursor:pointer;font-family:var(--f-head);font-weight:800;font-size:14px;color:var(--muted);border-radius:10px;white-space:nowrap;position:relative;transition:color .3s var(--ease-ios),background .3s var(--ease-ios)}
 .topnav button:hover{color:var(--text)}
-.topnav button.on{color:var(--text);background:color-mix(in srgb,var(--primary) 20%,transparent)}
-.topnav button.on::after{content:"";position:absolute;left:14px;right:14px;bottom:-11px;height:2px;background:var(--primary);box-shadow:0 0 10px var(--primary)}
+.topnav button:hover{background:var(--nav-hover)}
+.topnav button.on{color:var(--text);background:var(--nav-on);box-shadow:inset 0 0 0 1px var(--gold)}
+.topnav button.on::after{content:"";position:absolute;left:14px;right:14px;bottom:-11px;height:2px;background:var(--gold);box-shadow:0 0 10px var(--gold-glow)}
 .top-actions{display:flex;align-items:center;gap:8px}
 .badge-dot{position:absolute;top:4px;right:4px;min-width:16px;height:16px;padding:0 4px;border-radius:99px;background:var(--live);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center}
 .avatar{width:38px;height:38px;border-radius:50%;object-fit:cover;background:linear-gradient(135deg,var(--primary),var(--secondary));display:grid;place-items:center;font-family:var(--f-head);font-weight:700;color:var(--on-primary);flex:none;border:2px solid color-mix(in srgb,var(--primary) 60%,transparent)}
@@ -131,8 +133,9 @@ table.t th,table.t td{text-align:left;padding:8px;border-bottom:1px solid var(--
 .nav-item:hover{transform:translateX(3px)}
 .nav-item:active{transform:scale(.97)}
 .nav-item svg.lucide{width:21px;height:21px}
-.nav-item:hover{background:color-mix(in srgb,var(--primary) 10%,transparent)}
-.nav-item.on{background:linear-gradient(90deg,color-mix(in srgb,var(--primary) 55%,transparent),color-mix(in srgb,var(--primary) 18%,transparent));border-color:color-mix(in srgb,var(--primary) 70%,transparent);box-shadow:var(--glow)}
+.nav-item:hover{background:var(--nav-hover)}
+.nav-item.on{background:var(--nav-on);border-color:var(--gold);box-shadow:0 0 0 1px var(--gold-glow),0 0 18px -8px var(--gold-glow)}
+.nav-item.on svg.lucide{color:var(--gold)}
 .side-label{font-family:var(--f-head);font-weight:700;letter-spacing:.1em;color:var(--muted);font-size:13px;padding:14px 14px 4px;border-top:1px solid var(--border);margin-top:8px}
 .side-card{margin-top:auto;padding:16px;border-radius:var(--radius);border:1px solid var(--border);background:linear-gradient(160deg,color-mix(in srgb,var(--primary) 30%,var(--panel)),var(--bg2));display:flex;flex-direction:column;gap:8px}
 main{padding:16px max(16px,env(safe-area-inset-right,0px)) 90px max(16px,env(safe-area-inset-left,0px));min-width:0}
@@ -143,13 +146,7 @@ main{padding:16px max(16px,env(safe-area-inset-right,0px)) 90px max(16px,env(saf
 html{scroll-behavior:smooth}
 .enter{animation:rise .6s var(--ease-ios) both;animation-delay:calc(var(--i,0) * 45ms)}
 @keyframes rise{from{opacity:0;transform:translate3d(0,14px,0) scale(.985)}to{opacity:1;transform:none}}
-#cursorGlow{position:fixed;left:0;top:0;width:420px;height:420px;margin:-210px 0 0 -210px;border-radius:50%;pointer-events:none;z-index:1;opacity:0;transition:opacity .5s var(--ease-ios);
-  background:radial-gradient(circle,color-mix(in srgb,var(--primary) 22%,transparent) 0%,color-mix(in srgb,var(--secondary) 8%,transparent) 40%,transparent 70%);will-change:transform;mix-blend-mode:screen}
-#cursorGlow.on{opacity:1}
-.btn,.qa,.nav-item,.stat,.theme-card{--mx:50%;--my:50%}
-.qa::after,.stat::after,.btn::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .4s var(--ease-ios);background:radial-gradient(160px circle at var(--mx) var(--my),rgba(255,255,255,.14),transparent 60%)}
-.qa,.stat,.btn{position:relative;overflow:hidden}
-.qa:hover::after,.stat:hover::after,.btn:hover::before{opacity:1}
+.qa,.stat,.btn{position:relative}
 .stat{transition:transform .5s var(--spring),border-color .3s var(--ease-ios)}
 .stat:hover{transform:translateY(-2px)}
 .theme-card{transition:transform .5s var(--spring),border-color .3s var(--ease-ios),box-shadow .35s var(--ease-ios)}
@@ -194,7 +191,8 @@ html{scroll-behavior:smooth}
 .hub-bottom{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:14px}
 .platform{display:flex;align-items:center;gap:12px;padding:9px 4px;border-bottom:1px solid color-mix(in srgb,var(--border) 60%,transparent)}
 .platform:last-child{border-bottom:0}
-.platform .pl-logo{width:30px;height:30px;flex:none}
+.pl-logo{width:30px;height:30px;flex:none;display:block}
+.panel-h .pl-logo{width:34px;height:34px}
 .platform b{font-family:var(--f-head);font-weight:700;font-size:14px;flex:1;min-width:0}
 .qa-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:10px}
 .qa{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:14px 6px;border-radius:12px;border:1px solid var(--border);background:color-mix(in srgb,var(--panel2) 80%,transparent);cursor:pointer;font-family:var(--f-head);font-weight:700;font-size:12.5px;text-align:center;line-height:1.2;transition:transform .5s var(--spring),box-shadow .4s var(--ease-ios),border-color .3s var(--ease-ios)}
@@ -281,7 +279,7 @@ details.acc > div{padding:10px 0;font-size:13.5px}
 /* Admin shell */
 .admin-shell .topbar{border-bottom:2px solid var(--warn)}
 .admin-badge{font-family:var(--f-head);font-weight:700;font-size:12px;letter-spacing:.12em;padding:3px 10px;border-radius:6px;background:var(--warn);color:#1a1200}
-.admin-shell .nav-item.on{background:linear-gradient(90deg,color-mix(in srgb,var(--warn) 45%,transparent),color-mix(in srgb,var(--warn) 12%,transparent));border-color:var(--warn);box-shadow:none}
+.admin-shell .nav-item.on{background:var(--nav-on);border-color:var(--gold);box-shadow:0 0 0 1px var(--gold-glow)}
 #adminTabSelect{display:none;width:auto}
 /* Live chat */
 .chat-list{--chat-size:22px;height:min(62vh,640px);overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding:10px;border-radius:12px;border:1px solid var(--border);background:color-mix(in srgb,var(--bg) 85%,transparent);font-size:var(--chat-size);line-height:1.35}
@@ -305,7 +303,7 @@ details.acc > div{padding:10px 0;font-size:13.5px}
 @keyframes pulse{50%{transform:scale(1.06)}}
 
 /* RGB Arena dynamic accent */
-body.t-rgb .nav-item.on,body.t-rgb .theme-card.on,body.t-rgb .btn.primary{animation:rgb 6s linear infinite}
+body.t-rgb .theme-card.on,body.t-rgb .btn.primary{animation:rgb 6s linear infinite}
 @keyframes rgb{to{filter:hue-rotate(360deg)}}
 
 /* ---------- Responsive ---------- */
@@ -316,7 +314,7 @@ body.t-rgb .nav-item.on,body.t-rgb .theme-card.on,body.t-rgb .btn.primary{animat
   .shell{grid-template-columns:minmax(0,1fr)} .sidebar{display:none} .topnav{display:none}
   .mobilenav{display:flex;position:fixed;z-index:40;left:0;right:0;bottom:0;justify-content:space-around;padding:6px max(8px,env(safe-area-inset-right,0px)) max(6px,env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(12px);border-top:1px solid var(--border)}
   .mobilenav button{display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:none;color:var(--muted);font-size:10.5px;font-weight:600;padding:6px 4px;cursor:pointer;border-radius:10px;min-width:56px}
-  .mobilenav button.on{color:var(--text);background:color-mix(in srgb,var(--primary) 22%,transparent)}
+  .mobilenav button.on{color:var(--gold);background:var(--nav-on);box-shadow:inset 0 0 0 1px var(--gold)}
   .mobilenav svg.lucide{width:22px;height:22px}
   .ctrl-row{grid-template-columns:repeat(2,minmax(0,1fr))} .ctrl-row .btn:first-child{grid-column:1/-1}
 }
@@ -329,7 +327,7 @@ body.t-rgb .nav-item.on,body.t-rgb .theme-card.on,body.t-rgb .btn.primary{animat
   .welcome h1{font-size:24px} .view-h h1{font-size:25px}
 }
 @media (max-width:420px){ .brand-name{font-size:16px} .logo{width:34px;height:34px} .themes-grid{grid-template-columns:repeat(2,minmax(0,1fr))} .status-row{grid-template-columns:minmax(0,1fr)} }
-@media (prefers-reduced-motion:reduce){ *,*::before,*::after{animation:none!important;transition:none!important} html{scroll-behavior:auto} #cursorGlow{display:none} }
+@media (prefers-reduced-motion:reduce){ *,*::before,*::after{animation:none!important;transition:none!important} html{scroll-behavior:auto} }
 </style>
 </head>
 <body>
@@ -579,7 +577,7 @@ body.t-rgb .nav-item.on,body.t-rgb .theme-card.on,body.t-rgb .btn.primary{animat
     <span class="admin-badge">ADMIN</span>
     <select class="in" id="adminTabSelect" aria-label="Seksyen admin"></select>
     <div class="top-actions" style="margin-left:auto"><span class="small muted pmeta" id="adminEmail"></span>
-      <a class="btn sm" id="adminToStudio" href="?"><i data-lucide="monitor-play"></i>Studio</a>
+      <a class="btn sm" id="adminToStudio" href="index.html"><i data-lucide="monitor-play"></i>Studio</a>
       <button class="btn sm ghost" id="adminLogout"><i data-lucide="log-out"></i>Logout</button></div>
   </header>
   <aside class="sidebar" id="adminSide" aria-label="Menu admin"></aside>
@@ -614,7 +612,9 @@ const FUNCTIONS_REGION   = "asia-southeast1";
 const FIREBASE_SDK       = "10.12.2";
 const DEFAULT_ICE = [{ urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"] }];
 const FB_READY = !!(FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId && FIREBASE_CONFIG.appId);
-const APP_VERSION = "1.0.0";
+const APP_VERSION = "1.1.0";
+const APP_MODE = "studio";               // "studio" = index.html, "admin" = admin.html
+const isAdminApp = () => APP_MODE === "admin" || new URLSearchParams(location.search).get("panel") === "admin";
 
 /* ================= UTILITIES ================= */
 const $  = (s, r = document) => r.querySelector(s);
@@ -3032,7 +3032,7 @@ function bindChatEvents() {
 /* =====================================================================
    ADMIN SHELL (panel berasingan: ?panel=admin)
    ===================================================================== */
-function openAdminPanel() { window.open(`${location.pathname}?panel=admin`, "_blank", "noopener"); }
+function openAdminPanel() { window.open(new URL("admin.html", location.href).href, "_blank", "noopener"); }
 async function enterAdmin() {
   showOnly("adminApp");
   document.title = "STREAMVERSE Admin";
@@ -3049,9 +3049,8 @@ async function enterAdmin() {
 
 /* =====================================================================
    MOTION & SOUND FX
-   - Glow & sorotan mengikut mouse dikemas kini setiap frame paparan
-     (requestAnimationFrame = 60/120/144Hz ikut skrin) dengan pelicinan
-     eksponen bebas-frame-rate. Kelajuan cursor sendiri dikawal oleh OS.
+   - Tiada kesan pada cursor mouse. Animasi UI guna transform/opacity
+     dengan easing gaya iOS (GPU, ikut refresh rate skrin).
    - Bunyi UI disintesis dengan Web Audio dalam AudioContext berasingan,
      jadi tidak masuk ke mixer siaran/rakaman.
    ===================================================================== */
@@ -3063,28 +3062,14 @@ function staggerIn(root) {
   void root.offsetWidth;
   els.forEach(el => { el.classList.add("enter"); el.addEventListener("animationend", () => el.classList.remove("enter"), { once: true }); });
 }
-const CURSOR = { x: 0, y: 0, tx: 0, ty: 0, last: 0, el: null, hoverEl: null, raf: 0, active: false };
-function startCursorFx() {
-  if (!window.matchMedia("(pointer: fine)").matches || reduceMotion()) return;
-  const g = document.createElement("div"); g.id = "cursorGlow"; g.setAttribute("aria-hidden", "true"); document.body.prepend(g); CURSOR.el = g;
-  window.addEventListener("pointermove", e => {
-    CURSOR.tx = e.clientX; CURSOR.ty = e.clientY;
-    if (!CURSOR.active) { CURSOR.active = true; CURSOR.x = e.clientX; CURSOR.y = e.clientY; g.classList.add("on"); }
-    const h = e.target.closest?.(".btn, .qa, .stat, .nav-item, .theme-card");
-    if (h) { const r = h.getBoundingClientRect(); h.style.setProperty("--mx", (e.clientX - r.left) + "px"); h.style.setProperty("--my", (e.clientY - r.top) + "px"); }
-    if (h && h !== CURSOR.hoverEl && h.matches(".qa, .nav-item, .theme-card")) sfx("hover");
-    CURSOR.hoverEl = h;
-    if (!CURSOR.raf) CURSOR.raf = requestAnimationFrame(cursorTick);
+function bindHoverSfx() {
+  if (!window.matchMedia("(pointer: fine)").matches) return;
+  let last = null;
+  document.addEventListener("pointerover", e => {
+    const h = e.target.closest?.(".qa, .nav-item, .theme-card");
+    if (h && h !== last) sfx("hover");
+    last = h;
   }, { passive: true });
-  document.addEventListener("pointerleave", () => { CURSOR.active = false; g.classList.remove("on"); });
-}
-function cursorTick(t) {
-  const dt = Math.min(64, t - (CURSOR.last || t)); CURSOR.last = t;
-  const k = 1 - Math.exp(-dt / 70);                       // pelicinan eksponen: sama licin pada 60Hz atau 144Hz
-  CURSOR.x += (CURSOR.tx - CURSOR.x) * k; CURSOR.y += (CURSOR.ty - CURSOR.y) * k;
-  CURSOR.el.style.transform = `translate3d(${CURSOR.x}px, ${CURSOR.y}px, 0)`;
-  if (Math.abs(CURSOR.tx - CURSOR.x) + Math.abs(CURSOR.ty - CURSOR.y) > .3) CURSOR.raf = requestAnimationFrame(cursorTick);
-  else { CURSOR.raf = 0; CURSOR.last = 0; }
 }
 const SFX = { ctx: null, on: ls.get("sfx", true), vol: ls.get("sfxVol", 0.45), lastHover: 0 };
 function setSfx(on, silent) {
@@ -3236,7 +3221,7 @@ async function onUser(u) {
   S.isAdmin = tok.claims.admin === true;
   if (qs.get("pair")) return startCompanion(qs.get("pair").toUpperCase(), qs.get("kind") || "video");
   if (qs.get("remote") === "kill") return startKillRemote();
-  if (qs.get("panel") === "admin") return enterAdmin();
+  if (isAdminApp()) return enterAdmin();
   if (qs.get("panel") === "chat") return startChatWindow();
   enterApp();
 }
@@ -3528,7 +3513,7 @@ function bindEvents() {
    ===================================================================== */
 async function boot() {
   applyTheme(ls.get("theme", "neon"), ls.get("mode", "dark"));
-  renderLogos(); bindAuth(); bindEvents(); bindChatEvents(); bindSfx(); startCursorFx(); startCompositor();
+  renderLogos(); bindAuth(); bindEvents(); bindChatEvents(); bindSfx(); bindHoverSfx(); startCompositor();
   const qs = new URLSearchParams(location.search);
   try { await initFirebase(); }
   catch (e) { console.error(e); toast("Firebase SDK gagal dimuatkan: " + e.message, "err", 9000); }
@@ -3538,7 +3523,7 @@ async function boot() {
   if (qs.get("live")) return startViewerPage(qs.get("live"));
   if (!fb.ready) {
     if (qs.get("panel") === "chat") { S.local = true; return startChatWindow(); }
-    if (qs.get("panel") === "admin") {
+    if (isAdminApp()) {
       showOnly("adminApp");
       $("#adminSide").innerHTML = ADMIN_TABS.map(([k, l, ic]) => `<button class="nav-item ${k === adminTab ? "on" : ""}" disabled><i data-lucide="${ic}"></i>${l}</button>`).join("");
       $("#adminTabSelect").innerHTML = ADMIN_TABS.map(([k, l]) => `<option>${l}</option>`).join(""); $("#adminTabSelect").disabled = true;

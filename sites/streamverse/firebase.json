@@ -14,6 +14,10 @@
     ],
     "rewrites": [
       {
+        "source": "/admin",
+        "destination": "/admin.html"
+      },
+      {
         "source": "/oauth/callback",
         "function": {
           "functionId": "oauthCallback",

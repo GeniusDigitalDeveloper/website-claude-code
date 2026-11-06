@@ -5,6 +5,8 @@
 Platform all-in-one untuk gamer, livestreamer dan content creator. Frontend ialah **satu fail `index.html`** (HTML + CSS + JavaScript Vanilla dalam `<script type="module">`). Backend: Firebase Auth, Firestore, Storage, Hosting, Cloud Functions, App Check, dan Secret Manager. Tiada VPS.
 
 > **Status sekarang:** `FIREBASE_CONFIG` dalam `index.html` masih **kosong**, jadi app belum disambung ke Firebase. Tanpa config, app buka **Studio Tempatan**. Kamera, mikrofon, screen capture, capture card, mixer, audio processing dan rakaman tempatan berfungsi dengan peranti sebenar. Ciri cloud pula tunjuk status **Firebase Not Configured**.
+>
+> **Selepas `FIREBASE_CONFIG` diisi:** butang "Buka Studio Tempatan" dan kad "STUDIO TEMPATAN" hilang dengan sendirinya. Semua fungsi peranti (kamera, mic, mixer, rakaman, scene) **kekal**, cuma kini perlu log masuk dulu dan scene/tetapan disimpan ke Firestore akaun pengguna. Isi config yang **sama** dalam `index.html` dan `admin.html`.
 
 ---
 
@@ -47,7 +49,8 @@ Platform all-in-one untuk gamer, livestreamer dan content creator. Frontend iala
 
 ```
 sites/streamverse/
-  index.html              # SELURUH frontend (HTML+CSS+JS)
+  index.html              # SELURUH frontend studio pengguna (HTML+CSS+JS)
+  admin.html              # Admin Panel (fail sama dengan index.html, kecuali APP_MODE = "admin")
   firebase.json           # Hosting, rules, functions, rewrites /oauth/callback
   firestore.rules         # Security Rules Firestore
   firestore.indexes.json  # Index collection group (feed, carian game, pairing)
