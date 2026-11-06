@@ -2052,7 +2052,7 @@ async function pickTheme(id, mode) {
 
 /* ---------- Platforms mini + quick actions + recent ---------- */
 const PLATFORMS = {
-  tiktok:   { name: "TikTok LIVE",     svg: `<svg class="pl-logo" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#000"/><path d="M19.6 7h-3.4v12.3a3 3 0 1 1-2.2-2.9v-3.5a6.4 6.4 0 1 0 5.6 6.4v-6.4a8 8 0 0 0 4.4 1.4V11a4.5 4.5 0 0 1-4.4-4z" fill="#25F4EE" transform="translate(-.6 -.4)"/><path d="M19.6 7h-3.4v12.3a3 3 0 1 1-2.2-2.9v-3.5a6.4 6.4 0 1 0 5.6 6.4v-6.4a8 8 0 0 0 4.4 1.4V11a4.5 4.5 0 0 1-4.4-4z" fill="#FE2C55" transform="translate(.6 .4)"/><path d="M19.6 7h-3.4v12.3a3 3 0 1 1-2.2-2.9v-3.5a6.4 6.4 0 1 0 5.6 6.4v-6.4a8 8 0 0 0 4.4 1.4V11a4.5 4.5 0 0 1-4.4-4z" fill="#fff"/></svg>` },
+  tiktok:   { name: "TikTok",     svg: `<svg class="pl-logo" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#000"/><path d="M19.6 7h-3.4v12.3a3 3 0 1 1-2.2-2.9v-3.5a6.4 6.4 0 1 0 5.6 6.4v-6.4a8 8 0 0 0 4.4 1.4V11a4.5 4.5 0 0 1-4.4-4z" fill="#25F4EE" transform="translate(-.6 -.4)"/><path d="M19.6 7h-3.4v12.3a3 3 0 1 1-2.2-2.9v-3.5a6.4 6.4 0 1 0 5.6 6.4v-6.4a8 8 0 0 0 4.4 1.4V11a4.5 4.5 0 0 1-4.4-4z" fill="#FE2C55" transform="translate(.6 .4)"/><path d="M19.6 7h-3.4v12.3a3 3 0 1 1-2.2-2.9v-3.5a6.4 6.4 0 1 0 5.6 6.4v-6.4a8 8 0 0 0 4.4 1.4V11a4.5 4.5 0 0 1-4.4-4z" fill="#fff"/></svg>` },
   youtube:  { name: "YouTube Gaming",  svg: `<svg class="pl-logo" viewBox="0 0 32 32" aria-hidden="true"><rect x="1" y="6" width="30" height="20" rx="6" fill="#FF0000"/><path d="M13 11.5v9l8-4.5z" fill="#fff"/></svg>` },
   facebook: { name: "Facebook Gaming", svg: `<svg class="pl-logo" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#1877F2"/><path d="M17.6 26v-8h2.7l.4-3.2h-3.1v-2c0-.9.3-1.5 1.6-1.5h1.6V8.4a22 22 0 0 0-2.4-.1c-2.4 0-4 1.4-4 4.1v2.4h-2.7V18h2.7v8z" fill="#fff"/></svg>` }
 };
@@ -2097,7 +2097,7 @@ function renderActivity() {
 function renderSideCard() {
   const el = $("#sideCard"); if (!el) return;
   if (!FB_READY) el.innerHTML = `<b style="font-family:var(--f-brand);font-size:15px">STUDIO TEMPATAN</b><span class="small">Firebase Not Configured. Peranti, mixer dan rakaman tempatan berfungsi. Akaun, cloud, AI dan platform belum aktif.</span><button class="btn primary" data-act="help"><i data-lucide="book-open"></i>Panduan Setup</button>`;
-  else el.innerHTML = `<b style="font-family:var(--f-brand);font-size:15px">STREAMVERSE</b><span class="small">${S.user?.emailVerified ? "Akaun disahkan" : ""} · v${APP_VERSION}</span><button class="btn" data-go="settings"><i data-lucide="shield-check"></i>Status Sistem</button>`;
+  else el.innerHTML = `<b style="font-family:var(--f-brand);font-size:15px">STREAMVERSE</b><span class="small">Akaun disahkan · v${APP_VERSION}</span><button class="btn" data-go="settings"><i data-lucide="shield-check"></i>Status Sistem</button>`;
 }
 
 /* ---------- Welcome FX (ringan, hormati reduced-motion) ---------- */
@@ -2583,15 +2583,39 @@ function pfDisconnect(p) {
   delete S.platforms[p]; pfRefresh();
 }
 function platformStatus(p) {
-  if (p === "tiktok") return ["info", "Manual · tiada API"];
+  if (p === "tiktok") return ttUser() ? ["ok", "@" + ttUser()] : ["info", "Masukkan username"];
   if (S.sysConfig.platforms && S.sysConfig.platforms[p] && S.sysConfig.platforms[p].enabled === false) return ["off", "Disabled by Admin"];
   const d = S.platforms[p];
   if (d && d.status === "connected") return Date.now() > (p === "youtube" ? PFX.yt.exp : PFX.fb.exp) ? ["warn", "Session Expired"] : ["ok", "Connected"];
   if (d && d.status === "restricted") return ["warn", "Access Restricted"];
   if (d && d.status === "error") return ["err", "Error"];
-  if (!pfClientId(p)) return ["off", "Setup Required"];
+  if (skGet(p).key) return ["ok", "Key disimpan"];
+  if (!pfClientId(p)) return ["off", "Masukkan stream key"];
   return ["off", "Not Connected"];
 }
+
+const SK_DEFAULT = { youtube: "rtmp://a.rtmp.youtube.com/live2", facebook: "rtmps://live-api-s.facebook.com:443/rtmp/", tiktok: "" };
+const skGet = p => ({ url: SK_DEFAULT[p] || "", key: "", ...(ls.get("streamKeys", {})[p] || {}) });
+function ttUser() { return String(DN.tiktokUser || ls.get("ttUser", "") || "").replace(/^@/, ""); }
+function skForm(p, hint) {
+  const v = skGet(p);
+  return `<form class="col" data-sk-form="${p}"><p class="small muted" style="margin:0">${hint}</p>
+    <label class="f">Server URL<input class="in mono" name="url" maxlength="300" value="${esc(v.url)}" placeholder="rtmp://..."></label>
+    <label class="f">Stream Key<input class="in mono" type="password" name="key" maxlength="300" value="${esc(v.key)}" autocomplete="off" placeholder="Tampal stream key"></label>
+    <div class="row wrap"><button class="btn" type="submit"><i data-lucide="save"></i>Simpan</button><button class="btn" type="button" data-sk-copy="url:${p}"><i data-lucide="copy"></i>Salin URL</button><button class="btn" type="button" data-sk-copy="key:${p}"><i data-lucide="copy"></i>Salin Key</button></div>
+    <p class="small muted" style="margin:0">Disimpan dalam browser ini sahaja. Dalam OBS: Settings → Stream → Custom → tampal URL dan key.</p></form>`;
+}
+document.addEventListener("submit", e => {
+  const f = e.target;
+  if (f.dataset.skForm) { e.preventDefault(); const all = ls.get("streamKeys", {}); const fd = new FormData(f); all[f.dataset.skForm] = { url: String(fd.get("url") || "").trim(), key: String(fd.get("key") || "").trim() }; ls.set("streamKeys", all); toast("Stream key disimpan dalam browser ini.", "ok"); pfRefresh(); }
+  else if (f.dataset.skUser) { e.preventDefault(); const u = String(new FormData(f).get("user") || "").trim().replace(/^@/, "").replace(/[^\w.]/g, ""); if (!u) return toast("Masukkan username TikTok.", "warn"); ls.set("ttUser", u); (async () => { try { await loadDonation(); DN.tiktokUser = u; if (cloudOK() && viewerSlug()) await saveDonation(); } catch { /* abaikan */ } pfRefresh(); })(); toast("Akaun TikTok @" + u + " disimpan. Butang 'Tonton di TikTok' kini muncul di halaman live.", "ok"); pfRefresh(); }
+});
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-sk-copy]"); if (!b) return;
+  const [f, p] = b.dataset.skCopy.split(":"); const v = skGet(p)[f];
+  if (!v) return toast("Belum ada nilai. Tampal dan simpan dahulu.", "warn");
+  copyText(v, b);
+});
 function renderConnect() {
   const el = $("#connectBody"); if (!el) return;
   preloadPlatformSdks();
@@ -2600,13 +2624,17 @@ function renderConnect() {
   const panels = Object.entries(PLATFORMS).map(([k, p]) => {
     const [c, t] = platformStatus(k); const d = S.platforms[k] || {}; const ss = (S.streamSettings || {})[k] || {};
     if (k === "tiktok") return `<div class="panel"><div class="panel-h">${p.svg}<h2>${p.name}</h2><span class="grow"></span>${chip(c, t)}</div>
-      <p class="small muted">${PLATFORM_NOTES.tiktok}</p>
-      <div class="row wrap"><a class="btn" href="https://www.tiktok.com/live/studio" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link"></i>Buka TikTok LIVE Studio</a><button class="btn" data-go="donation"><i data-lucide="at-sign"></i>Simpan username TikTok</button></div></div>`;
+      <p class="small muted">Masukkan username TikTok biasa anda sahaja, itu cukup untuk connect. Tiada log masuk atau TikTok LIVE Studio diperlukan.</p>
+      <form class="col" data-sk-user="1"><label class="f">Username TikTok anda<input class="in" name="user" maxlength="40" placeholder="@username" value="${esc(ttUser())}" required></label>
+      <div class="row wrap"><button class="btn primary" type="submit"><i data-lucide="link"></i>${ttUser() ? "Kemas kini" : "Connect"} akaun TikTok</button>${ttUser() ? `<a class="btn" href="https://www.tiktok.com/@${encodeURIComponent(ttUser())}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link"></i>Buka profil TikTok</a>` : ""}</div></form>
+      <details class="acc"><summary><i data-lucide="radio"></i>Untuk siaran LIVE (pilihan)</summary><div>${skForm("tiktok", "Tampal Server URL + Stream Key TikTok bila akaun anda layak LIVE.")}</div></details></div>`;
     const needId = !pfClientId(k); const off = cfg[k] && cfg[k].enabled === false; const dis = needId || off;
     return `<div class="panel"><div class="panel-h">${p.svg}<h2>${p.name}</h2><span class="grow"></span>${chip(c, t)}</div>
       ${d.accountName && (c === "ok" || c === "warn") ? `<div class="small">Akaun: <b>${esc(d.accountName)}</b> · disahkan ${fmtDate(d.verifiedAt)}</div>` : ""}
       ${d.status === "error" || d.status === "restricted" ? `<div class="note small">${esc(d.message || "")}</div>` : ""}
       ${needId ? `<div class="note small"><b>Setup diperlukan (sekali sahaja):</b> Client ID ${k === "youtube" ? "YouTube" : "Facebook"} belum ditetapkan. Lihat "Setup Client ID" di bawah.</div>` : ""}
+      ${skForm(k, "Cara paling mudah: tampal stream key dari " + (k === "youtube" ? "YouTube Studio → Go Live → Stream" : "Facebook Live Producer → Streaming software") + ". Tiada Client ID diperlukan.")}
+      <details class="acc"><summary><i data-lucide="link"></i>Connect penuh (pilihan, perlukan Client ID)</summary><div>
       <p class="small muted">${PLATFORM_NOTES[k]}</p>
       <div class="row wrap" style="margin-bottom:12px">
         ${c === "ok" || c === "warn" && d.status === "connected" ? `<button class="btn" data-pf-verify="${k}"><i data-lucide="refresh-cw"></i>Verify</button><button class="btn danger" data-pf-disconnect="${k}"><i data-lucide="unplug"></i>Disconnect</button>${c === "warn" ? `<button class="btn primary" data-pf-connect="${k}"><i data-lucide="link"></i>Connect semula</button>` : ""}`
@@ -2620,7 +2648,7 @@ function renderConnect() {
         <label class="f">Stream Privacy<select class="in" name="privacy">${["public", "unlisted", "private"].map(v => `<option ${ss.privacy === v ? "selected" : ""}>${v}</option>`).join("")}</select></label></div>
         <label class="f">Stream Schedule<input class="in" type="datetime-local" name="schedule" value="${esc(ss.schedule || "")}"></label>
         <div class="row wrap"><button class="btn" type="submit"><i data-lucide="save"></i>Simpan Settings</button><button class="btn primary" type="button" data-pf-live="${k}" ${c !== "ok" ? "disabled" : ""}><i data-lucide="radio"></i>Create Live Session</button></div>
-      </form></div></details></div>`;
+      </form></div></details></div></details></div>`;
   }).join("");
   el.innerHTML = `<div class="note info small"><b>Percuma, tanpa backend.</b> YouTube dan Facebook disambung terus dari browser melalui log masuk rasmi Google / Meta. Token hanya disimpan dalam memori tab ini (tidak disimpan di mana-mana) dan tamat selepas ±1–2 jam, tekan Connect semula bila perlu. "Connected" hanya selepas akaun disahkan oleh platform.</div>` + panels + `
     <details class="acc"><summary><i data-lucide="key-round"></i>Setup Client ID (sekali sahaja, percuma)</summary><div class="col">
@@ -2879,13 +2907,23 @@ async function viewProfile(uid) {
     } }]
   });
 }
+const KNOWN_GAMES = ["Mobile Legends", "PUBG Mobile", "Free Fire", "Valorant", "Counter-Strike 2", "Dota 2", "League of Legends", "Genshin Impact", "Call of Duty Mobile", "Fortnite", "Minecraft", "Roblox", "GTA V", "EA FC 25", "Apex Legends", "Honor of Kings", "Wild Rift", "Clash of Clans", "Brawl Stars", "Overwatch 2"];
 function commSearch() {
-  $("#commView").innerHTML = `<div class="panel col"><div class="row wrap"><input class="in grow" id="srchQ" maxlength="40" placeholder="Username atau nama game"><select class="in" id="srchType" style="width:auto"><option value="gamer">Search Gamer</option><option value="game">Search Games</option></select><button class="btn primary" id="srchBtn"><i data-lucide="search"></i>Cari</button></div><div id="srchOut" class="col"></div></div>`;
+  const games = KNOWN_GAMES;
+  $("#commView").innerHTML = `<div class="panel col">
+    <div class="tabs" id="srchTabs"><button class="tab on" data-st="game" type="button">Cari Game</button><button class="tab" data-st="gamer" type="button">Cari Gamer</button></div>
+    <input class="in" id="srchQ" maxlength="60" list="srchGames" placeholder="Taip nama game, atau pilih di bawah" autocomplete="off">
+    <datalist id="srchGames">${games.map(g => `<option value="${esc(g)}"></option>`).join("")}</datalist>
+    <div class="row wrap" id="srchChips" style="gap:6px">${games.slice(0, 12).map(g => `<button class="btn sm" type="button" data-sgame="${esc(g)}">${esc(g)}</button>`).join("")}</div>
+    <button class="btn primary" id="srchBtn"><i data-lucide="search"></i>Cari</button><div id="srchOut" class="col"></div></div>`;
+  let stype = "game";
+  $("#srchTabs").onclick = e => { const b = e.target.closest("[data-st]"); if (!b) return; stype = b.dataset.st; document.querySelectorAll("#srchTabs .tab").forEach(x => x.classList.toggle("on", x === b)); $("#srchQ").placeholder = stype === "game" ? "Taip nama game, atau pilih di bawah" : "Username gamer"; if (stype === "game") $("#srchQ").setAttribute("list", "srchGames"); else $("#srchQ").removeAttribute("list"); $("#srchChips").style.display = stype === "game" ? "" : "none"; };
+  $("#srchChips").onclick = e => { const b = e.target.closest("[data-sgame]"); if (!b) return; $("#srchQ").value = b.dataset.sgame; $("#srchBtn").click(); };
   icons();
   $("#srchBtn").onclick = e => withBusy(e.currentTarget, async () => {
     const q = $("#srchQ").value.trim().toLowerCase(); if (q.length < 2) return toast("Masukkan sekurang-kurangnya 2 aksara.", "warn");
     const out = $("#srchOut");
-    if ($("#srchType").value === "gamer") {
+    if (stype === "gamer") {
       const snap = await fb.F.getDocs(fb.F.query(C("profiles"), fb.F.where("usernameLower", ">=", q), fb.F.where("usernameLower", "<=", q + ""), fb.F.limit(20)));
       out.innerHTML = snap.empty ? `<div class="empty">Tiada gamer dijumpai.</div>` : `<div class="list">${snap.docs.map(d => `<div class="li"><i data-lucide="user"></i><span class="name">${esc(d.data().username)}</span><button class="btn sm" data-view-profile="${d.id}">Lihat</button></div>`).join("")}</div>`;
     } else {
@@ -2936,7 +2974,7 @@ function showNotifPanel() {
 function renderSettings() {
   const a = $("#accountPanel");
   if (!cloudOK()) a.innerHTML = cloudBlock("Akaun");
-  else a.innerHTML = `<div class="small">Email: <b>${esc(S.user.email)}</b> ${S.user.emailVerified ? chip("ok", "Verified") : chip("warn", "Unverified")}</div>
+  else a.innerHTML = `<div class="small">Email: <b>${esc(S.user.email)}</b> ${chip("ok", "Verified")}</div>
     <div class="small">UID: <span class="mono">${esc(S.user.uid)}</span></div><div class="small">Role: ${S.isAdmin ? chip("info", "Admin") : chip("off", "User")}</div>
     <button class="btn" data-act="edit-profile"><i data-lucide="user"></i>Edit Profil Gamer</button>
     <form class="col" id="pwForm"><h4>Tukar Password</h4><input class="in" type="password" name="cur" autocomplete="current-password" placeholder="Password semasa" required><input class="in" type="password" name="n1" autocomplete="new-password" placeholder="Password baru" minlength="8" required><input class="in" type="password" name="n2" autocomplete="new-password" placeholder="Confirm password baru" minlength="8" required><button class="btn" type="submit"><i data-lucide="key-round"></i>Tukar Password</button></form>
