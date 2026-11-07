@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700&family=Montserrat:wght@500;600;700&family=Poppins:ital,wght@0,500;0,600;0,700;1,700&family=Sora:wght@700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/style.css?v=9">
+  <link rel="stylesheet" href="assets/style.css?v=10">
   <script src="assets/js/boot.js"></script>
 </head>
 <body>
@@ -35,6 +35,7 @@
   <!-- Menu halaman: setiap satu butang tersendiri, di bawah header -->
   <nav class="subnav" aria-label="Menu halaman">
     <div class="in">
+      <a class="sbtn" href="#home" data-nav="home" id="navHome"><span class="ico" data-ico="download"></span><span data-i18n="nav_home">Muat turun</span></a>
       <a class="sbtn" href="#cara" data-nav="cara"><span class="ico" data-ico="layers"></span><span data-i18n="nav_how">Cara guna</span></a>
       <a class="sbtn" href="#faq" data-nav="faq"><span class="ico" data-ico="help"></span><span data-i18n="nav_faq">Soalan lazim</span></a>
       <a class="sbtn" href="#profil" data-nav="profil" id="navProfile" hidden><span class="ico" data-ico="user"></span><span data-i18n="nav_profile">Profil</span></a>
@@ -147,6 +148,7 @@
 
     <!-- ============ CARA GUNA ============ -->
     <section class="view page" data-view="cara" hidden aria-labelledby="how">
+      <a class="back-home" href="#home"><span class="ico" data-ico="back"></span><span data-i18n="back_home">Kembali ke tempat tampal pautan</span></a>
       <h2 class="h2" id="how" data-i18n="how_title"></h2>
       <div class="grid steps">
         <article class="card glass"><span class="num">01</span><div class="badge" data-ico="link"></div><h3 data-i18n="s1_t"></h3><p data-i18n="s1_p"></p></article>
@@ -157,12 +159,14 @@
 
     <!-- ============ SOALAN LAZIM ============ -->
     <section class="view page" data-view="faq" hidden aria-labelledby="faqh">
+      <a class="back-home" href="#home"><span class="ico" data-ico="back"></span><span data-i18n="back_home">Kembali ke tempat tampal pautan</span></a>
       <h2 class="h2" id="faqh" data-i18n="faq_title"></h2>
       <div class="faq" id="faqList"></div>
     </section>
 
     <!-- ============ TERMA & HAK CIPTA ============ -->
     <section class="view page" data-view="terma" hidden aria-labelledby="termsh">
+      <a class="back-home" href="#home"><span class="ico" data-ico="back"></span><span data-i18n="back_home">Kembali ke tempat tampal pautan</span></a>
       <h2 class="h2" id="termsh" data-i18n="terms_title"></h2>
       <p class="cr-note terms-note" role="note"><span class="ico" data-ico="shield"></span><span data-i18n="cr_note"></span></p>
       <ol class="terms">
@@ -172,6 +176,7 @@
 
     <!-- ============ PROFIL (susunan seperti profil TikTok) ============ -->
     <section class="view page" data-view="profil" hidden aria-labelledby="profh">
+      <a class="back-home" href="#home"><span class="ico" data-ico="back"></span><span data-i18n="back_home">Kembali ke tempat tampal pautan</span></a>
       <div class="tt">
         <div class="tt-head">
           <div class="avatar" id="avatar"><img id="avatarImg" alt="" hidden><span id="avatarInit"></span></div>
@@ -274,6 +279,6 @@
   </section>
 
   <script src="assets/js/config.js"></script>
-  <script type="module" src="assets/js/app.js?v=10"></script>
+  <script type="module" src="assets/js/app.js?v=11"></script>
 </body>
 </html>
