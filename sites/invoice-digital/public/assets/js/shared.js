@@ -10,7 +10,10 @@ export function footerHtml(s = {}) {
     ${["users", "today", "month", "total"].map((k) => `<div><b data-s="${k}">…</b><span>${t("ft_" + k)}</span></div>`).join("")}</div>
     <p class="ft-slogan">${esc(t("slogan"))}</p>${c}<p class="ft-copy">${esc(t("copyright"))}</p></div></footer>`;
 }
-export async function fillFooterStats(root = document) {
+// Paparkan statistik footer dan segarkan setiap 60 saat (angka "hari ini" bertukar sendiri selepas 12 tengah malam waktu Malaysia).
+let timer;
+async function refreshStats() {
   const s = await loadStats(); const f = (v) => (v == null ? "-" : Number(v).toLocaleString("en-MY"));
-  root.querySelectorAll("#ftStats [data-s]").forEach((e) => (e.textContent = f(s[e.dataset.s])));
+  document.querySelectorAll("#ftStats [data-s]").forEach((e) => (e.textContent = f(s[e.dataset.s])));
 }
+export function fillFooterStats() { refreshStats(); if (!timer) timer = setInterval(() => { if (!document.hidden) refreshStats(); }, 60000); }
