@@ -150,7 +150,7 @@ function run(args, timeoutMs) {
 function friendly(stderr = '') {
   const s = stderr.toLowerCase();
   // Sekatan platform terhadap IP pelayan (pusat data) diperiksa dulu, supaya tidak tersalah dilapor sebagai video peribadi.
-  if ((s.includes('confirm') && s.includes('bot')) || s.includes('ip address is blocked') || s.includes('blocking requests') || s.includes('http error 403') || s.includes('http error 429') || s.includes('too many requests')) return 'Platform menyekat pelayan muat turun ini (IP pusat data). Ini bukan salah pautan. Cuba lagi nanti atau hubungi admin.';
+  if ((s.includes('confirm') && s.includes('bot')) || s.includes('ip address is blocked') || s.includes('blocking requests') || s.includes('unexpected response from webpage') || s.includes('http error 403') || s.includes('http error 429') || s.includes('too many requests')) return 'Platform menyekat pelayan muat turun ini (IP pusat data). Ini bukan salah pautan. Cuba lagi nanti atau hubungi admin.';
   if (s.includes('unsupported url')) return 'Pautan ini bukan pautan video.';
   if (s.includes('private') || s.includes('login') || s.includes('sign in') || s.includes('cookies')) return 'Video ini peribadi atau perlukan log masuk, jadi tidak boleh dimuat turun.';
   if (s.includes('not available') || s.includes('unavailable') || s.includes('removed') || s.includes('404')) return 'Video tidak ditemui atau sudah dipadam.';
