@@ -273,3 +273,4 @@ button, a, select, summary { touch-action: manipulation; }
 @media (max-width: 420px) { .footer-stats { gap: 6px; } .fstat { padding: 8px 2px; } .stat-value { font-size: .98rem; } .fstat-label { font-size: .62rem; } .my-clock { padding: 0 9px; font-size: .84rem; } }
 .tool-transform .split > .pane > .pane-head { min-height: 44px; margin-block-end: 10px; }
 .tool-transform .split > .pane > .code-input, .tool-transform .split > .pane > .code-view { box-sizing: border-box; }
+.slogan { margin: 0 auto; }

@@ -1,6 +1,5 @@
 import { h } from '../utils/dom.js';
 import { icon } from '../utils/icons.js';
-import { logo } from './ui-parts.js';
 import { SITE } from '../config.js';
 import { loadSummary, trackVisit } from '../statistics/stats.js';
 import { fmtNum } from '../i18n/i18n.js';
@@ -12,7 +11,7 @@ export function createFooter() {
   const footer = h('footer', { class: 'site-footer', id: 'footer' },
     h('div', { class: 'footer-stats', role: 'group', 'aria-label': 'Statistik' }, users.el, today.el, month.el, total.el),
     h('div', { class: 'footer-main' },
-      h('div', { class: 'footer-brand' }, h('div', { class: 'brand-row' }, logo(40), h('div', {}, h('strong', {}, SITE.name), h('small', {}, SITE.brand))), h('p', { class: 'slogan', i18n: 'footer.slogan' })),
+      h('div', { class: 'footer-brand' }, h('p', { class: 'slogan', i18n: 'footer.slogan' })),
       h('nav', { class: 'footer-links', 'aria-label': 'Footer' }, link('#/about', 'footer.about'), link('#/privacy', 'footer.privacy'), link('#/terms', 'footer.terms'), link('#/contact', 'footer.contact'), link('#/guide', 'footer.guide'))),
     h('div', { class: 'footer-copy' }, h('p', { i18n: 'footer.copyright', i18nArgs: { brand: SITE.brand, year: SITE.year } })));
   const set = (c, n) => { c.v.textContent = n === null || n === undefined ? '—' : fmtNum(n); };

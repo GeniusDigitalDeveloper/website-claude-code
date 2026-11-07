@@ -30,7 +30,7 @@ export function homePage() {
   return h('div', { class: 'page home' }, hero,
     h('div', { class: 'hero-stats' }, stat(TOOLS.length, 'common.tools'), stat(CATEGORIES.length, 'common.categories'), stat(3, 'common.languages'), stat(0, 'common.apiKeys')),
     section('home.categories', cats),
-    section('home.popular', h('p', { class: 'muted note', i18n: 'home.popularNote' }), grid(POPULAR.map(toolById).filter(Boolean))),
+    section('home.popular', grid(POPULAR.map(toolById).filter(Boolean))),
     recent.length ? section('home.recent', grid(recent, { compact: true })) : null);
 }
 
