@@ -2,7 +2,7 @@ import { h } from '../utils/dom.js';
 import { icon } from '../utils/icons.js';
 import { logo } from './ui-parts.js';
 import { SITE } from '../config.js';
-import { loadSummary } from '../statistics/stats.js';
+import { loadSummary, trackVisit } from '../statistics/stats.js';
 import { fmtNum } from '../i18n/i18n.js';
 
 export function createFooter() {
@@ -16,6 +16,7 @@ export function createFooter() {
       h('nav', { class: 'footer-links', 'aria-label': 'Footer' }, link('#/about', 'footer.about'), link('#/privacy', 'footer.privacy'), link('#/terms', 'footer.terms'), link('#/contact', 'footer.contact'), link('#/guide', 'footer.guide'))),
     h('div', { class: 'footer-copy' }, h('p', { i18n: 'footer.copyright', i18nArgs: { brand: SITE.brand, year: SITE.year } })));
   const set = (c, n) => { c.v.textContent = n === null || n === undefined ? '—' : fmtNum(n); };
-  loadSummary().then((s) => { set(users, s.registeredUsers); set(today, s.today); set(month, s.month); set(total, s.total); });
+  // Baca selepas lawatan dicatat supaya angka tidak bercampur dengan tulisan tertunda.
+  trackVisit().catch(() => {}).then(() => loadSummary()).then((s) => { set(users, s.registeredUsers); set(today, s.today); set(month, s.month); set(total, s.total); });
   return footer;
 }

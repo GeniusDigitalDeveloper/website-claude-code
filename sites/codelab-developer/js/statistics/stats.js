@@ -10,7 +10,9 @@ export const provider = new FirebaseProvider(firebaseConfig);
 const fallback = new NullProvider();
 
 /** Catat lawatan sekali sehari bagi setiap pelayar (kunci hari Malaysia). Kiraan global kekal di Firestore. */
-export async function trackVisit() {
+let visitP;
+export function trackVisit() { return (visitP ||= doTrack()); }
+async function doTrack() {
   const today = dayKey();
   if (store.get('lastVisitDay') === today) return false;
   try { await provider.recordVisit(); store.set('lastVisitDay', today); return true; } catch { return false; }
