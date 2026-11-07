@@ -7,7 +7,7 @@ set -euo pipefail
 REPO_URL="${REPO_URL:-https://github.com/izzulisyraf011207/website-claude-code.git}"
 BRANCH="${BRANCH:-claude/video-download-system-6g7ipu}"
 APP_DIR=/opt/fetchrbox
-ORIGINS="${ALLOWED_ORIGIN:-https://fetchrbox-app-izzul.web.app,https://fetchrbox-admin-app-izzul.web.app}"
+ORIGINS="${ALLOWED_ORIGIN:-https://fetchrbox-genius.web.app,https://fetchrbox-genius.firebaseapp.com}"
 
 echo "==> 1/6 Pasang Docker dan git"
 export DEBIAN_FRONTEND=noninteractive

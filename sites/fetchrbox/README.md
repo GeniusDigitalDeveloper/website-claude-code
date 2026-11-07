@@ -2,18 +2,18 @@
 
 Sistem muat turun video dan audio: YouTube, TikTok (tanpa watermark), Instagram, Facebook. Format MP4, MOV, MKV, MP3, M4A, WAV, FLAC. Ada panel admin dan chatbot bantuan.
 
-## Hos: Firebase (projek `fetchrbox-app-izzul`)
+## Hos: Firebase (projek `genius-digital-40bc9`, aplikasi web FETCHR BOX)
 
 | Bahagian | Pautan / lokasi | Status |
 |---|---|---|
-| Laman awam | https://fetchrbox-app-izzul.web.app | Aktif |
-| Panel admin (tapak berasingan) | https://fetchrbox-admin-app-izzul.web.app | Aktif |
-| Pangkalan data | Cloud Firestore `asia-southeast1`, dikongsi kedua-dua tapak, masa nyata | Aktif |
+| Laman awam | https://fetchrbox-genius.web.app | Aktif |
+| Panel admin | https://fetchrbox-genius.web.app/admin | Aktif |
+| Pangkalan data | Cloud Firestore `asia-southeast1`, masa nyata | Aktif |
 | Rules | `firestore.rules` | Aktif |
 | Pengesahan | Firebase Auth, **e-mel + kata laluan sahaja** (tiada Google, tiada e-mel pengesahan) | Aktif |
-| Pelayan muat turun (`server/`, yt-dlp + ffmpeg) | Cloud Run, disambung melalui rewrite `/api/**` | **Belum**, perlukan pelan Blaze |
+| Pelayan muat turun (`server/`, yt-dlp + ffmpeg) | Render (`render.yaml`), URL dalam `public/assets/js/config.js` | Aktif |
 
-Dua tapak Hosting berkongsi folder `public/`. `firebase.json` menetapkan fail mana yang diabaikan bagi setiap tapak, jadi kod admin tidak pernah dihantar ke tapak awam.
+Projek Firebase ini dikongsi dengan aplikasi lain (Auth dan Firestore). Satu tapak Hosting sahaja tersedia, jadi panel admin berada di laluan `/admin` pada tapak yang sama.
 
 ### Pengguna
 Pengguna mesti **daftar** (e-mel + kata laluan) sebelum boleh guna. Selepas daftar mereka terus ke skrin log masuk. Lupa kata laluan: pautan reset dihantar ke e-mel pendaftaran (Firebase). Tiada e-mel pengesahan dihantar semasa daftar.
