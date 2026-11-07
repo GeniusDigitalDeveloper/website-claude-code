@@ -1,5 +1,5 @@
 rules_version = '2';
-// GENIUS DIGITAL (projek Firebase dikongsi) — rules Firestore gabungan 5 aplikasi:
+// GENIUS DIGITAL (projek Firebase dikongsi) — rules Firestore gabungan:
 // Genius Digital (products) | Malaysia PDF Tools | Fetchr Box | Streamverse Gaming | CodeLab Developer
 // Setiap aplikasi mengekalkan peraturan asalnya; fungsi bantu dinamakan semula dengan awalan (pdf/fb/sv/cl).
 // PENTING: fail ini ialah SATU-SATUNYA rules untuk projek. `firebase deploy --only firestore:rules` menggantikan
@@ -15,8 +15,7 @@ service cloud.firestore {
 
     // Pengesahan (login) sahaja BUKAN bukti admin. Claim "admin" mesti true.
     function isAdmin() {
-      return isSignedIn() && (request.auth.token.admin == true
-        || request.auth.token.email == 'izzulmedia01@gmail.com');
+      return isSignedIn() && request.auth.token.admin == true;
     }
 
     function isValidStatus(value) {
@@ -105,18 +104,6 @@ service cloud.firestore {
 
       // Padam: admin sahaja.
       allow delete: if isAdmin();
-    }
-
-    // ---------- Koleksi: genius_site (tetapan laman awam Genius Digital) ----------
-    match /genius_site/{docId} {
-      allow read: if true;
-      allow write: if isAdmin() && docId == 'main'
-        && request.resource.data.keys().hasOnly(['logoURL', 'brandName', 'tagline', 'contact', 'texts', 'updatedAt'])
-        && (!('logoURL' in request.resource.data) || isValidThumbnail(request.resource.data.logoURL))
-        && (!('brandName' in request.resource.data) || (request.resource.data.brandName is string && request.resource.data.brandName.size() <= 60))
-        && (!('tagline' in request.resource.data) || (request.resource.data.tagline is string && request.resource.data.tagline.size() <= 120))
-        && (!('contact' in request.resource.data) || request.resource.data.contact is map)
-        && (!('texts' in request.resource.data) || request.resource.data.texts is map);
     }
 
     // ================= MALAYSIA PDF TOOLS =================
@@ -270,7 +257,8 @@ service cloud.firestore {
 
     // ================= STREAMVERSE GAMING =================
 
-    function verified() { return isSignedIn() && request.auth.token.email_verified == true; }
+    // Pendaftaran tanpa pengesahan email (atas permintaan pemilik): cukup dengan log masuk.
+    function verified() { return isSignedIn(); }
     function svOwner(uid) { return verified() && request.auth.uid == uid; }
     function data() { return request.resource.data; }
     function str(v, min, max) { return v is string && v.size() >= min && v.size() <= max; }
@@ -411,7 +399,7 @@ service cloud.firestore {
     match /_private/{doc=**}  { allow read, write: if false; }   // token OAuth (disulitkan), state OAuth
 
     // ================= CODELAB DEVELOPER =================
-    // Semua koleksi berawalan `codelab_`. Admin = isAdmin() di atas (custom claim admin=true atau e-mel pemilik).
+    // Semua koleksi berawalan `codelab_`. Admin = isAdmin() di atas (custom claim admin=true sahaja).
     //
     // Statistik agregat (tiada data peribadi). Bacaan awam untuk footer. Klien awam hanya boleh:
     //  - mencipta dokumen kiraan dengan visits == 1, atau
