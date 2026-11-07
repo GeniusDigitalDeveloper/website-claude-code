@@ -90,3 +90,25 @@ Ujian tapisan: `node --test server/classify.test.mjs`.
 2. Panel admin > **Kelulusan**: senarai masa nyata, penapis status, catatan pilihan, butang **Dibenarkan** / **Ditolak**. Keputusan menulis `status`, `adminNote`, `decidedAt`, `decidedBy` dan menghantar notis peribadi tiga bahasa ke `users/{uid}/notices/{id}` (muncul dalam loceng pengguna dengan pop-up merah).
 3. Profil pengguna > tab **Permohonan**: status Menunggu / Dibenarkan / Ditolak. Hanya yang Dibenarkan ada butang **Muat turun**.
 4. Pelayan menghormati kelulusan: permintaan membawa `approvalId` + `idToken`; pelayan membaca `requests/{id}` melalui REST Firestore menggunakan token pengguna itu (rules hanya benarkan pemilik membaca dan hanya admin menukar status) dan menyemak `status == approved` serta `url` sepadan (`server/approval.mjs`, ujian: `node --test server/`). Tiada kunci rahsia diperlukan.
+
+
+## Rules Firestore (PENTING)
+
+Projek Firebase `genius-digital-40bc9` dikongsi dengan aplikasi lain, dan rules Firestore-nya ialah **satu fail gabungan**. Fail `firestore.fetchrbox.rules` hanyalah rujukan bahagian Fetchr Box, **jangan deploy** (ia akan memadam rules aplikasi lain). Sebab itu `firebase.json` tidak lagi mengandungi bahagian `firestore`.
+
+Untuk sejarah muat turun di Profil disimpan dalam Firestore, tambah blok ini dalam bahagian FETCHR BOX pada rules gabungan (Firebase Console → Firestore → Rules):
+
+```
+match /users/{uid}/downloads/{did} {
+  allow read: if fbIsAdmin() || (request.auth != null && request.auth.uid == uid);
+  allow create: if request.auth != null && request.auth.uid == uid
+    && request.resource.data.keys().hasOnly(['title', 'format', 'platform', 'at'])
+    && request.resource.data.title is string && request.resource.data.title.size() <= 200
+    && request.resource.data.format is string && request.resource.data.format.size() <= 8
+    && request.resource.data.platform is string && request.resource.data.platform.size() <= 30
+    && request.resource.data.at == request.time;
+  allow update, delete: if false;
+}
+```
+
+Selagi blok itu belum ada, sejarah muat turun disimpan dalam peranti pengguna (localStorage) dan tetap dipaparkan di Profil.

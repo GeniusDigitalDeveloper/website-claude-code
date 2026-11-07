@@ -256,8 +256,12 @@ function paintProfile(d) {
   if (d.photo) { img.src = d.photo; img.hidden = false; $('#avatarInit').hidden = true; } else { img.hidden = true; $('#avatarInit').hidden = false; }
 }
 /* Semua muat turun pengguna (MP4, MP3, MOV, WAV dan lain-lain) dari users/{uid}/downloads, masa nyata */
+const LKEY = () => 'fbx_dl_' + (st.user?.uid || '');
+const localGet = () => { try { return JSON.parse(localStorage.getItem(LKEY()) || '[]'); } catch { return []; } };
+const localAdd = (rec) => { try { localStorage.setItem(LKEY(), JSON.stringify([{ ...rec, id: 'l' + Date.now(), at: Date.now() }, ...localGet()].slice(0, 200))); } catch { /* abaikan */ } };
+const tms = (v) => (v?.toMillis ? v.toMillis() : v?.toDate ? v.toDate().getTime() : v ? new Date(v).getTime() : Date.now());
 function paintDownloads() {
-  const list = downloads.slice(0, 200), fmts = list.map((r) => String(r.format || '').toLowerCase());
+  const list = [...downloads, ...(st.user ? localGet() : [])].sort((a, b) => tms(b.at) - tms(a.at)).slice(0, 200), fmts = list.map((r) => String(r.format || '').toLowerCase());
   const count = (f) => fmts.filter((x) => x === f).length;
   const mp4 = count('mp4'), mp3 = count('mp3'), wav = count('wav'), other = list.length - mp4 - mp3 - wav;
   $('#stTotal').textContent = nf(list.length);
@@ -465,7 +469,7 @@ function done(id, name) {
   setProgress(100, 'finished');
   const href = DEMO ? '#' : fileUrl(id);
   if (!DEMO) { const a = document.createElement('a'); a.href = href; a.download = name || ''; document.body.append(a); a.click(); a.remove(); }
-  if (!DEMO && st.user) { const ext = (String(name || '').match(/\.([a-z0-9]{2,5})$/i) || [])[1] || st.format; fb.addDownload(st.user.uid, { title: st.info?.title || String(name || '').replace(/\.[a-z0-9]{2,5}$/i, ''), format: ext, platform: st.info?.platform?.name || st.info?.platform?.id || '' }).catch(() => {}); }
+  if (!DEMO && st.user) { const ext = (String(name || '').match(/\.([a-z0-9]{2,5})$/i) || [])[1] || st.format; const rec = { title: st.info?.title || String(name || '').replace(/\.[a-z0-9]{2,5}$/i, ''), format: ext, platform: st.info?.platform?.name || st.info?.platform?.id || '' }; fb.addDownload(st.user.uid, rec).catch(() => { localAdd(rec); paintDownloads(); }); }
   sfx.success();
   setTimeout(() => modal({
     icon: 'check', title: t('m_done_title'), text: isIOS ? t('m_done_ios') : t('m_done_text'),
