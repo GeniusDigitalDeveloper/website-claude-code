@@ -40,8 +40,8 @@ function shell() {
   const b = brand(S.settings);
   root.innerHTML = `<div class="shell"><aside class="side" id="side"><a href="#/dashboard" class="brand side-brand"><img src="${esc(b.logo)}" alt="Genius Digital" width="150" height="25"></a><div class="side-app">${t("admin_panel")}</div>
   <nav>${NAV.map(([k, i]) => `<a href="#/${k}" data-nav="${k}">${ico(i)}<span>${t("adm_" + k)}</span></a>`).join("")}<a href="/invoice/">${ico("globe")}<span>${t("view_site")}</span></a></nav>
-  <div class="side-f"><div class="lang" id="lang"></div><button class="btn ghost block" id="out">${ico("logout")}${t("logout")}</button></div></aside><div class="scrim" id="scrim"></div>
-  <div class="main"><header class="app-top"><button class="icon-btn" id="menuBtn" aria-label="Menu">${ico("menu")}</button><span class="app-top-t">${t("admin_panel")}</span><div class="who"><span class="avatar">A</span><span class="who-n">${esc(S.user.email)}</span></div></header><div class="view" id="view"></div>
+  <div class="side-f"><button class="btn ghost block" id="out">${ico("logout")}${t("logout")}</button></div></aside><div class="scrim" id="scrim"></div>
+  <div class="main"><header class="app-top"><button class="icon-btn" id="menuBtn" aria-label="Menu">${ico("menu")}</button><span class="app-top-t">${t("admin_panel")}</span><div class="top-r"><div class="lang" id="lang"></div><div class="who"><span class="avatar">A</span><span class="who-n">${esc(S.user.email)}</span></div></div></header><div class="view" id="view"></div>
   <footer class="site-footer"><div class="wrap"><p class="ft-slogan">${esc(t("slogan"))}</p><p class="ft-copy">${esc(t("copyright"))}</p></div></footer></div></div>`;
   langSwitcher($("#lang")); const side = $("#side"), scrim = $("#scrim"); const tog = (o) => { side.classList.toggle("open", o); scrim.classList.toggle("on", o); };
   $("#menuBtn").onclick = () => tog(!side.classList.contains("open")); scrim.onclick = () => tog(false); side.addEventListener("click", (e) => e.target.closest("a") && tog(false));

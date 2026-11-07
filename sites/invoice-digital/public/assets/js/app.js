@@ -87,14 +87,14 @@ function renderAuth(mode, q) {
 }
 
 // ---------------------------------------------------------------- APP SHELL
-const NAV = [["dashboard", "home"], ["invoices", "doc"], ["quotations", "quote"], ["receipts", "receipt"], ["customers", "users"], ["products", "box"], ["company", "building"], ["history", "clock"], ["settings", "gear"]];
+const NAV = [["dashboard", "home"], ["invoices", "doc"], ["quotations", "quote"], ["receipts", "receipt"], ["customers", "users"], ["products", "box"], ["history", "clock"], ["profile", "gear"]];
 const MOBILE = ["dashboard", "invoices", "quotations", "receipts"];
 function renderShell() {
   const b = brand(S.settings);
   root.innerHTML = `<div class="shell"><aside class="side" id="side"><a href="#/" class="brand side-brand"><img src="${esc(b.logo)}" alt="Genius Digital" width="150" height="25"></a><div class="side-app">${esc(b.name)}</div>
    <nav aria-label="Menu utama">${NAV.map(([k, i]) => `<a href="#/app/${k}" data-nav="${k}">${ico(i)}<span>${t("nav_" + k)}</span></a>`).join("")}</nav>
-   <div class="side-f"><div class="lang" id="lang"></div><button class="btn ghost block" id="out">${ico("logout")}${t("logout")}</button></div></aside><div class="scrim" id="scrim"></div>
-   <div class="main"><header class="app-top"><button class="icon-btn" id="menuBtn" aria-label="Menu" aria-expanded="false">${ico("menu")}</button><span class="app-top-t" id="topT"></span><div class="who" id="who"></div></header>
+   <div class="side-f"><button class="btn ghost block" id="out">${ico("logout")}${t("logout")}</button></div></aside><div class="scrim" id="scrim"></div>
+   <div class="main"><header class="app-top"><button class="icon-btn" id="menuBtn" aria-label="Menu" aria-expanded="false">${ico("menu")}</button><span class="app-top-t" id="topT"></span><div class="top-r"><div class="lang" id="lang"></div><a class="who" id="who" href="#/app/profile/account" aria-label="${t("nav_profile")}"></a></div></header>
    <div class="view" id="view"></div>${footerHtml(S.settings)}</div>
    <nav class="bottom" aria-label="Navigasi bawah">${MOBILE.map((k) => `<a href="#/app/${k}" data-nav="${k}">${ico(NAV.find((n) => n[0] === k)[1])}<span>${t("nav_" + k)}</span></a>`).join("")}<button type="button" id="moreBtn">${ico("menu")}<span>${t("more")}</span></button></nav></div>`;
   langSwitcher($("#lang")); fillFooterStats(root); renderShellHeader();
@@ -111,20 +111,23 @@ async function renderApp(segs, q) {
   if (!S.shell || !$("#view")) renderShell();
   const page = segs[0] || "dashboard", sub = segs[1], sub2 = segs[2];
   $$("[data-nav]").forEach((a) => a.classList.toggle("on", a.dataset.nav === page));
-  $("#topT").textContent = t("nav_" + page) || ""; const view = $("#view"); view.onclick = null; window.scrollTo(0, 0);
+  $("#topT").textContent = t("nav_" + page) || "";
+  // Setiap laluan dapat bekas baharu: paparan lama yang lewat siap tidak boleh menimpa halaman semasa.
+  const view = document.createElement("div"); $("#view").replaceChildren(view); window.scrollTo(0, 0);
   try {
-    if (page === "dashboard") return (await import("./modules/dashboard.js")).render(view, ctx);
+    if (page === "dashboard") return await (await import("./modules/dashboard.js")).render(view, ctx);
     if (page === "invoices" || page === "quotations") {
       const type = page === "invoices" ? "invoice" : "quotation"; const M = await import("./modules/documents.js");
       if (!sub) return M.renderList(view, ctx, type); if (sub === "new") return M.renderEditor(view, ctx, type, null);
       return sub2 === "edit" ? M.renderEditor(view, ctx, type, sub) : M.renderView(view, ctx, type, sub);
     }
     if (page === "receipts") { const M = await import("./modules/receipts.js"); return sub === "new" ? M.renderForm(view, ctx, q) : M.renderList(view, ctx); }
-    if (page === "customers") return (await import("./modules/customers.js")).renderList(view, ctx);
-    if (page === "products") return (await import("./modules/products.js")).renderList(view, ctx);
-    if (page === "company") return (await import("./modules/company.js")).render(view, ctx);
-    if (page === "history") return (await import("./modules/history.js")).render(view, ctx);
-    if (page === "settings") return (await import("./modules/settings.js")).render(view, ctx);
+    if (page === "customers") return await (await import("./modules/customers.js")).renderList(view, ctx);
+    if (page === "products") return await (await import("./modules/products.js")).renderList(view, ctx);
+    if (page === "profile") return await (await import("./modules/profile.js")).render(view, ctx, sub);
+    if (page === "company") return ctx.nav("#/app/profile/business");
+    if (page === "settings") return ctx.nav("#/app/profile/settings");
+    if (page === "history") return await (await import("./modules/history.js")).render(view, ctx);
     ctx.nav("#/app/dashboard");
   } catch (e) { console.error(e); view.innerHTML = `<p class="err">${esc(errMsg(e))}</p>`; }
 }
