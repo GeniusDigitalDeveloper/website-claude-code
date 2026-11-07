@@ -1,11 +1,12 @@
 // Modul Invoice & Quotation: senarai, borang (cipta/edit), paparan + tindakan.
 import { t, getLang } from "../i18n.js";
-import { esc, $, $$, money, num, round2, calc, fmtDate, todayMY, addDays, toast, setBusy, invoiceStatus, quotationStatus, debounce, modal, confirmBox } from "../util.js";
-import { listAll, getOne, create, update, remove, createNumbered, logActivity } from "../db.js";
+import { esc, $, $$, money, num, round2, calc, fmtDate, todayMY, addDays, toast, setBusy, readFileAsDataURL, invoiceStatus, quotationStatus, debounce, modal, confirmBox } from "../util.js";
+import { listAll, getOne, create, update, remove, createNumbered, logActivity, setMeta } from "../db.js";
+import { pickerHtml, bindPicker } from "../picker.js";
 import { F } from "../firebase.js";
 import { errMsg } from "../auth.js";
 import { ico, empty, loading, badge } from "./ui.js";
-import { pdfAction } from "./actions.js";
+import { pdfAction, makePdf } from "./actions.js";
 import { recordPayment, METHODS } from "./receipts.js";
 import { TEMPLATES } from "../pdf.js";
 
@@ -73,6 +74,7 @@ export async function renderEditor(el, ctx, type, id) {
     <label class="chk ${d.customerId ? "hide" : ""}" id="saveCustW"><input type="checkbox" name="saveCust" checked> ${t("save_customer")}</label>
    </section>
    <section class="card form"><h2>${t("sec_details")}</h2>
+    <div class="logo-inline"><div class="lp" id="lgp">${company.logo ? `<img alt="Logo" src="${esc(company.logo)}">` : t("no_logo")}</div><div><b>${t("logo_in_doc")}</b><br><label class="btn ghost sm file">${t("upload_logo")}<input type="file" id="lgf" accept="image/png,image/jpeg,image/webp" hidden></label></div></div>
     <div class="grid3"><label>${t("f_date")}<input name="date" type="date" value="${esc(d.date)}" required></label>
     <label>${t(type === "invoice" ? "f_due" : "f_valid")}<input name="due" type="date" value="${esc(dueOf(type, d))}" required></label>
     <label>${t("f_status")}<select name="status">${C.statuses.map((s) => `<option value="${s}" ${s === d.status ? "selected" : ""} ${type === "quotation" && s === "converted" && !d.convertedInvoiceId ? "disabled" : ""}>${t("st_" + s)}</option>`).join("")}</select></label></div>
@@ -81,12 +83,12 @@ export async function renderEditor(el, ctx, type, id) {
     <div id="items" class="items"></div></section>
    <section class="card form"><div class="grid2">
     <div class="form"><label>${t("pdf_note")}<textarea name="note" rows="3" maxlength="1000">${esc(d.note)}</textarea></label><label>${t("pdf_terms")}<textarea name="terms" rows="4" maxlength="2000">${esc(d.terms)}</textarea></label>
-     <div class="grid2"><label>${t("f_template")}<select name="template">${Object.keys(TEMPLATES).map((k) => `<option value="${k}" ${k === d.template ? "selected" : ""}>${t("tpl_" + k)}</option>`).join("")}</select></label><label>${t("f_color")}<input name="color" type="color" value="${esc(d.color)}"></label></div></div>
+     ${pickerHtml(d.template, d.color)}</div>
     <div class="form sum"><div class="grid2"><label>${t("f_docdisc")} (RM)<input name="docDiscount" type="number" min="0" step="0.01" value="${num(d.docDiscount)}"></label><label>${t("f_tax")} (%)<input name="taxRate" type="number" min="0" max="100" step="0.01" value="${num(d.taxRate)}"></label></div>
      ${type === "invoice" ? `<label>${t("pdf_deposit")} (RM)<input name="deposit" type="number" min="0" step="0.01" value="${num(d.deposit)}"></label>` : ""}
      <div id="sum" class="totals" aria-live="polite"></div></div></div></section>
    <p class="err" id="err" role="alert"></p>
-   <div class="form-f sticky"><a class="btn ghost" href="#/app/${C.route}">${t("cancel")}</a><button class="btn primary" type="submit">${ico("check")}${t("save")}</button></div>
+   <div class="form-f sticky"><a class="btn ghost" href="#/app/${C.route}">${t("cancel")}</a><button class="btn ghost" type="button" id="prev">${ico("eye")}${t("preview_draft")}</button><button class="btn primary" type="submit">${ico("check")}${t("save")}</button></div>
   </form>`;
   const f = $("#f", el); const itemsEl = $("#items", el);
   const readItems = () => $$(".item", itemsEl).forEach((row, k) => { items[k] = { ...items[k], name: row.querySelector("[data-k=name]").value, desc: row.querySelector("[data-k=desc]").value, qty: num(row.querySelector("[data-k=qty]").value), price: num(row.querySelector("[data-k=price]").value), discount: num(row.querySelector("[data-k=discount]").value) }; });
@@ -100,7 +102,22 @@ export async function renderEditor(el, ctx, type, id) {
       <div class="item-nums"><label>${t("pdf_qty")}<input data-k="qty" type="number" min="0" step="any" value="${num(i.qty)}"></label><label>${t("pdf_price")}<input data-k="price" type="number" min="0" step="0.01" value="${num(i.price)}"></label><label>${t("pdf_disc")} %<input data-k="discount" type="number" min="0" max="100" step="0.01" value="${num(i.discount)}"></label><div class="amt-w"><span>${t("pdf_amount")}</span><b class="amt"></b></div><button type="button" class="icon-btn danger" data-del="${k}" aria-label="${t("delete")}">${ico("trash")}</button></div></div>`).join("");
     drawSum();
   };
-  drawItems();
+  drawItems(); bindPicker(el);
+  $("#lgf", el).onchange = async (e) => {
+    const file = e.target.files[0]; if (!file) return;
+    try { let logo = await readFileAsDataURL(file, 400); if (logo.length > 250000) logo = await readFileAsDataURL(file, 260, 0.75);
+      await setMeta(ctx.uid, "company", { ...company, logo }); company = await ctx.getCompany(true); $("#lgp", el).innerHTML = `<img alt="Logo" src="${esc(company.logo)}">`; toast(t("saved")); }
+    catch (x) { console.error(x); toast(t("err_file"), "err"); }
+  };
+  $("#prev", el).onclick = async (e) => {
+    const btn = e.currentTarget; setBusy(btn, true); const dn = docNow();
+    try {
+      const docObj = { number: doc ? doc.number : "PRATONTON", date: f.date.value, status: f.status.value, customer: { name: f.cname.value.trim() || "-", company: f.ccompany.value.trim(), address: f.caddress.value.trim(), phone: f.cphone.value.trim(), email: f.cemail.value.trim(), regNo: f.cregNo.value.trim() },
+        items: items.filter((i) => i.name.trim()), docDiscount: dn.docDiscount, taxRate: dn.taxRate, taxName: d.taxName || "SST", deposit: dn.deposit, receiptsPaid: d.receiptsPaid || 0, note: f.note.value.trim(), terms: f.terms.value.trim(), template: f.template.value, color: f.color.value,
+        ...(type === "invoice" ? { dueDate: f.due.value } : { validUntil: f.due.value }) };
+      const pdf = await makePdf(ctx, type, docObj); window.open(URL.createObjectURL(pdf.output("blob")), "_blank");
+    } catch (x) { console.error(x); toast(t("pdf_fail"), "err"); } setBusy(btn, false);
+  };
   f.addEventListener("input", (e) => { if (e.target.closest("#items") || ["docDiscount", "taxRate", "deposit"].includes(e.target.name)) drawSum(); });
   itemsEl.onclick = (e) => { const b = e.target.closest("[data-del]"); if (!b) return; readItems(); items.splice(+b.dataset.del, 1); if (!items.length) items.push({ name: "", desc: "", qty: 1, price: 0, discount: 0 }); drawItems(); };
   $("#addItem", el).onclick = () => { readItems(); items.push({ name: "", desc: "", qty: 1, price: 0, discount: 0 }); drawItems(); itemsEl.querySelector(".item:last-child input").focus(); };

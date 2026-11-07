@@ -3,7 +3,7 @@ import { esc, $, num, toast, setBusy, readFileAsDataURL, isHttps } from "../util
 import { setMeta } from "../db.js";
 import { errMsg } from "../auth.js";
 import { loading } from "./ui.js";
-import { TEMPLATES } from "../pdf.js";
+import { pickerHtml, bindPicker } from "../picker.js";
 
 export async function render(el, ctx) {
   el.innerHTML = loading(); const c = await ctx.getCompany(true); const st = await ctx.getSettings(); let logo = c.logo || "";
@@ -16,11 +16,11 @@ export async function render(el, ctx) {
    <label>${t("pdf_bank")}<textarea name="bank" rows="3" maxlength="500" placeholder="Maybank 1234567890 — Nama Syarikat">${esc(c.bank)}</textarea></label>
    <h2>${t("doc_defaults")}</h2>
    <div class="grid3"><label>${t("f_taxname")}<input name="taxName" maxlength="20" value="${esc(c.taxName ?? st.taxName ?? "SST")}"></label><label>${t("f_tax")} (%)<input name="taxRate" type="number" min="0" max="100" step="0.01" value="${num(c.taxRate ?? st.taxRate)}"></label>
-   <label>${t("f_template")}<select name="template">${Object.keys(TEMPLATES).map((k) => `<option value="${k}" ${k === (c.template || "classic") ? "selected" : ""}>${t("tpl_" + k)}</option>`).join("")}</select></label></div>
-   <label>${t("f_color")}<input name="color" type="color" value="${esc(c.color || "#2563eb")}"></label>
+   </div>
+   ${pickerHtml(c.template, c.color)}
    <label>${t("pdf_terms")}<textarea name="terms" rows="4" maxlength="2000">${esc(c.terms ?? st.terms)}</textarea></label>
    <p class="err" id="err" role="alert"></p><div class="form-f"><button class="btn primary" type="submit">${t("save")}</button></div></form>`;
-  const f = $("#f", el);
+  const f = $("#f", el); bindPicker(el);
   $("#lf", el).onchange = async (e) => { const file = e.target.files[0]; if (!file) return; if (file.size > 5e6) return toast(t("err_file"), "err"); try { logo = await readFileAsDataURL(file, 400); if (logo.length > 250000) logo = await readFileAsDataURL(file, 260, 0.75); $("#lp", el).innerHTML = `<img alt="Logo" src="${logo}">`; } catch (x) { toast(t("err_file"), "err"); } };
   $("#lrm", el).onclick = () => { logo = ""; $("#lp", el).innerHTML = `<span>${t("no_logo")}</span>`; };
   f.onsubmit = async (e) => { e.preventDefault(); const err = $("#err", el); err.textContent = ""; const btn = $("button[type=submit]", f);

@@ -19,6 +19,9 @@ export const TEMPLATES = {
   minimal: { font: "helvetica", band: false, center: false, head: "none", zebra: false, rule: true },
   corporate: { font: "helvetica", band: false, center: false, head: "dark", zebra: true, rule: true, side: true },
   elegant: { font: "times", band: false, center: true, head: "none", zebra: false, rule: true, double: true },
+  bold: { font: "helvetica", band: true, bandH: 46, center: false, head: "dark", zebra: true, rule: false },
+  ribbon: { font: "helvetica", band: false, center: false, head: "accent", zebra: false, rule: false, pill: true },
+  compact: { font: "helvetica", band: false, center: false, head: "none", zebra: false, rule: true, small: true },
 };
 const hex = (h) => { const m = /^#?([0-9a-f]{6})$/i.exec(h || ""); const n = parseInt(m ? m[1] : "2563eb", 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
 const clean = (s) => String(s ?? "").replace(/[–—]/g, "-").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/…/g, "...").replace(/[^\u0009\u000A -ÿ€]/g, "?");
@@ -38,7 +41,8 @@ export async function buildPdf(type, doc, company = {}, opts = {}) {
   let y = 14;
 
   if (T.side) { pdf.setFillColor(...accent); pdf.rect(0, 0, 6, H, "F"); }
-  if (T.band) { pdf.setFillColor(...accent); pdf.rect(0, 0, W, 34, "F"); }
+  const bandH = T.bandH || 34;
+  if (T.band) { pdf.setFillColor(...accent); pdf.rect(0, 0, W, bandH, "F"); }
 
   // --- Pengepala: logo + maklumat syarikat
   let logoW = 0;
@@ -62,7 +66,8 @@ export async function buildPdf(type, doc, company = {}, opts = {}) {
   const title = t(TITLE[type]).toUpperCase();
   pdf.setFont(F, "bold"); pdf.setFontSize(T.center ? 20 : 22); setC(T.band ? [255, 255, 255] : accent);
   if (T.center) { y = Math.max(cy, y + 14) + 4; txt(title, W / 2, y, { align: "center" }); y += 3; }
-  else { txt(title, R, T.band ? 22 : y + 6, { align: "right" }); y = Math.max(cy, T.band ? 38 : y + 14) + 2; }
+  else if (T.pill) { pdf.setFillColor(...accent); pdf.roundedRect(R - 52, y - 2, 52, 12, 6, 6, "F"); pdf.setFontSize(13); setC([255, 255, 255]); txt(title, R - 26, y + 6.2, { align: "center" }); y = Math.max(cy, y + 16) + 2; }
+  else { txt(title, R, T.band ? bandH / 2 + 4 : y + 6, { align: "right" }); y = Math.max(cy, T.band ? bandH + 4 : y + 14) + 2; }
   if (T.rule) { pdf.setDrawColor(...accent); pdf.setLineWidth(T.double ? 0.2 : 0.5); pdf.line(L, y, R, y); if (T.double) pdf.line(L, y + 1.2, R, y + 1.2); }
   y += 7;
 
@@ -102,7 +107,7 @@ export async function buildPdf(type, doc, company = {}, opts = {}) {
   const headText = T.head === "none" ? dark : [255, 255, 255];
   pdf.autoTable({
     startY: y, head, body, theme: "plain", margin: { left: L, right: M, top: 16, bottom: 22 },
-    styles: { font: F, fontSize: 9, cellPadding: { top: 2.6, bottom: 2.6, left: 2.5, right: 2.5 }, textColor: dark, overflow: "linebreak", lineColor: [226, 232, 240], lineWidth: { bottom: 0.2 } },
+    styles: { font: F, fontSize: T.small ? 8 : 9, cellPadding: T.small ? { top: 1.6, bottom: 1.6, left: 2, right: 2 } : { top: 2.6, bottom: 2.6, left: 2.5, right: 2.5 }, textColor: dark, overflow: "linebreak", lineColor: [226, 232, 240], lineWidth: { bottom: 0.2 } },
     headStyles: { fillColor: headFill, textColor: headText, fontStyle: "bold", fontSize: 8.5, lineWidth: T.head === "none" ? { bottom: 0.6 } : 0, lineColor: accent },
     alternateRowStyles: T.zebra ? { fillColor: [247, 249, 252] } : {},
     columnStyles: { 0: { cellWidth: 9, halign: "center" }, 1: { cellWidth: "auto" }, 2: { cellWidth: 16, halign: "right" }, 3: { cellWidth: 26, halign: "right" }, 4: { cellWidth: 16, halign: "right" }, 5: { cellWidth: 28, halign: "right" } },
