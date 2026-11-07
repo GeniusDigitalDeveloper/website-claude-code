@@ -63,7 +63,7 @@
  "stats.users": "Registered Users",
  "stats.today": "Visitors Today",
  "stats.month": "Visitors This Month",
- "stats.total": "Total Visitors",
+ "stats.total": "All-time Total",
  "stats.notConnected": "The database is not connected yet — figures are shown as “—” rather than fake data. Global statistics will go live once Firebase is connected.",
  "stats.connected": "Connected to the shared database.",
  "stats.ruleDay": "Visitors Today: recounted every day at 12:00 midnight Malaysia time. Next reset in",

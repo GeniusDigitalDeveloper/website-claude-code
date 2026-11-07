@@ -63,7 +63,7 @@
  "stats.users": "Pengguna Berdaftar",
  "stats.today": "Pelawat Hari Ini",
  "stats.month": "Pelawat Bulan Ini",
- "stats.total": "Jumlah Pelawat Keseluruhan",
+ "stats.total": "Jumlah Keseluruhan",
  "stats.notConnected": "Pangkalan data belum disambungkan — angka dipaparkan sebagai “—” dan bukan data sebenar. Statistik global akan aktif selepas Firebase disambungkan.",
  "stats.connected": "Disambungkan ke pangkalan data kongsi.",
  "stats.ruleDay": "Pelawat Hari Ini: dikira semula setiap hari pada 12:00 tengah malam waktu Malaysia. Reset seterusnya dalam",

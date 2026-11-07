@@ -220,3 +220,56 @@ ul.alert { display: grid; gap: 4px; } ul.alert li { list-style: disc; margin-inl
 }
 .pw-box { display: grid; gap: 12px; } .pw-box .meter { margin-block: 0; } .pw-box p { margin: 0; }
 @media (max-width: 420px) { .brand-text strong { font-size: .84rem; } .brand { gap: 6px; } .site-header { gap: 6px; padding-inline: 10px; } }
+
+/* ================= Pembaikan v2 ================= */
+/* --- jam waktu Malaysia (pengepala) --- */
+.my-clock { display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; height: 44px; border-radius: 12px; background: #eef2ff; color: var(--primary-600); font-weight: 800; font-size: .92rem; font-variant-numeric: tabular-nums; flex: none; white-space: nowrap; }
+.my-clock small { font-size: .68rem; font-weight: 700; opacity: .8; letter-spacing: .04em; }
+@media (max-width: 1023px) {
+  .my-clock { order: 10; height: 44px; }
+  .search { order: 11; flex: 1 1 0; min-width: 0; }
+  .site-header .lang-switch { margin-inline-start: auto; }
+}
+
+/* --- footer ringkas --- */
+.site-footer { padding: 18px 16px 14px; text-align: center; }
+.footer-stats { max-width: 720px; margin: 0 auto 18px; padding: 0; border: 0; background: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.fstat { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 8px 6px; border-radius: 12px; background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .1); min-width: 0; }
+.fstat .icon { color: #a5b4fc; }
+.stat-value { font-size: 1.05rem; font-weight: 800; color: #fff; line-height: 1.15; }
+.fstat-label { font-size: .68rem; line-height: 1.2; color: #cbd5e1; text-align: center; }
+.footer-main { flex-direction: column; align-items: center; justify-content: center; gap: 12px; margin-block: 0; text-align: center; }
+.footer-brand { display: grid; justify-items: center; }
+.brand-row { justify-content: center; text-align: start; }
+.slogan { margin: 10px auto 0; text-align: center; }
+.footer-links { justify-content: center; }
+.footer-copy { text-align: center; font-size: .78rem; margin-block-start: 14px; padding-block-start: 12px; }
+
+/* --- kotak Input / Hasil: sama saiz, panjang bersama --- */
+.tool-transform .split { align-items: stretch; }
+.tool-transform .split > .pane { display: flex; flex-direction: column; min-width: 0; }
+.tool-transform .split > .pane > .code-input,
+.tool-transform .split > .pane > .code-view { flex: 1 1 auto; height: auto; min-height: 380px; max-height: none; resize: none; margin: 0; overflow: auto; }
+.tool-transform .split > .pane > .code-view { white-space: pre; overflow-wrap: normal; }
+.tool-transform .split > .pane > .code-input { overflow: auto; }
+
+/* --- skrin besar (TV) --- */
+@media (min-width: 1800px) { html { font-size: 112.5%; } .page { max-width: 1560px; } :root { --sb-w: 300px; --header-h: 76px; } }
+@media (min-width: 2400px) { html { font-size: 140%; } .page { max-width: 1900px; } :root { --sb-w: 320px; --header-h: 84px; } }
+
+/* --- sentuh (iPhone/Android/iPad): elak zum auto iOS, sasaran ≥44px, ruang selamat --- */
+html { -webkit-tap-highlight-color: transparent; }
+button, a, select, summary { touch-action: manipulation; }
+@media (pointer: coarse) {
+  input, select, textarea, .code-input { font-size: 16px; }
+  .btn, .chip, .tab, .tool-card-link { min-height: 44px; }
+}
+@supports (padding: max(0px)) {
+  .site-header { padding-inline: max(clamp(12px, 2vw, 28px), env(safe-area-inset-left), env(safe-area-inset-right)); }
+  .site-footer { padding-bottom: max(14px, env(safe-area-inset-bottom)); }
+  main { padding-inline: max(clamp(16px, 2.4vw, 32px), env(safe-area-inset-left), env(safe-area-inset-right)); }
+}
+@media (max-width: 900px) { .split { grid-template-columns: 1fr; } .tool-transform .split > .pane > .code-input, .tool-transform .split > .pane > .code-view { min-height: 260px; } }
+@media (max-width: 420px) { .footer-stats { gap: 6px; } .fstat { padding: 8px 2px; } .stat-value { font-size: .98rem; } .fstat-label { font-size: .62rem; } .my-clock { padding: 0 9px; font-size: .84rem; } }
+.tool-transform .split > .pane > .pane-head { min-height: 44px; margin-block-end: 10px; }
+.tool-transform .split > .pane > .code-input, .tool-transform .split > .pane > .code-view { box-sizing: border-box; }

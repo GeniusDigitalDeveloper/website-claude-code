@@ -4,6 +4,15 @@ import { logo } from './ui-parts.js';
 import { createSearch } from './search.js';
 import { LANGS, getLang, setLang, onLangChange } from '../i18n/i18n.js';
 import { SITE } from '../config.js';
+import { klParts } from '../statistics/kl-time.js';
+
+/** Jam waktu Malaysia (MYT, UTC+8) — dikira daripada zon Asia/Kuala_Lumpur, bukan jam peranti. */
+function myClock() {
+  const t = h('time', { dir: 'ltr' }); const el = h('div', { class: 'my-clock', role: 'timer', 'aria-label': 'Waktu Malaysia' }, icon('clock', 15), t, h('small', {}, 'MYT'));
+  const p2 = (n) => String(n).padStart(2, '0');
+  const tick = () => { const k = klParts(); t.textContent = `${p2(k.hour)}:${p2(k.minute)}:${p2(k.second)}`; };
+  tick(); setInterval(tick, 1000); return el;
+}
 
 export function createHeader({ onMenu }) {
   const menu = h('button', { type: 'button', class: 'icon-btn menu-btn', aria: 'nav.menu', 'aria-controls': 'sidebar', onclick: onMenu }, icon('menu', 22));
@@ -14,5 +23,5 @@ export function createHeader({ onMenu }) {
     Object.entries(LANGS).map(([code, l]) => h('button', { type: 'button', class: 'lang-btn', lang: code, 'aria-pressed': String(code === getLang()), title: l.name, onclick: () => setLang(code) }, l.label)));
   onLangChange((l) => langs.querySelectorAll('.lang-btn').forEach((b) => b.setAttribute('aria-pressed', String(b.lang === l))));
   const brand = h('a', { class: 'brand', href: '#/', 'aria-label': SITE.name }, logo(38), h('span', { class: 'brand-text' }, h('strong', {}, SITE.name), h('small', {}, SITE.brand)));
-  return h('header', { class: 'site-header', id: 'header' }, menu, brand, nav, createSearch(), langs);
+  return h('header', { class: 'site-header', id: 'header' }, menu, brand, nav, createSearch(), myClock(), langs);
 }
