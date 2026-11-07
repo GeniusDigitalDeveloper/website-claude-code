@@ -111,3 +111,41 @@ input:focus,select:focus,textarea:focus{outline:0;border-color:var(--blue);box-s
 .sec-t{margin:22px 0 10px;font-size:1.02rem}.sec-t:first-child{margin-top:0}#pbody .card{margin-top:0}
 .top-r .btn.sm{padding:6px 12px}
 @media(max-width:560px){.out-t{display:none}.top-r .btn.sm{padding:0;width:38px;min-height:38px}.top-r{gap:8px}}
+
+/* === Mesra peranti: iPhone/Android/iPad/tablet/laptop/TV === */
+html{-webkit-tap-highlight-color:transparent}
+button,a,input,select,textarea,label,summary{touch-action:manipulation}
+.auth-page,.boot,.shell{min-height:100vh;min-height:100dvh}
+.side{height:100vh;height:100dvh}
+.modal{max-height:92vh;max-height:92dvh}
+/* Notch / safe-area (iPhone landscape, Android cutout) */
+.topbar,.app-top{padding-left:max(0px,env(safe-area-inset-left));padding-right:max(0px,env(safe-area-inset-right))}
+.app-top{padding-top:env(safe-area-inset-top)}
+.topbar{padding-top:env(safe-area-inset-top)}
+.wrap,.view{padding-left:max(20px,env(safe-area-inset-left));padding-right:max(20px,env(safe-area-inset-right))}
+/* iOS Safari zum automatik bila fon input < 16px */
+@media(max-width:1024px){input,select,textarea{font-size:16px}}
+/* Sasaran sentuh >= 44px untuk skrin sentuh */
+@media(pointer:coarse){.btn{min-height:44px}.icon-btn,.eye{min-width:44px;min-height:44px}.lang button{padding:8px 13px}.tabs a{min-height:44px}.sw{width:38px;height:38px}.side nav a{min-height:46px}.subnav a{min-height:42px}}
+/* Telefon landskap (tinggi rendah): bar bawah lebih kecil */
+@media(max-height:480px) and (max-width:900px){.bottom a span,.bottom button span{display:none}.view{padding-bottom:70px}.hero{padding:24px 0}}
+/* Tablet (iPad portrait/landscape): sidebar tetap kelihatan, kandungan penuh */
+@media(min-width:861px) and (max-width:1100px){:root{--side:230px}.view{padding:22px 18px}.stats{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}.charts{grid-template-columns:1fr}}
+/* Skrin besar & TV: skala keseluruhan UI supaya mudah dibaca dari jauh */
+@media(min-width:1920px){html{zoom:1.2}}
+@media(min-width:2560px){html{zoom:1.6}}
+@media(min-width:3400px){html{zoom:2.2}}
+@media(min-width:1920px){.wrap{max-width:1320px}.view{max-width:1400px}}
+/* TV: fokus kelihatan jelas untuk kawalan jauh / papan kekunci */
+@media(min-width:1920px){:focus-visible{outline-width:4px}}
+
+/* foto profil, QR bank, sasaran sentuh */
+.avatar{overflow:hidden;position:relative}.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.avatar-row{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.avatar-big{width:84px;height:84px;border-radius:50%;background:var(--grad2);color:#fff;display:grid;place-items:center;font-size:2rem;font-weight:800;overflow:hidden;flex:none;box-shadow:var(--sh)}.avatar-big img{width:100%;height:100%;object-fit:cover}
+.avatar-row p{margin:2px 0 8px}.sep{border:0;border-top:1px solid var(--line);margin:4px 0}
+.bank-g{display:grid;grid-template-columns:1fr 210px;gap:16px;align-items:start}.qr-box{display:grid;gap:8px;justify-items:start}.qr-box .lbl{font-size:.82rem;font-weight:600;color:var(--ink2)}.qr-prev{width:132px;height:132px;border:2px dashed #cbd5e1;border-radius:14px;background:#fff;display:grid;place-items:center;overflow:hidden;color:var(--mut);font-size:.78rem;text-align:center}.qr-prev img{width:100%;height:100%;object-fit:contain}.qr-box .muted{margin:0}
+@media(max-width:700px){.bank-g{grid-template-columns:1fr}}
+@media(pointer:coarse){.lang button{min-height:40px;min-width:44px}.sw.custom input{height:100%;min-height:100%}}
+/* Skrin sangat sempit (iPhone SE lama / Android kecil, 320-380px) */
+@media(max-width:380px){.auth-main{padding:20px 12px}.auth-card{padding:18px}.btn.block{white-space:normal}.app-top{padding:8px 8px;gap:6px}.app-top .app-top-t{display:none}.top-r{gap:6px;margin-left:auto}.lang button{padding:6px 9px;min-width:36px}.avatar{width:32px;height:32px}.view{padding:16px 12px 92px}.hero h1{font-size:1.85rem}.card{padding:14px}.stat{padding:12px}.tabs a{padding:9px 12px}}
+.sw.custom input{padding:0}

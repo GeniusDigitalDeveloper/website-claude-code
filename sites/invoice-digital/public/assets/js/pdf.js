@@ -140,7 +140,17 @@ export async function buildPdf(type, doc, company = {}, opts = {}) {
     lines.forEach((p) => { if (y > H - 22) { pdf.addPage(); y = 18; } txt(p, L, y); y += 4.2; }); y += 3;
   };
   block(t("pdf_note"), doc.note);
-  if (type === "invoice") block(t("pdf_bank"), company.bank);
+  if (type === "invoice") {
+    if (company.bankQr && /^data:image\/(png|jpeg|webp)/.test(company.bankQr) && company.bank !== undefined) {
+      // Maklumat bank di kiri, kod QR di kanan (sebelah). Jika ruang tak cukup, pindah ke halaman seterusnya.
+      const q = 30, lines = pdf.splitTextToSize(clean(company.bank || ""), R - L - q - 8); const h = Math.max(6 + lines.length * 4.2, q + 12);
+      if (y + h > H - 22) { pdf.addPage(); y = 18; }
+      pdf.setFont(F, "bold"); pdf.setFontSize(8); setC(accent); txt(t("pdf_bank").toUpperCase(), L, y); pdf.setFont(F, "normal"); pdf.setFontSize(8.5); setC(dark);
+      lines.forEach((ln, i) => txt(ln, L, y + 4.6 + i * 4.2));
+      try { pdf.addImage(company.bankQr, pdf.getImageProperties(company.bankQr).fileType || "PNG", R - q, y - 1, q, q); } catch (e) { console.warn("qr", e); }
+      pdf.setFontSize(7); setC(grey); txt(t("pdf_scan"), R - q / 2, y + q + 3.4, { align: "center" }); y += h + 1;
+    } else block(t("pdf_bank"), company.bank);
+  }
   block(t("pdf_terms"), doc.terms);
   if (opts.signature !== false) {
     if (y + 26 > H - 20) { pdf.addPage(); y = 18; }
@@ -161,8 +171,10 @@ export async function buildPdf(type, doc, company = {}, opts = {}) {
 }
 
 export const pdfBlob = (pdf) => pdf.output("blob");
+const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 export function printPdf(pdf) {
   const url = URL.createObjectURL(pdf.output("blob"));
+  if (isIOS()) { window.open(url, "_blank"); return; } // iOS tidak membenarkan print() daripada iframe; pengguna cetak dari pemapar PDF
   const f = document.createElement("iframe"); f.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0"; f.src = url;
   f.onload = () => { try { f.contentWindow.focus(); f.contentWindow.print(); } catch { window.open(url, "_blank"); } setTimeout(() => { f.remove(); URL.revokeObjectURL(url); }, 60000); };
   document.body.append(f);

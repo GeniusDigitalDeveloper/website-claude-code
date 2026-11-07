@@ -98,3 +98,14 @@ export function readFileAsDataURL(file, maxW = 400, q = 0.85) {
 }
 export const isHttps = (u) => !u || /^https:\/\//i.test(u);
 export const download = (blob, name) => { const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.append(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); };
+
+// Foto profil: potong tengah jadi segi empat sama, mampat (JPEG) supaya ringan disimpan.
+export function readSquareAvatar(file, size = 192, q = 0.85) {
+  return new Promise((res, rej) => {
+    const fr = new FileReader(); fr.onerror = () => rej(new Error("read"));
+    fr.onload = () => { const im = new Image(); im.onerror = () => rej(new Error("img")); im.onload = () => {
+      const s = Math.min(im.width, im.height); const c = document.createElement("canvas"); c.width = c.height = size; const x = c.getContext("2d");
+      x.fillStyle = "#fff"; x.fillRect(0, 0, size, size); x.drawImage(im, (im.width - s) / 2, (im.height - s) / 2, s, s, 0, 0, size, size); res(c.toDataURL("image/jpeg", q)); }; im.src = fr.result; };
+    fr.readAsDataURL(file);
+  });
+}

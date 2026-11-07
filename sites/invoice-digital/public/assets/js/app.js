@@ -2,10 +2,11 @@
 import { t, L, getLang, applyI18n, langSwitcher } from "./i18n.js";
 import { $, $$, esc, toast, setBusy } from "./util.js";
 import { onUser, signIn, signOut, wipeLocal, register, resetPw, googleSignIn, ensureUserDoc, errMsg } from "./auth.js";
-import { getAppSettings, getMeta } from "./db.js";
+import { getAppSettings, getMeta, setMeta } from "./db.js";
 import { trackVisit } from "./stats.js";
 import { brand, footerHtml, fillFooterStats } from "./shared.js";
 import { ico, pwInput, bindEyes } from "./modules/ui.js";
+import { avatarInner } from "./modules/avatar.js";
 
 const root = $("#root");
 const S = { user: null, ready: false, settings: {}, company: null, shell: false };
@@ -16,6 +17,11 @@ const ctx = {
   getSettings: async () => S.settings,
   getCompany: async (force) => { if (!S.company || force) S.company = await getMeta(S.user.uid, "company"); return S.company; },
   refreshUser: () => renderShellHeader(),
+  // Simpan profil perniagaan: cache dikemas kini serta-merta (UI/PDF terus guna), tulis pelayan di latar; gagal -> kembalikan.
+  saveCompany: async (patch) => {
+    const prev = S.company || (await ctx.getCompany()); const merged = { ...prev, ...patch }; S.company = merged; renderShellHeader();
+    try { await setMeta(S.user.uid, "company", merged); } catch (e) { S.company = prev; renderShellHeader(); throw e; }
+  },
 };
 
 // ---------------------------------------------------------------- ROUTER
@@ -106,7 +112,7 @@ function renderShell() {
   $("#out").onclick = async () => { window.addEventListener("unhandledrejection", (e) => e.preventDefault()); await signOut(); await wipeLocal(); location.hash = "#/"; location.reload(); };
   S.shell = true;
 }
-function renderShellHeader() { const w = $("#who"); if (w && S.user) w.innerHTML = `<span class="avatar">${esc((S.user.displayName || S.user.email || "?")[0].toUpperCase())}</span><span class="who-n">${esc(S.user.displayName || S.user.email)}</span>`; }
+function renderShellHeader() { const w = $("#who"); if (w && S.user) w.innerHTML = `<span class="avatar">${avatarInner(S.company, S.user)}</span><span class="who-n">${esc(S.user.displayName || S.user.email)}</span>`; }
 
 async function renderApp(segs, q) {
   if (!S.shell || !$("#view")) renderShell();
@@ -142,6 +148,7 @@ async function renderApp(segs, q) {
   onUser((u) => {
     S.user = u; S.company = null; S.ready = true; route();
     if (!u) return;
+    ctx.getCompany().then(renderShellHeader).catch(() => {}); // foto profil di bar atas
     ensureUserDoc(u, getLang()).then((r) => {
       if (r.disabled) { signOut().then(() => { toast(t("err_disabled"), "err"); ctx.nav("#/login"); }); }
       else renderShellHeader();

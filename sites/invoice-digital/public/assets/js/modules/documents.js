@@ -110,7 +110,7 @@ export async function renderEditor(el, ctx, type, id) {
   $("#lgf", el).onchange = async (e) => {
     const file = e.target.files[0]; if (!file) return;
     try { let logo = await readFileAsDataURL(file, 400); if (logo.length > 250000) logo = await readFileAsDataURL(file, 260, 0.75);
-      await setMeta(ctx.uid, "company", { ...company, logo }); company = await ctx.getCompany(true); $("#lgp", el).innerHTML = `<img alt="Logo" src="${esc(company.logo)}">`; toast(t("saved")); }
+      await ctx.saveCompany({ logo }); company = await ctx.getCompany(); $("#lgp", el).innerHTML = `<img alt="Logo" src="${esc(company.logo)}">`; toast(t("saved")); }
     catch (x) { console.error(x); toast(t("err_file"), "err"); }
   };
   $("#prev", el).onclick = async (e) => {
