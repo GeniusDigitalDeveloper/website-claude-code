@@ -1,5 +1,18 @@
 {
   "projects": {
-    "default": "genius-digital-40bc9"
-  }
+    "default": "fetchrbox-app-izzul"
+  },
+  "targets": {
+    "fetchrbox-app-izzul": {
+      "hosting": {
+        "public": [
+          "fetchrbox-app-izzul"
+        ],
+        "admin": [
+          "fetchrbox-admin-app-izzul"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

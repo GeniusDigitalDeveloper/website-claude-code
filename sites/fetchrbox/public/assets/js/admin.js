@@ -244,7 +244,7 @@ function settings() {
   </div>
   <div class="settings-card glass" style="margin-top:.9rem">
     <h2 style="font-family:var(--strong);font-size:1.02rem;margin-bottom:.4rem">Sistem</h2>
-    <div class="kv"><span>Pangkalan data</span><span>Cloud Firestore (genius-digital-40bc9)</span></div>
+    <div class="kv"><span>Pangkalan data</span><span>Cloud Firestore (fetchrbox-app-izzul)</span></div>
     <div class="kv"><span>Platform aktif</span><span>${site.platforms.filter((p) => p.enabled).length} / ${site.platforms.length}</span></div>
     <div class="kv"><span>Muat turun</span><span>${window.FETCHRBOX?.DOWNLOADS_ENABLED ? 'Pelayan disambung' : 'Pelayan muat turun belum disambung (mod pratonton)'}</span></div>
     <button class="btn ghost" id="out" style="margin-top:.8rem"><span class="ico" data-ico="logout"></span><span class="t">Keluar</span></button>

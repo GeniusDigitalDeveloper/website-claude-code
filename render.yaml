@@ -14,7 +14,7 @@ services:
       - key: ADMIN_PASSWORD
         generateValue: true
       - key: ALLOWED_ORIGIN
-        value: https://genius-digital-40bc9.web.app,https://genius-digital-40bc9.firebaseapp.com
+        value: https://fetchrbox-app-izzul.web.app,https://fetchrbox-admin-app-izzul.web.app
       - key: MAX_DURATION_MIN
         value: "60"
       - key: MAX_JOBS
