@@ -22,7 +22,19 @@ const P = {
   menu: '<path d="M3 6h18M3 12h18M3 18h18"/>', logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>', swap: '<path d="M17 3l4 4-4 4M3 7h18M7 21l-4-4 4-4M21 17H3"/>',
   wallet: '<path d="M20 12V8H6a2 2 0 0 1 0-4h12v4M4 6v12a2 2 0 0 0 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/>', alert: '<path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>',
   shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>', chart: '<path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/>', mail: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/>',
+  eyeoff: '<path d="M17.9 17.9A10.1 10.1 0 0 1 12 20C5 20 1 12 1 12a18.5 18.5 0 0 1 5.1-5.9M9.9 4.2A9.1 9.1 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.2 3.2M14.1 14.1a3 3 0 1 1-4.2-4.2M1 1l22 22"/>',
   globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>', list: '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>', zap: '<path d="M13 2L3 14h8l-1 8 10-12h-8z"/>',
 };
 export function ico(name, cls = "") { return `<svg class="ico ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[name] || ""}</svg>`; }
 export function fieldVal(root, name) { const e = root.querySelector(`[name="${name}"]`); return e ? e.value.trim() : ""; }
+
+// Medan kata laluan dengan ikon mata (tunjuk/sembunyi). Panggil bindEyes(root) selepas dipaparkan.
+export function pwInput(name, autocomplete, extra = "") {
+  return `<span class="pw"><input name="${name}" type="password" autocomplete="${autocomplete}" ${extra}><button type="button" class="eye" data-eye aria-label="${esc(t("show_pw"))}" aria-pressed="false">${ico("eye")}</button></span>`;
+}
+export function bindEyes(root = document) {
+  root.querySelectorAll("[data-eye]").forEach((b) => (b.onclick = () => {
+    const inp = b.parentElement.querySelector("input"); const show = inp.type === "password"; inp.type = show ? "text" : "password";
+    b.setAttribute("aria-pressed", show); b.setAttribute("aria-label", t(show ? "hide_pw" : "show_pw")); b.innerHTML = ico(show ? "eyeoff" : "eye"); inp.focus();
+  }));
+}

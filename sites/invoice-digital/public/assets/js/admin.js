@@ -6,7 +6,7 @@ import { auth, db, F } from "./firebase.js";
 import { onUser, signIn, signOut, errMsg, isAdminUser } from "./auth.js";
 import { getAppSettings } from "./db.js";
 import { brand } from "./shared.js";
-import { ico, empty, loading, badge } from "./modules/ui.js";
+import { ico, empty, loading, badge, pwInput, bindEyes } from "./modules/ui.js";
 
 const root = $("#root"); const S = { user: null, settings: {}, ready: false };
 const NAV = [["dashboard", "chart"], ["users", "users"], ["documents", "doc"], ["content", "globe"], ["system", "gear"], ["logs", "list"]];
@@ -17,9 +17,9 @@ function loginView(msg = "") {
   const b = brand(S.settings);
   root.innerHTML = `<div class="auth-page admin-login"><div class="auth-main"><div class="auth-top"><a href="/invoice/" class="back">← ${t("back_site")}</a><div class="lang" id="lang"></div></div>
   <div class="card auth-card"><img src="${esc(b.logo)}" alt="Genius Digital" width="170" height="28" class="al-logo"><h1>${t("admin_login")}</h1><p class="sub">${t("admin_login_sub")}</p>
-  <form id="af" class="form" novalidate><label>${t("f_email")}<input name="email" type="email" autocomplete="username" required></label><label>${t("password")}<input name="pw" type="password" autocomplete="current-password" required></label>
+  <form id="af" class="form" novalidate><label>${t("f_email")}<input name="email" type="email" autocomplete="username" required></label><label>${t("password")}${pwInput("pw", "current-password", "required")}</label>
   <p class="err" id="err" role="alert">${esc(msg)}</p><button class="btn primary block" type="submit">${ico("shield")}${t("login")}</button></form></div></div></div>`;
-  langSwitcher($("#lang")); applyI18n(root);
+  langSwitcher($("#lang")); applyI18n(root); bindEyes(root);
   $("#af").onsubmit = async (e) => { e.preventDefault(); const f = e.target, btn = $("button[type=submit]", f), err = $("#err"); err.textContent = ""; setBusy(btn, true);
     try { await signIn(f.email.value.trim(), f.pw.value); } catch (x) { err.textContent = errMsg(x); setBusy(btn, false); } };
 }
@@ -40,8 +40,8 @@ function shell() {
   const b = brand(S.settings);
   root.innerHTML = `<div class="shell"><aside class="side" id="side"><a href="#/dashboard" class="brand side-brand"><img src="${esc(b.logo)}" alt="Genius Digital" width="150" height="25"></a><div class="side-app">${t("admin_panel")}</div>
   <nav>${NAV.map(([k, i]) => `<a href="#/${k}" data-nav="${k}">${ico(i)}<span>${t("adm_" + k)}</span></a>`).join("")}<a href="/invoice/">${ico("globe")}<span>${t("view_site")}</span></a></nav>
-  <div class="side-f"><button class="btn ghost block" id="out">${ico("logout")}${t("logout")}</button></div></aside><div class="scrim" id="scrim"></div>
-  <div class="main"><header class="app-top"><button class="icon-btn" id="menuBtn" aria-label="Menu">${ico("menu")}</button><span class="app-top-t">${t("admin_panel")}</span><div class="top-r"><div class="lang" id="lang"></div><div class="who"><span class="avatar">A</span><span class="who-n">${esc(S.user.email)}</span></div></div></header><div class="view" id="view"></div>
+  </aside><div class="scrim" id="scrim"></div>
+  <div class="main"><header class="app-top"><button class="icon-btn" id="menuBtn" aria-label="Menu">${ico("menu")}</button><span class="app-top-t">${t("admin_panel")}</span><div class="top-r"><div class="lang" id="lang"></div><button class="btn ghost sm" id="out" aria-label="${t("logout")}">${ico("logout")}<span class="out-t">${t("logout")}</span></button><div class="who"><span class="avatar">A</span><span class="who-n">${esc(S.user.email)}</span></div></div></header><div class="view" id="view"></div>
   <footer class="site-footer"><div class="wrap"><p class="ft-slogan">${esc(t("slogan"))}</p><p class="ft-copy">${esc(t("copyright"))}</p></div></footer></div></div>`;
   langSwitcher($("#lang")); const side = $("#side"), scrim = $("#scrim"); const tog = (o) => { side.classList.toggle("open", o); scrim.classList.toggle("on", o); };
   $("#menuBtn").onclick = () => tog(!side.classList.contains("open")); scrim.onclick = () => tog(false); side.addEventListener("click", (e) => e.target.closest("a") && tog(false));

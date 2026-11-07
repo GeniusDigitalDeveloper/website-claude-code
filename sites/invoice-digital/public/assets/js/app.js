@@ -5,7 +5,7 @@ import { onUser, signIn, signOut, wipeLocal, register, resetPw, googleSignIn, en
 import { getAppSettings, getMeta } from "./db.js";
 import { trackVisit } from "./stats.js";
 import { brand, footerHtml, fillFooterStats } from "./shared.js";
-import { ico } from "./modules/ui.js";
+import { ico, pwInput, bindEyes } from "./modules/ui.js";
 
 const root = $("#root");
 const S = { user: null, ready: false, settings: {}, company: null, shell: false };
@@ -69,11 +69,11 @@ function renderAuth(mode, q) {
    <button class="btn ghost block" id="gbtn" type="button"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.9 2.4 30.4 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.5 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.4-4.1 7-10.1 7-17.6z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.9 2.3-8.3 2.3-6.3 0-11.6-4.2-13.5-9.9l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>${t("google")}</button>
    <div class="or"><span>${t("or")}</span></div>
    <form id="af" class="form" novalidate>${isReg ? `<label>${t("f_name")}<input name="name" autocomplete="name" maxlength="80" required></label>` : ""}<label>${t("f_email")}<input name="email" type="email" autocomplete="email" required></label>
-    <label>${t("password")}<input name="pw" type="password" autocomplete="${isReg ? "new-password" : "current-password"}" minlength="6" required></label>
+    <label>${t("password")}${pwInput("pw", isReg ? "new-password" : "current-password", 'minlength="6" required')}</label>
     <p class="err" id="err" role="alert"></p><button class="btn primary block" type="submit">${isReg ? t("register") : t("login")}</button>
     ${isReg ? "" : `<button class="linkbtn" type="button" id="forgot">${t("forgot")}</button>`}</form>
    <p class="switch">${isReg ? `${t("have_account")} <a href="#/login${q.get("next") ? "?next=" + encodeURIComponent(q.get("next")) : ""}">${t("login")}</a>` : `${t("no_account")} <a href="#/register${q.get("next") ? "?next=" + encodeURIComponent(q.get("next")) : ""}">${t("register")}</a>`}</p></div></div></div>`;
-  langSwitcher($("#lang")); applyI18n(root);
+  langSwitcher($("#lang")); applyI18n(root); bindEyes(root);
   const err = $("#err"); const f = $("#af");
   f.onsubmit = async (e) => {
     e.preventDefault(); err.textContent = ""; const btn = $("button[type=submit]", f);
@@ -87,14 +87,15 @@ function renderAuth(mode, q) {
 }
 
 // ---------------------------------------------------------------- APP SHELL
-const NAV = [["dashboard", "home"], ["invoices", "doc"], ["quotations", "quote"], ["receipts", "receipt"], ["customers", "users"], ["products", "box"], ["history", "clock"], ["profile", "gear"]];
+const NAV = [["dashboard", "home"], ["invoices", "doc"], ["quotations", "quote"], ["receipts", "receipt"], ["customers", "users"], ["products", "box"], ["profile", "gear"]];
+const SUBS = [["business", "building"], ["history", "clock"], ["settings", "gear"]]; // sub bagi Profil
 const MOBILE = ["dashboard", "invoices", "quotations", "receipts"];
 function renderShell() {
   const b = brand(S.settings);
   root.innerHTML = `<div class="shell"><aside class="side" id="side"><a href="#/" class="brand side-brand"><img src="${esc(b.logo)}" alt="Genius Digital" width="150" height="25"></a><div class="side-app">${esc(b.name)}</div>
-   <nav aria-label="Menu utama">${NAV.map(([k, i]) => `<a href="#/app/${k}" data-nav="${k}">${ico(i)}<span>${t("nav_" + k)}</span></a>`).join("")}</nav>
-   <div class="side-f"><button class="btn ghost block" id="out">${ico("logout")}${t("logout")}</button></div></aside><div class="scrim" id="scrim"></div>
-   <div class="main"><header class="app-top"><button class="icon-btn" id="menuBtn" aria-label="Menu" aria-expanded="false">${ico("menu")}</button><span class="app-top-t" id="topT"></span><div class="top-r"><div class="lang" id="lang"></div><a class="who" id="who" href="#/app/profile/account" aria-label="${t("nav_profile")}"></a></div></header>
+   <nav aria-label="Menu utama">${NAV.map(([k, i]) => `<a href="#/app/${k}" data-nav="${k}">${ico(i)}<span>${t("nav_" + k)}</span></a>${k === "profile" ? `<div class="subnav">${SUBS.map(([s, si]) => `<a href="#/app/profile/${s}" data-sub="${s}">${ico(si)}<span>${t("sub_" + s)}</span></a>`).join("")}</div>` : ""}`).join("")}</nav>
+   </aside><div class="scrim" id="scrim"></div>
+   <div class="main"><header class="app-top"><button class="icon-btn" id="menuBtn" aria-label="Menu" aria-expanded="false">${ico("menu")}</button><span class="app-top-t" id="topT"></span><div class="top-r"><div class="lang" id="lang"></div><button class="btn ghost sm" id="out" aria-label="${t("logout")}">${ico("logout")}<span class="out-t">${t("logout")}</span></button><a class="who" id="who" href="#/app/profile/account" aria-label="${t("nav_profile")}"></a></div></header>
    <div class="view" id="view"></div>${footerHtml(S.settings)}</div>
    <nav class="bottom" aria-label="Navigasi bawah">${MOBILE.map((k) => `<a href="#/app/${k}" data-nav="${k}">${ico(NAV.find((n) => n[0] === k)[1])}<span>${t("nav_" + k)}</span></a>`).join("")}<button type="button" id="moreBtn">${ico("menu")}<span>${t("more")}</span></button></nav></div>`;
   langSwitcher($("#lang")); fillFooterStats(root); renderShellHeader();
@@ -102,7 +103,7 @@ function renderShell() {
   const tog = (o) => { side.classList.toggle("open", o); scrim.classList.toggle("on", o); $("#menuBtn").setAttribute("aria-expanded", o); };
   $("#menuBtn").onclick = () => tog(!side.classList.contains("open")); $("#moreBtn").onclick = () => tog(true); scrim.onclick = () => tog(false);
   side.addEventListener("click", (e) => e.target.closest("a") && tog(false));
-  $("#out").onclick = async () => { await signOut(); await wipeLocal(); location.hash = "#/"; location.reload(); };
+  $("#out").onclick = async () => { window.addEventListener("unhandledrejection", (e) => e.preventDefault()); await signOut(); await wipeLocal(); location.hash = "#/"; location.reload(); };
   S.shell = true;
 }
 function renderShellHeader() { const w = $("#who"); if (w && S.user) w.innerHTML = `<span class="avatar">${esc((S.user.displayName || S.user.email || "?")[0].toUpperCase())}</span><span class="who-n">${esc(S.user.displayName || S.user.email)}</span>`; }
@@ -111,6 +112,7 @@ async function renderApp(segs, q) {
   if (!S.shell || !$("#view")) renderShell();
   const page = segs[0] || "dashboard", sub = segs[1], sub2 = segs[2];
   $$("[data-nav]").forEach((a) => a.classList.toggle("on", a.dataset.nav === page));
+  const curSub = page === "profile" ? (SUBS.some((s) => s[0] === sub) ? sub : "business") : ""; $$("[data-sub]").forEach((a) => a.classList.toggle("on", a.dataset.sub === curSub));
   $("#topT").textContent = t("nav_" + page) || "";
   // Setiap laluan dapat bekas baharu: paparan lama yang lewat siap tidak boleh menimpa halaman semasa.
   const view = document.createElement("div"); $("#view").replaceChildren(view); window.scrollTo(0, 0);
@@ -127,7 +129,7 @@ async function renderApp(segs, q) {
     if (page === "profile") return await (await import("./modules/profile.js")).render(view, ctx, sub);
     if (page === "company") return ctx.nav("#/app/profile/business");
     if (page === "settings") return ctx.nav("#/app/profile/settings");
-    if (page === "history") return await (await import("./modules/history.js")).render(view, ctx);
+    if (page === "history") return ctx.nav("#/app/profile/history");
     ctx.nav("#/app/dashboard");
   } catch (e) { console.error(e); view.innerHTML = `<p class="err">${esc(errMsg(e))}</p>`; }
 }

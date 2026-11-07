@@ -35,6 +35,7 @@ const ms = {
   err_cust: "Sila masukkan nama pelanggan.", err_dates: "Tarikh akhir mesti selepas tarikh dokumen.", err_items: "Tambah sekurang-kurangnya satu item dengan nama.", err_num: "Kuantiti, harga atau diskaun tidak sah.", err_amount: "Jumlah bayaran tidak sah atau melebihi baki.", err_file: "Fail imej tidak sah atau terlalu besar.",
   // nav
   nav_dashboard: "Dashboard", nav_invoices: "Invoice", nav_quotations: "Quotation", nav_receipts: "Resit", nav_customers: "Pelanggan", nav_products: "Produk & Perkhidmatan", nav_company: "Profil Perniagaan", nav_history: "Sejarah Dokumen", nav_settings: "Tetapan",
+  show_pw: "Tunjuk kata laluan", hide_pw: "Sembunyi kata laluan", sub_business: "Perniagaan", sub_history: "Sejarah Dokumen", sub_settings: "Tetapan",
   nav_profile: "Profil", profile_sub: "Urus akaun, maklumat perniagaan, lalai dokumen dan tetapan.", prof_account: "Akaun", prof_business: "Perniagaan", prof_documents: "Dokumen", prof_settings: "Tetapan", doc_defaults_sub: "Lalai ini digunakan untuk dokumen baharu (cukai, templat, warna, terma).",
   // dashboard
   dash_hello: "Selamat datang, {n}", stat_invoices: "Jumlah Invoice", stat_quotations: "Jumlah Quotation", stat_receipts: "Jumlah Resit", stat_customers: "Jumlah Pelanggan", stat_value: "Jumlah Nilai Invoice", stat_received: "Pembayaran Diterima", stat_outstanding: "Pembayaran Belum Selesai",
@@ -105,6 +106,7 @@ const en = {
   err_perm: "You do not have permission for this action.", err_generic: "Something went wrong. Please try again.", err_disabled: "Your account access has been disabled. Please contact the admin.", err_not_admin: "This account does not have admin access.",
   err_cust: "Please enter the customer name.", err_dates: "The end date must be after the document date.", err_items: "Add at least one named item.", err_num: "Invalid quantity, price or discount.", err_amount: "Invalid payment amount or exceeds balance.", err_file: "Invalid or oversized image file.",
   nav_dashboard: "Dashboard", nav_invoices: "Invoices", nav_quotations: "Quotations", nav_receipts: "Receipts", nav_customers: "Customers", nav_products: "Products & Services", nav_company: "Business Profile", nav_history: "Document History", nav_settings: "Settings",
+  show_pw: "Show password", hide_pw: "Hide password", sub_business: "Business", sub_history: "Document History", sub_settings: "Settings",
   nav_profile: "Profile", profile_sub: "Manage your account, business details, document defaults and settings.", prof_account: "Account", prof_business: "Business", prof_documents: "Documents", prof_settings: "Settings", doc_defaults_sub: "These defaults apply to new documents (tax, template, colour, terms).",
   dash_hello: "Welcome, {n}", stat_invoices: "Total Invoices", stat_quotations: "Total Quotations", stat_receipts: "Total Receipts", stat_customers: "Total Customers", stat_value: "Total Invoice Value", stat_received: "Payments Received", stat_outstanding: "Outstanding Payments",
   chart_month: "Invoices by month", chart_value: "Value this year", chart_payments: "Payments received", chart_status: "Invoice status",
