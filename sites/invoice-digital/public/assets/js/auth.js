@@ -15,12 +15,17 @@ export const errMsg = (e) => {
 export const onUser = (cb) => A.onAuthStateChanged(auth, cb);
 export const signIn = (email, pw) => A.signInWithEmailAndPassword(auth, email, pw);
 export const signOut = () => A.signOut(auth);
+// Log keluar bersih: padam cache IndexedDB + penanda supaya data pengguna tidak tertinggal pada peranti kongsi.
+export async function wipeLocal() {
+  try { Object.keys(localStorage).filter((k) => k.startsWith("inv_swr_")).forEach((k) => localStorage.removeItem(k)); } catch {}
+  try { await F.terminate(db); await F.clearIndexedDbPersistence(db); } catch {}
+}
 export const resetPw = (email) => A.sendPasswordResetEmail(auth, email);
 // Popup dahulu (laju). Jika disekat pelayar (biasa pada mudah alih), guna redirect; hasil ditangkap oleh onAuthStateChanged.
 export async function googleSignIn() {
   const prov = new A.GoogleAuthProvider(); prov.setCustomParameters({ prompt: "select_account" });
-  try { return await A.signInWithPopup(auth, prov); }
-  catch (e) { if (e.code === "auth/popup-blocked") return A.signInWithRedirect(auth, prov); throw e; }
+  try { return await A.signInWithPopup(auth, prov, A.browserPopupRedirectResolver); }
+  catch (e) { if (e.code === "auth/popup-blocked") return A.signInWithRedirect(auth, prov, A.browserPopupRedirectResolver); throw e; }
 }
 export async function register(name, email, pw) {
   const cred = await A.createUserWithEmailAndPassword(auth, email, pw);
@@ -56,6 +61,7 @@ async function ensureUserDocOnce(user, lang) {
     return { disabled: false, isNew: true };
   }
   const d = snap.data();
-  if (!d.disabled) await F.updateDoc(ref, { lastLoginAt: F.serverTimestamp() }).catch(() => {});
+  const last = d.lastLoginAt && d.lastLoginAt.toMillis ? d.lastLoginAt.toMillis() : 0;
+  if (!d.disabled && Date.now() - last > 30 * 60 * 1000) F.updateDoc(ref, { lastLoginAt: F.serverTimestamp() }).catch(() => {}); // tidak menyekat; hanya jika > 30 minit
   return { disabled: d.disabled === true, isNew: false };
 }

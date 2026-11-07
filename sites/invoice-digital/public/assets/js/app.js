@@ -1,7 +1,7 @@
 // Panel awam: landing, auth, dan aplikasi (dashboard + modul). Routing berasaskan hash: #/ , #/login , #/app/...
 import { t, L, getLang, applyI18n, langSwitcher } from "./i18n.js";
 import { $, $$, esc, toast, setBusy } from "./util.js";
-import { onUser, signIn, signOut, register, resetPw, googleSignIn, ensureUserDoc, errMsg } from "./auth.js";
+import { onUser, signIn, signOut, wipeLocal, register, resetPw, googleSignIn, ensureUserDoc, errMsg } from "./auth.js";
 import { getAppSettings, getMeta } from "./db.js";
 import { trackVisit } from "./stats.js";
 import { brand, footerHtml, fillFooterStats } from "./shared.js";
@@ -102,7 +102,7 @@ function renderShell() {
   const tog = (o) => { side.classList.toggle("open", o); scrim.classList.toggle("on", o); $("#menuBtn").setAttribute("aria-expanded", o); };
   $("#menuBtn").onclick = () => tog(!side.classList.contains("open")); $("#moreBtn").onclick = () => tog(true); scrim.onclick = () => tog(false);
   side.addEventListener("click", (e) => e.target.closest("a") && tog(false));
-  $("#out").onclick = async () => { await signOut(); ctx.nav("#/"); };
+  $("#out").onclick = async () => { await signOut(); await wipeLocal(); location.hash = "#/"; location.reload(); };
   S.shell = true;
 }
 function renderShellHeader() { const w = $("#who"); if (w && S.user) w.innerHTML = `<span class="avatar">${esc((S.user.displayName || S.user.email || "?")[0].toUpperCase())}</span><span class="who-n">${esc(S.user.displayName || S.user.email)}</span>`; }

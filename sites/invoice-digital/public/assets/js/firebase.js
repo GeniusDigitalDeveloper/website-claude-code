@@ -13,6 +13,10 @@ export const firebaseConfig = {
   appId: "1:508099045190:web:f4ec1d3f5c38ae391e2747",
 };
 export const app = initializeApp(firebaseConfig);
-export const auth = A.getAuth(app);
-export const db = F.getFirestore(app);
+// Auth: sesi kekal. Iframe popup hanya dimuat awal pada halaman log masuk/daftar (jika dimuat di semua halaman, pemulihan sesi tertangguh).
+const onAuthPage = /^#\/(login|register)/.test(location.hash);
+export const auth = A.initializeAuth(app, { persistence: [A.indexedDBLocalPersistence, A.browserLocalPersistence], ...(onAuthPage ? { popupRedirectResolver: A.browserPopupRedirectResolver } : {}) });
+// Firestore: cache IndexedDB (data dipaparkan serta-merta pada lawatan seterusnya, disegarkan dari pelayan di latar).
+let _db; try { _db = F.initializeFirestore(app, { localCache: F.persistentLocalCache({ tabManager: F.persistentMultipleTabManager() }) }); } catch { _db = F.getFirestore(app); }
+export const db = _db;
 export { A, F };

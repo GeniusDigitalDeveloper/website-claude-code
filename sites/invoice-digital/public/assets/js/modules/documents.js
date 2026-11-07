@@ -1,7 +1,7 @@
 // Modul Invoice & Quotation: senarai, borang (cipta/edit), paparan + tindakan.
 import { t, getLang } from "../i18n.js";
 import { esc, $, $$, money, num, round2, calc, fmtDate, todayMY, addDays, toast, setBusy, readFileAsDataURL, invoiceStatus, quotationStatus, debounce, modal, confirmBox } from "../util.js";
-import { listAll, getOne, create, update, remove, createNumbered, logActivity, setMeta } from "../db.js";
+import { listAll, listSWR, getOne, create, update, remove, createNumbered, logActivity, setMeta } from "../db.js";
 import { pickerHtml, bindPicker } from "../picker.js";
 import { F } from "../firebase.js";
 import { errMsg } from "../auth.js";
@@ -19,11 +19,12 @@ const dueOf = (type, d) => (type === "invoice" ? d.dueDate : d.validUntil);
 // ------------------------------------------------------------------ SENARAI
 export async function renderList(el, ctx, type) {
   const C = CFG[type]; el.innerHTML = loading();
-  let rows; try { rows = await listAll(ctx.uid, C.col); } catch (e) { el.innerHTML = `<p class="err">${esc(errMsg(e))}</p>`; return; }
+  let rows = [], mounted = false, draw = () => {};
+  const mount = () => {
   el.innerHTML = `<div class="page-h"><div><h1>${t("nav_" + C.route)}</h1><p class="sub">${t(type + "_sub")}</p></div><a class="btn primary" href="#/app/${C.route}/new">${ico("plus")}${t(type + "_new")}</a></div>
   <div class="card"><div class="toolbar"><div class="search">${ico("search")}<input id="q" type="search" placeholder="${esc(t("search_ph"))}" aria-label="${esc(t("search_ph"))}"></div>
   <select id="sf" aria-label="${esc(t("f_status"))}"><option value="">${t("all_status")}</option>${C.filter.map((s) => `<option value="${s}">${t("st_" + s)}</option>`).join("")}</select></div><div id="tbl"></div></div>`;
-  const draw = () => {
+  draw = () => {
     const q = $("#q", el).value.toLowerCase(), sf = $("#sf", el).value;
     const list = rows.filter((r) => (!sf || C.eff(r) === sf) && (!q || [r.number, r.customer && r.customer.name, r.customer && r.customer.company].join(" ").toLowerCase().includes(q)));
     $("#tbl", el).innerHTML = list.length ? `<table class="tbl"><thead><tr><th>${t("col_number")}</th><th>${t("col_customer")}</th><th>${t("col_date")}</th><th>${t(type === "invoice" ? "col_due" : "col_valid")}</th><th class="r">${t("col_total")}</th><th>${t("f_status")}</th><th></th></tr></thead><tbody>${list.map((r) => `<tr>
@@ -38,6 +39,9 @@ export async function renderList(el, ctx, type) {
     if (b.dataset.a === "download") pdfAction(ctx, type, r, "download");
     if (b.dataset.a === "dup") { setBusy(b, true); try { const id = await duplicate(ctx, type, r); toast(t("duplicated")); ctx.nav(`#/app/${C.route}/${id}`); } catch (x) { toast(errMsg(x), "err"); setBusy(b, false); } }
   };
+  };
+  try { await listSWR(ctx.uid, C.col, (r) => { rows = r; if (!mounted) { mounted = true; mount(); } else draw(); }); }
+  catch (e) { if (!mounted) el.innerHTML = `<p class="err">${esc(errMsg(e))}</p>`; }
 }
 
 async function numberFmt(ctx, type) { const s = await ctx.getSettings(); return (s.numberFormat && s.numberFormat[type]) || CFG[type].fmt; }

@@ -9,6 +9,15 @@ export async function listAll(uid, name, max = 1000) {
   const s = await F.getDocs(q);
   return s.docs.map((d) => ({ id: d.id, ...d.data() }));
 }
+// Stale-while-revalidate: jika senarai ini pernah dimuat pada peranti ini, paparkan dari cache serta-merta, kemudian segarkan dari pelayan.
+const swrKey = (uid, name) => `inv_swr_${uid}_${name}`;
+export async function listSWR(uid, name, onData, max = 1000) {
+  const q = F.query(colRef(uid, name), F.orderBy("createdAt", "desc"), F.limit(max)); const map = (s) => s.docs.map((d) => ({ id: d.id, ...d.data() }));
+  let done = false, seen = false; try { seen = localStorage.getItem(swrKey(uid, name)) === "1"; } catch {}
+  if (seen) F.getDocsFromCache(q).then((c) => { if (!done && !c.empty) onData(map(c), false); }).catch(() => {});
+  const s = await F.getDocs(q); done = true; try { localStorage.setItem(swrKey(uid, name), "1"); } catch {}
+  const rows = map(s); onData(rows, true); return rows;
+}
 export async function getOne(uid, name, id) {
   const s = await F.getDoc(docRef(uid, name, id));
   return s.exists() ? { id: s.id, ...s.data() } : null;

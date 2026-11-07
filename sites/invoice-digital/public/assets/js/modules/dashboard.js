@@ -1,6 +1,6 @@
 import { t, getLang } from "../i18n.js";
 import { esc, money, calc, invoiceStatus, yearMY, round2 } from "../util.js";
-import { listAll } from "../db.js";
+import { listSWR } from "../db.js";
 import { errMsg } from "../auth.js";
 import { ico, loading } from "./ui.js";
 
@@ -23,8 +23,13 @@ function donut(counts) {
   <ul class="legend">${entries.map(([k, n]) => `<li><i style="background:${COLORS[k]}"></i>${t("st_" + k)} <b>${n}</b></li>`).join("")}</ul></div>`;
 }
 export async function render(el, ctx) {
-  el.innerHTML = loading(); let inv, quo, rec, cus;
-  try { [inv, quo, rec, cus] = await Promise.all(["invoices", "quotations", "receipts", "customers"].map((n) => listAll(ctx.uid, n))); } catch (e) { el.innerHTML = `<p class="err">${esc(errMsg(e))}</p>`; return; }
+  // Rangka serta-merta (tidak menunggu data)
+  const ph = ["doc", "quote", "receipt", "users", "chart", "wallet", "alert"].map((i, k) => `<div class="stat c${(k % 5) + 1}"><div class="stat-i">${ico(i)}</div><div><span>&nbsp;</span><b class="skel">…</b></div></div>`).join("");
+  el.innerHTML = `<div class="page-h"><div><h1>${t("nav_dashboard")}</h1><p class="sub">${t("dash_hello", { n: esc(ctx.user.displayName || ctx.user.email || "") })}</p></div><div class="inline-actions"><a class="btn primary" href="#/app/invoices/new">${ico("plus")}${t("invoice_new")}</a><a class="btn ghost" href="#/app/quotations/new">${ico("plus")}${t("quotation_new")}</a></div></div><div class="stats">${ph}</div>`;
+  const names = ["invoices", "quotations", "receipts", "customers"]; const data = {};
+  const onData = (n) => (rows) => { data[n] = rows; if (names.every((k) => data[k])) paint(data.invoices, data.quotations, data.receipts, data.customers); };
+  try { await Promise.all(names.map((n) => listSWR(ctx.uid, n, onData(n)))); } catch (e) { if (!data.invoices) el.innerHTML = `<p class="err">${esc(errMsg(e))}</p>`; }
+  function paint(inv, quo, rec, cus) {
   const live = inv.filter((i) => i.status !== "cancelled" && i.status !== "draft");
   const calcs = live.map((i) => ({ i, c: calc(i) }));
   const totalValue = round2(calcs.reduce((s, x) => s + x.c.total, 0)), received = round2(calcs.reduce((s, x) => s + x.c.deposit + x.c.paidReceipts, 0)), outstanding = round2(calcs.reduce((s, x) => s + x.c.balance, 0));
@@ -41,4 +46,5 @@ export async function render(el, ctx) {
   <div class="charts"><section class="card"><h2>${t("chart_month")} ${year}</h2>${bars(byMonthCount, m, "#2563eb", (v) => v)}<p class="muted">${t("chart_value")}: ${money(byMonthVal.reduce((a, b) => a + b, 0))}</p></section>
   <section class="card"><h2>${t("chart_payments")} ${year}</h2>${bars(payMonth.map(round2), m, "#06b6d4", short)}</section>
   <section class="card"><h2>${t("chart_status")}</h2>${donut(status)}</section></div>`;
+  }
 }
