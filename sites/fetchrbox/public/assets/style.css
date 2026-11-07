@@ -656,3 +656,8 @@ body[data-theme='profil'] #navChat { display: inline-flex; }
 [dir='rtl'] .back-home .ico { transform: scaleX(-1); }
 .view.page { padding-top: clamp(1rem, 3vw, 2rem); }
 @media (max-width: 640px) { .sbtn { font-size: 0.68rem; gap: 0.25rem; padding: 0.5rem 0.1rem; min-height: 62px; } .sbtn .ico { width: 1.25rem; height: 1.25rem; font-size: 1.25rem; } .subnav .in { gap: 0.4rem; } }
+
+/* Senarai muat turun di Profil: tunjuk lebih banyak baris, semua jenis fail */
+.dl-list { max-height: calc(5 * 62px + 4 * 6px); }
+.dl-row .fmt.f-mov, .dl-row .fmt.f-mkv, .dl-row .fmt.f-webm { background: linear-gradient(135deg, #5b4bd6, #2c6bff); }
+.dl-row .ttl { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }

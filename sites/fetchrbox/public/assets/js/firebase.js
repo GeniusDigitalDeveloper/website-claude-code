@@ -102,6 +102,10 @@ export const fb = {
   watchRequests(cb) { return onSnapshot(query(collection(db, 'requests'), orderBy('createdAt', 'desc'), limit(200)), (s) => cb(s.docs.map((d) => ({ id: d.id, ...d.data() }))), () => cb([])); },
   decideRequest: (id, status, note, by) => updateDoc(doc(db, 'requests', id), { status, adminNote: String(note || '').slice(0, 200), decidedAt: serverTimestamp(), decidedBy: by }),
 
+  /* ---- Sejarah muat turun (Profil) ---- */
+  addDownload: (uid, d) => addDoc(collection(db, 'users', uid, 'downloads'), { title: String(d.title || '').slice(0, 200), format: String(d.format || '').toLowerCase().slice(0, 8), platform: String(d.platform || '').slice(0, 30), at: serverTimestamp() }),
+  watchDownloads(uid, cb) { return onSnapshot(query(collection(db, 'users', uid, 'downloads'), orderBy('at', 'desc'), limit(200)), (s) => cb(s.docs.map((d) => ({ id: d.id, ...d.data() }))), () => cb([])); },
+
   /* ---- Chat pengguna <-> admin ---- */
   watchMyChat(uid, cb) { return onSnapshot(query(collection(db, 'chats', uid, 'messages'), orderBy('at', 'asc'), limit(200)), (s) => cb(s.docs.map((d) => ({ id: d.id, ...d.data() }))), () => cb([])); },
   watchChatMeta(uid, cb) { return onSnapshot(doc(db, 'chats', uid), (s) => cb(s.exists() ? s.data() : {}), () => cb({})); },

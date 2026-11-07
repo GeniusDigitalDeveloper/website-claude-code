@@ -58,6 +58,17 @@ service cloud.firestore {
         && (!('link' in request.resource.data) || (request.resource.data.link is string && request.resource.data.link.size() <= 200 && (request.resource.data.link == '' || request.resource.data.link.matches('^https?://[^ ]+$'))));
       allow delete: if false;
     }
+    // Sejarah muat turun pengguna (dipaparkan di Profil). Pengguna hanya boleh tambah rekod sendiri dan tidak boleh ubah atau padam.
+    match /users/{uid}/downloads/{did} {
+      allow read: if isAdmin() || (request.auth != null && request.auth.uid == uid);
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['title', 'format', 'platform', 'at'])
+        && request.resource.data.title is string && request.resource.data.title.size() <= 200
+        && request.resource.data.format is string && request.resource.data.format.size() <= 8
+        && request.resource.data.platform is string && request.resource.data.platform.size() <= 30
+        && request.resource.data.at == request.time;
+      allow update, delete: if false;
+    }
     // Permohonan kelulusan kandungan berhak cipta: pengguna mohon (status pending), hanya admin boleh putuskan.
     // Pelayan muat turun membaca status ini menggunakan token pengguna sendiri, jadi tidak boleh dipalsukan.
     match /requests/{id} {

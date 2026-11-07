@@ -154,7 +154,7 @@ $('#forgotForm').addEventListener('submit', async (e) => {
 
 $('#logoutBtn').addEventListener('click', () => fb.logout());
 
-let stopProfile = null, stopReq = null, requests = [], nRecent = 0, ptab = 'dl';
+let stopProfile = null, stopReq = null, stopDl = null, requests = [], downloads = [], nRecent = 0, ptab = 'dl';
 
 /* ---------- Permohonan kelulusan admin untuk kandungan berhak cipta ---------- */
 async function approval() { return st.approval ? { id: st.approval, token: await fb.idToken() } : null; }
@@ -219,12 +219,14 @@ fb.onUser((user) => {
   if (chatApi) chatApi.setUser(user);
   if (stopProfile) { stopProfile(); stopProfile = null; }
   if (stopReq) { stopReq(); stopReq = null; }
-  requests = []; paintRequests();
+  if (stopDl) { stopDl(); stopDl = null; }
+  requests = []; paintRequests(); downloads = [];
   if (user) {
     paintProfile({});
     fb.ensureProfile(user, getLang());
     stopProfile = fb.watchProfile(user.uid, paintProfile);
     stopReq = fb.watchMyRequests(user.uid, (r) => { requests = r; paintRequests(); });
+    stopDl = fb.watchDownloads(user.uid, (l) => { downloads = l; paintDownloads(); });
   } else {
     hideResult(); $('#url').value = ''; $('#detected').textContent = '';
     $$('.pchip').forEach((c) => c.classList.toggle('on', false));
@@ -249,22 +251,25 @@ function paintProfile(d) {
   const lk = cleanLink(d.link), a = $('#bioLink');
   a.hidden = !lk; if (lk) { a.href = lk; $('#bioLinkTxt').textContent = lk.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, ''); }
   if ($('#pedit') && !$('#pedit').hidden) paintEditAvatar();
-  const stt = d.stats || {};
-  const mp4 = stt.mp4 || 0, mp3 = stt.mp3 || 0, wav = stt.wav || 0, other = stt.other || 0;
-  $('#stTotal').textContent = nf(stt.total ?? mp4 + mp3 + wav + other);
+  paintDownloads();
+  const img = $('#avatarImg');
+  if (d.photo) { img.src = d.photo; img.hidden = false; $('#avatarInit').hidden = true; } else { img.hidden = true; $('#avatarInit').hidden = false; }
+}
+/* Semua muat turun pengguna (MP4, MP3, MOV, WAV dan lain-lain) dari users/{uid}/downloads, masa nyata */
+function paintDownloads() {
+  const list = downloads.slice(0, 200), fmts = list.map((r) => String(r.format || '').toLowerCase());
+  const count = (f) => fmts.filter((x) => x === f).length;
+  const mp4 = count('mp4'), mp3 = count('mp3'), wav = count('wav'), other = list.length - mp4 - mp3 - wav;
+  $('#stTotal').textContent = nf(list.length);
   $('#stWav').textContent = nf(wav); $('#stWavBox').hidden = wav === 0;
   $('#stMp4').textContent = nf(mp4); $('#stMp3').textContent = nf(mp3);
   $('#stOther').textContent = nf(other); $('#stOtherBox').hidden = other === 0;
-  // Senarai muat turun (ditulis oleh pelayan): users/{uid}.recent = [{ title, format, platform, at }]
-  const recent = Array.isArray(d.recent) ? d.recent.slice(0, 100) : [];
-  const when = (v) => { try { const dt = v?.toDate ? v.toDate() : v ? new Date(v) : null; return dt ? new Intl.DateTimeFormat(getLang() === 'ar' ? 'ar' : getLang() === 'en' ? 'en-GB' : 'ms-MY', { timeZone: 'Asia/Kuala_Lumpur', dateStyle: 'medium' }).format(dt) : ''; } catch { return ''; } };
-  $('#dlList').innerHTML = recent.map((r) => {
-    const fmt = String(r.format || '').toLowerCase();
+  const when = (v) => { try { const dt = v?.toDate ? v.toDate() : v ? new Date(v) : new Date(); return new Intl.DateTimeFormat(getLang() === 'ar' ? 'ar' : getLang() === 'en' ? 'en-GB' : 'ms-MY', { timeZone: 'Asia/Kuala_Lumpur', dateStyle: 'medium', timeStyle: 'short' }).format(dt); } catch { return ''; } };
+  $('#dlList').innerHTML = list.map((r, i) => {
+    const fmt = fmts[i];
     return `<li class="dl-row"><span class="fmt f-${esc(fmt)}">${esc(fmt.toUpperCase())}</span><span class="ttl">${esc(r.title || '')}</span><span class="when">${esc([r.platform, when(r.at)].filter(Boolean).join(' · '))}</span></li>`;
   }).join('');
-  nRecent = recent.length; applyTab();
-  const img = $('#avatarImg');
-  if (d.photo) { img.src = d.photo; img.hidden = false; $('#avatarInit').hidden = true; } else { img.hidden = true; $('#avatarInit').hidden = false; }
+  nRecent = list.length; applyTab();
 }
 document.addEventListener('langchange', () => paintProfile(profile));
 
@@ -460,6 +465,7 @@ function done(id, name) {
   setProgress(100, 'finished');
   const href = DEMO ? '#' : fileUrl(id);
   if (!DEMO) { const a = document.createElement('a'); a.href = href; a.download = name || ''; document.body.append(a); a.click(); a.remove(); }
+  if (!DEMO && st.user) { const ext = (String(name || '').match(/\.([a-z0-9]{2,5})$/i) || [])[1] || st.format; fb.addDownload(st.user.uid, { title: st.info?.title || String(name || '').replace(/\.[a-z0-9]{2,5}$/i, ''), format: ext, platform: st.info?.platform?.name || st.info?.platform?.id || '' }).catch(() => {}); }
   sfx.success();
   setTimeout(() => modal({
     icon: 'check', title: t('m_done_title'), text: isIOS ? t('m_done_ios') : t('m_done_text'),
