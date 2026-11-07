@@ -68,19 +68,19 @@ export function toast(msg, type = "ok") {
   const t = document.createElement("div"); t.className = "toast " + type; t.textContent = msg; box.append(t);
   setTimeout(() => t.classList.add("out"), 3600); setTimeout(() => t.remove(), 4000);
 }
-export function modal({ title, body, actions = [], wide = false }) {
+export function modal({ title, body, actions = [], wide = false, locked = false, onOpen }) {
   return new Promise((resolve) => {
     const ov = document.createElement("div"); ov.className = "overlay";
     ov.innerHTML = `<div class="modal ${wide ? "wide" : ""}" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="modal-h"><h3>${esc(title)}</h3><button class="icon-btn" data-x aria-label="Tutup">&times;</button></div><div class="modal-b"></div><div class="modal-f"></div></div>`;
     const b = $(".modal-b", ov); typeof body === "string" ? (b.innerHTML = body) : b.append(body);
     const f = $(".modal-f", ov);
     const close = (v) => { ov.remove(); document.removeEventListener("keydown", esck); resolve(v); };
-    const esck = (e) => e.key === "Escape" && close(null);
+    const esck = (e) => !locked && e.key === "Escape" && close(null);
     document.addEventListener("keydown", esck);
     actions.forEach((a) => { const bt = document.createElement("button"); bt.className = "btn " + (a.cls || "ghost"); bt.textContent = a.label; bt.onclick = async () => { if (a.onClick) { const r = await a.onClick(ov); if (r === false) return; close(r ?? a.value); } else close(a.value); }; f.append(bt); });
-    $("[data-x]", ov).onclick = () => close(null);
-    ov.addEventListener("mousedown", (e) => e.target === ov && close(null));
-    document.body.append(ov); const first = $("input,select,textarea,button.btn", ov); first && first.focus();
+    const xb = $("[data-x]", ov); if (locked) xb.remove(); else xb.onclick = () => close(null);
+    ov.addEventListener("mousedown", (e) => !locked && e.target === ov && close(null));
+    document.body.append(ov); onOpen && onOpen(ov); const first = $("input,select,textarea,button.btn", ov); first && first.focus();
   });
 }
 export const confirmBox = (title, msg, ok = "OK", cancel = "Batal") => modal({ title, body: `<p>${esc(msg)}</p>`, actions: [{ label: cancel, value: false }, { label: ok, cls: "primary", value: true }] }).then(Boolean);

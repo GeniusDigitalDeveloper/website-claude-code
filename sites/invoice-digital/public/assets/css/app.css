@@ -149,3 +149,7 @@ button,a,input,select,textarea,label,summary{touch-action:manipulation}
 /* Skrin sangat sempit (iPhone SE lama / Android kecil, 320-380px) */
 @media(max-width:380px){.auth-main{padding:20px 12px}.auth-card{padding:18px}.btn.block{white-space:normal}.app-top{padding:8px 8px;gap:6px}.app-top .app-top-t{display:none}.top-r{gap:6px;margin-left:auto}.lang button{padding:6px 9px;min-width:36px}.avatar{width:32px;height:32px}.view{padding:16px 12px 92px}.hero h1{font-size:1.85rem}.card{padding:14px}.stat{padding:12px}.tabs a{padding:9px 12px}}
 .sw.custom input{padding:0}
+
+.b-k-invoice{background:#dbeafe;color:#1e40af}.b-k-quotation{background:#ede9fe;color:#5b21b6}.b-k-receipt{background:#d1fae5;color:#065f46}
+#proj{margin-bottom:16px}.pdf-frame{width:100%;height:78vh;min-height:420px;border:1px solid var(--line);border-radius:12px;background:#f1f5f9}#pvbox{margin-bottom:16px}
+#devpw{letter-spacing:.05em}.chk{display:flex;align-items:center;gap:8px;font-weight:500}

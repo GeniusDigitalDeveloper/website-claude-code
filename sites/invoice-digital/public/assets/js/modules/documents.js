@@ -7,6 +7,7 @@ import { F } from "../firebase.js";
 import { errMsg } from "../auth.js";
 import { ico, empty, loading, badge } from "./ui.js";
 import { pdfAction, makePdf } from "./actions.js";
+import { deleteProject, confirmKey } from "./projects.js";
 import { recordPayment, METHODS } from "./receipts.js";
 import { TEMPLATES } from "../pdf.js";
 
@@ -164,14 +165,15 @@ export async function renderView(el, ctx, type, id) {
     if (type === "invoice") { const s = await F.getDocs(F.query(F.collection(F.getFirestore(), "inv_users", ctx.uid, "receipts"), F.where("invoiceId", "==", id))); receipts = s.docs.map((x) => ({ id: x.id, ...x.data() })).sort((a, b) => (a.date < b.date ? 1 : -1)); }
   } catch (e) { el.innerHTML = `<p class="err">${esc(errMsg(e))}</p>`; return; }
   const c = calc(d), st = C.eff(d), cu = d.customer || {};
-  const canDelete = ["draft", "cancelled"].includes(d.status);
+  const canDelete = true;
   const btn = (a, icon, label, cls = "ghost") => `<button class="btn ${cls}" data-a="${a}">${ico(icon)}<span>${t(label)}</span></button>`;
   el.innerHTML = `<div class="page-h"><div><h1>${esc(d.number)} ${badge(st)}</h1><p class="sub">${esc(cu.name || "")}${cu.company ? " · " + esc(cu.company) : ""}</p></div><a class="btn ghost" href="#/app/${C.route}">${t("back")}</a></div>
-  <div class="actions-bar">${btn("edit", "edit", "act_edit", "primary")}${btn("download", "download", "act_download")}${btn("print", "print", "act_print")}${btn("preview", "eye", "act_preview")}${btn("share", "share", "act_share")}${btn("dup", "copy", "act_duplicate")}
+  <div class="actions-bar">${btn("edit", "edit", "act_edit", "primary")}${btn("download", "download", "act_download")}${btn("print", "print", "act_print")}${btn("inline", "eye", "preview_inline")}${btn("preview", "eye", "act_preview")}${btn("share", "share", "act_share")}${btn("dup", "copy", "act_duplicate")}
    ${type === "invoice" && !["paid", "cancelled", "draft"].includes(d.status) ? btn("pay", "wallet", "act_receipt", "accent") : ""}
    ${type === "invoice" ? `${d.status !== "paid" && d.status !== "cancelled" ? btn("paid", "check", "mark_paid") : ""}${["paid", "partial", "sent", "draft"].includes(d.status) ? btn("unpaid", "clock", "mark_unpaid") : ""}${d.status !== "cancelled" && d.status !== "draft" && d.status !== "paid" ? btn("partial", "wallet", "mark_partial") : ""}${d.status !== "cancelled" ? btn("cancel", "x", "mark_cancel") : ""}`
    : `${!d.convertedInvoiceId ? btn("convert", "swap", "act_convert", "accent") : ""}${["sent", "draft", "rejected", "expired"].includes(d.status) ? btn("accepted", "check", "mark_accepted") : ""}${["sent", "draft", "accepted"].includes(d.status) ? btn("rejected", "x", "mark_rejected") : ""}${["sent", "draft"].includes(d.status) ? btn("expired", "clock", "mark_expired") : ""}${d.status === "draft" ? btn("sent", "mail", "mark_sent") : ""}`}
    ${type === "invoice" && d.status === "draft" ? btn("sent", "mail", "mark_sent") : ""}${canDelete ? btn("del", "trash", "delete", "danger") : ""}</div>
+  <section class="card" id="pvbox" hidden><h2>${t("preview_title")}</h2><iframe class="pdf-frame" title="PDF" src="about:blank"></iframe></section>
   <div class="grid-view"><section class="card"><div class="kv"><div><span>${t("f_date")}</span><b>${fmtDate(d.date, getLang())}</b></div><div><span>${t(type === "invoice" ? "f_due" : "f_valid")}</span><b>${fmtDate(dueOf(type, d), getLang())}</b></div>
    <div><span>${t("sec_customer")}</span><b>${esc(cu.name || "-")}</b><small>${esc(cu.address || "")}<br>${esc([cu.phone, cu.email].filter(Boolean).join(" · "))}</small></div>
    ${d.convertedInvoiceId ? `<div><span>${t("st_converted")}</span><a href="#/app/invoices/${esc(d.convertedInvoiceId)}"><b>${esc(d.convertedInvoiceNumber || "")}</b></a></div>` : ""}${d.fromQuotationNumber ? `<div><span>${t("from_quotation")}</span><a href="#/app/quotations/${esc(d.fromQuotationId)}"><b>${esc(d.fromQuotationNumber)}</b></a></div>` : ""}</div>
@@ -194,7 +196,8 @@ export async function renderView(el, ctx, type, id) {
       if (a === "partial") { setBusy(b, false); return askPartial(); }
       if (a === "cancel") { if (!(await confirmBox(t("mark_cancel"), t("confirm_cancel", { n: d.number }), t("yes")))) return setBusy(b, false); return upd({ status: "cancelled" }); }
       if (["accepted", "rejected", "expired", "sent"].includes(a)) return upd({ status: a });
-      if (a === "del") { if (!(await confirmBox(t("delete"), t("confirm_delete", { n: d.number }), t("delete")))) return setBusy(b, false); await remove(ctx.uid, C.col, id); toast(t("deleted")); return ctx.nav(`#/app/${C.route}`); }
+      if (a === "del") { if (!(await confirmBox(t("delete"), t(confirmKey(type), { n: d.number }), t("delete")))) return setBusy(b, false); await deleteProject(ctx, type, d); toast(t("deleted")); return ctx.nav(`#/app/${C.route}`); }
+      if (a === "inline") { const box = el.querySelector("#pvbox"); const open = !box.hidden; box.hidden = open; if (!open) { const pdf = await makePdf(ctx, type, d); const fr = box.querySelector("iframe"); if (fr.dataset.u) URL.revokeObjectURL(fr.dataset.u); fr.dataset.u = URL.createObjectURL(pdf.output("blob")); fr.src = fr.dataset.u; box.scrollIntoView({ behavior: "smooth", block: "start" }); } setBusy(b, false); return; }
       if (a === "convert") {
         if (!(await confirmBox(t("act_convert"), t("confirm_convert", { n: d.number }), t("yes")))) return setBusy(b, false);
         const today = todayMY(); const { id: _i, number, createdAt, updatedAt, ownerUid, status, validUntil, convertedInvoiceId, ...rest } = d;

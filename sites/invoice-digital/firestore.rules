@@ -389,7 +389,7 @@ service cloud.firestore {
           && invNew().status in ['draft', 'sent', 'unpaid', 'partial', 'paid', 'cancelled']
           && invNew().items is list && invNew().items.size() <= 150
           && invNew().number == resource.data.number && invNew().createdAt == resource.data.createdAt;
-        allow delete: if invOwner(uid) && resource.data.status in ['draft', 'cancelled'];
+        allow delete: if invOwner(uid);   // pemilik boleh padam projek sendiri (UI minta pengesahan)
       }
       match /quotations/{id} {
         allow create: if invOwner(uid) && invBase(uid)
@@ -401,14 +401,16 @@ service cloud.firestore {
           && invNew().status in ['draft', 'sent', 'accepted', 'rejected', 'expired', 'converted']
           && invNew().items is list && invNew().items.size() <= 150
           && invNew().number == resource.data.number && invNew().createdAt == resource.data.createdAt;
-        allow delete: if invOwner(uid) && resource.data.status in ['draft', 'cancelled'];
+        allow delete: if invOwner(uid);   // pemilik boleh padam projek sendiri (UI minta pengesahan)
       }
-      // Resit: tidak boleh diubah/dipadam selepas dicipta (integriti rekod).
+      // Resit: tidak boleh diubah selepas dicipta (integriti rekod); boleh dipadam oleh pemilik.
       match /receipts/{id} {
         allow create: if invOwner(uid) && invBase(uid)
           && invNew().amount is number && invNew().amount > 0
           && invNew().number is string && invNew().number.size() <= 40
           && invNew().createdAt == request.time;
+        // Padam resit dibenarkan (app memulihkan baki invoice dalam transaksi); tidak boleh diubah.
+        allow delete: if invOwner(uid);
       }
       // Kaunter nombor dokumen: hanya naik tepat +1 (digunakan dalam transaksi bersama dokumen).
       match /counters/{id} {

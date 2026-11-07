@@ -1,7 +1,7 @@
 // Panel awam: landing, auth, dan aplikasi (dashboard + modul). Routing berasaskan hash: #/ , #/login , #/app/...
 import { t, L, getLang, applyI18n, langSwitcher } from "./i18n.js";
-import { $, $$, esc, toast, setBusy } from "./util.js";
-import { onUser, signIn, signOut, wipeLocal, register, resetPw, googleSignIn, ensureUserDoc, errMsg } from "./auth.js";
+import { $, $$, esc, toast, setBusy, modal } from "./util.js";
+import { hasPassword, createPassword, setDevicePw, onUser, signIn, signOut, wipeLocal, register, resetPw, googleSignIn, ensureUserDoc, errMsg } from "./auth.js";
 import { getAppSettings, getMeta, setMeta } from "./db.js";
 import { trackVisit } from "./stats.js";
 import { brand, footerHtml, fillFooterStats } from "./shared.js";
@@ -140,6 +140,21 @@ async function renderApp(segs, q) {
   } catch (e) { console.error(e); view.innerHTML = `<p class="err">${esc(errMsg(e))}</p>`; }
 }
 
+// ---------------------------------------------------------------- KATA LALUAN (pengguna Google)
+// Pengguna yang masuk dengan Google mesti mencipta kata laluan (dipautkan ke akaun yang sama) supaya boleh log masuk dengan e-mel + kata laluan juga.
+async function askCreatePassword() {
+  const body = `<p class="muted">${t("pw_create_text")}</p><form class="form" id="cpf" novalidate><label>${t("pw_new")}${pwInput("nw", "new-password", 'required minlength="8"')}</label><label>${t("pw_confirm")}${pwInput("cf", "new-password", 'required minlength="8"')}</label>
+    <label class="chk"><input type="checkbox" name="rem"> ${t("pw_remember")}</label><p class="muted">${t("pw_remember_hint")}</p><p class="err" id="cperr" role="alert"></p></form>`;
+  const r = await modal({ title: t("pw_create_title"), body, locked: true, onOpen: (ov) => bindEyes(ov), actions: [
+    { label: t("logout"), value: "out" },
+    { label: t("save"), cls: "primary", onClick: async (ov) => {
+      const f = ov.querySelector("#cpf"), err = ov.querySelector("#cperr"); err.textContent = "";
+      if (f.nw.value.length < 8) { err.textContent = t("pw_min"); return false; } if (f.nw.value !== f.cf.value) { err.textContent = t("pw_mismatch"); return false; }
+      try { await createPassword(S.user, f.nw.value); setDevicePw(S.user.uid, f.rem.checked ? f.nw.value : ""); return true; }
+      catch (x) { err.textContent = errMsg(x); if (x.code === "auth/provider-already-linked") return true; return false; } } }] });
+  if (r === "out") { await signOut(); await wipeLocal(); location.hash = "#/"; location.reload(); } else toast(t("pw_updated"));
+}
+
 // ---------------------------------------------------------------- INIT
 (async function init() {
   S.settings = await getAppSettings(); document.title = brand(S.settings).name + " — Genius Digital";
@@ -147,8 +162,9 @@ async function renderApp(segs, q) {
   // Paparkan app serta-merta selepas log masuk; profil pengguna disegerakkan di latar (tidak menyekat UI).
   onUser((u) => {
     S.user = u; S.company = null; S.ready = true; route();
-    if (!u) return;
+    if (!u) { S.pwAsked = false; return; }
     ctx.getCompany().then(renderShellHeader).catch(() => {}); // foto profil di bar atas
+    if (!hasPassword(u) && u.email && !S.pwAsked) { S.pwAsked = true; askCreatePassword(); }
     ensureUserDoc(u, getLang()).then((r) => {
       if (r.disabled) { signOut().then(() => { toast(t("err_disabled"), "err"); ctx.nav("#/login"); }); }
       else renderShellHeader();

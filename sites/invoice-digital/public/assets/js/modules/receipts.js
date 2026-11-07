@@ -5,6 +5,8 @@ import { F } from "../firebase.js";
 import { errMsg } from "../auth.js";
 import { ico, empty, loading, badge } from "./ui.js";
 import { pdfAction } from "./actions.js";
+import { deleteProject, confirmKey } from "./projects.js";
+import { confirmBox } from "../util.js";
 
 export const METHODS = ["cash", "bank", "duitnow", "card", "ewallet", "other"];
 
@@ -38,10 +40,12 @@ export async function renderList(el, ctx) {
     const list = rows.filter((r) => !q || [r.number, r.customerName, r.invoiceNumber].join(" ").toLowerCase().includes(q));
     $("#tbl", el).innerHTML = list.length ? `<table class="tbl"><thead><tr><th>${t("col_number")}</th><th>${t("col_date")}</th><th>${t("col_invref")}</th><th>${t("col_customer")}</th><th>${t("col_method")}</th><th class="r">${t("col_amount")}</th><th></th></tr></thead><tbody>${list.map((r) => `<tr>
       <td data-l="${t("col_number")}"><b>${esc(r.number)}</b></td><td data-l="${t("col_date")}">${fmtDate(r.date, getLang())}</td><td data-l="${t("col_invref")}">${esc(r.invoiceNumber)}</td><td data-l="${t("col_customer")}">${esc(r.customerName)}</td><td data-l="${t("col_method")}">${esc(t("pm_" + r.method))}</td><td class="r" data-l="${t("col_amount")}"><b>${money(r.amount)}</b></td>
-      <td class="acts"><button class="icon-btn" data-a="preview" data-id="${r.id}" aria-label="${t("act_preview")}">${ico("eye")}</button><button class="icon-btn" data-a="download" data-id="${r.id}" aria-label="${t("act_download")}">${ico("download")}</button><button class="icon-btn" data-a="print" data-id="${r.id}" aria-label="${t("act_print")}">${ico("print")}</button></td></tr>`).join("")}</tbody></table>` : empty("receipt", t("receipts_empty"));
+      <td class="acts"><button class="icon-btn" data-a="preview" data-id="${r.id}" aria-label="${t("act_preview")}">${ico("eye")}</button><button class="icon-btn" data-a="download" data-id="${r.id}" aria-label="${t("act_download")}">${ico("download")}</button><button class="icon-btn" data-a="print" data-id="${r.id}" aria-label="${t("act_print")}">${ico("print")}</button><button class="icon-btn danger" data-a="del" data-id="${r.id}" aria-label="${t("delete")}">${ico("trash")}</button></td></tr>`).join("")}</tbody></table>` : empty("receipt", t("receipts_empty"));
   };
   draw(); $("#q", el).oninput = debounce(draw, 150);
-  el.onclick = (e) => { const b = e.target.closest("[data-a]"); if (!b) return; const r = rows.find((x) => x.id === b.dataset.id); if (r) pdfAction(ctx, "receipt", r, b.dataset.a); };
+  el.onclick = async (e) => { const b = e.target.closest("[data-a]"); if (!b) return; const r = rows.find((x) => x.id === b.dataset.id); if (!r) return;
+    if (b.dataset.a === "del") { if (!(await confirmBox(t("delete"), t(confirmKey("receipt"), { n: r.number }), t("delete")))) return; try { await deleteProject(ctx, "receipt", r); toast(t("deleted")); renderList(el, ctx); } catch (x) { toast(errMsg(x), "err"); } return; }
+    pdfAction(ctx, "receipt", r, b.dataset.a); };
 }
 
 export async function renderForm(el, ctx, params) {

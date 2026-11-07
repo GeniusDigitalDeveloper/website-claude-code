@@ -7,7 +7,7 @@ export const errMsg = (e) => {
     "auth/invalid-credential": "err_login", "auth/wrong-password": "err_login", "auth/user-not-found": "err_login", "auth/invalid-email": "err_email",
     "auth/email-already-in-use": "err_exists", "auth/weak-password": "err_weak", "auth/too-many-requests": "err_many", "auth/network-request-failed": "err_net",
     "auth/popup-closed-by-user": "err_popup", "auth/cancelled-popup-request": "err_popup", "auth/operation-not-allowed": "err_notallowed", "auth/unauthorized-domain": "err_domain",
-    "permission-denied": "err_perm", "unavailable": "err_net",
+    "auth/requires-recent-login": "err_recent", "auth/provider-already-linked": "err_linked", "auth/credential-already-in-use": "err_exists", "permission-denied": "err_perm", "unavailable": "err_net",
   }[c.replace("firestore/", "")];
   return m ? t(m) : t("err_generic") + (c ? ` (${c})` : "");
 };
@@ -65,3 +65,12 @@ async function ensureUserDocOnce(user, lang) {
   if (!d.disabled && Date.now() - last > 30 * 60 * 1000) F.updateDoc(ref, { lastLoginAt: F.serverTimestamp() }).catch(() => {}); // tidak menyekat; hanya jika > 30 minit
   return { disabled: d.disabled === true, isNew: false };
 }
+
+// ---- Kata laluan untuk pengguna Google (pautkan kredensial e-mel/kata laluan) & tukar kata laluan.
+export const hasPassword = (u) => !!u && u.providerData.some((p) => p.providerId === "password");
+export async function createPassword(user, pw) { await A.linkWithCredential(user, A.EmailAuthProvider.credential(user.email, pw)); await user.reload(); }
+export async function changePassword(user, current, next) { await A.reauthenticateWithCredential(user, A.EmailAuthProvider.credential(user.email, current)); await A.updatePassword(user, next); }
+// Pilihan: simpan pada PERANTI ini sahaja (localStorage) supaya boleh dilihat semula dengan ikon mata. Tidak pernah dihantar/disimpan dalam pangkalan data.
+const PWK = (uid) => "inv_devpw_" + uid;
+export const getDevicePw = (uid) => { try { return localStorage.getItem(PWK(uid)) || ""; } catch { return ""; } };
+export const setDevicePw = (uid, pw) => { try { pw ? localStorage.setItem(PWK(uid), pw) : localStorage.removeItem(PWK(uid)); } catch {} };
