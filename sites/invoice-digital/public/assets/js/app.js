@@ -81,7 +81,8 @@ function renderAuth(mode, q) {
     setBusy(btn, true);
     try { if (isReg) await register(f.name.value.trim(), email, pw); else await signIn(email, pw); } catch (x) { err.textContent = errMsg(x); setBusy(btn, false); }
   };
-  $("#gbtn").onclick = async (e) => { setBusy(e.currentTarget, true); try { await googleSignIn(); } catch (x) { err.textContent = errMsg(x); setBusy(e.currentTarget, false); } };
+  const gb = $("#gbtn");
+  gb.onclick = async () => { err.textContent = ""; setBusy(gb, true); try { await googleSignIn(); } catch (x) { console.warn("google", x.code); err.textContent = errMsg(x); setBusy(gb, false); } };
   const fg = $("#forgot"); if (fg) fg.onclick = async () => { const email = f.email.value.trim(); if (!email) return (err.textContent = t("err_email")); try { await resetPw(email); toast(t("reset_sent")); } catch (x) { err.textContent = errMsg(x); } };
 }
 
@@ -132,13 +133,13 @@ async function renderApp(segs, q) {
 (async function init() {
   S.settings = await getAppSettings(); document.title = brand(S.settings).name + " — Genius Digital";
   trackVisit();
-  onUser(async (u) => {
-    if (u) {
-      try {
-        const r = await ensureUserDoc(u, getLang());
-        if (r.disabled) { await signOut(); S.user = null; S.ready = true; toast(t("err_disabled"), "err"); ctx.nav("#/login"); return route(); }
-      } catch (e) { console.error(e); toast(errMsg(e), "err"); }
-    }
+  // Paparkan app serta-merta selepas log masuk; profil pengguna disegerakkan di latar (tidak menyekat UI).
+  onUser((u) => {
     S.user = u; S.company = null; S.ready = true; route();
+    if (!u) return;
+    ensureUserDoc(u, getLang()).then((r) => {
+      if (r.disabled) { signOut().then(() => { toast(t("err_disabled"), "err"); ctx.nav("#/login"); }); }
+      else renderShellHeader();
+    }).catch((e) => { console.error(e); toast(errMsg(e), "err"); });
   });
 })();
