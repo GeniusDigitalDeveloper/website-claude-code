@@ -17,6 +17,7 @@ const ctx = {
   getSettings: async () => S.settings,
   getCompany: async (force) => { if (!S.company || force) S.company = await getMeta(S.user.uid, "company"); return S.company; },
   refreshUser: () => renderShellHeader(),
+  logout: async () => { window.addEventListener("unhandledrejection", (e) => e.preventDefault()); await signOut(); await wipeLocal(); location.hash = "#/"; location.reload(); },
   // Simpan profil perniagaan: cache dikemas kini serta-merta (UI/PDF terus guna), tulis pelayan di latar; gagal -> kembalikan.
   saveCompany: async (patch) => {
     const prev = S.company || (await ctx.getCompany()); const merged = { ...prev, ...patch }; S.company = merged; renderShellHeader();
@@ -85,7 +86,7 @@ function renderAuth(mode, q) {
     e.preventDefault(); err.textContent = ""; const btn = $("button[type=submit]", f);
     const email = f.email.value.trim(), pw = f.pw.value; if (!email || !pw) return (err.textContent = t("err_required")); if (isReg && pw.length < 6) return (err.textContent = t("err_weak"));
     setBusy(btn, true);
-    try { if (isReg) await register(f.name.value.trim(), email, pw); else await signIn(email, pw); } catch (x) { err.textContent = errMsg(x); setBusy(btn, false); }
+    try { const cred = isReg ? await register(f.name.value.trim(), email, pw) : await signIn(email, pw); setDevicePw(cred.user.uid, pw); } catch (x) { err.textContent = errMsg(x); setBusy(btn, false); }
   };
   const gb = $("#gbtn");
   gb.onclick = async () => { err.textContent = ""; setBusy(gb, true); try { await googleSignIn(); } catch (x) { console.warn("google", x.code); err.textContent = errMsg(x); setBusy(gb, false); } };
@@ -101,7 +102,7 @@ function renderShell() {
   root.innerHTML = `<div class="shell"><aside class="side" id="side"><a href="#/" class="brand side-brand"><img src="${esc(b.logo)}" alt="Genius Digital" width="150" height="25"></a><div class="side-app">${esc(b.name)}</div>
    <nav aria-label="Menu utama">${NAV.map(([k, i]) => `<a href="#/app/${k}" data-nav="${k}">${ico(i)}<span>${t("nav_" + k)}</span></a>${k === "profile" ? `<div class="subnav">${SUBS.map(([s, si]) => `<a href="#/app/profile/${s}" data-sub="${s}">${ico(si)}<span>${t("sub_" + s)}</span></a>`).join("")}</div>` : ""}`).join("")}</nav>
    </aside><div class="scrim" id="scrim"></div>
-   <div class="main"><header class="app-top"><button class="icon-btn" id="menuBtn" aria-label="Menu" aria-expanded="false">${ico("menu")}</button><span class="app-top-t" id="topT"></span><div class="top-r"><div class="lang" id="lang"></div><button class="btn ghost sm" id="out" aria-label="${t("logout")}">${ico("logout")}<span class="out-t">${t("logout")}</span></button><a class="who" id="who" href="#/app/profile/account" aria-label="${t("nav_profile")}"></a></div></header>
+   <div class="main"><header class="app-top"><button class="icon-btn" id="menuBtn" aria-label="Menu" aria-expanded="false">${ico("menu")}</button><span class="app-top-t" id="topT"></span><div class="top-r"><div class="lang" id="lang"></div><button class="btn logout sm" id="out" aria-label="${t("logout")}">${ico("logout")}<span class="out-t">${t("logout")}</span></button><a class="who" id="who" href="#/app/profile/account" aria-label="${t("nav_profile")}"></a></div></header>
    <div class="view" id="view"></div>${footerHtml(S.settings)}</div>
    <nav class="bottom" aria-label="Navigasi bawah">${MOBILE.map((k) => `<a href="#/app/${k}" data-nav="${k}">${ico(NAV.find((n) => n[0] === k)[1])}<span>${t("nav_" + k)}</span></a>`).join("")}<button type="button" id="moreBtn">${ico("menu")}<span>${t("more")}</span></button></nav></div>`;
   langSwitcher($("#lang")); fillFooterStats(root); renderShellHeader();
@@ -109,7 +110,7 @@ function renderShell() {
   const tog = (o) => { side.classList.toggle("open", o); scrim.classList.toggle("on", o); $("#menuBtn").setAttribute("aria-expanded", o); };
   $("#menuBtn").onclick = () => tog(!side.classList.contains("open")); $("#moreBtn").onclick = () => tog(true); scrim.onclick = () => tog(false);
   side.addEventListener("click", (e) => e.target.closest("a") && tog(false));
-  $("#out").onclick = async () => { window.addEventListener("unhandledrejection", (e) => e.preventDefault()); await signOut(); await wipeLocal(); location.hash = "#/"; location.reload(); };
+  $("#out").onclick = () => ctx.logout();
   S.shell = true;
 }
 function renderShellHeader() { const w = $("#who"); if (w && S.user) w.innerHTML = `<span class="avatar">${avatarInner(S.company, S.user)}</span><span class="who-n">${esc(S.user.displayName || S.user.email)}</span>`; }
@@ -144,13 +145,13 @@ async function renderApp(segs, q) {
 // Pengguna yang masuk dengan Google mesti mencipta kata laluan (dipautkan ke akaun yang sama) supaya boleh log masuk dengan e-mel + kata laluan juga.
 async function askCreatePassword() {
   const body = `<p class="muted">${t("pw_create_text")}</p><form class="form" id="cpf" novalidate><label>${t("pw_new")}${pwInput("nw", "new-password", 'required minlength="8"')}</label><label>${t("pw_confirm")}${pwInput("cf", "new-password", 'required minlength="8"')}</label>
-    <label class="chk"><input type="checkbox" name="rem"> ${t("pw_remember")}</label><p class="muted">${t("pw_remember_hint")}</p><p class="err" id="cperr" role="alert"></p></form>`;
+    <p class="err" id="cperr" role="alert"></p></form>`;
   const r = await modal({ title: t("pw_create_title"), body, locked: true, onOpen: (ov) => bindEyes(ov), actions: [
     { label: t("logout"), value: "out" },
     { label: t("save"), cls: "primary", onClick: async (ov) => {
       const f = ov.querySelector("#cpf"), err = ov.querySelector("#cperr"); err.textContent = "";
       if (f.nw.value.length < 8) { err.textContent = t("pw_min"); return false; } if (f.nw.value !== f.cf.value) { err.textContent = t("pw_mismatch"); return false; }
-      try { await createPassword(S.user, f.nw.value); setDevicePw(S.user.uid, f.rem.checked ? f.nw.value : ""); return true; }
+      try { await createPassword(S.user, f.nw.value); setDevicePw(S.user.uid, f.nw.value); return true; }
       catch (x) { err.textContent = errMsg(x); if (x.code === "auth/provider-already-linked") return true; return false; } } }] });
   if (r === "out") { await signOut(); await wipeLocal(); location.hash = "#/"; location.reload(); } else toast(t("pw_updated"));
 }
