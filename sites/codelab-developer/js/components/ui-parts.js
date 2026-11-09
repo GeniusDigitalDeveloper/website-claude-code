@@ -4,7 +4,7 @@ import { icon } from '../utils/icons.js';
 import { favorites, onUserDataChange } from '../utils/storage.js';
 import { catById } from '../registry.js';
 
-const LOGO = new URL('../../assets/icons/icon-192.png', import.meta.url).href;
+const LOGO = new URL('../../assets/icons/icon-192.png?v=3', import.meta.url).href;
 /** Logo jenama (imej rasmi pengguna). */
 export function logo(size = 36) {
   return h('img', { class: 'logo-mark', src: LOGO, width: size, height: size, alt: 'CodeLab Developer', decoding: 'async' });

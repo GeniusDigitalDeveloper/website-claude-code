@@ -102,7 +102,7 @@ export async function users() {
 
 export async function settings() {
   const saved = await adminData.getConfig('site').catch(() => null) || {};
-  const def0 = { name: SITE.name, logo: 'assets/icons/icon-192.png', slogan: t('footer.slogan'), footer: t('footer.copyright', { brand: SITE.brand, year: SITE.year }), langs: ['ms', 'en', 'ar'], defaultLang: 'ms', maintenance: false };
+  const def0 = { name: SITE.name, logo: 'assets/icons/icon-192.png?v=3', slogan: t('footer.slogan'), footer: t('footer.copyright', { brand: SITE.brand, year: SITE.year }), langs: ['ms', 'en', 'ar'], defaultLang: 'ms', maintenance: false };
   const def = { ...def0, ...saved, langs: saved.languages || def0.langs };
   const f = (key, label, val, ph) => { const i = h('input', { type: 'text', value: val, id: `s-${key}`, ph }); return { i, el: h('div', { class: 'field' }, h('label', { for: `s-${key}`, i18n: label }), i) }; };
   const name = f('name', 'adm.set.name', def.name), logoF = f('logo', 'adm.set.logo', def.logo), slogan = f('slogan', 'adm.set.slogan', def.slogan), footer = f('footer', 'adm.set.footer', def.footer);

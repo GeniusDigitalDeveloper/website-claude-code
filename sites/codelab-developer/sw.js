@@ -1,12 +1,12 @@
 /* Service worker CodeLab Developer — membolehkan pemasangan (PWA) dan penggunaan luar talian.
    Strategi: shell di-precache; fail tapak sendiri = stale-while-revalidate; aset/vendor = cache-first.
    TIDAK menyentuh: /admin/ (sentiasa rangkaian), permintaan silang-asal (Firestore/Auth), bukan-GET. */
-const VERSION = 'cl-v2';
+const VERSION = 'cl-v3';
 const SHELL = `${VERSION}-shell`;
 const RUNTIME = `${VERSION}-runtime`;
 const PRECACHE = [
-  '/', '/index.html', '/manifest.webmanifest', '/favicon.ico',
-  '/assets/icons/icon-192.png', '/assets/icons/icon-512.png', '/assets/icons/apple-touch-icon.png',
+  '/', '/index.html', '/manifest.webmanifest', '/favicon.ico?v=3',
+  '/assets/icons/icon-192.png?v=3', '/assets/icons/icon-512.png?v=3', '/assets/icons/apple-touch-icon.png?v=3',
   '/css/fonts.css', '/css/base.css', '/css/layout.css', '/css/components.css',
   '/js/main.js', '/js/pages.js', '/js/registry.js', '/js/config.js',
   '/locales/ms.json', '/locales/en.json', '/locales/ar.json',
@@ -41,6 +41,6 @@ self.addEventListener('fetch', (e) => {
     e.respondWith(fetch(req).catch(() => caches.match('/index.html')));
     return;
   }
-  if (url.pathname.startsWith('/assets/')) { e.respondWith(cacheFirst(req)); return; }
+  if (/^\/assets\/(fonts|vendor)\//.test(url.pathname)) { e.respondWith(cacheFirst(req)); return; }
   e.respondWith(swr(req, RUNTIME));
 });
