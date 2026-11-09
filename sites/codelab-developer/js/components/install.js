@@ -34,5 +34,12 @@ export function installButton(cls = 'btn btn-glass') {
 
 export function registerSW() {
   if (!('serviceWorker' in navigator) || !(location.protocol === 'https:' || location.hostname === 'localhost')) return;
-  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {}));
+  const had = !!navigator.serviceWorker.controller;
+  // Versi baharu mengambil alih → muat semula sekali supaya pengguna terus nampak kemas kini (tanpa kosongkan cache).
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!had || sessionStorage.getItem('cl-reloaded')) return;
+    try { sessionStorage.setItem('cl-reloaded', '1'); } catch { /* abaikan */ }
+    location.reload();
+  });
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js', { scope: '/', updateViaCache: 'none' }).then((r) => r.update()).catch(() => {}));
 }
