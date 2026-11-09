@@ -162,3 +162,9 @@ button,a,input,select,textarea,label,summary{touch-action:manipulation}
 /* Butang Log Keluar: merah, teks & ikon putih */
 .btn.logout{background:#dc2626;border-color:#dc2626;color:#fff;box-shadow:0 4px 12px rgba(220,38,38,.28)}.btn.logout:hover{background:#b91c1c;border-color:#b91c1c}.btn.logout .ico{color:#fff;stroke:#fff}
 .page-h .btn.logout{align-self:flex-start}
+
+[hidden]{display:none!important}
+.menu .menu-install{display:inline-flex;align-items:center;gap:8px;color:var(--blue2)}.menu .menu-install .ico{width:16px;height:16px}
+.btn.accent{background:#ecfeff;border-color:#a5f3fc;color:#0e7490}
+.steps-list{margin:8px 0 0;padding-left:20px;display:grid;gap:8px;line-height:1.5}
+@media(display-mode:standalone){.menu .menu-install,.cta .btn[data-install]{display:none!important}}

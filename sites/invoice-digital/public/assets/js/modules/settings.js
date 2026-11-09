@@ -2,6 +2,7 @@
 import { t, getLang, setLang } from "../i18n.js";
 import { esc, $, toast, setBusy, fmtTs } from "../util.js";
 import { ico } from "./ui.js";
+import { bindInstall } from "../install.js";
 import { A, auth, F, db } from "../firebase.js";
 import { errMsg, hasPassword, createPassword, changePassword, getDevicePw, setDevicePw } from "../auth.js";
 import { pwInput, bindEyes } from "./ui.js";
@@ -20,7 +21,8 @@ export async function render(el, ctx, section = "account") {
   }
   const dev = getDevicePw(ctx.uid);
   el.innerHTML = `<div class="card form"><h2>${t("language")}</h2><label>${t("language")}<select id="lg"><option value="ms" ${getLang() === "ms" ? "selected" : ""}>Bahasa Melayu</option><option value="en" ${getLang() === "en" ? "selected" : ""}>English</option></select></label></div>
-    <div class="card form"><h2>${t("pw_title")}</h2>${dev ? `<label>${t("pw_view")}<span class="pw"><input id="devpw" type="password" value="${esc(dev)}" readonly autocomplete="off"><button type="button" class="eye" data-eye aria-label="${esc(t("show_pw"))}" aria-pressed="false">${ico("eye")}</button></span></label>` : `<p class="muted">${t("pw_unavailable")}</p>`}</div>`;
-  bindEyes(el);
+    <div class="card form"><h2>${t("pw_title")}</h2>${dev ? `<label>${t("pw_view")}<span class="pw"><input id="devpw" type="password" value="${esc(dev)}" readonly autocomplete="off"><button type="button" class="eye" data-eye aria-label="${esc(t("show_pw"))}" aria-pressed="false">${ico("eye")}</button></span></label>` : `<p class="muted">${t("pw_unavailable")}</p>`}</div>
+    <div class="card form"><h2>${t("install_title")}</h2><p class="muted">${t("install_text")}</p><div><button type="button" class="btn primary" data-install>${ico("download")}${t("install_app")}</button></div></div>`;
+  bindEyes(el); bindInstall(el);
   $("#lg", el).onchange = (e) => { F.updateDoc(F.doc(db, "inv_users", ctx.uid), { lang: e.target.value, updatedAt: F.serverTimestamp() }).catch(() => {}); setLang(e.target.value); };
 }

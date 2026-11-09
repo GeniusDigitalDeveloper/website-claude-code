@@ -7,6 +7,8 @@ import { trackVisit } from "./stats.js";
 import { brand, footerHtml, fillFooterStats } from "./shared.js";
 import { ico, pwInput, bindEyes } from "./modules/ui.js";
 import { avatarInner } from "./modules/avatar.js";
+import { bindInstall, registerSW } from "./install.js";
+registerSW();
 
 const root = $("#root");
 const S = { user: null, ready: false, settings: {}, company: null, shell: false };
@@ -48,12 +50,12 @@ function renderLanding() {
   const ann = L(st.announcement);
   root.innerHTML = `${ann ? `<div class="announce" role="status">${esc(ann)}</div>` : ""}
   <header class="topbar"><div class="wrap bar"><a href="#/" class="brand" aria-label="${esc(b.name)}"><img src="${esc(b.logo)}" alt="Genius Digital" width="150" height="25"><span class="app-name">${esc(b.name)}</span></a>
-   <nav class="menu" id="menu" aria-label="Menu"><a href="#features" data-sc>${t("menu_features")}</a><a href="#guide" data-sc>${t("menu_guide")}</a><a href="#contact" data-sc>${t("menu_contact")}</a></nav>
+   <nav class="menu" id="menu" aria-label="Menu"><a href="#features" data-sc>${t("menu_features")}</a><a href="#guide" data-sc>${t("menu_guide")}</a><a href="#contact" data-sc>${t("menu_contact")}</a><a href="#" class="menu-install" data-install>${ico("download")}${t("install_app")}</a></nav>
    <div class="bar-r"><div class="lang" id="lang"></div>${S.user ? `<a class="btn primary sm" href="#/app/dashboard">${t("nav_dashboard")}</a>` : `<a class="btn ghost sm hide-s" href="#/login">${t("login")}</a><a class="btn primary sm" href="#/register">${t("start_now")}</a>`}
    <button class="icon-btn burger" id="burger" aria-label="Menu" aria-expanded="false">${ico("menu")}</button></div></div></header>
   <main>
    <section class="hero"><div class="wrap hero-g"><div class="hero-t"><span class="pill">${ico("zap")}${t("hero_pill")}</span><h1>${esc(L(st.heroTitle, t("hero_title")))}</h1><p>${esc(L(st.heroText, t("hero_text")))}</p>
-     <div class="cta"><a class="btn primary lg" href="#/app/invoices/new">${ico("doc")}${t("create_invoice")}</a><a class="btn ghost lg" href="#/app/quotations/new">${ico("quote")}${t("create_quotation")}</a></div>
+     <div class="cta"><a class="btn primary lg" href="#/app/invoices/new">${ico("doc")}${t("create_invoice")}</a><a class="btn ghost lg" href="#/app/quotations/new">${ico("quote")}${t("create_quotation")}</a><button type="button" class="btn accent lg" data-install>${ico("download")}${t("install_app")}</button></div>
      <ul class="trust"><li>${ico("check")}${t("trust_1")}</li><li>${ico("check")}${t("trust_2")}</li><li>${ico("check")}${t("trust_3")}</li></ul></div>
     <div class="hero-v"><div class="shot"><img src="/assets/img/banner.jpg" alt="${esc(b.name)}" width="1200" height="675" fetchpriority="high"></div><img class="floaty" src="/assets/img/icon.png" alt="" width="120" height="120"></div></div></section>
    <section id="features" class="sec"><div class="wrap"><div class="sec-h"><h2>${t("features_title")}</h2><p>${esc(L(st.intro, t("features_sub")))}</p></div>
@@ -61,7 +63,7 @@ function renderLanding() {
    <section id="guide" class="sec alt"><div class="wrap"><div class="sec-h"><h2>${t("guide_title")}</h2></div><ol class="steps">${[1, 2, 3, 4].map((n) => `<li><span class="n">${n}</span><h3>${t("guide_" + n)}</h3><p>${t("guide_" + n + "_d")}</p></li>`).join("")}</ol></div></section>
    <section id="contact" class="sec"><div class="wrap cta-box"><div><h2>${t("contact_title")}</h2><p>${t("contact_text")}</p>${st.contactEmail ? `<p><a href="mailto:${esc(st.contactEmail)}">${esc(st.contactEmail)}</a></p>` : ""}${st.contactPhone ? `<p><a href="tel:${esc(st.contactPhone.replace(/\s/g, ""))}">${esc(st.contactPhone)}</a></p>` : ""}</div><a class="btn light lg" href="#/register">${t("start_now")}</a></div></section>
   </main>${footerHtml(st)}`;
-  langSwitcher($("#lang")); applyI18n(root); fillFooterStats(root);
+  langSwitcher($("#lang")); applyI18n(root); fillFooterStats(root); bindInstall(root);
   $("#burger").onclick = (e) => { const m = $("#menu"); const o = m.classList.toggle("open"); e.currentTarget.setAttribute("aria-expanded", o); };
   $$("[data-sc]").forEach((a) => (a.onclick = (e) => { e.preventDefault(); $("#menu").classList.remove("open"); const el = document.getElementById(a.getAttribute("href").slice(1)); el && el.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); }));
   window.scrollTo(0, 0);
