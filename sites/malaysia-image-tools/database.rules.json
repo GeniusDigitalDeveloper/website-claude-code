@@ -2,47 +2,25 @@
   "rules": {
     ".read": false,
     ".write": false,
-
-    "visits": {
-      ".read": true,
-      ".write": "auth != null && (auth.token.admin === true || auth.token.email === 'izzulmedia01@gmail.com')",
-      "users": { ".write": "newData.isNumber() && newData.val() < 1000000000000 && ((!data.exists() && newData.val() === 1) || (data.exists() && newData.val() === data.val() + 1))" },
-      "total": { ".write": "newData.isNumber() && newData.val() < 1000000000000 && ((!data.exists() && newData.val() === 1) || (data.exists() && newData.val() === data.val() + 1))" },
-      "daily": {
-        "$day": {
-          ".validate": "$day.matches(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)",
-          ".write": "newData.isNumber() && newData.val() < 1000000000000 && ((!data.exists() && newData.val() === 1) || (data.exists() && newData.val() === data.val() + 1))"
-        }
-      },
-      "monthly": {
-        "$month": {
-          ".validate": "$month.matches(/^[0-9]{4}-[0-9]{2}$/)",
-          ".write": "newData.isNumber() && newData.val() < 1000000000000 && ((!data.exists() && newData.val() === 1) || (data.exists() && newData.val() === data.val() + 1))"
-        }
-      },
-      "$other": { ".validate": false }
+    "admins": {
+      "$uid": { ".read": "auth != null && auth.uid === $uid", ".write": false }
     },
-
-    "stats": {
-      ".read": "auth != null && (auth.token.admin === true || auth.token.email === 'izzulmedia01@gmail.com')",
-      ".write": "auth != null && (auth.token.admin === true || auth.token.email === 'izzulmedia01@gmail.com')",
-      "total": { ".write": "newData.isNumber() && newData.val() < 1000000000000 && ((!data.exists() && newData.val() === 1) || (data.exists() && newData.val() === data.val() + 1))" },
-      "tools": {
-        "$id": {
-          ".validate": "$id.matches(/^[a-z0-9-]{1,40}$/)",
-          ".write": "newData.isNumber() && newData.val() < 1000000000000 && ((!data.exists() && newData.val() === 1) || (data.exists() && newData.val() === data.val() + 1))"
+    "apps": {
+      "$app": {
+        "visits": {
+          ".read": true,
+          "users":   { ".write": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
+          "total":   { ".write": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
+          "daily":   { "$day":   { ".write": "$day.matches(/^\\d{4}-\\d{2}-\\d{2}$/) && newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" } },
+          "monthly": { "$month": { ".write": "$month.matches(/^\\d{4}-\\d{2}$/) && newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" } }
+        },
+        "stats": {
+          ".read": "root.child('admins').child(auth.uid).val() === true",
+          "total": { "count": { ".write": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" } },
+          "daily": { "$day": { "count": { ".write": "$day.matches(/^\\d{4}-\\d{2}-\\d{2}$/) && newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" } } },
+          "tools": { "$tool": { "count": { ".write": "$tool.matches(/^[a-z0-9_-]{1,40}$/) && newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" } } }
         }
-      },
-      "daily": {
-        "$day": {
-          ".validate": "$day.matches(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)",
-          "$id": {
-            ".validate": "$id.matches(/^[a-z0-9-]{1,40}$/)",
-            ".write": "newData.isNumber() && newData.val() < 1000000000000 && ((!data.exists() && newData.val() === 1) || (data.exists() && newData.val() === data.val() + 1))"
-          }
-        }
-      },
-      "$other": { ".validate": false }
+      }
     }
   }
 }

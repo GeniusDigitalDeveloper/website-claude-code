@@ -220,13 +220,12 @@ tr:last-child td{border-bottom:0}
           <tr><td>Firestore <code>mit_tools/{id}</code></td><td>Status aktif &amp; pilihan</td><td>Semua boleh baca · admin sahaja tulis</td></tr>
           <tr><td>Firestore <code>mit_feedback/{id}</code></td><td>Nama (pilihan), mesej, penilaian</td><td>Semua boleh cipta · admin sahaja baca/ubah/padam</td></tr>
           <tr><td>Firestore <code>admins/{uid}</code></td><td>Senarai admin (dikongsi dengan Malaysia PDF Tools)</td><td>Dicipta manual di konsol Firebase</td></tr>
-          <tr><td>Realtime DB <code>visits/…</code></td><td>Kiraan pelawat (nombor sahaja)</td><td>Semua boleh baca &amp; tambah +1 · admin sahaja boleh set semula</td></tr>
-          <tr><td>Realtime DB <code>stats/…</code></td><td>Kiraan penggunaan (nombor sahaja)</td><td>Admin sahaja baca · semua boleh tambah +1</td></tr>
+          <tr><td>Realtime DB <code>apps/image-tools/visits/…</code></td><td>Kiraan pelawat (nombor sahaja)</td><td>Semua boleh baca &amp; tambah +1 · admin sahaja boleh set semula</td></tr>
+          <tr><td>Realtime DB <code>apps/image-tools/stats/…</code></td><td>Kiraan penggunaan (nombor sahaja)</td><td>Admin (RTDB <code>admins/{UID}</code>) sahaja baca · semua boleh tambah +1</td></tr>
         </tbody></table></div>
       </div></div>
       <div class="card"><div class="card-h"><h2>Set semula statistik</h2></div><div class="card-b">
-        <p style="margin:0;color:var(--muted)">Padam semua kiraan penggunaan alat <b>dan</b> statistik pelawat dalam Realtime Database. Tindakan ini tidak boleh dibatalkan.</p>
-        <div style="display:flex;gap:8px;flex-wrap:wrap" id="resetArea"><button class="btn danger" type="button" id="resetStats">Set Semula Statistik</button></div>
+        <p style="margin:0;color:var(--muted)">Kiraan disimpan di Realtime Database pada <code>apps/image-tools/visits</code> dan <code>apps/image-tools/stats</code>. Untuk set semula, padam nod tersebut di Firebase Console. Statistik penggunaan hanya boleh dibaca jika UID anda ada di <code>admins/{UID}: true</code> dalam Realtime Database.</p>
       </div></div>
     </section>
   </div></main>

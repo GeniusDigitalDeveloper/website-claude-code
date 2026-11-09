@@ -44,10 +44,8 @@ function firebaseAPI() {
     async saveSettings(d) { await db.doc('mit_settings/site').set({ ...d, updatedAt: firebase.firestore.FieldValue.serverTimestamp(), updatedBy: user.email }); },
     async getTools() { const out = {}; (await db.collection('mit_tools').get()).forEach(d => out[d.id] = d.data()); return out; },
     async setTool(id, patch) { await db.doc('mit_tools/' + id).set({ ...patch, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true }); },
-    async getStats() { if (!rt) return {}; const s = await rt.ref('stats').get(); return s.val() || {}; },
-    async getVisits() { if (!rt) return {}; const s = await rt.ref('visits').get(); return s.val() || {}; },
-    async resetVisits() { if (!rt) throw new Error('Realtime Database tidak dikonfigurasi.'); await rt.ref('visits').remove(); },
-    async resetStats() { if (!rt) throw new Error('Realtime Database tidak dikonfigurasi.'); await rt.ref('stats').remove(); },
+    async getStats() { if (!rt) return {}; const s = await rt.ref('apps/image-tools/stats').get(); return s.val() || {}; },
+    async getVisits() { if (!rt) return {}; const s = await rt.ref('apps/image-tools/visits').get(); return s.val() || {}; },
     async listFeedback() { const q = await db.collection('mit_feedback').orderBy('createdAt', 'desc').limit(200).get(); return q.docs.map(d => ({ id: d.id, ...d.data(), createdAt: d.data().createdAt ? d.data().createdAt.toDate() : null })); },
     async updateFeedback(id, patch) { await db.doc('mit_feedback/' + id).update(patch); },
     async deleteFeedback(id) { await db.doc('mit_feedback/' + id).delete(); }
@@ -101,12 +99,12 @@ async function loadAll() {
 }
 function renderOverview() {
   const st = cache.stats || {}, t = st.tools || {}, daily = st.daily || {}, today = dayKey(new Date());
-  $('#kTotal').textContent = num(st.total);
+  $('#kTotal').textContent = num((st.total || {}).count);
   const vi = cache.visits || {}; $('#vUsers').textContent = num(vi.users); $('#vTotal').textContent = num(vi.total); $('#vToday').textContent = num((vi.daily || {})[today]); $('#vMonth').textContent = num((vi.monthly || {})[today.slice(0, 7)]);
-  $('#kToday').textContent = num(Object.values(daily[today] || {}).reduce((a, b) => a + b, 0)); $('#kTodayDate').textContent = today;
+  $('#kToday').textContent = num((daily[today] || {}).count); $('#kTodayDate').textContent = today;
   const active = TOOL_LIST.filter(([id]) => (cache.tools[id] || {}).enabled !== false).length; $('#kActive').textContent = active; $('#kActiveOf').textContent = `daripada ${TOOL_LIST.length} alat`;
   const nNew = cache.feedback.filter(f => f.status === 'new').length; $('#kFb').textContent = nNew; $('#fbBadge').hidden = !nNew; $('#fbBadge').textContent = nNew;
-  const days = Array.from({ length: 7 }, (_, i) => { const d = new Date(Date.now() - (6 - i) * 864e5); const k = dayKey(d); return { k, label: d.toLocaleDateString('ms-MY', { weekday: 'short', day: 'numeric' }), v: Object.values(daily[k] || {}).reduce((a, b) => a + b, 0) }; });
+  const days = Array.from({ length: 7 }, (_, i) => { const d = new Date(Date.now() - (6 - i) * 864e5); const k = dayKey(d); return { k, label: d.toLocaleDateString('ms-MY', { weekday: 'short', day: 'numeric' }), v: (daily[k] || {}).count || 0 }; });
   const max = Math.max(1, ...days.map(d => d.v)), mag = Math.pow(10, Math.floor(Math.log10(max))), step = mag * (max / mag > 5 ? 2 : 1), top = Math.ceil(max / step) * step;
   const L = 44, R = 12, T = 14, B = 34, W = 560 - L - R, H = 240 - T - B, bw = W / 7;
   let svg = '';
@@ -114,12 +112,12 @@ function renderOverview() {
   svg += `<defs><linearGradient id="gb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7b3fe4"/><stop offset="1" stop-color="#2457f5"/></linearGradient></defs>`;
   days.forEach((d, i) => { const h = d.v / top * H, x = L + i * bw + bw * .2; svg += `<rect x="${x}" y="${T + H - h}" width="${bw * .6}" height="${Math.max(h, 0)}" rx="5" fill="url(#gb)"><title>${d.k}: ${d.v}</title></rect>${d.v ? `<text x="${x + bw * .3}" y="${T + H - h - 5}" text-anchor="middle" font-size="11" font-weight="600" fill="#0e1530" font-family="JetBrains Mono, monospace">${d.v}</text>` : ''}<text x="${x + bw * .3}" y="${240 - 12}" text-anchor="middle" font-size="11" fill="#626b88">${esc(d.label)}</text>`; });
   $('#chart').innerHTML = svg;
-  const rows = TOOL_LIST.map(([id, n]) => [n, t[id] || 0]).sort((a, b) => b[1] - a[1]).slice(0, 8); const m = Math.max(1, ...rows.map(r => r[1]));
+  const rows = TOOL_LIST.map(([id, n]) => [n, (t[id] || {}).count || 0]).sort((a, b) => b[1] - a[1]).slice(0, 8); const m = Math.max(1, ...rows.map(r => r[1]));
   $('#topTools').innerHTML = rows.some(r => r[1]) ? rows.map(([n, v]) => `<div class="bar-row"><span class="n" title="${esc(n)}">${esc(n)}</span><span class="t"><i style="width:${v / m * 100}%"></i></span><span class="v">${num(v)}</span></div>`).join('') : '<div class="empty">Belum ada data penggunaan.</div>';
 }
 function renderTools() {
   const t = (cache.stats || {}).tools || {};
-  $('#toolRows').innerHTML = TOOL_LIST.map(([id, n, c]) => { const s = cache.tools[id] || {}; return `<tr><td><b>${esc(n)}</b><br><span class="mono" style="font-size:11.5px;color:var(--muted)">#${id}</span></td><td><span class="pill ${c}">${CAT_NAME[c]}</span></td><td class="mono">${num(t[id])}</td>
+  $('#toolRows').innerHTML = TOOL_LIST.map(([id, n, c]) => { const s = cache.tools[id] || {}; return `<tr><td><b>${esc(n)}</b><br><span class="mono" style="font-size:11.5px;color:var(--muted)">#${id}</span></td><td><span class="pill ${c}">${CAT_NAME[c]}</span></td><td class="mono">${num((t[id] || {}).count)}</td>
     <td><label class="switch" aria-label="Aktifkan ${esc(n)}"><input type="checkbox" data-id="${id}" data-k="enabled" ${s.enabled !== false ? 'checked' : ''}><span></span></label></td>
     <td><label class="switch" aria-label="Tanda pilihan ${esc(n)}"><input type="checkbox" data-id="${id}" data-k="featured" ${s.featured ? 'checked' : ''}><span></span></label></td></tr>`; }).join('');
 }
@@ -159,10 +157,4 @@ $('#fbList').addEventListener('click', async e => {
     else { await API.updateFeedback(id, { status: b.dataset.a }); f.status = b.dataset.a; }
     renderFeedback(); renderOverview();
   } catch (err) { toast('Gagal: ' + err.message, 'error'); }
-});
-$('#resetArea').addEventListener('click', async e => {
-  const b = e.target.closest('button'); if (!b) return;
-  if (b.id === 'resetStats') { $('#resetArea').innerHTML = '<span style="align-self:center;font-weight:600">Anda pasti? Semua kiraan akan dipadam.</span><button class="btn danger" id="resetYes" type="button">Ya, padam</button><button class="btn" id="resetNo" type="button">Batal</button>'; return; }
-  if (b.id === 'resetYes') { try { await API.resetStats(); await API.resetVisits(); cache.stats = {}; cache.visits = {}; renderOverview(); renderTools(); toast('Statistik telah diset semula.', 'success'); } catch (err) { toast('Gagal: ' + err.message, 'error'); } }
-  $('#resetArea').innerHTML = '<button class="btn danger" type="button" id="resetStats">Set Semula Statistik</button>';
 });

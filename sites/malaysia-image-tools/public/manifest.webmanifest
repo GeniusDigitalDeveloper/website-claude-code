@@ -1,0 +1,26 @@
+{
+  "id": "/",
+  "name": "Malaysia Image Tools",
+  "short_name": "MY Image Tools",
+  "description": "Alat gambar percuma: tukar format, mampat, ubah saiz, potong, buang latar dan banyak lagi. Semua diproses dalam peranti anda.",
+  "lang": "ms",
+  "dir": "ltr",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#2457f5",
+  "categories": ["photo", "productivity", "utilities"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Mampat Gambar", "url": "/?source=shortcut#image-compressor", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Ubah Saiz", "url": "/?source=shortcut#image-resizer", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Buang Latar (AI)", "url": "/?source=shortcut#remove-background", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

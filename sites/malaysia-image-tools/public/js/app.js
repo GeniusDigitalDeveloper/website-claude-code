@@ -87,6 +87,8 @@ function mytKeys(d = new Date()) {
   return { day, month: day.slice(0, 7) };
 }
 function msToMidnightMYT() { const now = Date.now(), off = 8 * 3600e3; return Math.floor((now + off) / 864e5 + 1) * 864e5 - off - now + 1500; }
+const APP_ID = 'image-tools'; /* skema RTDB kongsi: apps/<APP_ID>/visits|stats */
+const rt = path => FB.rtdb.ref(`apps/${APP_ID}/${path}`);
 const VIS = { users: null, today: null, month: null, total: null };
 function paintVisits() {
   $$('[data-v]').forEach(el => { const v = VIS[el.dataset.v]; el.textContent = v == null ? '—' : Number(v).toLocaleString('ms-MY'); });
@@ -96,7 +98,7 @@ function paintVisits() {
 }
 const lsx = (k, v) => { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch { return null; } };
 function countVisit() {
-  const { day, month } = mytKeys(), inc = v => (typeof v === 'number' ? v : 0) + 1, T = p => FB.rtdb.ref(p).transaction(inc);
+  const { day, month } = mytKeys(), inc = v => (typeof v === 'number' ? v : 0) + 1, T = p => rt(p).transaction(inc);
   if (!lsx('mit_visitor')) { lsx('mit_visitor', '1'); T('visits/users'); }
   if (lsx('mit_v_day') !== day) { lsx('mit_v_day', day); T('visits/daily/' + day); T('visits/total'); }
   if (lsx('mit_v_month') !== month) { lsx('mit_v_month', month); T('visits/monthly/' + month); }
@@ -106,7 +108,7 @@ function watchVisits() {
   visitRefs.forEach(r => r.off()); visitRefs = [];
   const { day, month } = mytKeys();
   [['users', 'visits/users'], ['total', 'visits/total'], ['today', 'visits/daily/' + day], ['month', 'visits/monthly/' + month]].forEach(([k, path]) => {
-    const r = FB.rtdb.ref(path); r.on('value', s => { VIS[k] = s.val() || 0; paintVisits(); }, e => console.warn(e)); visitRefs.push(r);
+    const r = rt(path); r.on('value', s => { VIS[k] = s.val() || 0; paintVisits(); }, e => console.warn(e)); visitRefs.push(r);
   });
   setTimeout(() => { countVisit(); watchVisits(); }, msToMidnightMYT());
 }
@@ -146,7 +148,7 @@ function route() {
 
 /* ---------- Firebase (GENIUS DIGITAL): tetapan admin, statistik & maklum balas ----------
    Firestore: mit_settings/site, mit_tools/{id}, mit_feedback/{id}
-   Realtime DB: visits/*, stats/*  */
+   Realtime DB (skema kongsi): apps/image-tools/visits/*, apps/image-tools/stats/*  */
 const FB = { ready: false, db: null, rtdb: null };
 async function initFirebase() {
   if (!FIREBASE_CONFIG.apiKey || !FIREBASE_CONFIG.projectId) return;
@@ -172,7 +174,7 @@ function track(id) {
   if (!FB.rtdb) return;
   try {
     const day = mytKeys().day, inc = v => (typeof v === 'number' ? v : 0) + 1;
-    FB.rtdb.ref('stats/tools/' + id).transaction(inc); FB.rtdb.ref('stats/total').transaction(inc); FB.rtdb.ref(`stats/daily/${day}/${id}`).transaction(inc);
+    rt('stats/tools/' + id + '/count').transaction(inc); rt('stats/total/count').transaction(inc); rt(`stats/daily/${day}/count`).transaction(inc);
   } catch (e) { console.warn(e); }
 }
 function feedback() {
@@ -210,3 +212,28 @@ document.addEventListener('keydown', e => {
 window.addEventListener('hashchange', route);
 route();
 initFirebase();
+
+/* ---------- PWA: pasang ke skrin utama / desktop ---------- */
+let deferredInstall = null;
+const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+function showInstall(on) { $('#installBtn').hidden = !on; }
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; if (!isStandalone()) showInstall(true); });
+window.addEventListener('appinstalled', () => { deferredInstall = null; showInstall(false); toast('Aplikasi berjaya dipasang.', 'success'); });
+if (isIOS && !isStandalone()) showInstall(true);
+$('#installBtn').addEventListener('click', async () => {
+  if (deferredInstall) {
+    deferredInstall.prompt();
+    const r = await deferredInstall.userChoice.catch(() => null);
+    if (r && r.outcome === 'accepted') showInstall(false);
+    deferredInstall = null; return;
+  }
+  const b = document.createElement('div'); b.style.cssText = 'display:grid;gap:12px;width:100%';
+  b.innerHTML = isIOS
+    ? `<p style="margin:0">Untuk pasang di iPhone / iPad (Safari):</p><ol style="margin:0;padding-left:20px;display:grid;gap:6px"><li>Ketik butang <b>Kongsi</b> (kotak dengan anak panah ke atas) di bahagian bawah.</li><li>Pilih <b>Tambah ke Skrin Utama</b>.</li><li>Ketik <b>Tambah</b>.</li></ol>`
+    : `<p style="margin:0">Pelayar ini belum menawarkan pemasangan automatik. Cuba:</p><ul style="margin:0;padding-left:20px;display:grid;gap:6px"><li><b>Chrome / Edge (komputer):</b> klik ikon pasang di hujung bar alamat, atau menu ⋮ → <i>Pasang Malaysia Image Tools</i>.</li><li><b>Android Chrome:</b> menu ⋮ → <i>Pasang aplikasi</i> / <i>Tambah ke skrin utama</i>.</li></ul>`;
+  openModal('Pasang Aplikasi', b, { left: true });
+});
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(e => console.warn('SW:', e.message)));
+}

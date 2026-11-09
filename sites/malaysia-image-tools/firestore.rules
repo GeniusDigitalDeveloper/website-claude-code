@@ -1,7 +1,7 @@
 rules_version = '2';
-// GENIUS DIGITAL (projek Firebase dikongsi) — rules Firestore gabungan 6 aplikasi:
-// Genius Digital (products) | Malaysia PDF Tools | Fetchr Box | Streamverse Gaming | CodeLab Developer | Malaysia Image Tools (mit_*)
-// Setiap aplikasi mengekalkan peraturan asalnya; fungsi bantu dinamakan semula dengan awalan (pdf/fb/sv/cl/mit).
+// GENIUS DIGITAL (projek Firebase dikongsi) — rules Firestore gabungan:
+// Genius Digital (products) | Malaysia PDF Tools | Streamverse Gaming | CodeLab Developer | Invoice Digital (inv_) | Malaysia Image Tools (mit_)
+// Setiap aplikasi mengekalkan peraturan asalnya; fungsi bantu dinamakan semula dengan awalan (pdf/sv/cl).
 // PENTING: fail ini ialah SATU-SATUNYA rules untuk projek. `firebase deploy --only firestore:rules` menggantikan
 // semua; sentiasa mulakan dari rules semasa projek (firebase_get_security_rules) sebelum mengubah.
 service cloud.firestore {
@@ -15,8 +15,7 @@ service cloud.firestore {
 
     // Pengesahan (login) sahaja BUKAN bukti admin. Claim "admin" mesti true.
     function isAdmin() {
-      return isSignedIn() && (request.auth.token.admin == true
-        || request.auth.token.email == 'izzulmedia01@gmail.com');
+      return isSignedIn() && request.auth.token.admin == true;
     }
 
     function isValidStatus(value) {
@@ -107,18 +106,6 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
-    // ---------- Koleksi: genius_site (tetapan laman awam Genius Digital) ----------
-    match /genius_site/{docId} {
-      allow read: if true;
-      allow write: if isAdmin() && docId == 'main'
-        && request.resource.data.keys().hasOnly(['logoURL', 'brandName', 'tagline', 'contact', 'texts', 'updatedAt'])
-        && (!('logoURL' in request.resource.data) || isValidThumbnail(request.resource.data.logoURL))
-        && (!('brandName' in request.resource.data) || (request.resource.data.brandName is string && request.resource.data.brandName.size() <= 60))
-        && (!('tagline' in request.resource.data) || (request.resource.data.tagline is string && request.resource.data.tagline.size() <= 120))
-        && (!('contact' in request.resource.data) || request.resource.data.contact is map)
-        && (!('texts' in request.resource.data) || request.resource.data.texts is map);
-    }
-
     // ================= MALAYSIA PDF TOOLS =================
 
     function pdfIsAdmin() {
@@ -156,121 +143,10 @@ service cloud.firestore {
       allow update: if pdfIsAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
     }
 
-    // ================= FETCHR BOX =================
-
-    // Pemilik = akaun dengan custom claim admin=true. Admin lain = e-mel yang didaftarkan oleh pemilik dalam koleksi admins.
-    // Dua-dua dinilai di sini (bukan di pelayar), jadi pengguna awam tidak boleh menjadikan diri sendiri admin.
-    function fbIsOwner() {
-      return request.auth != null && request.auth.token.admin == true;
-    }
-    function fbIsAdmin() {
-      return fbIsOwner() || (request.auth != null && request.auth.token.email != null
-        && exists(/databases/$(database)/documents/admins/$(request.auth.token.email.lower())));
-    }
-    match /admins/{email} {
-      allow read: if fbIsAdmin();
-      allow write: if fbIsOwner();
-    }
-    // Tetapan awam (platform, FAQ 3 bahasa, pengumuman): semua boleh baca, admin sahaja boleh tulis.
-    match /site/{doc} {
-      allow read: if true;
-      allow write: if fbIsAdmin();
-    }
-    // Statistik: admin baca sahaja. Pelayan muat turun menulis melalui akaun perkhidmatan (tidak tertakluk pada rules).
-    // stats/public = jumlah awam untuk footer (tiada data peribadi). Selebihnya admin sahaja.
-    match /stats/{doc} {
-      allow read: if doc == 'public' || fbIsAdmin();
-      allow write: if false;
-    }
-    match /daily/{day} {
-      allow read: if fbIsAdmin();
-      allow write: if false;
-    }
-    // Nama pengguna unik: dokumen usernames/{nama} dicipta sekali sahaja oleh pemiliknya (tidak boleh diubah atau dipadam).
-    match /usernames/{name} {
-      allow get: if true;
-      allow list: if false;
-      allow create: if request.auth != null
-        && name.matches('^[a-z0-9_.]{3,20}$')
-        && request.resource.data.keys().hasOnly(['uid'])
-        && request.resource.data.uid == request.auth.uid;
-      allow update, delete: if false;
-    }
-    // Profil pengguna berdaftar. Pengguna boleh cipta rekod sendiri dan tukar gambar, bahasa dan bio sahaja.
-    // Jumlah muat turun (stats, recent) hanya ditulis oleh pelayan, jadi tidak boleh dipalsukan oleh pengguna.
-    match /users/{uid} {
-      allow create: if request.auth != null
-        && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['email', 'createdAt', 'lang', 'photo', 'photoSrc', 'username', 'bio', 'link'])
-        && request.resource.data.email == request.auth.token.email
-        && (!('username' in request.resource.data)
-            || getAfter(/databases/$(database)/documents/usernames/$(request.resource.data.username)).data.uid == uid);
-      allow read: if fbIsAdmin() || (request.auth != null && request.auth.uid == uid);
-      allow update: if request.auth != null
-        && request.auth.uid == uid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['photo', 'photoSrc', 'lang', 'bio', 'link'])
-        && (!('photo' in request.resource.data) || (request.resource.data.photo is string && request.resource.data.photo.size() < 150000))
-        && (!('bio' in request.resource.data) || (request.resource.data.bio is string && request.resource.data.bio.size() <= 150))
-        && (!('photoSrc' in request.resource.data) || (request.resource.data.photoSrc is string && request.resource.data.photoSrc.size() < 260000))
-        && (!('link' in request.resource.data) || (request.resource.data.link is string && request.resource.data.link.size() <= 200 && (request.resource.data.link == '' || request.resource.data.link.matches('^https?://[^ ]+$'))));
-      allow delete: if false;
-    }
-    // Permohonan kelulusan kandungan berhak cipta: pengguna mohon (status pending), hanya admin boleh putuskan.
-    // Pelayan muat turun membaca status ini menggunakan token pengguna sendiri, jadi tidak boleh dipalsukan.
-    match /requests/{id} {
-      allow read: if fbIsAdmin() || (request.auth != null && resource.data.uid == request.auth.uid);
-      allow create: if request.auth != null
-        && request.resource.data.uid == request.auth.uid
-        && request.resource.data.status == 'pending'
-        && request.resource.data.keys().hasOnly(['uid', 'email', 'username', 'url', 'title', 'platform', 'code', 'message', 'status', 'createdAt'])
-        && request.resource.data.url is string && request.resource.data.url.size() <= 2048
-        && request.resource.data.message is string && request.resource.data.message.size() <= 300;
-      allow update: if fbIsAdmin()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'adminNote', 'decidedAt', 'decidedBy'])
-        && request.resource.data.status in ['pending', 'approved', 'rejected'];
-      allow delete: if false;
-    }
-    // Notis peribadi (cth keputusan permohonan): admin hantar kepada seorang pengguna, pengguna baca sendiri.
-    match /users/{uid}/notices/{nid} {
-      allow read: if fbIsAdmin() || (request.auth != null && request.auth.uid == uid);
-      allow create: if fbIsAdmin();
-    }
-    // Notifikasi: admin hantar, semua pengguna yang log masuk boleh baca. Keadaan baca/padam disimpan per pengguna.
-    match /notifications/{id} {
-      allow read: if request.auth != null;
-      allow create, update, delete: if fbIsAdmin();
-    }
-    match /users/{uid}/nstate/{nid} {
-      allow read: if request.auth != null && request.auth.uid == uid;
-      allow create, update: if request.auth != null && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['read', 'deleted']);
-    }
-    // Chat pengguna <-> admin. Pengguna hanya boleh akses chat sendiri. Admin boleh akses semua dan balas.
-    match /chats/{uid} {
-      allow read: if fbIsAdmin() || (request.auth != null && request.auth.uid == uid);
-      allow create: if request.auth != null && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly(['email', 'lang', 'lastText', 'lastFrom', 'lastAt', 'unreadAdmin'])
-        && request.resource.data.email == request.auth.token.email
-        && request.resource.data.lastFrom == 'user' && request.resource.data.unreadAdmin == true;
-      allow update: if fbIsAdmin() || (request.auth != null && request.auth.uid == uid
-        && ((request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lang', 'lastText', 'lastFrom', 'lastAt', 'unreadAdmin'])
-             && request.resource.data.lastFrom == 'user' && request.resource.data.unreadAdmin == true)
-            || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['unreadUser'])
-             && request.resource.data.unreadUser == false)));
-      match /messages/{mid} {
-        allow read: if fbIsAdmin() || (request.auth != null && request.auth.uid == uid);
-        allow create: if request.auth != null && request.auth.uid == uid
-          && request.resource.data.from == 'user'
-          && request.resource.data.keys().hasOnly(['from', 'text', 'lang', 'at'])
-          && request.resource.data.text is string && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 1000;
-        allow create: if fbIsAdmin() && request.resource.data.from == 'admin';
-        allow update: if fbIsAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['trMs']);
-      }
-    }
-
     // ================= STREAMVERSE GAMING =================
 
-    function verified() { return isSignedIn() && request.auth.token.email_verified == true; }
+    // Pendaftaran tanpa pengesahan email (atas permintaan pemilik): cukup dengan log masuk.
+    function verified() { return isSignedIn(); }
     function svOwner(uid) { return verified() && request.auth.uid == uid; }
     function data() { return request.resource.data; }
     function str(v, min, max) { return v is string && v.size() >= min && v.size() <= max; }
@@ -411,7 +287,7 @@ service cloud.firestore {
     match /_private/{doc=**}  { allow read, write: if false; }   // token OAuth (disulitkan), state OAuth
 
     // ================= CODELAB DEVELOPER =================
-    // Semua koleksi berawalan `codelab_`. Admin = isAdmin() di atas (custom claim admin=true atau e-mel pemilik).
+    // Semua koleksi berawalan `codelab_`. Admin = isAdmin() di atas (custom claim admin=true sahaja).
     //
     // Statistik agregat (tiada data peribadi). Bacaan awam untuk footer. Klien awam hanya boleh:
     //  - mencipta dokumen kiraan dengan visits == 1, atau
@@ -458,6 +334,158 @@ service cloud.firestore {
     // Log aktiviti & pengguna CodeLab: admin sahaja.
     match /codelab_activity/{id} { allow read: if isAdmin(); allow create: if isAdmin() && request.resource.data.keys().hasOnly(['type', 'detail', 'actor', 'at']); allow update, delete: if false; }
     match /codelab_users/{uid}   { allow read, write: if isAdmin(); }
+
+    // ================= INVOICE DIGITAL & QUOTATION (awalan inv_) =================
+    // Ditambah tanpa mengubah rules aplikasi lain. Admin = isAdmin() (custom claim admin=true) di atas.
+    // Data pengguna: inv_users/{uid}/{customers|products|invoices|quotations|receipts|meta|counters}/{id}
+    function invActive(uid) {
+      return !(exists(/databases/$(database)/documents/inv_users/$(uid))
+        && get(/databases/$(database)/documents/inv_users/$(uid)).data.get('disabled', false) == true);
+    }
+    function invOwner(uid) { return isSignedIn() && request.auth.uid == uid && invActive(uid); }
+    function invNew() { return request.resource.data; }
+    function invBase(uid) { return invNew().ownerUid == uid && invNew().keys().size() <= 40; }
+    function invBump(k) {
+      return request.resource.data.keys().hasOnly([k]) && request.resource.data[k] is int
+        && request.resource.data[k] == resource.data[k] + 1;
+    }
+    function invFirst(k) { return request.resource.data.keys().hasOnly([k]) && request.resource.data[k] == 1; }
+    function invBool(v) { return v is bool; }
+
+    match /inv_users/{uid} {
+      allow read: if (isSignedIn() && request.auth.uid == uid) || isAdmin();
+      // Pengguna cipta profil sendiri sahaja; tiada medan role/admin/disabled dibenarkan.
+      allow create: if isSignedIn() && request.auth.uid == uid
+        && invNew().keys().hasOnly(['uid', 'email', 'displayName', 'lang', 'createdAt', 'lastLoginAt'])
+        && invNew().uid == uid
+        && invNew().email == request.auth.token.get('email', '')
+        && invNew().displayName is string && invNew().displayName.size() <= 80
+        && invNew().lang in ['ms', 'en']
+        && invNew().createdAt == request.time && invNew().lastLoginAt == request.time;
+      allow update: if
+        (invOwner(uid)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'lang', 'lastLoginAt', 'updatedAt'])
+          && (!('displayName' in invNew()) || (invNew().displayName is string && invNew().displayName.size() <= 80))
+          && invNew().lang in ['ms', 'en'])
+        || (isAdmin()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['disabled', 'updatedAt'])
+          && invBool(invNew().disabled));
+      allow delete: if false;
+
+      // Bacaan: pemilik (aktif) atau admin. Tulisan: ikut koleksi di bawah.
+      match /{sub}/{id} {
+        allow get, list: if (invOwner(uid) || isAdmin())
+          && sub in ['customers', 'products', 'invoices', 'quotations', 'receipts', 'meta', 'counters'];
+        allow create, update: if invOwner(uid) && sub in ['customers', 'products', 'meta'] && invBase(uid);
+        allow delete: if invOwner(uid) && sub in ['customers', 'products'];
+      }
+      match /invoices/{id} {
+        allow create: if invOwner(uid) && invBase(uid)
+          && invNew().status in ['draft', 'sent', 'unpaid', 'partial', 'paid', 'cancelled']
+          && invNew().items is list && invNew().items.size() <= 150
+          && invNew().number is string && invNew().number.size() <= 40
+          && invNew().createdAt == request.time;
+        allow update: if invOwner(uid) && invBase(uid) && resource.data.ownerUid == uid
+          && invNew().status in ['draft', 'sent', 'unpaid', 'partial', 'paid', 'cancelled']
+          && invNew().items is list && invNew().items.size() <= 150
+          && invNew().number == resource.data.number && invNew().createdAt == resource.data.createdAt;
+        allow delete: if invOwner(uid);   // pemilik boleh padam projek sendiri (UI minta pengesahan)
+      }
+      match /quotations/{id} {
+        allow create: if invOwner(uid) && invBase(uid)
+          && invNew().status in ['draft', 'sent', 'accepted', 'rejected', 'expired', 'converted']
+          && invNew().items is list && invNew().items.size() <= 150
+          && invNew().number is string && invNew().number.size() <= 40
+          && invNew().createdAt == request.time;
+        allow update: if invOwner(uid) && invBase(uid) && resource.data.ownerUid == uid
+          && invNew().status in ['draft', 'sent', 'accepted', 'rejected', 'expired', 'converted']
+          && invNew().items is list && invNew().items.size() <= 150
+          && invNew().number == resource.data.number && invNew().createdAt == resource.data.createdAt;
+        allow delete: if invOwner(uid);   // pemilik boleh padam projek sendiri (UI minta pengesahan)
+      }
+      // Resit: tidak boleh diubah selepas dicipta (integriti rekod); boleh dipadam oleh pemilik.
+      match /receipts/{id} {
+        allow create: if invOwner(uid) && invBase(uid)
+          && invNew().amount is number && invNew().amount > 0
+          && invNew().number is string && invNew().number.size() <= 40
+          && invNew().createdAt == request.time;
+        // Padam resit dibenarkan (app memulihkan baki invoice dalam transaksi); tidak boleh diubah.
+        allow delete: if invOwner(uid);
+      }
+      // Kaunter nombor dokumen: hanya naik tepat +1 (digunakan dalam transaksi bersama dokumen).
+      match /counters/{id} {
+        allow create: if invOwner(uid) && invNew().n == 1 && invNew().ownerUid == uid
+          && invNew().keys().hasOnly(['n', 'kind', 'year', 'ownerUid']);
+        allow update: if invOwner(uid) && invNew().n == resource.data.n + 1 && invNew().ownerUid == uid
+          && invNew().keys().hasOnly(['n', 'kind', 'year', 'ownerUid']);
+      }
+    }
+
+    // Admin: baca semua dokumen pengguna melalui collection group (untuk kiraan statistik).
+    match /{path=**}/invoices/{id}   { allow read: if isAdmin(); }
+    match /{path=**}/quotations/{id} { allow read: if isAdmin(); }
+    match /{path=**}/receipts/{id}   { allow read: if isAdmin(); }
+    match /{path=**}/customers/{id}  { allow read: if isAdmin(); }
+
+    // Statistik awam (footer). Waktu Malaysia dikira di klien (kunci YYYY-MM-DD / YYYY-MM).
+    match /inv_stats/{doc} {
+      allow read: if true;
+      allow create: if (doc == 'total' && invFirst('visits'))
+        || (doc == 'users' && isSignedIn() && invFirst('count')
+            && existsAfter(/databases/$(database)/documents/inv_users/$(request.auth.uid))
+            && !exists(/databases/$(database)/documents/inv_users/$(request.auth.uid)));
+      allow update: if isAdmin()
+        || (doc == 'total' && invBump('visits'))
+        || (doc == 'users' && isSignedIn() && invBump('count')
+            && existsAfter(/databases/$(database)/documents/inv_users/$(request.auth.uid))
+            && !exists(/databases/$(database)/documents/inv_users/$(request.auth.uid)));
+      allow delete: if isAdmin();
+    }
+    match /inv_stats_daily/{day} {
+      allow read: if true;
+      allow create: if day.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$') && invFirst('visits');
+      allow update: if isAdmin() || invBump('visits');
+      allow delete: if isAdmin();
+    }
+    match /inv_stats_monthly/{month} {
+      allow read: if true;
+      allow create: if month.matches('^[0-9]{4}-[0-9]{2}$') && invFirst('visits');
+      allow update: if isAdmin() || invBump('visits');
+      allow delete: if isAdmin();
+    }
+
+    // Konfigurasi & kandungan landing: baca awam, tulis admin sahaja.
+    match /inv_settings/{doc} {
+      allow read: if true;
+      allow write: if isAdmin() && doc == 'app'
+        && request.resource.data.keys().hasOnly(['appName', 'logo', 'heroTitle', 'heroText', 'intro', 'announcement', 'contactEmail', 'contactPhone', 'numberFormat', 'taxName', 'taxRate', 'terms', 'updatedAt'])
+        && (!('appName' in request.resource.data) || (request.resource.data.appName is string && request.resource.data.appName.size() <= 80))
+        && (!('logo' in request.resource.data) || (request.resource.data.logo is string && request.resource.data.logo.size() <= 150000
+            && (request.resource.data.logo == '' || request.resource.data.logo.matches('data:image/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+'))))
+        && (!('numberFormat' in request.resource.data) || request.resource.data.numberFormat is map)
+        && (!('taxRate' in request.resource.data) || (request.resource.data.taxRate is number && request.resource.data.taxRate >= 0 && request.resource.data.taxRate <= 100));
+    }
+
+    // Log aktiviti (untuk dashboard admin) — pengguna hanya boleh menambah log milik sendiri.
+    match /inv_activity/{id} {
+      allow read: if isAdmin();
+      allow create: if isSignedIn() && invActive(request.auth.uid)
+        && request.resource.data.keys().hasOnly(['uid', 'email', 'kind', 'number', 'at'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.kind in ['invoice', 'quotation', 'receipt']
+        && request.resource.data.number is string && request.resource.data.number.size() <= 40
+        && request.resource.data.at == request.time;
+      allow update, delete: if false;
+    }
+    // Log admin: admin sahaja boleh menambah; tiada siapa boleh ubah/padam.
+    match /inv_adminLogs/{id} {
+      allow read: if isAdmin();
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasOnly(['type', 'detail', 'actor', 'actorEmail', 'at'])
+        && request.resource.data.actor == request.auth.uid
+        && request.resource.data.at == request.time;
+      allow update, delete: if false;
+    }
 
     // ================= MALAYSIA IMAGE TOOLS (koleksi berawalan mit_) =================
     // Admin = akaun yang ada dokumen admins/{uid} (sama seperti Malaysia PDF Tools)
