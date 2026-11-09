@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+
+Sitemap: https://genius-digital-40bc9-db0cc.web.app/sitemap.xml

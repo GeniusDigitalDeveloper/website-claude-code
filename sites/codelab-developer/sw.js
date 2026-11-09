@@ -1,11 +1,11 @@
 /* Service worker CodeLab Developer — membolehkan pemasangan (PWA) dan penggunaan luar talian.
    Strategi: shell di-precache; fail tapak sendiri = stale-while-revalidate; aset/vendor = cache-first.
    TIDAK menyentuh: /admin/ (sentiasa rangkaian), permintaan silang-asal (Firestore/Auth), bukan-GET. */
-const VERSION = 'cl-v1';
+const VERSION = 'cl-v2';
 const SHELL = `${VERSION}-shell`;
 const RUNTIME = `${VERSION}-runtime`;
 const PRECACHE = [
-  '/', '/index.html', '/manifest.webmanifest', '/assets/logo.svg',
+  '/', '/index.html', '/manifest.webmanifest', '/favicon.ico',
   '/assets/icons/icon-192.png', '/assets/icons/icon-512.png', '/assets/icons/apple-touch-icon.png',
   '/css/fonts.css', '/css/base.css', '/css/layout.css', '/css/components.css',
   '/js/main.js', '/js/pages.js', '/js/registry.js', '/js/config.js',

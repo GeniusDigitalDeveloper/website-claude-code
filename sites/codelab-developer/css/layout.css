@@ -6,7 +6,8 @@ body.sidebar-collapsed #app { grid-template-columns: 76px minmax(0, 1fr); }
 .brand-text { display: flex; flex-direction: column; line-height: 1.15; }
 .brand-text strong { font-size: 1.05rem; font-weight: 800; background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .brand-text small { font-size: .72rem; color: var(--muted); font-weight: 600; }
-.logo-mark { display: inline-grid; place-items: center; border-radius: 28%; background: var(--grad); color: #fff; box-shadow: 0 6px 16px -4px rgba(79, 70, 229, .55), inset 0 1px 0 rgba(255, 255, 255, .35); flex: none; }
+/* logo = imej rasmi */
+.logo-mark { display: block; flex: none; object-fit: contain; filter: drop-shadow(0 4px 10px rgba(79, 70, 229, .35)); }
 .top-nav { display: flex; gap: 2px; margin-inline-start: 8px; }
 .top-nav a { display: inline-flex; gap: 6px; align-items: center; padding: 8px 12px; border-radius: 10px; text-decoration: none; color: var(--muted); font-weight: 600; font-size: .92rem; transition: background .15s, color .15s; }
 .top-nav a:hover { background: #eef2ff; color: var(--primary-600); }
