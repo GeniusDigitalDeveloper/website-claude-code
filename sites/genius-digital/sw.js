@@ -2,8 +2,8 @@
    - Laman (HTML): rangkaian dahulu, kembali ke cache jika luar talian. Kemas kini sentiasa nampak.
    - Fail statik sama-asal (ikon, manifest): cache dahulu, dikemas kini di latar.
    - Firebase / Google Fonts / gstatic (lain asal): tidak disentuh, terus ke rangkaian. */
-const CACHE = "gd-v1";
-const SHELL = ["/", "/admin", "/manifest.webmanifest", "/admin.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png", "/icons/admin-icon-192.png", "/icons/admin-icon-512.png"];
+const CACHE = "gd-v2";
+const SHELL = ["/", "/admin", "/manifest.webmanifest", "/admin.webmanifest", "/icons/icon-192.png", "/icons/logo-192.png", "/favicon.ico", "/icons/icon-512.png", "/icons/admin-icon-192.png", "/icons/admin-icon-512.png"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => Promise.all(SHELL.map((u) => c.add(u).catch(() => {})))).then(() => self.skipWaiting()));
