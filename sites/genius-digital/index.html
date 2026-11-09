@@ -6,6 +6,13 @@
   <title>GENIUS DIGITAL — Digital Innovation. Intelligent Systems.</title>
   <meta name="description" content="Genius Digital — syarikat teknologi digital yang membangunkan sistem, aplikasi web dan penyelesaian digital yang praktikal serta inovatif.">
   <meta name="theme-color" content="#FFFFFF">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Genius Digital">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="application-name" content="Genius Digital">
   <script>
     /* Tetapkan bahasa/arah/tema sebelum paparan pertama (elak kelipan). Lalai: BM + mod cerah. */
     (function () {
@@ -482,6 +489,12 @@
       .fc-socials { justify-content: flex-start; }
     }
 
+    /* ---------- Pasang Apps (PWA) ---------- */
+    .install-btn { display: flex; align-items: center; gap: .5rem; min-height: 52px; padding: 0 1rem; margin-top: .25rem; border: 1.5px dashed var(--ghost-border); border-radius: 12px; background: transparent; color: var(--accent); font-family: var(--font-head); font-weight: 700; font-size: 1rem; letter-spacing: .04em; text-transform: uppercase; text-align: start; }
+    .install-btn svg { width: 18px; height: 18px; flex: none; }
+    .install-btn:hover { background: var(--bg-soft); border-style: solid; }
+    @media (min-width: 900px) { .install-btn { min-height: 44px; padding: 0 .9rem; margin: 0 0 0 .5rem; font-size: .8rem; } }
+
     /* ---------- RTL (Bahasa Arab) ---------- */
     [dir="rtl"] .btn svg { transform: scaleX(-1); }
     [dir="rtl"] .btn:hover svg { transform: scaleX(-1) translateX(3px); }
@@ -539,6 +552,7 @@
       <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.200" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.500v2.200M12 19.300v2.200M2.500 12h2.200M19.300 12h2.200M5.300 5.300l1.500 1.500M17.200 17.200l1.500 1.500M18.700 5.300l-1.500 1.500M6.800 17.200l-1.500 1.500" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
       <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 12h18M12 3c2.8 2.7 4 5.7 4 9s-1.2 6.3-4 9c-2.8-2.7-4-5.7-4-9s1.2-6.3 4-9z" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
       <symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
       <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
       <symbol id="i-logo" viewBox="0 0 64 64"><path d="M32 3 58 18v28L32 61 6 46V18z" fill="#0A1F44"/><path d="M32 3 58 18v28L32 61 6 46V18z" fill="none" stroke="url(#gdGrad)" stroke-width="3.5" stroke-linejoin="round"/><path d="M43 24a15 15 0 1 0 2 12H32" fill="none" stroke="url(#gdGrad)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="43" cy="24" r="3" fill="#5BE3FF"/></symbol>
     </defs>
@@ -558,6 +572,7 @@
           <a class="nav-link" href="#about" data-i18n="nav.about">Tentang Kami</a>
           <a class="nav-link" href="#products" data-i18n="nav.products">Produk</a>
           <a class="nav-link" href="#contact" data-i18n="nav.contact">Hubungi Kami</a>
+          <button class="install-btn" id="installBtn" type="button" hidden><svg aria-hidden="true"><use href="#i-download"/></svg><span data-i18n="install.btn">Pasang Apps</span></button>
         </nav>
         <div class="lang-menu" id="langMenu">
           <button class="lang-btn" id="langBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="langPop" data-i18n-attr="aria-label:ui.language" aria-label="Pilih bahasa">
@@ -685,6 +700,15 @@
     <div class="container"><p class="copy" data-i18n="footer.copy">© 2026 Genius Digital. Hak Cipta Terpelihara.</p></div>
   </footer>
 
+  <!-- ====================== PASANG APPS (iPhone / iPad) ====================== -->
+  <dialog class="modal" id="installDialog" aria-labelledby="installTitle">
+    <div class="modal-body">
+      <h3 id="installTitle" data-i18n="install.title">Pasang Genius Digital</h3>
+      <p class="desc" data-i18n="install.ios">Tekan butang Kongsi, kemudian pilih “Tambah ke Skrin Utama”.</p>
+      <button class="btn btn-primary" type="button" id="installClose" data-i18n="modal.ok">Tutup</button>
+    </div>
+  </dialog>
+
   <!-- ====================== PRODUCT MODAL ====================== -->
   <dialog class="modal" id="productModal" aria-labelledby="modalTitle">
     <button class="modal-x" type="button" id="modalClose" data-i18n-attr="aria-label:modal.close" aria-label="Tutup"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
@@ -805,7 +829,7 @@
         "state.empty.title": "Belum ada produk",
         "state.empty.text": "Produk digital Genius Digital akan dipaparkan di sini tidak lama lagi. Sila kembali semula nanti.",
         "modal.msg": "Produk Akan Datang.", "modal.close": "Tutup", "modal.ok": "Tutup",
-        "contact.eyebrow": "Perhubungan", "contact.h2": "Hubungi Kami", "contact.soon": "Maklumat hubungan akan dikemas kini tidak lama lagi.",
+        "contact.eyebrow": "Perhubungan", "contact.h2": "Hubungi Kami", "contact.soon": "Maklumat hubungan akan dikemas kini tidak lama lagi.", "install.btn": "Pasang Apps", "install.title": "Pasang Genius Digital", "install.ios": "Pada iPhone / iPad: tekan butang Kongsi di Safari, kemudian pilih “Tambah ke Skrin Utama”.",
         "contact.lead": "<strong>Genius Digital.</strong> Berminat dengan produk kami atau ingin bekerjasama? Hubungi kami melalui saluran di bawah.",
         "contact.email": "E-mel", "contact.whatsapp": "WhatsApp", "contact.social": "Media Sosial",
         "contact.phEmail": "Placeholder: tambah e-mel syarikat", "contact.phWhatsapp": "Placeholder: tambah nombor WhatsApp", "contact.phSocial": "(placeholder)",
@@ -845,7 +869,7 @@
         "state.empty.title": "No products yet",
         "state.empty.text": "Genius Digital's products will appear here soon. Please check back later.",
         "modal.msg": "Product Coming Soon.", "modal.close": "Close", "modal.ok": "Close",
-        "contact.eyebrow": "Get in Touch", "contact.h2": "Contact Us", "contact.soon": "Contact details will be updated soon.",
+        "contact.eyebrow": "Get in Touch", "contact.h2": "Contact Us", "contact.soon": "Contact details will be updated soon.", "install.btn": "Install App", "install.title": "Install Genius Digital", "install.ios": "On iPhone / iPad: tap the Share button in Safari, then choose “Add to Home Screen”.",
         "contact.lead": "<strong>Genius Digital.</strong> Interested in our products or looking to collaborate? Reach us through the channels below.",
         "contact.email": "Email", "contact.whatsapp": "WhatsApp", "contact.social": "Social Media",
         "contact.phEmail": "Placeholder: add the company email", "contact.phWhatsapp": "Placeholder: add the WhatsApp number", "contact.phSocial": "(placeholder)",
@@ -885,7 +909,7 @@
         "state.empty.title": "لا توجد منتجات بعد",
         "state.empty.text": "ستظهر منتجات جينيوس ديجيتال هنا قريباً. يُرجى العودة لاحقاً.",
         "modal.msg": "المنتج قريباً.", "modal.close": "إغلاق", "modal.ok": "إغلاق",
-        "contact.eyebrow": "التواصل", "contact.h2": "اتصل بنا", "contact.soon": "ستُحدَّث بيانات التواصل قريباً.",
+        "contact.eyebrow": "التواصل", "contact.h2": "اتصل بنا", "contact.soon": "ستُحدَّث بيانات التواصل قريباً.", "install.btn": "تثبيت التطبيق", "install.title": "تثبيت جينيوس ديجيتال", "install.ios": "على iPhone / iPad: اضغط زر المشاركة في Safari ثم اختر «إضافة إلى الشاشة الرئيسية».",
         "contact.lead": "<strong>جينيوس ديجيتال.</strong> هل أنت مهتم بمنتجاتنا أو ترغب في التعاون معنا؟ تواصل معنا عبر القنوات التالية.",
         "contact.email": "البريد الإلكتروني", "contact.whatsapp": "WhatsApp", "contact.social": "وسائل التواصل الاجتماعي",
         "contact.phEmail": "نص مؤقت: أضف البريد الإلكتروني للشركة", "contact.phWhatsapp": "نص مؤقت: أضف رقم WhatsApp", "contact.phSocial": "(نص مؤقت)",
@@ -1242,6 +1266,25 @@
     document.addEventListener("click", (e) => { if (!e.target.closest("#langMenu")) setLangPop(false); });
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") setLangPop(false); });
     themeBtn.addEventListener("click", () => setTheme(root.getAttribute("data-theme") === "dark" ? "light" : "dark"));
+
+    /* ---------- Pasang Apps (PWA) ---------- */
+    let deferredInstall = null;
+    const installBtn = $("#installBtn"), installDialog = $("#installDialog");
+    const isStandalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferredInstall = e; if (!isStandalone()) installBtn.hidden = false; });
+    window.addEventListener("appinstalled", () => { deferredInstall = null; installBtn.hidden = true; });
+    if (isIOS && !isStandalone()) installBtn.hidden = false;
+    installBtn.addEventListener("click", async () => {
+      setMenu(false);
+      if (deferredInstall) { deferredInstall.prompt(); try { await deferredInstall.userChoice; } catch (e) {} deferredInstall = null; installBtn.hidden = true; }
+      else if (typeof installDialog.showModal === "function") installDialog.showModal();
+    });
+    $("#installClose").addEventListener("click", () => installDialog.close());
+    installDialog.addEventListener("click", (e) => { if (e.target === installDialog) installDialog.close(); });
+
+    // PWA: service worker (boleh dipasang ke skrin utama / desktop)
+    if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(() => {}));
 
     /* ---------- Mula ---------- */
     setTheme(readStore(STORE_THEME) === "dark" ? "dark" : "light", false);

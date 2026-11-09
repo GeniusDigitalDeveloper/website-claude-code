@@ -6,6 +6,13 @@
   <meta name="robots" content="noindex, nofollow">
   <title>Admin Panel — GENIUS DIGITAL</title>
   <meta name="theme-color" content="#FFFFFF">
+  <link rel="manifest" href="/admin.webmanifest">
+  <link rel="apple-touch-icon" href="/icons/admin-apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="GD Admin">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="application-name" content="GD Admin">
   <script>
     /* Tetapkan bahasa/arah/tema sebelum paparan pertama. Lalai: BM + mod cerah. Kongsi pilihan dengan index.html. */
     (function () {
@@ -382,6 +389,7 @@
       <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
       <symbol id="i-eyeoff" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 5.2A10.6 10.6 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.2M6.5 6.6A17 17 0 0 0 2 12s3.6 7 10 7c1.7 0 3.2-.4 4.5-1M9.9 9.9a3 3 0 0 0 4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
       <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9M15 4v6M9 14v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
       <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.500A8.500 8.500 0 0 1 9.500 4 8.500 8.500 0 1 0 20 14.500z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
       <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.200" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.500v2.200M12 19.300v2.200M2.500 12h2.200M19.300 12h2.200M5.300 5.300l1.500 1.500M17.200 17.200l1.500 1.500M18.700 5.300l-1.500 1.500M6.800 17.200l-1.500 1.500" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
       <symbol id="i-logo" viewBox="0 0 64 64"><path d="M32 3 58 18v28L32 61 6 46V18z" fill="#0A1F44"/><path d="M32 3 58 18v28L32 61 6 46V18z" fill="none" stroke="url(#gdGrad)" stroke-width="3.5" stroke-linejoin="round"/><path d="M43 24a15 15 0 1 0 2 12H32" fill="none" stroke="url(#gdGrad)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="43" cy="24" r="3" fill="#5BE3FF"/></symbol>
@@ -451,6 +459,7 @@
       </nav>
       <div class="side-spacer"></div>
       <div class="side-user"><small id="userRole" data-i18n="nav.role">Admin</small><span class="iso" id="userEmail" dir="auto"></span></div>
+      <button class="side-link" type="button" id="installBtn" hidden><svg aria-hidden="true"><use href="#i-download"/></svg><span>Pasang Apps</span></button>
       <button class="side-link" type="button" id="signOutBtn"><svg aria-hidden="true"><use href="#i-out"/></svg><span data-i18n="nav.signOut">Log Keluar</span></button>
     </aside>
     <div class="scrim" id="scrim"></div>
@@ -1475,6 +1484,19 @@
       pw.type = show ? "text" : "password"; b.setAttribute("aria-pressed", String(show));
       const label = show ? "Sembunyi kata laluan" : "Tunjuk kata laluan"; b.setAttribute("aria-label", label); b.setAttribute("title", label);
     });
+    /* ---------- Pasang Apps (PWA) ---------- */
+    let deferredInstall = null;
+    const installBtn = $("#installBtn");
+    const isStandalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferredInstall = e; if (!isStandalone()) installBtn.hidden = false; });
+    window.addEventListener("appinstalled", () => { deferredInstall = null; installBtn.hidden = true; });
+    if (isIOS && !isStandalone()) installBtn.hidden = false;
+    installBtn.addEventListener("click", async () => {
+      if (deferredInstall) { deferredInstall.prompt(); try { await deferredInstall.userChoice; } catch (e) {} deferredInstall = null; installBtn.hidden = true; }
+      else toast("Pada iPhone / iPad: tekan butang Kongsi di Safari, kemudian pilih “Tambah ke Skrin Utama”.");
+    });
+    if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(() => {}));
     const doSignOut = async () => { try { await backend.signOut(); } catch (err) { toast(friendlyError(err), "err"); } };
     $("#signOutBtn").addEventListener("click", doSignOut);
 
