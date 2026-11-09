@@ -18,8 +18,8 @@ function toast(msg, type = '') { const t = document.createElement('div'); t.clas
 function showMsg(text, type) { const m = $('#loginMsg'); m.hidden = !text; m.className = 'msg ' + type; m.textContent = text || ''; }
 
 /* Logo */
-const LOGO = `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Logo Malaysia Image Tools"><defs><linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4aa3ff"/><stop offset=".45" stop-color="#3a5cf5"/><stop offset="1" stop-color="#7d33e6"/></linearGradient><linearGradient id="lg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5ec8ff"/><stop offset="1" stop-color="#d7f1ff"/></linearGradient></defs><rect x="4" y="4" width="56" height="56" rx="15" fill="url(#lg1)"/><g transform="rotate(-7 32 32)"><rect x="15" y="15" width="34" height="32" rx="4" fill="#fff"/><rect x="18" y="18" width="28" height="23" rx="2.5" fill="url(#lg2)"/><circle cx="27" cy="26" r="3.5" fill="#ffd23f"/><path d="M18 41 28 29l6 7 4-4 8 9z" fill="#14a36b"/></g></svg>`;
-$('#logoLogin').innerHTML = LOGO; $('#logoSide').innerHTML = LOGO.replace(/lg1/g, 'lg3').replace(/lg2/g, 'lg4');
+const LOGO = `<img src="/icons/logo.png" alt="Logo Malaysia Image Tools" width="44" height="44">`;
+$('#logoLogin').innerHTML = LOGO; $('#logoSide').innerHTML = LOGO;
 
 /* Ikon mata (tunjuk / sembunyi kata laluan) */
 const EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
