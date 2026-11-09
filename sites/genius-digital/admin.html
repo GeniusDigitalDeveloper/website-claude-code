@@ -329,6 +329,15 @@
     .trans legend { padding: 0; margin-bottom: .7rem; font-family: var(--font-head); font-weight: 800; font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
 
 
+    /* ---------- Seret untuk susun semula ---------- */
+    .drag-handle { width: 40px; height: 40px; flex: none; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--muted); cursor: grab; touch-action: none; -webkit-user-select: none; user-select: none; }
+    .drag-handle:not(:disabled):hover { border-color: var(--blue-500); color: var(--accent); }
+    .drag-handle:disabled { opacity: .35; cursor: not-allowed; }
+    .drag-handle svg { width: 20px; height: 20px; }
+    .prow.dragging { position: relative; z-index: 2; outline: 2px solid var(--blue-500); outline-offset: -2px; box-shadow: var(--shadow-md); background: var(--row-hover); }
+    .ptable tr.prow.dragging td { background: var(--row-hover); }
+    body.is-dragging, body.is-dragging * { cursor: grabbing !important; -webkit-user-select: none; user-select: none; }
+
     /* ---------- Kata laluan: ikon mata ---------- */
     .pw-wrap { position: relative; }
     .pw-wrap .input { padding-inline-end: 3.3rem; }
@@ -391,6 +400,7 @@
       <symbol id="i-eyeoff" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 5.2A10.6 10.6 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.2M6.5 6.6A17 17 0 0 0 2 12s3.6 7 10 7c1.7 0 3.2-.4 4.5-1M9.9 9.9a3 3 0 0 0 4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
       <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9M15 4v6M9 14v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
       <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-grip" viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.7" fill="currentColor"/><circle cx="15" cy="6" r="1.7" fill="currentColor"/><circle cx="9" cy="12" r="1.7" fill="currentColor"/><circle cx="15" cy="12" r="1.7" fill="currentColor"/><circle cx="9" cy="18" r="1.7" fill="currentColor"/><circle cx="15" cy="18" r="1.7" fill="currentColor"/></symbol>
       <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.500A8.500 8.500 0 0 1 9.500 4 8.500 8.500 0 1 0 20 14.500z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
       <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.200" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.500v2.200M12 19.300v2.200M2.500 12h2.200M19.300 12h2.200M5.300 5.300l1.500 1.500M17.200 17.200l1.500 1.500M18.700 5.300l-1.500 1.500M6.800 17.200l-1.500 1.500" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
       <symbol id="i-logo" viewBox="0 0 64 64"><image href="/icons/logo-192.png" width="64" height="64"/></symbol>
@@ -785,7 +795,8 @@
         "dash.loading": "Memuatkan…", "dash.error": "Data tidak dapat dimuatkan.", "dash.none": "Belum ada produk.",
         "stat.total": "Jumlah Produk", "stat.active": "Produk Aktif", "stat.soon": "Produk Akan Datang", "stat.hidden": "Produk Tersembunyi", "stat.categories": "Jumlah Kategori",
         "act.add": "Tambah Produk", "act.manage": "Urus Produk",
-        "prod.sub": "Tambah, edit, susun dan padam produk yang dipaparkan di website.",
+        "prod.sub": "Tambah, edit, padam dan susun produk. Seret ikon ⋮⋮ ke atas atau bawah; susunan terus berubah di laman awam.",
+        "row.drag": "Seret untuk susun semula", "row.dragAria": "Seret {name} untuk susun semula", "toast.reordered": "Susunan disimpan. Laman awam dikemas kini.",
         "search.label": "Cari produk", "search.placeholder": "Cari nama, slug atau kategori…",
         "filter.categoryLabel": "Tapis mengikut kategori", "filter.allCategories": "Semua kategori", "filter.statusLabel": "Tapis mengikut status", "filter.allStatuses": "Semua status",
         "status.active": "Aktif", "status.soon": "Akan Datang", "status.hidden": "Tersembunyi",
@@ -1124,6 +1135,7 @@
     }
 
     function renderProducts() {
+      if (dragState) { dragState.pending = true; return; }   // jangan lukis semula ketika menyeret
       const area = $("#productsArea");
       if (dataState === "loading") { area.replaceChildren(el("div", { class: "sk-row" }), el("div", { class: "sk-row" }), el("div", { class: "sk-row" })); return; }
       if (dataState === "error") {
@@ -1148,8 +1160,10 @@
         sel.addEventListener("change", () => changeStatus(p, sel));
         const up = el("button", { class: "icon-btn", type: "button", "aria-label": t("row.upAria", { name: p.name }), title: canReorder ? t("row.up") : t("row.reorderBlocked"), disabled: !canReorder || idx === 0, onclick: () => moveProduct(p.slug, -1) }, icon("i-up"));
         const down = el("button", { class: "icon-btn", type: "button", "aria-label": t("row.downAria", { name: p.name }), title: canReorder ? t("row.down") : t("row.reorderBlocked"), disabled: !canReorder || idx === full.length - 1, onclick: () => moveProduct(p.slug, 1) }, icon("i-down"));
+        const grip = el("button", { class: "drag-handle", type: "button", "aria-label": t("row.dragAria", { name: p.name }), title: canReorder ? t("row.drag") : t("row.reorderBlocked"), disabled: !canReorder }, icon("i-grip"));
+        grip.addEventListener("pointerdown", startDrag);
         return el("tr", { class: "prow", "data-slug": p.slug }, [
-          el("td", { class: "c-order" }, el("div", { class: "order-ctl" }, [up, el("span", { class: "num", text: String(p.displayOrder), title: t("row.orderTitle") }), down])),
+          el("td", { class: "c-order" }, el("div", { class: "order-ctl" }, [grip, up, el("span", { class: "num", text: String(p.displayOrder), title: t("row.orderTitle") }), down])),
           el("td", { class: "c-thumb" }, thumbImg(p, "pthumb", t("row.thumbAlt", { name: p.name }))),
           el("td", { class: "c-name" }, [el("span", { class: "pname", text: p.name }), el("span", { class: "pslug", text: p.slug }), el("span", { class: "pmeta", text: t("row.updated", { category: p.category, date: fmtDay(p.updatedAt) }) })]),
           el("td", { class: "c-cat" }, el("span", { class: "pcat", text: p.category })),
@@ -1174,6 +1188,54 @@
     $("#searchInput").addEventListener("input", (e) => { clearTimeout(searchTimer); searchTimer = setTimeout(() => { filters.q = e.target.value; renderProducts(); }, 120); });
     $("#categoryFilter").addEventListener("change", (e) => { filters.category = e.target.value; renderProducts(); });
     $("#statusFilter").addEventListener("change", (e) => { filters.status = e.target.value; renderProducts(); });
+
+    /* ---------- Seret untuk susun semula (tetikus & sentuhan) ---------- */
+    let dragState = null;
+    function startDrag(e) {
+      if (dragState || (e.pointerType === "mouse" && e.button !== 0)) return;
+      const handle = e.currentTarget; if (handle.disabled) return;
+      const row = handle.closest("tr.prow"); e.preventDefault();
+      dragState = { row, tbody: row.parentElement, y: e.clientY, id: e.pointerId, pending: false, raf: 0 };
+      try { document.body.setPointerCapture(e.pointerId); } catch (_) { /* tidak kritikal */ }
+      row.classList.add("dragging"); document.body.classList.add("is-dragging");
+      document.addEventListener("pointermove", onDragMove, { passive: false });
+      document.addEventListener("pointerup", endDrag); document.addEventListener("pointercancel", cancelDrag);
+      dragState.raf = requestAnimationFrame(dragTick);
+    }
+    function onDragMove(e) { if (dragState) { dragState.y = e.clientY; e.preventDefault(); } }
+    function dragTick() {
+      if (!dragState) return;
+      const { row, tbody } = dragState, y = dragState.y, edge = 90;
+      if (y < edge) scrollBy(0, -Math.ceil((edge - y) / 6)); else if (y > innerHeight - edge) scrollBy(0, Math.ceil((y - (innerHeight - edge)) / 6));
+      const rows = [...tbody.querySelectorAll("tr.prow")], first = rows[0].getBoundingClientRect(), last = rows[rows.length - 1].getBoundingClientRect();
+      if (y < first.top && rows[0] !== row) tbody.insertBefore(row, rows[0]);
+      else if (y > last.bottom && rows[rows.length - 1] !== row) tbody.append(row);
+      else for (const r of rows) {
+        if (r === row) continue;
+        const b = r.getBoundingClientRect(); if (y < b.top || y > b.bottom) continue;
+        const mid = (b.top + b.bottom) / 2, rPrecedes = r.compareDocumentPosition(row) & Node.DOCUMENT_POSITION_FOLLOWING;
+        if (rPrecedes && y < mid) tbody.insertBefore(row, r); else if (!rPrecedes && y > mid) tbody.insertBefore(row, r.nextSibling);
+        break;
+      }
+      dragState.raf = requestAnimationFrame(dragTick);
+    }
+    function finishDrag() {
+      cancelAnimationFrame(dragState.raf);
+      document.removeEventListener("pointermove", onDragMove); document.removeEventListener("pointerup", endDrag); document.removeEventListener("pointercancel", cancelDrag);
+      try { document.body.releasePointerCapture(dragState.id); } catch (_) { /* abaikan */ }
+      dragState.row.classList.remove("dragging"); document.body.classList.remove("is-dragging");
+    }
+    function cancelDrag() { if (!dragState) return; finishDrag(); dragState = null; renderAll(); }
+    async function endDrag() {
+      if (!dragState) return;
+      const { tbody } = dragState; finishDrag();
+      const order = [...tbody.querySelectorAll("tr.prow")].map(r => r.dataset.slug);
+      const changes = order.map((slug, k) => ({ slug, displayOrder: k + 1 })).filter(c => (products.find(p => p.slug === c.slug) || {}).displayOrder !== c.displayOrder);
+      dragState = null;
+      if (!changes.length) { renderAll(); return; }
+      try { await backend.reorder(changes); toast(t("toast.reordered"), "ok"); }
+      catch (err) { toast(friendlyError(err), "err"); renderAll(); }
+    }
 
     /* ---------- Tukar status & susunan ---------- */
     async function changeStatus(p, sel) {
