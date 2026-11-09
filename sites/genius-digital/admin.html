@@ -182,7 +182,7 @@
     .panel h3 { font-size: 1rem; color: var(--head); margin-bottom: .8rem; }
     .recent { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
     .recent li { display: flex; align-items: center; gap: .8rem; padding: .55rem; border-radius: 12px; background: var(--bg); }
-    .recent img { width: 64px; height: 40px; object-fit: cover; border-radius: 8px; flex: none; background: var(--navy-900); }
+    .recent img { width: 52px; height: 52px; object-fit: cover; border-radius: 8px; flex: none; background: var(--navy-900); }
     .recent .meta { flex: 1; min-width: 0; } .recent .meta b { display: block; font-family: var(--font-head); font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .recent .meta small { color: var(--muted); }
     .quick { display: flex; flex-direction: column; gap: .7rem; }
 
@@ -203,7 +203,7 @@
     .c-actions .inner { display: flex; gap: .6rem; width: 100%; margin-top: .75rem; }
     .c-actions .inner .btn:first-child { flex: 1; }
     .pmeta { display: block; margin-top: .3rem; font-size: .82rem; color: var(--muted); }
-    .pthumb { width: 96px; height: auto; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 10px; background: var(--navy-900); border: 1px solid var(--line); }
+    .pthumb { width: 80px; height: auto; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 10px; background: var(--navy-900); border: 1px solid var(--line); }
     .pname { font-family: var(--font-head); font-weight: 700; color: var(--head); word-break: break-word; }
     .pslug { direction: ltr; unicode-bidi: isolate; display: block; font-size: .78rem; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; word-break: break-all; }
     .pcat { font-size: .85rem; color: var(--accent); font-weight: 600; }
@@ -241,7 +241,7 @@
     .dlg.small h2 { font-size: 1.25rem; margin-bottom: .6rem; color: var(--head); } .dlg.small p { color: var(--muted); font-size: .95rem; }
 
     .thumb-field { display: grid; gap: .8rem; }
-    .thumb-preview { position: relative; aspect-ratio: 16 / 10; border-radius: 14px; overflow: hidden; background: var(--navy-900); border: 1px solid var(--line); }
+    .thumb-preview { position: relative; aspect-ratio: 1 / 1; max-width: 360px; border-radius: 14px; overflow: hidden; background: var(--navy-900); border: 1px solid var(--line); }
     .thumb-preview img { width: 100%; height: 100%; object-fit: cover; }
     .thumb-preview .tag { position: absolute; inset-inline-start: .6rem; top: .6rem; padding: .2rem .6rem; border-radius: 999px; background: var(--glass-3); color: var(--head); font-size: .68rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; font-family: var(--font-head); }
     .thumb-actions { display: flex; flex-wrap: wrap; gap: .6rem; }
@@ -297,9 +297,9 @@
       .c-actions .inner { justify-content: flex-end; width: auto; gap: .5rem; margin-top: 0; }
       .c-actions .inner .btn:first-child { flex: none; }
       .pmeta { display: none; }
-      .pthumb { width: 84px; }
+      .pthumb { width: 64px; }
     }
-    @media (max-width: 380px) { .toolbar-filters { grid-template-columns: 1fr; } .pthumb { width: 80px; } .c-name { flex-basis: calc(100% - 104px); } }
+    @media (max-width: 380px) { .toolbar-filters { grid-template-columns: 1fr; } .pthumb { width: 72px; } .c-name { flex-basis: calc(100% - 104px); } }
 
     /* ---------- Kawalan bahasa + tema ---------- */
     .theme-toggle { width: 44px; height: 44px; flex: none; display: inline-grid; place-items: center; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--head); -webkit-tap-highlight-color: transparent; }
@@ -639,13 +639,13 @@
         <div class="field">
           <span class="label" data-i18n="dlg.thumb">Thumbnail Produk</span>
           <div class="thumb-field">
-            <div class="thumb-preview"><img id="thumbImg" data-i18n-attr="alt:thumb.alt" alt="Pratonton thumbnail" width="640" height="400"><span class="tag" id="thumbTag">Imej ganti</span></div>
+            <div class="thumb-preview"><img id="thumbImg" data-i18n-attr="alt:thumb.alt" alt="Pratonton thumbnail" width="600" height="600"><span class="tag" id="thumbTag">Imej ganti</span></div>
             <div class="thumb-actions">
               <button class="btn btn-ghost" type="button" id="thumbPick"><svg aria-hidden="true"><use href="#i-upload"/></svg><span id="thumbPickText">Muat Naik Imej</span></button>
               <button class="btn btn-ghost" type="button" id="thumbRemove" hidden><svg aria-hidden="true"><use href="#i-trash"/></svg><span data-i18n="thumb.remove">Padam Imej</span></button>
             </div>
             <input type="file" id="thumbFile" accept="image/jpeg,image/png,image/webp" hidden>
-            <span class="hint" data-i18n="thumb.hint">JPG, PNG atau WebP. Imej dipotong ke nisbah 16:10, dimampatkan secara automatik (maksimum kira-kira 100 KB) dan disimpan terus dalam Firestore bersama produk. Firebase Storage tidak diperlukan.</span>
+            <span class="hint" data-i18n="thumb.hint">JPG, PNG atau WebP. Imej dipotong ke segi empat sama (1:1), dimampatkan secara automatik (maksimum kira-kira 100 KB) dan disimpan terus dalam Firestore bersama produk. Firebase Storage tidak diperlukan.</span>
             <span class="err" id="eThumb"></span>
           </div>
         </div>
@@ -816,7 +816,7 @@
         "dlg.url": "Pautan Website Produk", "dlg.urlOpt": "(https://)", "dlg.urlHint": "Pengguna dibawa ke pautan ini bila menekan butang atau gambar produk di laman awam. Kosongkan untuk paparan \u201cProduk Akan Datang\u201d.", "dlg.order": "Susunan Paparan", "dlg.thumb": "Thumbnail Produk",
         "thumb.alt": "Pratonton thumbnail", "thumb.upload": "Muat Naik Imej", "thumb.replace": "Ganti Imej", "thumb.remove": "Padam Imej",
         "thumb.tagPlaceholder": "Imej ganti", "thumb.tagNew": "Imej baharu", "thumb.tagCurrent": "Imej semasa",
-        "thumb.hint": "JPG, PNG atau WebP. Imej dipotong ke nisbah 16:10, dimampatkan secara automatik (maksimum kira-kira 100 KB) dan disimpan terus dalam Firestore bersama produk. Firebase Storage tidak diperlukan.",
+        "thumb.hint": "JPG, PNG atau WebP. Imej dipotong ke segi empat sama (1:1), dimampatkan secara automatik (maksimum kira-kira 100 KB) dan disimpan terus dalam Firestore bersama produk. Firebase Storage tidak diperlukan.",
         "dlg.created": "Tarikh Dicipta", "dlg.updatedAt": "Tarikh Dikemas kini", "dlg.cancel": "Batal", "dlg.save": "Simpan Produk", "dlg.saving": "Sedang menyimpan…",
         "tr.summary": "Terjemahan produk (pilihan)",
         "tr.help": "Jika dikosongkan, website memaparkan teks Bahasa Melayu yang ditulis di atas.",
@@ -892,7 +892,7 @@
       return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
     }
     function thumbImg(p, cls = "", alt = "") {
-      const img = el("img", { class: cls, alt, decoding: "async", width: "640", height: "400" });
+      const img = el("img", { class: cls, alt, decoding: "async", width: "600", height: "600" });
       img.loading = "lazy";
       const fb = placeholderThumbURL(p);
       img.addEventListener("error", () => { if (img.src !== fb) img.src = fb; }, { once: true });
@@ -996,14 +996,14 @@
     }
 
     /* =====================================================================
-       Bahagian 5: Pemprosesan imej — crop 16:10, mampat JPEG, jadikan data URL
+       Bahagian 5: Pemprosesan imej — crop segi empat sama 1:1, mampat JPEG, jadikan data URL
        Imej disimpan terus dalam dokumen Firestore (medan thumbnailURL), jadi
        ia mesti kecil. Had dokumen Firestore ialah 1 MiB; sasaran kami ≈ 100 KB.
        ===================================================================== */
     const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
     const MAX_INPUT_BYTES = 12 * 1024 * 1024;
     const MAX_THUMB_CHARS = 135000;                        // ≈ 100 KB (mesti ≤ had dalam firestore.rules: 150000)
-    const THUMB_SIZES = [[640, 400], [480, 300], [320, 200]];
+    const THUMB_SIZES = [[600, 600], [480, 480], [360, 360], [240, 240]];   // segi empat sama 1:1
     const THUMB_QUALITIES = [0.82, 0.72, 0.62, 0.52, 0.42];
     async function processImage(file) {
       if (!ALLOWED_TYPES.includes(file.type)) throw new Error(t("img.type"));
@@ -1015,7 +1015,7 @@
           const canvas = document.createElement("canvas"); canvas.width = W; canvas.height = H;
           const ctx = canvas.getContext("2d");
           ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, W, H);
-          const scale = Math.max(W / img.naturalWidth, H / img.naturalHeight);   // "cover"
+          const scale = Math.max(W / img.naturalWidth, H / img.naturalHeight);   // "cover" (potong tengah)
           const dw = img.naturalWidth * scale, dh = img.naturalHeight * scale;
           ctx.imageSmoothingQuality = "high";
           ctx.drawImage(img, (W - dw) / 2, (H - dh) / 2, dw, dh);
