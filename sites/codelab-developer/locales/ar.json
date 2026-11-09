@@ -867,5 +867,10 @@
  "adm.account": "الحساب",
  "adm.role.admin": "مسؤول",
  "adm.login.title": "تسجيل دخول المسؤول",
- "adm.login.wait": "جارٍ تسجيل الدخول…"
+ "adm.login.wait": "جارٍ تسجيل الدخول…",
+ "pwa.install": "تثبيت التطبيق",
+ "pwa.iosTitle": "التثبيت على iPhone / iPad",
+ "pwa.iosStep1": "افتح هذا الموقع في متصفح Safari.",
+ "pwa.iosStep2": "اضغط زر المشاركة (المربع الذي بداخله سهم للأعلى).",
+ "pwa.iosStep3": "اختر «إضافة إلى الشاشة الرئيسية» ثم اضغط إضافة."
 }

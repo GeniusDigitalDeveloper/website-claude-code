@@ -867,5 +867,10 @@
  "adm.account": "Akaun",
  "adm.role.admin": "Pentadbir",
  "adm.login.title": "Log masuk Admin",
- "adm.login.wait": "Sedang log masuk…"
+ "adm.login.wait": "Sedang log masuk…",
+ "pwa.install": "Pasang Apl",
+ "pwa.iosTitle": "Pasang pada iPhone / iPad",
+ "pwa.iosStep1": "Buka laman ini dalam Safari.",
+ "pwa.iosStep2": "Ketik butang Kongsi (petak dengan anak panah ke atas).",
+ "pwa.iosStep3": "Pilih “Tambah ke Skrin Utama”, kemudian Tambah."
 }

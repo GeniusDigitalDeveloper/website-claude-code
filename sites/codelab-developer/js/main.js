@@ -9,6 +9,7 @@ import { toolById } from './registry.js';
 import { trackVisit, provider } from './statistics/stats.js';
 import { applyDisabled } from './registry.js';
 import { SITE } from './config.js';
+import { registerSW } from './components/install.js';
 
 const main = h('main', { id: 'main', tabindex: '-1' });
 let overlay;
@@ -79,4 +80,5 @@ async function boot() {
   document.documentElement.classList.add('ready');
   trackVisit();
 }
+registerSW();
 boot();

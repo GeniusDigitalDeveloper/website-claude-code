@@ -867,5 +867,10 @@
  "adm.account": "Account",
  "adm.role.admin": "Administrator",
  "adm.login.title": "Admin sign-in",
- "adm.login.wait": "Signing in…"
+ "adm.login.wait": "Signing in…",
+ "pwa.install": "Install app",
+ "pwa.iosTitle": "Install on iPhone / iPad",
+ "pwa.iosStep1": "Open this site in Safari.",
+ "pwa.iosStep2": "Tap the Share button (the square with an up arrow).",
+ "pwa.iosStep3": "Choose “Add to Home Screen”, then Add."
 }

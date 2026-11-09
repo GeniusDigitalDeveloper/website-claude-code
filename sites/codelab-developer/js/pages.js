@@ -3,6 +3,7 @@ import { h, clear } from './utils/dom.js';
 import { icon } from './utils/icons.js';
 import { CATEGORIES, TOOLS, toolById, catById, toolsByCat, loadTool } from './registry.js';
 import { toolCard, favButton } from './components/ui-parts.js';
+import { installButton } from './components/install.js';
 import { favorites, history, usage, onUserDataChange } from './utils/storage.js';
 import { t, getLang, LANGS } from './i18n/i18n.js';
 import { SITE } from './config.js';
@@ -20,7 +21,7 @@ export function homePage() {
     h('p', { class: 'hero-sub', i18n: 'hero.subtitle' }),
     h('p', { class: 'hero-desc', i18n: 'hero.desc' }),
     h('ul', { class: 'badges', 'aria-label': 'Features' }, BADGES.map((b) => h('li', {}, icon('circle-check', 16), h('span', { i18n: `badge.${b}` })))),
-    h('div', { class: 'hero-cta' }, h('a', { class: 'btn btn-primary btn-lg', href: '#/tools' }, icon('layout-grid', 18), h('span', { i18n: 'hero.cta' })), h('a', { class: 'btn btn-glass btn-lg', href: '#/guide' }, icon('book-open', 18), h('span', { i18n: 'hero.cta2' }))));
+    h('div', { class: 'hero-cta' }, h('a', { class: 'btn btn-primary btn-lg', href: '#/tools' }, icon('layout-grid', 18), h('span', { i18n: 'hero.cta' })), h('a', { class: 'btn btn-glass btn-lg', href: '#/guide' }, icon('book-open', 18), h('span', { i18n: 'hero.cta2' })), installButton('btn btn-glass btn-lg')));
   const hero = h('section', { class: 'hero' }, h('div', { class: 'hero-bg', role: 'img', 'aria-label': 'Banner CodeLab Developer' }), h('div', { class: 'hero-overlay' }), heroText);
 
   const recent = history.all().slice(0, 4).map((x) => toolById(x.id)).filter(Boolean);

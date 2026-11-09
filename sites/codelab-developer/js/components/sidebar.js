@@ -1,6 +1,7 @@
 import { h } from '../utils/dom.js';
 import { icon } from '../utils/icons.js';
 import { CATEGORIES, toolsByCat } from '../registry.js';
+import { installButton } from './install.js';
 import { store } from '../utils/storage.js';
 
 export function createSidebar() {
@@ -15,7 +16,7 @@ export function createSidebar() {
   const collapse = h('button', { type: 'button', class: 'collapse-btn', 'aria-pressed': 'false', aria: 'side.collapse', tip: 'side.collapse' }, icon('panel-left', 18), h('span', { i18n: 'side.collapse' }));
   const aside = h('aside', { class: 'sidebar', id: 'sidebar', 'aria-label': 'Sidebar' },
     h('nav', {}, h('ul', {}, items.map((it) => h('li', { class: it.sep ? 'sep' : '' }, h('a', { href: it.href, dataset: { route: it.href }, tip: it.key }, icon(it.ic, 20), h('span', { class: 'label', i18n: it.key }), it.count ? h('em', { class: 'count' }, String(it.count)) : null))))),
-    collapse);
+    installButton('btn btn-primary install-side'), collapse);
   const set = (v) => { document.body.classList.toggle('sidebar-collapsed', v); collapse.setAttribute('aria-pressed', String(v)); store.set('sidebarCollapsed', v); };
   collapse.addEventListener('click', () => set(!document.body.classList.contains('sidebar-collapsed')));
   if (store.get('sidebarCollapsed', false)) set(true);

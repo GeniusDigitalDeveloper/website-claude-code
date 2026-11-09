@@ -7,8 +7,17 @@
   <meta name="description" content="CodeLab Developer oleh Genius Digital: koleksi lengkap alat pembangun web percuma yang berjalan dalam pelayar.">
   <meta name="theme-color" content="#4f46e5">
   <!-- CSP: skrip hanya dari tapak sendiri; worker hanya blob (untuk Regex Tester berhad masa). Tiada eval(). -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; worker-src blob:; connect-src 'self' https://firestore.googleapis.com; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; worker-src 'self' blob:; connect-src 'self' https://firestore.googleapis.com; object-src 'none'; base-uri 'self'; form-action 'none'">
   <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/icons/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="CodeLab">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="application-name" content="CodeLab Developer">
+  <meta name="msapplication-TileColor" content="#4f46e5">
   <link rel="preload" href="assets/img/hero-bg.webp" as="image" type="image/webp" media="(min-width: 761px)">
   <link rel="stylesheet" href="css/fonts.css">
   <link rel="stylesheet" href="css/base.css">
