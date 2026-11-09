@@ -579,3 +579,9 @@ a.c-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
   .chips::-webkit-scrollbar { display: none; }
   .chip { flex-shrink: 0; }
 }
+
+/* Butang pasang aplikasi (PWA) */
+.install-btn { margin-top: 1rem; display: inline-flex; align-items: center; gap: 0.5rem; min-height: 44px; padding: 0 1.1rem; border-radius: 999px; border: 1.5px solid rgba(255,255,255,0.35); background: rgba(255,255,255,0.08); color: #fff; font-family: var(--font-head); font-weight: 600; font-size: 0.9375rem; transition: background-color 0.2s, transform 0.2s var(--ease); }
+.install-btn:hover { background: rgba(255,255,255,0.18); transform: translateY(-2px); }
+.install-btn svg { width: 18px; height: 18px; }
+.install-btn[hidden], [data-install][hidden] { display: none !important; }

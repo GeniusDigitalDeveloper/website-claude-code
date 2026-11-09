@@ -27,6 +27,13 @@
   <meta property="og:title" content="Sumayyah Dental Clinic" />
   <meta property="og:description" content="Senyuman sihat, keyakinan sepanjang hayat. Tempah temujanji sekarang." />
   <link rel="icon" href="img/favicon.svg" type="image/svg+xml" id="favicon" />
+  <!-- Aplikasi (PWA): boleh dipasang ke skrin utama / desktop -->
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/img/apple-touch-icon.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Sumayyah" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -83,6 +90,7 @@
       </nav>
       <button class="btn btn-primary btn-block" data-book data-close-drawer><i data-lucide="calendar-check"></i>Tempah Temujanji</button>
       <a class="btn btn-wa btn-block" data-wa target="_blank" rel="noopener"><i data-lucide="message-circle"></i>WhatsApp Kami</a>
+      <button class="btn btn-ghost btn-block" data-install hidden data-close-drawer><i data-lucide="download"></i>Pasang Aplikasi</button>
     </aside>
   </div>
 
@@ -301,6 +309,7 @@
           <a data-social="tiktok" target="_blank" rel="noopener" aria-label="TikTok"><i data-lucide="music-2"></i></a>
           <a data-wa target="_blank" rel="noopener" aria-label="WhatsApp"><i data-lucide="message-circle"></i></a>
         </div>
+        <button class="install-btn" data-install hidden><i data-lucide="download"></i>Pasang Aplikasi</button>
       </div>
       <div>
         <h4>Pautan Pantas</h4>
@@ -402,5 +411,6 @@
 
   <script src="js/vendor/lucide.min.js?v=20261031c"></script>
   <script type="module" src="js/app.js?v=20261031c"></script>
+  <script src="js/pwa.js?v=20261109" defer></script>
 </body>
 </html>

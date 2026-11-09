@@ -1,0 +1,25 @@
+{
+  "id": "/",
+  "name": "Sumayyah Dental Clinic",
+  "short_name": "Sumayyah",
+  "description": "Klinik pergigian — tempah temujanji, lihat perkhidmatan dan hubungi kami.",
+  "lang": "ms",
+  "dir": "ltr",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#0e7490",
+  "categories": ["health", "medical"],
+  "icons": [
+    { "src": "/img/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/img/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/img/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/img/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Hubungi WhatsApp", "short_name": "WhatsApp", "url": "/#hubungi", "icons": [{ "src": "/img/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Perkhidmatan", "short_name": "Rawatan", "url": "/#perkhidmatan", "icons": [{ "src": "/img/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

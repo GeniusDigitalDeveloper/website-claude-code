@@ -6,6 +6,14 @@
   <meta name="robots" content="noindex, nofollow" />
   <title>Panel Admin — Sumayyah Dental Clinic</title>
   <link rel="icon" href="img/favicon.svg" type="image/svg+xml" />
+  <!-- Aplikasi admin (PWA) -->
+  <meta name="theme-color" content="#082f3d" />
+  <link rel="manifest" href="/admin.webmanifest" />
+  <link rel="apple-touch-icon" href="/img/admin-apple-touch-icon.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Sumayyah Admin" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -33,6 +41,7 @@
       <nav id="tabs" style="display:contents"></nav>
       <div class="side-foot">
         <div class="who" id="who"></div>
+        <button class="btn" data-install hidden><i data-lucide="download"></i>Pasang Aplikasi</button>
         <a class="btn" href="./" target="_blank" rel="noopener"><i data-lucide="external-link"></i>Lihat Website</a>
         <button class="btn" id="logout"><i data-lucide="log-out"></i>Log Keluar</button>
       </div>
@@ -58,5 +67,6 @@
 
   <script src="js/vendor/lucide.min.js?v=20261031c"></script>
   <script type="module" src="js/admin.js?v=20261031c"></script>
+  <script src="js/pwa.js?v=20261109" defer></script>
 </body>
 </html>
