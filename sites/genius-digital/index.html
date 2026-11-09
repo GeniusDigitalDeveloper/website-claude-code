@@ -304,7 +304,7 @@
     /* ---------- Products ---------- */
     .products { background: linear-gradient(180deg, var(--bg) 0%, var(--bg-soft) 100%); overflow: hidden; }
     .products::before { content: ""; position: absolute; width: 520px; height: 520px; right: -200px; top: -120px; border-radius: 50%; background: radial-gradient(circle, rgba(0, 200, 245, .18), transparent 70%); pointer-events: none; }
-    .product-grid { display: grid; grid-template-columns: minmax(0, 300px); justify-content: center; gap: 1.1rem; position: relative; }
+    .product-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .55rem; position: relative; }   /* Telefon: 3 sebaris */
     .product-card {
       display: flex; flex-direction: column; background: var(--surface); border-radius: var(--radius); border: 1px solid var(--line); overflow: hidden;
       box-shadow: var(--shadow-sm); transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
@@ -401,7 +401,7 @@
       .contact-card { padding: 2.25rem; }
     }
     @media (min-width: 640px) {
-      .product-grid { grid-template-columns: repeat(2, minmax(0, 280px)); justify-content: start; gap: 1.25rem; }    /* Tablet: 2 kad */
+      .product-grid { gap: 1rem; }    /* Tablet: 3 sebaris */
       .section { padding: 5.5rem 0; }
     }
     @media (min-width: 900px) {
@@ -416,9 +416,12 @@
       .contact-card { grid-template-columns: 1fr 1fr; align-items: center; padding: 3.25rem; }
     }
     @media (min-width: 1024px) {
-      .product-grid { grid-template-columns: repeat(3, minmax(0, 280px)); }    /* Desktop: 3 kad */
       .hero { padding-bottom: 6rem; }
     }
+    @media (min-width: 900px) { .product-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }                 /* Tablet besar / laptop kecil: 4 sebaris */
+    @media (min-width: 1100px) { .product-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1.1rem; } }   /* Desktop: 5 sebaris */
+    @media (min-width: 1920px) { :root { --container: 1600px; } }
+    @media (min-width: 2560px) { :root { --container: 1900px; } }
     @media (min-width: 1600px) {
       :root { --container: 1360px; }
       body { font-size: 1.05rem; }
@@ -502,6 +505,22 @@
       .footer-links a { min-height: 38px; }
       .fc-list { justify-items: start; }
       .fc-socials { justify-content: flex-start; }
+    }
+
+    /* ---------- Kad produk padat pada telefon (3 sebaris) ---------- */
+    @media (max-width: 639px) {
+      .product-card { border-radius: 14px; }
+      .status-badge { top: .35rem; inset-inline-start: .35rem; padding: .15rem .4rem; font-size: .5rem; gap: .25rem; }
+      .status-badge::before { width: 5px; height: 5px; }
+      .card-body { padding: .6rem .5rem .65rem; }
+      .category-pill { font-size: .5rem; padding: .15rem .4rem; letter-spacing: .03em; }
+      .card-body h3 { font-size: .78rem; line-height: 1.25; margin: .45rem 0 .5rem; flex: 1; word-break: break-word; }
+      .card-body p { display: none; }
+      .card-body .btn { margin-top: 0; min-height: 36px; padding: .3rem .35rem; font-size: .58rem; letter-spacing: .02em; border-radius: 9px; }
+      .card-body .btn svg { display: none; }
+      html[lang="ar"] .category-pill, html[lang="ar"] .status-badge { font-size: .62rem; }
+      html[lang="ar"] .card-body h3 { font-size: .8rem; line-height: 1.4; }
+      html[lang="ar"] .card-body .btn { font-size: .72rem; }
     }
 
     /* ---------- Pasang Apps (PWA) ---------- */
@@ -1025,7 +1044,7 @@
     function renderView() {
       grid.setAttribute("aria-busy", String(view.kind === "loading"));
       if (view.kind === "loading") {
-        grid.replaceChildren(...Array.from({ length: 3 }, () => el("article", { class: "product-card skeleton", "aria-hidden": "true" }, [
+        grid.replaceChildren(...Array.from({ length: 5 }, () => el("article", { class: "product-card skeleton", "aria-hidden": "true" }, [
           el("div", { class: "thumb" }),
           el("div", { class: "card-body" }, [el("div", { class: "sk-line w40" }), el("div", { class: "sk-line w70" }), el("div", { class: "sk-line" }), el("div", { class: "sk-line btn-sk" })])
         ])));
