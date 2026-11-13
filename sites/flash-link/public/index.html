@@ -826,6 +826,12 @@ body[data-s] .dnav-i[aria-current=page]{color:#fff;background:color-mix(in srgb,
 .pp-x{z-index:4!important;top:20px!important;right:20px!important}
 @media(prefers-reduced-motion:reduce){.pp-card{transform:none!important}}
 .cbsug{display:flex;flex-wrap:wrap;gap:6px;align-self:flex-start;max-width:92%}.cbsug .chip{min-height:36px;font-size:13px}
+
+/* ===== V-68: halaman awam penuh skrin ala Linktree; kaki di bawah sekali ===== */
+.pubmain{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+.pubmain>.fl-root{flex:1 0 auto;min-height:100vh!important;min-height:100dvh!important;display:flex;flex-direction:column}
+.pubmain>.fl-root>.fl-wrap{flex:1 0 auto;width:100%}
+.pubmain .fl-foot{margin-top:auto;padding-top:24px}
 </style>
 </head>
 <body>
@@ -1529,7 +1535,8 @@ async function publicView(username) {
   setMeta("description", desc); setMeta("og:title", document.title, 1); setMeta("og:description", desc, 1);
   setMeta("og:image", safeUrl(p.avatarUrl) || origin() + "/assets/logo-2x.png", 1); setMeta("og:url", profileUrl(p.username), 1);
   document.documentElement.style.background = rootStyle(p).match(/--bgcss:([^;]+)/)?.[0] ? "" : "";
-  app.innerHTML = `<main>${renderProfile(p, links)}</main>`; armReveal(app);
+  app.innerHTML = `<main class="pubmain">${renderProfile(p, links)}</main>`; armReveal(app);
+  try { const rt = $(".fl-root"); if (rt) { const cs = getComputedStyle(rt); document.documentElement.style.background = cs.backgroundImage !== "none" ? `${cs.backgroundColor} ${cs.backgroundImage}` : cs.backgroundColor; document.body.style.background = "transparent"; } } catch {}
   PUBCTX = { p, links };
   const root = $("main"); bindPublicEvents(root, uid);
   const hbg = $(".fl-phero-bg"), htx = $(".fl-phero-txt");
@@ -1826,6 +1833,16 @@ function okFx(msg) {
   document.body.appendChild(d); return sleep(REDUCE() ? 500 : 1250).then(() => d.remove());
 }
 function failFx(card, el, msg) { SFX.error(); el.textContent = msg; card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake"); }
+const emailLast = () => { try { return localStorage.getItem("fl_email") || ""; } catch { return ""; } };
+async function credSave(email, pw) {
+  try { localStorage.setItem("fl_email", email); } catch {}
+  try { if (window.PasswordCredential && navigator.credentials && navigator.credentials.store) await navigator.credentials.store(new PasswordCredential({ id: email, password: pw, name: email })); } catch {}
+}
+async function credFill() {
+  const e = $("#le"), p = $("#lp"); if (!e || !p) return;
+  const last = emailLast(); if (last && !e.value) e.value = last;
+  try { if (window.PasswordCredential && navigator.credentials && navigator.credentials.get) { const c = await navigator.credentials.get({ password: true, mediation: "optional" }); if (c && c.password && $("#le") === e) { e.value = c.id || e.value; p.value = c.password; } } } catch {}
+}
 const authShell = inner => { $("#app").innerHTML = `<div style="position:fixed;top:14px;right:14px;z-index:61">${langSwitch()}</div><a href="/" data-nav class="backarrow" aria-label="Kembali ke laman asal">${ic("arrowl", "w-6 h-6")}</a><main class="container" style="min-height:100vh;display:grid;place-items:center;padding:24px 16px"><div id="acard" class="glass" style="width:100%;max-width:420px;border-radius:24px;padding:28px"><a href="/" data-nav style="display:block;text-align:center"><img src="/assets/logo-2x.png" alt="Genius Digital Flash Link" width="220" height="110" style="height:76px;width:auto;margin:0 auto 12px"></a>${inner}</div></main>${siteFooter(false)}`; sfxScope(true); };
 function startFail() { $("#app").innerHTML = `<main class="container" style="min-height:100vh;display:grid;place-items:center;text-align:center;padding:24px 16px"><div><img src="/assets/icon.png" alt="" width="80" height="80" style="margin:0 auto 12px;height:80px;width:80px"><h1 class="font-display" style="font-size:24px;font-weight:700;margin:0 0 8px">Tak dapat sediakan dashboard anda</h1><p style="color:#C7C9D1;margin:0 0 18px">Semak sambungan internet, kemudian cuba lagi.</p><button id="rt" class="btn btn-red">Cuba lagi</button></div></main>`; $("#rt").onclick = () => dashView(); }
 const pwField = (id, label, ac, ph = "") => `<div style="margin-top:12px"><label class="lbl" for="${id}">${label}</label><div class="pwwrap"><input id="${id}" class="inp" type="password" autocomplete="${ac}" placeholder="${ph}" maxlength="64"><button type="button" class="eye" data-eye="${id}" aria-label="Tunjuk kata laluan" aria-pressed="false">${ic("eye", "w-5 h-5")}</button></div></div>`;
@@ -1849,7 +1866,7 @@ function setPasswordModal(u) {
         if (p1.length < 8) return (er.textContent = "Kata laluan minimum 8 aksara.");
         if (p1 !== p2) return (er.textContent = "Kata laluan dan pengesahan tidak sama.");
         const b = $("#npb", bg); b.disabled = true;
-        try { await FB.linkWithCredential(u, FB.EmailAuthProvider.credential(u.email, p1)); bg.close(); toast("Kata laluan disimpan ✓"); res(true); }
+        try { await FB.linkWithCredential(u, FB.EmailAuthProvider.credential(u.email, p1)); credSave(u.email, p1); bg.close(); toast("Kata laluan disimpan ✓"); res(true); }
         catch (e) { b.disabled = false; er.textContent = AUTH_ERR[e.code] || "Gagal menyimpan: " + (e.code || e.message); }
       };
       setTimeout(() => $("#np1", bg).focus(), 80);
@@ -1895,12 +1912,12 @@ async function loginView() {
       <div style="text-align:center;margin-top:8px"><button type="button" id="lforgot" class="linkbtn">Lupa kata laluan?</button></div></form>
     <div style="text-align:center;margin-top:16px"><a href="/login?new=1" data-nav class="linkbtn">Pengguna baharu? Daftar di sini</a></div>`);
   const card = $("#acard"), err = $("#e"); bindEyes(document);
-  if (!reg) $("#lforgot").onclick = () => forgotModal($("#le").value.trim());
+  if (!reg) { $("#lforgot").onclick = () => forgotModal($("#le").value.trim()); credFill(); }
   if (!reg) $("#lf").onsubmit = async ev => {
     ev.preventDefault(); const em = $("#le").value.trim(), pw = $("#lp").value; err.textContent = "";
     if (!/^\S+@\S+\.\S+$/.test(em)) return failFx(card, err, "Masukkan e-mel yang sah."); if (!pw) return failFx(card, err, "Masukkan kata laluan.");
     const b = $("#lb"); b.disabled = true; S.holdRoute = true;
-    try { await FB.signInWithEmailAndPassword(auth, em, pw); await onAuthChange(auth.currentUser); await okFx("Berjaya log masuk"); S.holdRoute = false; route(true); }
+    try { await FB.signInWithEmailAndPassword(auth, em, pw); credSave(em, pw); await onAuthChange(auth.currentUser); await okFx("Berjaya log masuk"); S.holdRoute = false; route(true); }
     catch (e) { S.holdRoute = false; b.disabled = false; failFx(card, err, AUTH_ERR[e.code] || "Log masuk gagal: " + (e.code || e.message)); }
   };
   if ($("#g")) $("#g").onclick = async () => {
@@ -2718,7 +2735,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-67";
+const APP_VERSION = "V-68";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
