@@ -329,6 +329,13 @@
     .trans legend { padding: 0; margin-bottom: .7rem; font-family: var(--font-head); font-weight: 800; font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
 
 
+    /* ---------- Harga produk ---------- */
+    .pricebox { border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1rem .4rem; margin-bottom: 1rem; background: var(--bg); }
+    .pricebox-title { font-family: var(--font-head); font-weight: 800; font-size: .85rem; letter-spacing: .06em; text-transform: uppercase; color: #C4141C; margin-bottom: .8rem; }
+    .pricebox .hint { display: block; margin: -.3rem 0 .8rem; }
+    .pprice { display: block; margin-top: .25rem; font-size: .8rem; font-weight: 700; color: #C4141C; }
+    .pprice s { color: var(--muted); font-weight: 500; }
+
     /* ---------- Seret untuk susun semula ---------- */
     .drag-handle { width: 40px; height: 40px; flex: none; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--muted); cursor: grab; touch-action: none; -webkit-user-select: none; user-select: none; }
     .drag-handle:not(:disabled):hover { border-color: var(--blue-500); color: var(--accent); }
@@ -622,6 +629,22 @@
             <div class="field"><label for="fDescAr" data-i18n="tr.desc">Penerangan</label><textarea class="input" id="fDescAr" dir="rtl" lang="ar" maxlength="1000"></textarea></div>
           </fieldset>
         </details>
+        <div class="pricebox">
+          <div class="pricebox-title">Badge Harga (RM)</div>
+          <div class="row2">
+            <div class="field">
+              <label for="fPrice"><span>Harga Istimewa (RM)</span> <span class="opt">(badge merah)</span></label>
+              <input class="input" dir="ltr" id="fPrice" type="number" inputmode="decimal" min="0" max="1000000" step="0.01" placeholder="129.99">
+              <span class="err" id="ePrice"></span>
+            </div>
+            <div class="field">
+              <label for="fOrigPrice"><span>Harga Asal (RM)</span> <span class="opt">(dicoret, pilihan)</span></label>
+              <input class="input" dir="ltr" id="fOrigPrice" type="number" inputmode="decimal" min="0" max="1000000" step="0.01" placeholder="199.99">
+              <span class="err" id="eOrigPrice"></span>
+            </div>
+          </div>
+          <span class="hint">Kosongkan kedua-duanya jika produk tiada badge harga. Harga asal mesti lebih tinggi daripada harga istimewa. Badge terus muncul pada kad produk di laman awam.</span>
+        </div>
         <div class="row2">
           <div class="field">
             <label for="fUrl"><span data-i18n="dlg.url">URL Produk</span> <span class="opt" data-i18n="dlg.urlOpt">(pilihan, https://)</span></label>
@@ -914,6 +937,7 @@
         nameEn: data.nameEn || "", categoryEn: data.categoryEn || "", descriptionEn: data.descriptionEn || "",
         nameAr: data.nameAr || "", categoryAr: data.categoryAr || "", descriptionAr: data.descriptionAr || "",
         productURL: data.productURL || "", displayOrder: Number(data.displayOrder) || 0,
+        price: typeof data.price === "number" ? data.price : null, originalPrice: typeof data.originalPrice === "number" ? data.originalPrice : null,
         createdAt: toMillis(data.createdAt), updatedAt: toMillis(data.updatedAt)
       };
     }
@@ -953,10 +977,14 @@
             nameEn: p.nameEn || "", categoryEn: p.categoryEn || "", descriptionEn: p.descriptionEn || "",
             nameAr: p.nameAr || "", categoryAr: p.categoryAr || "", descriptionAr: p.descriptionAr || "",
             status: p.status, productURL: p.productURL || "", displayOrder: p.displayOrder,
+            ...(p.price != null ? { price: p.price } : {}), ...(p.originalPrice != null ? { originalPrice: p.originalPrice } : {}),
             createdAt: FS.serverTimestamp(), updatedAt: FS.serverTimestamp()
           });
         },
-        async update(slug, patch) { await FS.updateDoc(docRef(slug), { ...patch, updatedAt: FS.serverTimestamp() }); },
+        async update(slug, patch) {   // harga kosong (null) = padam medan harga
+          const clean = Object.fromEntries(Object.entries(patch).map(([k, v]) => [k, (k === "price" || k === "originalPrice") && v === null ? FS.deleteField() : v]));
+          await FS.updateDoc(docRef(slug), { ...clean, updatedAt: FS.serverTimestamp() });
+        },
         async remove(slug) { await FS.deleteDoc(docRef(slug)); },
         async reorder(changes) {   // changes: [{slug, displayOrder}]
           const batch = FS.writeBatch(db);
@@ -1134,6 +1162,11 @@
       finally { setBusy(btn, false); }
     }
 
+    const fmtRM = (n) => "RM " + (Number.isInteger(n) ? String(n) : n.toFixed(2));
+    function priceLine(p) {
+      if (p.price == null) return null;
+      return el("span", { class: "pprice" }, p.originalPrice != null ? [fmtRM(p.price) + "  ", el("s", { text: fmtRM(p.originalPrice) })] : fmtRM(p.price));
+    }
     function renderProducts() {
       if (dragState) { dragState.pending = true; return; }   // jangan lukis semula ketika menyeret
       const area = $("#productsArea");
@@ -1165,7 +1198,7 @@
         return el("tr", { class: "prow", "data-slug": p.slug }, [
           el("td", { class: "c-order" }, el("div", { class: "order-ctl" }, [grip, up, el("span", { class: "num", text: String(p.displayOrder), title: t("row.orderTitle") }), down])),
           el("td", { class: "c-thumb" }, thumbImg(p, "pthumb", t("row.thumbAlt", { name: p.name }))),
-          el("td", { class: "c-name" }, [el("span", { class: "pname", text: p.name }), el("span", { class: "pslug", text: p.slug }), el("span", { class: "pmeta", text: t("row.updated", { category: p.category, date: fmtDay(p.updatedAt) }) })]),
+          el("td", { class: "c-name" }, [el("span", { class: "pname", text: p.name }), el("span", { class: "pslug", text: p.slug }), priceLine(p), el("span", { class: "pmeta", text: t("row.updated", { category: p.category, date: fmtDay(p.updatedAt) }) })]),
           el("td", { class: "c-cat" }, el("span", { class: "pcat", text: p.category })),
           el("td", { class: "c-status" }, sel),
           el("td", { class: "c-date", text: fmtDay(p.updatedAt) }),
@@ -1257,7 +1290,7 @@
        Bahagian 9: Dialog Tambah / Edit produk
        ===================================================================== */
     const pd = $("#productDialog"), form = $("#productForm");
-    const F = { name: $("#fName"), slug: $("#fSlug"), category: $("#fCategory"), status: $("#fStatus"), desc: $("#fDesc"), url: $("#fUrl"), order: $("#fOrder"),
+    const F = { name: $("#fName"), slug: $("#fSlug"), category: $("#fCategory"), status: $("#fStatus"), desc: $("#fDesc"), url: $("#fUrl"), order: $("#fOrder"), price: $("#fPrice"), orig: $("#fOrigPrice"),
                 nameEn: $("#fNameEn"), catEn: $("#fCatEn"), descEn: $("#fDescEn"), nameAr: $("#fNameAr"), catAr: $("#fCatAr"), descAr: $("#fDescAr") };
     let editing = null;               // produk yang sedang diedit (null = baharu)
     let slugTouched = false, saving = false;
@@ -1290,6 +1323,7 @@
       F.name.value = p ? p.name : ""; F.slug.value = p ? p.slug : ""; F.slug.readOnly = !!p;
       F.category.value = p ? p.category : ""; F.status.value = p ? p.status : "active"; F.desc.value = p ? p.description : "";
       F.url.value = p ? p.productURL : "";
+      F.price.value = p && p.price != null ? p.price : ""; F.orig.value = p && p.originalPrice != null ? p.originalPrice : "";
       F.order.value = p ? p.displayOrder : (products.reduce((m, x) => Math.max(m, x.displayOrder), 0) + 1);
       F.nameEn.value = p ? p.nameEn : ""; F.catEn.value = p ? p.categoryEn : ""; F.descEn.value = p ? p.descriptionEn : "";
       F.nameAr.value = p ? p.nameAr : ""; F.catAr.value = p ? p.categoryAr : ""; F.descAr.value = p ? p.descriptionAr : "";
@@ -1334,9 +1368,17 @@
       if (desc.length > 1000) { fieldError(F.desc, "#eDesc", t("val.desc")); ok = false; }
       if (url && !/^https:\/\/[^\s]+$/i.test(url)) { fieldError(F.url, "#eUrl", t("val.url")); ok = false; }
       if (!Number.isInteger(order) || order < 0 || order > 100000) { fieldError(F.order, "#eOrder", t("val.order")); ok = false; }
+      const money = (i) => { const v = i.value.trim().replace(",", "."); return v === "" ? null : Number(v); };
+      const price = money(F.price), orig = money(F.orig);
+      if (price !== null && (!Number.isFinite(price) || price <= 0 || price > 1000000)) { fieldError(F.price, "#ePrice", "Masukkan harga lebih daripada 0 (contoh: 129.99)."); ok = false; }
+      if (orig !== null) {
+        if (price === null) { fieldError(F.orig, "#eOrigPrice", "Isi Harga Istimewa dahulu."); ok = false; }
+        else if (!Number.isFinite(orig) || orig <= price || orig > 1000000) { fieldError(F.orig, "#eOrigPrice", "Harga asal mesti lebih tinggi daripada harga istimewa."); ok = false; }
+      }
+      const r2 = (n) => n === null ? null : Math.round(n * 100) / 100;
       if (!ok) { const first = form.querySelector(".invalid"); if (first) first.focus(); }
       const tr = (i) => i.value.trim();
-      return ok ? { name, slug, category: cat, description: desc, status: F.status.value, productURL: url, displayOrder: order,
+      return ok ? { name, slug, category: cat, description: desc, status: F.status.value, productURL: url, displayOrder: order, price: r2(price), originalPrice: r2(orig),
         nameEn: tr(F.nameEn), categoryEn: tr(F.catEn), descriptionEn: tr(F.descEn), nameAr: tr(F.nameAr), categoryAr: tr(F.catAr), descriptionAr: tr(F.descAr) } : null;
     }
 

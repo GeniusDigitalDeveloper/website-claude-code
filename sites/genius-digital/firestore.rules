@@ -28,7 +28,7 @@ service cloud.firestore {
       return data.keys().hasOnly([
         'name', 'slug', 'category', 'description',
         'thumbnailURL',
-        'status', 'productURL', 'displayOrder',
+        'status', 'productURL', 'displayOrder', 'price', 'originalPrice',
         'nameEn', 'categoryEn', 'descriptionEn',
         'nameAr', 'categoryAr', 'descriptionAr',
         'createdAt', 'updatedAt'
@@ -60,6 +60,11 @@ service cloud.firestore {
         && (value == '' || value.matches('https://.*') || value.matches('data:image/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+'));
     }
 
+    // Harga (RM): pilihan; jika ada mestilah nombor 0 - 1,000,000. originalPrice ialah harga asal yang dicoret.
+    function optPrice(data, key) {
+      return !(key in data) || (data[key] is number && data[key] >= 0 && data[key] <= 1000000);
+    }
+
     function hasValidFields(data, docId) {
       return hasOnlyAllowedKeys(data)
         && hasRequiredKeys(data)
@@ -76,6 +81,7 @@ service cloud.firestore {
         && isEmptyOrHttps(data.productURL) && data.productURL.size() <= 2048
         && data.displayOrder is number
         && data.displayOrder >= 0 && data.displayOrder <= 100000
+        && optPrice(data, 'price') && optPrice(data, 'originalPrice')
         && data.createdAt is timestamp
         && data.updatedAt is timestamp;
     }
