@@ -810,6 +810,21 @@ body[data-s] .dnav-i[aria-current=page]{color:#fff;background:color-mix(in srgb,
 .btn-yellow .upd-txt,.b3-r .btn-yellow .upd-txt{color:#1A1200!important;font-size:13px;text-shadow:0 1px 0 rgba(255,255,255,.35)}
 .pray-card{max-width:1060px!important;margin:0 auto!important}
 .btn-yellow,.btn-yellow span,.btn-yellow svg,.b3-r .btn-yellow span{color:#111!important}.btn-yellow .upd-txt,.b3-r .btn-yellow .upd-txt{color:#111!important}
+
+/* ===== V-62: bingkai pop-up kaca gaya iOS dengan kesan 3D mengikut tetikus ===== */
+#praypop{perspective:1100px}
+.pp-card{--rx:0deg;--ry:0deg;--mx:50%;--my:30%;--tx:0px;--ty:0px;padding:10px!important;min-height:0!important;display:block!important;border-radius:36px!important;background:linear-gradient(150deg,rgba(255,255,255,.34),rgba(255,255,255,.1) 45%,rgba(255,255,255,.22))!important;backdrop-filter:blur(30px) saturate(190%);-webkit-backdrop-filter:blur(30px) saturate(190%);border:1px solid rgba(255,255,255,.65)!important;box-shadow:inset 0 2px 0 rgba(255,255,255,.75),inset 0 -2px 0 rgba(255,255,255,.2),inset 0 0 22px rgba(255,255,255,.18),0 40px 90px -25px rgba(0,0,0,.75)!important;transform:rotateX(var(--rx)) rotateY(var(--ry));transform-style:preserve-3d;transition:transform .7s cubic-bezier(.32,.72,0,1);will-change:transform}
+.pp-card.tilt{transition:transform .12s ease-out}
+.pp-card::before{display:none!important}
+.pp-gloss{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:3;background:radial-gradient(420px circle at var(--mx) var(--my),rgba(255,255,255,.42),rgba(255,255,255,.08) 38%,transparent 62%);mix-blend-mode:soft-light}
+.pp-in{position:relative;border-radius:27px;overflow:hidden;min-height:500px;display:flex;flex-direction:column;justify-content:flex-end;background:#06121a;transform:translateZ(18px)}
+.pp-in::before{content:"";position:absolute;inset:-18px;background:var(--pp) center/cover no-repeat;transform:translate3d(var(--tx),var(--ty),0);transition:transform .7s cubic-bezier(.32,.72,0,1)}
+.pp-card.tilt .pp-in::before{transition:transform .12s ease-out}
+.pp-in::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,6,12,.32) 0%,rgba(0,6,12,.12) 28%,rgba(0,6,12,.72) 62%,rgba(0,6,12,.9) 100%)}
+.pp-body,.pp-c{position:relative;z-index:1}
+.pp-c div+div{margin-top:2px}
+.pp-x{z-index:4!important;top:20px!important;right:20px!important}
+@media(prefers-reduced-motion:reduce){.pp-card{transform:none!important}}
 </style>
 </head>
 <body>
@@ -1627,15 +1642,21 @@ function stopAudio(a, ms) {
 }
 function showPrayPop(i, key) {
   const [k, n] = PRAY_N[i], z = zInfo(PR.zone) || ["", "", ""], bg = document.createElement("div"); bg.id = "praypop"; const [pk, pc] = POP_BG[i];
-  bg.innerHTML = `<div class="pp-card" role="alertdialog" aria-modal="true" aria-labelledby="pp-t" style="--pp:url(/assets/pop-${pk}.jpg)"><button type="button" class="pp-x" aria-label="Tutup notifikasi waktu solat"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-    <div class="pp-body"><div class="pp-s">Sekarang sudah masuk waktu solat</div><h2 class="pp-t" id="pp-t" translate="no">${n}</h2><div class="pp-ar" lang="ar" dir="rtl" translate="no">${PRAY_AR[k]}</div><div class="pp-tm">${to12(PR.times[k])}</div>
+  bg.innerHTML = `<div class="pp-card" role="alertdialog" aria-modal="true" aria-labelledby="pp-t" ><span class="pp-gloss" aria-hidden="true"></span><button type="button" class="pp-x" aria-label="Tutup notifikasi waktu solat"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <div class="pp-in" style="--pp:url(/assets/pop-${pk}.jpg)"><div class="pp-body"><div class="pp-s">Sekarang sudah masuk waktu solat</div><h2 class="pp-t" id="pp-t" translate="no">${n}</h2><div class="pp-ar" lang="ar" dir="rtl" translate="no">${PRAY_AR[k]}</div><div class="pp-tm">${to12(PR.times[k])}</div>
     <div class="pp-z">Bagi negeri ${esc(z[1])}, zon ${esc(PR.zone)}</div><div class="pp-d">${esc(z[2])}</div>
     <p class="pp-m">Jom sama-sama tunaikan solat awal waktu, semoga kita berjaya dunia dan akhirat.</p></div>
-    <div class="pp-c" translate="no">${POP_PLACE[i]} · Photo: ${pc}</div></div>`;
+    <div class="pp-c" translate="no"><div>${POP_PLACE[i]} · Photo: ${pc}</div><div>Azan by: ${i === 0 ? "Furqan Fawaz" : "Ustaz Asri (Rabbani)"}</div></div></div></div>`;
   document.body.appendChild(bg); const card = $(".pp-card", bg), x = $(".pp-x", bg), audio = prayAudio(i);
   const EZ = "cubic-bezier(.32,.72,0,1)";
   const close = () => { document.removeEventListener("keydown", kd); if (key) lsSet(key, "1"); stopAudio(audio, 700); if (REDUCE()) return bg.remove(); bg.style.pointerEvents = "none"; bg.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 700, easing: "ease-out", fill: "forwards" }).onfinish = () => bg.remove(); };
   const kd = e => e.key === "Escape" && close(); document.addEventListener("keydown", kd); x.onclick = close;
+  if (!REDUCE()) {
+    let raf = 0, px = .5, py = .5;
+    const apply = () => { raf = 0; const rx = (.5 - py) * 14, ry = (px - .5) * 18; card.style.setProperty("--rx", rx.toFixed(2) + "deg"); card.style.setProperty("--ry", ry.toFixed(2) + "deg"); card.style.setProperty("--mx", (px * 100).toFixed(1) + "%"); card.style.setProperty("--my", (py * 100).toFixed(1) + "%"); card.style.setProperty("--tx", ((px - .5) * -14).toFixed(1) + "px"); card.style.setProperty("--ty", ((py - .5) * -14).toFixed(1) + "px"); };
+    bg.addEventListener("pointermove", e => { const r = card.getBoundingClientRect(); px = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); py = Math.max(0, Math.min(1, (e.clientY - r.top) / r.height)); card.classList.add("tilt"); if (!raf) raf = requestAnimationFrame(apply); });
+    bg.addEventListener("pointerleave", () => { card.classList.remove("tilt"); px = .5; py = .5; apply(); });
+  }
   if (!REDUCE()) bg.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 800, easing: "ease-out" });
   x.focus({ preventScroll: true }); if (!audio) prayChime();
 }
@@ -2686,7 +2707,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-61";
+const APP_VERSION = "V-62";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
