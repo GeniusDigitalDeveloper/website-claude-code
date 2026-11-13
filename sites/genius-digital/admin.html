@@ -357,6 +357,7 @@
     .bulkbar.active { border-color: var(--blue-500); background: rgba(10, 102, 255, .05); }
     .bulk-all { display: inline-flex; align-items: center; gap: .55rem; min-height: 44px; cursor: pointer; font-family: var(--font-head); font-weight: 700; font-size: .85rem; color: var(--head); }
     .bulk-all input, .c-sel input { width: 20px; height: 20px; margin: 0; accent-color: var(--blue-500); cursor: pointer; }
+    .bulk-hint { flex: 1 1 100%; font-size: .78rem; color: var(--muted); }
     .bulk-count { font-family: var(--font-head); font-weight: 800; font-size: .85rem; color: var(--accent); }
     .bulk-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; margin-inline-start: auto; }
     .bulk-actions .input { width: auto; min-width: 190px; min-height: 44px; padding-block: .4rem; }
@@ -1034,9 +1035,9 @@
           for (const c of changes) batch.update(docRef(c.slug), { displayOrder: c.displayOrder, updatedAt: FS.serverTimestamp() });
           await batch.commit();
         },
-        async bulkStatus(slugs, status) {   // satu batch: status + updatedAt sahaja (badge harga tidak disentuh)
+        async bulkBadge(slugs, type) {   // satu batch: tetapkan jenis badge (tanpa harga); harga lama dipadam
           const batch = FS.writeBatch(db);
-          for (const s of slugs) batch.update(docRef(s), { status, updatedAt: FS.serverTimestamp() });
+          for (const s of slugs) batch.update(docRef(s), { priceType: type === "none" ? FS.deleteField() : type, price: FS.deleteField(), originalPrice: FS.deleteField(), updatedAt: FS.serverTimestamp() });
           await batch.commit();
         },
         subscribeSettings(onData, onError) {
@@ -1066,7 +1067,7 @@
         async update(slug, patch) { const i = items.find(x => x.slug === slug); if (!i) throw new Error(t("err.notFound")); touch(i, patch); emit(); },
         async remove(slug) { items = items.filter(i => i.slug !== slug); emit(); },
         async reorder(changes) { for (const c of changes) { const i = items.find(x => x.slug === c.slug); if (i) touch(i, { displayOrder: c.displayOrder }); } emit(); },
-        async bulkStatus(slugs, status) { for (const s of slugs) { const i = items.find(x => x.slug === s); if (i) touch(i, { status }); } emit(); },
+        async bulkBadge(slugs, type) { for (const s of slugs) { const i = items.find(x => x.slug === s); if (i) touch(i, { priceType: type === "none" ? null : type, price: null, originalPrice: null }); } emit(); },
         subscribeSettings(onData) { queueMicrotask(() => onData({})); return () => {}; },
         async saveSettings() {}
       };
@@ -1290,11 +1291,12 @@
     /* ---------- Pilih banyak produk: tukar status sekaligus ---------- */
     const selected = new Set();
     let bulkStatusVal = "";
+    const BADGE_LABEL = { none: "Tiada badge", free: "Percuma", ended: "Tamat", soldout: "Habis Stok" };
     function buildBulkBar(rows) {
       const all = el("input", { type: "checkbox", id: "bulkAll" });
       all.addEventListener("change", () => { if (all.checked) rows.forEach(r => selected.add(r.slug)); else selected.clear(); $$(".row-check").forEach(c => { c.checked = selected.has(c.dataset.slug); }); updateBulkUI(); });
-      const sel = el("select", { class: "input", id: "bulkStatus", "aria-label": "Status baharu untuk produk yang dipilih" },
-        [el("option", { value: "", text: "Tukar status kepada…" }), ...["active", "coming-soon", "free", "ended", "soldout", "hidden"].map(v => el("option", { value: v, text: statusLabel(v) }))]);
+      const sel = el("select", { class: "input", id: "bulkStatus", "aria-label": "Jenis badge baharu untuk produk yang dipilih" },
+        [el("option", { value: "", text: "Tukar badge kepada…" }), ...Object.entries(BADGE_LABEL).map(([v, l]) => el("option", { value: v, text: l }))]);
       sel.value = bulkStatusVal;
       sel.addEventListener("change", () => { bulkStatusVal = sel.value; updateBulkUI(); });
       const apply = el("button", { class: "btn btn-primary", type: "button", id: "bulkApply", text: "Terapkan", onclick: applyBulk });
@@ -1302,7 +1304,8 @@
       return el("div", { class: "bulkbar", id: "bulkBar" }, [
         el("label", { class: "bulk-all" }, [all, el("span", { text: "Pilih semua" })]),
         el("span", { class: "bulk-count", id: "bulkCount", hidden: "" }),
-        el("div", { class: "bulk-actions", id: "bulkActions", hidden: "" }, [sel, apply, clear])
+        el("div", { class: "bulk-actions", id: "bulkActions", hidden: "" }, [sel, apply, clear]),
+        el("span", { class: "bulk-hint", text: "Badge Harga Tetap dan Harga Istimewa perlu ditetapkan satu-satu (kerana ada harga) dalam borang Edit." })
       ]);
     }
     function updateBulkUI() {
@@ -1316,12 +1319,14 @@
       $$("tr.prow").forEach(r => r.classList.toggle("selected", selected.has(r.dataset.slug)));
     }
     async function applyBulk() {
-      const status = bulkStatusVal; if (!status || !selected.size) return;
-      const changes = [...selected].filter(s => { const p = products.find(x => x.slug === s); return p && p.status !== status; });
-      if (!changes.length) { toast("Semua produk yang dipilih sudah berstatus " + statusLabel(status) + ".", ""); return; }
-      if (!confirm("Tukar status " + changes.length + " produk kepada \u201c" + statusLabel(status) + "\u201d?\n\nBadge harga tidak berubah.")) return;
+      const type = bulkStatusVal; if (!type || !selected.size) return;
+      const chosen = [...selected].map(s => products.find(x => x.slug === s)).filter(Boolean);
+      const changes = chosen.filter(p => priceModeOf(p) !== type);
+      if (!changes.length) { toast("Semua produk yang dipilih sudah berbadge " + BADGE_LABEL[type] + ".", ""); return; }
+      const withPrice = changes.filter(p => p.price != null).length;
+      if (!confirm("Tukar badge " + changes.length + " produk kepada \u201c" + BADGE_LABEL[type] + "\u201d?" + (withPrice ? "\n\nHarga sedia ada pada " + withPrice + " produk akan dipadam (badge ini tiada harga)." : "") + "\n\nStatus produk (Tersedia, dll.) tidak berubah.")) return;
       const btn = $("#bulkApply"); setBusy(btn, true, "Sedang menukar…");
-      try { await backend.bulkStatus(changes, status); toast(changes.length + " produk ditukar kepada " + statusLabel(status) + ".", "ok"); selected.clear(); bulkStatusVal = ""; }
+      try { await backend.bulkBadge(changes.map(p => p.slug), type); toast(type === "none" ? "Badge dibuang daripada " + changes.length + " produk." : changes.length + " produk ditukar kepada badge " + BADGE_LABEL[type] + ".", "ok"); selected.clear(); bulkStatusVal = ""; }
       catch (err) { toast(friendlyError(err), "err"); }
       finally { setBusy(btn, false); renderProducts(); }
     }

@@ -1082,6 +1082,8 @@
     const grid = $("#productGrid");
     const modal = $("#productModal");
     let view = { kind: "loading", error: null, retry: null, products: [] };
+    let productsRendered = false;   // lukisan pertama sahaja guna animasi masuk; kemas kini masa nyata terus (tiada kelewatan)
+    const cardCache = new Map();    // guna semula kad yang tidak berubah (tiada kelipan gambar)
     let modalProduct = null;
 
     // Teks produk mengikut bahasa. Jika terjemahan kosong, gunakan teks asal (Bahasa Melayu).
@@ -1115,7 +1117,9 @@
       } else if (view.kind === "empty") {
         grid.replaceChildren(stateBox("empty", "i-box", t("state.empty.title"), t("state.empty.text")));
       } else {
-        grid.replaceChildren(...view.products.map(productCard));
+        const cards = view.products.map((p, idx) => cachedCard(p, idx));
+        if (productsRendered) cards.forEach(c => c.classList.add("in"));   // tanpa fade 0.7s
+        grid.replaceChildren(...cards); productsRendered = true;
         observeReveals(grid);
       }
     }
@@ -1180,6 +1184,11 @@
     $("#modalClose").addEventListener("click", closeModal);
     $("#modalOk").addEventListener("click", closeModal);
 
+    function cachedCard(p, idx) {
+      const sig = lang + "|" + idx + "|" + JSON.stringify(p), hit = cardCache.get(p.slug);
+      if (hit && hit.sig === sig) return hit.node;
+      const node = productCard(p, idx); cardCache.set(p.slug, { sig, node }); return node;
+    }
     function productCard(product, index) {
       const name = localized(product, "name") || t("product.noName");
       const blocked = isBlocked(product);
@@ -1383,6 +1392,7 @@
       setMenu(menu.classList.contains("open"));
       updateThemeButton();
       renderContact();
+      cardCache.clear();
       renderView();
       if (modal.open && modalProduct) fillModal(modalProduct);
     }
