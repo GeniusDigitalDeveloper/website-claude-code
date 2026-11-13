@@ -204,14 +204,14 @@ body.flow #bgflow{display:block}
 .dnav-i:hover{color:#fff}.dnav-i[aria-current=page]{color:#fff;background:rgba(255,77,77,.16)}.dnav-i:active{transform:scale(.92)}
 .dprev{display:none}
 body:has(.dnav) footer{padding-bottom:96px!important}
-body:has(.dnav) .pvfab{bottom:78px}body:has(.dnav) #fabs{bottom:78px}body:has(.dnav):has(.pvfab.on) #fabs{bottom:146px}
+body:has(.dnav) .pvfab{bottom:78px}
 @media(min-width:1180px){
   .dsh{grid-template-columns:210px minmax(0,1fr) var(--pvw,360px);padding-bottom:40px;transition:grid-template-columns .5s var(--ease)}
   .dnav{position:sticky;top:78px;align-self:start;flex-direction:column;justify-content:flex-start;gap:6px;padding:0;background:none;border:0;backdrop-filter:none;-webkit-backdrop-filter:none}
   .dnav-i{flex:none;flex-direction:row;gap:12px;padding:12px 14px;font-size:14.5px;justify-content:flex-start}
   .dnav-i[aria-current=page]{border-color:rgba(255,107,107,.45)}
   .dprev{display:block;position:sticky;top:78px;align-self:start}
-  body:has(.dnav) footer{padding-bottom:44px!important}body:has(.dnav) #fabs{bottom:16px}
+  body:has(.dnav) footer{padding-bottom:44px!important}
 }
 .seg{display:inline-flex;padding:4px;border-radius:14px;background:rgba(255,255,255,.07);border:1px solid var(--line);gap:4px}
 .seg button{min-height:38px;padding:0 14px;border-radius:10px;color:#C7C9D1;font-weight:700;display:flex;align-items:center;gap:8px;transition:background .35s var(--ease),color .3s,transform .3s var(--ease)}
@@ -290,7 +290,6 @@ body:has(.dnav) .pvfab{bottom:78px}body:has(.dnav) #fabs{bottom:78px}body:has(.d
 #fabs{position:fixed;right:16px;bottom:16px;z-index:55;display:flex;flex-direction:column-reverse;align-items:center;gap:12px;pointer-events:none}#fabs>*{pointer-events:auto}
 #totop{position:relative;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#FF2A2A,#B80000);border:1px solid rgba(255,255,255,.25);box-shadow:0 10px 30px -8px rgba(225,6,0,.8),0 0 0 4px rgba(56,189,248,.14);opacity:0;visibility:hidden;transform:translate3d(0,16px,0) scale(.8);transition:opacity .35s var(--ease),transform .45s var(--ease),visibility .35s}
 #totop.on{opacity:1;visibility:visible;transform:none}#totop.on:hover{transform:translate3d(0,-4px,0) scale(1.06)}#totop.on:active{transform:scale(.92)}
-body:has(.pvfab.on) #fabs{bottom:84px}
 html{scrollbar-width:thin;scrollbar-color:#FF4D4D rgba(255,255,255,.08)}
 ::-webkit-scrollbar{width:12px;height:12px}::-webkit-scrollbar-track{background:rgba(255,255,255,.06)}
 ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#FF4D4D,#38BDF8);border-radius:10px;border:2px solid #07070A}::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#FF7A7A,#7DD3FC)}
@@ -381,13 +380,13 @@ html{scrollbar-width:thin;scrollbar-color:#FF4D4D rgba(255,255,255,.08)}
 @keyframes ember{0%{opacity:0;transform:translate3d(0,0,0) scale(.6)}15%{opacity:.95}100%{opacity:0;transform:translate3d(8px,-90px,0) scale(.2)}}
 @media (prefers-reduced-motion:reduce){.logo-fx img,.logo-fx .shine i,.logo-fx .ember{animation:none}}
 /* ===== telefon + laptop serentak ===== */
-.devs{position:relative;width:100%;min-width:0;max-width:460px;margin:0 auto;padding-bottom:128px}
-.devs-lap{width:100%}
-.devs-ph{position:absolute;right:0;bottom:0;width:292px;height:604px;transform:scale(.55);transform-origin:100% 100%}
-.devs.land{max-width:640px}.devs.land .devs-ph{transform:scale(.8)}
-@media(max-width:600px){.devs.land .devs-ph{transform:scale(.52)}}
+.devs{--ps:.5;display:flex;align-items:center;gap:12px;width:100%;min-width:0;margin:0 auto}
+.devs-lap{flex:1;min-width:0}
+.devs-ph{flex:none;width:calc(292px*var(--ps));height:calc(604px*var(--ps))}.devs-ph .iphone{transform:scale(var(--ps));transform-origin:0 0}
+.devs.land{--ps:.72;max-width:860px;gap:18px}
+@media(max-width:600px){.devs.land{--ps:.4;gap:8px}}
 .dprev-in{padding-bottom:8px}
-@media(min-width:1180px){.dsh{--pvw:400px}}@media(min-width:1500px){.dsh{--pvw:470px}}
+@media(min-width:1180px){.dsh{--pvw:420px}}@media(min-width:1500px){.dsh{--pvw:520px}}@media(min-width:2000px){.dsh{--pvw:580px}}
 /* ===== shorten link ===== */
 .scrollbox{max-height:min(62vh,520px);overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:8px;padding-right:4px;scrollbar-width:thin}
 #leadsblk .scrollbox,.glass>.scrollbox{display:block;max-height:min(58vh,480px)}
@@ -415,8 +414,8 @@ html{scrollbar-width:thin;scrollbar-color:#FF4D4D rgba(255,255,255,.08)}
 .sc-dt{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:12px}
 .srow.due{border-color:#FFD166;box-shadow:0 0 0 2px rgba(255,209,102,.25)}
 /* ===== chatbot ===== */
-body{--cbb:16px}body:has(.pvfab.on){--cbb:84px}body:has(.dnav){--cbb:78px}body:has(.dnav):has(.pvfab.on){--cbb:146px}
-@media(min-width:1180px){body:has(.dnav){--cbb:16px}}
+body{--cbb:16px}
+@media(max-width:1179px){body:has(.dnav){--cbb:78px}body:has(.dnav):has(.pvfab.on){--cbb:146px}body:has(.dnav) #fabs{bottom:var(--cbb)}}
 #cbfab{position:relative;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 30% 25%,#1e2a44,#0a0d18);border:1px solid rgba(125,211,252,.55);box-shadow:0 10px 30px -8px rgba(56,189,248,.7),0 0 0 4px rgba(225,6,0,.18);transition:transform .45s var(--ease),box-shadow .3s}
 #cbfab:hover{transform:translate3d(0,-3px,0) scale(1.06)}#cbfab:active{transform:scale(.92)}#cbfab img{width:40px;height:40px;object-fit:contain;border-radius:50%}
 .cb-dot{position:absolute;top:2px;right:2px;width:13px;height:13px;border-radius:50%;background:#34D399;border:2px solid #0a0d18}
@@ -511,6 +510,17 @@ body:not(.flow) #cbfab,body:not(.flow) #cbtip,body:not(.flow) #cbpanel{display:n
   .fl-auto.fl-tpl-minimal,.fl-auto.fl-tpl-grid,.fl-auto.fl-tpl-store{--bgcss:#0B0B0F!important;--text:#F4F4F5!important;--btn:#F4F4F5!important;--btnText:#0B0B0F!important}
 }
 .pv-wrap .fl-wrap{padding-top:22px}
+/* ===== v36: footer melekat bawah, galeri kecil ===== */
+#app{display:flex;flex-direction:column;min-height:100vh}
+#app>footer{margin-top:auto;width:100%}#app>main,#app>.dsh{flex:1 0 auto;width:100%}
+.dgrid2{display:grid;gap:10px;grid-template-columns:repeat(5,minmax(0,1fr))}
+@media(max-width:900px){.dgrid2{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:520px){.dgrid2{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.galwrap{overflow-y:auto;overscroll-behavior:contain;padding:2px 4px 2px 2px;scrollbar-width:thin}
+.gal-card{padding:7px;gap:7px;border-radius:14px}.gal-card .mini{border-radius:10px}
+.gal-meta{flex-direction:column;align-items:stretch;gap:5px}.gal-meta.row{flex-direction:row;align-items:center}
+.gal-name{font-size:12.5px}.gal-card .vbadge{font-size:11px;padding:1px 8px}
+.gal-act{gap:4px;justify-content:flex-start}.gal-card .btn{min-height:30px;padding:0 8px;font-size:12px;border-radius:9px;flex:none}.gal-card .btn svg{width:14px;height:14px}
+.gal-card:hover{transform:translate3d(0,-3px,0)}
 </style>
 </head>
 <body>
@@ -1156,12 +1166,13 @@ function landing() {
     ["bag", "Jualan nampak profesional", "Produk dengan gambar, harga dan lencana promosi. Pelanggan klik, terus ke kedai anda. Tiada potongan jualan."],
     ["chart", "Tahu apa yang menjadi", "Lihat berapa orang melawat dan pautan mana paling laku, supaya anda gandakan yang berhasil."],
   ];
-  const feats = [
-    ["layers", "Pautan dengan logo sebenar", "TikTok, Instagram, WhatsApp, Shopee dan 20 platform lain. Gambar kecil dikesan automatik."],
-    ["palette", "Design siap edit", "Pilih template, klik, dan ubah nama, gambar, warna, fon dan saiz. Ada 7 gaya kepala profil."],
-    ["users", "Kumpul pelanggan", "Borang e-mel dan tempahan terus masuk ke dashboard anda."],
-    ["qr", "Kod QR sedia ada", "Cetak pada kad atau kedai. Pelanggan imbas terus."],
-    ["phone", "Edit dari telefon", "Pratonton langsung semasa anda reka. Ringan dan laju."],
+  const FT = {
+    design: [`${DESIGNS.length} design siap edit`, () => `${DESIGNS.length} template siap dan ${STYLES.length} gaya kepala profil. Klik, lalu ubah nama, gambar, warna, fon dan saiz.`],
+    links: ["Pautan dengan logo sebenar", () => `Logo dikesan automatik untuk ${LINK_KEYS.length} platform: ${LINK_KEYS.slice(0, 5).map(k => BRANDS[k].n).join(", ")} dan lain-lain.`],
+    profile: [null, () => `${STYLES.length} gaya profil, laras gambar (crop dan zum) resolusi tinggi, dan ikon sosial pilihan anda.`],
+  };
+  const feats = [...NAV.map(n => [n.i, (FT[n.k] && FT[n.k][0]) || n.n, FT[n.k] ? FT[n.k][1]() : n.d]),
+    ["phone", "Pratonton telefon dan laptop", "Lihat halaman awam anda pada telefon dan laptop serentak semasa mengedit."],
     ["zap", "Kemas kini automatik", "Setiap penambahbaikan sampai kepada anda secara langsung, dengan butang kemas kini."],
   ];
   $("#app").innerHTML = `
@@ -1184,7 +1195,7 @@ function landing() {
     </div></section>
   <section class="container" style="padding:8px 16px 64px"><h2 data-fx="up" class="font-display" style="font-size:clamp(26px,4vw,36px);text-align:center;margin:0 0 28px;font-weight:700">Kenapa pemilik bisnes pilih Flash Link</h2>
     <div style="display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">${hooks.map((f, i) => `<article data-fx="pop" data-d="${i * 110}" class="glass" style="border-radius:22px;padding:26px"><div class="dtile" style="margin-bottom:14px">${ic(f[0], "w-6 h-6")}</div><h3 class="font-display" style="font-weight:700;font-size:20px;margin:0 0 8px">${f[1]}</h3><p style="margin:0;color:#D1D5DB;font-size:15.5px;line-height:1.55">${f[2]}</p></article>`).join("")}</div></section>
-  <section class="container" style="padding:0 16px 64px"><h2 data-fx="up" class="font-display" style="font-size:clamp(26px,4vw,36px);text-align:center;margin:0 0 8px;font-weight:700">Semua yang anda perlukan, tanpa serabut</h2><p data-fx="up" data-d="80" style="text-align:center;color:#9CA3AF;margin:0 0 32px">Ciri lanjutan tersembunyi di bawah butang “Tambah pautan”.</p>
+  <section class="container" style="padding:0 16px 64px"><h2 data-fx="up" class="font-display" style="font-size:clamp(26px,4vw,36px);text-align:center;margin:0 0 8px;font-weight:700">Semua yang anda perlukan, tanpa serabut</h2><p data-fx="up" data-d="80" style="text-align:center;color:#9CA3AF;margin:0 0 32px">Senarai ini mengikut ciri yang benar-benar ada dalam app sekarang.</p>
     <div style="display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">${feats.map((f, i) => `<article data-fx="${i % 2 ? "right" : "left"}" data-d="${(i % 3) * 90}" class="glass" style="border-radius:18px;padding:22px"><div style="width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:rgba(56,189,248,.16);color:#7DD3FC;margin-bottom:12px">${ic(f[0], "w-6 h-6")}</div><h3 style="font-weight:700;font-size:18px;margin:0 0 6px">${f[1]}</h3><p style="margin:0;color:#C7C9D1;font-size:15px">${f[2]}</p></article>`).join("")}</div></section>
   <section class="container" style="padding:0 16px 72px"><h2 data-fx="up" class="font-display" style="font-size:clamp(26px,4vw,36px);text-align:center;margin:0 0 28px;font-weight:700">3 langkah. Itu sahaja.</h2>
     <ol style="list-style:none;padding:0;margin:0;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">${["Tekan Mula sekarang dan log masuk dengan Google", "Beri nama dan pilih templat anda", "Tambah pautan, salin pautan anda dan tampal di TikTok"].map((s, i) => `<li data-fx="up" data-d="${i * 120}" class="glass" style="border-radius:16px;padding:18px;display:flex;gap:12px;align-items:center"><span class="font-display" style="font-size:28px;font-weight:700;color:#7DD3FC">${i + 1}</span><span style="font-weight:600">${s}</span></li>`).join("")}</ol>
@@ -1339,7 +1350,7 @@ function dashboard() {
   $("#cp").onclick = () => copyText(url); $("#lo").onclick = () => { S.view = "design"; FB.signOut(auth); };
   $("#hm").onclick = () => openView("design");
   $$(".dnav-i").forEach(b => (b.onclick = () => openView(b.dataset.k)));
-  $("#pvb").onclick = () => modal(`<div id="pvmobile" style="max-height:78vh;overflow-y:auto;display:flex;flex-direction:column;gap:18px;align-items:center"><div style="width:100%;max-width:340px">${phoneFrame("", "")}</div><div style="width:100%">${laptopFrame()}</div></div>`, () => refreshPreview(true));
+  $("#pvb").onclick = () => modal(`<div id="pvmobile" style="max-height:78vh;overflow-y:auto">${devsHtml("land")}</div>`, () => refreshPreview(true));
   drawPreviewPanel();
   if (/[?&]zc=/.test(location.search)) { S.view = "schedule"; SC.prov = "zernio"; history.replaceState({}, "", "/dashboard"); }
   if (S.view === "home") S.view = "design";
@@ -1389,7 +1400,7 @@ function designCard(d, activeId) {
     <div class="gal-meta"><div style="min-width:0;display:flex;flex-direction:column;gap:4px"><b class="gal-name">${esc(d.name)}</b>${on ? '<span class="vbadge" style="align-self:flex-start">Aktif</span>' : ""}</div>
     <div class="gal-act">${on ? "" : `<button class="btn btn-red btn-sm" data-use="${d.id}">Guna</button>`}<button class="btn btn-ghost btn-sm" data-edit="${d.id}" aria-label="Edit ${esc(d.name)}">${ic("pencil", "w-4 h-4")}</button><button class="btn btn-ghost btn-sm" data-dup="${d.id}" aria-label="Pendua ${esc(d.name)}">${ic("copy", "w-4 h-4")}</button><button class="btn btn-ghost btn-sm" data-del="${d.id}" aria-label="Padam ${esc(d.name)}">${ic("trash", "w-4 h-4")}</button></div></div></article>`;
 }
-const presetCard = d => `<article class="gal-card clk" data-p="${d.id}"><div class="mini">${miniHtml({ ...S.profile, template: d.tpl, profileStyle: d.sty || "classic", theme: designTheme(d) })}</div><div class="gal-meta"><div style="min-width:0"><b class="gal-name">${esc(d.n)}</b><small style="display:block;color:#9CA3AF;line-height:1.3">${esc(d.d)}</small></div></div><div class="gal-act" style="padding:0 2px 2px"><button class="btn btn-red btn-sm" data-ap="${d.id}" style="flex:1">Pilih & edit</button><button class="btn btn-ghost btn-sm" data-an="${d.id}" aria-label="Simpan ${esc(d.n)} sebagai design baharu" title="Simpan sebagai design baharu">${ic("plus", "w-4 h-4")}</button></div></article>`;
+const presetCard = d => `<article class="gal-card clk" data-p="${d.id}" title="${esc(d.n)}: ${esc(d.d)}"><div class="mini">${miniHtml({ ...S.profile, template: d.tpl, profileStyle: d.sty || "classic", theme: designTheme(d) })}</div><div class="gal-meta row"><b class="gal-name" style="flex:1;min-width:0">${esc(d.n)}</b><button class="btn btn-ghost btn-sm" data-an="${d.id}" aria-label="Simpan ${esc(d.n)} sebagai design baharu" title="Simpan sebagai design baharu">${ic("plus", "w-4 h-4")}</button></div></article>`;
 function applyPreset(d, edit = true) {
   const p = S.profile; p.template = d.tpl; p.profileStyle = d.sty || "classic"; p.theme = designTheme(d);
   saveProfile(); refreshPreview(true); toast(`Design “${d.n}” dipilih ✓ (boleh ditukar bila-bila masa)`); if (edit) editDesign();
@@ -1410,8 +1421,8 @@ async function designTab() {
     ${S.links.length ? "" : `<div class="glass" style="border-radius:20px;padding:16px;margin-bottom:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:200px"><b>Mula di sini</b><p style="margin:4px 0 0;color:#C7C9D1;font-size:14.5px">Halaman anda masih kosong. Tambah pautan pertama anda.</p></div><button id="hlk" class="btn btn-red btn-sm">${ic("plus", "w-4 h-4")} Tambah pautan</button></div>`}
     <h2 class="lbl" style="font-size:15px;color:#fff;margin:0 0 10px">Design saya (${p.designs.length}/${MAXD})</h2>
     <div class="dgrid2" id="mine">${p.designs.map(d => designCard(d, p.activeDesign)).join("")}</div>
-    <h2 class="lbl" style="font-size:15px;color:#fff;margin:22px 0 10px">Galeri template: klik untuk pilih dan edit (skrol ke bawah untuk lagi)</h2>
-    <div class="dgrid2" id="gal">${DESIGNS.map(presetCard).join("")}</div>`;
+    <h2 class="lbl" style="font-size:15px;color:#fff;margin:22px 0 10px">Galeri template (5 sebaris, skrol ke bawah untuk lagi). Klik untuk pilih dan edit</h2>
+    <div class="galwrap" id="galw"><div class="dgrid2" id="gal">${DESIGNS.map(presetCard).join("")}</div></div>`;
   $("#hcp").onclick = () => copyText(url); if ($("#hlk")) $("#hlk").onclick = () => openView("links");
   const mine = $("#mine");
   $$(".gal-card", mine).forEach(c => (c.onclick = e => { if (e.target.closest("button")) return; const id = c.dataset.id; if (S.profile.activeDesign !== id) activateDesign(id, true); editDesign(); }));
@@ -1423,6 +1434,8 @@ async function designTab() {
   $$(".gal-card", gal).forEach(c => (c.onclick = e => { if (e.target.closest("[data-an]")) return; applyPreset(DESIGNS.find(x => x.id === c.dataset.p)); }));
   $$("[data-an]", gal).forEach(b => (b.onclick = e => { e.stopPropagation(); const d = DESIGNS.find(x => x.id === b.dataset.an); if (newDesign({ template: d.tpl, profileStyle: d.sty || "classic", theme: designTheme(d) }, d.n)) { toast(`“${d.n}” disimpan sebagai design baharu ✓`); designTab(); } }));
   fillOverview(); fitMinis();
+  const fitGal = () => { const g = $("#galw"), c = g && $(".gal-card", g); if (c) g.style.maxHeight = c.offsetHeight + 8 + "px"; };
+  requestAnimationFrame(() => { fitGal(); const c = $("#gal .gal-card"); if (c) new ResizeObserver(fitGal).observe(c); });
 }
 
 /* ---------- Popup edit design: semua boleh diedit ---------- */
@@ -1940,7 +1953,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-35";
+const APP_VERSION = "V-36";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
@@ -2029,7 +2042,7 @@ function cbInit() {
   const fabs = $("#fabs"); if (!fabs || $("#cbfab")) return;
   const fab = document.createElement("button"); fab.id = "cbfab"; fab.type = "button"; fab.setAttribute("aria-label", "Buka pembantu bantuan Flash Link"); fab.setAttribute("aria-expanded", "false");
   fab.innerHTML = `<img src="/assets/icon.png" alt="" width="44" height="44"><span class="cb-dot" aria-hidden="true"></span>`;
-  const tip = document.createElement("div"); tip.id = "cbtip"; tip.innerHTML = `<span>Ada masalah? Cek saya</span><button type="button" aria-label="Tutup mesej">${ic("x", "w-4 h-4")}</button>`;
+  const tip = document.createElement("div"); tip.id = "cbtip"; tip.innerHTML = `<span>Ada masalah?? Chat saya...</span><button type="button" aria-label="Tutup mesej">${ic("x", "w-4 h-4")}</button>`;
   const panel = document.createElement("section"); panel.id = "cbpanel"; panel.setAttribute("role", "dialog"); panel.setAttribute("aria-label", "Pembantu Flash Link"); panel.hidden = true;
   panel.innerHTML = `<header><img src="/assets/icon.png" alt="" width="34" height="34"><div><b>Pembantu Flash Link</b><small>Tanya apa-apa tentang app ini</small></div><button type="button" id="cbx" aria-label="Tutup">${ic("x", "w-5 h-5")}</button></header><div id="cbmsgs" aria-live="polite"></div><div id="cbchips"></div><form id="cbform"><input id="cbin" class="inp" placeholder="Tulis soalan anda…" autocomplete="off" maxlength="200" aria-label="Soalan anda"><button class="btn btn-red" aria-label="Hantar">${ic("send", "w-5 h-5")}</button></form>`;
   fabs.appendChild(fab); document.body.appendChild(tip); document.body.appendChild(panel);
