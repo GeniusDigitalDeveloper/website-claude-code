@@ -761,6 +761,13 @@ body[data-s] .dnav-i[aria-current=page]{color:#fff;background:color-mix(in srgb,
 .b3-c{justify-self:center;text-align:center;flex-direction:column;border-left:0!important;padding:8px 24px!important}
 .b3-r{justify-content:flex-end!important;border-left:0!important}
 }
+/* V-58: bingkai TV warna silver, masjid lebih jelas */
+.pray-tv{background:linear-gradient(145deg,#F1F3F6 0%,#B9BEC6 28%,#E8EAEE 52%,#9CA2AB 78%,#D7DADF 100%)!important;box-shadow:0 34px 60px -34px rgba(0,0,0,.9),inset 0 0 0 1.5px rgba(255,255,255,.75),inset 0 -2px 4px rgba(60,66,76,.45)!important}
+.tv-led{background:#34D399}
+.pray-scr{box-shadow:0 0 0 2px rgba(70,76,86,.55),inset 0 0 22px rgba(0,0,0,.35)}
+.pray-scr::before{background:linear-gradient(180deg,rgba(3,10,14,.58) 0%,rgba(3,10,14,.12) 40%,rgba(3,10,14,.12) 60%,rgba(3,10,14,.72) 100%)!important}
+.pray-i{background:rgba(6,18,16,.5)!important;backdrop-filter:blur(3px)!important;-webkit-backdrop-filter:blur(3px)!important}
+.pray-i.on{background:#0B4A2E!important}
 </style>
 </head>
 <body>
@@ -2596,7 +2603,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-57";
+const APP_VERSION = "V-58";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
