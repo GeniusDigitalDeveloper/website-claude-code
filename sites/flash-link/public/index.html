@@ -529,6 +529,11 @@ body:not(.flow) #cbfab,body:not(.flow) #cbtip,body:not(.flow) #cbpanel{display:n
 html,body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
 .imgq{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:12px 0 0}.imgq .lsel{min-height:38px}
 .gal-meta.row .gal-name{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.2;overflow:hidden}
+.fl-bs-glass .fl-btn{background:color-mix(in srgb,var(--btn) 16%,transparent);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid color-mix(in srgb,var(--btn) 40%,transparent);color:var(--text)}
+.fl-bs-outline .fl-btn{background:transparent;border:1.6px solid var(--btn);color:var(--btn)}
+.fl-bs-outline .fl-btn:hover{background:color-mix(in srgb,var(--btn) 14%,transparent);box-shadow:none}
+.fl-bs-hard .fl-btn{border:2.5px solid var(--bd);box-shadow:4px 4px 0 var(--bd);color:var(--btnText)}
+.fl-bs-hard .fl-btn:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--bd)}
 </style>
 </head>
 <body>
@@ -566,7 +571,10 @@ const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const RESERVED = new Set(["s","admin","login","logout","dashboard","signup","register","daftar","api","app","assets","static","public","demo","flash","flashlink","flash-link","help","support","settings","terms","privacy","about","index","null","undefined","root","www","mail","staff","system","test","user","users","profile","me","home","firebase","__"]);
 const USER_RE = /^[a-z0-9_]{3,20}$/;
-const FONTS = ["Inter", "Poppins", "Space Grotesk", "Playfair Display", "Nunito", "DM Sans", "Montserrat", "Oswald", "Bebas Neue", "Lora", "Raleway", "Roboto Slab", "Pacifico"];
+const FONTS = ["Inter", "Poppins", "Space Grotesk", "Playfair Display", "Nunito", "DM Sans", "Montserrat", "Oswald", "Bebas Neue", "Lora", "Raleway", "Roboto Slab", "Pacifico", "Cormorant Garamond", "Syne", "Archivo Black", "DM Serif Display", "Sora"];
+const BSTYLES = [["solid", "Pepejal"], ["glass", "Kaca"], ["outline", "Garisan"], ["hard", "Blok (bayang keras)"]];
+const PATS = { grid: "linear-gradient(color-mix(in srgb,var(--text) 9%,transparent) 1px,transparent 1px) 0 0/30px 30px,linear-gradient(90deg,color-mix(in srgb,var(--text) 9%,transparent) 1px,transparent 1px) 0 0/30px 30px", dots: "radial-gradient(color-mix(in srgb,var(--text) 18%,transparent) 1.5px,transparent 1.7px) 0 0/22px 22px", stripes: "repeating-linear-gradient(135deg,color-mix(in srgb,var(--text) 8%,transparent) 0 2px,transparent 2px 15px)" };
+const PAT_NAMES = [["", "Tiada"], ["grid", "Grid"], ["dots", "Titik"], ["stripes", "Garis serong"]];
 const HEX = /^#[0-9a-f]{6}$/i;
 const hex = (v, d) => (HEX.test(v || "") ? v : d);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -845,6 +853,25 @@ const DESIGNS = [
   { id: "cover", n: "Foto Penuh Kaca", d: "Gambar jadi latar penuh", tpl: "dark", sty: "cover" },
   { id: "store", n: "Katalog Kedai", d: "Produk, harga dan lencana", tpl: "store" },
   { id: "mini", n: "Laman Mini", d: "Hero, servis, testimoni", tpl: "landing" },
+  { id: "t-udara", n: "Udara", d: "Kelabu cerah, butang putih", tpl: "minimal", theme: { bgType: "solid", bg1: "#E8E9EF", bg2: "#E8E9EF", text: "#111111", btn: "#FFFFFF", font: "Inter", shape: "round" } },
+  { id: "t-bintang", n: "Bintang", d: "Gelap zaitun, butang kaca", tpl: "minimal", theme: { bgType: "gradient", bg1: "#25261E", bg2: "#0B0C09", text: "#F3F3EA", btn: "#FFFFFF", font: "DM Sans", shape: "pill", bs: "glass" } },
+  { id: "t-aura", n: "Aura", d: "Krim berfon serif, kaca", tpl: "minimal", theme: { bgType: "gradient", bg1: "#DEDDD0", bg2: "#C6C5B6", text: "#2B2B26", btn: "#FFFFFF", font: "Lora", shape: "pill", bs: "glass" } },
+  { id: "t-bliss", n: "Kelabu Lembut", d: "Kelabu bergradien, serif", tpl: "minimal", theme: { bgType: "gradient", bg1: "#E9ECEE", bg2: "#AEB4B8", text: "#15181A", btn: "#FFFFFF", font: "Lora", shape: "round", bs: "glass" } },
+  { id: "t-blok", n: "Blok Ungu", d: "Ungu terang, butang blok", tpl: "minimal", theme: { bgType: "solid", bg1: "#7A1FD8", bg2: "#7A1FD8", text: "#FFFFFF", btn: "#E04BD8", bd: "#1A0A2E", font: "Poppins", shape: "square", bs: "hard" } },
+  { id: "t-mekar", n: "Mekar", d: "Wain ke ungu, butang bergaris", tpl: "minimal", theme: { bgType: "mesh", bg1: "#8A1F5C", bg2: "#3F2BB8", bg3: "#B0245E", bg4: "#2B1346", text: "#FFFFFF", btn: "#FFFFFF", font: "DM Sans", shape: "pill", bs: "outline" } },
+  { id: "t-angin", n: "Angin", d: "Merah jambu lembut, serif", tpl: "minimal", theme: { bgType: "mesh", bg1: "#F0A6D8", bg2: "#C9A6F5", bg3: "#FBC4DE", bg4: "#F6B7DA", text: "#2B1230", btn: "#FFFFFF", font: "DM Serif Display", shape: "pill", bs: "glass" } },
+  { id: "t-encore", n: "Encore", d: "Gelap hijau laut, garisan tembaga", tpl: "minimal", theme: { bgType: "gradient", bg1: "#0D1B1E", bg2: "#05090A", text: "#E9BFA9", btn: "#C98467", font: "Cormorant Garamond", shape: "square", bs: "outline" } },
+  { id: "t-grid", n: "Grid Hijau", d: "Kertas grid, butang bayang keras", tpl: "minimal", theme: { bgType: "solid", bg1: "#DDEEB0", bg2: "#DDEEB0", text: "#10150A", btn: "#FFFFFF", bd: "#10150A", font: "Archivo Black", shape: "pill", bs: "hard", pat: "grid" } },
+  { id: "t-alun", n: "Alun", d: "Gelap berwarna, kaca", tpl: "minimal", theme: { bgType: "mesh", bg1: "#FF6B35", bg2: "#2F6BFF", bg3: "#A21CAF", bg4: "#150D2B", text: "#FFFFFF", btn: "#FFFFFF", font: "Syne", shape: "pill", bs: "glass" } },
+  { id: "t-teduh", n: "Teduh", d: "Coklat muda, tenang", tpl: "minimal", theme: { bgType: "gradient", bg1: "#C3B49D", bg2: "#DDD3C3", text: "#2D251A", btn: "#EFE7DA", font: "Lora", shape: "round" } },
+  { id: "t-tasik", n: "Tasik", d: "Hampir hitam, butang gelap", tpl: "minimal", theme: { bgType: "gradient", bg1: "#14151D", bg2: "#06060A", text: "#FFFFFF", btn: "#FFFFFF", font: "Inter", shape: "pill", bs: "glass" } },
+  { id: "t-mineral", n: "Mineral", d: "Krim pic, garisan halus", tpl: "minimal", theme: { bgType: "solid", bg1: "#F8EADF", bg2: "#F8EADF", text: "#3A2A22", btn: "#8A6A57", font: "Lora", shape: "round", bs: "outline" } },
+  { id: "t-zaitun", n: "Zaitun", d: "Hijau zaitun, butang limau", tpl: "minimal", theme: { bgType: "solid", bg1: "#6C7F3B", bg2: "#6C7F3B", text: "#EAF28C", btn: "#DDEA7B", font: "Sora", shape: "pill" } },
+  { id: "t-terbit", n: "Terbit", d: "Koral berkabus, garisan putih", tpl: "minimal", theme: { bgType: "mesh", bg1: "#FF8A6B", bg2: "#F4B6C2", bg3: "#6FD3C0", bg4: "#F29A83", text: "#FFFFFF", btn: "#FFFFFF", font: "Unbounded", shape: "pill", bs: "outline" } },
+  { id: "t-peluh", n: "Peluh", d: "Biru ke magenta, butang biru", tpl: "minimal", theme: { bgType: "mesh", bg1: "#1F5BFF", bg2: "#E5309B", bg3: "#0B1020", bg4: "#10163A", text: "#FFFFFF", btn: "#4B83F0", font: "Poppins", shape: "pill" } },
+  { id: "t-senja", n: "Senja", d: "Ungu senja, butang jambu", tpl: "minimal", theme: { bgType: "mesh", bg1: "#5B3FA0", bg2: "#B14EBF", bg3: "#2E5A8A", bg4: "#3A2A6E", text: "#FFFFFF", btn: "#EDB8F4", font: "Cormorant Garamond", shape: "pill" } },
+  { id: "t-siaran", n: "Siaran", d: "Merah menyala, tajuk tebal", tpl: "minimal", theme: { bgType: "gradient", bg1: "#C1121F", bg2: "#5C040C", text: "#FFFFFF", btn: "#FFFFFF", bd: "#1A0003", font: "Bebas Neue", shape: "square", bs: "hard" } },
+  { id: "t-titik", n: "Titik Krim", d: "Krim bertitik, butang hitam", tpl: "minimal", theme: { bgType: "solid", bg1: "#F7F1E6", bg2: "#F7F1E6", text: "#1C1A16", btn: "#1C1A16", font: "Space Grotesk", shape: "pill", pat: "dots" } },
 ];
 const designTheme = d => ({ ...TPL[d.tpl].theme, ...(d.theme || {}), ov: d.ov ?? 70, auto: false });
 const mkTheme = (tpl, accent) => { const t = { ...TPL[tpl].theme, auto: true }; if (accent) { t.btn = accent; t.auto = false; if (tpl === "minimal") t.auto = false; } return t; };
@@ -904,12 +931,14 @@ function rootStyle(p) {
   const t = p.theme, btn = hex(t.btn, "#111111");
   let bg = hex(t.bg1, "#ffffff");
   if (t.bgType === "gradient") bg = `linear-gradient(160deg,${hex(t.bg1, "#05060F")},${hex(t.bg2, "#1A0A12")})`;
+  if (t.bgType === "mesh") { const a = hex(t.bg1, "#7B1E5A"), b = hex(t.bg2, "#4A2DB5"), c = hex(t.bg3, b); bg = `radial-gradient(65% 55% at 12% 10%,${a},transparent 72%),radial-gradient(60% 55% at 92% 30%,${b},transparent 72%),radial-gradient(75% 60% at 30% 98%,${c},transparent 72%),${hex(t.bg4, a)}`; }
   if (t.bgType === "image" && imgUrl(t.bgImg)) bg = `linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.5)),url('${encodeURI(imgUrl(t.bgImg)).replace(/'/g, "%27")}') center/cover`;
   const font = FONTS.includes(t.font) ? t.font : "Inter";
   let extra = "";
   if (p.template !== "landing" && p.profileStyle === "cover" && imgUrl(p.avatarUrl)) { bg = `linear-gradient(rgba(4,5,12,.4),rgba(4,5,12,.9)),url('${encodeURI(imgUrl(p.avatarUrl)).replace(/'/g, "%27")}') center top/cover`; extra = ";--text:#FFFFFF"; }
+  if (PATS[t.pat] && t.bgType !== "image") bg = PATS[t.pat] + "," + bg;
   const ovc = hex(t.bgType === "gradient" ? t.bg2 : t.bg1, "#000000"), ov = Math.max(0, Math.min(100, Number(t.ov ?? 70)));
-  return `--bgcss:${bg};--text:${hex(t.text, "#111111")};--btn:${btn};--btnText:${onColor(btn)};--r:${SHAPES[t.shape] || "16px"};--font:'${font}';--ovc:${ovc};--ovp:${ov}%;--ovt:${onColor(ovc)};--sz:${({ s: .86, m: 1, l: 1.22 })[t.sz] || 1};--fs:${({ s: .92, m: 1, l: 1.12 })[t.fs] || 1}${extra}`;
+  return `--bgcss:${bg};--text:${hex(t.text, "#111111")};--btn:${btn};--btnText:${onColor(btn)};--r:${SHAPES[t.shape] || "16px"};--font:'${font}';--ovc:${ovc};--ovp:${ov}%;--ovt:${onColor(ovc)};--bd:${hex(t.bd, "#111111")};--sz:${({ s: .86, m: 1, l: 1.22 })[t.sz] || 1};--fs:${({ s: .92, m: 1, l: 1.12 })[t.fs] || 1}${extra}`;
 }
 function socialHtml(p) {
   const items = (p.socialIcons || []).map(s => ({ s, href: socialHref(s.type, s.url) })).filter(x => x.href && BRANDS[x.s.type]);
@@ -1026,9 +1055,9 @@ function renderProfile(p, links, { preview = false, anim = true } = {}) {
       (tests.length ? `<h2 class="fl-sec">Kata pelanggan</h2>` + tests.map((x, i) => Wi(i, `<div class="fl-card fl-quote">“${esc(x.text)}”<small>— ${esc(x.name || "Pelanggan")}</small></div>`)).join("") : "") +
       (forms.length ? `<h2 class="fl-sec">Tempahan</h2>` + forms.map(formHtml).join("") : "") +
       (cta ? `<a class="fl-btn" style="margin-top:8px" ${linkAttrs(cta)}>${ic("whatsapp")}<span class="fl-t">Hubungi sekarang</span></a>` : "");
-    return `<div class="fl-root fl-tpl-landing ${t.auto ? "fl-auto" : ""} ${anim ? "" : "fl-noanim"}" style="${esc(rootStyle(p))}"><div class="fl-wrap">${banner}${body}${foot}</div></div>`;
+    return `<div class="fl-root fl-tpl-landing fl-bs-${BSTYLES.some(x => x[0] === t.bs) ? t.bs : "solid"} ${t.auto ? "fl-auto" : ""} ${anim ? "" : "fl-noanim"}" style="${esc(rootStyle(p))}"><div class="fl-wrap">${banner}${body}${foot}</div></div>`;
   } else body = act.map((l, i) => Wi(i, blockHtml(l))).join("");
-  return `<div class="fl-root fl-tpl-${tpl} fl-sty-${sty} ${t.auto && sty !== "cover" ? "fl-auto" : ""} ${anim ? "" : "fl-noanim"}" style="${esc(rootStyle(p))}"><div class="fl-wrap">${banner}${head}<div style="height:6px"></div>${body}${foot}</div></div>`;
+  return `<div class="fl-root fl-tpl-${tpl} fl-sty-${sty} fl-bs-${BSTYLES.some(x => x[0] === t.bs) ? t.bs : "solid"} ${t.auto && sty !== "cover" ? "fl-auto" : ""} ${anim ? "" : "fl-noanim"}" style="${esc(rootStyle(p))}"><div class="fl-wrap">${banner}${head}<div style="height:6px"></div>${body}${foot}</div></div>`;
 }
 function tileProduct(l) { return productHtml(l); }
 function blockHtml(l) {
@@ -1536,10 +1565,11 @@ function editDesign() {
     <div class="edsec"><h3>Gambar (boleh laras / crop)</h3>${imgFieldHtml("ed-av", "Gambar profil / hero", "round")}${imgFieldHtml("ed-bn", "Banner", "wide")}</div>
     <div class="edsec"><h3>Susun atur</h3><select id="ed-tpl" class="inp" aria-label="Susun atur">${Object.entries(TPL).map(([k, x]) => `<option value="${k}" ${p.template === k ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select></div>
     <div class="edsec" id="ed-stysec"><h3>Gaya kepala profil</h3><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px">${STYLES.map(([k, n, d]) => `<button type="button" class="stybtn" data-s="${k}" aria-pressed="${(p.profileStyle || "classic") === k}"><span class="stymini sty-${k}"><i></i><b></b></span><span style="font-weight:700;font-size:13px">${n}</span></button>`).join("")}</div></div>
-    <div class="edsec"><h3>Warna & latar</h3><label class="lbl" for="ed-bt">Latar belakang</label><select id="ed-bt" class="inp"><option value="solid">Warna penuh</option><option value="gradient">Gradien</option><option value="image">Gambar</option></select>
-      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px">${col("ed-c1", "Warna latar 1", t.bg1)}${col("ed-c2", "Warna latar 2", t.bg2)}${col("ed-ct", "Warna tulisan", t.text)}${col("ed-cb", "Warna butang / aksen", t.btn)}</div>
+    <div class="edsec"><h3>Warna & latar</h3><label class="lbl" for="ed-bt">Latar belakang</label><select id="ed-bt" class="inp"><option value="solid">Warna penuh</option><option value="gradient">Gradien</option><option value="mesh">Gradien lembut (mesh)</option><option value="image">Gambar</option></select>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px">${col("ed-c1", "Warna latar 1", t.bg1)}${col("ed-c2", "Warna latar 2", t.bg2)}${col("ed-c3", "Warna latar 3 (mesh)", t.bg3 || t.bg2)}${col("ed-ct", "Warna tulisan", t.text)}${col("ed-cb", "Warna butang / aksen", t.btn)}</div>
       <div id="ed-bgi" style="${t.bgType === "image" ? "" : "display:none"}">${imgFieldHtml("ed-bg", "Gambar latar", "round")}</div><div id="ed-ctr" class="err"></div>
       <label class="lbl" for="ed-ov" style="margin-top:12px">Overlay gambar: <b id="ed-ovv">${Math.round(t.ov ?? 70)}%</b> <span style="font-weight:400;color:#9CA3AF">(warna ikut latar)</span></label><input id="ed-ov" type="range" min="0" max="100" step="5" value="${Math.round(t.ov ?? 70)}" style="width:100%;accent-color:#FF4D4D"></div>
+    <div class="edsec"><h3>Corak & gaya butang</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">${sel("ed-pat", "Corak latar", PAT_NAMES, t.pat || "")}${sel("ed-bs", "Gaya butang", BSTYLES, t.bs || "solid")}</div><p class="hint" style="margin:8px 0 0">Gaya butang terpakai pada susun atur senarai (Minimalis, Gelap dan Laman Mini).</p></div>
     <div class="edsec"><h3>Tulisan & saiz</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">${sel("ed-ft", "Jenis tulisan", FONTS.map(f => [f, f]), t.font)}${sel("ed-fs", "Saiz tulisan", [["s", "Kecil"], ["m", "Sederhana"], ["l", "Besar"]], t.fs || "m")}${sel("ed-sh", "Bentuk butang", [["pill", "Kapsul"], ["round", "Bulat sudut"], ["square", "Segi empat"]], t.shape || "pill")}${sel("ed-sz", "Saiz kad pautan", [["s", "Kecil"], ["m", "Sederhana"], ["l", "Besar"]], t.sz || "m")}</div></div>
     <button class="btn btn-red" id="ed-done" style="width:100%;min-height:50px;margin-top:18px">Siap</button>`, null, { side: true, cls: "wide" });
   const $e = id => $("#" + id, m);
@@ -1555,9 +1585,9 @@ function editDesign() {
   $e("ed-stysec").style.opacity = p.template === "poster" || p.template === "landing" ? ".4" : "1";
   $$(".stybtn", m).forEach(b => (b.onclick = () => { S.profile.profileStyle = b.dataset.s; $$(".stybtn", m).forEach(x => x.setAttribute("aria-pressed", x === b)); commit(); }));
   $e("ed-bt").onchange = e => { S.profile.theme.bgType = e.target.value; $e("ed-bgi").style.display = e.target.value === "image" ? "" : "none"; commit(); };
-  [["ed-c1", "bg1"], ["ed-c2", "bg2"], ["ed-ct", "text"], ["ed-cb", "btn"]].forEach(([id, k]) => ($e(id).oninput = e => { S.profile.theme[k] = e.target.value; commit(); }));
+  [["ed-c1", "bg1"], ["ed-c2", "bg2"], ["ed-c3", "bg3"], ["ed-ct", "text"], ["ed-cb", "btn"]].forEach(([id, k]) => ($e(id).oninput = e => { S.profile.theme[k] = e.target.value; commit(); }));
   $e("ed-ov").oninput = e => { S.profile.theme.ov = +e.target.value; $e("ed-ovv").textContent = e.target.value + "%"; commit(); };
-  [["ed-ft", "font"], ["ed-fs", "fs"], ["ed-sh", "shape"], ["ed-sz", "sz"]].forEach(([id, k]) => ($e(id).onchange = e => { S.profile.theme[k] = e.target.value; commit(); }));
+  [["ed-ft", "font"], ["ed-fs", "fs"], ["ed-sh", "shape"], ["ed-sz", "sz"], ["ed-pat", "pat"], ["ed-bs", "bs"]].forEach(([id, k]) => ($e(id).onchange = e => { S.profile.theme[k] = e.target.value; commit(); }));
   $e("ed-done").onclick = () => m.close(); check();
   const mo = new MutationObserver(() => { if (!document.body.contains(m)) { mo.disconnect(); if (S.view === "design") designTab(); } }); mo.observe(document.body, { childList: true });
 }
@@ -2051,7 +2081,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-42";
+const APP_VERSION = "V-43";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
