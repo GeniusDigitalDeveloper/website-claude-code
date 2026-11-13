@@ -90,8 +90,6 @@ select.inp option{color:#111}
 .sortable-ghost{opacity:.35}
 .bar{background:linear-gradient(180deg,#FF4D4D,#B80000);border-radius:6px 6px 0 0;min-height:2px}
 
-#sfxbtn{position:fixed;left:14px;bottom:14px;z-index:60;width:42px;height:42px;border-radius:50%;display:none;place-items:center;color:#E5E7EB;background:rgba(16,16,21,.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);transition:transform .3s var(--ease,ease),border-color .3s}
-#sfxbtn.on{display:grid}#sfxbtn:hover{transform:scale(1.08);border-color:#FF6B6B}#sfxbtn:active{transform:scale(.94)}
 /* ============ LATAR GRADIEN MERAH + BIRU CERAH (bergerak kiri-kanan) ============ */
 #bgflow{position:fixed;inset:0;z-index:-1;overflow:hidden;display:none;pointer-events:none;background:#05060B}
 body.flow #bgflow{display:block}
@@ -120,7 +118,11 @@ body.flow #bgflow{display:block}
 /* ============ LOG MASUK: mata, animasi berjaya, goncang ============ */
 .backarrow{position:fixed;top:14px;left:14px;z-index:60;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#fff;background:rgba(16,16,21,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);transition:transform .35s var(--ease),border-color .25s,background .25s}
 .backarrow:hover{transform:translate3d(-3px,0,0);border-color:#7DD3FC;background:rgba(56,189,248,.16)}.backarrow:active{transform:scale(.92)}
-.spinning svg{animation:rot .8s linear infinite}
+.btn-yellow{background:linear-gradient(135deg,#FFE066,#F5A100);color:#1A1200;box-shadow:0 8px 26px -8px rgba(255,200,40,.85);animation:updpulse 2.2s ease-in-out infinite}
+.btn-yellow:hover{box-shadow:0 10px 34px -6px rgba(255,210,60,1)}
+@keyframes updpulse{50%{transform:scale(1.05)}}
+#updfix{position:fixed;top:14px;right:14px;z-index:70}
+@media (prefers-reduced-motion:reduce){.btn-yellow{animation:none}}
 .pwwrap{position:relative}.pwwrap .inp{padding-right:52px}
 .eye{position:absolute;right:5px;top:50%;margin-top:-20px;width:40px;height:40px;display:grid;place-items:center;color:#C7C9D1;border-radius:10px;transition:color .2s,transform .2s}.eye:hover{color:#fff}.eye:active{transform:scale(.88)}
 .okfx{position:fixed;inset:0;z-index:120;display:grid;place-items:center;background:rgba(5,6,11,.74);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);animation:okin .35s var(--ease) both}
@@ -186,7 +188,7 @@ body.flow #bgflow{display:block}
 .b3-c{flex-direction:column;gap:2px;text-align:center}
 .b3-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(17px,2vw,28px);line-height:1.15}
 .b3-r span{font-size:13px;color:#E5E7EB;font-weight:600}
-@media(max-width:760px){.b3-in{grid-template-columns:1fr auto}.b3-l,.b3-c small,.b3-r span{display:none}.b3-c{border-left:0!important}.b3-zone{padding:0 14px}.b3-title{font-size:17px}}
+@media(max-width:760px){.b3-in{grid-template-columns:1fr}.b3-l,.b3-r,.b3-c small{display:none}.b3-c{border-left:0!important}.b3-zone{padding:0 14px}.b3-title{font-size:17px}}
 /* ============ DASHBOARD V22 ============ */
 :root{--ease:cubic-bezier(.32,.72,0,1)}
 .dcard{position:relative;display:flex;flex-direction:column;gap:10px;text-align:left;width:100%;padding:20px;border-radius:22px;color:#fff;overflow:hidden;
@@ -691,7 +693,7 @@ function siteFooter(withStats = true) {
     <p style="margin:0;font-size:clamp(10px,3.05vw,13.5px);font-weight:700;line-height:1.6;white-space:nowrap;background:linear-gradient(90deg,#E5E7EB 0%,#FF9A9A 35%,#FF4D4D 75%,#FF3B3B 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent">Hak Cipta Terpelihara Genius Digital | Flash Link 2026</p>
     <div role="separator" style="height:1px;width:min(100%,360px);margin:10px auto;background:#4B5563"></div>
     <p style="margin:0 auto;max-width:560px;font-size:13.5px;font-weight:600;line-height:1.6;background:linear-gradient(90deg,#E5E7EB 0%,#FF9A9A 35%,#FF4D4D 75%,#FF3B3B 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent">Memacu Inovasi Digital Melalui Sistem Pintar, Kreatif dan Efisien.</p>
-    <p style="margin:12px 0 0;font-size:12px;color:#9CA3AF">Versi ${APP_VERSION} · <button type="button" data-upd style="text-decoration:underline;color:#7DD3FC;min-height:28px">Semak kemas kini</button></p></footer>`;
+    <p style="margin:12px 0 0;font-size:12px;color:#9CA3AF">Versi ${APP_VERSION}</p></footer>`;
 }
 function fillStat() {
   statOff.forEach(f => { try { f(); } catch {} }); statOff = []; clearTimeout(statTimer);
@@ -742,11 +744,11 @@ function landing() {
   <div class="fl-banner3" role="region" aria-label="Promosi Flash Link"><div class="b3-bg" aria-hidden="true"></div><div class="b3-in">
     <div class="b3-zone b3-l">${ic("zap", "w-7 h-7")}<span><b>Setup 2 minit</b><small>Tanpa kod, terus guna</small></span></div>
     <div class="b3-zone b3-c"><span class="b3-title gradtxt">Satu pautan. Semua jualan.</span><small>WhatsApp · Shopee · TikTok Shop · YouTube</small></div>
-    <div class="b3-zone b3-r"><span>Sentiasa dikemas kini</span><a class="btn btn-red btn-sm" href="${go}" data-nav>Mula sekarang</a></div>
+    <div class="b3-zone b3-r"><span>Sentiasa dikemas kini</span></div>
   </div></div>
   <header class="container" style="display:flex;align-items:center;justify-content:space-between;height:68px;position:relative;z-index:5">
     <a href="/" data-nav aria-label="Flash Link"><img src="/assets/logo.png" alt="Flash Link" width="132" height="66" style="height:44px;width:auto"></a>
-    <nav style="display:flex;gap:8px"><button class="btn btn-ghost btn-sm" data-upd aria-label="Semak kemas kini">${ic("refresh", "w-4 h-4")}<span class="hidden sm:inline">Kemas kini</span></button><a class="btn btn-red btn-sm" href="${go}" data-nav>Mula sekarang</a></nav>
+    <nav style="display:flex;gap:8px"><a class="btn btn-red btn-sm" href="${go}" data-nav>Mula sekarang</a></nav>
   </header>
   <main>
   <section style="position:relative;padding:40px 0 72px">
@@ -984,7 +986,7 @@ let navBusy = false;
 function dashboard() {
   const url = profileUrl(S.profile.username);
   $("#app").innerHTML = `<header style="position:sticky;top:0;z-index:30;background:rgba(7,7,10,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)"><div class="container" style="display:flex;align-items:center;justify-content:space-between;height:60px;gap:8px">
-    <button id="hm" aria-label="Dashboard utama"><img src="/assets/logo.png" alt="Flash Link" width="110" height="55" style="height:38px;width:auto"></button><div style="display:flex;gap:8px"><a class="btn btn-ghost btn-sm" href="${esc(url)}" target="_blank" rel="noopener" aria-label="Buka halaman awam">${ic("ext", "w-4 h-4")}<span class="hidden sm:inline">Halaman saya</span></a><button id="cp" class="btn btn-red btn-sm" aria-label="Salin pautan">${ic("copy", "w-4 h-4")}<span class="hidden sm:inline">Salin</span></button><button class="btn btn-ghost btn-sm" data-upd aria-label="Semak kemas kini">${ic("refresh", "w-4 h-4")}<span class="hidden sm:inline">Kemas kini</span></button><a id="gohome" class="btn btn-ghost btn-sm" href="/" data-nav aria-label="Laman utama">${ic("home", "w-4 h-4")}<span class="hidden sm:inline">Laman utama</span></a><button id="lo" class="btn btn-ghost btn-sm" aria-label="Log keluar">${ic("logout", "w-4 h-4")}</button></div></div></header>
+    <button id="hm" aria-label="Dashboard utama"><img src="/assets/logo.png" alt="Flash Link" width="110" height="55" style="height:38px;width:auto"></button><div id="dhead-actions" style="display:flex;gap:8px"><a class="btn btn-ghost btn-sm" href="${esc(url)}" target="_blank" rel="noopener" aria-label="Buka halaman awam">${ic("ext", "w-4 h-4")}<span class="hidden sm:inline">Halaman saya</span></a><button id="cp" class="btn btn-red btn-sm" aria-label="Salin pautan">${ic("copy", "w-4 h-4")}<span class="hidden sm:inline">Salin</span></button><a id="gohome" class="btn btn-ghost btn-sm" href="/" data-nav aria-label="Laman utama">${ic("home", "w-4 h-4")}<span class="hidden sm:inline">Laman utama</span></a><button id="lo" class="btn btn-ghost btn-sm" aria-label="Log keluar">${ic("logout", "w-4 h-4")}</button></div></div></header>
   <div class="container" id="stage" style="padding-top:22px;padding-bottom:96px;position:relative;min-height:70vh"></div>
   <button id="pvb" class="btn btn-red pvfab">${ic("phone", "w-5 h-5")} Pratonton</button>
   ${siteFooter(false)}`;
@@ -1282,7 +1284,7 @@ async function statsTab(part = "stats") {
    Pelayar hanya benarkan bunyi selepas pelawat menyentuh skrin. */
 const SFX = {
   ctx: null, master: null, mus: null, scope: false, last: null, lastPop: 0,
-  get muted() { try { return localStorage.getItem("fl_sfx") === "0"; } catch { return false; } },
+  muted: false,
   init() {
     if (this.ctx) return true;
     const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false;
@@ -1308,14 +1310,7 @@ function sfxUnlock() {
   if (!SFX.scope || !SFX.init()) return Promise.resolve(false);
   return SFX.ctx.resume().then(() => SFX.ctx.state === "running", () => false);
 }
-function sfxScope(on) {
-  SFX.scope = on;
-  let b = $("#sfxbtn");
-  if (!b) { b = document.createElement("button"); b.id = "sfxbtn"; document.body.appendChild(b); b.onclick = () => { const m = !SFX.muted; try { localStorage.setItem("fl_sfx", m ? "0" : "1"); } catch {} sfxIcon(); if (!m) sfxUnlock().then(() => SFX.click()); }; }
-  b.classList.toggle("on", on);
-  if (on) { sfxIcon(); if (!SFX.muted) sfxUnlock(); }
-}
-function sfxIcon() { const b = $("#sfxbtn"), m = SFX.muted; b.innerHTML = ic(m ? "mute" : "vol", "w-5 h-5"); b.setAttribute("aria-label", m ? "Hidupkan bunyi" : "Matikan bunyi"); b.setAttribute("aria-pressed", String(!m)); }
+function sfxScope(on) { SFX.scope = on; if (on) sfxUnlock(); }
 const SFX_SEL = "a.btn,button.btn,a[data-nav],.chip,.ptile,.dcard";
 ["pointerdown", "touchend", "keydown", "click"].forEach(ev => addEventListener(ev, e => {
   if (!SFX.scope) return;
@@ -1330,44 +1325,46 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-27";
+const APP_VERSION = "V-29";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
 function hardReload() { try { navigator.serviceWorker?.getRegistrations?.().then(rs => rs.forEach(r => r.unregister())); } catch {} location.reload(); }
-function showUpdateBar(j) {
-  const old = $("#updbar"); if (old) { if (old.dataset.v === j.version) return; old.remove(); }
-  const d = document.createElement("div"); d.id = "updbar"; d.dataset.v = j.version; d.setAttribute("role", "status");
-  d.innerHTML = `<span><b>Versi baharu ${esc(j.version)} tersedia</b>${j.notes ? `<small>${esc(j.notes)}</small>` : ""}${IS_CENTRAL ? "" : "<small>Muat turun ZIP terbaru dan deploy semula.</small>"}</span><button id="updgo" class="btn btn-red btn-sm">${IS_CENTRAL ? "Kemas kini sekarang" : "Muat turun kemas kini"}</button>`;
-  document.body.appendChild(d); $("#updgo").onclick = () => (IS_CENTRAL ? hardReload() : window.open(ZIP_URL, "_blank", "noopener"));
+/* Butang Kemas kini (kuning): hanya wujud bila ada versi baharu; hilang selepas dikemas kini. Diletak di kanan "Mula sekarang". */
+const verNum = v => parseInt(String(v || "").replace(/\D/g, ""), 10) || 0;
+const isNewer = v => verNum(v) > verNum(APP_VERSION);
+let UPD = null;
+function setUpdate(j) { UPD = j; renderUpdateBtn(); }
+function renderUpdateBtn() {
+  $("#updbtn")?.remove(); $("#updfix")?.remove();
+  if (!UPD || !document.body.classList.contains("flow")) return;
+  const b = document.createElement("button"); b.id = "updbtn"; b.type = "button"; b.className = "btn btn-yellow btn-sm";
+  b.title = UPD.notes || ("Versi " + UPD.version); b.setAttribute("aria-label", "Kemas kini ke versi " + UPD.version);
+  b.innerHTML = `${ic("refresh", "w-4 h-4")}<span class="hidden sm:inline">Kemas kini</span>`;
+  b.onclick = () => (IS_CENTRAL ? hardReload() : window.open(ZIP_URL, "_blank", "noopener"));
+  const host = $("header nav") || $("#dhead-actions");
+  if (host) host.appendChild(b); else { const d = document.createElement("div"); d.id = "updfix"; d.appendChild(b); document.body.appendChild(d); }
 }
 let LATEST = { version: "", notes: "" };
-function announceCheck() { if (LATEST.version && LATEST.version !== APP_VERSION && document.body.classList.contains("flow")) showUpdateBar(LATEST); }
+function announceCheck() {
+  if (!LATEST.version) return;
+  if (isNewer(LATEST.version)) setUpdate({ ...LATEST }); else if (UPD) setUpdate(null);
+}
 function watchVersion() {
   if (!rtdb) return; const R = FB.rt;
   try {
-    R.onValue(R.ref(rtdb, "flashlink/stats/versionNotes"), s => { LATEST.notes = s.val() || ""; }, () => {});
+    R.onValue(R.ref(rtdb, "flashlink/stats/versionNotes"), s => { LATEST.notes = s.val() || ""; if (UPD) { UPD.notes = LATEST.notes; $("#updbtn") && ($("#updbtn").title = LATEST.notes); } }, () => {});
     R.onValue(R.ref(rtdb, "flashlink/stats/version"), s => { LATEST.version = s.val() || ""; announceCheck(); }, () => {}); // masa nyata
   } catch {}
 }
 let lastUpd = 0;
 async function checkUpdate(force) {
-  if (!document.body.classList.contains("flow")) return; // bukan halaman profil awam pelawat
-  announceCheck();
+  if (!document.body.classList.contains("flow")) return;
   if (!force && Date.now() - lastUpd < 20000) return; lastUpd = Date.now();
-  try { const j = await fetchLatest(); if (j.version && j.version !== APP_VERSION) showUpdateBar(j); } catch {}
+  try { const j = await fetchLatest(); if (j.version && isNewer(j.version)) setUpdate(j); } catch {}
 }
-async function manualUpdate(btn) {
-  if (btn) btn.classList.add("spinning"); toast("Menyemak kemas kini…");
-  try {
-    const j = await fetchLatest();
-    if (j.version && j.version !== APP_VERSION) { if (IS_CENTRAL) { toast("Versi " + j.version + " ditemui. Mengemas kini…"); await sleep(800); hardReload(); return; } showUpdateBar(j); }
-    else toast("Anda sudah menggunakan versi terkini (" + APP_VERSION + ") ✓");
-  } catch { toast("Tak dapat semak kemas kini. Semak sambungan internet.", "bad"); }
-  if (btn) btn.classList.remove("spinning");
-}
-document.addEventListener("click", e => { const b = e.target.closest("[data-upd]"); if (b) manualUpdate(b); });
 setInterval(() => checkUpdate(true), 45000); document.addEventListener("visibilitychange", () => !document.hidden && checkUpdate(true)); addEventListener("focus", () => checkUpdate());
+new MutationObserver(() => renderUpdateBtn()).observe($("#app"), { childList: true });
 
 /* ---------- Router ---------- *//* ---------- Router ---------- */
 function nav(path, replace) { replace ? history.replaceState({}, "", path) : history.pushState({}, "", path); route(true); window.scrollTo(0, 0); }
