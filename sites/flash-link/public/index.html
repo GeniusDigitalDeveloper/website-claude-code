@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" href="/assets/icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;700&family=Dancing+Script:wght@600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
 tailwind.config = { theme: { extend: { fontFamily: { display: ['"Space Grotesk"','sans-serif'], sans: ['"DM Sans"','system-ui','sans-serif'] },
@@ -689,18 +689,154 @@ html,body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;t
 .fx-rip{position:fixed;width:88px;height:88px;border-radius:50%;border:2px solid rgba(147,197,253,.9);box-shadow:0 0 18px rgba(96,165,250,.5),inset 0 0 14px rgba(147,197,253,.35);pointer-events:none;z-index:9999;will-change:transform,opacity}
 .fx-star{position:fixed;font-size:15px;line-height:1;color:#BFDBFE;text-shadow:0 0 8px rgba(147,197,253,.9);pointer-events:none;z-index:9999;will-change:transform,opacity}
 .gal-act .btn-red,.gal-act .btn[disabled]{flex:1 1 100%}
-/* ===== waktu solat ===== */
-.pray-card{max-width:900px;margin:0 auto;border-radius:26px;padding:22px;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid rgba(232,196,104,.3);box-shadow:0 30px 70px -40px rgba(232,196,104,.35)}
-.pray-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}.pray-t{font-size:22px;font-weight:700}.pray-z{font-size:13px;color:#C7C9D1;margin-top:2px}
-.pray-now{margin:16px 0;padding:14px 16px;border-radius:18px;background:rgba(232,196,104,.08);border:1px solid rgba(232,196,104,.25);display:flex;gap:6px 16px;align-items:center;justify-content:space-between;flex-wrap:wrap}.pray-now small{color:#C7C9D1;display:block}.pray-now b{font-size:20px;color:#F6E7B8}.pray-now .pn-c{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* ===== V-52: tema cerah untuk laman app (body.flow). Laman awam pengguna tidak terjejas ===== */
+body.flow{--ink:#EDF3FB;--line:rgba(22,46,82,.17);--ac:#D10F0A;--act:#FFE9E7;--tx:#15294B;--tm:#34496D;color:var(--tx);background:var(--ink)}
+body.flow #bgflow{background:#F3F7FD}
+body.flow #bgflow .bg-grid{background:radial-gradient(46% 36% at 14% 8%,color-mix(in srgb,var(--ac) 17%,transparent),transparent 70%),radial-gradient(40% 32% at 90% 18%,rgba(56,140,248,.18),transparent 70%),radial-gradient(52% 40% at 52% 104%,color-mix(in srgb,var(--ac) 13%,transparent),transparent 70%);-webkit-mask-image:none;mask-image:none}
+body.flow #bgflow .bg-vig,body.flow .aurora{display:none}
+body[data-s=design]{--acd:#B50D08;--ac:#D10F0A;--act:#FFE9E7}
+body[data-s=links]{--acd:#1757BF;--ac:#1D6FE8;--act:#E2EDFF}
+body[data-s=profile]{--acd:#6A32C8;--ac:#7A3FE0;--act:#EFE6FF}
+body[data-s=insights]{--acd:#086A61;--ac:#0A7D73;--act:#DAF3EF}
+body[data-s=leads]{--acd:#A5470A;--ac:#C2540A;--act:#FFEBD8}
+body[data-s=short]{--acd:#0F6B35;--ac:#137A3E;--act:#DDF4E6}
+body[data-s=schedule]{--acd:#A82050;--ac:#C42A60;--act:#FFE2EC}
+body.flow .hint,body.flow .lbl{color:var(--tm)}
+body.flow .lbl{font-weight:700}
+body.flow .ok{color:#047857}body.flow .err{color:#B91C1C}
+body.flow .glass{background:rgba(255,255,255,.88);backdrop-filter:none;-webkit-backdrop-filter:none;border:1px solid color-mix(in srgb,var(--ac) 22%,var(--line));box-shadow:0 14px 34px -24px rgba(21,41,75,.5)}
+body.flow .btn-red{background:var(--ac);color:#fff;box-shadow:0 10px 24px -12px var(--ac)}
+body.flow .btn-ghost,body.flow .chip,body.flow .lsel,body.flow .sc-net,body.flow .pc-net{background:#fff;color:var(--tx);border-color:var(--line)}
+body.flow .btn-ghost:hover,body.flow .chip:hover{background:var(--act)}
+body.flow .inp{background:#fff;color:var(--tx);border-color:rgba(22,46,82,.3)}
+body.flow .inp::placeholder{color:#5C6E8E}
+body.flow .inp:focus{border-color:var(--ac);outline:2px solid color-mix(in srgb,var(--ac) 30%,transparent)}
+body.flow select.inp option,body.flow .lsel option{background:#fff;color:#15294B}
+body.flow .gradtxt{background:linear-gradient(90deg,#15294B,#D10F0A 72%);-webkit-background-clip:text;background-clip:text;color:transparent}
+body.flow .tabbtn{color:var(--tm)}body.flow .tabbtn[aria-selected=true]{color:var(--ac);border-color:var(--ac)}
+body.flow .dtop{background:rgba(255,255,255,.9);border-bottom-color:var(--line)}
+body.flow .dnav{background:rgba(255,255,255,.92);border-color:var(--line)}
+body.flow .dnav-i{color:var(--tm)}body.flow .dnav-i:hover{color:var(--ac)}
+body.flow .dnav-i[aria-current=page]{color:var(--acd,#B50D08);background:var(--act);border-color:color-mix(in srgb,var(--ac) 45%,transparent)}
+body.flow .dtile{background:var(--ac);box-shadow:0 10px 22px -12px var(--ac)}
+body.flow #sec h1{color:var(--tx)}
+body.flow .seg{background:#fff}body.flow .seg button{color:var(--tm)}body.flow .seg [aria-selected=true]{background:var(--ac);color:#fff}
+body.flow .gal-card{background:#fff;color:var(--tx)}body.flow .gal-card.on{border-color:var(--ac);box-shadow:0 0 0 2px color-mix(in srgb,var(--ac) 30%,transparent)}
+body.flow .addnew,body.flow .addnew small{color:var(--tm)}
+body.flow .modal{background:#fff;color:var(--tx);border-color:var(--line)}body.flow .modal-bg{background:rgba(20,34,60,.45)}
+body.flow .toast{background:#fff;color:var(--tx);box-shadow:0 14px 40px rgba(21,41,75,.3)}
+body.flow .stybtn,body.flow .ptile{background:#fff;color:var(--tx)}
+body.flow .ptile:hover{background:var(--act);border-color:var(--ac)}
+body.flow .slink,body.flow .linkbtn,body.flow .pl-more{color:#0B55C4}
+body.flow .eye,body.flow .grip,body.flow .orline,body.flow .sc-h,body.flow .pl-hr,body.flow .pl-wd,body.flow .pl-add{color:var(--tm)}
+body.flow .eye:hover{color:var(--ac)}
+body.flow .backarrow{background:rgba(255,255,255,.92);color:var(--tx)}
+body.flow .vbadge{background:#FDE2E0;border-color:#F5A3A0;color:#9B1111}
+body.flow .meter{background:rgba(22,46,82,.12)}
+body.flow .sc-clock,body.flow .sc-info ul,body.flow .pl-legend{color:var(--tm)}body.flow .sc-clock b{color:var(--tx)}
+body.flow .sc-c{color:var(--tx);background:#fff}
+body.flow .pl-month,body.flow .pl-week,body.flow .txrow{background:#fff}
+body.flow .pl-cell.e{background:rgba(22,46,82,.05)}body.flow .pl-wh{background:#fff}body.flow .pl-slot:hover,body.flow .rowlk:hover{background:var(--act)}
+body.flow .dlt.up{background:#D7F5E4;color:#065F46}
+body.flow .bar.blue{background:linear-gradient(180deg,#38A3FA,#0B55C4)}
+body.flow .imgf-p{background:#fff}
+body.flow .dcard{color:var(--tx)}
+body.flow .pvfab{box-shadow:0 10px 28px rgba(21,41,75,.35)}
+html:has(body.flow){scrollbar-color:#6B8BC4 #E5ECF7}
+body.flow ::-webkit-scrollbar-track{background:#E5ECF7}body.flow ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#7FA0DA,#5C86CF);border:2px solid #E5ECF7}
+body.flow .lbl+.hint{color:var(--tm)}
+/* banner & penutup laman utama */
+body.flow .fl-banner3{background:#fff;border-bottom:1px solid var(--line);color:var(--tx)}
+body.flow .b3-bg{background:linear-gradient(100deg,#FFE9E7,#fff 40%,#E3EEFF)}body.flow .b3-bg::after{display:none}
+body.flow .b3-zone+.b3-zone{border-left-color:var(--line)}
+body.flow .b3-zone small{color:var(--tm)}body.flow .b3-l b{color:var(--tx)}body.flow .b3-r span,body.flow .b3-note{color:var(--tm)}body.flow .b3-sep{background:var(--line)}
+body.flow .fl-clock,body.flow .fl-clock b{color:var(--tx)}body.flow .fl-clock .ck-d{color:var(--tm)}
+body.flow footer{border-top-color:var(--line)!important}
+body.flow footer [style*="color:#fff"]{color:var(--tx)!important}
+body.flow footer [style*="color:#9CA3AF"]{color:var(--tm)!important}
+body.flow footer [style*="#FF6B6B"],body.flow footer [style*="#FF8A8A"],body.flow footer [style*="#FF4D4D"]{color:#B00D08!important}
+body.flow #updbar{background:#fff;color:var(--tx);border-color:var(--line)}body.flow #updbar small{color:var(--tm)}
+/* chatbot */
+body.flow #cbpanel{background:#fff;color:var(--tx);border-color:var(--line)}
+body.flow #cbpanel header{background:linear-gradient(100deg,#FFE9E7,#E3EEFF)}body.flow #cbpanel header small{color:var(--tm)}body.flow #cbpanel header button{color:var(--tx)}
+body.flow .cbm.bot{background:#EAF0FA;color:var(--tx)}
+body.flow #cbtip{background:#fff;color:var(--tx)}
+body.flow [style*="color:#9CA3AF"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#3E5276!important}
+body.flow [style*="color:#C7C9D1"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#2F4468!important}
+body.flow [style*="color:#D1D5DB"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#2F4468!important}
+body.flow [style*="color:#E5E7EB"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#2F4468!important}
+body.flow [style*="color:#fff"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#15294B!important}
+body.flow [style*="color:#FFFFFF"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#15294B!important}
+body.flow [style*="color:#F4F4F5"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#15294B!important}
+body.flow [style*="color:#7DD3FC"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#0B5FA8!important}
+body.flow [style*="color:#6EE7A8"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#047857!important}
+body.flow [style*="color:#FFD166"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#8A4B04!important}
+body.flow [style*="color:#FF8A8A"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#B42318!important}
+body.flow [style*="color:#FF6B6B"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#B42318!important}
+body.flow [style*="color:#FFB4B4"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#9B1111!important}
+body.flow [style*="color:#FCA5A5"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#B42318!important}
+body.flow [style*="background:rgba(56,189,248,.16)"]:not(.devs *){background:#DCEBFF!important}
+
+/* ===== waktu solat: TV pintar ===== */
+.pray-card{max-width:940px;margin:0 auto}
+.pray-tv{position:relative;padding:16px;border-radius:30px;background:linear-gradient(145deg,#2A3447,#0E1420 60%,#1D2636);box-shadow:0 34px 60px -34px rgba(13,28,52,.7),inset 0 0 0 1.5px rgba(255,255,255,.12)}
+.tv-led{position:absolute;right:26px;bottom:5px;width:7px;height:7px;border-radius:50%;background:#34D399;box-shadow:0 0 8px #34D399}
+.pray-scr{position:relative;overflow:hidden;border-radius:18px;background:linear-gradient(180deg,#F4FBF6 0%,#DFF1E6 62%,#C9E6D6 100%);isolation:isolate}
+.tv-bg{position:absolute;inset:0;width:100%;height:100%;z-index:-1}
+.pray-in{padding:22px 22px 14px;color:#0B3B26}
+.pray-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.pray-t{font-family:'Dancing Script','Brush Script MT',cursive;font-size:38px;font-weight:700;line-height:1.1;color:#0A4D31}
+.pray-z{font-size:13px;color:#245C41;margin-top:2px;font-weight:600}
+.pray-now{margin:14px 0 18px;padding:0;background:none;border:0;display:flex;gap:10px 24px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}
+.pray-now small{display:block;font-size:13px;font-weight:700;color:#245C41;letter-spacing:.02em}
+.pn-cur{font-family:'Dancing Script','Brush Script MT',cursive;font-size:52px;line-height:1.05;font-weight:700;color:#0A4D31}
+.pn-r{text-align:right}.pn-c{font-size:42px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.02em;line-height:1.1;color:#0A4D31;font-family:'Space Grotesk','DM Sans',sans-serif}
 .pray-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
-.pray-i{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 6px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid var(--line);transition:background .4s,border-color .4s,transform .5s cubic-bezier(.32,.72,0,1)}
-.pray-i.on{background:linear-gradient(180deg,rgba(232,196,104,.24),rgba(232,196,104,.06));border-color:rgba(232,196,104,.75);transform:translateY(-3px)}
-.pray-i svg{width:26px;height:26px;color:#E8C468}.pray-i b{font-size:14px}.pray-i span{font-size:15.5px;font-variant-numeric:tabular-nums;font-weight:700}
-.pray-src{margin-top:12px;font-size:12px;color:#9CA3AF;text-align:center}
-.zrow{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--line);color:#fff;font-size:14px}.zrow[aria-pressed=true]{border-color:#E8C468;background:rgba(232,196,104,.14)}.zrow b{color:#E8C468;margin-right:6px}
-@media(max-width:560px){.pray-card{padding:16px}.pray-row{gap:6px}.pray-i{padding:10px 2px}.pray-i b{font-size:11.5px}.pray-i span{font-size:12px}.pray-i svg{width:20px;height:20px}.pray-now b,.pray-now .pn-c{font-size:16px}}
-.fl-ringwrap{background:color-mix(in srgb,var(--btn) 85%,transparent)!important;animation:none!important}.fl-ringwrap .fl-avatar{animation:none!important}
+.pray-i{display:flex;flex-direction:column;align-items:center;gap:3px;padding:14px 6px 12px;border-radius:18px;background:rgba(255,255,255,.94);border:1.5px solid rgba(15,90,60,.22);color:#0B3B26;transition:background .5s,transform .6s cubic-bezier(.32,.72,0,1),box-shadow .5s,color .4s}
+.pray-i svg{width:28px;height:28px;color:#0F7A4D}
+.pray-i .pr-n{font-family:'Dancing Script','Brush Script MT',cursive;font-size:27px;font-weight:700;line-height:1.1;color:#0A4D31}
+.pray-i .pr-a{font-family:'Amiri',serif;font-style:normal;font-size:17px;line-height:1.2;color:#245C41}
+.pray-i .pr-t{font-size:16px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:3px;color:#0B3B26}
+.pray-i.on{background:#0B4A2E;border-color:#0B4A2E;color:#fff;transform:translateY(-4px);box-shadow:0 18px 26px -16px rgba(6,60,36,.9)}
+.pray-i.on svg,.pray-i.on .pr-n,.pray-i.on .pr-a,.pray-i.on .pr-t{color:#fff}
+.pray-src{margin-top:14px;font-size:12px;color:#245C41;text-align:center;font-weight:600}
+.pray-err{margin:14px 0;color:#8A4B04;font-weight:700}
+.zrow{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:12px;background:#fff;border:1px solid var(--line);color:#15294B;font-size:14px}.zrow[aria-pressed=true]{border-color:#0F7A4D;background:#E0F4E8}.zrow b{color:#0A6B40;margin-right:6px}
+@media(max-width:560px){.pray-tv{padding:9px;border-radius:22px}.pray-in{padding:14px 10px 10px}.pray-t{font-size:30px}.pn-cur{font-size:38px}.pn-c{font-size:28px}.pray-row{gap:5px}.pray-i{padding:10px 1px 8px;border-radius:13px}.pray-i svg{width:20px;height:20px}.pray-i .pr-n{font-size:17px}.pray-i .pr-a{font-size:13px}.pray-i .pr-t{font-size:11.5px}}
+/* ===== pop-up waktu solat (plain, tiada hologram) ===== */
+#praypop{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:20px;background:rgba(17,32,58,.42);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.pp-card{position:relative;width:min(380px,100%);padding:34px 24px 26px;border-radius:30px;background:#fff;color:#15294B;text-align:center;box-shadow:0 40px 90px -30px rgba(10,24,48,.65);will-change:transform}
+.pp-x{position:absolute;top:12px;right:12px;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#EEF3FA;color:#15294B;transition:background .2s,transform .3s cubic-bezier(.32,.72,0,1)}.pp-x:hover{background:#DDE6F4;transform:scale(1.06)}.pp-x:focus-visible{outline:3px solid #0F7A4D;outline-offset:2px}
+.pp-ic{width:84px;height:84px;margin:0 auto 12px;border-radius:50%;display:grid;place-items:center;background:#0B4A2E;color:#fff}.pp-ic svg{width:42px;height:42px}
+.pp-s{font-size:14px;font-weight:700;color:#245C41}
+.pp-t{font-family:'Dancing Script','Brush Script MT',cursive;font-size:50px;line-height:1.1;margin:2px 0 0;color:#0A4D31;font-weight:700}
+.pp-ar{font-family:'Amiri',serif;font-size:26px;color:#245C41;margin-top:2px}
+.pp-tm{margin-top:10px;font-size:26px;font-weight:800;font-variant-numeric:tabular-nums;color:#15294B}
+.pp-z{font-size:13px;color:#34496D;margin-top:4px;font-weight:600}
+.st-pub{color:#047857;font-weight:700}.st-draft{color:#8A4B04;font-weight:700}
+@media(prefers-reduced-motion:reduce){.pray-i{transition:none}}
+body.flow footer p[style*="background:linear-gradient"]{background:linear-gradient(90deg,#15294B 0%,#B00D08 55%,#8F0B07 100%)!important;-webkit-background-clip:text!important;background-clip:text!important}
+body.flow .dnav{border-radius:16px}
+/* gaya sebaris yang diserialkan semula oleh JS (rgb) */
+body.flow [style*=" color: rgb(156, 163, 175)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *),body.flow [style^="color: rgb(156, 163, 175)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#3E5276!important}
+body.flow [style*=" color: rgb(199, 201, 209)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *),body.flow [style^="color: rgb(199, 201, 209)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#2F4468!important}
+body.flow [style*=" color: rgb(209, 213, 219)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *),body.flow [style^="color: rgb(209, 213, 219)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#2F4468!important}
+body.flow [style*=" color: rgb(229, 231, 235)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *),body.flow [style^="color: rgb(229, 231, 235)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#2F4468!important}
+body.flow [style*=" color: rgb(255, 255, 255)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *),body.flow [style^="color: rgb(255, 255, 255)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#15294B!important}
+body.flow [style*=" color: rgb(244, 244, 245)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *),body.flow [style^="color: rgb(244, 244, 245)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#15294B!important}
+body.flow [style*=" color: rgb(125, 211, 252)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *),body.flow [style^="color: rgb(125, 211, 252)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#0B5FA8!important}
+body.flow [style*=" color: rgb(110, 231, 168)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *),body.flow [style^="color: rgb(110, 231, 168)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#047857!important}
+body.flow [style*=" color: rgb(255, 209, 102)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *),body.flow [style^="color: rgb(255, 209, 102)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#8A4B04!important}
+body.flow [style*=" color: rgb(255, 138, 138)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *),body.flow [style^="color: rgb(255, 138, 138)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#B42318!important}
+body.flow [style*=" color: rgb(255, 107, 107)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *),body.flow [style^="color: rgb(255, 107, 107)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#B42318!important}
+body.flow [style*=" color: rgb(255, 180, 180)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *),body.flow [style^="color: rgb(255, 180, 180)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#9B1111!important}
+body.flow [style*=" color: rgb(252, 165, 165)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *),body.flow [style^="color: rgb(252, 165, 165)"]:not(.devs *):not(.mini *):not(.dprev *):not(#pvmobile *):not(.btn-red *):not(.dtile *):not(.pray-i.on *):not(#cbpanel *){color:#B42318!important}
+body.flow footer [style*="color: rgb(255, 255, 255)"]{color:var(--tx)!important}
+body.flow .dlt.down{background:#FDE2E0;color:#9B1111}
+.pray-in{padding-bottom:92px}.pray-src{position:absolute;left:0;right:0;bottom:10px;margin:0}
+@media(max-width:560px){.pray-in{padding-bottom:78px}}
+.tv-bg.tv-sky{top:auto;bottom:0;height:62%}
 </style>
 </head>
 <body>
@@ -1395,7 +1531,7 @@ syncClock().then(tickClock); setInterval(tickClock, 1000);
 /* ---------- Waktu solat: data rasmi JAKIM (e-solat.gov.my), ikut zon ---------- */
 const ZONES = [["JHR01", "Johor", "Pulau Aur dan Pulau Pemanggil"], ["JHR02", "Johor", "Johor Bahru, Kota Tinggi, Mersing, Kulai"], ["JHR03", "Johor", "Kluang, Pontian"], ["JHR04", "Johor", "Batu Pahat, Muar, Segamat, Gemas Johor, Tangkak"], ["KDH01", "Kedah", "Kota Setar, Kubang Pasu, Pokok Sena (Daerah Kecil)"], ["KDH02", "Kedah", "Kuala Muda, Yan, Pendang"], ["KDH03", "Kedah", "Padang Terap, Sik"], ["KDH04", "Kedah", "Baling"], ["KDH05", "Kedah", "Bandar Baharu, Kulim"], ["KDH06", "Kedah", "Langkawi"], ["KDH07", "Kedah", "Puncak Gunung Jerai"], ["KTN01", "Kelantan", "Bachok, Kota Bharu, Machang, Pasir Mas, Pasir Puteh, Tanah Merah, Tumpat, Kuala Krai, Mukim Chiku"], ["KTN02", "Kelantan", "Gua Musang (Daerah Galas Dan Bertam), Jeli, Jajahan Kecil Lojing"], ["MLK01", "Melaka", "SELURUH NEGERI MELAKA"], ["NGS01", "Negeri Sembilan", "Tampin, Jempol"], ["NGS02", "Negeri Sembilan", "Jelebu, Kuala Pilah, Rembau"], ["NGS03", "Negeri Sembilan", "Port Dickson, Seremban"], ["PHG01", "Pahang", "Pulau Tioman"], ["PHG02", "Pahang", "Kuantan, Pekan, Muadzam Shah"], ["PHG03", "Pahang", "Jerantut, Temerloh, Maran, Bera, Chenor, Jengka"], ["PHG04", "Pahang", "Bentong, Lipis, Raub"], ["PHG05", "Pahang", "Genting Sempah, Janda Baik, Bukit Tinggi"], ["PHG06", "Pahang", "Cameron Highlands, Genting Higlands, Bukit Fraser"], ["PHG07", "Pahang", "Zon Khas Daerah Rompin, (Mukim Rompin, Mukim Endau, Mukim Pontian)"], ["PRK01", "Perak", "Tapah, Slim River, Tanjung Malim"], ["PRK02", "Perak", "Kuala Kangsar, Sg. Siput , Ipoh, Batu Gajah, Kampar"], ["PRK03", "Perak", "Lenggong, Pengkalan Hulu, Grik"], ["PRK04", "Perak", "Temengor, Belum"], ["PRK05", "Perak", "Kg Gajah, Teluk Intan, Bagan Datuk, Seri Iskandar, Beruas, Parit, Lumut, Sitiawan, Pulau Pangkor"], ["PRK06", "Perak", "Selama, Taiping, Bagan Serai, Parit Buntar"], ["PRK07", "Perak", "Bukit Larut"], ["PLS01", "Perlis", "SELURUH NEGERI PERLIS"], ["PNG01", "Pulau Pinang", "SELURUH NEGERI PULAU PINANG"], ["SBH01", "Sabah", "Bahagian Sandakan (Timur), Bukit Garam, Semawang, Temanggong, Tambisan, Bandar Sandakan, Sukau"], ["SBH02", "Sabah", "Beluran, Telupid, Pinangah, Terusan, Kuamut, Bahagian Sandakan (Barat)"], ["SBH03", "Sabah", "Lahad Datu, Silabukan, Kunak, Sahabat, Semporna, Tungku, Bahagian Tawau (Timur)"], ["SBH04", "Sabah", "Bandar Tawau, Balong, Merotai, Kalabakan, Bahagian Tawau (Barat)"], ["SBH05", "Sabah", "Kudat, Kota Marudu, Pitas, Pulau Banggi, Bahagian Kudat"], ["SBH06", "Sabah", "Gunung Kinabalu"], ["SBH07", "Sabah", "Kota Kinabalu, Ranau, Kota Belud, Tuaran, Penampang, Papar, Putatan, Bahagian Pantai Barat"], ["SBH08", "Sabah", "Pensiangan, Keningau, Tambunan, Nabawan, Bahagian Pendalaman (Atas)"], ["SBH09", "Sabah", "Beaufort, Kuala Penyu, Sipitang, Tenom, Long Pasia, Membakut, Weston, Bahagian Pendalaman (Bawah)"], ["SWK01", "Sarawak", "Limbang, Lawas, Sundar, Trusan"], ["SWK02", "Sarawak", "Miri, Niah, Bekenu, Sibuti, Marudi"], ["SWK03", "Sarawak", "Pandan, Belaga, Suai, Tatau, Sebauh, Bintulu"], ["SWK04", "Sarawak", "Sibu, Mukah, Dalat, Song, Igan, Oya, Balingian, Kanowit, Kapit"], ["SWK05", "Sarawak", "Sarikei, Matu, Julau, Rajang, Daro, Bintangor, Belawai"], ["SWK06", "Sarawak", "Lubok Antu, Sri Aman, Roban, Debak, Kabong, Lingga, Engkelili, Betong, Spaoh, Pusa, Saratok"], ["SWK07", "Sarawak", "Serian, Simunjan, Samarahan, Sebuyau, Meludam"], ["SWK08", "Sarawak", "Kuching, Bau, Lundu, Sematan"], ["SWK09", "Sarawak", "Zon Khas (Kampung Patarikan)"], ["SGR01", "Selangor", "Gombak, Petaling, Sepang, Hulu Langat, Hulu Selangor, Shah Alam"], ["SGR02", "Selangor", "Kuala Selangor, Sabak Bernam"], ["SGR03", "Selangor", "Klang, Kuala Langat"], ["TRG01", "Terengganu", "Kuala Terengganu, Marang, Kuala Nerus"], ["TRG02", "Terengganu", "Besut, Setiu"], ["TRG03", "Terengganu", "Hulu Terengganu"], ["TRG04", "Terengganu", "Dungun, Kemaman"], ["WLY01", "Wilayah Persekutuan", "Kuala Lumpur, Putrajaya"], ["WLY02", "Wilayah Persekutuan", "Labuan"]];
 const PRAY_N = [["fajr", "Subuh", '<path d="M3 18h18M6 18a6 6 0 0 1 12 0M12 4v4M4.9 9.9l2.1 2.1M19.1 9.9 17 12M9 6l3-3 3 3"/>'], ["dhuhr", "Zuhur", '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'], ["asr", "Asar", '<circle cx="12" cy="13" r="3.5"/><path d="M12 4v2M3 13h2M19 13h2M5.6 6.6 7 8M18.4 6.6 17 8M3 20h18"/>'], ["maghrib", "Maghrib", '<path d="M3 18h18M6 18a6 6 0 0 1 12 0M12 5v4M9 8l3 3 3-3M4.9 11.9l2.1 2.1M19.1 11.9 17 14"/>'], ["isha", "Isyak", '<path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5Z"/>']];
-const PR = { zone: null, auto: true, times: null, err: "", busy: false };
+const PR = { zone: null, auto: true, times: null, day: "", err: "", busy: false };
 const zInfo = c => ZONES.find(z => z[0] === c);
 async function zoneFromCoords(lat, lon) { const j = await (await fetch(`https://api.waktusolat.app/zones/${lat}/${lon}`)).json(); if (!j.zone || !zInfo(j.zone)) throw new Error("zon"); return j.zone; }
 const geoZone = () => new Promise((res, rej) => { if (!navigator.geolocation) return rej(new Error("tiada")); navigator.geolocation.getCurrentPosition(p => zoneFromCoords(p.coords.latitude, p.coords.longitude).then(res, rej), rej, { timeout: 12000, maximumAge: 600000 }); });
@@ -1411,26 +1547,63 @@ async function loadPray(zone) {
 }
 const to12 = t => { const [h, m] = t.split(":").map(Number); return `${h % 12 || 12}:${String(m).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`; };
 const secOf = t => { const [h, m, s = 0] = t.split(":").map(Number); return h * 3600 + m * 60 + (s || 0); };
-function prayHtml() { return `<div id="pray"><div class="pray-card"><div class="pray-t">Waktu Solat</div><p class="hint" style="margin:6px 0 0">Memuatkan waktu solat…</p></div></div>`; }
+const PRAY_AR = { fajr: "الفجر", dhuhr: "الظهر", asr: "العصر", maghrib: "المغرب", isha: "العشاء" };
+const MOSQUE = `<svg class="tv-bg" viewBox="0 0 800 320" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false"><defs><pattern id="tvstar" width="56" height="56" patternUnits="userSpaceOnUse"><path d="M28 6 35 21l15-7-7 15 15 7-15 7 7 15-15-7-7 15-7-15-15 7 7-15-15-7 15-7-7-15 15 7z" fill="none" stroke="#0F7A4D" stroke-opacity=".13" stroke-width="1.2"/></pattern></defs>
+<rect width="800" height="320" fill="url(#tvstar)"/><path d="M702 34a30 30 0 1 0 22 52 24 24 0 1 1-22-52z" fill="#0F7A4D" fill-opacity=".30"/><path d="m742 52 3 7 8 1-6 5 2 8-7-4-7 4 2-8-6-5 8-1z" fill="#0F7A4D" fill-opacity=".30"/></svg><svg class="tv-bg tv-sky" viewBox="0 100 800 220" preserveAspectRatio="xMidYMax meet" aria-hidden="true" focusable="false">
+<g transform="translate(0,24)"><g fill="#7DBE9B" fill-opacity=".38"><rect x="0" y="258" width="800" height="62"/><rect x="60" y="226" width="64" height="94"/><path d="M60 226a32 32 0 0 1 64 0z"/><rect x="676" y="232" width="70" height="88"/><path d="M676 232a35 35 0 0 1 70 0z"/></g>
+<g fill="#3E9C73" fill-opacity=".40"><rect x="22" y="120" width="22" height="200"/><path d="M17 120 33 78l16 42z"/><rect x="14" y="170" width="38" height="7"/><rect x="756" y="120" width="22" height="200"/><path d="M751 120 767 78l16 42z"/><rect x="748" y="170" width="38" height="7"/>
+<rect x="140" y="150" width="18" height="170"/><path d="M136 150 149 112l13 38z"/><rect x="134" y="190" width="30" height="6"/><rect x="642" y="150" width="18" height="170"/><path d="M638 150 651 112l13 38z"/><rect x="636" y="190" width="30" height="6"/>
+<rect x="290" y="214" width="220" height="106"/><path d="M296 214a104 104 0 0 1 208 0z"/><rect x="399" y="86" width="2.4" height="26"/><circle cx="400" cy="82" r="5"/><rect x="228" y="236" width="62" height="84"/><path d="M228 236a31 31 0 0 1 62 0z"/><rect x="510" y="236" width="62" height="84"/><path d="M510 236a31 31 0 0 1 62 0z"/></g>
+<g fill="#fff" fill-opacity=".55"><path d="M372 320v-44a28 28 0 0 1 56 0v44z"/><rect x="316" y="250" width="20" height="30" rx="10"/><rect x="464" y="250" width="20" height="30" rx="10"/></g></g></svg>`;
+function prayHtml() { return `<div id="pray"><div class="pray-card"><div class="pray-tv"><div class="pray-scr"><div class="pray-in"><div class="pray-t">Waktu Solat</div><p class="hint" style="margin:6px 0 0">Memuatkan waktu solat…</p></div></div></div></div></div>`; }
+const prayIco = (k, c = "") => `<svg ${c ? `class="${c}" ` : ""}viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${PRAY_N.find(x => x[0] === k)[2]}</svg>`;
 function drawPray() {
   const el = $("#pray"); if (!el) return; const z = zInfo(PR.zone) || ["", "", ""];
-  el.innerHTML = `<div class="pray-card"><div class="pray-top"><div><div class="pray-t">Waktu Solat</div><div class="pray-z">${esc(z[1])} · ${esc(PR.zone)} · ${esc(z[2])}</div></div><button class="chip" id="pz-btn" type="button">${ic("globe", "w-4 h-4")} Tukar zon</button></div>
-    ${PR.times ? `<div class="pray-now" id="pz-now"></div><div class="pray-row">${PRAY_N.map(([k, n, ic2]) => `<div class="pray-i" data-k="${k}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ic2}</svg><b>${n}</b><span>${to12(PR.times[k])}</span></div>`).join("")}</div>` : `<p class="hint" style="margin:14px 0 0;color:#FFD166">${esc(PR.err || "Memuatkan…")}</p>`}
-    <div class="pray-src">Sumber: JAKIM (e-solat.gov.my) · ${PR.auto ? "zon dikesan automatik" : "zon pilihan anda"}</div></div>`;
+  el.innerHTML = `<div class="pray-card"><div class="pray-tv"><span class="tv-led" aria-hidden="true"></span><div class="pray-scr">${MOSQUE}<div class="pray-in"><div class="pray-top"><div><div class="pray-t">Waktu Solat</div><div class="pray-z">${esc(z[1])} · ${esc(PR.zone)} · ${esc(z[2])}</div></div><button class="btn btn-ghost btn-sm" id="pz-btn" type="button">${ic("globe", "w-4 h-4")} Tukar zon</button></div>
+    ${PR.times ? `<div class="pray-now" id="pz-now"></div><div class="pray-row">${PRAY_N.map(([k, n]) => `<div class="pray-i" data-k="${k}">${prayIco(k)}<b class="pr-n">${n}</b><em class="pr-a" lang="ar" dir="rtl">${PRAY_AR[k]}</em><span class="pr-t">${to12(PR.times[k])}</span></div>`).join("")}</div>` : `<p class="pray-err">${esc(PR.err || "Memuatkan…")}</p>`}
+    <div class="pray-src">Sumber: JAKIM (e-solat.gov.my) · ${PR.auto ? "zon dikesan automatik" : "zon pilihan anda"}</div></div></div></div></div>`;
   $("#pz-btn").onclick = zoneModal; tickPray();
 }
+const prayIdx = () => { const w = wallIn(klNow(), "Asia/Kuala_Lumpur"), sec = secOf(w.slice(11)), ts = PRAY_N.map(([k]) => secOf(PR.times[k])); let cur = -1; ts.forEach((t, i) => { if (t <= sec) cur = i; }); let ni = ts.findIndex(t => t > sec), diff, tomorrow = false; if (ni < 0) { ni = 0; diff = ts[0] + 86400 - sec; tomorrow = true; } else diff = ts[ni] - sec; return { sec, ts, cur, ni, diff, tomorrow }; };
+const hms = d => `${String(Math.floor(d / 3600)).padStart(2, "0")}:${String(Math.floor((d % 3600) / 60)).padStart(2, "0")}:${String(d % 60).padStart(2, "0")}`;
 function tickPray() {
-  const now = $("#pz-now"); if (!now || !PR.times) return; const w = wallIn(klNow(), "Asia/Kuala_Lumpur"), sec = secOf(w.slice(11)), ts = PRAY_N.map(([k]) => secOf(PR.times[k]));
-  let ni = ts.findIndex(t => t > sec), diff, tomorrow = false; if (ni < 0) { ni = 0; diff = ts[0] + 86400 - sec; tomorrow = true; } else diff = ts[ni] - sec;
-  const h = Math.floor(diff / 3600), m = Math.floor((diff % 3600) / 60), sc = diff % 60, cur = ts.filter(t => t <= sec).length - 1;
-  $$(".pray-i").forEach((e, i) => e.classList.toggle("on", i === ni));
-  now.innerHTML = `<div><small>${cur >= 0 ? "Waktu semasa: " + PRAY_N[cur][1] : "Sebelum Subuh"}</small><b>Seterusnya: ${PRAY_N[ni][1]}${tomorrow ? " (esok)" : ""} · ${to12(PR.times[PRAY_N[ni][0]])}</b></div><div class="pn-c" aria-label="Masa berbaki">${h ? h + "j " : ""}${m}m ${String(sc).padStart(2, "0")}s</div>`;
+  prayWatch();
+  const now = $("#pz-now"); if (!now || !PR.times) return; const { cur, ni, diff, tomorrow } = prayIdx(), c = cur < 0 ? PRAY_N.length - 1 : cur;
+  $$(".pray-i").forEach((e, i) => e.classList.toggle("on", i === c));
+  const html = `<div class="pn-l"><small>Waktu semasa</small><strong class="pn-cur">${PRAY_N[c][1]}</strong></div><div class="pn-r"><small>${PRAY_N[ni][1]}${tomorrow ? " (esok)" : ""} dalam</small><div class="pn-c" aria-label="Masa berbaki">${hms(diff)}</div></div>`;
+  const cd = $(".pn-c", now); if (cd && now.dataset.c === String(c) + String(ni)) cd.textContent = hms(diff); else { now.innerHTML = html; now.dataset.c = String(c) + String(ni); }
 }
-async function initPray(force) {
-  if (!$("#pray") || PR.busy) return; PR.busy = true;
+async function ensurePray(force) {
+  if (PR.busy) return; PR.busy = true;
   if (PR.zone === null) { PR.zone = lsGet("fl_zone"); PR.auto = !PR.zone; }
-  try { if (!PR.zone || force) { PR.zone = await detectZone(); PR.auto = true; } PR.times = await loadPray(PR.zone); PR.err = ""; } catch { PR.err = "Waktu solat tidak dapat dimuatkan. Semak sambungan internet."; PR.times = null; }
+  try { if (!PR.zone || force) { PR.zone = await detectZone(); PR.auto = true; } PR.times = await loadPray(PR.zone); PR.day = klDay(klNow()); PR.err = ""; } catch { PR.err = "Waktu solat tidak dapat dimuatkan. Semak sambungan internet."; PR.times = null; }
   PR.busy = false; drawPray();
+}
+const initPray = force => ensurePray(force);
+/* ---- Notifikasi pop-up bila masuk waktu solat (hanya semasa app dibuka; hilang bila dipangkah) ---- */
+function prayChime() {
+  const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return; let played = false;
+  try { PR.ctx = PR.ctx || new AC(); } catch { return; }
+  const c = PR.ctx, go = () => { if (played || c.state !== "running") return; played = true; const t0 = c.currentTime; [[659, 0], [880, .3], [1319, .6], [1760, .95]].forEach(([f, d]) => { const o = c.createOscillator(), g = c.createGain(); o.type = "sine"; o.frequency.value = f; g.gain.setValueAtTime(.0001, t0 + d); g.gain.exponentialRampToValueAtTime(.16, t0 + d + .03); g.gain.exponentialRampToValueAtTime(.0001, t0 + d + 1.7); o.connect(g); g.connect(c.destination); o.start(t0 + d); o.stop(t0 + d + 1.8); }); };
+  c.resume().then(go, () => {}); if (c.state === "running") go();
+  const again = () => { if (played || !$("#praypop")) return; c.resume().then(go, () => {}); }; addEventListener("pointerdown", again, { once: true }); addEventListener("keydown", again, { once: true });
+}
+function showPrayPop(i, key) {
+  const [k, n] = PRAY_N[i], z = zInfo(PR.zone) || ["", "", ""], bg = document.createElement("div"); bg.id = "praypop";
+  bg.innerHTML = `<div class="pp-card" role="alertdialog" aria-modal="true" aria-labelledby="pp-t"><button type="button" class="pp-x" aria-label="Tutup notifikasi waktu solat"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <div class="pp-ic">${prayIco(k)}</div><div class="pp-s">Telah masuk</div><h2 class="pp-t" id="pp-t">Waktu ${n}</h2><div class="pp-ar" lang="ar" dir="rtl">${PRAY_AR[k]}</div><div class="pp-tm">${to12(PR.times[k])}</div><div class="pp-z">${esc(z[1])} · ${esc(PR.zone)}</div></div>`;
+  document.body.appendChild(bg); const card = $(".pp-card", bg), x = $(".pp-x", bg);
+  const EZ = "cubic-bezier(.32,.72,0,1)", close = () => { document.removeEventListener("keydown", kd); lsSet(key, "1"); if (REDUCE()) return bg.remove(); bg.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 260, easing: EZ, fill: "forwards" }); card.animate([{ transform: "none", opacity: 1 }, { transform: "translate3d(0,14px,0) scale(.94)", opacity: 0 }], { duration: 260, easing: EZ, fill: "forwards" }).onfinish = () => bg.remove(); };
+  const kd = e => e.key === "Escape" && close(); document.addEventListener("keydown", kd); x.onclick = close;
+  if (!REDUCE()) { bg.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 380, easing: EZ }); card.animate([{ opacity: 0, transform: "translate3d(0,34px,0) scale(.84)" }, { opacity: 1, transform: "translate3d(0,-4px,0) scale(1.025)", offset: .7 }, { opacity: 1, transform: "none" }], { duration: 680, easing: EZ, fill: "both" }); $(".pp-ic", bg).animate([{ transform: "scale(.4)", opacity: 0 }, { transform: "scale(1.12)", opacity: 1, offset: .65 }, { transform: "none", opacity: 1 }], { duration: 760, delay: 140, easing: EZ, fill: "both" }); }
+  x.focus({ preventScroll: true }); prayChime();
+}
+function prayWatch() {
+  if (!PR.times || !document.body.classList.contains("flow") || $("#praypop")) return;
+  const day = klDay(klNow()); if (PR.day && PR.day !== day) { if (!PR.roll) { PR.roll = true; PR.times = null; ensurePray().finally(() => (PR.roll = false)); } return; }
+  const { sec, ts, cur } = prayIdx(); if (cur < 0 || sec - ts[cur] > 1800) return;
+  const key = `fl_pd_${day}_${PRAY_N[cur][0]}`; if (lsGet(key)) return;
+  showPrayPop(cur, key);
 }
 function zoneModal() {
   const states = [...new Set(ZONES.map(z => z[1]))], cur = zInfo(PR.zone);
@@ -1727,10 +1900,11 @@ function armReveal(host) {
     r.querySelectorAll(".fl-in").forEach(i => io.observe(i));
   });
 }
+const previewProfile = () => { const p = S.profile; if (S.editing || p.activeDesign === p.publishedDesign) return p; const pd = p.designs.find(d => d.id === p.publishedDesign); return pd ? { ...p, template: pd.template, profileStyle: pd.profileStyle || "classic", theme: pd.theme } : p; };
 const refreshPreview = (anim = false) => {
   if (!S.profile) return;
   if (imgMissing(S.profile, S.links)) hydrateImages(S.profile, S.links).then(() => { refreshPreview(anim); fitMinis(); });
-  const html = renderProfile(S.profile, S.links, { preview: true, anim });
+  const html = renderProfile(previewProfile(), S.links, { preview: true, anim });
   $$(".dprev .iscreen.pv-wrap, #pvmobile .iscreen.pv-wrap").forEach(el => (el.innerHTML = html));
   $$(".dprev .lap-scale, #pvmobile .lap-scale").forEach(el => (el.innerHTML = html));
   fitLaptop(); $$(".dprev, #pvmobile").forEach(armReveal);
@@ -1778,7 +1952,7 @@ function openView(view, o = {}) {
   const stage = $("#stage"); if (!stage) return;
   if (view === "home") view = "design"; if (!NAV.some(x => x.k === view)) view = "design";
   const prev = NAV.findIndex(n => n.k === S.view), next = NAV.findIndex(n => n.k === view), dir = next >= prev ? 1 : -1, tok = ++navTok;
-  S.view = view; const x = NAV[next];
+  S.view = view; document.body.dataset.s = view; const x = NAV[next];
   $$(".dnav-i").forEach(b => b.setAttribute("aria-current", b.dataset.k === view ? "page" : "false")); // butang bertindak balas serta-merta
   stage.innerHTML = `<div id="sec"><div class="sec-in" style="display:flex;gap:14px;align-items:center;margin-bottom:6px"><div class="dtile">${ic(x.i, "w-6 h-6")}</div><h1 class="font-display" style="font-size:26px;font-weight:700;margin:0">${x.n}</h1></div><p class="sec-in" style="margin:0 0 18px;color:#C7C9D1;max-width:680px;line-height:1.55">${x.d}</p><section id="pane" aria-live="polite"></section></div>`;
   window.scrollTo({ top: 0 });
@@ -1798,13 +1972,12 @@ function activateDesign(id, quiet) {
 }
 function publishDesign(id) {
   const p = S.profile, d = p.designs.find(x => x.id === id); if (!d) return;
-  syncActive(); p.publishedDesign = id; saveProfile(); updatePvState(); toast(`Design “${d.name}” diterbitkan ✓ Pautan anda kini memaparkan design ini.`);
+  syncActive(); p.publishedDesign = id; saveProfile(); refreshPreview(true); updatePvState(); toast(`Design “${d.name}” diterbitkan ✓ Pautan anda kini memaparkan design ini.`);
 }
 function updatePvState() {
   const el = $("#pvstate"), p = S.profile; if (!el || !p) return;
-  const d = p.designs.find(x => x.id === p.activeDesign), pub = p.activeDesign === p.publishedDesign;
-  el.innerHTML = `Pratonton: <b>${esc(d?.name || "")}</b> · ${pub ? '<span style="color:#6EE7A8">Diterbitkan</span>' : '<span style="color:#FFD166">Draf (belum diterbitkan)</span> <button type="button" class="linkbtn" id="pvpub" style="min-height:28px;padding:0 6px">Terbitkan</button>'}`;
-  const b = $("#pvpub"); if (b) b.onclick = () => { publishDesign(p.activeDesign); if (S.view === "design") designTab(); };
+  const pd = p.designs.find(x => x.id === p.publishedDesign), cur = p.designs.find(x => x.id === p.activeDesign), ed = S.editing && p.activeDesign !== p.publishedDesign;
+  el.innerHTML = ed ? `Pratonton langsung: <b>${esc(cur?.name || "")}</b> · <span class="st-draft">Draf (belum diterbitkan)</span>` : `Pratonton: <b>${esc(pd?.name || "")}</b> · <span class="st-pub">Diterbitkan</span> (sama dengan laman utama)`;
 }
 function newDesign(src, name) {
   syncActive();
@@ -1868,7 +2041,7 @@ async function designTab() {
 const snapProfile = () => { syncActive(); const p = S.profile; return JSON.parse(JSON.stringify({ designs: p.designs, activeDesign: p.activeDesign, publishedDesign: p.publishedDesign, template: p.template, profileStyle: p.profileStyle, theme: p.theme, displayName: p.displayName, bio: p.bio, avatarUrl: p.avatarUrl, bannerUrl: p.bannerUrl, imgOrig: p.imgOrig || {}, handle: p.handle || "" })); };
 const restoreSnap = sn => { Object.assign(S.profile, JSON.parse(JSON.stringify(sn))); saveProfile(); refreshPreview(true); };
 function editDesign(snap0) {
-  const snap = snap0 || snapProfile(); let done = false;
+  const snap = snap0 || snapProfile(); let done = false; S.editing = true; refreshPreview(true); updatePvState();
   const p = S.profile, t = p.theme, cur = p.designs.find(x => x.id === p.activeDesign);
   const col = (id, label, v) => `<div><label class="lbl" for="${id}">${label}</label><input id="${id}" type="color" value="${hex(v, "#000000")}" style="width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.07);padding:3px"></div>`;
   const sel = (id, label, opts, v) => `<div><label class="lbl" for="${id}">${label}</label><select id="${id}" class="inp">${opts.map(([k, n]) => `<option value="${k}" ${String(v) === String(k) ? "selected" : ""}>${esc(n)}</option>`).join("")}</select></div>`;
@@ -1914,7 +2087,7 @@ function editDesign(snap0) {
   $e("ed-done").onclick = () => { done = true; m.close(); };
   $e("ed-pub").onclick = () => { done = true; publishDesign(S.profile.activeDesign); m.close(); };
   check();
-  const mo = new MutationObserver(() => { if (!document.body.contains(m)) { mo.disconnect(); if (!done) { restoreSnap(snap); toast("Perubahan dibatalkan."); } if (S.view === "design") designTab(); } }); mo.observe(document.body, { childList: true });
+  const mo = new MutationObserver(() => { if (!document.body.contains(m)) { mo.disconnect(); S.editing = false; if (!done) { restoreSnap(snap); toast("Perubahan dibatalkan."); } refreshPreview(true); updatePvState(); if (S.view === "design") designTab(); } }); mo.observe(document.body, { childList: true });
 }
 
 /* ---------- Jadual posting: Zernio (API terus dari pelayar) atau Metricool (kalendar + peringatan) ---------- */
@@ -2463,7 +2636,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-51";
+const APP_VERSION = "V-52";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
@@ -2521,7 +2694,10 @@ new MutationObserver(() => renderUpdateBtn()).observe($("#app"), { childList: tr
 const CB_EXTRA = [
   { k: "shorten pendek short ringkas username webapps", q: "Shorten link", a: "Isi Username dahulu di Profil (boleh guna apa-apa aksara: huruf, nombor, simbol, garis bawah, tanda seru, titik, sempang, garis condong; maksimum 20). Kemudian di Shorten link: isi nama dan tampal pautan panjang. Pautan pendek berbentuk alamat/kod-anda/webapps/username-anda. Setiap baris ada butang salin, edit, buang, dan pemegang untuk susun.", go: "short" },
   { k: "teks font fon saiz warna gradien nama bio butang huruf", q: "Gaya teks", a: "Buka mana-mana design (klik kadnya), skrol ke bahagian Teks. Nama, bio dan teks butang masing-masing boleh ditukar fon, saiz, warna dan gradien.", go: "design" },
-  { k: "jam masa waktu tarikh masihi solat subuh zuhur asar maghrib isyak zon jakim", q: "Jam dan waktu solat", a: "Jam di penjuru kanan atas menunjuk waktu Malaysia (12 jam) dan tarikh. Di muka depan ada Waktu Solat ikut zon JAKIM (Subuh, Zuhur, Asar, Maghrib, Isyak). Zon dikesan automatik dan boleh ditukar dengan butang Tukar zon." },
+  { k: "jam masa waktu tarikh masihi solat subuh zuhur asar maghrib isyak zon jakim tv", q: "Jam dan waktu solat", a: "Jam di penjuru kanan atas menunjuk waktu Malaysia (12 jam) dan tarikh Masihi. Di laman utama ada Waktu Solat gaya TV pintar ikut zon JAKIM: waktu semasa ditandakan hijau pekat, dengan jam kira detik ke waktu seterusnya. Zon dikesan automatik dan boleh ditukar melalui butang Tukar zon." },
+  { k: "notifikasi pop up popup azan waktu solat masuk bunyi pangkah tutup loceng", q: "Notifikasi waktu solat", a: "Bila waktu solat masuk dan app sedang dibuka, satu pop-up di tengah skrin memaparkan waktu itu dengan bunyi loceng lembut. Ia keluar di laman utama, laman dalam dan dashboard sehingga anda tekan butang pangkah (X). Selepas dipangkah ia tidak keluar lagi untuk waktu itu. Jika app tidak dibuka, tiada notifikasi." },
+  { k: "warna cerah tema latar belakang bahagian dashboard", q: "Tema cerah dan warna bahagian", a: "Laman utama, laman dalam dan dashboard menggunakan latar cerah dengan teks biru gelap yang sepadan. Setiap bahagian dashboard (Design, Pautan, Profil, Analitik, Pelanggan, Shorten link, Jadual posting) ada warna tersendiri yang plain." },
+  { k: "terbit diterbitkan pratonton sama laman utama sinkron draf", q: "Design diterbitkan dan pratonton", a: "Pratonton telefon dan laptop di dashboard sentiasa menunjukkan design yang diterbitkan, sama seperti di laman utama dan pautan awam anda. Semasa anda membuka tetingkap Edit design, pratonton menunjukkan draf langsung; tekan pangkah untuk batal dan ia kembali ke design diterbitkan." },
   { k: "logo thumbnail gambar kecil butang jenama warna whatsapp tiktok facebook", q: "Logo dan warna butang", a: "Pautan media sosial hanya menunjuk logo jenama dan warna jenama (WhatsApp hijau, Facebook biru, dll). Gambar kecil (thumbnail) hanya untuk produk, pautan affiliate dan laman web; kalau tiada, butang hanya ada teks." },
   { k: "terbit terbitkan publish design salin pautan diterbitkan draf", q: "Terbitkan design", a: "Anda boleh buat design sebanyak mana pun (tiada had). Pilih satu dan tekan Terbit: itulah design yang dipaparkan pada Pautan anda (butang Salin pautan). Design lain kekal sebagai draf. Tukar design terbitan bila-bila masa.", go: "design" },
   { k: "crop potong laras zum zoom gambar pecah kabur 4k kualiti resolusi tajam jelas 1080", q: "Gambar & kualiti", a: "Setiap gambar ada butang Laras (seret, zum, kiri/kanan/atas/bawah). Kualiti gambar ada pilihan Auto (ikut peranti anda), 1080p, 2K atau 4K, di Profil atau dalam tetingkap Laras. Gambar baharu disimpan pada kualiti itu (tidak dibesarkan melebihi saiz asal). Gambar lama yang sudah kecil: muat naik semula.", go: "profile" },
@@ -2543,7 +2719,7 @@ function cbKB() {
   out.push({ k: "gaya profil kepala klasik hero banner cincin kaca sebelah header", q: "Gaya profil", a: () => `Ada ${STYLES.length} gaya kepala profil: ${STYLES.map(x => x[1]).join(", ")}. Tukar di Profil atau dalam panel edit design.`, go: "profile" });
   out.push({ k: "susun atur layout poster grid katalog bento", q: "Susun atur", a: () => `Susun atur tersedia: ${Object.values(TPL).map(x => x.name).join(", ")}.`, go: "design" });
   out.push({ k: "platform sokongan whatsapp shopee tiktok instagram lazada youtube", q: "Platform disokong", a: () => `Logo platform dikesan automatik untuk: ${LINK_KEYS.map(k => BRANDS[k].n).join(", ")}.`, go: "links" });
-  out.push({ k: "pratonton preview telefon laptop", q: "Pratonton", a: "Pratonton telefon dan laptop dipaparkan serentak dan berubah langsung semasa anda edit." });
+  out.push({ k: "pratonton preview telefon laptop", q: "Pratonton", a: "Pratonton telefon dan laptop menunjukkan design yang diterbitkan (sama dengan laman utama). Semasa anda edit design, ia berubah langsung sebagai draf." });
   return out;
 }
 const CB_NORM = t => String(t).toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
@@ -2594,6 +2770,7 @@ function route() {
   document.documentElement.style.background = ""; sfxScope(false); setTimeout(() => checkUpdate(), 1200);
   const p = location.pathname.replace(/\/+$/, "") || "/", seg = p.split("/").filter(Boolean);
   document.body.classList.toggle("flow", !(seg.length === 1 && USER_RE.test(seg[0]) && !RESERVED.has(seg[0])) && seg[0] !== "s");
+  if (p !== "/dashboard") delete document.body.dataset.s; if (!document.body.classList.contains("flow")) { const pp = document.getElementById("praypop"); if (pp) pp.remove(); } else ensurePray();
   if (p === "/" || p === "/index.html") return landing();
   if (p === "/login") return loginView();
   if (p === "/dashboard") return dashView();
