@@ -529,6 +529,22 @@
     .price-badge.free .pb-label { color: #0A0A0A; }
     .price-badge.free .pb-body { background: #0B5D2A; }
     .pb-free { display: block; padding: .12em .1em; font-size: clamp(12px, 6cqw, 18px); font-weight: 900; letter-spacing: .02em; text-transform: uppercase; color: #fff; white-space: nowrap; }
+    /* Tanpa tab label (Percuma / Tamat): hanya satu perkataan */
+    .price-badge.nolabel { padding-top: clamp(2px, .9cqw, 4px); }
+    /* Tamat / Habis Stok: produk tidak boleh ditekan */
+    .btn:disabled { background: #B9C3D6; color: #fff; box-shadow: none; cursor: not-allowed; transform: none; }
+    .btn:disabled:hover { transform: none; box-shadow: none; }
+    .btn:disabled:hover svg { transform: none; }
+    :root[data-theme="dark"] .btn:disabled { background: #33456B; color: #8FA3C8; box-shadow: none; }
+    .product-card.unavailable:hover { transform: none; box-shadow: var(--shadow-sm); border-color: var(--line); }
+    .product-card.unavailable:hover .thumb img { transform: none; }
+    /* Tamat: biru cerah (luar) + biru gelap (dalam), tulisan putih */
+    .price-badge.ended { background: #4DB8FF; box-shadow: 0 3px 9px rgba(0, 40, 120, .3); }
+    .price-badge.ended .pb-body { background: #0A2A6B; }
+    /* Habis Stok: tanda larangan merah (PNG), tiada border, tiada latar */
+    .price-badge.soldout { flex-direction: row; align-items: center; gap: .35em; padding: 0; background: none; box-shadow: none; border-radius: 0; }
+    .so-img { display: block; width: clamp(26px, 12cqw, 40px); height: auto; flex: none; }
+    .so-txt { max-width: 3.8em; font-size: clamp(9px, 4.6cqw, 14px); font-weight: 900; letter-spacing: .03em; line-height: 1.05; text-transform: uppercase; color: #E8111F; }
     .pb-old { align-self: flex-end; padding: .35em .35em .12em; font-size: clamp(6px, 3cqw, 10px); font-weight: 700; color: #1B1B1B; white-space: nowrap; }
     .pb-old s { text-decoration-color: #E8111F; text-decoration-thickness: .13em; }
     .modal-price { margin-top: .9rem; display: flex; justify-content: center; }
@@ -904,7 +920,7 @@
         "state.empty.title": "Belum ada produk",
         "state.empty.text": "Produk digital Genius Digital akan dipaparkan di sini tidak lama lagi. Sila kembali semula nanti.",
         "modal.msg": "Produk Akan Datang.", "modal.close": "Tutup", "modal.ok": "Tutup",
-        "contact.eyebrow": "Perhubungan", "contact.h2": "Hubungi Kami", "contact.soon": "Maklumat hubungan akan dikemas kini tidak lama lagi.", "install.btn": "Pasang Apps", "price.label": "Harga Istimewa", "price.was": "harga asal", "price.fixed": "Harga", "price.free": "Percuma", "install.title": "Pasang Genius Digital", "install.ios": "Pada iPhone / iPad: tekan butang Kongsi di Safari, kemudian pilih “Tambah ke Skrin Utama”.",
+        "contact.eyebrow": "Perhubungan", "contact.h2": "Hubungi Kami", "contact.soon": "Maklumat hubungan akan dikemas kini tidak lama lagi.", "install.btn": "Pasang Apps", "price.label": "Harga Istimewa", "price.was": "harga asal", "price.fixed": "Harga", "price.free": "Percuma", "price.ended": "Tamat", "price.soldout": "Habis Stok", "install.title": "Pasang Genius Digital", "install.ios": "Pada iPhone / iPad: tekan butang Kongsi di Safari, kemudian pilih “Tambah ke Skrin Utama”.",
         "contact.lead": "<strong>Genius Digital.</strong> Berminat dengan produk kami atau ingin bekerjasama? Hubungi kami melalui saluran di bawah.",
         "contact.email": "E-mel", "contact.whatsapp": "WhatsApp", "contact.social": "Media Sosial",
         "contact.phEmail": "Placeholder: tambah e-mel syarikat", "contact.phWhatsapp": "Placeholder: tambah nombor WhatsApp", "contact.phSocial": "(placeholder)",
@@ -944,7 +960,7 @@
         "state.empty.title": "No products yet",
         "state.empty.text": "Genius Digital's products will appear here soon. Please check back later.",
         "modal.msg": "Product Coming Soon.", "modal.close": "Close", "modal.ok": "Close",
-        "contact.eyebrow": "Get in Touch", "contact.h2": "Contact Us", "contact.soon": "Contact details will be updated soon.", "install.btn": "Install App", "price.label": "Special Price", "price.was": "original price", "price.fixed": "Price", "price.free": "Free", "install.title": "Install Genius Digital", "install.ios": "On iPhone / iPad: tap the Share button in Safari, then choose “Add to Home Screen”.",
+        "contact.eyebrow": "Get in Touch", "contact.h2": "Contact Us", "contact.soon": "Contact details will be updated soon.", "install.btn": "Install App", "price.label": "Special Price", "price.was": "original price", "price.fixed": "Price", "price.free": "Free", "price.ended": "Ended", "price.soldout": "Sold Out", "install.title": "Install Genius Digital", "install.ios": "On iPhone / iPad: tap the Share button in Safari, then choose “Add to Home Screen”.",
         "contact.lead": "<strong>Genius Digital.</strong> Interested in our products or looking to collaborate? Reach us through the channels below.",
         "contact.email": "Email", "contact.whatsapp": "WhatsApp", "contact.social": "Social Media",
         "contact.phEmail": "Placeholder: add the company email", "contact.phWhatsapp": "Placeholder: add the WhatsApp number", "contact.phSocial": "(placeholder)",
@@ -984,7 +1000,7 @@
         "state.empty.title": "لا توجد منتجات بعد",
         "state.empty.text": "ستظهر منتجات جينيوس ديجيتال هنا قريباً. يُرجى العودة لاحقاً.",
         "modal.msg": "المنتج قريباً.", "modal.close": "إغلاق", "modal.ok": "إغلاق",
-        "contact.eyebrow": "التواصل", "contact.h2": "اتصل بنا", "contact.soon": "ستُحدَّث بيانات التواصل قريباً.", "install.btn": "تثبيت التطبيق", "price.label": "سعر خاص", "price.was": "السعر الأصلي", "price.fixed": "السعر", "price.free": "مجاني", "install.title": "تثبيت جينيوس ديجيتال", "install.ios": "على iPhone / iPad: اضغط زر المشاركة في Safari ثم اختر «إضافة إلى الشاشة الرئيسية».",
+        "contact.eyebrow": "التواصل", "contact.h2": "اتصل بنا", "contact.soon": "ستُحدَّث بيانات التواصل قريباً.", "install.btn": "تثبيت التطبيق", "price.label": "سعر خاص", "price.was": "السعر الأصلي", "price.fixed": "السعر", "price.free": "مجاني", "price.ended": "انتهى", "price.soldout": "نفد المخزون", "install.title": "تثبيت جينيوس ديجيتال", "install.ios": "على iPhone / iPad: اضغط زر المشاركة في Safari ثم اختر «إضافة إلى الشاشة الرئيسية».",
         "contact.lead": "<strong>جينيوس ديجيتال.</strong> هل أنت مهتم بمنتجاتنا أو ترغب في التعاون معنا؟ تواصل معنا عبر القنوات التالية.",
         "contact.email": "البريد الإلكتروني", "contact.whatsapp": "WhatsApp", "contact.social": "وسائل التواصل الاجتماعي",
         "contact.phEmail": "نص مؤقت: أضف البريد الإلكتروني للشركة", "contact.phWhatsapp": "نص مؤقت: أضف رقم WhatsApp", "contact.phSocial": "(نص مؤقت)",
@@ -1113,16 +1129,22 @@
     const priceNum = (v) => (typeof v === "number" && isFinite(v) && v > 0) ? v : null;
     const fmtRM = (n) => "RM " + n.toLocaleString("en-US", { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 });
     function priceBadge(product, index = 0) {
-      if (product.price === 0) {   // Percuma
-        const lbl = t("price.fixed"), free = t("price.free");
-        return el("div", { class: "price-badge free", role: "img", "aria-label": `${lbl}: ${free}`, style: `--pd:${(-(index % 5) * 0.7).toFixed(1)}s` }, [
-          el("span", { class: "pb-label", text: lbl }), el("span", { class: "pb-body" }, el("span", { class: "pb-free", text: free }))]);
+      const pd = `--pd:${(-(index % 5) * 0.7).toFixed(1)}s`;
+      const word = (cls, key) => el("div", { class: "price-badge nolabel " + cls, role: "img", "aria-label": t(key), style: pd }, el("span", { class: "pb-body" }, el("span", { class: "pb-free", text: t(key) })));
+      let type = product.priceType;   // free | fixed | special | ended | soldout (data lama: disimpulkan daripada price)
+      if (!["free", "fixed", "special", "ended", "soldout"].includes(type)) {
+        const p0 = priceNum(product.price);
+        type = product.price === 0 ? "free" : p0 === null ? null : (priceNum(product.originalPrice) > p0 ? "special" : "fixed");
       }
+      if (type === "free") return word("free", "price.free");
+      if (type === "ended") return word("ended", "price.ended");
+      if (type === "soldout") return el("div", { class: "price-badge soldout", role: "img", "aria-label": t("price.soldout"), style: pd }, [
+        el("img", { class: "so-img", src: "/icons/habis-stok.png", alt: "", width: "256", height: "256", decoding: "async" }), el("span", { class: "so-txt", text: t("price.soldout") })]);
       const price = priceNum(product.price); if (price === null) return null;
-      const old = priceNum(product.originalPrice), hasOld = old !== null && old > price;
+      const old = priceNum(product.originalPrice), hasOld = type === "special" && old !== null && old > price;
       const [ip, dp] = price.toFixed(2).split("."), label = t(hasOld ? "price.label" : "price.fixed");
       const aria = `${label}: ${fmtRM(price)}` + (hasOld ? `, ${t("price.was")} ${fmtRM(old)}` : "");
-      return el("div", { class: "price-badge " + (hasOld ? "special" : "fixed"), role: "img", "aria-label": aria, style: `--pd:${(-(index % 5) * 0.7).toFixed(1)}s` }, [
+      return el("div", { class: "price-badge " + (hasOld ? "special" : "fixed"), role: "img", "aria-label": aria, style: pd }, [
         el("span", { class: "pb-label", text: label }),
         el("span", { class: "pb-body", dir: "ltr" }, el("span", { class: "pb-main" }, [
           el("span", { class: "pb-cur", text: "RM" }), el("span", { class: "pb-int", text: Number(ip).toLocaleString("en-US") }), dp !== "00" ? el("span", { class: "pb-dec", text: "." + dp }) : null])),
@@ -1139,6 +1161,7 @@
     }
 
     function openProduct(product) {
+      if (product.priceType === "ended" || product.priceType === "soldout") return;
       // Jika admin isi Pautan Produk (https://), ke sana; jika tidak, modal "Produk Akan Datang".
       const link = safeHttps(product.productURL);
       if (link) { window.open(link, "_blank", "noopener,noreferrer"); return; }
@@ -1154,17 +1177,19 @@
 
     function productCard(product, index) {
       const name = localized(product, "name") || t("product.noName");
-      const link = safeHttps(product.productURL);
+      const blocked = product.priceType === "ended" || product.priceType === "soldout";   // Tamat / Habis Stok: tidak boleh ditekan
+      const link = blocked ? "" : safeHttps(product.productURL);
       const thumbKids = [statusBadge(product.status), thumbImage(product, t("thumb.alt", { name }))];
       const pb = priceBadge(product, index);
       const btnKids = [el("span", { text: t("btn.explore") }), icon("i-arrow")];
-      return el("article", { class: "product-card reveal", style: `--d:${Math.min(index, 5) * .08}s`, "data-slug": product.slug }, [
+      return el("article", { class: "product-card reveal" + (blocked ? " unavailable" : ""), style: `--d:${Math.min(index, 5) * .08}s`, "data-slug": product.slug }, [
         link ? el("a", { class: "thumb", href: link, target: "_blank", rel: "noopener noreferrer", "aria-label": name, tabindex: "-1" }, thumbKids) : el("div", { class: "thumb" }, thumbKids),
         el("div", { class: "card-body" }, [
           el("div", { class: "card-top" + (pb ? " has-price" : "") }, [el("span", { class: "category-pill", text: localized(product, "category") || t("product.defaultCat") }), pb]),
           el("h3", { text: name }),
           el("p", { text: localized(product, "description") }),
           link ? el("a", { class: "btn btn-primary", href: link, target: "_blank", rel: "noopener noreferrer" }, btnKids)
+               : blocked ? el("button", { class: "btn btn-primary", type: "button", disabled: "", "aria-disabled": "true" }, btnKids)
                : el("button", { class: "btn btn-primary", type: "button", onclick: () => openProduct(product) }, btnKids)
         ])
       ]);

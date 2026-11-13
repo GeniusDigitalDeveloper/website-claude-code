@@ -333,7 +333,7 @@
     .pricebox { border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1rem .4rem; margin-bottom: 1rem; background: var(--bg); }
     .pricebox-title { font-family: var(--font-head); font-weight: 800; font-size: .85rem; letter-spacing: .06em; text-transform: uppercase; color: #C4141C; margin-bottom: .8rem; }
     .pricebox .hint { display: block; margin: -.3rem 0 .8rem; }
-    .pmode { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; margin-bottom: 1rem; }
+    .pmode { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; margin-bottom: 1rem; }
     .pm { position: relative; cursor: pointer; }
     .pm input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
     .pm span { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .15rem; min-height: 58px; padding: .5rem .4rem; border: 1.5px solid var(--input-border); border-radius: 12px; background: var(--surface); font-family: var(--font-head); font-weight: 700; font-size: .82rem; line-height: 1.2; text-align: center; color: var(--head); }
@@ -341,7 +341,7 @@
     .pm input:checked + span { border-color: var(--blue-500); box-shadow: 0 0 0 3px rgba(10, 102, 255, .15); color: var(--accent); }
     .pm input:focus-visible + span { outline: 3px solid var(--cyan-400); outline-offset: 2px; }
     @media (max-width: 640px) { .pmode { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 420px) { .pmode { grid-template-columns: 1fr; } .pm span { min-height: 48px; } }
+    @media (max-width: 420px) { .pm span { min-height: 48px; } }
     .pprice { display: block; margin-top: .25rem; font-size: .8rem; font-weight: 700; color: #C4141C; }
     .pprice s { color: var(--muted); font-weight: 500; }
 
@@ -645,6 +645,8 @@
             <label class="pm"><input type="radio" name="priceMode" value="free"><span>Percuma<small>tiada harga</small></span></label>
             <label class="pm"><input type="radio" name="priceMode" value="fixed"><span>Harga Tetap<small>tanpa diskaun</small></span></label>
             <label class="pm"><input type="radio" name="priceMode" value="special"><span>Harga Istimewa<small>ada potongan</small></span></label>
+            <label class="pm"><input type="radio" name="priceMode" value="ended"><span>Tamat<small>badge biru</small></span></label>
+            <label class="pm"><input type="radio" name="priceMode" value="soldout"><span>Habis Stok<small>tanda merah</small></span></label>
           </div>
           <div class="row2" id="priceFields" hidden>
             <div class="field" id="fldPrice">
@@ -952,7 +954,7 @@
         nameEn: data.nameEn || "", categoryEn: data.categoryEn || "", descriptionEn: data.descriptionEn || "",
         nameAr: data.nameAr || "", categoryAr: data.categoryAr || "", descriptionAr: data.descriptionAr || "",
         productURL: data.productURL || "", displayOrder: Number(data.displayOrder) || 0,
-        price: typeof data.price === "number" ? data.price : null, originalPrice: typeof data.originalPrice === "number" ? data.originalPrice : null,
+        priceType: typeof data.priceType === "string" ? data.priceType : null, price: typeof data.price === "number" ? data.price : null, originalPrice: typeof data.originalPrice === "number" ? data.originalPrice : null,
         createdAt: toMillis(data.createdAt), updatedAt: toMillis(data.updatedAt)
       };
     }
@@ -992,12 +994,12 @@
             nameEn: p.nameEn || "", categoryEn: p.categoryEn || "", descriptionEn: p.descriptionEn || "",
             nameAr: p.nameAr || "", categoryAr: p.categoryAr || "", descriptionAr: p.descriptionAr || "",
             status: p.status, productURL: p.productURL || "", displayOrder: p.displayOrder,
-            ...(p.price != null ? { price: p.price } : {}), ...(p.originalPrice != null ? { originalPrice: p.originalPrice } : {}),
+            ...(p.priceType ? { priceType: p.priceType } : {}), ...(p.price != null ? { price: p.price } : {}), ...(p.originalPrice != null ? { originalPrice: p.originalPrice } : {}),
             createdAt: FS.serverTimestamp(), updatedAt: FS.serverTimestamp()
           });
         },
         async update(slug, patch) {   // harga kosong (null) = padam medan harga
-          const clean = Object.fromEntries(Object.entries(patch).map(([k, v]) => [k, (k === "price" || k === "originalPrice") && v === null ? FS.deleteField() : v]));
+          const clean = Object.fromEntries(Object.entries(patch).map(([k, v]) => [k, (k === "price" || k === "originalPrice" || k === "priceType") && v === null ? FS.deleteField() : v]));
           await FS.updateDoc(docRef(slug), { ...clean, updatedAt: FS.serverTimestamp() });
         },
         async remove(slug) { await FS.deleteDoc(docRef(slug)); },
@@ -1178,10 +1180,19 @@
     }
 
     const fmtRM = (n) => "RM " + (Number.isInteger(n) ? String(n) : n.toFixed(2));
+    const PRICE_TYPES = ["free", "fixed", "special", "ended", "soldout"];
+    function priceModeOf(p) {   // jenis badge: guna priceType; data lama disimpulkan daripada harga
+      if (PRICE_TYPES.includes(p.priceType)) return p.priceType;
+      if (p.price == null) return "none";
+      return p.price === 0 ? "free" : p.originalPrice != null ? "special" : "fixed";
+    }
     function priceLine(p) {
-      if (p.price == null) return null;
-      if (p.price === 0) return el("span", { class: "pprice" }, "Percuma");
-      return el("span", { class: "pprice" }, p.originalPrice != null ? ["Istimewa: " + fmtRM(p.price) + "  ", el("s", { text: fmtRM(p.originalPrice) })] : "Tetap: " + fmtRM(p.price));
+      const m = priceModeOf(p);
+      if (m === "none") return null;
+      const word = { free: "Percuma", ended: "Tamat", soldout: "Habis Stok" }[m];
+      if (word) return el("span", { class: "pprice" }, word);
+      if (m === "special") return el("span", { class: "pprice" }, ["Istimewa: " + fmtRM(p.price) + "  ", el("s", { text: fmtRM(p.originalPrice) })]);
+      return el("span", { class: "pprice" }, "Tetap: " + fmtRM(p.price));
     }
     function renderProducts() {
       if (dragState) { dragState.pending = true; return; }   // jangan lukis semula ketika menyeret
@@ -1340,7 +1351,7 @@
       F.category.value = p ? p.category : ""; F.status.value = p ? p.status : "active"; F.desc.value = p ? p.description : "";
       F.url.value = p ? p.productURL : "";
       F.price.value = p && p.price != null ? p.price : ""; F.orig.value = p && p.originalPrice != null ? p.originalPrice : "";
-      setPriceMode(p && p.price != null ? (p.price === 0 ? "free" : p.originalPrice != null ? "special" : "fixed") : "none");
+      setPriceMode(p ? priceModeOf(p) : "none");
       F.order.value = p ? p.displayOrder : (products.reduce((m, x) => Math.max(m, x.displayOrder), 0) + 1);
       F.nameEn.value = p ? p.nameEn : ""; F.catEn.value = p ? p.categoryEn : ""; F.descEn.value = p ? p.descriptionEn : "";
       F.nameAr.value = p ? p.nameAr : ""; F.catAr.value = p ? p.categoryAr : ""; F.descAr.value = p ? p.descriptionAr : "";
@@ -1375,12 +1386,14 @@
 
     // Jenis badge harga: none (tiada), free (percuma, harga 0), fixed (harga tetap, tanpa diskaun), special (harga istimewa + harga asal dicoret)
     const PRICE_HINT = { none: "Produk tidak akan memaparkan badge harga.",
-      free: "Badge hijau \"PERCUMA\": produk percuma, tiada harga. Terus muncul pada kad produk di laman awam.",
+      free: "Badge hijau \"PERCUMA\": produk percuma, tiada harga dipaparkan. Terus muncul pada kad produk di laman awam.",
+      ended: "Badge biru \"TAMAT\": produk atau tawaran telah tamat. Tiada harga dipaparkan, dan produk tidak boleh ditekan di laman awam.",
+      soldout: "Tanda larangan merah \"HABIS STOK\". Tiada harga dipaparkan, dan produk tidak boleh ditekan di laman awam.",
       fixed: "Badge biru: satu harga tetap, tanpa diskaun. Terus muncul pada kad produk di laman awam.",
       special: "Badge merah: harga istimewa dengan harga asal dicoret (ada potongan). Harga asal mesti lebih tinggi daripada harga istimewa." };
     function setPriceMode(mode) {
       const r = $(`input[name="priceMode"][value="${mode}"]`); if (r) r.checked = true;
-      $("#priceFields").hidden = mode === "none" || mode === "free"; $("#fldOrig").hidden = mode !== "special";
+      $("#priceFields").hidden = !(mode === "fixed" || mode === "special"); $("#fldOrig").hidden = mode !== "special";
       $("#lblPrice").textContent = mode === "special" ? "Harga Istimewa (RM)" : "Harga Tetap (RM)";
       $("#optPrice").textContent = mode === "special" ? "(badge merah)" : "(badge biru)";
       $("#priceHint").textContent = PRICE_HINT[mode];
@@ -1401,7 +1414,7 @@
       if (!Number.isInteger(order) || order < 0 || order > 100000) { fieldError(F.order, "#eOrder", t("val.order")); ok = false; }
       const mode = $('input[name="priceMode"]:checked').value;
       const money = (i) => { const v = i.value.trim().replace(",", "."); return v === "" ? null : Number(v); };
-      const price = mode === "none" ? null : mode === "free" ? 0 : money(F.price), orig = mode === "special" ? money(F.orig) : null;
+      const price = (mode === "fixed" || mode === "special") ? money(F.price) : null, orig = mode === "special" ? money(F.orig) : null;
       if (mode === "fixed" || mode === "special") {
         const okPrice = price !== null && Number.isFinite(price) && price > 0 && price <= 1000000;
         if (!okPrice) { fieldError(F.price, "#ePrice", "Masukkan harga lebih daripada 0 (contoh: 129.99)."); ok = false; }
@@ -1413,7 +1426,7 @@
       const r2 = (n) => n === null ? null : Math.round(n * 100) / 100;
       if (!ok) { const first = form.querySelector(".invalid"); if (first) first.focus(); }
       const tr = (i) => i.value.trim();
-      return ok ? { name, slug, category: cat, description: desc, status: F.status.value, productURL: url, displayOrder: order, price: r2(price), originalPrice: r2(orig),
+      return ok ? { name, slug, category: cat, description: desc, status: F.status.value, productURL: url, displayOrder: order, price: r2(price), originalPrice: r2(orig), priceType: mode === "none" ? null : mode,
         nameEn: tr(F.nameEn), categoryEn: tr(F.catEn), descriptionEn: tr(F.descEn), nameAr: tr(F.nameAr), categoryAr: tr(F.catAr), descriptionAr: tr(F.descAr) } : null;
     }
 

@@ -28,7 +28,7 @@ service cloud.firestore {
       return data.keys().hasOnly([
         'name', 'slug', 'category', 'description',
         'thumbnailURL',
-        'status', 'productURL', 'displayOrder', 'price', 'originalPrice',
+        'status', 'productURL', 'displayOrder', 'price', 'originalPrice', 'priceType',
         'nameEn', 'categoryEn', 'descriptionEn',
         'nameAr', 'categoryAr', 'descriptionAr',
         'createdAt', 'updatedAt'
@@ -65,6 +65,11 @@ service cloud.firestore {
       return !(key in data) || (data[key] is number && data[key] >= 0 && data[key] <= 1000000);
     }
 
+    // Jenis badge harga (pilihan): free | fixed | special | ended | soldout
+    function optPriceType(data) {
+      return !('priceType' in data) || (data.priceType is string && data.priceType in ['free', 'fixed', 'special', 'ended', 'soldout']);
+    }
+
     function hasValidFields(data, docId) {
       return hasOnlyAllowedKeys(data)
         && hasRequiredKeys(data)
@@ -81,7 +86,7 @@ service cloud.firestore {
         && isEmptyOrHttps(data.productURL) && data.productURL.size() <= 2048
         && data.displayOrder is number
         && data.displayOrder >= 0 && data.displayOrder <= 100000
-        && optPrice(data, 'price') && optPrice(data, 'originalPrice')
+        && optPrice(data, 'price') && optPrice(data, 'originalPrice') && optPriceType(data)
         && data.createdAt is timestamp
         && data.updatedAt is timestamp;
     }
