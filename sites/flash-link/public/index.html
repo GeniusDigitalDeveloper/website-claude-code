@@ -403,6 +403,17 @@ html{scrollbar-width:thin;scrollbar-color:#FF4D4D rgba(255,255,255,.08)}
 .lsel{min-height:44px;max-width:200px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid var(--line);color:#fff;font-weight:600}
 .lsel option{background:#14151c;color:#fff}
 .rowlk:hover{background:rgba(255,255,255,.04);border-radius:12px}.rowlk:focus-visible{outline:2px solid #7DD3FC;outline-offset:2px;border-radius:12px}
+/* ===== jadual posting ===== */
+.sc-clock{display:flex;gap:6px 18px;flex-wrap:wrap;align-items:center;border-radius:16px;padding:10px 14px;margin:12px 0;font-size:14px;color:#C7C9D1}.sc-clock span{display:inline-flex;gap:6px;align-items:center}.sc-clock b{color:#fff;font-variant-numeric:tabular-nums}
+.sc-info{border-radius:18px;padding:14px 16px}.sc-info ul{margin:8px 0 0;padding-left:18px;color:#C7C9D1;font-size:14px;line-height:1.55}
+.sc-cal{border-radius:20px;padding:14px;margin-top:12px}.sc-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;text-transform:capitalize}
+.sc-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}.sc-h{text-align:center;font-size:12px;color:#9CA3AF;padding:4px 0}
+.sc-c{position:relative;min-height:46px;border-radius:12px;display:grid;place-items:center;color:#fff;background:rgba(255,255,255,.04);border:1px solid transparent;font-weight:600}.sc-c.e{background:none}
+.sc-c:hover{border-color:rgba(125,211,252,.5)}.sc-c.t{border-color:rgba(255,107,107,.7)}.sc-c.s{background:linear-gradient(135deg,#FF2A2A,#B80000)}
+.sc-c em{position:absolute;right:4px;bottom:3px;min-width:18px;height:18px;border-radius:9px;background:#38BDF8;color:#04121c;font-size:11px;font-style:normal;font-weight:800;display:grid;place-items:center;padding:0 4px}
+.sc-nets,.sc-accs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.sc-net{display:inline-flex;gap:8px;align-items:center;min-height:44px;padding:0 14px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid var(--line);cursor:pointer}.sc-net input{width:18px;height:18px;accent-color:#FF4D4D}
+.sc-dt{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:12px}
+.srow.due{border-color:#FFD166;box-shadow:0 0 0 2px rgba(255,209,102,.25)}
 /* ===== chatbot ===== */
 body{--cbb:16px}body:has(.pvfab.on){--cbb:84px}body:has(.dnav){--cbb:78px}body:has(.dnav):has(.pvfab.on){--cbb:146px}
 @media(min-width:1180px){body:has(.dnav){--cbb:16px}}
@@ -601,6 +612,9 @@ const P = {
   laptop: '<rect width="18" height="12" x="3" y="4" rx="2"/><path d="M2 20h20"/>',
   trend: '<path d="M22 7 13.5 15.5l-5-5L2 17"/><path d="M16 7h6v6"/>',
   more: '<circle cx="12" cy="5" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="12" cy="19" r="1.4"/>',
+  calendar: '<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  clock: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+  chevl: '<path d="m15 18-6-6 6-6"/>',
   scissors: '<circle cx="6" cy="6" r="3"/><path d="M8.12 8.12 12 12"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.12 15.88"/><path d="M14.8 14.8 20 20"/>',
   crop: '<path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/>',
   send: '<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>',
@@ -1311,6 +1325,7 @@ const NAV = [
   { k: "insights", n: "Analitik", i: "chart", d: "Prestasi keseluruhan, pautan yang sedang naik, sumber pelawat dan analitik setiap pautan." },
   { k: "leads", n: "Pelanggan", i: "mail", d: "Mesej dan tempahan daripada borang e-mel anda." },
   { k: "short", n: "Shorten link", i: "scissors", d: "Pendekkan mana-mana pautan panjang. Setiap pautan pendek ada nama, butang salin, edit dan buang, dan boleh disusun." },
+  { k: "schedule", n: "Jadual posting", i: "calendar", d: "Jadualkan post media sosial pada tarikh dan masa pilihan anda. Pilih Zernio (hantar automatik melalui API) atau Metricool (kalendar + peringatan)." },
 ];
 let navBusy = false;
 function dashboard() {
@@ -1326,6 +1341,7 @@ function dashboard() {
   $$(".dnav-i").forEach(b => (b.onclick = () => openView(b.dataset.k)));
   $("#pvb").onclick = () => modal(`<div id="pvmobile" style="max-height:78vh;overflow-y:auto;display:flex;flex-direction:column;gap:18px;align-items:center"><div style="width:100%;max-width:340px">${phoneFrame("", "")}</div><div style="width:100%">${laptopFrame()}</div></div>`, () => refreshPreview(true));
   drawPreviewPanel();
+  if (/[?&]zc=/.test(location.search)) { S.view = "schedule"; SC.prov = "zernio"; history.replaceState({}, "", "/dashboard"); }
   if (S.view === "home") S.view = "design";
   openView(NAV.some(x => x.k === S.view) ? S.view : "design", { instant: true });
 }
@@ -1338,7 +1354,7 @@ async function openView(view, o = {}) {
     S.view = view; const x = NAV.find(n => n.k === view);
     stage.innerHTML = `<div id="sec"><div class="sec-in" style="display:flex;gap:14px;align-items:center;margin-bottom:6px"><div class="dtile">${ic(x.i, "w-6 h-6")}</div><h1 class="font-display" style="font-size:26px;font-weight:700;margin:0">${x.n}</h1></div><p class="sec-in" style="margin:0 0 18px;color:#C7C9D1;max-width:680px;line-height:1.55">${x.d}</p><section id="pane" aria-live="polite"></section></div>`;
     $$(".dnav-i").forEach(b => b.setAttribute("aria-current", b.dataset.k === view ? "page" : "false"));
-    ({ design: designTab, links: linksTab, profile: profileTab, insights: insightsTab, leads: () => statsTab("leads"), short: shortTab })[view]();
+    ({ design: designTab, links: linksTab, profile: profileTab, insights: insightsTab, leads: () => statsTab("leads"), short: shortTab, schedule: scheduleTab })[view]();
     window.scrollTo({ top: 0 }); fitMinis();
     anim($("#sec"), [{ opacity: 0, transform: "translate3d(28px,0,0) scale(.985)" }, { opacity: 1, transform: "none" }], { duration: 620 });
     stagger(".sec-in, #pane > .glass, #pane > div > section, #ll > *, .gal-card", 110, 50);
@@ -1444,6 +1460,138 @@ function editDesign() {
   [["ed-ft", "font"], ["ed-fs", "fs"], ["ed-sh", "shape"], ["ed-sz", "sz"]].forEach(([id, k]) => ($e(id).onchange = e => { S.profile.theme[k] = e.target.value; commit(); }));
   $e("ed-done").onclick = () => m.close(); check();
   const mo = new MutationObserver(() => { if (!document.body.contains(m)) { mo.disconnect(); if (S.view === "design") designTab(); } }); mo.observe(document.body, { childList: true });
+}
+
+/* ---------- Jadual posting: Zernio (API terus dari pelayar) atau Metricool (kalendar + peringatan) ---------- */
+const ZAPI = "https://zernio.com/api/v1", MC_LIMIT = 20, ZFREE = 2;
+const lsGet = k => { try { return localStorage.getItem(k) || ""; } catch { return ""; } };
+const lsSet = (k, v) => { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch {} };
+const TZS = [["Asia/Kuala_Lumpur", "Malaysia (Kuala Lumpur)"], ["Asia/Singapore", "Singapura"], ["Asia/Jakarta", "Indonesia (Jakarta)"], ["Asia/Brunei", "Brunei"], ["Asia/Bangkok", "Thailand"], ["Asia/Tokyo", "Jepun"], ["Asia/Dubai", "Dubai"], ["Asia/Riyadh", "Arab Saudi"], ["Europe/London", "London"], ["America/New_York", "New York"], ["America/Los_Angeles", "Los Angeles"], ["Australia/Sydney", "Sydney"], ["UTC", "UTC"]];
+const wallIn = (d, tz) => { const p = Object.fromEntries(new Intl.DateTimeFormat("en-CA", { timeZone: tz, hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit" }).formatToParts(d).map(x => [x.type, x.value])); return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}:${p.second}`; };
+const zonedToUtc = (wall, tz) => { const g = new Date(wall + "Z"), w = new Date(wallIn(g, tz) + "Z"); return new Date(g.getTime() - (w - g)); };
+const addMin = (wall, m) => new Date(new Date(wall.slice(0, 19) + "Z").getTime() + m * 6e4).toISOString().slice(0, 19);
+const dayIn = (d, tz) => wallIn(d, tz).slice(0, 10), timeIn = (d, tz) => wallIn(d, tz).slice(11, 16);
+const SC = { prov: lsGet("fl_prov") === "metricool" ? "metricool" : "zernio", tz: lsGet("fl_tz") || "Asia/Kuala_Lumpur", ym: "", sel: "", posts: [], accounts: [], timer: 0 };
+const zkey = () => lsGet("fl_zkey");
+async function zfetch(path, opt = {}) {
+  const r = await fetch(ZAPI + path, { ...opt, headers: { Authorization: "Bearer " + zkey(), "Content-Type": "application/json", ...(opt.headers || {}) } });
+  let j = null; try { j = await r.json(); } catch {}
+  if (!r.ok) { const e = new Error((j && (j.error || j.message)) || "Ralat " + r.status); e.status = r.status; throw e; }
+  return j || {};
+}
+async function zload() {
+  const [a, ps] = await Promise.all([zfetch("/accounts"), zfetch("/posts?status=scheduled&limit=100")]);
+  SC.accounts = (a.accounts || (Array.isArray(a) ? a : [])).filter(x => x.isActive !== false);
+  const arr = ps.posts || ps.data || (Array.isArray(ps) ? ps : []);
+  SC.posts = arr.map(p => ({ id: p._id || p.id, text: p.content || "", ts: new Date(p.scheduledFor).getTime(), plats: (p.platforms || []).map(x => x.platform), status: p.status || "scheduled" })).filter(p => p.id && !isNaN(p.ts));
+}
+async function zconnect(pl) {
+  const pr = await zfetch("/profiles"), pid = (pr.profiles || (Array.isArray(pr) ? pr : []))[0]?._id;
+  const q = new URLSearchParams({ redirect_url: location.origin + "/dashboard?zc=1" }); if (pid) q.set("profileId", pid);
+  const r = await zfetch(`/connect/${pl}?` + q); if (!r.authUrl) throw new Error("Tiada pautan sambungan diterima."); location.href = r.authUrl;
+}
+const mcGet = () => { try { return JSON.parse(lsGet("fl_mc") || "[]"); } catch { return []; } };
+const mcSet = a => lsSet("fl_mc", JSON.stringify(a));
+const PLAT = { instagram: "Instagram", facebook: "Facebook", tiktok: "TikTok", youtube: "YouTube", linkedin: "LinkedIn", twitter: "X (Twitter)", threads: "Threads", pinterest: "Pinterest" };
+const MC_NETS = ["instagram", "facebook", "tiktok", "youtube", "linkedin", "twitter"];
+const schedItems = () => (SC.prov === "zernio" ? SC.posts : mcGet().map(x => ({ ...x, status: x.done ? "siap" : x.ts <= Date.now() ? "due" : "dirancang" })));
+function scheduleTab() {
+  clearInterval(SC.timer); const pane = $("#pane");
+  if (!SC.ym) SC.ym = dayIn(new Date(), SC.tz).slice(0, 7);
+  pane.innerHTML = `<div class="seg" role="tablist" aria-label="Pilih perkhidmatan" style="margin-bottom:14px">${[["zernio", "Zernio"], ["metricool", "Metricool"]].map(([k, n]) => `<button role="tab" data-pv="${k}" aria-selected="${SC.prov === k}">${n}</button>`).join("")}</div>
+  <div id="sc-info"></div><div class="glass sc-clock" id="sc-clock" aria-live="off"></div><div id="sc-body"></div>`;
+  $$("[data-pv]").forEach(b => (b.onclick = () => { SC.prov = b.dataset.pv; lsSet("fl_prov", SC.prov); scheduleTab(); }));
+  const tick = () => { const c = $("#sc-clock"); if (!c) return clearInterval(SC.timer); const n = new Date(), f = tz => new Intl.DateTimeFormat("ms-MY", { timeZone: tz, weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }).format(n); c.innerHTML = `<span>${ic("clock", "w-4 h-4")} Malaysia: <b>${f("Asia/Kuala_Lumpur")}</b></span>${SC.tz !== "Asia/Kuala_Lumpur" ? `<span>${esc((TZS.find(t => t[0] === SC.tz) || [0, SC.tz])[1])}: <b>${f(SC.tz)}</b></span>` : ""}<span>UTC: <b>${f("UTC")}</b></span>`; if (SC.prov === "metricool" && n.getSeconds() === 0 && $("#sc-list")) drawDay(); };
+  tick(); SC.timer = setInterval(tick, 1000);
+  if (SC.prov === "zernio") return zernioView(); metricoolView();
+}
+const infoCard = (title, lines) => `<div class="glass sc-info"><b>${title}</b><ul>${lines.map(l => `<li>${l}</li>`).join("")}</ul></div>`;
+function calHtml() {
+  const [y, m] = SC.ym.split("-").map(Number), first = new Date(Date.UTC(y, m - 1, 1)), dim = new Date(Date.UTC(y, m, 0)).getUTCDate(), off = (first.getUTCDay() + 6) % 7, today = dayIn(new Date(), SC.tz), cnt = {};
+  schedItems().forEach(p => { const d = dayIn(new Date(p.ts), SC.tz); cnt[d] = (cnt[d] || 0) + 1; });
+  const cells = Array.from({ length: off }, () => `<i class="sc-c e"></i>`).concat(Array.from({ length: dim }, (_, i) => { const d = `${SC.ym}-${String(i + 1).padStart(2, "0")}`; return `<button class="sc-c${d === today ? " t" : ""}${d === SC.sel ? " s" : ""}" data-d="${d}" aria-label="${i + 1} ${new Date(Date.UTC(y, m - 1, 1)).toLocaleDateString("ms-MY", { month: "long", timeZone: "UTC" })}${cnt[d] ? ", " + cnt[d] + " post" : ""}"><span>${i + 1}</span>${cnt[d] ? `<em>${cnt[d]}</em>` : ""}</button>`; }));
+  return `<div class="glass sc-cal"><div class="sc-nav"><button class="btn btn-ghost btn-sm" id="cpv" aria-label="Bulan sebelum">${ic("chevl", "w-4 h-4")}</button><b>${new Date(Date.UTC(y, m - 1, 1)).toLocaleDateString("ms-MY", { month: "long", year: "numeric", timeZone: "UTC" })}</b><button class="btn btn-ghost btn-sm" id="cnx" aria-label="Bulan seterusnya">${ic("chevr", "w-4 h-4")}</button></div><div class="sc-grid">${["Isn", "Sel", "Rab", "Kha", "Jum", "Sab", "Ahd"].map(d => `<span class="sc-h">${d}</span>`).join("")}${cells.join("")}</div></div><div class="glass" style="border-radius:20px;padding:14px;margin-top:12px"><div class="lbl" id="sc-dl"></div><div id="sc-list" class="scrollbox"></div></div>`;
+}
+function drawDay() {
+  const list = $("#sc-list"); if (!list) return; const day = SC.sel || dayIn(new Date(), SC.tz);
+  $("#sc-dl").textContent = "Post pada " + new Date(day + "T00:00:00Z").toLocaleDateString("ms-MY", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
+  const items = schedItems().filter(p => dayIn(new Date(p.ts), SC.tz) === day).sort((a, b) => a.ts - b.ts);
+  list.innerHTML = items.length ? items.map(p => `<div class="srow glass${p.status === "due" ? " due" : ""}" data-id="${esc(p.id)}"><div class="srow-t"><b>${timeIn(new Date(p.ts), SC.tz)} · ${esc((p.plats || []).map(x => PLAT[x] || x).join(", ") || "Media sosial")}</b><span style="color:#C7C9D1;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.text)}</span>${p.status === "due" ? `<small style="color:#FFD166">Masa posting! Salin teks dan hantar melalui Metricool.</small>` : `<small style="color:#9CA3AF">${esc({ scheduled: "Dijadualkan", dirancang: "Dirancang", siap: "Siap" }[p.status] || p.status)}</small>`}</div>${SC.prov === "metricool" ? `<button class="btn btn-ghost btn-sm" data-cp="${esc(p.id)}" aria-label="Salin teks">${ic("copy", "w-4 h-4")}</button>${p.status === "siap" ? "" : `<button class="btn btn-ghost btn-sm" data-ok="${esc(p.id)}" aria-label="Tandakan siap">${ic("check", "w-4 h-4")}</button>`}` : ""}<button class="btn btn-ghost btn-sm" data-rm="${esc(p.id)}" aria-label="Buang post">${ic("trash", "w-4 h-4")}</button></div>`).join("") : `<p style="color:#9CA3AF;margin:0">Tiada post pada hari ini.</p>`;
+  $$("[data-cp]", list).forEach(b => (b.onclick = () => copyText((mcGet().find(x => x.id === b.dataset.cp) || {}).text || "")));
+  $$("[data-ok]", list).forEach(b => (b.onclick = () => { mcSet(mcGet().map(x => (x.id === b.dataset.ok ? { ...x, done: true } : x))); drawCal(); }));
+  $$("[data-rm]", list).forEach(b => (b.onclick = async () => {
+    if (SC.prov === "metricool") { mcSet(mcGet().filter(x => x.id !== b.dataset.rm)); return drawCal(); }
+    b.disabled = true; try { await zfetch("/posts/" + encodeURIComponent(b.dataset.rm), { method: "DELETE" }); SC.posts = SC.posts.filter(x => x.id !== b.dataset.rm); toast("Post dibuang."); drawCal(); } catch (e) { b.disabled = false; toast("Gagal membuang: " + e.message, "bad"); }
+  }));
+}
+function drawCal() {
+  const box = $("#sc-cal"); if (!box) return; box.innerHTML = calHtml();
+  $("#cpv").onclick = () => { const [y, m] = SC.ym.split("-").map(Number); SC.ym = new Date(Date.UTC(y, m - 2, 1)).toISOString().slice(0, 7); drawCal(); };
+  $("#cnx").onclick = () => { const [y, m] = SC.ym.split("-").map(Number); SC.ym = new Date(Date.UTC(y, m, 1)).toISOString().slice(0, 7); drawCal(); };
+  $$(".sc-c[data-d]", box).forEach(b => (b.onclick = () => { SC.sel = b.dataset.d; $$(".sc-c.s", box).forEach(x => x.classList.remove("s")); b.classList.add("s"); drawDay(); const dt = $("#sc-date"); if (dt) dt.value = SC.sel; }));
+  drawDay(); const cnt = $("#mc-count"); if (cnt) cnt.textContent = mcMonthCount();
+}
+const mcMonthCount = (ym) => { ym = ym || dayIn(new Date(), SC.tz).slice(0, 7); return mcGet().filter(x => dayIn(new Date(x.ts), SC.tz).slice(0, 7) === ym).length; };
+function composerHtml(nets) {
+  const def = addMin(wallIn(new Date(), SC.tz), 15).slice(0, 16);
+  return `<div class="glass" style="border-radius:20px;padding:16px;margin-top:12px"><div class="lbl">Post baharu</div>
+  <textarea id="sc-text" class="inp" rows="4" maxlength="2200" placeholder="Tulis kapsyen / teks post anda…" aria-label="Teks post"></textarea>
+  <input id="sc-media" class="inp" style="margin-top:10px" inputmode="url" placeholder="Pautan gambar/video awam (pilihan, https://…)" aria-label="Pautan media">
+  <div class="lbl" style="margin-top:12px">Hantar ke</div><div class="sc-nets">${nets}</div>
+  <div class="sc-dt"><div><label class="lbl" for="sc-date">Tarikh</label><input id="sc-date" type="date" class="inp" value="${def.slice(0, 10)}"></div><div><label class="lbl" for="sc-time">Masa</label><input id="sc-time" type="time" class="inp" value="${def.slice(11, 16)}"></div>
+  <div><label class="lbl" for="sc-tz">Zon waktu</label><select id="sc-tz" class="inp">${TZS.map(([k, n]) => `<option value="${k}" ${SC.tz === k ? "selected" : ""}>${esc(n)}</option>`).join("")}</select></div></div>
+  <div id="sc-err" class="err" role="alert"></div><button id="sc-go" class="btn btn-red" style="width:100%;margin-top:12px;min-height:50px">${ic("calendar", "w-5 h-5")} Jadualkan</button></div>`;
+}
+function readComposer() {
+  const text = $("#sc-text").value.trim(), date = $("#sc-date").value, time = $("#sc-time").value, tz = $("#sc-tz").value, mu = $("#sc-media").value.trim(), er = $("#sc-err"); er.textContent = "";
+  if (!text && !mu) return (er.textContent = "Tulis teks atau letak pautan media."), null;
+  if (!date || !time) return (er.textContent = "Pilih tarikh dan masa."), null;
+  const wall = `${date}T${time}:00`; if (wall < addMin(wallIn(new Date(), tz), 2)) return (er.textContent = "Masa mesti sekurang-kurangnya 2 minit dari sekarang (zon waktu yang dipilih). Masa lepas akan dihantar serta-merta, jadi ia disekat."), null;
+  let media = ""; if (mu) { media = safeUrl(mu); if (!/^https:\/\//.test(media)) return (er.textContent = "Pautan media mesti https:// dan awam."), null; }
+  return { text, wall, tz, media, ts: zonedToUtc(wall, tz).getTime() };
+}
+function bindTz() { $("#sc-tz").onchange = e => { SC.tz = e.target.value; lsSet("fl_tz", SC.tz); SC.ym = dayIn(new Date(), SC.tz).slice(0, 7); drawCal(); }; }
+async function zernioView() {
+  const info = $("#sc-info"), body = $("#sc-body");
+  info.innerHTML = infoCard("Zernio (hantar automatik)", ["Percuma: <b>2 akaun media sosial serentak</b>. Akaun ketiga dan seterusnya perlukan kad dan pelan berbayar.", "Post tidak terhad; Zernio menghantar pada masa dijadualkan <b>walaupun app ditutup</b>.", "Anda guna API key akaun Zernio sendiri. Ia disimpan hanya dalam pelayar ini dan dihantar terus ke Zernio. Jangan kongsi komputer yang tidak dipercayai."]);
+  if (!zkey()) {
+    body.innerHTML = `<div class="glass" style="border-radius:20px;padding:16px"><div class="lbl">Sambung Zernio</div><p class="hint" style="margin:0 0 10px">Daftar di <a href="https://zernio.com" target="_blank" rel="noopener" style="color:#7DD3FC">zernio.com</a>, cipta API key dalam dashboard mereka, kemudian tampal di sini.</p><input id="zk" class="inp" type="password" autocomplete="off" placeholder="API key Zernio" aria-label="API key Zernio"><div id="zke" class="err" role="alert"></div><button id="zkb" class="btn btn-red" style="width:100%;margin-top:10px">Sambung</button></div>`;
+    $("#zkb").onclick = async () => { const v = $("#zk").value.trim(); if (!v) return; const b = $("#zkb"); b.disabled = true; lsSet("fl_zkey", v); try { await zload(); toast("Zernio disambung ✓"); scheduleTab(); } catch (e) { lsSet("fl_zkey", ""); $("#zke").textContent = e.status === 401 || e.status === 403 ? "API key tidak sah." : "Gagal menyambung: " + e.message; b.disabled = false; } };
+    return;
+  }
+  body.innerHTML = `<div style="display:grid;place-items:center;padding:30px"><div class="spin" role="status" aria-label="Memuatkan"></div></div>`;
+  try { await zload(); } catch (e) { return (body.innerHTML = `<div class="glass" style="border-radius:20px;padding:16px">${e.status === 401 || e.status === 403 ? "API key tidak lagi sah." : "Tak dapat hubungi Zernio: " + esc(e.message)}<div style="margin-top:10px"><button class="btn btn-ghost btn-sm" id="zout">Tukar API key</button> <button class="btn btn-ghost btn-sm" id="zre">Cuba lagi</button></div></div>`), ($("#zout").onclick = () => { lsSet("fl_zkey", ""); scheduleTab(); }), ($("#zre").onclick = () => scheduleTab()); }
+  const full = SC.accounts.length >= ZFREE;
+  body.innerHTML = `<div class="glass" style="border-radius:20px;padding:16px"><div class="lbl" style="display:flex;justify-content:space-between;gap:8px;align-items:center"><span>Akaun disambung (${SC.accounts.length})</span><button class="btn btn-ghost btn-sm" id="zout">Putus Zernio</button></div>
+    <div class="sc-accs">${SC.accounts.length ? SC.accounts.map(a => `<span class="chip" style="min-height:36px">${esc(PLAT[a.platform] || a.platform)} · ${esc(a.username || a.displayName || "")}</span>`).join("") : `<p style="color:#9CA3AF;margin:0">Belum ada akaun media sosial.</p>`}</div>
+    <div class="lbl" style="margin-top:12px">Sambung akaun baharu</div><div class="sc-accs">${Object.keys(PLAT).map(k => `<button class="chip" data-zc="${k}">${ic("plus", "w-4 h-4")} ${PLAT[k]}</button>`).join("")}</div>${full ? `<p class="hint" style="margin:8px 0 0;color:#FFD166">Plan percuma Zernio sudah mencapai ${ZFREE} akaun. Menyambung akaun lagi mungkin diminta kad.</p>` : ""}<div id="zce" class="err" role="alert"></div></div>
+    ${composerHtml(SC.accounts.length ? SC.accounts.map(a => `<label class="sc-net"><input type="checkbox" value="${esc(a._id)}"><span>${esc(PLAT[a.platform] || a.platform)} · ${esc(a.username || a.displayName || "")}</span></label>`).join("") : `<p style="color:#9CA3AF;margin:0">Sambung sekurang-kurangnya satu akaun dahulu.</p>`)}
+    <div id="sc-cal"></div>`;
+  $("#zout").onclick = () => { lsSet("fl_zkey", ""); SC.posts = []; SC.accounts = []; scheduleTab(); };
+  $$("[data-zc]").forEach(b => (b.onclick = async () => { b.disabled = true; try { await zconnect(b.dataset.zc); } catch (e) { b.disabled = false; $("#zce").textContent = "Gagal: " + e.message; } }));
+  bindTz(); drawCal();
+  $("#sc-go").onclick = async () => {
+    const v = readComposer(); if (!v) return; const ids = $$(".sc-net input:checked").map(x => x.value), er = $("#sc-err");
+    if (!ids.length) return (er.textContent = "Pilih sekurang-kurangnya satu akaun.");
+    const body = { content: v.text, platforms: ids.map(id => ({ platform: SC.accounts.find(a => a._id === id).platform, accountId: id })), scheduledFor: v.wall, timezone: v.tz };
+    if (v.media) body.mediaItems = [{ type: /\.(mp4|mov|webm|m4v)(\?|#|$)/i.test(v.media) ? "video" : "image", url: v.media }];
+    const b = $("#sc-go"); b.disabled = true;
+    try { await zfetch("/posts", { method: "POST", body: JSON.stringify(body) }); toast("Post dijadualkan ✓"); $("#sc-text").value = ""; $("#sc-media").value = ""; SC.sel = v.wall.slice(0, 10); SC.ym = SC.sel.slice(0, 7); await zload(); drawCal(); }
+    catch (e) { er.textContent = "Gagal menjadualkan: " + e.message; }
+    b.disabled = false;
+  };
+}
+function metricoolView() {
+  $("#sc-info").innerHTML = infoCard("Metricool (kalendar + peringatan)", ["Percuma: kira-kira <b>20 post sebulan</b> (semak kaunter dalam akaun Metricool anda).", "API Metricool hanya untuk pelan <b>Advanced/Custom</b> dan pelayar tidak dibenarkan memanggilnya terus, jadi Flash Link <b>tidak boleh menghantar</b> ke Metricool bagi pelan percuma.", "Apa yang berfungsi di sini: rancang post dalam kalendar, kaunter had 20 sebulan, dan peringatan bila tiba masanya (app perlu dibuka). Kemudian salin teks dan jadualkan/hantar dalam <a href=\"https://app.metricool.com\" target=\"_blank\" rel=\"noopener\" style=\"color:#7DD3FC\">Metricool</a>. Data disimpan dalam pelayar ini sahaja."]);
+  $("#sc-body").innerHTML = `<div class="glass" style="border-radius:20px;padding:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span>${ic("calendar", "w-5 h-5")} Dirancang bulan ini: <b id="mc-count">0</b> / ${MC_LIMIT}</span><a class="btn btn-ghost btn-sm" style="margin-left:auto" href="https://app.metricool.com" target="_blank" rel="noopener">${ic("ext", "w-4 h-4")} Buka Metricool</a></div>
+    ${composerHtml(MC_NETS.map(k => `<label class="sc-net"><input type="checkbox" value="${k}"><span>${PLAT[k]}</span></label>`).join(""))}<div id="sc-cal"></div>`;
+  bindTz(); drawCal();
+  $("#sc-go").onclick = () => {
+    const v = readComposer(); if (!v) return; const er = $("#sc-err"), ym = v.wall.slice(0, 7);
+    if (mcGet().filter(x => dayIn(new Date(x.ts), v.tz).slice(0, 7) === ym).length >= MC_LIMIT) return (er.textContent = `Had ${MC_LIMIT} post untuk bulan itu sudah penuh.`);
+    const plats = $$(".sc-net input:checked").map(x => x.value);
+    mcSet([...mcGet(), { id: "m" + genId(8), text: v.text, media: v.media, plats, ts: v.ts, tz: v.tz, done: false }]); toast("Ditambah ke kalendar ✓"); $("#sc-text").value = ""; $("#sc-media").value = ""; SC.sel = v.wall.slice(0, 10); SC.ym = SC.sel.slice(0, 7); drawCal();
+  };
 }
 
 /* ---------- Shorten link ---------- */
@@ -1792,7 +1940,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-34";
+const APP_VERSION = "V-35";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
@@ -1856,7 +2004,7 @@ const CB_EXTRA = [
   { k: "masuk login log daftar akaun google signin sign in", q: "Log masuk", a: "Log masuk guna akaun Google (pilih akaun). Tiada kata laluan untuk diingat. Jika tetingkap tidak muncul, benarkan popup untuk laman ini dan cuba lagi." },
   { k: "kemas kini update versi baharu muat semula exe zip desktop", q: "Kemas kini", a: () => `Versi anda ialah ${APP_VERSION}. Bila ada versi lebih baharu, butang kuning Kemas kini muncul di sebelah Mula sekarang, serta-merta tanpa perlu tekan apa-apa. Aplikasi EXE/ZIP juga sambung ke pangkalan data yang sama.` },
   { k: "domain dns cname nama sendiri custom", q: "Domain", a: "Pautan anda ialah halaman Flash Link dengan ID unik, cth. alamat/ID-anda. Domain sendiri tidak digunakan buat masa ini." },
-  { k: "jadual schedule auto post posting kalendar", q: "Jadual posting", a: "Jadual posting automatik belum ada. Ia masih dalam perancangan dan akan diumumkan bila siap." },
+  { k: "jadual schedule auto post posting kalendar zernio metricool waktu masa", q: "Jadual posting", a: "Di Jadual posting, pilih Zernio atau Metricool. Zernio: tampal API key, sambung akaun media sosial (plan percuma 2 akaun serentak), tulis post, pilih tarikh, masa dan zon waktu, dan Zernio hantar automatik. Metricool: Flash Link jadi kalendar dan peringatan (had percuma 20 post sebulan); penghantaran sebenar dibuat dalam Metricool kerana API-nya hanya untuk pelan Advanced.", go: "schedule" },
   { k: "bunyi muzik audio sfx", q: "Bunyi", a: "Tiada muzik latar. Hanya kesan bunyi kecil pada butang di laman utama dan log masuk." },
   { k: "kamera camera kebenaran permission", q: "Kebenaran", a: "Flash Link tidak minta akses kamera. Gambar dipilih sendiri daripada fail anda." },
   { k: "harga bayar percuma bayaran langgan potongan", q: "Harga", a: "Tiada potongan jualan daripada pautan anda. Untuk maklumat pakej atau bayaran, sila rujuk pentadbir Genius Digital." },
