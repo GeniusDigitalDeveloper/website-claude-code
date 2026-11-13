@@ -2458,7 +2458,7 @@ function drawLinks() {
     <button class="btn btn-ghost btn-sm" data-rm="${l.id}" aria-label="Padam ${esc(l.title)}">${ic("trash", "w-4 h-4")}</button></div>`).join("");
   $$("[data-tg]", ll).forEach(b => (b.onclick = async () => { const l = S.links.find(x => x.id === b.dataset.tg), v = l.active === false; l.active = v; drawLinks(); try { await FB.updateDoc(FB.doc(db, "flashlink_links", l.id), { active: v }); } catch { l.active = !v; drawLinks(); toast("Gagal kemas kini.", "bad"); } }));
   $$("[data-ed]", ll).forEach(b => (b.onclick = () => linkModal({ link: S.links.find(x => x.id === b.dataset.ed) })));
-  $$("[data-rm]", ll).forEach(b => (b.onclick = () => { const l = S.links.find(x => x.id === b.dataset.rm); modal(`<h2 style="font-size:19px;font-weight:700;margin:0 0 8px">Padam “${esc(l.title)}”?</h2><p style="color:#9CA3AF;margin:0 0 16px">Tindakan ini tidak boleh dipatah balik.</p><div style="display:flex;gap:10px"><button class="btn btn-ghost" style="flex:1" data-x2>Batal</button><button class="btn btn-red" style="flex:1" id="yes">Padam</button></div>`, bg => { $("[data-x2]", bg).onclick = bg.close; $("#yes", bg).onclick = async () => { try { await FB.deleteDoc(FB.doc(db, "flashlink_links", l.id)); S.links = S.links.filter(x => x.id !== l.id); bg.close(); drawLinks(); toast("Dipadam."); } catch { toast("Gagal memadam.", "bad"); } }; }); }));
+  $$("[data-rm]", ll).forEach(b => (b.onclick = () => { const l = S.links.find(x => x.id === b.dataset.rm); modal(`<h2 style="font-size:19px;font-weight:700;margin:0 0 8px">Padam “${esc(l.title)}”?</h2><p style="color:#9CA3AF;margin:0 0 16px">Tindakan ini tidak boleh dipatah balik.</p><div style="display:flex;gap:10px"><button class="btn btn-ghost" style="flex:1" data-x2>Batal</button><button class="btn btn-red" style="flex:1" id="yes">Padam</button></div>`, bg => { $("[data-x2]", bg).onclick = bg.close; $("#yes", bg).onclick = () => { const keep = S.links.slice(); S.links = S.links.filter(x => x.id !== l.id); bg.close(); drawLinks(); toast("Dipadam."); FB.deleteDoc(FB.doc(db, "flashlink_links", l.id)).catch(() => { S.links = keep; drawLinks(); toast("Gagal memadam. Pautan dipulihkan.", "bad"); }); }; }); }));
   if (window.Sortable) { ll._s && ll._s.destroy(); ll._s = Sortable.create(ll, { handle: ".grip", animation: 160, ghostClass: "sortable-ghost", delay: 0, onEnd: async () => {
     const ids = $$("[data-id]", ll).map(e => e.dataset.id); S.links = ids.map(i => S.links.find(l => l.id === i)); S.links.forEach((l, i) => (l.order = i)); refreshPreview();
     try { const b = FB.writeBatch(db); S.links.forEach((l, i) => b.update(FB.doc(db, "flashlink_links", l.id), { order: i })); await b.commit(); } catch { toast("Gagal simpan susunan.", "bad"); } } }); }
@@ -2548,12 +2548,16 @@ function linkModal({ link, platform, type } = {}) {
     const price = t === "product" ? parseFloat(v("mp").replace(",", ".")) || 0 : 0;
     const data = { type: t, platform: isWeb && needUrl ? detectPlatform(url) : plat, title: ttl.slice(0, 60), url, thumbnailUrl: th || "", layout: lay, price, promoLabel: v("ml").slice(0, 24), anim: ($m("man") && $m("man").value) || "" };
     const btn = $m("ms"); btn.disabled = true;
-    try {
-      { const w = upDone(); if (w) await w; }
-      if (edit) { await FB.updateDoc(FB.doc(db, "flashlink_links", link.id), data); Object.assign(link, data); }
-      else { const order = S.links.length ? Math.max(...S.links.map(l => l.order ?? 0)) + 1 : 0; const full = { uid: S.user.uid, ...data, order, active: true, clicks: 0, createdAt: FB.serverTimestamp() }; const r = await FB.addDoc(FB.collection(db, "flashlink_links"), full); S.links.push({ id: r.id, ...full, createdAt: new Date() }); }
-      m.close(); drawLinks(); toast(edit ? "Disimpan ✓" : "Pautan ditambah ✓");
-    } catch (er) { console.error(er); e.textContent = er.code === "permission-denied" ? "Kebenaran ditolak. Semak Firestore rules." : "Gagal menyimpan. Cuba lagi."; btn.disabled = false; }
+    // optimistik: kemas kini paparan DAHULU, kemudian simpan di latar belakang (kembali ke keadaan asal jika gagal)
+    const wait = async () => { const w = upDone(); if (w) await w; };
+    if (edit) {
+      const old = { ...link }; Object.assign(link, data); m.close(); drawLinks(); toast("Disimpan ✓");
+      wait().then(() => FB.updateDoc(FB.doc(db, "flashlink_links", link.id), data)).catch(er => { console.error(er); Object.assign(link, old); drawLinks(); toast("Gagal menyimpan. Perubahan dibatalkan.", "bad"); });
+    } else {
+      const order = S.links.length ? Math.max(...S.links.map(l => l.order ?? 0)) + 1 : 0, id = genId(20), full = { uid: S.user.uid, ...data, order, active: true, clicks: 0 };
+      const item = { id, ...full, createdAt: new Date() }; S.links.push(item); m.close(); drawLinks(); toast("Pautan ditambah ✓");
+      wait().then(() => FB.setDoc(FB.doc(db, "flashlink_links", id), { ...full, createdAt: FB.serverTimestamp() })).catch(er => { console.error(er); S.links = S.links.filter(x => x.id !== id); drawLinks(); toast("Gagal menyimpan pautan. Cuba lagi.", "bad"); });
+    }
   };
 }
 
@@ -2743,7 +2747,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-70";
+const APP_VERSION = "V-71";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
