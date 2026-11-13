@@ -114,6 +114,50 @@ body.flow #bgflow{display:block}
 /* ============ ANIMASI SKROL ============ */
 [data-fx]{opacity:0;will-change:transform,opacity}
 @media (prefers-reduced-motion:reduce){[data-fx]{opacity:1}#bgflow i{animation:none}}
+/* ============ POSTER HERO (hero penuh + kad berbingkai) ============ */
+.fl-tpl-poster .fl-wrap,.fl-pwrap{max-width:520px;padding:0;gap:0}
+.fl-phero{position:relative;aspect-ratio:4/5;max-height:640px;display:flex;align-items:flex-end}
+.fl-phero-media{position:absolute;inset:0;overflow:hidden;-webkit-mask-image:linear-gradient(180deg,#000 62%,transparent 100%);mask-image:linear-gradient(180deg,#000 62%,transparent 100%)}
+.fl-phero-bg{position:absolute;inset:-4% 0 0;background-size:cover;background-position:center top;will-change:transform}
+.fl-phero.noimg .fl-phero-media{background:linear-gradient(160deg,color-mix(in srgb,var(--btn) 55%,#000),#08060a)}
+.fl-phero-ov{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.22) 0%,transparent 26%,transparent 44%,rgba(0,0,0,.62) 100%)}
+.fl-pbtn{position:absolute;top:14px;width:46px;height:46px;border-radius:14px;display:grid;place-items:center;color:#fff;background:rgba(10,10,14,.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.22);z-index:3;text-decoration:none;transition:transform .4s cubic-bezier(.32,.72,0,1),background .3s}
+.fl-pbtn:hover{background:rgba(10,10,14,.75)}.fl-pbtn:active{transform:scale(.9)}.fl-pbtn-l{left:14px}.fl-pbtn-r{right:14px}
+.fl-phero-txt{position:relative;width:100%;padding:0 18px 4px;text-align:center;z-index:2}
+.fl-ptitle-main{margin:0;font-size:clamp(34px,11vw,56px);line-height:1.02;font-weight:800;text-transform:uppercase;letter-spacing:.01em;background:linear-gradient(180deg,color-mix(in srgb,var(--btn) 35%,#fff) 0%,var(--btn) 52%,color-mix(in srgb,var(--btn) 65%,#3a2200) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;filter:drop-shadow(0 3px 14px rgba(0,0,0,.55))}
+.fl-pbio{margin:12px 4px 0;font-size:17px;font-weight:600;line-height:1.45;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+.fl-pbody{padding:8px 16px 34px;display:flex;flex-direction:column;gap:14px}
+.fl-pbar,.fl-pfeat{position:relative;border:2px solid var(--btn);border-radius:18px;background:rgba(0,0,0,.5);box-shadow:4px 5px 0 -1px color-mix(in srgb,var(--btn) 50%,#000),inset 0 0 20px color-mix(in srgb,var(--btn) 14%,transparent);transition:transform .55s cubic-bezier(.32,.72,0,1),box-shadow .55s cubic-bezier(.32,.72,0,1)}
+.fl-pbar:hover,.fl-pfeat:hover{transform:translate3d(0,-3px,0)}.fl-pbar:active,.fl-pfeat:active{transform:scale(.98)}
+.fl-pb-a,.fl-pf-a{color:var(--btn);text-decoration:none}
+.fl-pb-a{display:flex;align-items:center;gap:14px;padding:10px 54px 10px 10px;min-height:76px}
+.fl-pth{width:56px;height:56px;border-radius:10px;flex:none;border:1px solid color-mix(in srgb,var(--btn) 60%,transparent);display:grid;place-items:center;overflow:hidden}
+.fl-pt{flex:1;text-align:center;font-weight:600;text-transform:uppercase;letter-spacing:.02em;font-size:15.5px;line-height:1.3}
+.fl-pmore{position:absolute;right:6px;top:50%;margin-top:-22px;width:44px;height:44px;display:grid;place-items:center;color:var(--btn);opacity:.85;border-radius:12px;transition:opacity .2s,transform .3s}
+.fl-pmore:hover{opacity:1}.fl-pmore:active{transform:scale(.85)}
+.fl-pfeat .fl-pmore{top:auto;bottom:6px;margin-top:0}
+.fl-pf-a{display:block;padding:10px 10px 4px}
+.fl-pimg2{aspect-ratio:1.9/1;border-radius:12px;width:100%}
+.fl-pcap{display:flex;align-items:center;justify-content:center;padding:12px 46px 8px;min-height:52px}
+.fl-pjoin{display:flex;align-items:center;justify-content:center;gap:8px;min-height:54px;border-radius:999px;background:#fff;color:#111;font-weight:700;text-decoration:none;margin-top:10px;transition:transform .45s cubic-bezier(.32,.72,0,1)}
+.fl-pjoin:active{transform:scale(.96)}
+.fl-pmeta{text-align:center;font-size:12px;color:rgba(255,255,255,.7)}
+.fl-tpl-poster .fl-social{margin:8px 0}.fl-tpl-poster .fl-social a{background:none;border:0;color:#fff;width:50px;height:50px}.fl-tpl-poster .fl-social svg{width:30px;height:30px}
+.fl-tpl-poster .fl-header{color:var(--btn)}
+.iscreen.pv-wrap .fl-tpl-poster .fl-wrap{padding-top:0}
+/* ============ HELAIAN KONGSI ============ */
+.modal.light{background:#fff;color:#111;border-color:rgba(0,0,0,.08)}
+.modal.light .btn-ghost{color:#111;background:rgba(0,0,0,.06);border-color:rgba(0,0,0,.1)}
+.sh-head{text-align:center;font-size:17px;margin:-34px 0 14px}
+.sh-card{display:flex;flex-direction:column;align-items:center;gap:6px;padding:20px 14px;border-radius:18px;background:#F3F4F6;margin-bottom:16px;text-align:center}
+.sh-card small{color:#6B7280;word-break:break-all}.sh-card b{font-size:17px}
+.sh-av{width:84px;height:84px;border-radius:20px;object-fit:cover}.sh-ini{display:grid;place-items:center;background:linear-gradient(135deg,#FF2A2A,#9B0000);color:#fff;font-size:34px;font-weight:800}
+.sh-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-bottom:18px}
+.sh-i{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#111;text-decoration:none;text-align:center}
+.sh-i{font-size:11px;line-height:1.2}.sh-i span{width:48px;height:48px;border-radius:50%;display:grid;place-items:center}
+.sh-join{border-top:1px solid #E5E7EB;padding-top:14px}.sh-join p{color:#6B7280;margin:4px 0 12px;font-size:14px}
+.sh-b1,.sh-b2{display:inline-flex;align-items:center;min-height:46px;padding:0 20px;border-radius:999px;font-weight:700;text-decoration:none}
+.sh-b1{background:#111;color:#fff}.sh-b2{background:#F3F4F6;color:#111}
 /* ============ DASHBOARD BAHARU ============ */
 .dtop{position:sticky;top:0;z-index:30;background:rgba(7,7,10,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
 .dtop-in{max-width:1500px;margin:0 auto;padding:0 16px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -460,6 +504,7 @@ const P = {
   arrowu: '<path d="m5 12 7-7 7 7"/><path d="M12 19V5"/>',
   laptop: '<rect width="18" height="12" x="3" y="4" rx="2"/><path d="M2 20h20"/>',
   trend: '<path d="M22 7 13.5 15.5l-5-5L2 17"/><path d="M16 7h6v6"/>',
+  more: '<circle cx="12" cy="5" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="12" cy="19" r="1.4"/>',
   chev: '<path d="m15 18-6-6 6-6"/>',
   chevr: '<path d="m9 18 6-6-6-6"/>',
   link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
@@ -551,6 +596,7 @@ const TPL = {
   grid: { name: "Kad Visual & Grid", desc: "Kotak bergambar dua lajur. Untuk kedai & jurugambar.", theme: { bgType: "solid", bg1: "#FFFFFF", bg2: "#FFFFFF", text: "#111827", btn: "#E10600", font: "Poppins", shape: "round" } },
   dark: { name: "Gelap & Moden", desc: "Kaca beku & garisan bercahaya. Untuk teknologi & gamer.", theme: { bgType: "gradient", bg1: "#05060F", bg2: "#1A0A12", text: "#F4F6FF", btn: "#FF3B3B", font: "Space Grotesk", shape: "round" } },
   landing: { name: "Laman Mini", desc: "Hero, servis, testimoni & CTA. Untuk servis & SME.", theme: { bgType: "solid", bg1: "#0E1116", bg2: "#0E1116", text: "#F4F4F5", btn: "#E10600", font: "DM Sans", shape: "round" } },
+  poster: { name: "Poster Hero", desc: "Gambar hero penuh, tajuk besar, kad berbingkai.", theme: { bgType: "gradient", bg1: "#4A0D1A", bg2: "#07060A", text: "#FFFFFF", btn: "#E8B94A", font: "Poppins", shape: "round", ov: 85 } },
   cards: { name: "Kad Besar", desc: "Kad gambar penuh dengan overlay.", theme: { bgType: "gradient", bg1: "#0B1020", bg2: "#1B1040", text: "#F5F7FF", btn: "#8B5CF6", font: "Poppins", shape: "round" } },
   icons: { name: "Ikon Aplikasi", desc: "Ikon bulat gaya skrin utama telefon.", theme: { bgType: "gradient", bg1: "#0EA5E9", bg2: "#6D28D9", text: "#FFFFFF", btn: "#FFFFFF", font: "Nunito", shape: "round" } },
   bento: { name: "Bento", desc: "Petak pelbagai saiz.", theme: { bgType: "solid", bg1: "#111318", bg2: "#111318", text: "#F4F4F5", btn: "#FF4D4D", font: "Space Grotesk", shape: "round" } },
@@ -561,6 +607,8 @@ const SHAPES = { pill: "9999px", round: "16px", square: "4px" };
 const COLORS = ["#E10600", "#2563EB", "#16A34A", "#9333EA", "#F59E0B", "#0EA5E9", "#EC4899", "#18181B"];
 /* Pustaka design: setiap satu = susun atur + gaya kepala + tema. Pengguna boleh guna mana-mana, bila-bila masa. */
 const DESIGNS = [
+  { id: "poster", n: "Poster Emas", d: "Hero penuh, tajuk besar, bingkai emas", tpl: "poster", sty: "hero" },
+  { id: "posterblue", n: "Poster Biru", d: "Hero penuh, bingkai biru cerah", tpl: "poster", sty: "hero", theme: { bg1: "#0B2A5B", bg2: "#05060B", btn: "#38BDF8" } },
   { id: "classic", n: "Senarai Klasik", d: "Butang bersusun, krim lembut", tpl: "minimal" },
   { id: "glass", n: "Kaca Gelap", d: "Butang kaca, cahaya halus", tpl: "dark" },
   { id: "duo", n: "Dua Kotak", d: "Kotak bergambar dua lajur", tpl: "grid" },
@@ -678,9 +726,31 @@ function tileHtml(l) {
   const img = imgUrl(l.thumbnailUrl), k = platOf(l);
   return `<a class="fl-card fl-tile" ${linkAttrs(l)}>${img ? `<span class="fl-thw fl-img"><img src="${esc(img)}" alt="" loading="lazy" decoding="async"><i class="fl-thov"></i></span>` : `<div class="fl-img" style="color:${BRANDS[k]?.c || "var(--btn)"}">${brandIc(k, "w-12 h-12")}</div>`}<div class="fl-tt">${esc(l.title)}</div></a>`;
 }
+function posterHtml(p, act, { preview = false, anim = true } = {}) {
+  const t = p.theme, avatar = imgUrl(p.avatarUrl), name = p.displayName || "@" + p.username;
+  const initial = esc(name.trim().charAt(0).toUpperCase());
+  const Wi = (i, h) => `<div class="fl-in" style="--i:${i}">${h}</div>`;
+  const hero = `<div class="fl-phero${avatar ? "" : " noimg"}"><div class="fl-phero-media">${avatar ? `<div class="fl-phero-bg" style="background-image:url('${esc(encodeURI(avatar).replace(/'/g, "%27"))}')"></div>` : `<div class="fl-heroini">${initial}</div>`}<div class="fl-phero-ov"></div></div>
+    <a class="fl-pbtn fl-pbtn-l" href="/" aria-label="Flash Link" ${preview ? 'tabindex="-1"' : ""}>${ic("zap", "w-5 h-5")}</a><button class="fl-pbtn fl-pbtn-r" type="button" data-sharepage aria-label="Kongsi halaman">${ic("share", "w-5 h-5")}</button>
+    <div class="fl-phero-txt"><h1 class="fl-ptitle-main">${esc(name)}</h1>${p.bio ? `<p class="fl-pbio">${esc(p.bio)}</p>` : ""}</div></div>`;
+  const more = l => `<button class="fl-pmore" type="button" data-share="${esc(l.id)}" aria-label="Kongsi ${esc(l.title)}">${ic("more", "w-5 h-5")}</button>`;
+  const item = (l, i) => {
+    if (l.type === "header") return Wi(i, `<h3 class="fl-header">${esc(l.title)}</h3>`);
+    if (l.type === "email_form") return Wi(i, formHtml(l));
+    if (l.type === "product") return Wi(i, productHtml(l));
+    const img = imgUrl(l.thumbnailUrl), k = platOf(l), c = BRANDS[k]?.c || "#38BDF8";
+    if (l.layout === "featured" && img) return Wi(i, `<div class="fl-pfeat"><a class="fl-pf-a" ${linkAttrs(l)}><span class="fl-thw fl-pimg2"><img src="${esc(img)}" alt="" loading="lazy" decoding="async"><i class="fl-thov"></i></span><span class="fl-pcap"><span class="fl-pt">${esc(l.title)}</span></span></a>${more(l)}</div>`);
+    const th = img ? `<span class="fl-thw fl-pth"><img src="${esc(img)}" alt="" loading="lazy" decoding="async"><i class="fl-thov"></i></span>` : `<span class="fl-pth" style="background:${c};color:${onColor(c)}">${brandIc(k, "w-6 h-6")}</span>`;
+    return Wi(i, `<div class="fl-pbar"><a class="fl-pb-a" ${linkAttrs(l)}>${th}<span class="fl-pt">${esc(l.title)}</span></a>${more(l)}</div>`);
+  };
+  const body = (act.length ? act.map(item).join("") : `<p class="fl-pbio" style="text-align:center">Belum ada pautan.</p>`) + socialHtml(p) +
+    `<a class="fl-pjoin" href="/" ${preview ? 'tabindex="-1"' : ""}>${ic("zap", "w-5 h-5")} Buat Flash Link anda sendiri</a><div class="fl-pmeta">Genius Digital Flash Link</div>`;
+  return `<div class="fl-root fl-tpl-poster fl-sty-poster ${anim ? "" : "fl-noanim"}" style="${esc(rootStyle(p))}"><div class="fl-wrap fl-pwrap">${hero}<div class="fl-pbody">${body}</div></div></div>`;
+}
 function renderProfile(p, links, { preview = false, anim = true } = {}) {
   const t = p.theme, tpl = p.template, act = links.filter(l => l.active !== false);
   loadFont(t.font);
+  if (tpl === "poster") return posterHtml(p, act, { preview, anim });
   const avatar = imgUrl(p.avatarUrl), sty = tpl === "landing" ? "classic" : (p.profileStyle || "classic");
   const initial = esc((p.displayName || p.username || "F").trim().charAt(0).toUpperCase());
   const nameBio = `<h1 class="fl-name">${esc(p.displayName || "@" + p.username)}</h1>${p.bio ? `<p class="fl-bio">${esc(p.bio)}</p>` : ""}${socialHtml(p)}`;
@@ -736,12 +806,31 @@ function blockHtml(l) {
   return buttonHtml(l);
 }
 
+/* ---------- Helaian kongsi ---------- */
+function sharePage({ url, title, img }) {
+  const enc = encodeURIComponent;
+  const nets = [["x", "X", `https://x.com/intent/tweet?url=${enc(url)}&text=${enc(title)}`], ["facebook", "Facebook", `https://www.facebook.com/sharer/sharer.php?u=${enc(url)}`], ["whatsapp", "WhatsApp", `https://wa.me/?text=${enc(title + " " + url)}`], ["linkedin", "LinkedIn", `https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}`]];
+  const m = modal(`<div class="sh-head"><b>Kongsi pautan</b></div>
+    <div class="sh-card">${img ? `<img src="${esc(img)}" alt="" class="sh-av">` : `<span class="sh-av sh-ini">${esc(title.trim().charAt(0).toUpperCase())}</span>`}<b>${esc(title)}</b><small>${esc(url.replace(/^https?:\/\//, ""))}</small></div>
+    <div class="sh-row"><button type="button" class="sh-i" id="shcp"><span style="background:#E5E7EB;color:#111">${ic("copy", "w-6 h-6")}</span>Salin pautan</button>${nets.map(([k, n, u]) => `<a class="sh-i" href="${esc(u)}" target="_blank" rel="noopener noreferrer"><span style="background:${BRANDS[k].c};color:${onColor(BRANDS[k].c)}">${brandIc(k, "w-6 h-6")}</span>${n}</a>`).join("")}</div>
+    <div class="sh-join"><b>Sertai ${esc(title)} di Flash Link</b><p>Buat Flash Link anda sendiri. Satu pautan untuk semua jualan anda.</p><div style="display:flex;gap:10px;flex-wrap:wrap"><a class="sh-b1" href="/">Mula sekarang</a><a class="sh-b2" href="/">Ketahui lebih lanjut</a></div></div>`);
+  m.firstElementChild.classList.add("light"); $("#shcp", m).onclick = () => copyText(url);
+}
+let PUBCTX = null;
+
 /* ---------- Penjejak & borang awam ---------- */
 function track(uid, linkId, type) {
   if (!db) return;
   FB.addDoc(FB.collection(db, "flashlink_events"), { uid, linkId: linkId || "", type, device: device(), referrer: (document.referrer || "langsung").slice(0, 200), createdAt: FB.serverTimestamp() }).catch(() => {});
 }
 function bindPublicEvents(root, uid) {
+  root.addEventListener("click", e => {
+    const sb = e.target.closest("[data-share],[data-sharepage]");
+    if (sb && PUBCTX) {
+      const p = PUBCTX.p, l = sb.dataset.share ? PUBCTX.links.find(x => x.id === sb.dataset.share) : null, nm = p.displayName || "@" + p.username;
+      return sharePage({ url: profileUrl(p.username), title: l ? `${l.title} — ${nm}` : nm, img: imgUrl(l?.thumbnailUrl) || imgUrl(p.avatarUrl) });
+    }
+  });
   root.addEventListener("click", e => {
     const a = e.target.closest("a[data-link]"); if (!a) return;
     const id = a.dataset.link; if (!db || id.startsWith("demo")) return;
@@ -801,7 +890,10 @@ async function publicView(username) {
   setMeta("og:image", safeUrl(p.avatarUrl) || origin() + "/assets/logo.png", 1); setMeta("og:url", profileUrl(p.username), 1);
   document.documentElement.style.background = rootStyle(p).match(/--bgcss:([^;]+)/)?.[0] ? "" : "";
   app.innerHTML = `<main>${renderProfile(p, links)}</main>`;
+  PUBCTX = { p, links };
   const root = $("main"); bindPublicEvents(root, uid);
+  const hbg = $(".fl-phero-bg"), htx = $(".fl-phero-txt");
+  if (hbg && !REDUCE()) { const f = () => { const y = scrollY; hbg.style.transform = `translate3d(0,${(y * .3).toFixed(1)}px,0) scale(1.06)`; if (htx) htx.style.opacity = Math.max(0, 1 - y / 520).toFixed(2); }; addEventListener("scroll", f, { passive: true }); f(); }
   if (uid !== "demo" && db) {
     try { if (!sessionStorage.getItem("fl_v_" + uid)) { sessionStorage.setItem("fl_v_" + uid, "1"); track(uid, "", "view"); } } catch { track(uid, "", "view"); }
     if (rtdb) { try { const r = FB.rt.ref(rtdb, `flashlink/live/${uid}`); FB.rt.runTransaction(r, v => (v || 0) + 1).catch(() => {}); addEventListener("pagehide", () => FB.rt.runTransaction(r, v => Math.max(0, (v || 1) - 1)).catch(() => {}), { once: true }); } catch {} }
@@ -983,7 +1075,7 @@ async function dashView() {
 async function autoCreateProfile() {
   const uid = S.user.uid; let name = genId();
   const base = (S.user.displayName || (S.user.email || "").split("@")[0] || "Pengguna").slice(0, 40);
-  const d0 = DESIGNS.find(x => x.id === "glass"), theme = designTheme(d0);
+  const d0 = DESIGNS.find(x => x.id === "poster"), theme = designTheme(d0);
   const design = { id: "d" + genId(6), name: "Design 1", template: d0.tpl, profileStyle: d0.sty || "classic", theme };
   const profile = { username: name, displayName: base, bio: "", avatarUrl: S.user.photoURL || "", bannerUrl: "", template: design.template, theme: JSON.parse(JSON.stringify(theme)), profileStyle: design.profileStyle, socialIcons: [], testimonials: [], designs: [design], activeDesign: design.id, createdAt: FB.serverTimestamp(), plan: "free" };
   for (let i = 0; ; i++) {
@@ -1234,7 +1326,7 @@ function linkModal({ link, platform, type } = {}) {
   if (type === "media") plat = "web";
   const isWeb = plat === "web" || (!plat && t === "link");
   const needUrl = !["header", "email_form"].includes(t), wantThumb = needUrl || t === "product";
-  let B = BRANDS[plat] || null, th = link?.thumbnailUrl || "", thTouched = !!th, titleTouched = edit;
+  let B = BRANDS[plat] || null, th = link?.thumbnailUrl || "", thTouched = !!th, titleTouched = edit, lay = link?.layout || "bar", layTouched = !!link?.layout;
   const title0 = link?.title || (type === "media" ? "Muat turun Media Kit" : type === "header" ? "Produk saya" : type === "email_form" ? "Hubungi / tempah" : B?.t || "");
   const f = (id, label, val, ph, extra = "") => `<div style="margin-top:12px"><label class="lbl" for="${id}">${label}</label><input id="${id}" class="inp" value="${esc(val ?? "")}" placeholder="${esc(ph)}" ${extra}></div>`;
   const urlLabel = t === "whatsapp" ? "No. telefon atau pautan wa.me" : type === "media" ? "Pautan PDF media kit" : "URL pautan";
@@ -1249,11 +1341,14 @@ function linkModal({ link, platform, type } = {}) {
       <div style="display:flex;gap:12px;align-items:center"><div id="thp" style="width:76px;height:76px;border-radius:16px;overflow:hidden;background:rgba(255,255,255,.08);display:grid;place-items:center;flex:none"></div>
       <div style="min-width:0"><div id="ths" class="hint" style="margin:0 0 8px"></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn btn-ghost btn-sm" id="thu">${ic("plus", "w-4 h-4")} Muat naik gambar</button><button type="button" class="btn btn-ghost btn-sm" id="thr">Buang</button></div></div></div>
       <input type="file" id="thf" accept="image/*" hidden>${f("thi", "atau tampal URL gambar", /^https?:/.test(th) && !/ytimg|microlink/.test(th) ? th : "", "https://…/gambar.jpg", 'inputmode="url"')}</div>` : ""}
+    ${wantThumb && t !== "product" ? `<div style="margin-top:14px"><div class="lbl">Papar sebagai (design Poster)</div><div class="seg" id="lay"><button type="button" data-lay="bar" aria-selected="${lay === "bar"}">Bar</button><button type="button" data-lay="featured" aria-selected="${lay === "featured"}">Kad besar</button></div><p class="hint">Kad besar memaparkan gambar penuh di atas tajuk.</p></div>` : ""}
     <div id="me" class="err" role="alert"></div><button id="ms" class="btn btn-red" style="width:100%;min-height:50px;margin-top:16px">${edit ? "Simpan" : "Tambah ke halaman saya"}</button>`);
   const $m = id => $("#" + id, m);
   const drawIcon = () => { const c = BRANDS[plat]?.c || "#38BDF8"; $m("mi").innerHTML = `<span class="pt-i" style="background:${c};color:${onColor(c)};width:46px;height:46px">${t === "email_form" ? ic("mail") : t === "header" ? ic("heading") : t === "product" ? ic("bag") : brandIc(plat || "web", "w-6 h-6")}</span>`; };
   const drawTh = () => { if (!wantThumb) return; const u = imgUrl(th); $m("thp").innerHTML = u ? `<img src="${esc(u)}" alt="" style="width:100%;height:100%;object-fit:cover">` : `<span style="color:#9CA3AF">${ic("eye", "w-6 h-6")}</span>`; };
   const status = x => { if ($m("ths")) $m("ths").textContent = x; };
+  const setLay = (v, auto) => { lay = v; if (!auto) layTouched = true; $$("[data-lay]", m).forEach(x => x.setAttribute("aria-selected", x.dataset.lay === v)); };
+  $$("[data-lay]", m).forEach(b => (b.onclick = () => setLay(b.dataset.lay)));
   drawIcon(); drawTh(); status(th ? "Gambar sedia ada." : t === "whatsapp" ? "Pilihan. Muat naik gambar anda." : "Akan dicari automatik selepas anda tampal pautan.");
   setTimeout(() => $m("mt").focus(), 60);
   $m("mt").addEventListener("input", () => (titleTouched = true));
@@ -1270,7 +1365,7 @@ function linkModal({ link, platform, type } = {}) {
       if (!wantThumb || thTouched || t === "whatsapp") return;
       const u = normUrl(v); if (!u) return;
       status("Mencari gambar…"); const r = await fetchThumb(u); if (thTouched) return;
-      if (r.image) { th = r.image; drawTh(); status("Gambar dijumpai ✓ Anda boleh tukar dengan gambar sendiri."); } else status("Tiada gambar ditemui. Anda boleh muat naik sendiri.");
+      if (r.image) { th = r.image; drawTh(); if (!layTouched) setLay("featured", true); status("Gambar dijumpai ✓ Anda boleh tukar dengan gambar sendiri."); } else status("Tiada gambar ditemui. Anda boleh muat naik sendiri.");
       if (isWeb && plat === "web" && r.title && !titleTouched) $m("mt").value = r.title.slice(0, 60);
     }, 700);
     $m("mu").addEventListener("input", onUrl); $m("mu").addEventListener("paste", () => setTimeout(onUrl, 0));
@@ -1282,7 +1377,7 @@ function linkModal({ link, platform, type } = {}) {
     let url = "";
     if (needUrl) { url = t === "whatsapp" ? waLink(v("mu"), v("mm")) : normUrl(v("mu")); if (!url) return (e.textContent = t === "whatsapp" ? "Nombor telefon tidak sah. Cuba 0123456789." : "URL tidak sah. Contoh: contoh.com/halaman"); }
     const price = t === "product" ? parseFloat(v("mp").replace(",", ".")) || 0 : 0;
-    const data = { type: t, platform: isWeb && needUrl ? detectPlatform(url) : plat, title: ttl.slice(0, 60), url, thumbnailUrl: th || "", price, promoLabel: v("ml").slice(0, 24) };
+    const data = { type: t, platform: isWeb && needUrl ? detectPlatform(url) : plat, title: ttl.slice(0, 60), url, thumbnailUrl: th || "", layout: lay, price, promoLabel: v("ml").slice(0, 24) };
     const btn = $m("ms"); btn.disabled = true;
     try {
       if (edit) { await FB.updateDoc(FB.doc(db, "flashlink_links", link.id), data); Object.assign(link, data); }
@@ -1454,7 +1549,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-31";
+const APP_VERSION = "V-32";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
