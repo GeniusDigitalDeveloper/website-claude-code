@@ -509,8 +509,7 @@ function siteFooter() {
   return `<footer class="container" style="padding:28px 16px 44px;text-align:center;border-top:1px solid var(--line);margin-top:8px">
     <img src="/assets/icon.png" alt="" width="36" height="36" style="margin:0 auto 14px;height:36px;width:36px">
     <div id="ustat" aria-label="Statistik Flash Link" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;max-width:560px;margin:0 auto 18px;align-items:start">${it("s_users", "Pengguna")}${it("s_day", "Pelawat hari ini")}${it("s_month", "Pelawat bulan ini")}${it("s_total", "Pelawat keseluruhan")}</div>
-    <p style="margin:0 0 6px;color:#E5E7EB;font-weight:600;font-size:14.5px">Hak Cipta Terpelihara Genius Digital / Flash Link 2026</p>
-    <p style="margin:0;color:#9CA3AF;font-size:14px">Memacu Inovasi Digital Melalui Sistem Pintar, Kreatif dan Efisien.</p></footer>`;
+    <p style="margin:0 auto;max-width:900px;font-size:13.5px;font-weight:600;line-height:1.6;background:linear-gradient(90deg,#E5E7EB 0%,#FF9A9A 35%,#FF4D4D 75%,#FF3B3B 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent">Hak Cipta Terpelihara Genius Digital | Flash Link 2026 &nbsp;Memacu Inovasi Digital Melalui Sistem Pintar, Kreatif dan Efisien.</p></footer>`;
 }
 function fillStat() {
   statOff.forEach(f => { try { f(); } catch {} }); statOff = []; clearTimeout(statTimer);
