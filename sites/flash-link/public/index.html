@@ -1054,8 +1054,19 @@ const SOCIAL_KEYS = ["instagram", "tiktok", "facebook", "youtube", "x", "threads
 const FALL = { lazada: "bag", web: "globe", email: "mail" };
 const brandIc = (k, c = "w-5 h-5") => { const key = BRANDS[k]?.ic || k; return BP[key] ? `<svg viewBox="0 0 24 24" fill="currentColor" class="${c}" aria-hidden="true"><path d="${BP[key]}"/></svg>` : ic(FALL[k] || "link", c); };
 const detectPlatform = url => { try { const u = new URL(normUrl(url)); const h = u.hostname + u.pathname; for (const [k, b] of Object.entries(BRANDS)) if (b.m && b.m.test(h)) return k; } catch {} return "web"; };
-const IMG_CACHE = new Map();
-const imgUrl = u => { u = String(u || ""); if (u.startsWith("fli:")) return IMG_CACHE.get(u.slice(4)) || ""; if (u.startsWith("data:image/") && u.length < 1000000 && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(u)) return u; return safeUrl(u); };
+const IMG_CACHE = new Map(), IMG_TH = new Map(), UPQ = new Set(), IMGMODE = { thumb: false };
+const idbP = new Promise(res => { try { const r = indexedDB.open("flashlink-img", 1); r.onupgradeneeded = () => r.result.createObjectStore("i"); r.onsuccess = () => res(r.result); r.onerror = () => res(null); r.onblocked = () => res(null); } catch { res(null); } });
+const idbGet = async k => { const d = await idbP; if (!d) return null; return new Promise(res => { try { const q = d.transaction("i").objectStore("i").get(k); q.onsuccess = () => res(q.result || null); q.onerror = () => res(null); } catch { res(null); } }); };
+const idbPut = async (k, v) => { const d = await idbP; if (!d) return; try { d.transaction("i", "readwrite").objectStore("i").put(v, k); } catch {} };
+function dataToBlob(d) { const i = d.indexOf(","), mime = (d.slice(5, d.indexOf(";")) || "image/jpeg"), bin = atob(d.slice(i + 1)), u = new Uint8Array(bin.length); for (let k = 0; k < bin.length; k++) u[k] = bin.charCodeAt(k); return new Blob([u], { type: mime }); }
+function imgPutBlob(ref, blob, persist) {
+  if (IMG_CACHE.has(ref)) return IMG_CACHE.get(ref); const url = URL.createObjectURL(blob); IMG_CACHE.set(ref, url); if (persist) idbPut(ref, blob);
+  (async () => { try { if (!window.createImageBitmap) return; const bm = await createImageBitmap(blob, { resizeWidth: 520, resizeQuality: "medium" }); const c = document.createElement("canvas"); c.width = bm.width; c.height = bm.height; c.getContext("2d").drawImage(bm, 0, 0); bm.close?.(); c.toBlob(tb => { if (tb) IMG_TH.set(ref, URL.createObjectURL(tb)); }, "image/jpeg", .82); } catch {} })();
+  return url;
+}
+const imgPut = (ref, data, persist = true) => imgPutBlob(ref, dataToBlob(data), persist);
+const upDone = () => (UPQ.size ? Promise.allSettled([...UPQ]) : null);
+const imgUrl = u => { u = String(u || ""); if (u.startsWith("fli:")) { const r = u.slice(4); return (IMGMODE.thumb && IMG_TH.get(r)) || IMG_CACHE.get(r) || ""; } if (u.startsWith("data:image/") && u.length < 1000000 && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(u)) return u; return safeUrl(u); };
 const IMG_TRIED = new Set();
 const imgIds = (p, links) => { const st = new Set(), add = v => { if (typeof v === "string" && v.startsWith("fli:")) st.add(v.slice(4)); }; if (p) { add(p.avatarUrl); add(p.bannerUrl); add(p.theme?.bgImg); (p.designs || []).forEach(d => add(d.theme?.bgImg)); } (links || []).forEach(l => add(l.thumbnailUrl)); return [...st]; };
 const imgMissing = (p, links) => imgIds(p, links).some(id => !IMG_CACHE.has(id) && !IMG_TRIED.has(id));
@@ -1063,29 +1074,23 @@ const JPG_PRE = "data:image/jpeg;base64,", IMG_CHUNK = 940000, IMG_MAXCH = 5, IM
 /* rujukan: "fli:ID" (satu dokumen) atau "fli:ID~N" (N dokumen: ID, ID_1 ... ID_N-1) */
 async function hydrateImages(p, links) {
   const need = imgIds(p, links).filter(id => !IMG_CACHE.has(id) && !IMG_TRIED.has(id)); need.forEach(id => IMG_TRIED.add(id));
-  await Promise.all(need.map(async ref => {
-    try {
-      const [id, n = "1"] = ref.split("~"), cnt = Math.min(IMG_MAXCH, Math.max(1, +n || 1));
-      const sns = await Promise.all(Array.from({ length: cnt }, (_, k) => FB.getDoc(FB.doc(db, "flashlink_images", k ? `${id}_${k}` : id))));
-      if (!sns.every(x => x.exists())) return;
-      const parts = sns.map(x => x.data().d); IMG_CACHE.set(ref, cnt === 1 ? parts[0] : JPG_PRE + parts.map(x => x.slice(JPG_PRE.length)).join(""));
-    } catch {}
-  }));
+  await Promise.all(need.map(ref => hydrateOne(ref).catch(() => {})));
 }
 /* simpan gambar ASAL (tanpa crop) supaya boleh dilaras semula bila-bila masa */
-async function hydrateRef(ref) {
-  if (!ref || IMG_CACHE.has(ref)) return; IMG_TRIED.add(ref);
+async function hydrateOne(ref) {
+  if (IMG_CACHE.has(ref)) return; const cached = await idbGet(ref); if (cached) { imgPutBlob(ref, cached, false); return; } // sudah ada pada peranti ini: terus keluar
   const [id, n = "1"] = ref.split("~"), cnt = Math.min(IMG_MAXCH, Math.max(1, +n || 1));
   const sns = await Promise.all(Array.from({ length: cnt }, (_, k) => FB.getDoc(FB.doc(db, "flashlink_images", k ? `${id}_${k}` : id))));
   if (!sns.every(x => x.exists())) return;
-  const parts = sns.map(x => x.data().d); IMG_CACHE.set(ref, cnt === 1 ? parts[0] : JPG_PRE + parts.map(x => x.slice(JPG_PRE.length)).join(""));
+  const parts = sns.map(x => x.data().d); imgPut(ref, cnt === 1 ? parts[0] : JPG_PRE + parts.map(x => x.slice(JPG_PRE.length)).join(""));
 }
+async function hydrateRef(ref) { if (!ref || IMG_CACHE.has(ref)) return; IMG_TRIED.add(ref); await hydrateOne(ref); }
 async function saveOriginal(file) {
   const bmp = await loadBitmap(file), L = 3840, k = Math.min(1, L / Math.max(bmp.width, bmp.height));
   let W = Math.round(bmp.width * k), out = null;
   for (let t = 0; t < 8 && !out; t++) {
     const H = Math.round(W * bmp.height / bmp.width), c = document.createElement("canvas"); c.width = W; c.height = H; const x = c.getContext("2d"); x.imageSmoothingQuality = "high"; x.fillStyle = "#fff"; x.fillRect(0, 0, W, H); x.drawImage(bmp, 0, 0, W, H);
-    for (const q of [.92, .86, .8, .72]) { const d = c.toDataURL("image/jpeg", q); if (d.length < IMG_TOTAL - 40000) { out = d; break; } }
+    for (const q of [.88, .8, .7]) { const d = c.toDataURL("image/jpeg", q); if (d.length < IMG_TOTAL - 40000) { out = d; break; } }
     if (!out) W = Math.floor(W * .82);
   }
   try { bmp.close?.(); } catch {}
@@ -1096,8 +1101,10 @@ async function saveImage(d) {
   const id = "i" + genId(10), body = d.slice(JPG_PRE.length), parts = [];
   if (d.length <= IMG_CHUNK + 20000) parts.push(d); else for (let i = 0; i < body.length; i += IMG_CHUNK - 30) parts.push(JPG_PRE + body.slice(i, i + IMG_CHUNK - 30));
   if (parts.length > IMG_MAXCH) throw new Error("terlalu besar");
-  await Promise.all(parts.map((x, k) => FB.setDoc(FB.doc(db, "flashlink_images", k ? `${id}_${k}` : id), { uid: S.user.uid, d: x, createdAt: FB.serverTimestamp() })));
-  const ref = parts.length > 1 ? `${id}~${parts.length}` : id; IMG_CACHE.set(ref, d); return "fli:" + ref;
+  const ref = parts.length > 1 ? `${id}~${parts.length}` : id; imgPut(ref, d); // paparan terus guna salinan setempat
+  const job = Promise.all(parts.map((x, k) => FB.setDoc(FB.doc(db, "flashlink_images", k ? `${id}_${k}` : id), { uid: S.user.uid, d: x, createdAt: FB.serverTimestamp() })));
+  UPQ.add(job); job.then(() => UPQ.delete(job), () => { UPQ.delete(job); toast("Gagal muat naik gambar ke pelayan. Semak sambungan, kemudian muat naik semula.", "bad"); });
+  return "fli:" + ref;
 }
 /* ---- kualiti gambar: auto ikut peranti, atau pilih sendiri (minimum 1080p) ---- */
 const IMGQ_LEVELS = [["auto", "Auto (ikut peranti)"], ["1080", "1080p"], ["1440", "2K"], ["4k", "4K"]];
@@ -1144,7 +1151,7 @@ function cropImage(src, { aspects = [["1:1", 1]], cap = 99999, title = "Laras ga
       const L0 = Math.min(imgLong(), cap); let W = Math.max(64, Math.min(ar >= 1 ? L0 : Math.round(L0 * ar), Math.floor(sw))), out = null;
       for (let t = 0; t < 8 && !out; t++) {
         const H = Math.round(W / ar), c = document.createElement("canvas"); c.width = W; c.height = H; const x = c.getContext("2d"); x.imageSmoothingQuality = "high"; x.fillStyle = "#fff"; x.fillRect(0, 0, W, H); x.drawImage(bmp, sx, sy, sw, sh, 0, 0, W, H);
-        for (const q of [.95, .9, .85, .8, .72, .64]) { const d = c.toDataURL("image/jpeg", q); if (d.length < IMG_TOTAL - 40000) { out = d; break; } }
+        for (const q of [.92, .85, .76, .66]) { const d = c.toDataURL("image/jpeg", q); if (d.length < IMG_TOTAL - 40000) { out = d; break; } }
         if (!out) W = Math.floor(W * .82);
       }
       LASTCROP = out ? { ai, z: +zoom.toFixed(3), x: +px.toFixed(4), y: +py.toFixed(4) } : null; finish(out);
@@ -1155,7 +1162,7 @@ const pickFile = () => new Promise(res => { const i = document.createElement("in
 async function uploadImage(opts) {
   const file = await pickFile(); if (!file) return null;
   const d = await cropImage(file, opts); if (!d) return null; const meta = LASTCROP;
-  try { const [ref, o] = await Promise.all([saveImage(d), saveOriginal(file).catch(() => "")]); recordOrig(ref, o, meta); return ref; }
+  try { const ref = await saveImage(d); setTimeout(() => saveOriginal(file).then(o => o && recordOrig(ref, o, meta)).catch(() => {}), 600); return ref; }
   catch (e) { console.error(e); toast("Gagal muat naik gambar. Semak sambungan.", "bad"); return null; }
 }
 /* laras semula: buka gambar ASAL (bukan hasil crop) dengan kedudukan dan zum terakhir */
@@ -1979,7 +1986,7 @@ const saveProfile = debounce(async () => {
   const p = S.profile, socialIcons = (p.socialIcons || []).filter(x => x.url);
   const data = { displayName: p.displayName, bio: p.bio, avatarUrl: p.avatarUrl, bannerUrl: p.bannerUrl, template: p.template, theme: p.theme, socialIcons, testimonials: p.testimonials, profileStyle: p.profileStyle, username: p.username, designs: p.designs, activeDesign: p.activeDesign, publishedDesign: p.publishedDesign || p.activeDesign, handle: p.handle || "", imgOrig: p.imgOrig || {} };
   if (JSON.stringify(data).length > 900000) return toast("Data terlalu besar (gambar). Buang gambar latar pada sesetengah design.", "bad");
-  try { await FB.setDoc(FB.doc(db, "flashlink_users", S.user.uid), data, { merge: true }); const el = $("#sv"); if (el) { el.textContent = "Disimpan ✓"; setTimeout(() => el && (el.textContent = ""), 1500); } }
+  try { const w = upDone(); if (w) { const el0 = $("#sv"); el0 && (el0.textContent = "Menyimpan gambar…"); await w; } await FB.setDoc(FB.doc(db, "flashlink_users", S.user.uid), data, { merge: true }); const el = $("#sv"); if (el) { el.textContent = "Disimpan ✓"; setTimeout(() => el && (el.textContent = ""), 1500); } }
   catch (e) { console.error(e); toast("Gagal simpan. Semak sambungan anda.", "bad"); }
 }, 600);
 
@@ -2095,7 +2102,7 @@ function lazyMinis(scope) {
   $$(".mini[data-lz]", scope).forEach(m => LZ.observe(m));
 }
 const withDesign = d => ({ ...S.profile, template: d.template, profileStyle: d.profileStyle || "classic", theme: d.theme });
-const miniHtml = pr => `<div class="mini-in">${renderProfile(pr, S.links, { preview: true, anim: false })}</div>`;
+const miniHtml = pr => { IMGMODE.thumb = true; try { return `<div class="mini-in">${renderProfile(pr, S.links, { preview: true, anim: false })}</div>`; } finally { IMGMODE.thumb = false; } };
 function designCard(d, activeId) {
   const on = d.id === activeId, pub = d.id === S.profile.publishedDesign;
   return `<article class="gal-card clk${on ? " on" : ""}" data-id="${d.id}"><div class="mini" data-lz="d:${d.id}"></div>
@@ -2542,6 +2549,7 @@ function linkModal({ link, platform, type } = {}) {
     const data = { type: t, platform: isWeb && needUrl ? detectPlatform(url) : plat, title: ttl.slice(0, 60), url, thumbnailUrl: th || "", layout: lay, price, promoLabel: v("ml").slice(0, 24), anim: ($m("man") && $m("man").value) || "" };
     const btn = $m("ms"); btn.disabled = true;
     try {
+      { const w = upDone(); if (w) await w; }
       if (edit) { await FB.updateDoc(FB.doc(db, "flashlink_links", link.id), data); Object.assign(link, data); }
       else { const order = S.links.length ? Math.max(...S.links.map(l => l.order ?? 0)) + 1 : 0; const full = { uid: S.user.uid, ...data, order, active: true, clicks: 0, createdAt: FB.serverTimestamp() }; const r = await FB.addDoc(FB.collection(db, "flashlink_links"), full); S.links.push({ id: r.id, ...full, createdAt: new Date() }); }
       m.close(); drawLinks(); toast(edit ? "Disimpan ✓" : "Pautan ditambah ✓");
@@ -2735,7 +2743,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-69";
+const APP_VERSION = "V-70";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
