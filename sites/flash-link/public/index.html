@@ -1187,12 +1187,16 @@ async function onAuthChange(u) {
 }
 async function loadProfile() {
   if (!S.user) return;
-  S.loadingProfile = true;
-  try {
-    const s = await FB.getDoc(FB.doc(db, "flashlink_users", S.user.uid));
-    S.profile = s.exists() ? normProfile(s.data()) : null;
-    if (S.profile) { await loadLinks(); await hydrateImages(S.profile, S.links); }
-  } catch (e) { console.error(e); toast("Tak dapat muat profil. Semak sambungan anda.", "bad"); }
+  S.loadingProfile = true; S.profileErr = false;
+  for (let i = 0; i < 4; i++) {
+    try {
+      const s = await FB.getDoc(FB.doc(db, "flashlink_users", S.user.uid));
+      S.profile = s.exists() ? normProfile(s.data()) : null; S.profileErr = false;
+      if (S.profile) { await loadLinks(); await hydrateImages(S.profile, S.links); }
+      break;
+    } catch (e) { console.error(e); S.profileErr = true; if (i < 3) await new Promise(r => setTimeout(r, 700 * (i + 1))); }
+  }
+  if (S.profileErr) toast("Tak dapat muat profil. Semak sambungan anda.", "bad");
   S.loadingProfile = false;
 }
 function normProfile(p) {
@@ -1789,8 +1793,10 @@ async function dashView() {
   await authReady; if (!S.user) return nav("/login", true);
   document.title = "Dashboard — Genius Digital Flash Link";
   if (!hasPassword(S.user)) { $("#app").innerHTML = `<div style="min-height:100vh"></div>`; if (!(await setPasswordModal(S.user))) return; }
+  for (let i = 0; S.loadingProfile && i < 100; i++) await new Promise(r => setTimeout(r, 100)); // tunggu muatan profil yang sedang berjalan (elak anggap akaun baharu)
   if (!S.profile) {
     $("#app").innerHTML = `<div style="display:grid;place-items:center;min-height:100vh"><div style="text-align:center"><div class="spin" role="status" aria-label="Memuatkan" style="margin:0 auto 12px"></div><div style="color:#C7C9D1">Menyediakan dashboard anda…</div></div></div>`;
+    if (S.profileErr) return startFail(); // gagal memuat BUKAN bermakna akaun baharu: jangan cipta/timpa profil
     try { await autoCreateProfile(); } catch (e) { console.error(e); return startFail(); }
   }
   dashboard();
@@ -1804,13 +1810,14 @@ async function autoCreateProfile() {
   for (let i = 0; ; i++) {
     try {
       await FB.runTransaction(db, async tx => {
-        const ur = FB.doc(db, "flashlink_usernames", name);
+        const ur = FB.doc(db, "flashlink_usernames", name), pr = FB.doc(db, "flashlink_users", uid);
+        if ((await tx.get(pr)).exists()) throw Object.assign(new Error("exists"), { code: "exists" }); // satu akaun sahaja: jangan timpa profil sedia ada
         if ((await tx.get(ur)).exists()) throw Object.assign(new Error("taken"), { code: "taken" });
         tx.set(ur, { uid, createdAt: FB.serverTimestamp() });
         tx.set(FB.doc(db, "flashlink_users", uid), profile);
       });
       break;
-    } catch (e) { if (e.code === "taken" && i < 6) { name = genId(); profile.username = name; continue; } throw e; }
+    } catch (e) { if (e.code === "exists") { await loadProfile(); return; } if (e.code === "taken" && i < 6) { name = genId(); profile.username = name; continue; } throw e; }
   }
   bump("flashlink/stats/users");
   await loadProfile(); S.view = "home";
@@ -2581,7 +2588,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-55";
+const APP_VERSION = "V-56";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
