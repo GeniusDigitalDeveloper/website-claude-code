@@ -954,7 +954,7 @@ function posterHtml(p, act, { preview = false, anim = true } = {}) {
   const initial = name ? esc(name.charAt(0).toUpperCase()) : "";
   const Wi = (i, h) => `<div class="fl-in" style="--i:${i}">${h}</div>`;
   const hero = `<div class="fl-phero${avatar ? "" : " noimg"}"><div class="fl-phero-media">${avatar ? `<div class="fl-phero-bg" style="background-image:url('${esc(encodeURI(avatar).replace(/'/g, "%27"))}')"></div>` : `<div class="fl-heroini">${initial}</div>`}<div class="fl-phero-ov"></div></div>${!avatar && preview ? `<div class="fl-hint-img">Tambah gambar anda di bahagian Profil</div>` : ""}
-    <a class="fl-pbtn fl-pbtn-l" href="/" aria-label="Flash Link" ${preview ? 'tabindex="-1"' : ""}>${ic("zap", "w-5 h-5")}</a><button class="fl-pbtn fl-pbtn-r" type="button" data-sharepage aria-label="Kongsi halaman">${ic("share", "w-5 h-5")}</button>
+    <button class="fl-pbtn fl-pbtn-r" type="button" data-sharepage aria-label="Kongsi halaman">${ic("share", "w-5 h-5")}</button>
     <div class="fl-phero-txt">${name ? `<h1 class="fl-ptitle-main">${esc(name)}</h1>` : preview ? `<h1 class="fl-ptitle-main fl-phold">NAMA ANDA</h1>` : ""}${p.bio ? `<p class="fl-pbio">${esc(p.bio)}</p>` : ""}</div></div>`;
   const more = l => `<button class="fl-pmore" type="button" data-share="${esc(l.id)}" aria-label="Kongsi ${esc(l.title)}">${ic("more", "w-5 h-5")}</button>`;
   const item = (l, i) => {
@@ -2051,7 +2051,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-41";
+const APP_VERSION = "V-42";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
