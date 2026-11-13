@@ -484,8 +484,27 @@ async function publicView(username) {
     if (rtdb) { try { const r = FB.rt.ref(rtdb, `flashlink/live/${uid}`); FB.rt.runTransaction(r, v => (v || 0) + 1).catch(() => {}); addEventListener("pagehide", () => FB.rt.runTransaction(r, v => Math.max(0, (v || 1) - 1)).catch(() => {}), { once: true }); } catch {} }
   }
 }
-function notFound(u) { $("#app").innerHTML = `<main class="container" style="text-align:center;padding:96px 16px"><img src="/assets/icon.png" width="96" height="96" alt="Flash Link" class="logo-glow" style="margin:0 auto"><h1 class="font-display" style="font-size:28px;margin:20px 0 8px;font-weight:700">${u ? "@" + esc(u) + " belum wujud" : "Halaman tidak dijumpai"}</h1><p style="color:#9CA3AF">${u ? "Nama ini masih kosong. Tuntut sekarang sebelum orang lain!" : "Pautan ini tidak sah."}</p><a class="btn btn-red" style="margin-top:20px" href="/${u ? "login" : ""}" data-nav>${u ? "Tuntut nama ini" : "Ke laman utama"}</a></main>`; }
+function notFound(u) { $("#app").innerHTML = `<main class="container" style="text-align:center;padding:96px 16px"><img src="/assets/icon.png" width="96" height="96" alt="Flash Link" class="logo-glow" style="margin:0 auto"><h1 class="font-display" style="font-size:28px;margin:20px 0 8px;font-weight:700">${u ? "@" + esc(u) + " belum wujud" : "Halaman tidak dijumpai"}</h1><p style="color:#9CA3AF">${u ? "Nama ini masih kosong. Tuntut sekarang sebelum orang lain!" : "Pautan ini tidak sah."}</p><a class="btn btn-red" style="margin-top:20px" href="/${u ? "login" : ""}" data-nav>${u ? "Tuntut nama ini" : "Ke laman utama"}</a></main>${siteFooter()}`; fillStat(); }
 function notice(m) { $("#app").innerHTML = `<main class="container" style="text-align:center;padding:96px 16px"><img src="/assets/icon.png" width="80" height="80" alt="" style="margin:0 auto"><p style="margin-top:16px;max-width:420px;margin-inline:auto">${esc(m)}</p></main>`; }
+
+/* ---------- Footer tapak + statistik jumlah pengguna ---------- */
+function siteFooter() {
+  return `<footer class="container" style="padding:32px 16px 44px;text-align:center;border-top:1px solid var(--line);margin-top:8px">
+    <img src="/assets/icon.png" alt="" width="40" height="40" style="margin:0 auto 12px;height:40px;width:40px">
+    <div class="glass" id="ustat" hidden style="display:none;align-items:center;justify-content:center;gap:10px;margin:0 auto 18px;padding:10px 18px;border-radius:999px;width:fit-content;max-width:100%">${ic("users", "w-5 h-5")}<span><b class="font-display" id="ucount" style="font-size:20px;color:#fff">0</b> <span style="color:#D1D5DB">pengguna berdaftar</span></span></div>
+    <p style="margin:0 0 6px;color:#E5E7EB;font-weight:600;font-size:14.5px">Hak Cipta Terpelihara Genius Digital / Flash Link 2026</p>
+    <p style="margin:0;color:#9CA3AF;font-size:14px">Memacu Inovasi Digital Melalui Sistem Pintar, Kreatif dan Efisien.</p></footer>`;
+}
+async function fillStat() {
+  const box = $("#ustat"); if (!box || !CONFIGURED) return;
+  let n = null; try { n = JSON.parse(sessionStorage.getItem("fl_ucount") || "null"); } catch {}
+  try {
+    if (n === null) { await initPromise; if (!db) return; n = (await FB.getCountFromServer(FB.collection(db, "flashlink_users"))).data().count; try { sessionStorage.setItem("fl_ucount", JSON.stringify(n)); } catch {} }
+  } catch (e) { console.error(e); return; }
+  const el = $("#ucount"); if (!el || !box.isConnected) return;
+  box.hidden = false; box.style.display = "flex"; el.textContent = n.toLocaleString("ms-MY");
+  if (n > 0 && !matchMedia("(prefers-reduced-motion:reduce)").matches) { const t0 = performance.now(); const step = t => { const k = Math.min(1, (t - t0) / 900); el.textContent = Math.round(n * (1 - (1 - k) ** 3)).toLocaleString("ms-MY"); if (k < 1 && el.isConnected) requestAnimationFrame(step); }; requestAnimationFrame(step); }
+}
 
 /* ---------- Pandangan: landing ---------- */
 function landing() {
@@ -523,9 +542,9 @@ function landing() {
     <ol style="list-style:none;padding:0;margin:0;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">${["Daftar dengan Google atau e-mel", "Pilih username anda", "Tampal pautan penting", "Pilih templat & tekan Terbit"].map((s, i) => `<li class="glass" style="border-radius:16px;padding:18px;display:flex;gap:12px;align-items:center"><span class="font-display" style="font-size:28px;font-weight:700;color:#FF4D4D">${i + 1}</span><span style="font-weight:600">${s}</span></li>`).join("")}</ol>
     <div style="text-align:center;margin-top:32px"><a class="btn btn-red" style="min-height:52px;padding:0 28px" href="${logged ? "/dashboard" : "/login?daftar=1"}" data-nav>Mula sekarang</a></div></section>
   </main>
-  <footer class="container" style="padding:24px 16px 40px;text-align:center;color:#9CA3AF;font-size:14px;border-top:1px solid var(--line)"><img src="/assets/icon.png" alt="" width="40" height="40" style="margin:0 auto 8px;height:40px;width:40px"><div>© ${new Date().getFullYear()} Flash Link · Dibuat di Malaysia</div></footer>`;
+  ${siteFooter()}`;
   const mq = matchMedia("(min-width:900px)"); const g = $("#hero-grid"); const fit = () => (g.style.gridTemplateColumns = mq.matches ? "1.1fr .9fr" : "1fr"); fit(); mq.addEventListener("change", fit);
-  revealInit();
+  revealInit(); fillStat();
 }
 function revealInit() {
   const els = $$(".reveal");
@@ -550,7 +569,8 @@ async function loginView() {
       <form id="f" novalidate><label class="lbl" for="em">E-mel</label><input id="em" class="inp" type="email" autocomplete="email" placeholder="nama@contoh.com" required>
       <label class="lbl" for="pw" style="margin-top:12px">Kata laluan</label><input id="pw" class="inp" type="password" autocomplete="${mode === "in" ? "current-password" : "new-password"}" placeholder="Minimum 6 aksara" required>
       <div id="e" class="err" role="alert"></div><button class="btn btn-red" style="width:100%;min-height:50px;margin-top:16px" type="submit">${mode === "in" ? "Log masuk" : "Daftar & teruskan"}</button></form>
-      <p style="text-align:center;margin:18px 0 0;font-size:14.5px;color:#C7C9D1">${mode === "in" ? "Belum ada akaun?" : "Sudah ada akaun?"} <button id="sw" class="gradtxt" style="font-weight:700;background:none;border:0;text-decoration:underline;color:#FF6B6B;-webkit-text-fill-color:#FF6B6B">${mode === "in" ? "Daftar percuma" : "Log masuk"}</button></p></div></main>`;
+      <p style="text-align:center;margin:18px 0 0;font-size:14.5px;color:#C7C9D1">${mode === "in" ? "Belum ada akaun?" : "Sudah ada akaun?"} <button id="sw" class="gradtxt" style="font-weight:700;background:none;border:0;text-decoration:underline;color:#FF6B6B;-webkit-text-fill-color:#FF6B6B">${mode === "in" ? "Daftar percuma" : "Log masuk"}</button></p></div></main>${siteFooter()}`;
+    fillStat();
     const fail = e => { $("#e").textContent = AUTH_ERR[e.code] || "Ralat: " + (e.message || "cuba lagi."); };
     $("#sw").onclick = () => { mode = mode === "in" ? "up" : "in"; draw(); };
     $("#g").onclick = async () => { try { await FB.signInWithPopup(auth, new FB.GoogleAuthProvider()); } catch (e) { fail(e); } };
