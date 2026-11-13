@@ -117,6 +117,18 @@ body.flow #bgflow{display:block}
 /* ============ ANIMASI SKROL ============ */
 [data-fx]{opacity:0;will-change:transform,opacity}
 @media (prefers-reduced-motion:reduce){[data-fx]{opacity:1}#bgflow i{animation:none}}
+/* ============ LOG MASUK: mata, animasi berjaya, goncang ============ */
+.pwwrap{position:relative}.pwwrap .inp{padding-right:52px}
+.eye{position:absolute;right:5px;top:50%;margin-top:-20px;width:40px;height:40px;display:grid;place-items:center;color:#C7C9D1;border-radius:10px;transition:color .2s,transform .2s}.eye:hover{color:#fff}.eye:active{transform:scale(.88)}
+.okfx{position:fixed;inset:0;z-index:120;display:grid;place-items:center;background:rgba(5,6,11,.74);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);animation:okin .35s var(--ease) both}
+.okc{text-align:center;font-weight:700;font-size:19px;display:flex;flex-direction:column;align-items:center;gap:14px;animation:okpop .7s var(--ease) both}
+.okc svg{width:104px;height:104px;filter:drop-shadow(0 0 26px rgba(52,211,153,.65))}
+.okcirc{stroke:#34D399;stroke-width:3;stroke-dasharray:152;stroke-dashoffset:152;animation:okdraw .7s .1s ease-out forwards}
+.okchk{stroke:#34D399;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:40;stroke-dashoffset:40;animation:okdraw .45s .6s ease-out forwards}
+@keyframes okdraw{to{stroke-dashoffset:0}}@keyframes okin{from{opacity:0}}@keyframes okpop{from{opacity:0;transform:scale(.7)}}
+.shake{animation:shk .45s cubic-bezier(.36,.07,.19,.97) both}
+@keyframes shk{10%,90%{transform:translate3d(-2px,0,0)}20%,80%{transform:translate3d(4px,0,0)}30%,50%,70%{transform:translate3d(-8px,0,0)}40%,60%{transform:translate3d(8px,0,0)}}
+@media (prefers-reduced-motion:reduce){.shake{animation:none}.okcirc,.okchk{animation-duration:.01ms}}
 /* ============ PEMILIH PLATFORM ============ */
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px}
 .ptile{display:flex;flex-direction:column;align-items:center;gap:7px;padding:12px 6px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:#F4F4F5;font-size:12.5px;font-weight:600;text-align:center;line-height:1.25;transition:transform .35s var(--ease,ease),border-color .25s,background .25s}
@@ -314,7 +326,13 @@ const contrast = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - 
 const device = () => (/Mobi|Android|iPhone/i.test(navigator.userAgent) ? "mobile" : "desktop");
 const rm = n => "RM " + Number(n || 0).toLocaleString("ms-MY", { minimumFractionDigits: Number(n) % 1 ? 2 : 0, maximumFractionDigits: 2 });
 const origin = () => location.origin;
-const profileUrl = u => `${origin()}/${u}`;
+const PUBLIC_BASE = "https://flashlink.geniusdigital.space";
+let BASE = location.origin;
+const baseReady = (async () => {
+  if (location.origin === PUBLIC_BASE) return;
+  try { const c = new AbortController(), t = setTimeout(() => c.abort(), 3500); const r = await fetch(PUBLIC_BASE + "/version.json?t=" + Date.now(), { signal: c.signal, cache: "no-store" }); clearTimeout(t); const j = await r.json(); if (j && j.version) BASE = PUBLIC_BASE; } catch {}
+})();
+const profileUrl = u => `${BASE}/${u}`;
 
 function toast(msg, kind = "good") {
   const el = document.createElement("div");
@@ -340,6 +358,7 @@ function loadFont(f) {
 const P = {
   vol: '<path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>',
   mute: '<path d="M11 5 6 9H2v6h4l5 4z"/><path d="m22 9-6 6"/><path d="m16 9 6 6"/>',
+  home: '<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/>',
   chev: '<path d="m15 18-6-6 6-6"/>',
   chevr: '<path d="m9 18 6-6-6-6"/>',
   link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
@@ -453,11 +472,13 @@ async function initFirebase() {
   FB = { ...a, ...f, rt: r };
   auth = a.getAuth(inst); db = f.getFirestore(inst);
   if (r) rtdb = r.getDatabase(inst);
-  a.onAuthStateChanged(auth, async u => {
-    S.user = u; S.profile = null; S.links = [];
-    if (u) { await loadProfile(); }
-    authReadyRes(); route(true);
-  });
+  a.onAuthStateChanged(auth, onAuthChange);
+}
+const hasPassword = u => !!u && (u.providerData || []).some(p => p.providerId === "password");
+async function onAuthChange(u) {
+  S.user = u; S.profile = null; S.links = []; S.needPw = !!u && !hasPassword(u);
+  if (u && !S.needPw) await loadProfile();
+  authReadyRes(); if (!S.holdRoute) route(true);
 }
 async function loadProfile() {
   if (!S.user) return;
@@ -643,7 +664,7 @@ async function publicView(username) {
     if (rtdb) { try { const r = FB.rt.ref(rtdb, `flashlink/live/${uid}`); FB.rt.runTransaction(r, v => (v || 0) + 1).catch(() => {}); addEventListener("pagehide", () => FB.rt.runTransaction(r, v => Math.max(0, (v || 1) - 1)).catch(() => {}), { once: true }); } catch {} }
   }
 }
-function notFound(u) { $("#app").innerHTML = `<main class="container" style="text-align:center;padding:96px 16px"><img src="/assets/icon.png" width="96" height="96" alt="Flash Link" class="logo-glow" style="margin:0 auto"><h1 class="font-display" style="font-size:28px;margin:20px 0 8px;font-weight:700">${u ? "@" + esc(u) + " belum wujud" : "Halaman tidak dijumpai"}</h1><p style="color:#9CA3AF">${u ? "Nama ini masih kosong. Tuntut sekarang sebelum orang lain!" : "Pautan ini tidak sah."}</p><a class="btn btn-red" style="margin-top:20px" href="/${u ? "login" : ""}" data-nav>${u ? "Tuntut nama ini" : "Ke laman utama"}</a></main>${siteFooter()}`; fillStat(); }
+function notFound(u) { $("#app").innerHTML = `<main class="container" style="text-align:center;padding:96px 16px"><img src="/assets/icon.png" width="96" height="96" alt="Flash Link" class="logo-glow" style="margin:0 auto"><h1 class="font-display" style="font-size:28px;margin:20px 0 8px;font-weight:700">${u ? "Halaman belum wujud" : "Halaman tidak dijumpai"}</h1><p style="color:#9CA3AF">${u ? "Halaman ini belum wujud." : "Pautan ini tidak sah."}</p><a class="btn btn-red" style="margin-top:20px" href="/" data-nav>Ke laman utama</a></main>${siteFooter(false)}`; fillStat(); }
 function notice(m) { $("#app").innerHTML = `<main class="container" style="text-align:center;padding:96px 16px"><img src="/assets/icon.png" width="80" height="80" alt="" style="margin:0 auto"><p style="margin-top:16px;max-width:420px;margin-inline:auto">${esc(m)}</p></main>`; }
 
 /* ---------- Statistik masa nyata (RTDB: flashlink/stats) + footer ----------
@@ -663,11 +684,11 @@ async function countVisit() {
   const k = mytKeys();
   bump("flashlink/stats/total"); bump(`flashlink/stats/monthly/${k.m}`); bump(`flashlink/stats/daily/${k.d}`);
 }
-function siteFooter() {
+function siteFooter(withStats = true) {
   const it = (id, l) => `<div><div id="${id}" class="font-display" style="font-size:15px;font-weight:600;color:#fff;font-variant-numeric:tabular-nums;line-height:1.3">${fmtN(statCache[id])}</div><div style="font-size:10.5px;color:#9CA3AF;line-height:1.25;margin-top:2px">${l}</div></div>`;
   return `<footer class="container" style="padding:28px 16px 44px;text-align:center;border-top:1px solid var(--line);margin-top:8px">
     <img src="/assets/icon.png" alt="" width="36" height="36" style="margin:0 auto 14px;height:36px;width:36px">
-    <div id="ustat" aria-label="Statistik Flash Link" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;max-width:560px;margin:0 auto 18px;align-items:start">${it("s_users", "Pengguna")}${it("s_day", "Pelawat hari ini")}${it("s_month", "Pelawat bulan ini")}${it("s_total", "Pelawat keseluruhan")}</div>
+    ${withStats ? `<div id="ustat" aria-label="Statistik Flash Link" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;max-width:560px;margin:0 auto 18px;align-items:start">${it("s_users", "Pengguna")}${it("s_day", "Pelawat hari ini")}${it("s_month", "Pelawat bulan ini")}${it("s_total", "Pelawat keseluruhan")}</div>` : ""}
     <p style="margin:0;font-size:clamp(10px,3.05vw,13.5px);font-weight:700;line-height:1.6;white-space:nowrap;background:linear-gradient(90deg,#E5E7EB 0%,#FF9A9A 35%,#FF4D4D 75%,#FF3B3B 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent">Hak Cipta Terpelihara Genius Digital | Flash Link 2026</p>
     <div role="separator" style="height:1px;width:min(100%,360px);margin:10px auto;background:#4B5563"></div>
     <p style="margin:0 auto;max-width:560px;font-size:13.5px;font-weight:600;line-height:1.6;background:linear-gradient(90deg,#E5E7EB 0%,#FF9A9A 35%,#FF4D4D 75%,#FF3B3B 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent">Memacu Inovasi Digital Melalui Sistem Pintar, Kreatif dan Efisien.</p></footer>`;
@@ -703,7 +724,7 @@ function landing() {
   document.title = "Flash Link — Satu pautan untuk semua jualan anda";
   const logged = !!S.user;
   const demo = renderProfile(demoProfile("dark"), DEMO_LINKS.slice(0, 5), { preview: true });
-  const go = logged ? "/dashboard" : "/login?daftar=1";
+  const go = logged ? "/dashboard" : "/login";
   const hooks = [
     ["zap", "Pelanggan terus ke tujuan", "Tak perlu lagi tanya “link mana?”. Satu pautan di bio, semua WhatsApp, Shopee, TikTok Shop dan YouTube anda sedia diklik."],
     ["bag", "Jualan nampak profesional", "Produk dengan gambar, harga dan lencana promosi. Pelanggan klik, terus ke kedai anda. Tiada potongan jualan."],
@@ -725,7 +746,7 @@ function landing() {
   </div></div>
   <header class="container" style="display:flex;align-items:center;justify-content:space-between;height:68px;position:relative;z-index:5">
     <a href="/" data-nav aria-label="Flash Link"><img src="/assets/logo.png" alt="Flash Link" width="132" height="66" style="height:44px;width:auto"></a>
-    <nav style="display:flex;gap:8px"><a class="btn btn-ghost btn-sm" href="${logged ? "/dashboard" : "/login"}" data-nav>${logged ? "Dashboard" : "Masuk"}</a><a class="btn btn-red btn-sm" href="${go}" data-nav>Mula sekarang</a></nav>
+    <nav style="display:flex;gap:8px"><a class="btn btn-red btn-sm" href="${go}" data-nav>Mula sekarang</a></nav>
   </header>
   <main>
   <section style="position:relative;padding:40px 0 72px">
@@ -734,7 +755,7 @@ function landing() {
         <img data-fx="pop" src="/assets/logo.png" alt="" aria-hidden="true" class="logo-glow" width="360" height="180" fetchpriority="high" style="width:min(300px,72vw);height:auto;margin:0 auto 8px">
         <h1 data-fx="up" data-d="120" class="font-display" style="font-size:clamp(32px,6vw,54px);line-height:1.08;font-weight:700;margin:8px 0 14px">Satu pautan untuk <span class="gradtxt">semua jualan</span> anda</h1>
         <p data-fx="up" data-d="240" style="font-size:18px;color:#D1D5DB;margin:0 auto 24px;max-width:520px">Tampal satu pautan di bio Instagram & TikTok. Pelanggan terus ke WhatsApp, Shopee, TikTok Shop atau YouTube anda, tanpa tersesat.</p>
-        <div data-fx="up" data-d="360" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap"><a class="btn btn-red shine" style="min-height:54px;padding:0 30px;font-size:17px" href="${go}" data-nav>${ic("zap")} Cipta Flash Link saya</a></div>
+        <div data-fx="up" data-d="360" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap"><a class="btn btn-red shine" style="min-height:54px;padding:0 30px;font-size:17px" href="${go}" data-nav>${ic("zap")} Mula sekarang</a></div>
         <p data-fx="up" data-d="440" class="hint" style="margin-top:14px">Setup 2 minit · Kemas kini automatik · Tiada potongan jualan</p>
       </div>
       <div data-fx="pop" data-d="200" style="display:flex;justify-content:center"><div data-par=".07"><div class="float" style="animation-delay:-2s">${phoneFrame(demo)}</div></div></div>
@@ -744,7 +765,7 @@ function landing() {
   <section class="container" style="padding:0 16px 64px"><h2 data-fx="up" class="font-display" style="font-size:clamp(26px,4vw,36px);text-align:center;margin:0 0 8px;font-weight:700">Semua yang anda perlukan, tanpa serabut</h2><p data-fx="up" data-d="80" style="text-align:center;color:#9CA3AF;margin:0 0 32px">Ciri lanjutan tersembunyi di bawah butang “Tambah pautan”.</p>
     <div style="display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">${feats.map((f, i) => `<article data-fx="${i % 2 ? "right" : "left"}" data-d="${(i % 3) * 90}" class="glass" style="border-radius:18px;padding:22px"><div style="width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:rgba(56,189,248,.16);color:#7DD3FC;margin-bottom:12px">${ic(f[0], "w-6 h-6")}</div><h3 style="font-weight:700;font-size:18px;margin:0 0 6px">${f[1]}</h3><p style="margin:0;color:#C7C9D1;font-size:15px">${f[2]}</p></article>`).join("")}</div></section>
   <section class="container" style="padding:0 16px 72px"><h2 data-fx="up" class="font-display" style="font-size:clamp(26px,4vw,36px);text-align:center;margin:0 0 28px;font-weight:700">3 langkah. Itu sahaja.</h2>
-    <ol style="list-style:none;padding:0;margin:0;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">${["Daftar dengan Google atau e-mel", "Pilih username dan templat anda", "Tekan Tambah pautan, pilih platform, siap"].map((s, i) => `<li data-fx="up" data-d="${i * 120}" class="glass" style="border-radius:16px;padding:18px;display:flex;gap:12px;align-items:center"><span class="font-display" style="font-size:28px;font-weight:700;color:#7DD3FC">${i + 1}</span><span style="font-weight:600">${s}</span></li>`).join("")}</ol>
+    <ol style="list-style:none;padding:0;margin:0;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">${["Tekan Mula sekarang dan log masuk dengan Google", "Beri nama dan pilih templat anda", "Tambah pautan, salin pautan anda dan tampal di TikTok"].map((s, i) => `<li data-fx="up" data-d="${i * 120}" class="glass" style="border-radius:16px;padding:18px;display:flex;gap:12px;align-items:center"><span class="font-display" style="font-size:28px;font-weight:700;color:#7DD3FC">${i + 1}</span><span style="font-weight:600">${s}</span></li>`).join("")}</ol>
     <div data-fx="pop" style="text-align:center;margin-top:32px"><a class="btn btn-red shine" style="min-height:54px;padding:0 30px;font-size:17px" href="${go}" data-nav>Mula sekarang</a></div></section>
   </main>
   ${siteFooter()}`;
@@ -771,46 +792,91 @@ function revealInit() {
 }
 
 /* ---------- Pandangan: log masuk ---------- */
-const AUTH_ERR = { "auth/invalid-credential": "E-mel atau kata laluan tidak betul.", "auth/wrong-password": "Kata laluan tidak betul.", "auth/user-not-found": "Akaun tidak dijumpai. Cuba daftar.", "auth/email-already-in-use": "E-mel ini sudah berdaftar. Sila log masuk.", "auth/weak-password": "Kata laluan terlalu lemah (minimum 6 aksara).", "auth/invalid-email": "Format e-mel tidak sah.", "auth/popup-closed-by-user": "Tetingkap Google ditutup. Cuba lagi.", "auth/cancelled-popup-request": "Cuba lagi.", "auth/too-many-requests": "Terlalu banyak percubaan. Tunggu sebentar.", "auth/network-request-failed": "Tiada sambungan internet.", "auth/operation-not-allowed": "Kaedah log masuk ini belum diaktifkan dalam Firebase Authentication.", "auth/unauthorized-domain": "Domain ini belum dibenarkan dalam Firebase Authentication > Settings > Authorized domains." };
+const AUTH_ERR = { "auth/invalid-credential": "E-mel atau kata laluan salah.", "auth/wrong-password": "Kata laluan salah.", "auth/user-not-found": "Akaun tidak dijumpai. Tekan Log masuk dengan Google untuk mula.", "auth/invalid-email": "Format e-mel tidak sah.", "auth/popup-closed-by-user": "Tetingkap Google ditutup. Cuba lagi.", "auth/cancelled-popup-request": "Cuba lagi.", "auth/popup-blocked": "Pelayar menyekat tetingkap Google. Benarkan pop-up dan cuba lagi.", "auth/too-many-requests": "Terlalu banyak percubaan. Tunggu sebentar.", "auth/network-request-failed": "Tiada sambungan internet.", "auth/operation-not-allowed": "Kaedah log masuk ini belum diaktifkan dalam Firebase Authentication.", "auth/unauthorized-domain": "Domain ini belum dibenarkan untuk log masuk Google. Tambah domain ini di Firebase Console > Authentication > Settings > Authorized domains.", "auth/weak-password": "Kata laluan terlalu lemah (minimum 8 aksara).", "auth/requires-recent-login": "Sesi terlalu lama. Log masuk dengan Google semula.", "auth/credential-already-in-use": "E-mel ini sudah mempunyai kata laluan. Log masuk dengan e-mel dan kata laluan.", "auth/email-already-in-use": "E-mel ini sudah mempunyai kata laluan. Log masuk dengan e-mel dan kata laluan." };
+const pwField = (id, label, auto) => `<label class="lbl" for="${id}" style="margin-top:12px">${label}</label><div class="pwwrap"><input id="${id}" class="inp" type="password" autocomplete="${auto}" placeholder="••••••••" required><button type="button" class="eye" data-eye="${id}" aria-label="Tunjuk kata laluan" aria-pressed="false">${ic("eye", "w-5 h-5")}</button></div>`;
+function bindEyes() {
+  $$("[data-eye]").forEach(b => (b.onclick = () => { const i = $("#" + b.dataset.eye), show = i.type === "password"; i.type = show ? "text" : "password"; b.innerHTML = ic(show ? "eyeoff" : "eye", "w-5 h-5"); b.setAttribute("aria-pressed", String(show)); b.setAttribute("aria-label", show ? "Sembunyi kata laluan" : "Tunjuk kata laluan"); }));
+}
+function okFx(msg) {
+  SFX.success();
+  const d = document.createElement("div"); d.className = "okfx"; d.setAttribute("role", "status");
+  d.innerHTML = `<div class="okc"><svg viewBox="0 0 52 52" aria-hidden="true"><circle class="okcirc" cx="26" cy="26" r="24" fill="none"/><path class="okchk" fill="none" d="M14 27l8 8 16-17"/></svg><div>${esc(msg)}</div></div>`;
+  document.body.appendChild(d); return sleep(REDUCE() ? 500 : 1250).then(() => d.remove());
+}
+function failFx(card, el, msg) { SFX.error(); el.textContent = msg; card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake"); }
+const authShell = inner => { $("#app").innerHTML = `<main class="container" style="min-height:100vh;display:grid;place-items:center;padding:24px 16px"><div id="acard" class="glass" style="width:100%;max-width:420px;border-radius:24px;padding:28px"><a href="/" data-nav style="display:block;text-align:center"><img src="/assets/logo.png" alt="Flash Link" width="220" height="110" style="height:76px;width:auto;margin:0 auto 12px"></a>${inner}</div></main>${siteFooter(false)}`; bindEyes(); sfxScope(true); };
 async function loginView() {
   if (!CONFIGURED) return notice("Flash Link belum disambung ke Firebase. Tampal config app FLASH LINK dalam index.html.");
-  await authReady; if (S.user) return nav("/dashboard", true);
-  let mode = new URLSearchParams(location.search).get("daftar") ? "up" : "in";
-  const draw = () => {
-    $("#app").innerHTML = `<main class="container" style="min-height:100vh;display:grid;place-items:center;padding:24px 16px"><div class="glass" style="width:100%;max-width:420px;border-radius:24px;padding:28px">
-      <a href="/" data-nav style="display:block;text-align:center"><img src="/assets/logo.png" alt="Flash Link" width="220" height="110" style="height:76px;width:auto;margin:0 auto 12px"></a>
-      <h1 class="font-display" style="font-size:24px;font-weight:700;text-align:center;margin:0 0 4px">${mode === "in" ? "Selamat kembali" : "Cipta akaun anda"}</h1>
-      <p style="text-align:center;color:#9CA3AF;margin:0 0 20px;font-size:15px">${mode === "in" ? "Log masuk untuk urus Flash Link anda." : "Langkah 1 daripada 4 — kurang 2 minit."}</p>
-      <button id="g" class="btn btn-ghost" style="width:100%;min-height:50px"><svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg> Teruskan dengan Google</button>
-      <div style="display:flex;align-items:center;gap:10px;margin:18px 0;color:#9CA3AF;font-size:13px"><span style="flex:1;height:1px;background:var(--line)"></span>atau e-mel<span style="flex:1;height:1px;background:var(--line)"></span></div>
-      <form id="f" novalidate><label class="lbl" for="em">E-mel</label><input id="em" class="inp" type="email" autocomplete="email" placeholder="nama@contoh.com" required>
-      <label class="lbl" for="pw" style="margin-top:12px">Kata laluan</label><input id="pw" class="inp" type="password" autocomplete="${mode === "in" ? "current-password" : "new-password"}" placeholder="Minimum 6 aksara" required>
-      <div id="e" class="err" role="alert"></div><button class="btn btn-red" style="width:100%;min-height:50px;margin-top:16px" type="submit">${mode === "in" ? "Log masuk" : "Daftar & teruskan"}</button></form>
-      <p style="text-align:center;margin:18px 0 0;font-size:14.5px;color:#C7C9D1">${mode === "in" ? "Belum ada akaun?" : "Sudah ada akaun?"} <button id="sw" class="gradtxt" style="font-weight:700;background:none;border:0;text-decoration:underline;color:#FF6B6B;-webkit-text-fill-color:#FF6B6B">${mode === "in" ? "Daftar sekarang" : "Log masuk"}</button></p></div></main>${siteFooter()}`;
-    fillStat(); sfxScope(true);
-    const fail = e => { $("#e").textContent = AUTH_ERR[e.code] || "Ralat: " + (e.message || "cuba lagi."); };
-    $("#sw").onclick = () => { mode = mode === "in" ? "up" : "in"; draw(); };
-    $("#g").onclick = async () => { try { await FB.signInWithPopup(auth, new FB.GoogleAuthProvider()); } catch (e) { fail(e); } };
-    $("#f").onsubmit = async ev => {
-      ev.preventDefault(); const em = $("#em").value.trim(), pw = $("#pw").value;
-      if (!/^\S+@\S+\.\S+$/.test(em)) return ($("#e").textContent = "Masukkan e-mel yang sah.");
-      if (pw.length < 6) return ($("#e").textContent = "Kata laluan minimum 6 aksara.");
-      const b = $("button[type=submit]"); b.disabled = true;
-      try { await (mode === "in" ? FB.signInWithEmailAndPassword : FB.createUserWithEmailAndPassword)(auth, em, pw); } catch (e) { fail(e); b.disabled = false; }
-    };
-  }; draw();
+  await authReady;
+  if (S.user && S.needPw) return pwSetupView();
+  if (S.user) return nav("/dashboard", true);
+  document.title = "Log masuk — Flash Link";
+  authShell(`<h1 class="font-display" style="font-size:24px;font-weight:700;text-align:center;margin:0 0 4px">Log masuk</h1>
+    <p style="text-align:center;color:#9CA3AF;margin:0 0 20px;font-size:15px">Selamat datang ke Flash Link.</p>
+    <button id="g" class="btn btn-ghost" style="width:100%;min-height:50px"><svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg> Log masuk dengan Google</button>
+    <div style="display:flex;align-items:center;gap:10px;margin:18px 0;color:#9CA3AF;font-size:13px"><span style="flex:1;height:1px;background:var(--line)"></span>atau e-mel<span style="flex:1;height:1px;background:var(--line)"></span></div>
+    <form id="f" novalidate><label class="lbl" for="em">E-mel</label><input id="em" class="inp" type="email" autocomplete="email" placeholder="nama@contoh.com" required>
+    ${pwField("pw", "Kata laluan", "current-password")}
+    <div style="text-align:right;margin-top:8px"><button type="button" id="fg" style="color:#7DD3FC;font-size:13.5px;text-decoration:underline;min-height:32px">Lupa kata laluan?</button></div>
+    <div id="e" class="err" role="alert"></div><button class="btn btn-red" style="width:100%;min-height:50px;margin-top:12px" type="submit">Log masuk</button></form>
+    <p style="text-align:center;margin:16px 0 0;font-size:13.5px;color:#9CA3AF">Pengguna baharu? Tekan <b style="color:#E5E7EB">Log masuk dengan Google</b>, kemudian cipta kata laluan anda.</p>`);
+  if (S.flash) { toast(S.flash); S.flash = ""; }
+  const card = $("#acard"), err = $("#e");
+  $("#g").onclick = async () => {
+    const pr = new FB.GoogleAuthProvider(); pr.setCustomParameters({ prompt: "select_account" }); // paparan pilih e-mel
+    S.holdRoute = true;
+    try {
+      await FB.signInWithPopup(auth, pr);
+      await onAuthChange(auth.currentUser);
+      if (S.needPw) { S.holdRoute = false; return pwSetupView(); }
+      await okFx("Berjaya log masuk"); S.holdRoute = false; route(true);
+    } catch (e) { S.holdRoute = false; failFx(card, err, AUTH_ERR[e.code] || "Log masuk Google gagal: " + (e.code || e.message)); }
+  };
+  $("#f").onsubmit = async ev => {
+    ev.preventDefault(); const em = $("#em").value.trim(), pw = $("#pw").value;
+    if (!/^\S+@\S+\.\S+$/.test(em)) return failFx(card, err, "Masukkan e-mel yang sah.");
+    if (!pw) return failFx(card, err, "Masukkan kata laluan.");
+    const b = $("button[type=submit]"); b.disabled = true; S.holdRoute = true;
+    try { await FB.signInWithEmailAndPassword(auth, em, pw); await onAuthChange(auth.currentUser); await okFx("Berjaya log masuk"); S.holdRoute = false; route(true); }
+    catch (e) { S.holdRoute = false; b.disabled = false; failFx(card, err, AUTH_ERR[e.code] || "Log masuk gagal: " + (e.code || e.message)); }
+  };
+  $("#fg").onclick = () => {
+    const m = modal(`<h2 class="font-display" style="font-size:21px;font-weight:700;margin:0 0 6px">Set semula kata laluan</h2><p style="margin:0 0 12px;color:#C7C9D1;font-size:14.5px">Kami hantar pautan set semula ke e-mel anda.</p><input id="fe" class="inp" type="email" placeholder="nama@contoh.com" value="${esc($("#em").value.trim())}"><div id="fee" class="err"></div><button id="fgo" class="btn btn-red" style="width:100%;min-height:48px;margin-top:14px">Hantar pautan</button>`);
+    $("#fgo", m).onclick = async () => { const v = $("#fe", m).value.trim(); if (!/^\S+@\S+\.\S+$/.test(v)) return ($("#fee", m).textContent = "Masukkan e-mel yang sah."); try { await FB.sendPasswordResetEmail(auth, v); } catch {} m.close(); toast("Jika e-mel itu berdaftar, pautan set semula telah dihantar."); };
+  };
+}
+function pwSetupView() {
+  const u = S.user; document.title = "Cipta kata laluan — Flash Link";
+  authShell(`<h1 class="font-display" style="font-size:24px;font-weight:700;text-align:center;margin:0 0 4px">Cipta kata laluan</h1>
+    <p style="text-align:center;color:#C7C9D1;margin:0 0 6px;font-size:15px">Akaun Google anda:</p><p style="text-align:center;font-weight:700;color:#7DD3FC;margin:0 0 14px;word-break:break-all">${esc(u.email || "")}</p>
+    <form id="pf" novalidate>${pwField("p1", "Kata laluan baharu", "new-password")}${pwField("p2", "Sahkan kata laluan", "new-password")}
+    <p class="hint">Minimum 8 aksara. Anda akan menggunakannya untuk log masuk manual.</p>
+    <div id="e" class="err" role="alert"></div><button class="btn btn-red" style="width:100%;min-height:50px;margin-top:12px" type="submit">Sahkan</button></form>`);
+  const card = $("#acard"), err = $("#e");
+  $("#pf").onsubmit = async ev => {
+    ev.preventDefault(); const a = $("#p1").value, b = $("#p2").value;
+    if (a.length < 8) return failFx(card, err, "Kata laluan minimum 8 aksara.");
+    if (a !== b) return failFx(card, err, "Kata laluan tidak sama. Semak dan cuba lagi.");
+    const btn = $("button[type=submit]"); btn.disabled = true;
+    try {
+      try { await FB.linkWithCredential(u, FB.EmailAuthProvider.credential(u.email, a)); } catch (e) { if (e.code !== "auth/provider-already-linked") throw e; }
+      S.holdRoute = true; await okFx("Kata laluan disimpan");
+      S.flash = "Akaun siap. Sila log masuk semula."; await FB.signOut(auth); S.holdRoute = false; nav("/login", true); // kembali ke log masuk
+    } catch (e) { S.holdRoute = false; btn.disabled = false; failFx(card, err, AUTH_ERR[e.code] || "Gagal menyimpan kata laluan: " + (e.code || e.message)); }
+  };
 }
 
 /* ---------- Pandangan: dashboard + wizard ---------- */
 async function dashView() {
   if (!CONFIGURED) return notice("Flash Link belum disambung ke Firebase. Tampal config app FLASH LINK dalam index.html.");
-  await authReady; if (!S.user) return nav("/login", true);
+  await authReady; await baseReady; if (!S.user || S.needPw) return nav("/login", true);
   document.title = "Dashboard — Flash Link";
   if (!S.profile) return wizard();
   if (S.celebrate) return success();
   dashboard();
 }
 
+const genId = (n = 8) => { const a = "abcdefghjkmnpqrstuvwxyz23456789", r = crypto.getRandomValues(new Uint8Array(n)); return [...r].map(x => a[x % a.length]).join(""); }; // ID unik setiap pengguna
 /* Wizard (langkah 2-4; langkah 1 = log masuk) */
 const W = { step: 2, username: "", avail: null, display: "", tpl: "minimal", color: "#E10600", busy: false };
 const checkName = debounce(async () => {
@@ -822,29 +888,22 @@ const checkName = debounce(async () => {
   try { const s = await FB.getDoc(FB.doc(db, "flashlink_usernames", n)); if (n !== W.username) return; W.avail = !s.exists(); el.innerHTML = W.avail ? `<div class="ok">✓ ${esc(n)} masih ada!</div>` : `<div class="err">Maaf, nama ini sudah diambil.</div>`; } catch { el.innerHTML = `<div class="err">Tak dapat semak sekarang. Cuba lagi.</div>`; }
 }, 350);
 function wizHead() {
-  return `<header class="container" style="display:flex;justify-content:space-between;align-items:center;height:64px"><img src="/assets/logo.png" alt="Flash Link" width="120" height="60" style="height:40px;width:auto"><button id="lo" class="btn btn-ghost btn-sm" aria-label="Log keluar">${ic("logout", "w-4 h-4")} Keluar</button></header>
-  <div class="container" style="max-width:560px"><div style="display:flex;gap:6px;margin:8px 0 6px" role="progressbar" aria-valuemin="1" aria-valuemax="3" aria-valuenow="${W.step}">${[1, 2, 3].map(i => `<span style="flex:1;height:5px;border-radius:9px;background:${i <= W.step ? "linear-gradient(90deg,#FF4D4D,#38BDF8)" : "rgba(255,255,255,.15)"}"></span>`).join("")}</div><div class="hint" style="margin:0 0 16px">Langkah ${W.step} daripada 3</div></div>`;
+  return `<header class="container" style="display:flex;justify-content:space-between;align-items:center;height:64px"><img src="/assets/logo.png" alt="Flash Link" width="120" height="60" style="height:40px;width:auto"><span style="display:flex;gap:8px"><a class="btn btn-ghost btn-sm" href="/" data-nav aria-label="Laman utama">${ic("home", "w-4 h-4")} Laman utama</a><button id="lo" class="btn btn-ghost btn-sm" aria-label="Log keluar">${ic("logout", "w-4 h-4")} Keluar</button></span></header>
+  <div class="container" style="max-width:560px"><div style="display:flex;gap:6px;margin:8px 0 6px" role="progressbar" aria-valuemin="1" aria-valuemax="2" aria-valuenow="${W.step - 1}">${[1, 2].map(i => `<span style="flex:1;height:5px;border-radius:9px;background:${i <= W.step - 1 ? "linear-gradient(90deg,#FF4D4D,#38BDF8)" : "rgba(255,255,255,.15)"}"></span>`).join("")}</div><div class="hint" style="margin:0 0 16px">Langkah ${W.step - 1} daripada 2</div></div>`;
 }
 function wizard() {
   const app = $("#app");
-  const shell = inner => { app.innerHTML = wizHead() + `<main class="container" style="max-width:560px;padding-bottom:48px">${inner}</main>`; $("#lo").onclick = () => FB.signOut(auth); };
+  const shell = inner => { app.innerHTML = wizHead() + `<main class="container" style="max-width:560px;padding-bottom:24px">${inner}</main>` + siteFooter(false); $("#lo").onclick = () => FB.signOut(auth); };
   if (W.step === 2) {
+    if (!W.username) W.username = genId();
     if (!W.display) W.display = S.user.displayName || "";
-    shell(`<h1 class="font-display" style="font-size:28px;font-weight:700;margin:0 0 6px">Pilih nama pautan anda</h1><p style="color:#9CA3AF;margin:0 0 20px">Ini akan jadi alamat anda — mudah diingat, mudah dikongsi.</p>
+    shell(`<h1 class="font-display" style="font-size:28px;font-weight:700;margin:0 0 6px">Siapa nama anda atau kedai anda?</h1><p style="color:#9CA3AF;margin:0 0 20px">Pautan anda dijana automatik dan unik untuk anda.</p>
     <label class="lbl" for="dn">Nama paparan</label><input id="dn" class="inp" maxlength="40" placeholder="cth. Kedai Aisyah" value="${esc(W.display)}">
-    <label class="lbl" for="un" style="margin-top:14px">Username</label>
-    <div style="display:flex;align-items:center;gap:0"><span class="inp" style="width:auto;display:flex;align-items:center;border-radius:12px 0 0 12px;color:#9CA3AF;font-size:14px;white-space:nowrap;overflow:hidden;max-width:55%">${esc(location.host)}/</span><input id="un" class="inp" style="border-radius:0 12px 12px 0" maxlength="20" autocapitalize="none" autocomplete="off" spellcheck="false" placeholder="kedaiaisyah" value="${esc(W.username)}" aria-describedby="av"></div><div id="av" aria-live="polite"></div>
+    <div class="lbl" style="margin-top:16px">Pautan anda</div><div class="glass" style="border-radius:14px;padding:14px;word-break:break-all;font-weight:700;color:#7DD3FC">${esc(profileUrl(W.username))}</div>
+    <p class="hint">Ini pautan sebenar anda. Selepas siap, salin dan tampal di bio TikTok atau Instagram.</p>
     <button id="nx" class="btn btn-red" style="width:100%;min-height:52px;margin-top:24px">Seterusnya</button>`);
     $("#dn").oninput = e => (W.display = e.target.value);
-    $("#un").oninput = e => { e.target.value = W.username = e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""); W.avail = null; checkName(); };
-    if (W.username) checkName();
-    $("#nx").onclick = async () => {
-      if (!W.display.trim()) return toast("Isi nama paparan dahulu.", "bad");
-      if (!USER_RE.test(W.username) || RESERVED.has(W.username)) return toast("Username tidak sah atau dikhaskan.", "bad");
-      if (W.avail !== true) { try { const s = await FB.getDoc(FB.doc(db, "flashlink_usernames", W.username)); W.avail = !s.exists(); } catch { return toast("Tak dapat semak username.", "bad"); } }
-      if (!W.avail) return toast("Username sudah diambil.", "bad");
-      W.step = 3; wizard();
-    };
+    $("#nx").onclick = () => { if (!W.display.trim()) return toast("Isi nama paparan dahulu.", "bad"); W.step = 3; wizard(); };
   } else {
     shell(`<h1 class="font-display" style="font-size:28px;font-weight:700;margin:0 0 6px">Pilih rupa anda</h1><p style="color:#9CA3AF;margin:0 0 16px">Templat dan warna boleh ditukar bila-bila masa. Pautan ditambah selepas ini.</p>
     <div id="tp" style="display:grid;gap:10px;margin-bottom:18px">${Object.entries(TPL).map(([k, t]) => `<button type="button" class="glass" data-t="${k}" aria-pressed="${W.tpl === k}" style="text-align:left;border-radius:16px;padding:14px;color:#fff;display:flex;gap:12px;align-items:center;${W.tpl === k ? "border-color:#FF4D4D;box-shadow:0 0 0 2px rgba(255,77,77,.4)" : ""}"><span style="width:36px;height:56px;border-radius:9px;flex:none;background:${t.theme.bgType === "gradient" ? `linear-gradient(160deg,${t.theme.bg1},${t.theme.bg2})` : t.theme.bg1};border:1px solid rgba(255,255,255,.25);display:flex;flex-direction:column;gap:4px;padding:8px 5px"><i style="height:6px;border-radius:9px;background:${t.theme.btn}"></i><i style="height:6px;border-radius:9px;background:${t.theme.btn}"></i></span><span><b style="display:block">${t.name}</b><small style="color:#C7C9D1">${t.desc}</small></span></button>`).join("")}</div>
@@ -858,21 +917,26 @@ function wizard() {
 }
 async function publish() {
   if (W.busy) return; W.busy = true; const b = $("#pub"); b.disabled = true; b.innerHTML = `<span class="spin"></span> Menerbitkan…`;
-  const uid = S.user.uid, name = W.username;
+  const uid = S.user.uid; let name = W.username;
   const theme = mkTheme(W.tpl, W.color); theme.auto = false;
   const profile = { username: name, displayName: W.display.trim().slice(0, 40), bio: "", avatarUrl: S.user.photoURL || "", bannerUrl: "", template: W.tpl, theme, socialIcons: [], testimonials: [], profileStyle: "classic", createdAt: FB.serverTimestamp(), plan: "free" };
   try {
-    await FB.runTransaction(db, async tx => {
-      const ur = FB.doc(db, "flashlink_usernames", name);
-      if ((await tx.get(ur)).exists()) throw Object.assign(new Error("taken"), { code: "taken" });
-      tx.set(ur, { uid, createdAt: FB.serverTimestamp() });
-      tx.set(FB.doc(db, "flashlink_users", uid), profile);
-    });
+    for (let i = 0; ; i++) {
+      try {
+        await FB.runTransaction(db, async tx => {
+          const ur = FB.doc(db, "flashlink_usernames", name);
+          if ((await tx.get(ur)).exists()) throw Object.assign(new Error("taken"), { code: "taken" });
+          tx.set(ur, { uid, createdAt: FB.serverTimestamp() });
+          tx.set(FB.doc(db, "flashlink_users", uid), profile);
+        });
+        break;
+      } catch (e) { if (e.code === "taken" && i < 6) { name = genId(); profile.username = name; continue; } throw e; }
+    }
     bump("flashlink/stats/users");
     await loadProfile(); S.celebrate = true; W.busy = false; route(true);
   } catch (e) {
     console.error(e); W.busy = false;
-    if (e.code === "taken") { toast("Username baru sahaja diambil orang. Pilih yang lain.", "bad"); W.step = 2; W.avail = false; wizard(); }
+    if (e.code === "taken") { toast("Cuba sekali lagi.", "bad"); b.disabled = false; b.innerHTML = `${ic("zap")} Terbit`; }
     else { toast("Gagal menerbitkan: " + (e.code === "permission-denied" ? "kebenaran ditolak (semak Firestore rules)." : "cuba lagi."), "bad"); b.disabled = false; b.innerHTML = `${ic("zap")} Terbit`; }
   }
 }
@@ -884,9 +948,9 @@ function success() {
   <div class="glass" style="border-radius:16px;padding:14px;margin:16px 0;word-break:break-all;font-weight:700;color:#FF8A8A">${esc(url)}</div>
   <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button id="cp" class="btn btn-red">${ic("copy")} Salin Pautan</button><button id="sh" class="btn btn-ghost">${ic("share")} Kongsi</button><a class="btn btn-ghost" href="${esc(url)}" target="_blank" rel="noopener">${ic("ext")} Buka</a></div>
   <div class="glass" style="border-radius:20px;padding:20px;margin:24px auto;max-width:300px"><div style="background:#fff;border-radius:14px;padding:10px;color:#000" id="qr" role="img" aria-label="Kod QR untuk ${esc(url)}">${qrSvg(url)}</div><button id="dq" class="btn btn-ghost btn-sm" style="margin-top:12px">${ic("qr", "w-4 h-4")} Muat turun QR</button></div>
-  <div class="glass" style="border-radius:16px;padding:16px;text-align:left"><b>Tampal di bio anda</b><p style="margin:6px 0 0;color:#C7C9D1;font-size:15px">Buka profil Instagram / TikTok → <b>Edit profil</b> → ruangan <b>Website / Pautan</b> → tampal pautan di atas.</p></div>
+  <div class="glass" style="border-radius:16px;padding:16px;text-align:left"><b>Tampal di bio anda</b><p style="margin:6px 0 0;color:#C7C9D1;font-size:15px">Buka profil TikTok / Instagram → <b>Edit profil</b> → ruangan <b>Website / Pautan</b> → tampal pautan di atas.</p></div>
   <div class="glass" style="border-radius:16px;padding:16px;text-align:left;margin-top:12px"><b>Langkah seterusnya</b><p style="margin:6px 0 0;color:#C7C9D1;font-size:15px">Halaman anda masih kosong. Tekan butang di bawah untuk tambah pautan pertama anda.</p></div>
-  <button id="go" class="btn btn-red" style="width:100%;min-height:52px;margin-top:20px">Tambah pautan pertama</button></main>`;
+  <button id="go" class="btn btn-red" style="width:100%;min-height:52px;margin-top:20px">Tambah pautan pertama</button></main>${siteFooter(false)}`;
   $("#cp").onclick = () => copyText(url);
   $("#sh").onclick = async () => { if (navigator.share) { try { await navigator.share({ title: S.profile.displayName, url }); } catch {} } else copyText(url); };
   $("#go").onclick = () => { S.celebrate = false; S.view = "links"; dashView(); };
@@ -920,9 +984,10 @@ let navBusy = false;
 function dashboard() {
   const url = profileUrl(S.profile.username);
   $("#app").innerHTML = `<header style="position:sticky;top:0;z-index:30;background:rgba(7,7,10,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)"><div class="container" style="display:flex;align-items:center;justify-content:space-between;height:60px;gap:8px">
-    <button id="hm" aria-label="Dashboard utama"><img src="/assets/logo.png" alt="Flash Link" width="110" height="55" style="height:38px;width:auto"></button><div style="display:flex;gap:8px"><a class="btn btn-ghost btn-sm" href="${esc(url)}" target="_blank" rel="noopener" aria-label="Buka halaman awam">${ic("ext", "w-4 h-4")}<span class="hidden sm:inline">Halaman saya</span></a><button id="cp" class="btn btn-red btn-sm" aria-label="Salin pautan">${ic("copy", "w-4 h-4")}<span class="hidden sm:inline">Salin</span></button><button id="lo" class="btn btn-ghost btn-sm" aria-label="Log keluar">${ic("logout", "w-4 h-4")}</button></div></div></header>
+    <button id="hm" aria-label="Dashboard utama"><img src="/assets/logo.png" alt="Flash Link" width="110" height="55" style="height:38px;width:auto"></button><div style="display:flex;gap:8px"><a class="btn btn-ghost btn-sm" href="${esc(url)}" target="_blank" rel="noopener" aria-label="Buka halaman awam">${ic("ext", "w-4 h-4")}<span class="hidden sm:inline">Halaman saya</span></a><button id="cp" class="btn btn-red btn-sm" aria-label="Salin pautan">${ic("copy", "w-4 h-4")}<span class="hidden sm:inline">Salin</span></button><a id="gohome" class="btn btn-ghost btn-sm" href="/" data-nav aria-label="Laman utama">${ic("home", "w-4 h-4")}<span class="hidden sm:inline">Laman utama</span></a><button id="lo" class="btn btn-ghost btn-sm" aria-label="Log keluar">${ic("logout", "w-4 h-4")}</button></div></div></header>
   <div class="container" id="stage" style="padding-top:22px;padding-bottom:96px;position:relative;min-height:70vh"></div>
-  <button id="pvb" class="btn btn-red pvfab">${ic("phone", "w-5 h-5")} Pratonton</button>`;
+  <button id="pvb" class="btn btn-red pvfab">${ic("phone", "w-5 h-5")} Pratonton</button>
+  ${siteFooter(false)}`;
   $("#cp").onclick = () => copyText(url); $("#lo").onclick = () => { S.view = "home"; FB.signOut(auth); };
   $("#hm").onclick = () => S.view !== "home" && openView("home");
   $("#pvb").onclick = () => modal(`<div class="pv-wrap" id="pvmobile" style="border-radius:16px;overflow:hidden;max-height:76vh;overflow-y:auto"></div>`, () => refreshPreview());
@@ -1212,16 +1277,16 @@ async function statsTab(part = "stats") {
   if (HAS_RTDB && $("#live")) { try { FB.rt.onValue(FB.rt.ref(rtdb, `flashlink/live/${S.user.uid}`), s => { const el = $("#live"); if (el) el.textContent = s.val() || 0; }); } catch {} }
 }
 
-/* ---------- Bunyi gaya gaming + muzik latar (HANYA paparan sebelum register: laman utama & log masuk) ----------
+/* ---------- Kesan bunyi gaya gaming (laman utama & log masuk; tiada muzik) ----------
    Semua dijana dengan Web Audio (tiada fail audio, tiada hak cipta). Volum sengaja rendah.
-   Pelayar menyekat bunyi sebelum pelawat menyentuh skrin; muzik cuba mula serta-merta dan bermula pada sentuhan/klik/kekunci pertama. */
+   Pelayar hanya benarkan bunyi selepas pelawat menyentuh skrin. */
 const SFX = {
   ctx: null, master: null, mus: null, scope: false, last: null, lastPop: 0,
   get muted() { try { return localStorage.getItem("fl_sfx") === "0"; } catch { return false; } },
   init() {
     if (this.ctx) return true;
     const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false;
-    try { this.ctx = new AC(); this.master = this.ctx.createGain(); this.master.gain.value = .55; this.master.connect(this.ctx.destination); this.mus = this.ctx.createGain(); this.mus.gain.value = .0001; this.mus.connect(this.master); } catch { return false; }
+    try { this.ctx = new AC(); this.master = this.ctx.createGain(); this.master.gain.value = .55; this.master.connect(this.ctx.destination); } catch { return false; }
     return true;
   },
   tone(type, f1, f2, dur, vol, delay = 0) {
@@ -1234,39 +1299,21 @@ const SFX = {
   hover() { this.tone("triangle", 1500, 1900, .045, .03); },
   click() { this.tone("square", 520, 880, .07, .028); this.tone("triangle", 880, 1320, .09, .03, .05); },
   power() { [523, 659, 784, 1047].forEach((f, i) => this.tone("square", f, f * 1.01, .1, .024, i * .07)); },
+  success() { [659, 784, 988, 1319].forEach((f, i) => this.tone("triangle", f, f * 1.005, .16, .045, i * .085)); this.tone("sine", 2637, 2637, .3, .014, .3); },
+  error() { this.tone("sawtooth", 190, 120, .2, .04); this.tone("sawtooth", 150, 90, .26, .04, .2); },
   type() { this.tone("sine", 700, 600, .03, .02); },
   pop() { const n = performance.now(); if (n - this.lastPop < 110) return; this.lastPop = n; this.tone("sine", 320, 980, .09, .05); this.tone("triangle", 1250, 1650, .05, .018, .05); },
 };
-const MUSIC = {
-  on: false, timer: 0, next: 0, step: 0,
-  CH: [[110, [220, 261.63, 329.63]], [87.31, [174.61, 220, 261.63]], [130.81, [261.63, 329.63, 392]], [98, [196, 246.94, 293.66]]], // Am - F - C - G
-  start() {
-    const c = SFX.ctx; if (this.on || !SFX.scope || SFX.muted || !c || c.state !== "running") return;
-    this.on = true; SFX.mus.gain.cancelScheduledValues(c.currentTime); SFX.mus.gain.setValueAtTime(.0001, c.currentTime); SFX.mus.gain.exponentialRampToValueAtTime(1, c.currentTime + 2.5);
-    this.next = c.currentTime + .15; this.step = 0; this.sched(); this.timer = setInterval(() => this.sched(), 300);
-  },
-  stop() { if (!this.on) return; this.on = false; clearInterval(this.timer); const c = SFX.ctx; if (c) { SFX.mus.gain.cancelScheduledValues(c.currentTime); SFX.mus.gain.setTargetAtTime(.0001, c.currentTime, .25); } },
-  note(type, f, t, d, v) { const c = SFX.ctx, o = c.createOscillator(), g = c.createGain(); o.type = type; o.frequency.value = f; g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(v, t + Math.min(.4, d * .3)); g.gain.exponentialRampToValueAtTime(.0001, t + d); o.connect(g); g.connect(SFX.mus); o.start(t); o.stop(t + d + .05); },
-  sched() {
-    const c = SFX.ctx; if (!c) return;
-    while (this.next < c.currentTime + 1.5) {
-      const s = this.step, bar = Math.floor(s / 8) % 4, [root, ch] = this.CH[bar], t = this.next;
-      if (s % 8 === 0) { this.note("triangle", root, t, 4.0, .05); ch.forEach(f => this.note("sine", f, t, 4.0, .018)); }
-      if (s % 2 === 0) this.note("square", ch[(s / 2 + bar) % 3] * 2 * (s % 8 === 6 ? 1.5 : 1), t, .22, .006);
-      this.next += .52; this.step++;
-    }
-  },
-};
 function sfxUnlock() {
   if (!SFX.scope || !SFX.init()) return Promise.resolve(false);
-  return SFX.ctx.resume().then(() => { MUSIC.start(); return SFX.ctx.state === "running"; }, () => false);
+  return SFX.ctx.resume().then(() => SFX.ctx.state === "running", () => false);
 }
 function sfxScope(on) {
   SFX.scope = on;
   let b = $("#sfxbtn");
-  if (!b) { b = document.createElement("button"); b.id = "sfxbtn"; document.body.appendChild(b); b.onclick = () => { const m = !SFX.muted; try { localStorage.setItem("fl_sfx", m ? "0" : "1"); } catch {} sfxIcon(); if (m) MUSIC.stop(); else sfxUnlock().then(() => SFX.click()); }; }
+  if (!b) { b = document.createElement("button"); b.id = "sfxbtn"; document.body.appendChild(b); b.onclick = () => { const m = !SFX.muted; try { localStorage.setItem("fl_sfx", m ? "0" : "1"); } catch {} sfxIcon(); if (!m) sfxUnlock().then(() => SFX.click()); }; }
   b.classList.toggle("on", on);
-  if (on) { sfxIcon(); if (!SFX.muted) sfxUnlock(); } else MUSIC.stop();
+  if (on) { sfxIcon(); if (!SFX.muted) sfxUnlock(); }
 }
 function sfxIcon() { const b = $("#sfxbtn"), m = SFX.muted; b.innerHTML = ic(m ? "mute" : "vol", "w-5 h-5"); b.setAttribute("aria-label", m ? "Hidupkan bunyi" : "Matikan bunyi"); b.setAttribute("aria-pressed", String(!m)); }
 const SFX_SEL = "a.btn,button.btn,a[data-nav],.chip,.ptile,.dcard";
@@ -1283,7 +1330,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-24";
+const APP_VERSION = "V-25";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "flashlink.geniusdigital.space", "localhost", "127.0.0.1"].includes(location.hostname);
 async function checkUpdate() {
