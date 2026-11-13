@@ -751,7 +751,8 @@ body[data-s] .dnav-i[aria-current=page]{color:#fff;background:color-mix(in srgb,
 .b3-r .b3-btns{flex-wrap:nowrap;gap:8px}.b3-r .fl-clock{flex:none;text-align:center}.b3-r .ck-ban{display:flex;flex-direction:column;align-items:center;line-height:1.25}
 @media(max-width:1180px){.b3-r .b3-note{display:none}}
 @media(max-width:760px){.b3-in{grid-template-columns:auto 1fr auto}.b3-r{gap:8px!important;padding:0 8px}.b3-r .ck-d{display:none}.b3-r .langsw button{min-width:34px;padding:0 7px}}
-@media(max-width:760px){.b3-c{display:none}.b3-in{grid-template-columns:auto minmax(0,1fr)}.b3-r{flex-wrap:wrap;justify-content:flex-end;row-gap:6px}.b3-r .b3-btns{flex-wrap:wrap;justify-content:flex-end}}
+@media(max-width:760px){.b3-c,.b3-note{display:none}.b3-in{grid-template-columns:auto minmax(0,1fr)}.b3-zone{padding:6px 6px}.b3-logo img{height:34px}.b3-r{flex-wrap:nowrap!important;justify-content:flex-end;gap:5px!important;padding:0 6px!important}.b3-r .ck-d{display:block!important;font-size:8.5px}.b3-r .ck-t{font-size:10.5px!important}.b3-r .langsw button{min-width:26px;min-height:28px;padding:0 5px;font-size:10.5px}.b3-r .btn{min-height:30px;padding:0 8px;font-size:10.5px;border-radius:9px}.b3-r .b3-btns{flex-wrap:nowrap;gap:5px}}
+@media(max-width:400px){.b3-logo img{height:28px}.b3-r{gap:3px!important}.b3-r .ck-t{font-size:9.5px!important}.b3-r .btn{padding:0 6px;font-size:9.5px}}
 </style>
 </head>
 <body>
@@ -2580,7 +2581,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-54";
+const APP_VERSION = "V-55";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
