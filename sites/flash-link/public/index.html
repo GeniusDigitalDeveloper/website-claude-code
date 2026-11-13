@@ -89,16 +89,16 @@ select.inp option{color:#111}
 .sortable-ghost{opacity:.35}
 .bar{background:linear-gradient(180deg,#FF4D4D,#B80000);border-radius:6px 6px 0 0;min-height:2px}
 
-/* ============ LATAR GRADIEN MERAH + BIRU CERAH (bergerak kiri-kanan) ============ */
-#bgflow{position:fixed;inset:0;z-index:-1;overflow:hidden;display:none;pointer-events:none;background:#05060B}
+/* ============ LATAR GAMING: grid bergerak + bunga api halus ============ */
+#bgflow{position:fixed;inset:0;z-index:-1;overflow:hidden;display:none;pointer-events:none;background:#05060A}
 body.flow #bgflow{display:block}
-#bgflow i{position:absolute;border-radius:50%;filter:blur(90px);will-change:transform;opacity:.62}
-#bgflow .g1{width:60vmax;height:60vmax;left:-20vmax;top:-26vmax;background:radial-gradient(circle,#FF2A2A 0%,rgba(255,42,42,0) 66%);animation:gfx1 24s ease-in-out infinite alternate}
-#bgflow .g2{width:62vmax;height:62vmax;right:-22vmax;top:-10vmax;background:radial-gradient(circle,#38BDF8 0%,rgba(37,99,235,.5) 38%,rgba(37,99,235,0) 68%);animation:gfx2 28s ease-in-out infinite alternate}
-#bgflow .g3{width:56vmax;height:56vmax;left:18vw;bottom:-30vmax;background:radial-gradient(circle,#4FC3F7 0%,rgba(79,195,247,0) 66%);animation:gfx3 32s ease-in-out infinite alternate;opacity:.42}
-@keyframes gfx1{0%{transform:translate3d(0,0,0) scale(1)}100%{transform:translate3d(70vw,12vh,0) scale(1.18)}}
-@keyframes gfx2{0%{transform:translate3d(0,0,0) scale(1.05)}100%{transform:translate3d(-75vw,18vh,0) scale(.92)}}
-@keyframes gfx3{0%{transform:translate3d(-30vw,0,0)}100%{transform:translate3d(46vw,-8vh,0) scale(1.15)}}
+#bgflow .bg-grid{position:absolute;inset:-58px;background:linear-gradient(rgba(56,189,248,.11) 1px,transparent 1px) 0 0/58px 58px,linear-gradient(90deg,rgba(255,64,64,.10) 1px,transparent 1px) 0 0/58px 58px;animation:bggrid 26s linear infinite;-webkit-mask-image:radial-gradient(ellipse 85% 70% at 50% 28%,#000 8%,transparent 78%);mask-image:radial-gradient(ellipse 85% 70% at 50% 28%,#000 8%,transparent 78%);will-change:transform}
+#bgflow .bg-em{position:absolute;left:0;right:0;top:0;height:200%;will-change:transform}
+#bgflow .bg-em1{background:radial-gradient(circle,rgba(255,176,64,.95) 0 1.4px,transparent 2.4px) 0 0/130px 190px,radial-gradient(circle,rgba(255,96,40,.85) 0 1.2px,transparent 2.2px) 61px 83px/170px 230px;animation:bgem 70s linear infinite;opacity:.55}
+#bgflow .bg-em2{background:radial-gradient(circle,rgba(255,214,120,.8) 0 .9px,transparent 1.8px) 23px 41px/97px 151px,radial-gradient(circle,rgba(255,70,70,.8) 0 1.1px,transparent 2px) 90px 120px/143px 211px;animation:bgem 110s linear infinite;opacity:.4}
+#bgflow .bg-vig{position:absolute;inset:0;background:radial-gradient(ellipse 70% 40% at 50% 108%,rgba(255,80,30,.20),transparent 70%),radial-gradient(ellipse at 50% 50%,transparent 45%,rgba(0,0,0,.62) 100%)}
+@keyframes bggrid{to{transform:translate3d(58px,58px,0)}}
+@keyframes bgem{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,-50%,0)}}
 .aurora{display:none}
 /* ============ iPHONE ============ */
 .iphone{position:relative;width:292px;height:604px;border-radius:56px;padding:10px;background:linear-gradient(145deg,#9a9aa3 0%,#2b2b31 16%,#5d5d66 50%,#26262c 84%,#8b8b94 100%);box-shadow:0 0 0 1px #0b0b0d,inset 0 0 0 2px rgba(255,255,255,.2),0 40px 90px -25px rgba(56,189,248,.4),0 30px 70px -30px rgba(225,6,0,.55)}
@@ -113,7 +113,7 @@ body.flow #bgflow{display:block}
 .iscreen.pv-wrap .fl-sty-hero .fl-wrap{padding-top:0}
 /* ============ ANIMASI SKROL ============ */
 [data-fx]{opacity:0;will-change:transform,opacity}
-@media (prefers-reduced-motion:reduce){[data-fx]{opacity:1}#bgflow i{animation:none}}
+@media (prefers-reduced-motion:reduce){[data-fx]{opacity:1}#bgflow .bg-grid,#bgflow .bg-em{animation:none}}
 /* ============ GAYA PROFIL BAHARU ============ */
 .fl-bn{height:150px;margin:0 -16px;background-size:cover;background-position:center;border-radius:0 0 var(--r) var(--r);position:relative;display:grid;place-items:center}
 .fl-bn.empty{background:linear-gradient(135deg,color-mix(in srgb,var(--btn) 60%,#000),color-mix(in srgb,var(--text) 14%,transparent))}
@@ -581,10 +581,108 @@ html,body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;t
 .pl-txt{white-space:pre-wrap;font-size:14px;line-height:1.5;word-break:break-word}.pl-med img{width:100%;border-radius:10px;margin-top:8px;max-height:260px;object-fit:cover}.pl-vid{margin-top:8px;padding:18px;border-radius:10px;background:#F3F4F6;display:flex;gap:8px;align-items:center;justify-content:center;color:#374151}
 .sc-info summary{cursor:pointer;list-style:none}.sc-info summary::-webkit-details-marker{display:none}
 @media(max-width:700px){.pl-x{display:none}.pl-cell{min-height:76px;padding:3px}.pl-chip{padding:2px 4px}.pl-bar .seg{margin-left:0}}
+.fl-clock{display:flex;flex-direction:column;align-items:flex-end;line-height:1.2;white-space:nowrap;padding-left:12px;border-left:1px solid var(--line);margin-left:6px}
+.fl-clock .ck-t{font-size:15.5px;font-weight:700;font-variant-numeric:tabular-nums;color:#fff;letter-spacing:.2px}.fl-clock .ck-d{font-size:11.5px;color:#C7C9D1}
+.ck-ban{align-items:center;border:0;padding:0;margin:0}.ck-ban .ck-t{font-size:14px}.ck-ban .ck-d{font-size:11px}
+@media(max-width:1480px){.dtop-act .btn span{display:none}}
+@media(max-width:760px){.ck-head .ck-d{display:none}.ck-head{padding-left:8px}.ck-head .ck-t{font-size:13px}.ck-ban .ck-d{display:none}}
+@media(max-width:520px){.dtop-act{gap:5px}.dtop-act .btn{padding:0 10px}}
+/* ===== warna butang ikut jenama ===== */
+.fl-bc .fl-btn[data-brand="whatsapp"]{background:#25D366;color:#111111;border-color:transparent}
+.fl-bc .fl-btn[data-brand="tiktok"]{background:#25F4EE;color:#111111;border-color:transparent}
+.fl-bc .fl-btn[data-brand="tiktokshop"]{background:#FE2C55;color:#FFFFFF;border-color:transparent}
+.fl-bc .fl-btn[data-brand="facebook"]{background:#1877F2;color:#FFFFFF;border-color:transparent}
+.fl-bc .fl-btn[data-brand="youtube"]{background:#FF0000;color:#FFFFFF;border-color:transparent}
+.fl-bc .fl-btn[data-brand="x"]{background:#000000;color:#FFFFFF;border-color:transparent}
+.fl-bc .fl-btn[data-brand="threads"]{background:#000000;color:#FFFFFF;border-color:transparent}
+.fl-bc .fl-btn[data-brand="telegram"]{background:#26A5E4;color:#FFFFFF;border-color:transparent}
+.fl-bc .fl-btn[data-brand="linkedin"]{background:#0A66C2;color:#FFFFFF;border-color:transparent}
+.fl-bc .fl-btn[data-brand="spotify"]{background:#1DB954;color:#FFFFFF;border-color:transparent}
+.fl-bc .fl-btn[data-brand="pinterest"]{background:#E60023;color:#FFFFFF;border-color:transparent}
+.fl-bc .fl-btn[data-brand="snapchat"]{background:#FFFC00;color:#111111;border-color:transparent}
+.fl-bc .fl-btn[data-brand="twitch"]{background:#9146FF;color:#FFFFFF;border-color:transparent}
+.fl-bc .fl-btn[data-brand="discord"]{background:#5865F2;color:#FFFFFF;border-color:transparent}
+.fl-bc .fl-btn[data-brand="github"]{background:#24292F;color:#FFFFFF;border-color:transparent}
+.fl-bc .fl-btn[data-brand="paypal"]{background:#003087;color:#FFFFFF;border-color:transparent}
+.fl-bc .fl-btn[data-brand="kofi"]{background:#FF5E5B;color:#FFFFFF;border-color:transparent}
+.fl-bc .fl-btn[data-brand="shopee"]{background:#EE4D2D;color:#FFFFFF;border-color:transparent}
+.fl-bc .fl-btn[data-brand="lazada"]{background:#0F146D;color:#FFFFFF;border-color:transparent}
+.fl-bc .fl-btn[data-brand="email"]{background:#EA4335;color:#FFFFFF;border-color:transparent}
+.fl-bc .fl-btn[data-brand="instagram"]{background:linear-gradient(45deg,#F58529,#DD2A7B 55%,#8134AF);color:#fff;border-color:transparent}
+.fl-bc .fl-btn[data-brand] .fl-bi{background:transparent!important;color:inherit!important}
+.fl-bc .fl-btn[data-brand]:hover{box-shadow:0 10px 26px -10px rgba(0,0,0,.55)}
+/* ===== gaya teks ===== */
+.fl-root :is(.fl-name,.fl-ptitle-main){font-family:var(--nf,inherit);zoom:var(--nz,1)}
+.fl-root :is(.fl-bio,.fl-pbio){font-family:var(--bf,inherit);zoom:var(--bz,1)}
+.fl-root :is(.fl-t,.fl-pt,.fl-tt){font-family:var(--lf,inherit);zoom:var(--lz,1)}
+.fl-tx-nc :is(.fl-name,.fl-ptitle-main){color:var(--nc);-webkit-text-fill-color:var(--nc);background:none}
+.fl-tx-bc :is(.fl-bio,.fl-pbio){color:var(--bc);opacity:1}
+.fl-tx-lc :is(.fl-t,.fl-pt,.fl-tt){color:var(--lc)}
+.fl-tx-ng :is(.fl-name,.fl-ptitle-main){background:linear-gradient(90deg,var(--ng1),var(--ng2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;width:fit-content;margin-left:auto;margin-right:auto}
+.fl-tx-bg :is(.fl-bio,.fl-pbio){background:linear-gradient(90deg,var(--bg1),var(--bg2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;width:fit-content;margin-left:auto;margin-right:auto;text-shadow:none}
+.fl-tx-lg :is(.fl-t,.fl-pt,.fl-tt){background:linear-gradient(90deg,var(--lg1),var(--lg2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+.txrow{margin-top:14px;padding:12px;border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.03)}.txrow h4{margin:0 0 8px;font-size:14px}.txgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* ===== muncul ikut skrol (gaya iOS) ===== */
+.fl-reveal:not(.fl-noanim) .fl-in:not(.fl-vis){animation:none!important;opacity:0;transform:translate3d(0,30px,0) scale(.96)}
+.fl-reveal .fl-in.fl-vis{animation:flin .9s cubic-bezier(.32,.72,0,1) both}
+@media (prefers-reduced-motion:reduce){.fl-reveal .fl-in{opacity:1!important;transform:none!important;animation:none!important}}
+/* ===== kesan latar bergerak (setiap design) ===== */
+.fl-root{position:relative;isolation:isolate}
+[class*="fl-fx-"]{overflow:hidden}
+[class*="fl-fx-"]::before,[class*="fl-fx-"]::after{content:"";position:absolute;pointer-events:none;z-index:-1}
+@keyframes fxAur{0%{transform:translate3d(-4%,-2%,0) rotate(0deg) scale(1)}100%{transform:translate3d(5%,4%,0) rotate(14deg) scale(1.12)}}
+@keyframes fxRise{from{transform:translate3d(0,0,0)}to{transform:translate3d(0,-50%,0)}}
+@keyframes fxFall{from{transform:translate3d(0,-50%,0)}to{transform:translate3d(0,0,0)}}
+@keyframes fxFloor{to{background-position:0 60px,60px 0}}
+@keyframes fxTw{0%,100%{opacity:.25}50%{opacity:1}}
+@keyframes fxGlow{0%,100%{opacity:.55}50%{opacity:1}}
+@keyframes fxWave{to{background-position-x:240px}}
+@keyframes fxFlick{0%,100%{opacity:.5}50%{opacity:.62}}
+.fl-fx-aurora::before{inset:-25%;background:radial-gradient(40% 35% at 22% 26%,color-mix(in srgb,var(--btn) 75%,transparent),transparent 70%),radial-gradient(36% 30% at 80% 18%,rgba(124,58,237,.6),transparent 70%),radial-gradient(46% 40% at 58% 86%,rgba(6,182,212,.55),transparent 70%);filter:blur(34px);animation:fxAur 16s ease-in-out infinite alternate;will-change:transform}
+.fl-fx-orbs::before{inset:-20%;background:radial-gradient(28% 24% at 18% 22%,#ff7ab8,transparent 70%),radial-gradient(30% 26% at 84% 30%,#7aa2ff,transparent 70%),radial-gradient(34% 28% at 48% 84%,#7affd9,transparent 70%);filter:blur(26px);animation:fxAur 20s ease-in-out infinite alternate;opacity:.85;will-change:transform}
+.fl-fx-embers::before,.fl-fx-embers::after,.fl-fx-fireflies::before,.fl-fx-fireflies::after,.fl-fx-petals::before,.fl-fx-petals::after{left:0;right:0;top:0;height:200%;will-change:transform}
+.fl-fx-embers::before{background:radial-gradient(circle,rgba(255,176,64,.95) 0 1.4px,transparent 2.6px) 0 0/120px 180px,radial-gradient(circle,rgba(255,96,40,.9) 0 1.2px,transparent 2.4px) 55px 70px/160px 220px;animation:fxRise 55s linear infinite}
+.fl-fx-embers::after{background:radial-gradient(circle,rgba(255,214,120,.85) 0 1px,transparent 2px) 20px 40px/95px 150px,radial-gradient(circle,rgba(255,70,70,.85) 0 1.1px,transparent 2px) 80px 110px/140px 200px;animation:fxRise 90s linear infinite;opacity:.7}
+.fl-fx-embers{box-shadow:inset 0 -160px 140px -90px rgba(255,90,20,.45)}
+.fl-fx-fireflies::before{background:radial-gradient(circle,rgba(224,255,120,1) 0 1.6px,rgba(170,255,70,.28) 3.2px,transparent 8px) 0 0/150px 210px,radial-gradient(circle,rgba(255,244,150,.95) 0 1.3px,rgba(200,255,90,.22) 3px,transparent 7px) 70px 90px/190px 260px;animation:fxRise 80s linear infinite,fxTw 5s ease-in-out infinite}
+.fl-fx-fireflies::after{background:radial-gradient(circle,rgba(190,255,100,.9) 0 1px,rgba(150,255,60,.2) 3px,transparent 6px) 30px 50px/120px 180px;animation:fxRise 120s linear infinite,fxTw 7s ease-in-out infinite;opacity:.8}
+.fl-fx-petals::before{background:radial-gradient(ellipse 7px 4.5px,rgba(255,170,200,.95) 45%,transparent 50%) 0 0/110px 170px,radial-gradient(ellipse 6px 4px,rgba(255,205,224,.9) 45%,transparent 50%) 50px 80px/150px 210px;animation:fxFall 60s linear infinite}
+.fl-fx-petals::after{background:radial-gradient(ellipse 5px 3.5px,rgba(255,150,185,.85) 45%,transparent 50%) 25px 40px/130px 190px;animation:fxFall 95s linear infinite;opacity:.8}
+.fl-fx-gamegrid::before{left:-60%;right:-60%;bottom:0;height:58%;background:linear-gradient(rgba(34,211,238,.65) 1.5px,transparent 1.5px) 0 0/60px 60px,linear-gradient(90deg,rgba(236,72,153,.65) 1.5px,transparent 1.5px) 0 0/60px 60px;transform:perspective(360px) rotateX(64deg);transform-origin:50% 100%;animation:fxFloor 3.2s linear infinite;-webkit-mask-image:linear-gradient(transparent,#000 70%);mask-image:linear-gradient(transparent,#000 70%)}
+.fl-fx-gamegrid::after{inset:0;background:repeating-linear-gradient(transparent 0 2px,rgba(0,0,0,.22) 2px 3px),radial-gradient(60% 40% at 50% 100%,rgba(168,85,247,.35),transparent 70%);animation:fxFlick 4s ease-in-out infinite}
+.fl-fx-stars::before{inset:0;background:radial-gradient(circle,#fff 0 1px,transparent 1.6px) 0 0/90px 120px,radial-gradient(circle,#ffe9a8 0 1.2px,transparent 2px) 41px 57px/140px 170px,radial-gradient(circle,#fff 0 .8px,transparent 1.4px) 17px 83px/70px 95px;animation:fxTw 4.5s ease-in-out infinite}
+.fl-fx-stars::after{top:26px;right:22px;width:54px;height:54px;border-radius:50%;box-shadow:inset -16px 6px 0 0 #F5D77A,0 0 34px 6px rgba(245,215,122,.28);animation:fxGlow 6s ease-in-out infinite}
+.fl-fx-islamic::before{inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='84' height='84' viewBox='0 0 84 84'%3E%3Cg fill='none' stroke='%23E8C468' stroke-width='1.1'%3E%3Crect x='22' y='22' width='40' height='40'/%3E%3Crect x='22' y='22' width='40' height='40' transform='rotate(45 42 42)'/%3E%3Ccircle cx='42' cy='42' r='28'/%3E%3Ccircle cx='42' cy='42' r='9'/%3E%3C/g%3E%3C/svg%3E") 0 0/84px 84px;opacity:.2;animation:fxIsl 70s linear infinite}
+.fl-fx-islamic::after{inset:0;background:radial-gradient(ellipse 70% 38% at 50% 0%,rgba(255,215,120,.3),transparent 70%),radial-gradient(ellipse 60% 30% at 50% 100%,rgba(255,215,120,.16),transparent 70%);animation:fxGlow 7s ease-in-out infinite}
+@keyframes fxIsl{to{background-position:84px 84px}}
+.fl-fx-waves::before{left:0;right:0;bottom:0;height:140px;background:radial-gradient(120px 40px at 50% 100%,rgba(56,189,248,.38) 97%,transparent) 0 100%/240px 90px repeat-x,radial-gradient(150px 50px at 50% 100%,rgba(14,116,144,.5) 97%,transparent) 60px 100%/300px 110px repeat-x;animation:fxWave 9s linear infinite}
+.fl-fx-waves::after{left:0;right:0;bottom:0;height:90px;background:radial-gradient(100px 32px at 50% 100%,rgba(125,211,252,.35) 97%,transparent) 0 100%/200px 70px repeat-x;animation:fxWave 6s linear infinite reverse}
+@media (prefers-reduced-motion:reduce){[class*="fl-fx-"]::before,[class*="fl-fx-"]::after{animation:none!important}}
+/* ===== bingkai gambar profil ===== */
+.fl-fr-arch .fl-avatar{border-radius:999px 999px 18px 18px!important;width:104px;height:124px;object-fit:cover}
+.fl-fr-hex .fl-avatar{border-radius:0!important;clip-path:polygon(25% 4%,75% 4%,100% 50%,75% 96%,25% 96%,0 50%);width:112px;height:112px;object-fit:cover}
+.fl-fr-squircle .fl-avatar{border-radius:34%!important}
+/* ===== gaya butang baharu ===== */
+@property --ang{syntax:"<angle>";inherits:false;initial-value:0deg}
+@keyframes fxSpin{to{--ang:360deg}}
+.fl-bs-conic .fl-btn{border:2px solid transparent;background:linear-gradient(color-mix(in srgb,var(--btn) 10%,#07070d),color-mix(in srgb,var(--btn) 10%,#07070d)) padding-box,conic-gradient(from var(--ang),#22d3ee,#a855f7,#f43f5e,#facc15,#22d3ee) border-box;color:var(--text);animation:fxSpin 5s linear infinite}
+.fl-bs-editorial .fl-wrap{counter-reset:flc}
+.fl-bs-editorial .fl-btn{background:transparent;color:var(--text);border:0;border-top:1.5px solid var(--text);border-radius:0;box-shadow:none;padding-left:4px;min-height:64px;counter-increment:flc}
+.fl-bs-editorial .fl-btn::before{content:counter(flc,decimal-leading-zero);font-size:12px;font-weight:700;opacity:.55;margin-right:6px;flex:none}
+.fl-bs-editorial .fl-btn::after{content:"\2197";margin-left:auto;font-size:20px;flex:none}
+.fl-bs-editorial .fl-btn .fl-t{text-align:left;padding-right:0;font-size:1.18em}
+.fl-bs-ticket .fl-btn{position:relative;border:0;border-radius:12px;-webkit-mask:radial-gradient(circle 9px at 0 50%,transparent 96%,#000) left/51% 100% no-repeat,radial-gradient(circle 9px at 100% 50%,transparent 96%,#000) right/51% 100% no-repeat;mask:radial-gradient(circle 9px at 0 50%,transparent 96%,#000) left/51% 100% no-repeat,radial-gradient(circle 9px at 100% 50%,transparent 96%,#000) right/51% 100% no-repeat}
+.fl-bs-ticket .fl-btn::before{content:"";position:absolute;right:56px;top:10px;bottom:10px;border-left:2px dashed color-mix(in srgb,var(--btnText) 45%,transparent)}
+.fl-bs-orn .fl-btn{background:linear-gradient(180deg,color-mix(in srgb,var(--btn) 16%,transparent),color-mix(in srgb,var(--btn) 4%,transparent));color:var(--text);border:1px solid var(--btn);border-radius:14px;box-shadow:inset 0 0 0 4px transparent,inset 0 0 0 5px color-mix(in srgb,var(--btn) 50%,transparent)}
+.fl-bs-orn .fl-btn::before{content:"\2756";color:var(--btn);font-size:13px;margin-right:2px;flex:none}
+.fl-bs-orn .fl-btn:hover{box-shadow:inset 0 0 0 4px transparent,inset 0 0 0 5px var(--btn),0 0 26px -6px var(--btn)}
+.fl-bs-flame .fl-btn{background:linear-gradient(135deg,#ff3d00,#ff9100 55%,#ffd54a);color:#1a0600;border:0;font-weight:800;box-shadow:0 8px 24px -8px rgba(255,100,20,.75)}
+.mini .fl-root::before,.mini .fl-root::after{animation:none!important}
+.dtop-act{margin-left:auto}
 </style>
 </head>
 <body>
-<div id="bgflow" aria-hidden="true"><i class="g1"></i><i class="g2"></i><i class="g3"></i></div>
+<div id="bgflow" aria-hidden="true"><div class="bg-grid"></div><div class="bg-em bg-em1"></div><div class="bg-em bg-em2"></div><div class="bg-vig"></div></div>
 <div id="app"></div>
 <div id="toasts" aria-live="polite"></div>
 
@@ -618,12 +716,15 @@ const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const RESERVED = new Set(["s","admin","login","logout","dashboard","signup","register","daftar","api","app","assets","static","public","demo","flash","flashlink","flash-link","help","support","settings","terms","privacy","about","index","null","undefined","root","www","mail","staff","system","test","user","users","profile","me","home","firebase","__"]);
 const USER_RE = /^[a-z0-9_]{3,20}$/;
-const FONTS = ["Inter", "Poppins", "Space Grotesk", "Playfair Display", "Nunito", "DM Sans", "Montserrat", "Oswald", "Bebas Neue", "Lora", "Raleway", "Roboto Slab", "Pacifico", "Cormorant Garamond", "Syne", "Archivo Black", "DM Serif Display", "Sora"];
-const BSTYLES = [["solid", "Pepejal"], ["glass", "Kaca"], ["outline", "Garisan"], ["hard", "Blok (bayang keras)"]];
+const FONTS = ["Inter", "Poppins", "Space Grotesk", "Playfair Display", "Nunito", "DM Sans", "Montserrat", "Oswald", "Bebas Neue", "Lora", "Raleway", "Roboto Slab", "Pacifico", "Cormorant Garamond", "Syne", "Archivo Black", "DM Serif Display", "Sora", "Orbitron", "Rajdhani", "Press Start 2P", "Instrument Serif", "Bricolage Grotesque", "Anton", "Amiri", "Reem Kufi", "Aref Ruqaa", "Cinzel"];
+const BSTYLES = [["solid", "Pepejal"], ["glass", "Kaca"], ["outline", "Garisan"], ["hard", "Blok (bayang keras)"], ["conic", "Garisan neon berputar"], ["editorial", "Editorial (bernombor)"], ["ticket", "Tiket"], ["orn", "Ornamen emas"], ["flame", "Api"]];
+const FX_NAMES = [["", "Tiada"], ["aurora", "Aurora"], ["embers", "Bunga api"], ["gamegrid", "Grid gaming"], ["stars", "Bintang & bulan"], ["islamic", "Ornamen Islamik"], ["orbs", "Orbit kaca"], ["petals", "Kelopak sakura"], ["fireflies", "Kelip-kelip"], ["waves", "Ombak"]];
+const FR_NAMES = [["", "Bulat (lalai)"], ["arch", "Gerbang (mihrab)"], ["hex", "Heksagon"], ["squircle", "Squircle"]];
 const PATS = { grid: "linear-gradient(color-mix(in srgb,var(--text) 9%,transparent) 1px,transparent 1px) 0 0/30px 30px,linear-gradient(90deg,color-mix(in srgb,var(--text) 9%,transparent) 1px,transparent 1px) 0 0/30px 30px", dots: "radial-gradient(color-mix(in srgb,var(--text) 18%,transparent) 1.5px,transparent 1.7px) 0 0/22px 22px", stripes: "repeating-linear-gradient(135deg,color-mix(in srgb,var(--text) 8%,transparent) 0 2px,transparent 2px 15px)" };
 const ANIMS = [["", "Tiada"], ["bounce", "Pantul"], ["wobble", "Goyang"], ["pulse", "Denyut"], ["shake", "Gegar"], ["shine", "Kilau"], ["glow", "Bercahaya"], ["float", "Terapung"]];
 const ENTRANCES = [["up", "Naik (lalai)"], ["pop", "Pop melantun"], ["fade", "Pudar"], ["none", "Tiada"]];
-const rootCls = t => `fl-bs-${BSTYLES.some(x => x[0] === t.bs) ? t.bs : "solid"} fl-ba-${ANIMS.some(x => x[0] && x[0] === t.ba) ? t.ba : "none"} fl-en-${["pop", "fade", "none"].includes(t.en) ? t.en : "up"}`;
+const TXK = ["n", "b", "l"];
+const rootCls = (t, tpl) => `fl-bs-${BSTYLES.some(x => x[0] === t.bs) ? t.bs : "solid"} fl-ba-${ANIMS.some(x => x[0] && x[0] === t.ba) ? t.ba : "none"} fl-en-${["pop", "fade", "none"].includes(t.en) ? t.en : "up"}${FX_NAMES.some(x => x[0] && x[0] === t.fx) ? " fl-fx-" + t.fx : ""}${FR_NAMES.some(x => x[0] && x[0] === t.fr) ? " fl-fr-" + t.fr : ""}${(tpl === "minimal" || tpl === "landing") && t.bc !== false && ["solid", "hard"].includes(t.bs || "solid") ? " fl-bc" : ""}${TXK.map(k => { const o = (t.tx || {})[k] || {}; return (HEX.test(o.c || "") ? ` fl-tx-${k}c` : "") + (o.g && HEX.test(o.g1 || "") && HEX.test(o.g2 || "") ? ` fl-tx-${k}g` : ""); }).join("")}`;
 const PAT_NAMES = [["", "Tiada"], ["grid", "Grid"], ["dots", "Titik"], ["stripes", "Garis serong"]];
 const HEX = /^#[0-9a-f]{6}$/i;
 const hex = (v, d) => (HEX.test(v || "") ? v : d);
@@ -674,7 +775,7 @@ function setMeta(name, content, prop) {
 function loadFont(f) {
   if (!FONTS.includes(f) || $(`link[data-font="${f}"]`)) return;
   const l = document.createElement("link"); l.rel = "stylesheet"; l.dataset.font = f;
-  l.href = `https://fonts.googleapis.com/css2?family=${f.replace(/ /g, "+")}:wght@400;600;700;800&display=swap`; document.head.appendChild(l);
+  l.href = `https://fonts.googleapis.com/css?family=${f.replace(/ /g, "+")}:400,600,700,800&display=swap`; document.head.appendChild(l);
 }
 
 /* ---------- Ikon SVG (gaya lucide) ---------- */
@@ -926,65 +1027,35 @@ const DESIGNS = [
   { id: "posterblue", n: "Poster Biru", d: "Hero penuh, bingkai biru cerah", tpl: "poster", sty: "hero", theme: { bg1: "#0B2A5B", bg2: "#05060B", btn: "#38BDF8" } },
   { id: "classic", n: "Senarai Klasik", d: "Butang bersusun, krim lembut", tpl: "minimal" },
   { id: "glass", n: "Kaca Gelap", d: "Butang kaca, cahaya halus", tpl: "dark" },
-  { id: "duo", n: "Dua Kotak", d: "Kotak bergambar dua lajur", tpl: "grid" },
   { id: "cards", n: "Kad Besar", d: "Kad gambar penuh + overlay", tpl: "cards" },
   { id: "icons", n: "Ikon Aplikasi", d: "Ikon bulat macam skrin utama", tpl: "icons" },
   { id: "bento", n: "Bento", d: "Petak pelbagai saiz", tpl: "bento" },
   { id: "carousel", n: "Karusel", d: "Kad meluncur ke tepi", tpl: "carousel" },
-  { id: "neon", n: "Senarai Neon", d: "Hitam dengan garisan neon", tpl: "dark", theme: { bgType: "gradient", bg1: "#000000", bg2: "#031A1F", btn: "#22D3EE", shape: "pill", font: "Space Grotesk" } },
-  { id: "pastel", n: "Pastel Dua Kotak", d: "Lembut, dua lajur", tpl: "grid", theme: { bgType: "gradient", bg1: "#FFE4EC", bg2: "#E0F2FE", text: "#3B1D2E", btn: "#EC4899", font: "Nunito" } },
   { id: "hero", n: "Foto Hero", d: "Gambar penuh di atas + overlay", tpl: "minimal", sty: "hero", theme: { bgType: "solid", bg1: "#0E1116", bg2: "#0E1116", text: "#F4F4F5", btn: "#F4F4F5", shape: "round", font: "Poppins" } },
   { id: "cover", n: "Foto Penuh Kaca", d: "Gambar jadi latar penuh", tpl: "dark", sty: "cover" },
   { id: "store", n: "Katalog Kedai", d: "Produk, harga dan lencana", tpl: "store" },
   { id: "mini", n: "Laman Mini", d: "Hero, servis, testimoni", tpl: "landing" },
-  { id: "t-udara", n: "Udara", d: "Kelabu cerah, butang putih", tpl: "minimal", theme: { bgType: "solid", bg1: "#E8E9EF", bg2: "#E8E9EF", text: "#111111", btn: "#FFFFFF", font: "Inter", shape: "round" } },
-  { id: "t-bintang", n: "Bintang", d: "Gelap zaitun, butang kaca", tpl: "minimal", theme: { bgType: "gradient", bg1: "#25261E", bg2: "#0B0C09", text: "#F3F3EA", btn: "#FFFFFF", font: "DM Sans", shape: "pill", bs: "glass" } },
   { id: "t-aura", n: "Aura", d: "Krim berfon serif, kaca", tpl: "minimal", theme: { bgType: "gradient", bg1: "#DEDDD0", bg2: "#C6C5B6", text: "#2B2B26", btn: "#FFFFFF", font: "Lora", shape: "pill", bs: "glass" } },
-  { id: "t-bliss", n: "Kelabu Lembut", d: "Kelabu bergradien, serif", tpl: "minimal", theme: { bgType: "gradient", bg1: "#E9ECEE", bg2: "#AEB4B8", text: "#15181A", btn: "#FFFFFF", font: "Lora", shape: "round", bs: "glass" } },
   { id: "t-blok", n: "Blok Ungu", d: "Ungu terang, butang blok", tpl: "minimal", theme: { bgType: "solid", bg1: "#7A1FD8", bg2: "#7A1FD8", text: "#FFFFFF", btn: "#E04BD8", bd: "#1A0A2E", font: "Poppins", shape: "square", bs: "hard" } },
   { id: "t-mekar", n: "Mekar", d: "Wain ke ungu, butang bergaris", tpl: "minimal", theme: { bgType: "mesh", bg1: "#8A1F5C", bg2: "#3F2BB8", bg3: "#B0245E", bg4: "#2B1346", text: "#FFFFFF", btn: "#FFFFFF", font: "DM Sans", shape: "pill", bs: "outline" } },
-  { id: "t-angin", n: "Angin", d: "Merah jambu lembut, serif", tpl: "minimal", theme: { bgType: "mesh", bg1: "#F0A6D8", bg2: "#C9A6F5", bg3: "#FBC4DE", bg4: "#F6B7DA", text: "#2B1230", btn: "#FFFFFF", font: "DM Serif Display", shape: "pill", bs: "glass" } },
-  { id: "t-encore", n: "Encore", d: "Gelap hijau laut, garisan tembaga", tpl: "minimal", theme: { bgType: "gradient", bg1: "#0D1B1E", bg2: "#05090A", text: "#E9BFA9", btn: "#C98467", font: "Cormorant Garamond", shape: "square", bs: "outline" } },
   { id: "t-grid", n: "Grid Hijau", d: "Kertas grid, butang bayang keras", tpl: "minimal", theme: { bgType: "solid", bg1: "#DDEEB0", bg2: "#DDEEB0", text: "#10150A", btn: "#FFFFFF", bd: "#10150A", font: "Archivo Black", shape: "pill", bs: "hard", pat: "grid" } },
-  { id: "t-alun", n: "Alun", d: "Gelap berwarna, kaca", tpl: "minimal", theme: { bgType: "mesh", bg1: "#FF6B35", bg2: "#2F6BFF", bg3: "#A21CAF", bg4: "#150D2B", text: "#FFFFFF", btn: "#FFFFFF", font: "Syne", shape: "pill", bs: "glass" } },
-  { id: "t-teduh", n: "Teduh", d: "Coklat muda, tenang", tpl: "minimal", theme: { bgType: "gradient", bg1: "#C3B49D", bg2: "#DDD3C3", text: "#2D251A", btn: "#EFE7DA", font: "Lora", shape: "round" } },
-  { id: "t-tasik", n: "Tasik", d: "Hampir hitam, butang gelap", tpl: "minimal", theme: { bgType: "gradient", bg1: "#14151D", bg2: "#06060A", text: "#FFFFFF", btn: "#FFFFFF", font: "Inter", shape: "pill", bs: "glass" } },
-  { id: "t-mineral", n: "Mineral", d: "Krim pic, garisan halus", tpl: "minimal", theme: { bgType: "solid", bg1: "#F8EADF", bg2: "#F8EADF", text: "#3A2A22", btn: "#8A6A57", font: "Lora", shape: "round", bs: "outline" } },
-  { id: "t-zaitun", n: "Zaitun", d: "Hijau zaitun, butang limau", tpl: "minimal", theme: { bgType: "solid", bg1: "#6C7F3B", bg2: "#6C7F3B", text: "#EAF28C", btn: "#DDEA7B", font: "Sora", shape: "pill" } },
-  { id: "t-terbit", n: "Terbit", d: "Koral berkabus, garisan putih", tpl: "minimal", theme: { bgType: "mesh", bg1: "#FF8A6B", bg2: "#F4B6C2", bg3: "#6FD3C0", bg4: "#F29A83", text: "#FFFFFF", btn: "#FFFFFF", font: "Unbounded", shape: "pill", bs: "outline" } },
-  { id: "t-peluh", n: "Peluh", d: "Biru ke magenta, butang biru", tpl: "minimal", theme: { bgType: "mesh", bg1: "#1F5BFF", bg2: "#E5309B", bg3: "#0B1020", bg4: "#10163A", text: "#FFFFFF", btn: "#4B83F0", font: "Poppins", shape: "pill" } },
-  { id: "t-senja", n: "Senja", d: "Ungu senja, butang jambu", tpl: "minimal", theme: { bgType: "mesh", bg1: "#5B3FA0", bg2: "#B14EBF", bg3: "#2E5A8A", bg4: "#3A2A6E", text: "#FFFFFF", btn: "#EDB8F4", font: "Cormorant Garamond", shape: "pill" } },
-  { id: "t-siaran", n: "Siaran", d: "Merah menyala, tajuk tebal", tpl: "minimal", theme: { bgType: "gradient", bg1: "#C1121F", bg2: "#5C040C", text: "#FFFFFF", btn: "#FFFFFF", bd: "#1A0003", font: "Bebas Neue", shape: "square", bs: "hard" } },
-  { id: "p-merah", n: "Poster Merah", d: "Hero penuh, merah delima", tpl: "poster", sty: "hero", theme: { bg1: "#7A0F1F", bg2: "#0A0306", btn: "#FFD166" } },
-  { id: "p-hijau", n: "Poster Hijau", d: "Hero penuh, hijau zamrud", tpl: "poster", sty: "hero", theme: { bg1: "#0B3D2E", bg2: "#03100B", btn: "#5EEAD4" } },
-  { id: "p-ungu", n: "Poster Ungu", d: "Hero penuh, ungu diraja", tpl: "poster", sty: "hero", theme: { bg1: "#2A0B4A", bg2: "#08030F", btn: "#C084FC" } },
-  { id: "p-jingga", n: "Poster Jingga", d: "Hero penuh, jingga senja", tpl: "poster", sty: "hero", theme: { bg1: "#4A1D05", bg2: "#0C0502", btn: "#FB923C" } },
-  { id: "p-mono", n: "Poster Mono", d: "Hero penuh, hitam putih", tpl: "poster", sty: "hero", theme: { bg1: "#1C1C1F", bg2: "#050506", btn: "#FFFFFF" } },
-  { id: "g-biru", n: "Dua Kotak Biru", d: "Dua lajur, biru langit", tpl: "grid", theme: { bg1: "#EAF3FF", bg2: "#EAF3FF", text: "#0B1E3F", btn: "#2563EB" } },
-  { id: "g-mint", n: "Dua Kotak Mint", d: "Dua lajur, hijau mint", tpl: "grid", theme: { bg1: "#E8FBF3", bg2: "#E8FBF3", text: "#052E22", btn: "#10B981" } },
-  { id: "g-gelap", n: "Dua Kotak Gelap", d: "Dua lajur, hitam dan emas", tpl: "grid", theme: { bg1: "#0F1115", bg2: "#0F1115", text: "#F4F4F5", btn: "#F59E0B" } },
-  { id: "c-merah", n: "Kad Besar Merah", d: "Kad penuh, merah menyala", tpl: "cards", theme: { bg1: "#2A0A0F", bg2: "#12060A", btn: "#EF4444" } },
-  { id: "c-hijau", n: "Kad Besar Hijau", d: "Kad penuh, hijau segar", tpl: "cards", theme: { bg1: "#06231A", bg2: "#031009", btn: "#22C55E" } },
-  { id: "c-emas", n: "Kad Besar Emas", d: "Kad penuh, emas mewah", tpl: "cards", theme: { bg1: "#1F1608", bg2: "#0B0803", btn: "#FBBF24" } },
-  { id: "i-oren", n: "Ikon Oren", d: "Ikon aplikasi, oren ke merah jambu", tpl: "icons", theme: { bg1: "#FB923C", bg2: "#DB2777" } },
-  { id: "i-hijau", n: "Ikon Hijau", d: "Ikon aplikasi, hijau ke biru", tpl: "icons", theme: { bg1: "#10B981", bg2: "#0EA5E9" } },
-  { id: "i-malam", n: "Ikon Malam", d: "Ikon aplikasi, biru malam", tpl: "icons", theme: { bg1: "#111827", bg2: "#312E81" } },
-  { id: "b-krim", n: "Bento Krim", d: "Petak, latar krim", tpl: "bento", theme: { bgType: "solid", bg1: "#F5EFE6", bg2: "#F5EFE6", text: "#1C1A16", btn: "#E10600" } },
-  { id: "b-biru", n: "Bento Biru", d: "Petak, biru malam", tpl: "bento", theme: { bg1: "#0B1730", bg2: "#0B1730", btn: "#38BDF8" } },
-  { id: "k-jambu", n: "Karusel Jambu", d: "Kad meluncur, merah jambu", tpl: "carousel", theme: { bg1: "#4A1034", bg2: "#1F0A33", btn: "#F472B6" } },
-  { id: "k-hijau", n: "Karusel Hijau", d: "Kad meluncur, hijau tosca", tpl: "carousel", theme: { bg1: "#052E2B", bg2: "#0B1F3A", btn: "#34D399" } },
-  { id: "s-biru", n: "Katalog Biru", d: "Kedai, biru bersih", tpl: "store", theme: { bg1: "#F1F7FF", bg2: "#F1F7FF", text: "#0B1E3F", btn: "#2563EB" } },
-  { id: "s-hijau", n: "Katalog Hijau", d: "Kedai, hijau segar", tpl: "store", theme: { bg1: "#F2FBF5", bg2: "#F2FBF5", text: "#0A2E1A", btn: "#16A34A" } },
-  { id: "d-biru", n: "Kaca Biru", d: "Butang kaca, biru laut", tpl: "dark", theme: { bg1: "#04121F", bg2: "#0A2540", btn: "#38BDF8" } },
-  { id: "d-hijau", n: "Kaca Hijau", d: "Butang kaca, hijau hutan", tpl: "dark", theme: { bg1: "#03140D", bg2: "#062B1B", btn: "#34D399" } },
-  { id: "d-emas", n: "Kaca Emas", d: "Butang kaca, emas hangat", tpl: "dark", theme: { bg1: "#140F03", bg2: "#2A1D06", btn: "#FBBF24" } },
-  { id: "m-biru", n: "Klasik Biru", d: "Senarai bersih, biru lembut", tpl: "minimal", theme: { bg1: "#EEF4FF", bg2: "#EEF4FF", text: "#0B1E3F", btn: "#2563EB" } },
-  { id: "m-mint", n: "Klasik Mint", d: "Senarai bersih, hijau mint", tpl: "minimal", theme: { bg1: "#ECFDF5", bg2: "#ECFDF5", text: "#052E22", btn: "#059669" } },
-  { id: "m-jambu", n: "Klasik Jambu", d: "Senarai bersih, merah jambu", tpl: "minimal", theme: { bg1: "#FFF1F5", bg2: "#FFF1F5", text: "#3B1D2E", btn: "#E11D48" } },
-  { id: "t-udara-pop", n: "Udara Pop", d: "Kelabu cerah, butang berdenyut", tpl: "minimal", theme: { bgType: "solid", bg1: "#E8E9EF", bg2: "#E8E9EF", text: "#111111", btn: "#FFFFFF", font: "Inter", shape: "pill", ba: "pulse", en: "pop" } },
-  { id: "t-blok-kilau", n: "Blok Kilau", d: "Teal blok, butang berkilau", tpl: "minimal", theme: { bgType: "solid", bg1: "#14B8A6", bg2: "#14B8A6", text: "#06201D", btn: "#FDE047", bd: "#06201D", font: "Poppins", shape: "square", bs: "hard", ba: "shine", en: "pop" } },
-  { id: "t-neon-glow", n: "Neon Bercahaya", d: "Hitam, butang bercahaya", tpl: "minimal", theme: { bgType: "gradient", bg1: "#050510", bg2: "#14052B", text: "#F5F3FF", btn: "#A78BFA", font: "Space Grotesk", shape: "pill", bs: "outline", ba: "glow", en: "fade" } },
-  { id: "t-titik", n: "Titik Krim", d: "Krim bertitik, butang hitam", tpl: "minimal", theme: { bgType: "solid", bg1: "#F7F1E6", bg2: "#F7F1E6", text: "#1C1A16", btn: "#1C1A16", font: "Space Grotesk", shape: "pill", pat: "dots" } },
+  { id: "n-aurora", n: "Aurora", d: "Cahaya aurora bergerak, kaca beku", tpl: "minimal", theme: { bgType: "solid", bg1: "#070B1A", bg2: "#070B1A", text: "#F5F7FF", btn: "#8B5CF6", font: "Bricolage Grotesque", shape: "pill", bs: "glass", fx: "aurora", en: "pop" } },
+  { id: "n-api", n: "Api Membara", d: "Bunga api halus naik perlahan, butang api", tpl: "minimal", theme: { bgType: "gradient", bg1: "#1A0603", bg2: "#050101", text: "#FFE9D6", btn: "#FF6A1A", font: "Anton", shape: "pill", bs: "flame", fx: "embers", en: "pop" } },
+  { id: "n-gaming", n: "Gaming Neon", d: "Lantai grid retro, garisan neon berputar", tpl: "minimal", theme: { bgType: "solid", bg1: "#05010F", bg2: "#05010F", text: "#E8FBFF", btn: "#22D3EE", font: "Orbitron", shape: "round", bs: "conic", fx: "gamegrid", en: "pop" } },
+  { id: "n-piksel", n: "Piksel Arked", d: "Fon piksel, butang blok hijau", tpl: "minimal", theme: { bgType: "solid", bg1: "#07110A", bg2: "#07110A", text: "#7CFC8E", btn: "#7CFC8E", bd: "#7CFC8E", font: "Press Start 2P", shape: "square", bs: "hard", fx: "gamegrid", fs: "s" } },
+  { id: "n-islam-emas", n: "Islamik Emas", d: "Ornamen geometri bergerak, gerbang mihrab", tpl: "minimal", theme: { bgType: "gradient", bg1: "#063B2E", bg2: "#021410", text: "#F6E7B8", btn: "#E8C468", font: "Amiri", shape: "round", bs: "orn", fx: "islamic", fr: "arch", en: "fade" } },
+  { id: "n-ramadan", n: "Malam Ramadan", d: "Bintang berkelip dan bulan sabit", tpl: "minimal", theme: { bgType: "gradient", bg1: "#0B1030", bg2: "#05071A", text: "#FFF4D6", btn: "#F5D77A", font: "Reem Kufi", shape: "round", bs: "orn", fx: "stars", fr: "arch", en: "fade" } },
+  { id: "n-kaligrafi", n: "Kaligrafi Krim", d: "Kertas krim, fon kaligrafi, ornamen emas", tpl: "minimal", theme: { bgType: "solid", bg1: "#F4EAD5", bg2: "#F4EAD5", text: "#3B2A10", btn: "#9A6B1C", font: "Aref Ruqaa", shape: "round", bs: "orn", fx: "islamic", fr: "arch", en: "fade" } },
+  { id: "n-poster-islam", n: "Poster Islamik", d: "Hero penuh, ornamen emas bergerak", tpl: "poster", sty: "hero", theme: { bg1: "#063B2E", bg2: "#021410", btn: "#E8C468", font: "Amiri", fx: "islamic" } },
+  { id: "n-kaca", n: "Kaca Cecair", d: "Orbit warna di belakang kaca beku", tpl: "minimal", theme: { bgType: "solid", bg1: "#E9EEF9", bg2: "#E9EEF9", text: "#0F172A", btn: "#0F172A", font: "Sora", shape: "round", bs: "glass", fx: "orbs", en: "pop" } },
+  { id: "n-editorial", n: "Editorial", d: "Senarai bernombor gaya majalah", tpl: "minimal", theme: { bgType: "solid", bg1: "#FAF7F2", bg2: "#FAF7F2", text: "#111111", btn: "#111111", font: "Instrument Serif", shape: "square", bs: "editorial", fs: "l" } },
+  { id: "n-tiket", n: "Tiket Konsert", d: "Butang berbentuk tiket bertakuk", tpl: "minimal", theme: { bgType: "solid", bg1: "#111111", bg2: "#111111", text: "#FFFFFF", btn: "#FACC15", font: "Rajdhani", shape: "round", bs: "ticket", pat: "stripes", en: "pop" } },
+  { id: "n-pelangi", n: "Pelangi Neon", d: "Aurora lembut, garisan pelangi berputar", tpl: "minimal", theme: { bgType: "solid", bg1: "#0A0A12", bg2: "#0A0A12", text: "#FFFFFF", btn: "#A855F7", font: "Poppins", shape: "pill", bs: "conic", fx: "aurora" } },
+  { id: "n-senja", n: "Matahari Terbenam", d: "Gradien senja, butang putih, bingkai squircle", tpl: "minimal", theme: { bgType: "mesh", bg1: "#FF7A59", bg2: "#C4388C", bg3: "#FFB36B", bg4: "#6A2C8F", text: "#FFFFFF", btn: "#FFFFFF", font: "DM Serif Display", shape: "pill", fr: "squircle", en: "pop" } },
+  { id: "n-sakura", n: "Sakura", d: "Kelopak sakura gugur perlahan", tpl: "minimal", theme: { bgType: "gradient", bg1: "#FFF0F5", bg2: "#FFD9E6", text: "#5B2A3C", btn: "#EC4899", font: "Instrument Serif", shape: "pill", bs: "outline", fx: "petals", fs: "l" } },
+  { id: "n-kelip", n: "Hutan Kelip-kelip", d: "Kelip-kelip bercahaya di hutan malam", tpl: "minimal", theme: { bgType: "gradient", bg1: "#06190F", bg2: "#020A05", text: "#E7FFD6", btn: "#A3E635", font: "Sora", shape: "round", bs: "glass", fx: "fireflies" } },
+  { id: "n-mewah", n: "Hitam Emas Mewah", d: "Hitam pekat, emas, fon Cinzel", tpl: "minimal", theme: { bgType: "solid", bg1: "#0A0A0A", bg2: "#0A0A0A", text: "#E9D9A6", btn: "#C9A227", font: "Cinzel", shape: "square", bs: "orn", pat: "dots" } },
+  { id: "n-ombak", n: "Ombak Laut", d: "Ombak bergerak di bawah, butang kaca", tpl: "minimal", theme: { bgType: "gradient", bg1: "#0B3C5D", bg2: "#031B2C", text: "#F0FBFF", btn: "#7DD3FC", font: "Poppins", shape: "pill", bs: "glass", fx: "waves", fr: "squircle" } },
 ];
 const designTheme = d => ({ ...TPL[d.tpl].theme, ...(d.theme || {}), ov: d.ov ?? 70, auto: false });
 const mkTheme = (tpl, accent) => { const t = { ...TPL[tpl].theme, auto: true }; if (accent) { t.btn = accent; t.auto = false; if (tpl === "minimal") t.auto = false; } return t; };
@@ -1052,15 +1123,17 @@ function rootStyle(p) {
   let extra = "";
   if (p.template !== "landing" && p.profileStyle === "cover" && imgUrl(p.avatarUrl)) { bg = `linear-gradient(rgba(4,5,12,.4),rgba(4,5,12,.9)),url('${encodeURI(imgUrl(p.avatarUrl)).replace(/'/g, "%27")}') center top/cover`; extra = ";--text:#FFFFFF"; }
   if (PATS[t.pat] && t.bgType !== "image") bg = PATS[t.pat] + "," + bg;
+  let txv = ""; TXK.forEach(k => { const o = (t.tx || {})[k]; if (!o) return; if (FONTS.includes(o.f)) txv += `;--${k}f:'${o.f}'`; if (+o.z && +o.z !== 100) txv += `;--${k}z:${(Math.min(220, Math.max(50, +o.z)) / 100).toFixed(2)}`; if (HEX.test(o.c || "")) txv += `;--${k}c:${o.c}`; if (HEX.test(o.g1 || "") && HEX.test(o.g2 || "")) txv += `;--${k}g1:${o.g1};--${k}g2:${o.g2}`; });
   const ovc = hex(t.bgType === "gradient" ? t.bg2 : t.bg1, "#000000"), ov = Math.max(0, Math.min(100, Number(t.ov ?? 70)));
-  return `--bgcss:${bg};--text:${hex(t.text, "#111111")};--btn:${btn};--btnText:${onColor(btn)};--r:${SHAPES[t.shape] || "16px"};--font:'${font}';--ovc:${ovc};--ovp:${ov}%;--ovt:${onColor(ovc)};--bd:${hex(t.bd, "#111111")};--sz:${({ s: .86, m: 1, l: 1.22 })[t.sz] || 1};--fs:${({ s: .92, m: 1, l: 1.12 })[t.fs] || 1}${extra}`;
+  return `--bgcss:${bg};--text:${hex(t.text, "#111111")};--btn:${btn};--btnText:${onColor(btn)};--r:${SHAPES[t.shape] || "16px"};--font:'${font}';--ovc:${ovc};--ovp:${ov}%;--ovt:${onColor(ovc)};--bd:${hex(t.bd, "#111111")};--sz:${({ s: .86, m: 1, l: 1.22 })[t.sz] || 1};--fs:${({ s: .92, m: 1, l: 1.12 })[t.fs] || 1}${extra}${txv}`;
 }
 function socialHtml(p) {
   const items = (p.socialIcons || []).map(s => ({ s, href: socialHref(s.type, s.url) })).filter(x => x.href && BRANDS[x.s.type]);
   if (!items.length) return "";
   return `<div class="fl-social">${items.map(({ s, href }) => `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(BRANDS[s.type].n)}">${brandIc(s.type, "w-5 h-5")}</a>`).join("")}</div>`;
 }
-const linkAttrs = l => `href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener noreferrer" data-link="${esc(l.id)}"${l.anim === "none" || ANIMS.some(x => x[0] && x[0] === l.anim) ? ` data-an="${l.anim}"` : ""}`;
+const BRAND_BTN = new Set(["whatsapp", "tiktok", "tiktokshop", "facebook", "youtube", "x", "threads", "telegram", "linkedin", "spotify", "pinterest", "snapchat", "twitch", "discord", "github", "paypal", "kofi", "shopee", "lazada", "email", "instagram"]);
+const linkAttrs = l => `href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener noreferrer" data-link="${esc(l.id)}"${BRAND_BTN.has(platOf(l)) ? ` data-brand="${platOf(l)}"` : ""}${l.anim === "none" || ANIMS.some(x => x[0] && x[0] === l.anim) ? ` data-an="${l.anim}"` : ""}`;
 function formHtml(l) {
   return `<form class="fl-card fl-form" data-lead="${esc(l.id)}" novalidate>
     <b>${esc(l.title || "Hubungi saya")}</b>
@@ -1072,25 +1145,27 @@ function formHtml(l) {
     <button type="submit">Hantar</button><div class="fl-msg" role="status" style="font-size:13px"></div></form>`;
 }
 function productHtml(l, badgeFirst) {
-  const img = imgUrl(l.thumbnailUrl);
+  const img = thOf(l);
   const badge = l.promoLabel ? `<span class="fl-badge">${esc(l.promoLabel)}</span>` : badgeFirst ? `<span class="fl-badge">Terlaris</span>` : "";
   return `<a class="fl-card fl-prod" ${linkAttrs(l)}>${img ? `<span class="fl-thw fl-pimg"><img src="${esc(img)}" alt="${esc(l.title)}" loading="lazy" decoding="async"><i class="fl-thov"></i></span>` : `<div class="fl-ph">${ic("bag", "w-7 h-7")}</div>`}
     <div class="fl-pi">${badge}<b>${esc(l.title)}</b>${Number(l.price) ? `<div class="fl-price">${rm(l.price)}</div>` : ""}<span class="fl-buy">Beli sekarang ${ic("ext", "w-4 h-4")}</span></div></a>`;
 }
+const thOf = l => ((l.type !== "product" && SOCIAL_KEYS.includes(platOf(l))) ? "" : imgUrl(l.thumbnailUrl));
 const platOf = l => (l.platform && BRANDS[l.platform] ? l.platform : l.type === "whatsapp" ? "whatsapp" : l.type === "youtube" ? "youtube" : detectPlatform(l.url || ""));
 function iconTile(l) {
-  const th = imgUrl(l.thumbnailUrl); if (th) return `<span class="fl-th fl-thw"><img src="${esc(th)}" alt="" loading="lazy" decoding="async"><i class="fl-thov"></i></span>`;
-  const k = platOf(l), c = BRANDS[k]?.c || "#38BDF8";
-  return `<span class="fl-bi" style="background:${c};color:${onColor(c)}">${/\.pdf(\?|$)/i.test(l.url || "") ? ic("file", "w-5 h-5") : brandIc(k, "w-5 h-5")}</span>`;
+  const th = thOf(l); if (th) return `<span class="fl-th fl-thw"><img src="${esc(th)}" alt="" loading="lazy" decoding="async"><i class="fl-thov"></i></span>`;
+  const k = platOf(l), c = BRANDS[k]?.c || "#38BDF8", pdf = /\.pdf(\?|$)/i.test(l.url || "");
+  if (!pdf && !SOCIAL_KEYS.includes(k)) return "";
+  return `<span class="fl-bi" style="background:${c};color:${onColor(c)}">${pdf ? ic("file", "w-5 h-5") : brandIc(k, "w-5 h-5")}</span>`;
 }
 function buttonHtml(l) {
   const yt = ytId(l.url || "");
-  if (yt && platOf(l) === "youtube") return `<a class="fl-card" ${linkAttrs(l)} style="display:block"><img src="https://i.ytimg.com/vi/${yt}/hqdefault.jpg" alt="${esc(l.title)}" loading="lazy" decoding="async" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block"><div style="padding:10px 14px;font-weight:700;display:flex;gap:8px;align-items:center">${brandIc("youtube", "w-5 h-5")}${esc(l.title)}</div></a>`;
+  if (yt && platOf(l) === "youtube" && l.layout === "featured") return `<a class="fl-card" ${linkAttrs(l)} style="display:block"><img src="https://i.ytimg.com/vi/${yt}/hqdefault.jpg" alt="${esc(l.title)}" loading="lazy" decoding="async" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block"><div style="padding:10px 14px;font-weight:700;display:flex;gap:8px;align-items:center">${brandIc("youtube", "w-5 h-5")}${esc(l.title)}</div></a>`;
   return `<a class="fl-btn" ${linkAttrs(l)}>${iconTile(l)}<span class="fl-t">${esc(l.title)}</span></a>`;
 }
 function tileHtml(l) {
   if (l.type === "product") return productHtml(l);
-  const img = imgUrl(l.thumbnailUrl), k = platOf(l);
+  const img = thOf(l), k = platOf(l);
   return `<a class="fl-card fl-tile" ${linkAttrs(l)}>${img ? `<span class="fl-thw fl-img"><img src="${esc(img)}" alt="" loading="lazy" decoding="async"><i class="fl-thov"></i></span>` : `<div class="fl-img" style="color:${BRANDS[k]?.c || "var(--btn)"}">${brandIc(k, "w-12 h-12")}</div>`}<div class="fl-tt">${esc(l.title)}</div></a>`;
 }
 function posterHtml(p, act, { preview = false, anim = true } = {}) {
@@ -1105,18 +1180,18 @@ function posterHtml(p, act, { preview = false, anim = true } = {}) {
     if (l.type === "header") return Wi(i, `<h3 class="fl-header">${esc(l.title)}</h3>`);
     if (l.type === "email_form") return Wi(i, formHtml(l));
     if (l.type === "product") return Wi(i, productHtml(l));
-    const img = imgUrl(l.thumbnailUrl), k = platOf(l), c = BRANDS[k]?.c || "#38BDF8";
+    const img = thOf(l), k = platOf(l), c = BRANDS[k]?.c || "#38BDF8";
     if (l.layout === "featured" && img) return Wi(i, `<div class="fl-pfeat"><a class="fl-pf-a" ${linkAttrs(l)}><span class="fl-thw fl-pimg2"><img src="${esc(img)}" alt="" loading="lazy" decoding="async"><i class="fl-thov"></i></span><span class="fl-pcap"><span class="fl-pt">${esc(l.title)}</span></span></a>${more(l)}</div>`);
-    const th = img ? `<span class="fl-thw fl-pth"><img src="${esc(img)}" alt="" loading="lazy" decoding="async"><i class="fl-thov"></i></span>` : `<span class="fl-pth" style="background:${c};color:${onColor(c)}">${brandIc(k, "w-6 h-6")}</span>`;
+    const th = img ? `<span class="fl-thw fl-pth"><img src="${esc(img)}" alt="" loading="lazy" decoding="async"><i class="fl-thov"></i></span>` : SOCIAL_KEYS.includes(k) ? `<span class="fl-pth" style="background:${c};color:${onColor(c)}">${brandIc(k, "w-6 h-6")}</span>` : "";
     return Wi(i, `<div class="fl-pbar"><a class="fl-pb-a" ${linkAttrs(l)}>${th}<span class="fl-pt">${esc(l.title)}</span></a>${more(l)}</div>`);
   };
   const body = (act.length ? act.map(item).join("") : `<p class="fl-pbio" style="text-align:center">Belum ada pautan.</p>`) + socialHtml(p) +
     `<a class="fl-pjoin" href="/" ${preview ? 'tabindex="-1"' : ""}>${ic("zap", "w-5 h-5")} Buat Flash Link anda sendiri</a><div class="fl-pmeta">Genius Digital Flash Link</div>`;
-  return `<div class="fl-root fl-tpl-poster fl-sty-poster ${rootCls(p.theme)} ${anim ? "" : "fl-noanim"}" style="${esc(rootStyle(p))}"><div class="fl-wrap fl-pwrap">${hero}<div class="fl-pbody">${body}</div></div></div>`;
+  return `<div class="fl-root fl-tpl-poster fl-sty-poster ${rootCls(p.theme, "poster")} ${anim ? "" : "fl-noanim"}" style="${esc(rootStyle(p))}"><div class="fl-wrap fl-pwrap">${hero}<div class="fl-pbody">${body}</div></div></div>`;
 }
 function renderProfile(p, links, { preview = false, anim = true } = {}) {
   const t = p.theme, tpl = p.template, act = links.filter(l => l.active !== false);
-  loadFont(t.font);
+  loadFont(t.font); TXK.forEach(k => t.tx && t.tx[k] && t.tx[k].f && loadFont(t.tx[k].f));
   if (tpl === "poster") return posterHtml(p, act, { preview, anim });
   const avatar = imgUrl(p.avatarUrl), sty = tpl === "landing" ? "classic" : (p.profileStyle || "classic");
   const nm = (p.displayName || "").trim();
@@ -1138,10 +1213,10 @@ function renderProfile(p, links, { preview = false, anim = true } = {}) {
   const foot = `<div class="fl-foot"><a href="/" ${preview ? 'tabindex="-1"' : ""}>${ic("zap", "w-4 h-4")} Dibuat dengan Flash Link</a></div>`;
   const Wi = (i, h, cls = "") => `<div class="fl-in ${cls}" style="--i:${i}">${h}</div>`;
   const cardTile = (l, cls) => {
-    const img = imgUrl(l.thumbnailUrl), k = platOf(l), c = BRANDS[k]?.c || "#38BDF8", price = l.type === "product" && Number(l.price) ? `<span class="fl-pr">${rm(l.price)}</span>` : "";
+    const img = thOf(l), k = platOf(l), c = BRANDS[k]?.c || "#38BDF8", price = l.type === "product" && Number(l.price) ? `<span class="fl-pr">${rm(l.price)}</span>` : "";
     return `<a class="${cls}" ${linkAttrs(l)} style="--cc:${c}">${img ? `<img src="${esc(img)}" alt="" loading="lazy" decoding="async">` : `<span class="fl-cbg"></span><span class="fl-cbig">${brandIc(k, "w-12 h-12")}</span>`}<i class="fl-thov"></i>${price}<span class="fl-cmeta"><span class="fl-cic" style="background:${c};color:${onColor(c)}">${brandIc(k, "w-4 h-4")}</span><span class="fl-ct">${esc(l.title)}</span></span></a>`;
   };
-  const icoTile = l => { const img = imgUrl(l.thumbnailUrl), k = platOf(l), c = BRANDS[k]?.c || "#38BDF8"; return `<a class="fl-ico" ${linkAttrs(l)}><span class="fl-ico-i" style="background:${c};color:${onColor(c)}">${img ? `<img src="${esc(img)}" alt="" loading="lazy" decoding="async"><i class="fl-thov"></i>` : brandIc(k, "w-7 h-7")}</span><small>${esc(l.title)}</small></a>`; };
+  const icoTile = l => { const img = thOf(l), k = platOf(l), c = BRANDS[k]?.c || "#38BDF8"; return `<a class="fl-ico" ${linkAttrs(l)}><span class="fl-ico-i" style="background:${c};color:${onColor(c)}">${img ? `<img src="${esc(img)}" alt="" loading="lazy" decoding="async"><i class="fl-thov"></i>` : brandIc(k, "w-7 h-7")}</span><small>${esc(l.title)}</small></a>`; };
   const special = l => l.type === "header" ? `<h3 class="fl-header">${esc(l.title)}</h3>` : l.type === "email_form" ? formHtml(l) : "";
   let body = "";
   if (!act.length) body = `<p class="fl-bio" style="margin-top:20px">Belum ada pautan.</p>`;
@@ -1170,9 +1245,9 @@ function renderProfile(p, links, { preview = false, anim = true } = {}) {
       (tests.length ? `<h2 class="fl-sec">Kata pelanggan</h2>` + tests.map((x, i) => Wi(i, `<div class="fl-card fl-quote">“${esc(x.text)}”<small>— ${esc(x.name || "Pelanggan")}</small></div>`)).join("") : "") +
       (forms.length ? `<h2 class="fl-sec">Tempahan</h2>` + forms.map(formHtml).join("") : "") +
       (cta ? `<a class="fl-btn" style="margin-top:8px" ${linkAttrs(cta)}>${ic("whatsapp")}<span class="fl-t">Hubungi sekarang</span></a>` : "");
-    return `<div class="fl-root fl-tpl-landing ${rootCls(t)} ${t.auto ? "fl-auto" : ""} ${anim ? "" : "fl-noanim"}" style="${esc(rootStyle(p))}"><div class="fl-wrap">${banner}${body}${foot}</div></div>`;
+    return `<div class="fl-root fl-tpl-landing ${rootCls(t, "landing")} ${t.auto ? "fl-auto" : ""} ${anim ? "" : "fl-noanim"}" style="${esc(rootStyle(p))}"><div class="fl-wrap">${banner}${body}${foot}</div></div>`;
   } else body = act.map((l, i) => Wi(i, blockHtml(l))).join("");
-  return `<div class="fl-root fl-tpl-${tpl} fl-sty-${sty} ${rootCls(t)} ${t.auto && sty !== "cover" ? "fl-auto" : ""} ${anim ? "" : "fl-noanim"}" style="${esc(rootStyle(p))}"><div class="fl-wrap">${banner}${head}<div style="height:6px"></div>${body}${foot}</div></div>`;
+  return `<div class="fl-root fl-tpl-${tpl} fl-sty-${sty} ${rootCls(t, tpl)} ${t.auto && sty !== "cover" ? "fl-auto" : ""} ${anim ? "" : "fl-noanim"}" style="${esc(rootStyle(p))}"><div class="fl-wrap">${banner}${head}<div style="height:6px"></div>${body}${foot}</div></div>`;
 }
 function tileProduct(l) { return productHtml(l); }
 function blockHtml(l) {
@@ -1267,7 +1342,7 @@ async function publicView(username) {
   setMeta("description", desc); setMeta("og:title", document.title, 1); setMeta("og:description", desc, 1);
   setMeta("og:image", safeUrl(p.avatarUrl) || origin() + "/assets/logo-2x.png", 1); setMeta("og:url", profileUrl(p.username), 1);
   document.documentElement.style.background = rootStyle(p).match(/--bgcss:([^;]+)/)?.[0] ? "" : "";
-  app.innerHTML = `<main>${renderProfile(p, links)}</main>`;
+  app.innerHTML = `<main>${renderProfile(p, links)}</main>`; armReveal(app);
   PUBCTX = { p, links };
   const root = $("main"); bindPublicEvents(root, uid);
   const hbg = $(".fl-phero-bg"), htx = $(".fl-phero-txt");
@@ -1279,6 +1354,33 @@ async function publicView(username) {
 }
 function notFound(u) { $("#app").innerHTML = `<main class="container" style="text-align:center;padding:96px 16px"><img src="/assets/icon.png" width="96" height="96" alt="Flash Link" class="logo-glow" style="margin:0 auto"><h1 class="font-display" style="font-size:28px;margin:20px 0 8px;font-weight:700">${u ? "Halaman belum wujud" : "Halaman tidak dijumpai"}</h1><p style="color:#9CA3AF">${u ? "Halaman ini belum wujud." : "Pautan ini tidak sah."}</p><a class="btn btn-red" style="margin-top:20px" href="/" data-nav>Ke laman utama</a></main>${siteFooter(false)}`; fillStat(); }
 function notice(m) { $("#app").innerHTML = `<main class="container" style="text-align:center;padding:96px 16px"><img src="/assets/icon.png" width="80" height="80" alt="" style="margin:0 auto"><p style="margin-top:16px;max-width:420px;margin-inline:auto">${esc(m)}</p></main>`; }
+
+/* ---------- Jam Malaysia (12 jam), tarikh Masihi dan Hijri rasmi JAKIM ---------- */
+const HIJRI_M = ["Muharram", "Safar", "Rabiulawal", "Rabiulakhir", "Jamadilawal", "Jamadilakhir", "Rejab", "Syaaban", "Ramadan", "Syawal", "Zulkaedah", "Zulhijjah"];
+const CLK = { off: 0, hij: null, day: "", busy: false };
+const klNow = () => new Date(Date.now() + CLK.off);
+const klDay = d => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kuala_Lumpur", year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
+async function syncClock() {
+  if (CLK.busy) return; CLK.busy = true; const day = klDay(klNow());
+  try {
+    const r = await fetch("https://www.e-solat.gov.my/index.php?r=esolatApi/TakwimSolat&period=today&zone=SGR01", { cache: "no-store" }), j = await r.json();
+    const st = String(j.serverTime || "").match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})$/); if (st) CLK.off = new Date(`${st[1]}T${st[2]}+08:00`).getTime() - Date.now();
+    const h = j.prayerTime && j.prayerTime[0] && j.prayerTime[0].hijri; if (h) { const [y, m, d] = h.split("-").map(Number); if (y && m && d) { CLK.hij = { y, m, d }; CLK.day = klDay(klNow()); } }
+  } catch {}
+  CLK.busy = false;
+}
+function hijriText() {
+  if (CLK.hij && CLK.day === klDay(klNow())) return `${CLK.hij.d} ${HIJRI_M[CLK.hij.m - 1]} ${CLK.hij.y}H`;
+  try { const p = Object.fromEntries(new Intl.DateTimeFormat("en-u-ca-islamic-umalqura", { timeZone: "Asia/Kuala_Lumpur", day: "numeric", month: "numeric", year: "numeric" }).formatToParts(klNow()).map(x => [x.type, x.value])); return `${p.day} ${HIJRI_M[(+p.month || 1) - 1]} ${parseInt(p.year)}H`; } catch { return ""; }
+}
+function clockHtml(cls = "") { return `<div class="fl-clock ${cls}" role="timer" aria-label="Masa Malaysia"><b class="ck-t">--:--</b><span class="ck-d"></span></div>`; }
+function tickClock() {
+  const els = document.querySelectorAll(".fl-clock"); if (!els.length) return; const n = klNow();
+  if (klDay(n) !== CLK.day) syncClock();
+  const t = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Kuala_Lumpur", hour: "numeric", minute: "2-digit", second: "2-digit", hour12: true }).format(n), g = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Kuala_Lumpur", day: "numeric", month: "short", year: "numeric" }).format(n), h = hijriText();
+  els.forEach(e => { const a = e.querySelector(".ck-t"), b = e.querySelector(".ck-d"); if (a.textContent !== t) a.textContent = t; const d = h ? `${g} · ${h}` : g; if (b.textContent !== d) b.textContent = d; });
+}
+syncClock().then(tickClock); setInterval(tickClock, 1000);
 
 /* ---------- Statistik masa nyata (RTDB: flashlink/stats) + footer ----------
    Setiap lawatan (sekali setiap sesi pelayar) menaikkan TIGA kaunter serentak: hari, bulan, keseluruhan.
@@ -1300,7 +1402,7 @@ async function countVisit() {
 function siteFooter(withStats = true) {
   const it = (id, l) => `<div><div id="${id}" class="font-display" style="font-size:15px;font-weight:600;color:#fff;font-variant-numeric:tabular-nums;line-height:1.3">${fmtN(statCache[id])}</div><div style="font-size:10.5px;color:#9CA3AF;line-height:1.25;margin-top:2px">${l}</div></div>`;
   return `<footer class="container" style="padding:28px 16px 44px;text-align:center;border-top:1px solid var(--line);margin-top:8px">
-    <img src="/assets/icon.png" alt="" width="36" height="36" style="margin:0 auto 14px;height:36px;width:36px">
+    <img src="/assets/icon.png" alt="Genius Digital Flash Link" width="88" height="88" style="margin:0 auto 14px;height:88px;width:88px;filter:drop-shadow(0 0 18px rgba(255,64,64,.45))">
     ${withStats ? `<div id="ustat" aria-label="Statistik Flash Link" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;max-width:560px;margin:0 auto 18px;align-items:start">${it("s_users", "Pengguna")}${it("s_day", "Pelawat hari ini")}${it("s_month", "Pelawat bulan ini")}${it("s_total", "Pelawat keseluruhan")}</div>` : ""}
     <p style="margin:0;font-size:clamp(10px,3.05vw,13.5px);font-weight:700;line-height:1.6;white-space:nowrap;background:linear-gradient(90deg,#E5E7EB 0%,#FF9A9A 35%,#FF4D4D 75%,#FF3B3B 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent">Hak Cipta Terpelihara Genius Digital | Flash Link 2026</p>
     <div role="separator" style="height:1px;width:min(100%,360px);margin:10px auto;background:#4B5563"></div>
@@ -1337,7 +1439,8 @@ function parallaxInit() {
 function landing() {
   document.title = "Genius Digital Flash Link — Satu pautan untuk semua jualan anda";
   const logged = !!S.user;
-  const demo = renderProfile(demoProfile("dark"), DEMO_LINKS.slice(0, 5), { preview: true });
+  const pubP = S.user && S.profile ? (() => { const p = S.profile, pd = p.designs.find(d => d.id === p.publishedDesign); return pd ? { ...p, template: pd.template, profileStyle: pd.profileStyle || "classic", theme: pd.theme } : p; })() : null;
+  const demo = pubP ? renderProfile(pubP, S.links, { preview: true }) : renderProfile(demoProfile("dark"), DEMO_LINKS.slice(0, 5), { preview: true });
   const go = logged ? "/dashboard" : "/login";
   const hooks = [
     ["zap", "Pelanggan terus ke tujuan", "Tak perlu lagi tanya “link mana?”. Satu pautan di bio, semua WhatsApp, Shopee, TikTok Shop dan YouTube anda sedia diklik."],
@@ -1357,7 +1460,7 @@ function landing() {
   <div class="fl-banner3" role="region" aria-label="Promosi Flash Link"><div class="b3-bg" aria-hidden="true"></div><div class="b3-in">
     <div class="b3-zone b3-l"><a href="/" data-nav class="b3-logo" aria-label="Genius Digital Flash Link"><img src="/assets/logo-2x.png" alt="Genius Digital Flash Link" width="150" height="75"></a><span class="b3-sep" aria-hidden="true"></span>${ic("zap", "w-7 h-7")}<span><b>Setup 2 minit</b><small>Tanpa kod, terus guna</small></span></div>
     <div class="b3-zone b3-c"><span class="b3-title gradtxt">Satu pautan. Semua jualan.</span><small>WhatsApp · Shopee · TikTok Shop · YouTube</small></div>
-    <div class="b3-zone b3-r"><div class="b3-btns"><a class="btn btn-red btn-sm" href="${go}" data-nav>Mula sekarang</a></div><span class="b3-note">Sentiasa dikemas kini</span></div>
+    <div class="b3-zone b3-r">${clockHtml("ck-ban")}<div class="b3-btns"><a class="btn btn-red btn-sm" href="${go}" data-nav>Mula sekarang</a></div><span class="b3-note">Sentiasa dikemas kini</span></div>
   </div></div>
   <main>
   <section style="position:relative;padding:40px 0 72px">
@@ -1380,7 +1483,7 @@ function landing() {
     <div data-fx="pop" style="text-align:center;margin-top:32px"><a class="btn btn-red shine" style="min-height:54px;padding:0 30px;font-size:17px" href="${go}" data-nav>Mula sekarang</a></div></section>
   </main>
   ${siteFooter()}`;
-  $$("#hero-devs .iscreen").forEach(el => (el.innerHTML = demo)); $$("#hero-devs .lap-scale").forEach(el => (el.innerHTML = demo)); fitLaptop();
+  $$("#hero-devs .iscreen").forEach(el => (el.innerHTML = demo)); $$("#hero-devs .lap-scale").forEach(el => (el.innerHTML = demo)); fitLaptop(); tickClock(); armReveal($("#hero-devs"));
   const mq = matchMedia("(min-width:900px)"); const g = $("#hero-grid"); const fit = () => (g.style.gridTemplateColumns = mq.matches ? "minmax(0,1fr) minmax(0,1fr)" : "minmax(0,1fr)"); fit(); mq.addEventListener("change", fit);
   revealInit(); parallaxInit(); fillStat(); sfxScope(true);
 }
@@ -1551,13 +1654,21 @@ const fitMini = m => { if (!m.clientWidth) return; const k = m.clientWidth / 375
 function fitMinis() { $$(".mini").forEach(m => { if (!m._ro) { m._ro = new ResizeObserver(() => fitMini(m)); m._ro.observe(m); } fitMini(m); }); }
 const fitDevs = () => { const ps = Math.max(.5, Math.min(.82, (innerHeight - 470) / 604)); $$(".dprev .devs").forEach(d => d.style.setProperty("--ps", ps.toFixed(3))); };
 addEventListener("resize", () => { fitDevs(); fitLaptop(); fitMinis(); });
+function armReveal(host) {
+  if (!host) return; const t0 = performance.now();
+  host.querySelectorAll(".fl-root:not(.fl-noanim)").forEach(r => {
+    r.classList.add("fl-reveal"); const sc = r.closest(".iscreen,.lap-view");
+    const io = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; if (performance.now() - t0 > 900) e.target.style.setProperty("--i", "0"); e.target.classList.add("fl-vis"); io.unobserve(e.target); }), { root: sc || null, threshold: .06, rootMargin: "0px 0px -5% 0px" });
+    r.querySelectorAll(".fl-in").forEach(i => io.observe(i));
+  });
+}
 const refreshPreview = (anim = false) => {
   if (!S.profile) return;
   if (imgMissing(S.profile, S.links)) hydrateImages(S.profile, S.links).then(() => { refreshPreview(anim); fitMinis(); });
   const html = renderProfile(S.profile, S.links, { preview: true, anim });
   $$(".dprev .iscreen.pv-wrap, #pvmobile .iscreen.pv-wrap").forEach(el => (el.innerHTML = html));
   $$(".dprev .lap-scale, #pvmobile .lap-scale").forEach(el => (el.innerHTML = html));
-  fitLaptop();
+  fitLaptop(); $$(".dprev, #pvmobile").forEach(armReveal);
 };
 function drawPreviewPanel() {
   const el = $("#dprev"); if (!el) return;
@@ -1569,7 +1680,7 @@ function drawPreviewPanel() {
 const REDUCE = () => matchMedia("(prefers-reduced-motion:reduce)").matches;
 const EASE = "cubic-bezier(.32,.72,0,1)";
 const anim = (el, kf, o = {}) => (!el || REDUCE() ? null : el.animate(kf, { duration: 520, easing: EASE, fill: "both", ...o }));
-function stagger(sel, base = 0, gap = 55) { $$(sel).forEach((el, i) => anim(el, [{ opacity: 0, transform: "translate3d(0,18px,0) scale(.98)" }, { opacity: 1, transform: "none" }], { delay: base + i * gap, fill: "backwards", duration: 600 })); }
+function stagger(sel, base = 0, gap = 55) { $$(sel).slice(0, 14).forEach((el, i) => anim(el, [{ opacity: 0, transform: "translate3d(0,18px,0) scale(.98)" }, { opacity: 1, transform: "none" }], { delay: base + i * gap, fill: "backwards", duration: 600 })); }
 const NAV = [
   { k: "design", n: "Design", i: "palette", d: "Semua design anda dan galeri template di satu tempat. Klik template untuk pilih dan edit (nama, gambar, warna, fon, saiz). Pautan anda tak akan hilang bila design bertukar." },
   { k: "links", n: "Pautan", i: "link", d: "Tambah pautan anda: tampal mana-mana URL atau pilih platform. Logo dan gambar kecil dikesan automatik. Seret untuk susun." },
@@ -1583,12 +1694,12 @@ let navBusy = false;
 function dashboard() {
   const url = profileUrl(S.profile.username);
   $("#app").innerHTML = `<header class="dtop"><div class="dtop-in"><button id="hm" aria-label="Design" class="dlogo"><img src="/assets/logo-2x.png" alt="Genius Digital Flash Link" width="110" height="55"></button>
-    <div id="dhead-actions" class="dtop-act"><button id="cp" class="btn btn-red btn-sm" aria-label="Salin pautan">${ic("copy", "w-4 h-4")}<span class="hidden sm:inline">Salin pautan</span></button><a class="btn btn-ghost btn-sm" href="${esc(url)}" target="_blank" rel="noopener" aria-label="Buka halaman awam">${ic("ext", "w-4 h-4")}<span class="hidden sm:inline">Halaman saya</span></a><a id="gohome" class="btn btn-ghost btn-sm" href="/" data-nav aria-label="Laman utama">${ic("home", "w-4 h-4")}<span class="hidden sm:inline">Laman utama</span></a><button id="lo" class="btn btn-ghost btn-sm" aria-label="Log keluar">${ic("logout", "w-4 h-4")}</button></div></div></header>
+    <div id="dhead-actions" class="dtop-act"><button id="cp" class="btn btn-red btn-sm" aria-label="Salin pautan">${ic("copy", "w-4 h-4")}<span class="hidden sm:inline">Salin pautan</span></button><a class="btn btn-ghost btn-sm" href="${esc(url)}" target="_blank" rel="noopener" aria-label="Buka halaman awam">${ic("ext", "w-4 h-4")}<span class="hidden sm:inline">Halaman saya</span></a><a id="gohome" class="btn btn-ghost btn-sm" href="/" data-nav aria-label="Laman utama">${ic("home", "w-4 h-4")}<span class="hidden sm:inline">Laman utama</span></a><button id="lo" class="btn btn-ghost btn-sm" aria-label="Log keluar">${ic("logout", "w-4 h-4")}</button></div>${clockHtml("ck-head")}</div></header>
   <div class="dsh"><nav class="dnav" aria-label="Menu dashboard">${NAV.map(x => `<button class="dnav-i" data-k="${x.k}" aria-label="${x.n}">${ic(x.i, "w-5 h-5")}<span>${x.n}</span></button>`).join("")}</nav>
     <main id="stage" class="dmain"></main><aside class="dprev" id="dprev"></aside></div>
   <button id="pvb" class="btn btn-red pvfab on">${ic("phone", "w-5 h-5")} Pratonton</button>
   ${siteFooter(false)}`;
-  $("#cp").onclick = () => copyText(url); $("#lo").onclick = () => { S.view = "design"; FB.signOut(auth); };
+  tickClock(); $("#cp").onclick = () => copyText(url); $("#lo").onclick = () => { S.view = "design"; FB.signOut(auth); };
   $("#hm").onclick = () => openView("design");
   $$(".dnav-i").forEach(b => (b.onclick = () => openView(b.dataset.k)));
   $("#pvb").onclick = () => modal(`<div id="pvmobile" style="max-height:78vh;overflow-y:auto">${devsHtml("land")}</div>`, () => refreshPreview(true));
@@ -1597,20 +1708,18 @@ function dashboard() {
   if (S.view === "home") S.view = "design";
   openView(NAV.some(x => x.k === S.view) ? S.view : "design", { instant: true });
 }
-async function openView(view, o = {}) {
-  const stage = $("#stage"); if (!stage || navBusy) return; navBusy = true;
-  try {
-    if (view === "home") view = "design"; if (!NAV.some(x => x.k === view)) view = "design";
-    const old = stage.firstElementChild;
-    if (old && !o.instant) { const a = anim(old, [{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translate3d(-22px,0,0) scale(.985)" }], { duration: 170, easing: "cubic-bezier(.4,0,1,1)" }); if (a) await a.finished.catch(() => {}); }
-    S.view = view; const x = NAV.find(n => n.k === view);
-    stage.innerHTML = `<div id="sec"><div class="sec-in" style="display:flex;gap:14px;align-items:center;margin-bottom:6px"><div class="dtile">${ic(x.i, "w-6 h-6")}</div><h1 class="font-display" style="font-size:26px;font-weight:700;margin:0">${x.n}</h1></div><p class="sec-in" style="margin:0 0 18px;color:#C7C9D1;max-width:680px;line-height:1.55">${x.d}</p><section id="pane" aria-live="polite"></section></div>`;
-    $$(".dnav-i").forEach(b => b.setAttribute("aria-current", b.dataset.k === view ? "page" : "false"));
-    ({ design: designTab, links: linksTab, profile: profileTab, insights: insightsTab, leads: () => statsTab("leads"), short: shortTab, schedule: scheduleTab })[view]();
-    window.scrollTo({ top: 0 }); fitMinis();
-    anim($("#sec"), [{ opacity: 0, transform: "translate3d(28px,0,0) scale(.985)" }, { opacity: 1, transform: "none" }], { duration: 620 });
-    stagger(".sec-in, #pane > .glass, #pane > div > section, #ll > *, .gal-card", 110, 50);
-  } finally { navBusy = false; }
+let navTok = 0;
+function openView(view, o = {}) {
+  const stage = $("#stage"); if (!stage) return;
+  if (view === "home") view = "design"; if (!NAV.some(x => x.k === view)) view = "design";
+  const prev = NAV.findIndex(n => n.k === S.view), next = NAV.findIndex(n => n.k === view), dir = next >= prev ? 1 : -1, tok = ++navTok;
+  S.view = view; const x = NAV[next];
+  $$(".dnav-i").forEach(b => b.setAttribute("aria-current", b.dataset.k === view ? "page" : "false")); // butang bertindak balas serta-merta
+  stage.innerHTML = `<div id="sec"><div class="sec-in" style="display:flex;gap:14px;align-items:center;margin-bottom:6px"><div class="dtile">${ic(x.i, "w-6 h-6")}</div><h1 class="font-display" style="font-size:26px;font-weight:700;margin:0">${x.n}</h1></div><p class="sec-in" style="margin:0 0 18px;color:#C7C9D1;max-width:680px;line-height:1.55">${x.d}</p><section id="pane" aria-live="polite"></section></div>`;
+  window.scrollTo({ top: 0 });
+  if (!o.instant) anim($("#sec"), [{ opacity: 0, transform: `translate3d(${dir * 44}px,0,0) scale(.985)` }, { opacity: 1, transform: "none" }], { duration: 480 });
+  // kandungan dibina selepas satu bingkai supaya klik terasa serta-merta
+  requestAnimationFrame(() => { if (tok !== navTok) return; ({ design: designTab, links: linksTab, profile: profileTab, insights: insightsTab, leads: () => statsTab("leads"), short: shortTab, schedule: scheduleTab })[view](); fitMinis(); if (!o.instant) stagger(".sec-in, #pane > .glass, #pane > div > section, #ll > *", 40, 36); });
 }
 
 /* ---------- Graf bar berselang-seli merah / biru ---------- */
@@ -1643,15 +1752,20 @@ function deleteDesign(id) {
   if (p.publishedDesign === id) { p.publishedDesign = p.designs[0].id; toast(`Design diterbitkan dipadam. “${p.designs[0].name}” kini diterbitkan.`); }
   if (wasActive) activateDesign(p.designs[0].id, true); else saveProfile();
 }
+let LZ = null;
+function lazyMinis(scope) {
+  if (!LZ) LZ = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; const m = e.target; LZ.unobserve(m); const [k, id] = (m.dataset.lz || "").split(":"); let pr = null; if (k === "d") { const d = S.profile.designs.find(x => x.id === id); if (d) pr = withDesign(d); } else { const d = DESIGNS.find(x => x.id === id); if (d) pr = { ...S.profile, template: d.tpl, profileStyle: d.sty || "classic", theme: designTheme(d) }; } if (pr) { m.innerHTML = miniHtml(pr); m.removeAttribute("data-lz"); fitMini(m); } }), { rootMargin: "240px" });
+  $$(".mini[data-lz]", scope).forEach(m => LZ.observe(m));
+}
 const withDesign = d => ({ ...S.profile, template: d.template, profileStyle: d.profileStyle || "classic", theme: d.theme });
 const miniHtml = pr => `<div class="mini-in">${renderProfile(pr, S.links, { preview: true, anim: false })}</div>`;
 function designCard(d, activeId) {
   const on = d.id === activeId, pub = d.id === S.profile.publishedDesign;
-  return `<article class="gal-card clk${on ? " on" : ""}" data-id="${d.id}"><div class="mini">${miniHtml(withDesign(d))}</div>
+  return `<article class="gal-card clk${on ? " on" : ""}" data-id="${d.id}"><div class="mini" data-lz="d:${d.id}"></div>
     <div class="gal-meta"><div style="min-width:0;display:flex;flex-direction:column;gap:4px"><b class="gal-name">${esc(d.name)}</b><div style="display:flex;gap:4px;flex-wrap:wrap">${pub ? '<span class="vbadge" style="background:rgba(52,211,153,.18);color:#6EE7A8;border-color:rgba(52,211,153,.5)">Diterbitkan</span>' : ""}${on && !pub ? '<span class="vbadge">Diedit</span>' : ""}</div></div>
     <div class="gal-act">${pub ? "" : `<button class="btn btn-red btn-sm" data-use="${d.id}" title="Terbitkan: pautan anda akan memaparkan design ini">Terbit</button>`}<button class="btn btn-ghost btn-sm" data-edit="${d.id}" aria-label="Edit ${esc(d.name)}">${ic("pencil", "w-4 h-4")}</button><button class="btn btn-ghost btn-sm" data-dup="${d.id}" aria-label="Pendua ${esc(d.name)}">${ic("copy", "w-4 h-4")}</button><button class="btn btn-ghost btn-sm" data-del="${d.id}" aria-label="Padam ${esc(d.name)}">${ic("trash", "w-4 h-4")}</button></div></div></article>`;
 }
-const presetCard = d => `<article class="gal-card clk" data-p="${d.id}" title="${esc(d.n)}: ${esc(d.d)}"><div class="mini">${miniHtml({ ...S.profile, template: d.tpl, profileStyle: d.sty || "classic", theme: designTheme(d) })}</div><div class="gal-meta row"><b class="gal-name" style="flex:1;min-width:0">${esc(d.n)}</b><button class="btn btn-ghost btn-sm" data-an="${d.id}" aria-label="Simpan ${esc(d.n)} sebagai design baharu" title="Simpan sebagai design baharu">${ic("plus", "w-4 h-4")}</button></div></article>`;
+const presetCard = d => `<article class="gal-card clk" data-p="${d.id}" title="${esc(d.n)}: ${esc(d.d)}"><div class="mini" data-lz="p:${d.id}"></div><div class="gal-meta row"><b class="gal-name" style="flex:1;min-width:0">${esc(d.n)}</b><button class="btn btn-ghost btn-sm" data-an="${d.id}" aria-label="Simpan ${esc(d.n)} sebagai design baharu" title="Simpan sebagai design baharu">${ic("plus", "w-4 h-4")}</button></div></article>`;
 function applyPreset(d, edit = true) {
   const p = S.profile;
   if (p.activeDesign === p.publishedDesign) { const nd = newDesign({ template: d.tpl, profileStyle: d.sty || "classic", theme: designTheme(d) }, d.n); if (nd) { toast(`Design baharu “${d.n}” dibuat. Design yang diterbitkan tidak berubah.`); if (edit) editDesign(); } return; }
@@ -1660,7 +1774,6 @@ function applyPreset(d, edit = true) {
 }
 async function designTab() {
   const keep = { y: window.scrollY, g: $("#galw")?.scrollTop || 0, m: $("#minew")?.scrollTop || 0 };
-  try { await hydrateImages(S.profile, S.links); } catch {}
   const pane = $("#pane"), p = S.profile, url = profileUrl(p.username);
   pane.innerHTML = `<div class="glass" style="border-radius:20px;padding:16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:0 0 14px"><div style="flex:1;min-width:200px"><div class="lbl" style="margin:0 0 2px">Pautan anda (design diterbitkan: ${esc((p.designs.find(d => d.id === p.publishedDesign) || {}).name || "")})</div><div style="font-weight:700;color:#7DD3FC;word-break:break-all">${esc(url)}</div><div class="hint" style="margin-top:4px">Salin pautan ini ke profil media sosial anda. Ia memaparkan design yang diterbitkan.</div></div><button id="hcp" class="btn btn-red btn-sm">${ic("copy", "w-4 h-4")} Salin pautan</button></div>
     ${S.links.length ? "" : `<div class="glass" style="border-radius:20px;padding:16px;margin-bottom:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:200px"><b>Mula di sini</b><p style="margin:4px 0 0;color:#C7C9D1;font-size:14.5px">Halaman anda masih kosong. Tambah pautan pertama anda.</p></div><button id="hlk" class="btn btn-red btn-sm">${ic("plus", "w-4 h-4")} Tambah pautan</button></div>`}
@@ -1678,7 +1791,8 @@ async function designTab() {
   const gal = $("#gal");
   $$(".gal-card", gal).forEach(c => (c.onclick = e => { if (e.target.closest("[data-an]")) return; applyPreset(DESIGNS.find(x => x.id === c.dataset.p)); }));
   $$("[data-an]", gal).forEach(b => (b.onclick = e => { e.stopPropagation(); const d = DESIGNS.find(x => x.id === b.dataset.an); if (newDesign({ template: d.tpl, profileStyle: d.sty || "classic", theme: designTheme(d) }, d.n)) { toast(`“${d.n}” disimpan sebagai design baharu ✓`); designTab(); } }));
-  fitMinis();
+  fitMinis(); lazyMinis(pane);
+  if (imgMissing(S.profile, S.links)) hydrateImages(S.profile, S.links).then(() => designTab());
   const fitGal = () => { const g = $("#galw"), c = g && $(".gal-card", g); if (c) g.style.maxHeight = c.offsetHeight + 8 + "px"; const m = $("#minew"), mc = m && $(".gal-card", m); if (mc) m.style.maxHeight = mc.offsetHeight * 2 + 18 + "px"; };
   requestAnimationFrame(() => { fitGal(); const c = $("#gal .gal-card"); if (c) new ResizeObserver(fitGal).observe(c); requestAnimationFrame(() => { const g = $("#galw"), m = $("#minew"); if (g) g.scrollTop = keep.g; if (m) m.scrollTop = keep.m; window.scrollTo(0, keep.y); [180, 500].forEach(ms => setTimeout(() => { const g2 = $("#galw"), m2 = $("#minew"); if (g2 && Math.abs(g2.scrollTop - keep.g) > 2) g2.scrollTop = keep.g; if (m2 && Math.abs(m2.scrollTop - keep.m) > 2) m2.scrollTop = keep.m; if (Math.abs(window.scrollY - keep.y) > 2) window.scrollTo(0, keep.y); }, ms)); }); });
 }
@@ -1699,8 +1813,9 @@ function editDesign() {
       <div id="ed-bgi" style="${t.bgType === "image" ? "" : "display:none"}">${imgFieldHtml("ed-bg", "Gambar latar", "round")}</div><div id="ed-ctr" class="err"></div>
       <label class="lbl" for="ed-ov" style="margin-top:12px">Overlay gambar: <b id="ed-ovv">${Math.round(t.ov ?? 70)}%</b> <span style="font-weight:400;color:#9CA3AF">(warna ikut latar)</span></label><input id="ed-ov" type="range" min="0" max="100" step="5" value="${Math.round(t.ov ?? 70)}" style="width:100%;accent-color:#FF4D4D"></div>
     <div class="edsec"><h3>Corak & gaya butang</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">${sel("ed-pat", "Corak latar", PAT_NAMES, t.pat || "")}${sel("ed-bs", "Gaya butang", BSTYLES, t.bs || "solid")}</div><p class="hint" style="margin:8px 0 0">Gaya butang terpakai pada susun atur senarai (Minimalis, Gelap dan Laman Mini).</p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">${sel("ed-ba", "Animasi semua butang", ANIMS, t.ba || "")}${sel("ed-en", "Animasi kemunculan", ENTRANCES, t.en || "up")}</div><p class="hint" style="margin:8px 0 0">Setiap pautan juga boleh ada animasi sendiri (dalam tetingkap edit pautan).</p></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">${sel("ed-fx", "Kesan latar bergerak", FX_NAMES, t.fx || "")}${sel("ed-fr", "Bingkai gambar profil", FR_NAMES, t.fr || "")}</div><div style="margin-top:12px">${sel("ed-bc", "Warna butang ikut jenama (WhatsApp hijau, Facebook biru, dll)", [["on", "Ya"], ["off", "Tidak"]], t.bc === false ? "off" : "on")}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">${sel("ed-ba", "Animasi semua butang", ANIMS, t.ba || "")}${sel("ed-en", "Animasi kemunculan", ENTRANCES, t.en || "up")}</div><p class="hint" style="margin:8px 0 0">Setiap pautan juga boleh ada animasi sendiri (dalam tetingkap edit pautan).</p></div>
     <div class="edsec"><h3>Tulisan & saiz</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">${sel("ed-ft", "Jenis tulisan", FONTS.map(f => [f, f]), t.font)}${sel("ed-fs", "Saiz tulisan", [["s", "Kecil"], ["m", "Sederhana"], ["l", "Besar"]], t.fs || "m")}${sel("ed-sh", "Bentuk butang", [["pill", "Kapsul"], ["round", "Bulat sudut"], ["square", "Segi empat"]], t.shape || "pill")}${sel("ed-sz", "Saiz kad pautan", [["s", "Kecil"], ["m", "Sederhana"], ["l", "Besar"]], t.sz || "m")}</div></div>
+    <div class="edsec"><h3>Teks: fon, saiz, warna dan gradien</h3><p class="hint" style="margin:0">Laras nama, bio dan teks butang secara berasingan. Kosongkan fon untuk ikut design.</p>${[["n", "Nama"], ["b", "Bio"], ["l", "Teks butang"]].map(([k, label]) => { const o = (t.tx && t.tx[k]) || {}; return `<div class="txrow"><h4>${label}</h4><div class="txgrid">${sel("tx-" + k + "-f", "Fon", [["", "Ikut design"], ...FONTS.map(f => [f, f])], o.f || "")}<div><label class="lbl" for="tx-${k}-z">Saiz <b id="tx-${k}-zv">${o.z || 100}%</b></label><input id="tx-${k}-z" type="range" min="60" max="220" step="5" value="${o.z || 100}" style="width:100%;accent-color:#FF4D4D"></div><div><label class="lbl" for="tx-${k}-c">Warna</label><div style="display:flex;gap:6px"><input id="tx-${k}-c" type="color" value="${hex(o.c, "#FFFFFF")}" style="flex:1;height:44px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.07);padding:3px"><button type="button" class="chip" id="tx-${k}-cx" style="min-height:44px">Padam</button></div></div><div><label class="sc-net" style="margin-top:24px"><input type="checkbox" id="tx-${k}-g" ${o.g ? "checked" : ""}><span>Gradien</span></label></div><div id="tx-${k}-gr" style="display:${o.g ? "grid" : "none"};grid-column:1/-1;grid-template-columns:1fr 1fr;gap:10px">${col("tx-" + k + "-g1", "Gradien dari", o.g1 || "#FFD166")}${col("tx-" + k + "-g2", "Gradien ke", o.g2 || "#FF4D4D")}</div></div></div>`; }).join("")}</div>
     <button class="btn btn-red" id="ed-done" style="width:100%;min-height:50px;margin-top:18px">Siap</button>`, null, { side: true, cls: "wide" });
   const $e = id => $("#" + id, m);
   const check = () => { const th = S.profile.theme; const c = contrast(hex(th.text, "#000"), hex(th.bg1, "#fff")); $e("ed-ctr").textContent = c < 4.5 ? `Kontras tulisan/latar rendah (${c.toFixed(1)}:1). Pilih warna yang lebih berbeza.` : ""; };
@@ -1717,7 +1832,15 @@ function editDesign() {
   $e("ed-bt").onchange = e => { S.profile.theme.bgType = e.target.value; $e("ed-bgi").style.display = e.target.value === "image" ? "" : "none"; commit(); };
   [["ed-c1", "bg1"], ["ed-c2", "bg2"], ["ed-c3", "bg3"], ["ed-ct", "text"], ["ed-cb", "btn"]].forEach(([id, k]) => ($e(id).oninput = e => { S.profile.theme[k] = e.target.value; commit(); }));
   $e("ed-ov").oninput = e => { S.profile.theme.ov = +e.target.value; $e("ed-ovv").textContent = e.target.value + "%"; commit(); };
-  [["ed-ft", "font"], ["ed-fs", "fs"], ["ed-sh", "shape"], ["ed-sz", "sz"], ["ed-pat", "pat"], ["ed-bs", "bs"], ["ed-ba", "ba"], ["ed-en", "en"]].forEach(([id, k]) => ($e(id).onchange = e => { S.profile.theme[k] = e.target.value; commit(); }));
+  [["ed-ft", "font"], ["ed-fs", "fs"], ["ed-sh", "shape"], ["ed-sz", "sz"], ["ed-pat", "pat"], ["ed-bs", "bs"], ["ed-ba", "ba"], ["ed-en", "en"], ["ed-fx", "fx"], ["ed-fr", "fr"]].forEach(([id, k]) => ($e(id).onchange = e => { S.profile.theme[k] = e.target.value; commit(); }));
+  const txSet = (k, patch) => { const tx = (S.profile.theme.tx = S.profile.theme.tx || {}); tx[k] = { ...(tx[k] || {}), ...patch }; commit(); };
+  TXK.forEach(k => {
+    $e(`tx-${k}-f`).onchange = e => txSet(k, { f: e.target.value }); $e(`tx-${k}-z`).oninput = e => { $e(`tx-${k}-zv`).textContent = e.target.value + "%"; txSet(k, { z: +e.target.value }); };
+    $e(`tx-${k}-c`).oninput = e => txSet(k, { c: e.target.value }); $e(`tx-${k}-cx`).onclick = () => txSet(k, { c: "" });
+    $e(`tx-${k}-g`).onchange = e => { $e(`tx-${k}-gr`).style.display = e.target.checked ? "grid" : "none"; txSet(k, { g: e.target.checked, g1: $e(`tx-${k}-g1`).value, g2: $e(`tx-${k}-g2`).value }); };
+    $e(`tx-${k}-g1`).oninput = e => txSet(k, { g1: e.target.value }); $e(`tx-${k}-g2`).oninput = e => txSet(k, { g2: e.target.value });
+  });
+  $e("ed-bc").onchange = e => { S.profile.theme.bc = e.target.value !== "off"; commit(); };
   $e("ed-done").onclick = () => m.close(); check();
   const mo = new MutationObserver(() => { if (!document.body.contains(m)) { mo.disconnect(); if (S.view === "design") designTab(); } }); mo.observe(document.body, { childList: true });
 }
@@ -1899,8 +2022,14 @@ function metricoolView() {
 }
 
 /* ---------- Shorten link ---------- */
-const slugHandle = v => String(v || "").toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "").replace(/-{2,}/g, "-").slice(0, 24);
-const shortUrl = c => (c.includes("_") ? `${location.origin}/${c.split("_")[0]}/webapps/${c.split("_").slice(1).join("_")}` : `${location.origin}/s/${c}`);
+const slugHandle = v => String(v || "").slice(0, 20);
+const B32 = "abcdefghijklmnopqrstuvwxyz234567";
+const b32 = str => { const bytes = new TextEncoder().encode(str); let bits = "", out = ""; bytes.forEach(b => (bits += b.toString(2).padStart(8, "0"))); for (let i = 0; i < bits.length; i += 5) out += B32[parseInt(bits.slice(i, i + 5).padEnd(5, "0"), 2)]; return out; };
+const unb32 = enc => { let bits = ""; for (const c of enc) { const i = B32.indexOf(c); if (i < 0) return null; bits += i.toString(2).padStart(5, "0"); } const bytes = []; for (let i = 0; i + 8 <= bits.length; i += 8) bytes.push(parseInt(bits.slice(i, i + 8), 2)); try { return new TextDecoder("utf-8", { fatal: true }).decode(new Uint8Array(bytes)); } catch { return null; } };
+const shortId = (uc, slug) => `${uc}_--${b32(slug)}`;
+const shortSlug = code => { const rest = code.split("_").slice(1).join("_"); if (rest.startsWith("--")) return unb32(rest.slice(2)); return rest; };
+const shortUrl = c => (c.includes("_") ? `${location.origin}/${c.split("_")[0]}/webapps/${encodeURIComponent(shortSlug(c) ?? "")}` : `${location.origin}/s/${c}`);
+const shortDisp = c => (c.includes("_") ? `${location.host}/${c.split("_")[0]}/webapps/${shortSlug(c) ?? ""}` : `${location.host}/s/${c}`);
 async function loadShort() { const sn = await FB.getDocs(FB.query(FB.collection(db, "flashlink_short"), FB.where("uid", "==", S.user.uid))); S.short = sn.docs.map(d => ({ code: d.id, ...d.data() })).sort((a, b) => (a.order ?? 0) - (b.order ?? 0)); }
 async function shortTab() {
   const pane = $("#pane"); pane.innerHTML = `<div style="display:grid;place-items:center;padding:40px"><div class="spin" role="status" aria-label="Memuatkan"></div></div>`;
@@ -1909,33 +2038,34 @@ async function shortTab() {
     <div class="lbl" style="margin:16px 2px 8px"><span id="scount"></span></div><div id="slist" class="scrollbox"></div>`;
   const draw = () => {
     $("#scount").textContent = `Pautan pendek saya (${S.short.length})`;
-    $("#slist").innerHTML = S.short.length ? S.short.map(x => `<div class="srow glass" data-c="${x.code}"><span class="grip" title="Seret untuk susun" aria-label="Seret untuk susun">${ic("grip", "w-5 h-5")}</span><div class="srow-t"><b>${esc(x.name)}</b><a class="slink" href="${esc(shortUrl(x.code))}" target="_blank" rel="noopener">${esc(shortUrl(x.code).replace(/^https?:\/\//, ""))}</a></div><button class="btn btn-red btn-sm" data-cp="${x.code}" aria-label="Salin ${esc(x.name)}">${ic("copy", "w-4 h-4")}</button><button class="btn btn-ghost btn-sm" data-ed="${x.code}" aria-label="Edit ${esc(x.name)}">${ic("pencil", "w-4 h-4")}</button><button class="btn btn-ghost btn-sm" data-rm="${x.code}" aria-label="Buang ${esc(x.name)}">${ic("trash", "w-4 h-4")}</button></div>`).join("") : `<div class="glass" style="border-radius:16px;padding:22px;text-align:center;color:#9CA3AF">Belum ada pautan pendek. Tampal pautan di atas.</div>`;
+    $("#slist").innerHTML = S.short.length ? S.short.map(x => `<div class="srow glass" data-c="${x.code}"><span class="grip" title="Seret untuk susun" aria-label="Seret untuk susun">${ic("grip", "w-5 h-5")}</span><div class="srow-t"><b>${esc(x.name)}</b><a class="slink" href="${esc(shortUrl(x.code))}" target="_blank" rel="noopener">${esc(shortDisp(x.code))}</a></div><button class="btn btn-red btn-sm" data-cp="${x.code}" aria-label="Salin ${esc(x.name)}">${ic("copy", "w-4 h-4")}</button><button class="btn btn-ghost btn-sm" data-ed="${x.code}" aria-label="Edit ${esc(x.name)}">${ic("pencil", "w-4 h-4")}</button><button class="btn btn-ghost btn-sm" data-rm="${x.code}" aria-label="Buang ${esc(x.name)}">${ic("trash", "w-4 h-4")}</button></div>`).join("") : `<div class="glass" style="border-radius:16px;padding:22px;text-align:center;color:#9CA3AF">Belum ada pautan pendek. Tampal pautan di atas.</div>`;
     $$("[data-cp]").forEach(b => (b.onclick = () => copyText(shortUrl(b.dataset.cp))));
-    $$("[data-ed]").forEach(b => (b.onclick = () => { const x = S.short.find(z => z.code === b.dataset.ed); const mm = modal(`<h2 class="font-display" style="font-size:20px;font-weight:700;margin:0 0 10px">Edit pautan pendek</h2><label class="lbl" for="en">Nama</label><input id="en" class="inp" maxlength="60" value="${esc(x.name)}"><label class="lbl" for="eu" style="margin-top:10px">Pautan asal</label><input id="eu" class="inp" value="${esc(x.url)}" inputmode="url"><p class="hint">Pautan pendek ${esc(shortUrl(x.code).replace(/^https?:\/\//, ""))} kekal sama.</p><div id="ee" class="err"></div><button id="es" class="btn btn-red" style="width:100%;min-height:48px;margin-top:12px">Simpan</button>`); $("#es", mm).onclick = async () => { const nm = $("#en", mm).value.trim(), u = normUrl($("#eu", mm).value); if (!nm) return ($("#ee", mm).textContent = "Isi nama."); if (!u) return ($("#ee", mm).textContent = "Pautan tidak sah."); try { await FB.updateDoc(FB.doc(db, "flashlink_short", x.code), { name: nm.slice(0, 60), url: u }); x.name = nm.slice(0, 60); x.url = u; mm.close(); draw(); toast("Disimpan ✓"); } catch { $("#ee", mm).textContent = "Gagal menyimpan."; } }; }));
+    $$("[data-ed]").forEach(b => (b.onclick = () => { const x = S.short.find(z => z.code === b.dataset.ed); const mm = modal(`<h2 class="font-display" style="font-size:20px;font-weight:700;margin:0 0 10px">Edit pautan pendek</h2><label class="lbl" for="en">Nama</label><input id="en" class="inp" maxlength="60" value="${esc(x.name)}"><label class="lbl" for="eu" style="margin-top:10px">Pautan asal</label><input id="eu" class="inp" value="${esc(x.url)}" inputmode="url"><p class="hint">Pautan pendek ${esc(shortDisp(x.code))} kekal sama.</p><div id="ee" class="err"></div><button id="es" class="btn btn-red" style="width:100%;min-height:48px;margin-top:12px">Simpan</button>`); $("#es", mm).onclick = async () => { const nm = $("#en", mm).value.trim(), u = normUrl($("#eu", mm).value); if (!nm) return ($("#ee", mm).textContent = "Isi nama."); if (!u) return ($("#ee", mm).textContent = "Pautan tidak sah."); try { await FB.updateDoc(FB.doc(db, "flashlink_short", x.code), { name: nm.slice(0, 60), url: u }); x.name = nm.slice(0, 60); x.url = u; mm.close(); draw(); toast("Disimpan ✓"); } catch { $("#ee", mm).textContent = "Gagal menyimpan."; } }; }));
     $$("[data-rm]").forEach(b => (b.onclick = () => { const x = S.short.find(z => z.code === b.dataset.rm); modal(`<h2 style="font-size:19px;font-weight:700;margin:0 0 8px">Buang “${esc(x.name)}”?</h2><p style="color:#9CA3AF;margin:0 0 16px">Pautan pendek ini akan berhenti berfungsi.</p><div style="display:flex;gap:10px"><button class="btn btn-ghost" style="flex:1" data-x2>Batal</button><button class="btn btn-red" style="flex:1" id="yes">Buang</button></div>`, bg => { $("[data-x2]", bg).onclick = bg.close; $("#yes", bg).onclick = async () => { try { await FB.deleteDoc(FB.doc(db, "flashlink_short", x.code)); S.short = S.short.filter(z => z.code !== x.code); bg.close(); draw(); toast("Dibuang."); } catch { toast("Gagal membuang.", "bad"); } }; }); }));
     const L = $("#slist"); if (window.Sortable && S.short.length) { L._s && L._s.destroy(); L._s = Sortable.create(L, { handle: ".grip", animation: 160, ghostClass: "sortable-ghost", onEnd: async () => { const ids = $$("[data-c]", L).map(e => e.dataset.c); S.short = ids.map(i => S.short.find(z => z.code === i)); S.short.forEach((z, i) => (z.order = i)); try { const bt = FB.writeBatch(db); S.short.forEach((z, i) => bt.update(FB.doc(db, "flashlink_short", z.code), { order: i })); await bt.commit(); } catch { toast("Gagal simpan susunan.", "bad"); } } }); }
   };
   draw();
   $("#sadd").onclick = async () => {
     const nm = $("#sn").value.trim(), u = normUrl($("#su").value), er = $("#se"); er.textContent = "";
-    if (!S.profile.handle || S.profile.handle.length < 3) { er.innerHTML = `Isi <b>Username</b> (minimum 3 aksara) di Profil dahulu. <button type="button" class="linkbtn" id="gohn">Buka Profil</button>`; $("#gohn").onclick = () => openView("profile"); return; }
+    if (!S.profile.handle || !S.profile.handle.trim() || /^\.+$/.test(S.profile.handle.trim())) { er.innerHTML = `Isi <b>Username</b> di Profil dahulu (apa-apa aksara, tetapi bukan titik sahaja). <button type="button" class="linkbtn" id="gohn">Buka Profil</button>`; $("#gohn").onclick = () => openView("profile"); return; }
     if (!nm) return (er.textContent = "Isi nama pautan, cth. WhatsApp."); if (!u) return (er.textContent = "Pautan tidak sah. Mesti ada domain, cth. contoh.com/halaman.");
     const b = $("#sadd"); b.disabled = true;
     try {
       const order = S.short.length ? Math.max(...S.short.map(z => z.order ?? 0)) + 1 : 0; let made = null;
       const uc = S.profile.username, hd = S.profile.handle;
-      for (let i = 0; i < 40 && !made; i++) { const slug = i ? `${hd.slice(0, 36)}-${i + 1}` : hd, code = `${uc}_${slug}`; try { await FB.runTransaction(db, async tx => { const r = FB.doc(db, "flashlink_short", code); if ((await tx.get(r)).exists()) throw Object.assign(new Error("taken"), { code: "taken" }); tx.set(r, { uid: S.user.uid, name: nm.slice(0, 60), url: u, order, createdAt: FB.serverTimestamp() }); }); made = code; } catch (e) { if (e.code !== "taken") throw e; } }
+      for (let i = 0; i < 40 && !made; i++) { const slug = i ? `${hd}-${i + 1}` : hd; if (new TextEncoder().encode(slug).length > 23) throw Object.assign(new Error("panjang"), { code: "toolong" }); const code = shortId(uc, slug); try { await FB.runTransaction(db, async tx => { const r = FB.doc(db, "flashlink_short", code); if ((await tx.get(r)).exists()) throw Object.assign(new Error("taken"), { code: "taken" }); tx.set(r, { uid: S.user.uid, name: nm.slice(0, 60), url: u, order, createdAt: FB.serverTimestamp() }); }); made = code; } catch (e) { if (e.code !== "taken") throw e; } }
       if (!made) throw new Error("penuh");
       S.short.push({ code: made, uid: S.user.uid, name: nm.slice(0, 60), url: u, order }); $("#sn").value = ""; $("#su").value = ""; draw(); toast("Pautan dipendekkan ✓"); copyText(shortUrl(made));
-    } catch (e) { console.error(e); er.textContent = e.code === "permission-denied" ? "Kebenaran ditolak." : "Gagal memendekkan. Cuba lagi."; }
+    } catch (e) { console.error(e); er.textContent = e.code === "permission-denied" ? "Kebenaran ditolak." : e.code === "toolong" ? "Username terlalu panjang untuk pautan pendek (maksimum kira-kira 20 aksara)." : "Gagal memendekkan. Cuba lagi."; }
     b.disabled = false;
   };
 }
-async function shortView(code) {
+async function shortView(codes) {
+  codes = [].concat(codes);
   $("#app").innerHTML = `<div style="display:grid;place-items:center;min-height:100vh"><div style="text-align:center"><img src="/assets/icon.png" alt="" width="72" height="72" style="margin:0 auto 14px"><div class="spin" role="status" aria-label="Mengalihkan" style="margin:0 auto 12px"></div><p style="color:#C7C9D1">Mengalihkan…</p></div></div>`;
   if (!CONFIGURED) return notice("Flash Link belum disambung ke Firebase.");
   await initPromise;
-  try { const sn = await FB.getDoc(FB.doc(db, "flashlink_short", code)); if (!sn.exists()) return notFound(); const u = safeUrl(sn.data().url); if (!u) return notFound(); location.replace(u); }
+  try { for (const code of codes) { if (!/^[a-z0-9_-]{4,64}$/.test(code)) continue; const sn = await FB.getDoc(FB.doc(db, "flashlink_short", code)); if (!sn.exists()) continue; const u = safeUrl(sn.data().url); if (!u) return notFound(); return location.replace(u); } return notFound(); }
   catch { notice("Pautan tidak dapat dibuka. Cuba lagi sebentar."); }
 }
 
@@ -1959,7 +2089,7 @@ function linksTab() {
   drawLinks();
 }
 function rowIcon(l) {
-  const th = imgUrl(l.thumbnailUrl); if (th) return `<img src="${esc(th)}" alt="" width="40" height="40" style="width:40px;height:40px;border-radius:11px;object-fit:cover;flex:none">`;
+  const th = thOf(l); if (th) return `<img src="${esc(th)}" alt="" width="40" height="40" style="width:40px;height:40px;border-radius:11px;object-fit:cover;flex:none">`;
   if (l.type === "header") return `<span class="fl-bi" style="background:#64748B;color:#fff;width:40px;height:40px">${ic("heading", "w-5 h-5")}</span>`;
   if (l.type === "email_form") return `<span class="fl-bi" style="background:#EA4335;color:#fff;width:40px;height:40px">${ic("mail", "w-5 h-5")}</span>`;
   if (l.type === "product") return `<span class="fl-bi" style="background:#F59E0B;color:#111;width:40px;height:40px">${ic("bag", "w-5 h-5")}</span>`;
@@ -2050,7 +2180,7 @@ function linkModal({ link, platform, type } = {}) {
     const onUrl = debounce(async () => {
       const v = $m("mu").value.trim(); if (!v) return;
       if (isWeb) { const k = detectPlatform(v); if (k !== plat) { plat = k; B = BRANDS[k]; drawIcon(); if (!titleTouched || !$m("mt").value) { $m("mt").value = B.t; } $m("mdet").textContent = k !== "web" ? "Dikesan: " + B.n : ""; } }
-      if (!wantThumb || thTouched || t === "whatsapp") return;
+      if (!wantThumb || thTouched || t === "whatsapp" || (t !== "product" && SOCIAL_KEYS.includes(plat))) return;
       const u = normUrl(v); if (!u) return;
       status("Mencari gambar…"); const r = await fetchThumb(u); if (thTouched) return;
       if (r.image) { th = r.image; drawTh(); if (!layTouched) setLay("featured", true); status("Gambar dijumpai ✓ Anda boleh tukar dengan gambar sendiri."); } else status("Tiada gambar ditemui. Anda boleh muat naik sendiri.");
@@ -2083,7 +2213,7 @@ function profileTab() {
   $("#pane").innerHTML = `<div style="display:flex;flex-direction:column;gap:16px">
   <section class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Gambar & maklumat</h2>
     ${imgFieldHtml("f-av", "Gambar profil / hero", "round")}${imgFieldHtml("f-bn", "Banner (untuk gaya Banner)", "wide")}${imgQualityHtml("pq")}
-    ${inp("dn", "Nama paparan", p.displayName, "Tulis nama anda", 'maxlength="40"')}${inp("hn", "Username", p.handle, "cth. izzul", 'maxlength="24" autocapitalize="off" spellcheck="false"')}<p class="hint" style="margin:4px 0 0">Huruf kecil, nombor dan sempang. Digunakan di hujung pautan pendek anda.</p><div style="margin-top:12px"><label class="lbl" for="bio">Bio</label><textarea id="bio" class="inp" rows="2" maxlength="140" placeholder="Terangkan diri/kedai anda">${esc(p.bio)}</textarea></div></section>
+    ${inp("dn", "Nama paparan", p.displayName, "Tulis nama anda", 'maxlength="40"')}${inp("hn", "Username", p.handle, "cth. izzul", 'maxlength="20" autocapitalize="off" spellcheck="false"')}<p class="hint" style="margin:4px 0 0">Bebas: huruf, nombor, simbol, garis bawah, tanda seru, titik, sempang atau garis condong. Digunakan di hujung pautan pendek anda (maksimum 20 aksara).</p><div style="margin-top:12px"><label class="lbl" for="bio">Bio</label><textarea id="bio" class="inp" rows="2" maxlength="140" placeholder="Terangkan diri/kedai anda">${esc(p.bio)}</textarea></div></section>
   <section class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Gaya profil</h2><p class="hint" style="margin:0 0 10px">Pilih rupa kepala halaman anda, seperti profil premium.</p>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px">${STYLES.map(([k, n, d]) => `<button type="button" class="stybtn" data-s="${k}" aria-pressed="${(p.profileStyle || "classic") === k}"><span class="stymini sty-${k}"><i></i><b></b></span><span style="font-weight:700;font-size:14px">${n}</span><small style="color:#C7C9D1;font-size:11.5px;line-height:1.3">${d}</small></button>`).join("")}</div></section>
   <section class="glass" id="pwsec" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Kata laluan</h2><p class="hint" style="margin:0 0 10px">E-mel log masuk: <b>${esc(S.user.email || "")}</b>. Kata laluan disimpan dengan selamat (di-hash) oleh Firebase, jadi tidak boleh dipaparkan semula. Gunakan ikon mata semasa menaip untuk menyemak apa yang anda taip. Lupa kata laluan? Guna "Lupa kata laluan?" di halaman log masuk.</p><button type="button" class="btn btn-ghost" id="pwopen">${ic("eye", "w-4 h-4")} Tukar kata laluan</button></section>
@@ -2261,7 +2391,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-47";
+const APP_VERSION = "V-50";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
@@ -2317,7 +2447,10 @@ new MutationObserver(() => renderUpdateBtn()).observe($("#app"), { childList: tr
    Pangkalan jawapan dibina daripada pendaftaran sebenar app (NAV, DESIGNS, STYLES, TPL, BRANDS, APP_VERSION),
    jadi ciri baharu yang didaftarkan di situ masuk sendiri. Ciri tanpa pendaftaran: tambah di CB_EXTRA. */
 const CB_EXTRA = [
-  { k: "shorten pendek short ringkas username webapps", q: "Shorten link", a: "Isi Username dahulu di Profil. Kemudian di Shorten link: isi nama (cth. WhatsApp) dan tampal pautan panjang. Pautan pendek berbentuk alamat/kod-anda/webapps/username-anda. Setiap baris ada butang salin, edit, buang, dan pemegang di kiri untuk susun.", go: "short" },
+  { k: "shorten pendek short ringkas username webapps", q: "Shorten link", a: "Isi Username dahulu di Profil (boleh guna apa-apa aksara: huruf, nombor, simbol, garis bawah, tanda seru, titik, sempang, garis condong; maksimum 20). Kemudian di Shorten link: isi nama dan tampal pautan panjang. Pautan pendek berbentuk alamat/kod-anda/webapps/username-anda. Setiap baris ada butang salin, edit, buang, dan pemegang untuk susun.", go: "short" },
+  { k: "teks font fon saiz warna gradien nama bio butang huruf", q: "Gaya teks", a: "Buka mana-mana design (klik kadnya), skrol ke bahagian Teks. Nama, bio dan teks butang masing-masing boleh ditukar fon, saiz, warna dan gradien.", go: "design" },
+  { k: "jam masa waktu tarikh hijri hijrah masihi", q: "Jam dan tarikh", a: "Jam di penjuru kanan atas menunjuk waktu Malaysia (12 jam), tarikh Masihi dan tarikh Hijri rasmi JAKIM." },
+  { k: "logo thumbnail gambar kecil butang jenama warna whatsapp tiktok facebook", q: "Logo dan warna butang", a: "Pautan media sosial hanya menunjuk logo jenama dan warna jenama (WhatsApp hijau, Facebook biru, dll). Gambar kecil (thumbnail) hanya untuk produk, pautan affiliate dan laman web; kalau tiada, butang hanya ada teks." },
   { k: "terbit terbitkan publish design salin pautan diterbitkan draf", q: "Terbitkan design", a: "Anda boleh buat design sebanyak mana pun (tiada had). Pilih satu dan tekan Terbit: itulah design yang dipaparkan pada Pautan anda (butang Salin pautan). Design lain kekal sebagai draf. Tukar design terbitan bila-bila masa.", go: "design" },
   { k: "crop potong laras zum zoom gambar pecah kabur 4k kualiti resolusi tajam jelas 1080", q: "Gambar & kualiti", a: "Setiap gambar ada butang Laras (seret, zum, kiri/kanan/atas/bawah). Kualiti gambar ada pilihan Auto (ikut peranti anda), 1080p, 2K atau 4K, di Profil atau dalam tetingkap Laras. Gambar baharu disimpan pada kualiti itu (tidak dibesarkan melebihi saiz asal). Gambar lama yang sudah kecil: muat naik semula.", go: "profile" },
   { k: "pautan tambah link url tampal platform logo", q: "Tambah pautan", a: "Pergi Pautan, tekan Tambah, tampal URL atau pilih platform. Logo dan gambar kecil dikesan automatik. Seret untuk susun. Boleh pilih bentuk bar atau featured.", go: "links" },
@@ -2384,7 +2517,7 @@ function route() {
   if (p === "/login") return loginView();
   if (p === "/dashboard") return dashView();
   if (seg.length === 2 && seg[0] === "s" && /^[a-z0-9]{4,12}$/.test(seg[1])) return shortView(seg[1]);
-  if (seg.length === 3 && seg[1] === "webapps" && /^[a-z0-9]{4,12}$/.test(seg[0]) && /^[a-z0-9-]{3,40}$/.test(seg[2])) return shortView(seg[0] + "_" + seg[2]);
+  if (seg.length === 3 && seg[1] === "webapps" && /^[a-z0-9]{4,12}$/.test(seg[0])) { let sl = seg[2]; try { sl = decodeURIComponent(seg[2]); } catch {} return shortView([shortId(seg[0], sl), seg[0] + "_" + sl]); }
   if (seg.length === 1 && USER_RE.test(seg[0]) && !RESERVED.has(seg[0])) return publicView(seg[0]);
   notFound();
 }
