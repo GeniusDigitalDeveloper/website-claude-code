@@ -909,8 +909,8 @@ document.addEventListener("click", async e => { const b = e.target.closest && e.
 const RESERVED = new Set(["s","admin","login","logout","dashboard","signup","register","daftar","api","app","assets","static","public","demo","flash","flashlink","flash-link","help","support","settings","terms","privacy","about","index","null","undefined","root","www","mail","staff","system","test","user","users","profile","me","home","firebase","__"]);
 const USER_RE = /^[a-z0-9_]{3,20}$/;
 const FONTS = ["Inter", "Poppins", "Space Grotesk", "Playfair Display", "Nunito", "DM Sans", "Montserrat", "Oswald", "Bebas Neue", "Lora", "Raleway", "Roboto Slab", "Pacifico", "Cormorant Garamond", "Syne", "Archivo Black", "DM Serif Display", "Sora", "Orbitron", "Rajdhani", "Press Start 2P", "Instrument Serif", "Bricolage Grotesque", "Anton", "Amiri", "Reem Kufi", "Aref Ruqaa", "Cinzel"];
-const BSTYLES = [["solid", "Pepejal"], ["glass", "Kaca"], ["outline", "Garisan"], ["hard", "Blok (bayang keras)"], ["conic", "Garisan neon berputar"], ["editorial", "Editorial (bernombor)"], ["ticket", "Tiket"], ["orn", "Ornamen emas"], ["flame", "Api"]];
-const FX_NAMES = [["", "Tiada"], ["aurora", "Aurora"], ["embers", "Bunga api"], ["gamegrid", "Grid gaming"], ["stars", "Bintang & bulan"], ["islamic", "Ornamen Islamik"], ["orbs", "Orbit kaca"], ["petals", "Kelopak sakura"], ["fireflies", "Kelip-kelip"], ["waves", "Ombak"]];
+const BSTYLES = [["solid", "Pepejal"], ["glass", "Kaca"], ["outline", "Garisan"], ["hard", "Blok (bayang keras)"], ["conic", "Garisan neon berputar"], ["editorial", "Editorial (bernombor)"], ["ticket", "Tiket"], ["flame", "Api"]];
+const FX_NAMES = [["", "Tiada"], ["aurora", "Aurora"], ["embers", "Bunga api"], ["stars", "Bintang & bulan"], ["orbs", "Orbit kaca"], ["petals", "Kelopak sakura"], ["fireflies", "Kelip-kelip"], ["waves", "Ombak"]];
 const FR_NAMES = [["", "Bulat (lalai)"], ["arch", "Gerbang (mihrab)"], ["hex", "Heksagon"], ["squircle", "Squircle"]];
 const PATS = { grid: "linear-gradient(color-mix(in srgb,var(--text) 9%,transparent) 1px,transparent 1px) 0 0/30px 30px,linear-gradient(90deg,color-mix(in srgb,var(--text) 9%,transparent) 1px,transparent 1px) 0 0/30px 30px", dots: "radial-gradient(color-mix(in srgb,var(--text) 18%,transparent) 1.5px,transparent 1.7px) 0 0/22px 22px", stripes: "repeating-linear-gradient(135deg,color-mix(in srgb,var(--text) 8%,transparent) 0 2px,transparent 2px 15px)" };
 const ANIMS = [["", "Tiada"], ["bounce", "Pantul"], ["wobble", "Goyang"], ["pulse", "Denyut"], ["shake", "Gegar"], ["shine", "Kilau"], ["glow", "Bercahaya"], ["float", "Terapung"]];
@@ -1221,9 +1221,7 @@ const DESIGNS = [
   { id: "mini", n: "Laman Mini", d: "Hero, servis, testimoni", tpl: "landing" },
   { id: "hero", n: "Foto Hero", d: "Gambar penuh di atas + overlay", tpl: "minimal", sty: "hero", theme: { bgType: "solid", bg1: "#0E1116", bg2: "#0E1116", text: "#F4F4F5", btn: "#F4F4F5", shape: "round", font: "Poppins" } },
   { id: "cover", n: "Foto Penuh Kaca", d: "Gambar jadi latar penuh", tpl: "dark", sty: "cover" },
-  { id: "n-poster-islam", n: "Poster Islamik", d: "Hero penuh, ornamen emas bergerak", tpl: "poster", sty: "hero", theme: { bg1: "#063B2E", bg2: "#021410", btn: "#E8C468", font: "Amiri", fx: "islamic" } },
   { id: "n-editorial", n: "Editorial", d: "Senarai bernombor gaya majalah", tpl: "minimal", theme: { bgType: "solid", bg1: "#FAF7F2", bg2: "#FAF7F2", text: "#111111", btn: "#111111", font: "Instrument Serif", shape: "square", bs: "editorial", fs: "l" } },
-  { id: "n-kaligrafi", n: "Kaligrafi Krim", d: "Kertas krim, fon kaligrafi, ornamen emas", tpl: "minimal", theme: { bgType: "solid", bg1: "#F4EAD5", bg2: "#F4EAD5", text: "#3B2A10", btn: "#9A6B1C", font: "Aref Ruqaa", shape: "round", bs: "orn", fr: "arch", en: "fade" } },
   { id: "t-aura", n: "Aura", d: "Krim berfon serif, kaca", tpl: "minimal", theme: { bgType: "gradient", bg1: "#DEDDD0", bg2: "#C6C5B6", text: "#2B2B26", btn: "#FFFFFF", font: "Lora", shape: "pill", bs: "glass" } },
   { id: "f-putih", n: "Formal Putih", d: "Putih bersih, butang bergaris", tpl: "minimal", sty: "classic", theme: {bgType: "solid", bg1: "#FFFFFF", bg2: "#FFFFFF", text: "#0F172A", btn: "#0F172A", font: "Inter", shape: "square", bs: "outline", bc: false} },
   { id: "f-korporat", n: "Korporat Biru", d: "Banner, biru lembut dan butang biru tua", tpl: "minimal", sty: "banner", theme: {bgType: "gradient", bg1: "#F4F8FF", bg2: "#E3ECFA", text: "#0B2447", btn: "#1D4ED8", font: "Poppins", shape: "round", bs: "solid", bc: false} },
@@ -1241,7 +1239,9 @@ const DESIGNS = [
   { id: "f-arang", n: "Arang Eksekutif", d: "Kelabu arang, butang kaca", tpl: "minimal", sty: "classic", theme: {bgType: "solid", bg1: "#1C1F24", bg2: "#1C1F24", text: "#E5E7EB", btn: "#9CA3AF", font: "Inter", shape: "round", bs: "glass", bc: false} },
   { id: "f-pasir", n: "Pasir Hangat", d: "Gambar di kiri, warna pasir", tpl: "minimal", sty: "side", theme: {bgType: "gradient", bg1: "#F7EFE5", bg2: "#EBD9C3", text: "#3A2B1D", btn: "#A47148", font: "Lora", shape: "pill", bs: "outline", bc: false} },
 ];
-const designTheme = d => ({ ...TPL[d.tpl].theme, ...(d.theme || {}), ov: d.ov ?? 70, auto: false });
+const noPat = t => { if (t && typeof t === "object") { if (t.fx === "islamic" || t.fx === "gamegrid") t.fx = ""; t.pat = ""; if (t.bs === "orn") t.bs = "solid"; } return t; };
+Object.values(TPL).forEach(x => noPat(x.theme));
+const designTheme = d => noPat( ({ ...TPL[d.tpl].theme, ...(d.theme || {}), ov: d.ov ?? 70, auto: false }));
 const mkTheme = (tpl, accent) => { const t = { ...TPL[tpl].theme, auto: true }; if (accent) { t.btn = accent; t.auto = false; if (tpl === "minimal") t.auto = false; } return t; };
 
 /* ---------- Firebase (dimuat hanya jika config sah) ---------- */
@@ -1289,9 +1289,9 @@ async function loadProfile() {
 }
 function normProfile(p) {
   const tpl = TPL[p.template] ? p.template : "minimal";
-  const out = { username: "", displayName: "", bio: "", avatarUrl: "", bannerUrl: "", socialIcons: [], testimonials: [], profileStyle: "classic", plan: "free", ...p, template: tpl, theme: { ...TPL[tpl].theme, auto: false, ...(p.theme || {}) } };
+  const out = { username: "", displayName: "", bio: "", avatarUrl: "", bannerUrl: "", socialIcons: [], testimonials: [], profileStyle: "classic", plan: "free", ...p, template: tpl, theme: noPat({ ...TPL[tpl].theme, auto: false, ...(p.theme || {}) }) };
   const ds = Array.isArray(p.designs) ? p.designs.filter(d => d && d.id && TPL[d.template]) : [];
-  out.designs = ds.length ? ds.map(d => ({ ...d, profileStyle: d.profileStyle || "classic", theme: { ...TPL[d.template].theme, auto: false, ...(d.theme || {}) } })) : [{ id: "d1", name: "Design 1", template: tpl, profileStyle: out.profileStyle, theme: JSON.parse(JSON.stringify(out.theme)) }];
+  out.designs = ds.length ? ds.map(d => ({ ...d, profileStyle: d.profileStyle || "classic", theme: noPat({ ...TPL[d.template].theme, auto: false, ...(d.theme || {}) }) })) : [{ id: "d1", name: "Design 1", template: tpl, profileStyle: out.profileStyle, theme: JSON.parse(JSON.stringify(out.theme)) }];
   out.activeDesign = out.designs.some(d => d.id === p.activeDesign) ? p.activeDesign : out.designs[0].id;
   out.publishedDesign = out.designs.some(d => d.id === p.publishedDesign) ? p.publishedDesign : out.activeDesign;
   out.handle = typeof p.handle === "string" ? p.handle : ""; out.imgOrig = p.imgOrig && typeof p.imgOrig === "object" ? p.imgOrig : {};
@@ -2154,7 +2154,7 @@ function editDesign(snap0) {
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px">${col("ed-c1", "Warna latar 1", t.bg1)}${col("ed-c2", "Warna latar 2", t.bg2)}${col("ed-c3", "Warna latar 3 (mesh)", t.bg3 || t.bg2)}${col("ed-ct", "Warna tulisan", t.text)}${col("ed-cb", "Warna butang / aksen", t.btn)}</div>
       <div id="ed-bgi" style="${t.bgType === "image" ? "" : "display:none"}">${imgFieldHtml("ed-bg", "Gambar latar", "round")}</div><div id="ed-ctr" class="err"></div>
       <label class="lbl" for="ed-ov" style="margin-top:12px">Overlay gambar: <b id="ed-ovv">${Math.round(t.ov ?? 70)}%</b> <span style="font-weight:400;color:#9CA3AF">(warna ikut latar)</span></label><input id="ed-ov" type="range" min="0" max="100" step="5" value="${Math.round(t.ov ?? 70)}" style="width:100%;accent-color:#FF4D4D"></div>
-    <div class="edsec"><h3>Corak & gaya butang</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">${sel("ed-pat", "Corak latar", PAT_NAMES, t.pat || "")}${sel("ed-bs", "Gaya butang", BSTYLES, t.bs || "solid")}</div><p class="hint" style="margin:8px 0 0">Gaya butang terpakai pada susun atur senarai (Minimalis, Gelap dan Laman Mini).</p>
+    <div class="edsec"><h3>Gaya butang</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">${sel("ed-bs", "Gaya butang", BSTYLES, t.bs || "solid")}</div><p class="hint" style="margin:8px 0 0">Gaya butang terpakai pada susun atur senarai (Minimalis, Gelap dan Laman Mini).</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">${sel("ed-fx", "Kesan latar bergerak", FX_NAMES, t.fx || "")}${sel("ed-fr", "Bingkai gambar profil", FR_NAMES, t.fr || "")}</div><div style="margin-top:12px">${sel("ed-bc", "Warna butang ikut jenama (WhatsApp hijau, Facebook biru, dll)", [["on", "Ya"], ["off", "Tidak"]], t.bc === false ? "off" : "on")}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">${sel("ed-ba", "Animasi semua butang", ANIMS, t.ba || "")}${sel("ed-en", "Animasi kemunculan", ENTRANCES, t.en || "up")}</div><p class="hint" style="margin:8px 0 0">Setiap pautan juga boleh ada animasi sendiri (dalam tetingkap edit pautan).</p></div>
     <div class="edsec"><h3>Tulisan & saiz</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">${sel("ed-ft", "Jenis tulisan", FONTS.map(f => [f, f]), t.font)}${sel("ed-fs", "Saiz tulisan", [["s", "Kecil"], ["m", "Sederhana"], ["l", "Besar"]], t.fs || "m")}${sel("ed-sh", "Bentuk butang", [["pill", "Kapsul"], ["round", "Bulat sudut"], ["square", "Segi empat"]], t.shape || "pill")}${sel("ed-sz", "Saiz kad pautan", [["s", "Kecil"], ["m", "Sederhana"], ["l", "Besar"]], t.sz || "m")}</div></div>
     <div class="edsec"><h3>Teks: fon, saiz, warna dan gradien</h3><p class="hint" style="margin:0">Laras nama, bio dan teks butang secara berasingan. Kosongkan fon untuk ikut design.</p>${[["n", "Nama"], ["b", "Bio"], ["l", "Teks butang"]].map(([k, label]) => { const o = (t.tx && t.tx[k]) || {}; return `<div class="txrow"><h4>${label}</h4><div class="txgrid">${sel("tx-" + k + "-f", "Fon", [["", "Ikut design"], ...FONTS.map(f => [f, f])], o.f || "")}<div><label class="lbl" for="tx-${k}-z">Saiz <b id="tx-${k}-zv">${o.z || 100}%</b></label><input id="tx-${k}-z" type="range" min="60" max="220" step="5" value="${o.z || 100}" style="width:100%;accent-color:#FF4D4D"></div><div><label class="lbl" for="tx-${k}-c">Warna</label><div style="display:flex;gap:6px"><input id="tx-${k}-c" type="color" value="${hex(o.c, "#FFFFFF")}" style="flex:1;height:44px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.07);padding:3px"><button type="button" class="chip" id="tx-${k}-cx" style="min-height:44px">Padam</button></div></div><div><label class="sc-net" style="margin-top:24px"><input type="checkbox" id="tx-${k}-g" ${o.g ? "checked" : ""}><span>Gradien</span></label></div><div id="tx-${k}-gr" style="display:${o.g ? "grid" : "none"};grid-column:1/-1;grid-template-columns:1fr 1fr;gap:10px">${col("tx-" + k + "-g1", "Gradien dari", o.g1 || "#FFD166")}${col("tx-" + k + "-g2", "Gradien ke", o.g2 || "#FF4D4D")}</div></div></div>`; }).join("")}</div>
@@ -2174,7 +2174,7 @@ function editDesign(snap0) {
   $e("ed-bt").onchange = e => { S.profile.theme.bgType = e.target.value; $e("ed-bgi").style.display = e.target.value === "image" ? "" : "none"; commit(); };
   [["ed-c1", "bg1"], ["ed-c2", "bg2"], ["ed-c3", "bg3"], ["ed-ct", "text"], ["ed-cb", "btn"]].forEach(([id, k]) => ($e(id).oninput = e => { S.profile.theme[k] = e.target.value; commit(); }));
   $e("ed-ov").oninput = e => { S.profile.theme.ov = +e.target.value; $e("ed-ovv").textContent = e.target.value + "%"; commit(); };
-  [["ed-ft", "font"], ["ed-fs", "fs"], ["ed-sh", "shape"], ["ed-sz", "sz"], ["ed-pat", "pat"], ["ed-bs", "bs"], ["ed-ba", "ba"], ["ed-en", "en"], ["ed-fx", "fx"], ["ed-fr", "fr"]].forEach(([id, k]) => ($e(id).onchange = e => { S.profile.theme[k] = e.target.value; commit(); }));
+  [["ed-ft", "font"], ["ed-fs", "fs"], ["ed-sh", "shape"], ["ed-sz", "sz"], ["ed-bs", "bs"], ["ed-ba", "ba"], ["ed-en", "en"], ["ed-fx", "fx"], ["ed-fr", "fr"]].forEach(([id, k]) => ($e(id).onchange = e => { S.profile.theme[k] = e.target.value; commit(); }));
   const txSet = (k, patch) => { const tx = (S.profile.theme.tx = S.profile.theme.tx || {}); tx[k] = { ...(tx[k] || {}), ...patch }; commit(); };
   TXK.forEach(k => {
     $e(`tx-${k}-f`).onchange = e => txSet(k, { f: e.target.value }); $e(`tx-${k}-z`).oninput = e => { $e(`tx-${k}-zv`).textContent = e.target.value + "%"; txSet(k, { z: +e.target.value }); };
@@ -2735,7 +2735,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-68";
+const APP_VERSION = "V-69";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
