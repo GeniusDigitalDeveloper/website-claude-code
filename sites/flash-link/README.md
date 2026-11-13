@@ -29,3 +29,6 @@ Medan tambahan dalam `flashlink_users`: `bannerUrl`, `testimonials[]`.
 ## Had diketahui
 - SEO/Open Graph dijana oleh JS (Spark, tiada Cloud Functions) — pengecam pautan yang tak jalankan JS tidak nampak avatar.
 - Tiada muat naik fail: imej guna URL.
+
+## Statistik masa nyata (footer)
+RTDB `flashlink/stats/{users,total,daily/YYYY-MM-DD,monthly/YYYY-MM}`. Setiap sesi pelayar menaikkan hari + bulan + keseluruhan serentak (waktu Malaysia, UTC+8), jadi "reset" 12 malam dan awal bulan berlaku melalui kunci tarikh — tiada Cloud Functions. Dipaparkan dengan `onValue` (masa nyata). Kaunter dibuka kepada klien (+1 sahaja), maka angka boleh dipalsukan oleh pihak yang berniat jahat; ia untuk paparan, bukan bil.

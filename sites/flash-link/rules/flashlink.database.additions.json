@@ -1,8 +1,11 @@
 "flashlink": {
-  "live": {
-    "$uid": {
-      ".read": "auth != null && auth.uid == $uid",
-      ".write": true
-    }
+  "live": { "$uid": { ".read": "auth != null && auth.uid == $uid", ".write": true } },
+  "stats": {
+    ".read": true,
+    "users": { ".write": "<+1 sahaja>" },
+    "total": { ".write": "<+1 sahaja>" },
+    "daily": { "$day": { ".write": "<kunci YYYY-MM-DD + 1 sahaja>" } },
+    "monthly": { "$month": { ".write": "<kunci YYYY-MM + 1 sahaja>" } }
   }
 }
+// Versi penuh sebenar: rules/database.rules.merged.json

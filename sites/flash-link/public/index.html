@@ -487,23 +487,43 @@ async function publicView(username) {
 function notFound(u) { $("#app").innerHTML = `<main class="container" style="text-align:center;padding:96px 16px"><img src="/assets/icon.png" width="96" height="96" alt="Flash Link" class="logo-glow" style="margin:0 auto"><h1 class="font-display" style="font-size:28px;margin:20px 0 8px;font-weight:700">${u ? "@" + esc(u) + " belum wujud" : "Halaman tidak dijumpai"}</h1><p style="color:#9CA3AF">${u ? "Nama ini masih kosong. Tuntut sekarang sebelum orang lain!" : "Pautan ini tidak sah."}</p><a class="btn btn-red" style="margin-top:20px" href="/${u ? "login" : ""}" data-nav>${u ? "Tuntut nama ini" : "Ke laman utama"}</a></main>${siteFooter()}`; fillStat(); }
 function notice(m) { $("#app").innerHTML = `<main class="container" style="text-align:center;padding:96px 16px"><img src="/assets/icon.png" width="80" height="80" alt="" style="margin:0 auto"><p style="margin-top:16px;max-width:420px;margin-inline:auto">${esc(m)}</p></main>`; }
 
-/* ---------- Footer tapak + statistik jumlah pengguna ---------- */
+/* ---------- Statistik masa nyata (RTDB: flashlink/stats) + footer ----------
+   Setiap lawatan (sekali setiap sesi pelayar) menaikkan TIGA kaunter serentak: hari, bulan, keseluruhan.
+   - Harian: kunci tarikh waktu Malaysia (UTC+8) => "reset" automatik tepat 12 malam.
+   - Bulanan: kunci bulan => jumlah semua hari dalam bulan itu, "reset" automatik pada awal bulan.
+   - Keseluruhan: jumlah semua bulan. Tiada kerja berjadual / Cloud Functions diperlukan (kekal Spark). */
+const mytKeys = () => { const t = new Date(Date.now() + 8 * 36e5).toISOString(); return { d: t.slice(0, 10), m: t.slice(0, 7) }; };
+const msToMidnight = () => 864e5 - ((Date.now() + 8 * 36e5) % 864e5) + 300;
+const fmtN = n => (Number(n) || 0).toLocaleString("ms-MY");
+let statCache = {}; try { statCache = JSON.parse(localStorage.getItem("fl_stats") || "{}"); } catch {}
+let statOff = [], statTimer = 0;
+const bump = path => FB.rt.runTransaction(FB.rt.ref(rtdb, path), v => (v || 0) + 1).catch(() => {});
+async function countVisit() {
+  await initPromise; if (!rtdb) return;
+  try { if (sessionStorage.getItem("fl_vis")) return; sessionStorage.setItem("fl_vis", "1"); } catch {}
+  const k = mytKeys();
+  bump("flashlink/stats/total"); bump(`flashlink/stats/monthly/${k.m}`); bump(`flashlink/stats/daily/${k.d}`);
+}
 function siteFooter() {
-  return `<footer class="container" style="padding:32px 16px 44px;text-align:center;border-top:1px solid var(--line);margin-top:8px">
-    <img src="/assets/icon.png" alt="" width="40" height="40" style="margin:0 auto 12px;height:40px;width:40px">
-    <div class="glass" id="ustat" hidden style="display:none;align-items:center;justify-content:center;gap:10px;margin:0 auto 18px;padding:10px 18px;border-radius:999px;width:fit-content;max-width:100%">${ic("users", "w-5 h-5")}<span><b class="font-display" id="ucount" style="font-size:20px;color:#fff">0</b> <span style="color:#D1D5DB">pengguna berdaftar</span></span></div>
+  const it = (id, l) => `<div><div id="${id}" class="font-display" style="font-size:15px;font-weight:600;color:#fff;font-variant-numeric:tabular-nums;line-height:1.3">${fmtN(statCache[id])}</div><div style="font-size:11px;color:#9CA3AF;letter-spacing:.03em">${l}</div></div>`;
+  return `<footer class="container" style="padding:28px 16px 44px;text-align:center;border-top:1px solid var(--line);margin-top:8px">
+    <img src="/assets/icon.png" alt="" width="36" height="36" style="margin:0 auto 14px;height:36px;width:36px">
+    <div id="ustat" aria-label="Statistik Flash Link" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px;max-width:520px;margin:0 auto 18px">${it("s_users", "Pengguna")}${it("s_day", "Pelawat hari ini")}${it("s_month", "Pelawat bulan ini")}${it("s_total", "Pelawat keseluruhan")}</div>
     <p style="margin:0 0 6px;color:#E5E7EB;font-weight:600;font-size:14.5px">Hak Cipta Terpelihara Genius Digital / Flash Link 2026</p>
     <p style="margin:0;color:#9CA3AF;font-size:14px">Memacu Inovasi Digital Melalui Sistem Pintar, Kreatif dan Efisien.</p></footer>`;
 }
-async function fillStat() {
-  const box = $("#ustat"); if (!box || !CONFIGURED) return;
-  let n = null; try { n = JSON.parse(sessionStorage.getItem("fl_ucount") || "null"); } catch {}
-  try {
-    if (n === null) { await initPromise; if (!db) return; n = (await FB.getCountFromServer(FB.collection(db, "flashlink_users"))).data().count; try { sessionStorage.setItem("fl_ucount", JSON.stringify(n)); } catch {} }
-  } catch (e) { console.error(e); return; }
-  const el = $("#ucount"); if (!el || !box.isConnected) return;
-  box.hidden = false; box.style.display = "flex"; el.textContent = n.toLocaleString("ms-MY");
-  if (n > 0 && !matchMedia("(prefers-reduced-motion:reduce)").matches) { const t0 = performance.now(); const step = t => { const k = Math.min(1, (t - t0) / 900); el.textContent = Math.round(n * (1 - (1 - k) ** 3)).toLocaleString("ms-MY"); if (k < 1 && el.isConnected) requestAnimationFrame(step); }; requestAnimationFrame(step); }
+function fillStat() {
+  statOff.forEach(f => { try { f(); } catch {} }); statOff = []; clearTimeout(statTimer);
+  if (!$("#ustat")) return;
+  initPromise.then(() => {
+    if (!rtdb || !$("#ustat")) return;
+    const R = FB.rt, k = mytKeys();
+    const put = (id, v) => { const n = Number(v) || 0; statCache[id] = n; const el = $("#" + id); if (el) el.textContent = fmtN(n); try { localStorage.setItem("fl_stats", JSON.stringify(statCache)); } catch {} };
+    const sub = (id, path) => statOff.push(R.onValue(R.ref(rtdb, path), s => put(id, s.val()), () => {}));
+    sub("s_users", "flashlink/stats/users"); sub("s_total", "flashlink/stats/total");
+    sub("s_month", `flashlink/stats/monthly/${k.m}`); sub("s_day", `flashlink/stats/daily/${k.d}`);
+    statTimer = setTimeout(fillStat, msToMidnight()); // tukar ke kunci hari baharu tepat 12 malam
+  });
 }
 
 /* ---------- Pandangan: landing ---------- */
@@ -664,6 +684,7 @@ async function publish() {
       tx.set(ur, { uid, createdAt: FB.serverTimestamp() });
       tx.set(FB.doc(db, "flashlink_users", uid), profile);
     });
+    bump("flashlink/stats/users");
     const defs = [];
     if (W.q.whatsapp.trim()) defs.push({ type: "whatsapp", title: "WhatsApp saya", url: waLink(W.q.whatsapp) });
     if (W.q.shopee.trim()) defs.push({ type: "link", title: "Kedai Shopee", url: normUrl(W.q.shopee) });
@@ -874,6 +895,7 @@ function route() {
 document.addEventListener("click", e => { const a = e.target.closest("a[data-nav]"); if (!a || e.metaKey || e.ctrlKey) return; e.preventDefault(); nav(a.getAttribute("href")); });
 addEventListener("popstate", route);
 const initPromise = initFirebase().catch(e => { console.error(e); authReadyRes(); toast("Gagal menyambung ke Firebase. Semak config.", "bad"); });
+initPromise.then(countVisit);
 route();
 </script>
 </body>
