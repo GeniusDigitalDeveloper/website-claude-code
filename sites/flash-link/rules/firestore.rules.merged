@@ -621,7 +621,9 @@ service cloud.firestore {
       allow get: if true;
       allow list: if request.auth != null && resource.data.uid == request.auth.uid;
       allow create: if request.auth != null && request.resource.data.uid == request.auth.uid
-        && code.matches('^[a-z0-9]{4,12}$')
+        && (code.matches('^[a-z0-9]{4,12}$')
+            || (code.matches('^[a-z0-9]{4,12}_[a-z0-9-]{3,40}$')
+                && get(/databases/$(database)/documents/flashlink_users/$(request.auth.uid)).data.username == code.split('_')[0]))
         && request.resource.data.keys().hasOnly(['uid','name','url','order','createdAt'])
         && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 60
         && request.resource.data.url is string && request.resource.data.url.size() <= 2000

@@ -558,6 +558,29 @@ html,body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;t
 .fl-ba-glow [data-link]:not([data-an]),[data-link][data-an="glow"]{animation:flGlow 2.2s ease-in-out infinite}
 .fl-ba-float [data-link]:not([data-an]),[data-link][data-an="float"]{animation:flFloat 3.2s ease-in-out infinite}
 @media (prefers-reduced-motion:reduce){[data-link],[data-link]::after{animation:none!important}.fl-en-pop .fl-in,.fl-en-fade .fl-in{animation:none}}
+/* ===== planner jadual posting (gaya Metricool) ===== */
+.pl-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}.pl-nav{display:flex;gap:6px;align-items:center}.pl-title{font-size:17px;text-transform:capitalize;margin-left:6px}.pl-bar .seg{margin-left:auto}.pl-bar .lsel{max-width:190px}
+.pl-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:#C7C9D1;margin-bottom:8px}.pl-legend span{display:inline-flex;gap:6px;align-items:center}.pl-legend i{width:10px;height:10px;border-radius:3px;background:var(--stc,#38BDF8)}
+.st-scheduled{--stc:#38BDF8}.st-draft{--stc:#9CA3AF}.st-published{--stc:#34D399}.st-failed{--stc:#F87171}.st-due{--stc:#FFD166}
+.pl-month,.pl-week{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.pl-wd{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));text-align:center;font-size:12px;color:#9CA3AF;padding:8px 0;border-bottom:1px solid var(--line)}
+.pl-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.pl-cell{min-height:104px;padding:5px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:3px;cursor:default;min-width:0}.pl-cell:nth-child(7n){border-right:0}.pl-cell.e{background:rgba(0,0,0,.15)}
+.pl-cell.t .pl-dn span{background:#E10600;color:#fff;border-radius:50%;min-width:24px;height:24px;display:grid;place-items:center}.pl-cell.s{background:rgba(56,189,248,.07)}
+.pl-dn{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:700;min-height:26px}.pl-add{opacity:0;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;color:#C7C9D1;transition:opacity .2s}.pl-cell:hover .pl-add,.pl-add:focus-visible{opacity:1}.pl-add:hover{background:rgba(255,255,255,.12)}
+.pl-chip,.pl-li{display:flex;align-items:center;gap:5px;width:100%;min-width:0;padding:3px 6px;border-radius:8px;background:color-mix(in srgb,var(--stc) 16%,transparent);border-left:3px solid var(--stc);font-size:11.5px;color:#fff;text-align:left;min-height:24px}
+.pl-chip:hover,.pl-li:hover{background:color-mix(in srgb,var(--stc) 30%,transparent)}.pl-t{font-weight:700;flex:none}.pl-n{display:inline-flex;gap:2px;flex:none}.pl-n svg{width:13px;height:13px}.pl-x{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.pl-more{font-size:11.5px;color:#7DD3FC;text-align:left;padding:2px 6px;min-height:22px}
+.pl-week{max-height:62vh;overflow:auto}.pl-wgrid{display:grid;grid-template-columns:52px repeat(7,minmax(110px,1fr));min-width:820px}.pl-wh{position:sticky;top:0;background:#14151c;z-index:2;text-align:center;font-size:12.5px;font-weight:700;padding:8px 2px;border-bottom:1px solid var(--line)}.pl-wh.t{color:#FF8A8A}
+.pl-hr{font-size:11px;color:#9CA3AF;text-align:right;padding:4px 6px 0 0;border-bottom:1px solid var(--line);min-height:44px}.pl-slot{border-left:1px solid var(--line);border-bottom:1px solid var(--line);min-height:44px;padding:2px;display:flex;flex-direction:column;gap:2px;cursor:pointer}.pl-slot:hover{background:rgba(255,255,255,.04)}
+.pl-list{display:flex;flex-direction:column;gap:12px}.pl-ld{font-weight:700;font-size:14px;margin-bottom:6px;text-transform:capitalize}.pl-lg{display:flex;flex-direction:column;gap:6px}.pl-li{padding:8px 10px;font-size:13.5px;min-height:40px}.pl-li em{margin-left:auto;font-style:normal;font-size:11.5px;color:var(--stc);flex:none}
+.pl-comp{display:grid;gap:18px;grid-template-columns:minmax(0,1fr)}@media(min-width:1000px){.pl-comp{grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr)}}
+.pc-net{display:inline-flex;gap:6px;align-items:center;min-height:42px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.06);border:1.5px solid var(--line);color:#fff;font-size:13.5px}.pc-net[aria-pressed=true]{border-color:#38BDF8;background:rgba(56,189,248,.18)}
+.pl-act{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.pl-act .btn-red{flex:1;min-height:48px}
+.pl-prev{position:sticky;top:0;align-self:start}.pl-card{background:#fff;color:#111;border-radius:14px;padding:12px;min-height:160px}.pl-ch{display:flex;gap:10px;align-items:center;margin-bottom:8px}.pl-ch small{display:block;color:#6B7280}.pl-av{width:38px;height:38px;border-radius:50%;background:#E5E7EB;display:grid;place-items:center;color:#111}
+.pl-txt{white-space:pre-wrap;font-size:14px;line-height:1.5;word-break:break-word}.pl-med img{width:100%;border-radius:10px;margin-top:8px;max-height:260px;object-fit:cover}.pl-vid{margin-top:8px;padding:18px;border-radius:10px;background:#F3F4F6;display:flex;gap:8px;align-items:center;justify-content:center;color:#374151}
+.sc-info summary{cursor:pointer;list-style:none}.sc-info summary::-webkit-details-marker{display:none}
+@media(max-width:700px){.pl-x{display:none}.pl-cell{min-height:76px;padding:3px}.pl-chip{padding:2px 4px}.pl-bar .seg{margin-left:0}}
 </style>
 </head>
 <body>
@@ -756,6 +779,26 @@ async function hydrateImages(p, links) {
     } catch {}
   }));
 }
+/* simpan gambar ASAL (tanpa crop) supaya boleh dilaras semula bila-bila masa */
+async function hydrateRef(ref) {
+  if (!ref || IMG_CACHE.has(ref)) return; IMG_TRIED.add(ref);
+  const [id, n = "1"] = ref.split("~"), cnt = Math.min(IMG_MAXCH, Math.max(1, +n || 1));
+  const sns = await Promise.all(Array.from({ length: cnt }, (_, k) => FB.getDoc(FB.doc(db, "flashlink_images", k ? `${id}_${k}` : id))));
+  if (!sns.every(x => x.exists())) return;
+  const parts = sns.map(x => x.data().d); IMG_CACHE.set(ref, cnt === 1 ? parts[0] : JPG_PRE + parts.map(x => x.slice(JPG_PRE.length)).join(""));
+}
+async function saveOriginal(file) {
+  const bmp = await loadBitmap(file), L = 3840, k = Math.min(1, L / Math.max(bmp.width, bmp.height));
+  let W = Math.round(bmp.width * k), out = null;
+  for (let t = 0; t < 8 && !out; t++) {
+    const H = Math.round(W * bmp.height / bmp.width), c = document.createElement("canvas"); c.width = W; c.height = H; const x = c.getContext("2d"); x.imageSmoothingQuality = "high"; x.fillStyle = "#fff"; x.fillRect(0, 0, W, H); x.drawImage(bmp, 0, 0, W, H);
+    for (const q of [.92, .86, .8, .72]) { const d = c.toDataURL("image/jpeg", q); if (d.length < IMG_TOTAL - 40000) { out = d; break; } }
+    if (!out) W = Math.floor(W * .82);
+  }
+  try { bmp.close?.(); } catch {}
+  return out ? await saveImage(out) : "";
+}
+function recordOrig(ref, o, meta) { if (!S.profile || !ref || !o) return; const m = (S.profile.imgOrig = S.profile.imgOrig || {}); m[ref] = { o, ...(meta || {}) }; saveProfile(); }
 async function saveImage(d) {
   const id = "i" + genId(10), body = d.slice(JPG_PRE.length), parts = [];
   if (d.length <= IMG_CHUNK + 20000) parts.push(d); else for (let i = 0; i < body.length; i += IMG_CHUNK - 30) parts.push(JPG_PRE + body.slice(i, i + IMG_CHUNK - 30));
@@ -776,7 +819,8 @@ async function loadBitmap(src) {
   return await new Promise((res, rej) => { const u = URL.createObjectURL(blob), im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = u; });
 }
 /* Alat potong gambar: seret untuk gerak, slider zum dan kiri/kanan/atas/bawah. Output resolusi tinggi (hingga 4K) dalam had pangkalan data. */
-function cropImage(src, { aspects = [["1:1", 1]], cap = 99999, title = "Laras gambar" } = {}) {
+let LASTCROP = null;
+function cropImage(src, { aspects = [["1:1", 1]], cap = 99999, title = "Laras gambar", init = null } = {}) {
   return new Promise(async resolve => {
     let bmp, blobUrl; try { bmp = await loadBitmap(src); const blob = typeof src === "string" ? await (await fetch(src)).blob() : src; blobUrl = URL.createObjectURL(blob); } catch { toast("Gambar tidak boleh dibaca.", "bad"); return resolve(null); }
     const iw = bmp.width, ih = bmp.height; let ai = 0, zoom = 1, px = .5, py = .5, finished = false;
@@ -789,6 +833,7 @@ function cropImage(src, { aspects = [["1:1", 1]], cap = 99999, title = "Laras ga
     bindQ("crq", m); const frame = $("#crf", m), img = $("#cri", m);
     const setAspect = () => { frame.style.aspectRatio = String(aspects[ai][1]); };
     const lay = () => { const fw = frame.clientWidth, fh = frame.clientHeight; if (!fw || !fh) return; const sc = Math.max(fw / iw, fh / ih) * zoom, dw = iw * sc, dh = ih * sc; img.style.width = dw + "px"; img.style.height = dh + "px"; img.style.left = -(dw - fw) * px + "px"; img.style.top = -(dh - fh) * py + "px"; $("#crx", m).value = px; $("#cry", m).value = py; };
+    if (init) { ai = Math.min(Math.max(+init.ai || 0, 0), aspects.length - 1); zoom = Math.min(4, Math.max(1, +init.z || 1)); px = init.x ?? .5; py = init.y ?? .5; $$("[data-a]", m).forEach((x, i) => x.setAttribute("aria-selected", i === ai)); $("#crz", m).value = zoom; }
     setAspect(); requestAnimationFrame(lay);
     let drag = null;
     frame.addEventListener("pointerdown", e => { drag = { x: e.clientX, y: e.clientY }; frame.setPointerCapture(e.pointerId); frame.classList.add("grab"); });
@@ -809,13 +854,25 @@ function cropImage(src, { aspects = [["1:1", 1]], cap = 99999, title = "Laras ga
         for (const q of [.95, .9, .85, .8, .72, .64]) { const d = c.toDataURL("image/jpeg", q); if (d.length < IMG_TOTAL - 40000) { out = d; break; } }
         if (!out) W = Math.floor(W * .82);
       }
-      finish(out);
+      LASTCROP = out ? { ai, z: +zoom.toFixed(3), x: +px.toFixed(4), y: +py.toFixed(4) } : null; finish(out);
     };
   });
 }
-function pickImage(opts) { return new Promise(res => { const i = document.createElement("input"); i.type = "file"; i.accept = "image/*"; i.onchange = async () => { const f = i.files[0]; res(f ? await cropImage(f, opts) : null); }; i.click(); }); }
-async function uploadImage(opts) { const d = await pickImage(opts); if (!d) return null; try { return await saveImage(d); } catch (e) { console.error(e); toast("Gagal muat naik gambar. Semak sambungan.", "bad"); return null; } }
-async function recropImage(ref, opts) { const u = imgUrl(ref); if (!u) return null; const d = await cropImage(u, opts); if (!d) return null; try { return await saveImage(d); } catch { toast("Gagal menyimpan gambar.", "bad"); return null; } }
+const pickFile = () => new Promise(res => { const i = document.createElement("input"); i.type = "file"; i.accept = "image/*"; i.onchange = () => res(i.files[0] || null); i.click(); });
+async function uploadImage(opts) {
+  const file = await pickFile(); if (!file) return null;
+  const d = await cropImage(file, opts); if (!d) return null; const meta = LASTCROP;
+  try { const [ref, o] = await Promise.all([saveImage(d), saveOriginal(file).catch(() => "")]); recordOrig(ref, o, meta); return ref; }
+  catch (e) { console.error(e); toast("Gagal muat naik gambar. Semak sambungan.", "bad"); return null; }
+}
+/* laras semula: buka gambar ASAL (bukan hasil crop) dengan kedudukan dan zum terakhir */
+async function recropImage(ref, opts) {
+  const rec = S.profile?.imgOrig?.[ref], srcRef = rec ? rec.o : ref;
+  try { await hydrateRef(srcRef); } catch {}
+  const u = imgUrl(srcRef) || imgUrl(ref); if (!u) return null;
+  const d = await cropImage(u, { ...opts, init: rec ? { ai: rec.ai, z: rec.z, x: rec.x, y: rec.y } : null }); if (!d) return null; const meta = LASTCROP;
+  try { const nr = await saveImage(d); recordOrig(nr, imgUrl(srcRef) ? srcRef : ref, meta); return nr; } catch { toast("Gagal menyimpan gambar.", "bad"); return null; }
+}
 const AV_OPTS = { aspects: [["4:5 (hero)", .8], ["1:1 (bulat)", 1]], title: "Laras gambar profil / hero" };
 const BN_OPTS = { aspects: [["3:1", 3], ["2:1", 2]], title: "Laras gambar banner" };
 const BG_OPTS = { aspects: [["9:16", 9 / 16]], title: "Laras gambar latar" };
@@ -972,6 +1029,8 @@ function normProfile(p) {
   const ds = Array.isArray(p.designs) ? p.designs.filter(d => d && d.id && TPL[d.template]) : [];
   out.designs = ds.length ? ds.map(d => ({ ...d, profileStyle: d.profileStyle || "classic", theme: { ...TPL[d.template].theme, auto: false, ...(d.theme || {}) } })) : [{ id: "d1", name: "Design 1", template: tpl, profileStyle: out.profileStyle, theme: JSON.parse(JSON.stringify(out.theme)) }];
   out.activeDesign = out.designs.some(d => d.id === p.activeDesign) ? p.activeDesign : out.designs[0].id;
+  out.publishedDesign = out.designs.some(d => d.id === p.publishedDesign) ? p.publishedDesign : out.activeDesign;
+  out.handle = typeof p.handle === "string" ? p.handle : ""; out.imgOrig = p.imgOrig && typeof p.imgOrig === "object" ? p.imgOrig : {};
   return out;
 }
 async function loadLinks(uid = S.user.uid) {
@@ -1199,6 +1258,7 @@ async function publicView(username) {
       const us = await FB.getDoc(FB.doc(db, "flashlink_users", uid));
       if (!us.exists()) return notFound(username);
       p = normProfile(us.data()); links = await loadLinks(uid);
+      { const pd = p.designs.find(d => d.id === p.publishedDesign); if (pd) { p.template = pd.template; p.profileStyle = pd.profileStyle || "classic"; p.theme = pd.theme; } }
     } catch (e) { console.error(e); return notice("Halaman tidak dapat dimuatkan. Cuba semula sebentar lagi."); }
   }
   try { await hydrateImages(p, links); } catch {}
@@ -1454,7 +1514,7 @@ async function autoCreateProfile() {
   const uid = S.user.uid; let name = genId();
   const d0 = DESIGNS.find(x => x.id === "poster"), theme = designTheme(d0);
   const design = { id: "d" + genId(6), name: "Design 1", template: d0.tpl, profileStyle: d0.sty || "classic", theme };
-  const profile = { username: name, displayName: "", bio: "", avatarUrl: "", bannerUrl: "", template: design.template, theme: JSON.parse(JSON.stringify(theme)), profileStyle: design.profileStyle, socialIcons: [], testimonials: [], designs: [design], activeDesign: design.id, createdAt: FB.serverTimestamp(), plan: "free" };
+  const profile = { username: name, displayName: "", bio: "", avatarUrl: "", bannerUrl: "", template: design.template, theme: JSON.parse(JSON.stringify(theme)), profileStyle: design.profileStyle, socialIcons: [], testimonials: [], designs: [design], activeDesign: design.id, publishedDesign: design.id, handle: "", createdAt: FB.serverTimestamp(), plan: "free" };
   for (let i = 0; ; i++) {
     try {
       await FB.runTransaction(db, async tx => {
@@ -1471,13 +1531,13 @@ async function autoCreateProfile() {
 }
 const genId = (n = 8) => { const a = "abcdefghjkmnpqrstuvwxyz23456789", r = crypto.getRandomValues(new Uint8Array(n)); return [...r].map(x => a[x % a.length]).join(""); }; // ID unik setiap pengguna
 /* ---------- Simpan profil (termasuk senarai design) ---------- */
-const MAXD = 8;
+const MAXD = Infinity; // tiada had bilangan design
 const cloneTheme = t => JSON.parse(JSON.stringify(t));
 function syncActive() { const p = S.profile, d = p.designs.find(x => x.id === p.activeDesign); if (d) { d.template = p.template; d.profileStyle = p.profileStyle || "classic"; d.theme = cloneTheme(p.theme); } }
 const saveProfile = debounce(async () => {
   syncActive();
   const p = S.profile, socialIcons = (p.socialIcons || []).filter(x => x.url);
-  const data = { displayName: p.displayName, bio: p.bio, avatarUrl: p.avatarUrl, bannerUrl: p.bannerUrl, template: p.template, theme: p.theme, socialIcons, testimonials: p.testimonials, profileStyle: p.profileStyle, username: p.username, designs: p.designs, activeDesign: p.activeDesign };
+  const data = { displayName: p.displayName, bio: p.bio, avatarUrl: p.avatarUrl, bannerUrl: p.bannerUrl, template: p.template, theme: p.theme, socialIcons, testimonials: p.testimonials, profileStyle: p.profileStyle, username: p.username, designs: p.designs, activeDesign: p.activeDesign, publishedDesign: p.publishedDesign || p.activeDesign, handle: p.handle || "", imgOrig: p.imgOrig || {} };
   if (JSON.stringify(data).length > 900000) return toast("Data terlalu besar (gambar). Buang gambar latar pada sesetengah design.", "bad");
   try { await FB.setDoc(FB.doc(db, "flashlink_users", S.user.uid), data, { merge: true }); const el = $("#sv"); if (el) { el.textContent = "Disimpan ✓"; setTimeout(() => el && (el.textContent = ""), 1500); } }
   catch (e) { console.error(e); toast("Gagal simpan. Semak sambungan anda.", "bad"); }
@@ -1501,8 +1561,8 @@ const refreshPreview = (anim = false) => {
 };
 function drawPreviewPanel() {
   const el = $("#dprev"); if (!el) return;
-  el.innerHTML = `<div class="dprev-in">${devsHtml()}<div class="hint" style="text-align:center;margin-top:10px">Pratonton langsung: telefon dan laptop <span id="sv" style="color:#6EE7A8"></span></div></div>`;
-  fitDevs(); refreshPreview(true); anim($(".devs", el), [{ opacity: 0, transform: "scale(.96)" }, { opacity: 1, transform: "none" }], { duration: 520 });
+  el.innerHTML = `<div class="dprev-in">${devsHtml()}<div class="hint" style="text-align:center;margin-top:10px">Pratonton langsung: telefon dan laptop <span id="sv" style="color:#6EE7A8"></span></div><div class="hint" id="pvstate" style="text-align:center;margin-top:4px"></div></div>`;
+  fitDevs(); refreshPreview(true); updatePvState(); anim($(".devs", el), [{ opacity: 0, transform: "scale(.96)" }, { opacity: 1, transform: "none" }], { duration: 520 });
 }
 
 /* ---------- Dashboard: bar sisi + editor + pratonton, animasi gaya iOS ---------- */
@@ -1516,7 +1576,7 @@ const NAV = [
   { k: "profile", n: "Profil", i: "users", d: "Gambar profil, banner, nama, bio, gaya kepala halaman (7 gaya) dan ikon sosial yang anda tambah sendiri." },
   { k: "insights", n: "Analitik", i: "chart", d: "Prestasi keseluruhan, pautan yang sedang naik, sumber pelawat dan analitik setiap pautan." },
   { k: "leads", n: "Pelanggan", i: "mail", d: "Mesej dan tempahan daripada borang e-mel anda." },
-  { k: "short", n: "Shorten link", i: "scissors", d: "Pendekkan mana-mana pautan panjang. Setiap pautan pendek ada nama, butang salin, edit dan buang, dan boleh disusun." },
+  { k: "short", n: "Shorten link", i: "scissors", d: "Pendekkan mana-mana pautan panjang kepada bentuk pendek: alamat/kod-anda/webapps/username-anda. Setiap pautan ada nama, butang salin, edit dan buang, dan boleh disusun." },
   { k: "schedule", n: "Jadual posting", i: "calendar", d: "Jadualkan post media sosial pada tarikh dan masa pilihan anda. Pilih Zernio (hantar automatik melalui API) atau Metricool (kalendar + peringatan)." },
 ];
 let navBusy = false;
@@ -1562,8 +1622,17 @@ function activateDesign(id, quiet) {
   syncActive(); p.activeDesign = id; p.template = d.template; p.profileStyle = d.profileStyle || "classic"; p.theme = cloneTheme(d.theme);
   saveProfile(); refreshPreview(true); if (!quiet) toast(`Design “${d.name}” sedang digunakan ✓`);
 }
+function publishDesign(id) {
+  const p = S.profile, d = p.designs.find(x => x.id === id); if (!d) return;
+  syncActive(); p.publishedDesign = id; saveProfile(); updatePvState(); toast(`Design “${d.name}” diterbitkan ✓ Pautan anda kini memaparkan design ini.`);
+}
+function updatePvState() {
+  const el = $("#pvstate"), p = S.profile; if (!el || !p) return;
+  const d = p.designs.find(x => x.id === p.activeDesign), pub = p.activeDesign === p.publishedDesign;
+  el.innerHTML = `Pratonton: <b>${esc(d?.name || "")}</b> · ${pub ? '<span style="color:#6EE7A8">Diterbitkan</span>' : '<span style="color:#FFD166">Draf (belum diterbitkan)</span> <button type="button" class="linkbtn" id="pvpub" style="min-height:28px;padding:0 6px">Terbitkan</button>'}`;
+  const b = $("#pvpub"); if (b) b.onclick = () => { publishDesign(p.activeDesign); if (S.view === "design") designTab(); };
+}
 function newDesign(src, name) {
-  if (S.profile.designs.length >= MAXD) { toast("Maksimum " + MAXD + " design. Padam yang tak digunakan dahulu.", "bad"); return null; }
   syncActive();
   const d = { id: "d" + genId(6), name: (name || "Design " + (S.profile.designs.length + 1)).slice(0, 30), template: src.template, profileStyle: src.profileStyle || "classic", theme: cloneTheme(src.theme) };
   S.profile.designs.push(d); activateDesign(d.id, true); return d;
@@ -1571,34 +1640,38 @@ function newDesign(src, name) {
 function deleteDesign(id) {
   const p = S.profile; if (p.designs.length <= 1) return toast("Mesti ada sekurang-kurangnya satu design.", "bad");
   const wasActive = p.activeDesign === id; p.designs = p.designs.filter(x => x.id !== id);
+  if (p.publishedDesign === id) { p.publishedDesign = p.designs[0].id; toast(`Design diterbitkan dipadam. “${p.designs[0].name}” kini diterbitkan.`); }
   if (wasActive) activateDesign(p.designs[0].id, true); else saveProfile();
 }
 const withDesign = d => ({ ...S.profile, template: d.template, profileStyle: d.profileStyle || "classic", theme: d.theme });
 const miniHtml = pr => `<div class="mini-in">${renderProfile(pr, S.links, { preview: true, anim: false })}</div>`;
 function designCard(d, activeId) {
-  const on = d.id === activeId;
+  const on = d.id === activeId, pub = d.id === S.profile.publishedDesign;
   return `<article class="gal-card clk${on ? " on" : ""}" data-id="${d.id}"><div class="mini">${miniHtml(withDesign(d))}</div>
-    <div class="gal-meta"><div style="min-width:0;display:flex;flex-direction:column;gap:4px"><b class="gal-name">${esc(d.name)}</b>${on ? '<span class="vbadge" style="align-self:flex-start">Aktif</span>' : ""}</div>
-    <div class="gal-act">${on ? "" : `<button class="btn btn-red btn-sm" data-use="${d.id}">Guna</button>`}<button class="btn btn-ghost btn-sm" data-edit="${d.id}" aria-label="Edit ${esc(d.name)}">${ic("pencil", "w-4 h-4")}</button><button class="btn btn-ghost btn-sm" data-dup="${d.id}" aria-label="Pendua ${esc(d.name)}">${ic("copy", "w-4 h-4")}</button><button class="btn btn-ghost btn-sm" data-del="${d.id}" aria-label="Padam ${esc(d.name)}">${ic("trash", "w-4 h-4")}</button></div></div></article>`;
+    <div class="gal-meta"><div style="min-width:0;display:flex;flex-direction:column;gap:4px"><b class="gal-name">${esc(d.name)}</b><div style="display:flex;gap:4px;flex-wrap:wrap">${pub ? '<span class="vbadge" style="background:rgba(52,211,153,.18);color:#6EE7A8;border-color:rgba(52,211,153,.5)">Diterbitkan</span>' : ""}${on && !pub ? '<span class="vbadge">Diedit</span>' : ""}</div></div>
+    <div class="gal-act">${pub ? "" : `<button class="btn btn-red btn-sm" data-use="${d.id}" title="Terbitkan: pautan anda akan memaparkan design ini">Terbit</button>`}<button class="btn btn-ghost btn-sm" data-edit="${d.id}" aria-label="Edit ${esc(d.name)}">${ic("pencil", "w-4 h-4")}</button><button class="btn btn-ghost btn-sm" data-dup="${d.id}" aria-label="Pendua ${esc(d.name)}">${ic("copy", "w-4 h-4")}</button><button class="btn btn-ghost btn-sm" data-del="${d.id}" aria-label="Padam ${esc(d.name)}">${ic("trash", "w-4 h-4")}</button></div></div></article>`;
 }
 const presetCard = d => `<article class="gal-card clk" data-p="${d.id}" title="${esc(d.n)}: ${esc(d.d)}"><div class="mini">${miniHtml({ ...S.profile, template: d.tpl, profileStyle: d.sty || "classic", theme: designTheme(d) })}</div><div class="gal-meta row"><b class="gal-name" style="flex:1;min-width:0">${esc(d.n)}</b><button class="btn btn-ghost btn-sm" data-an="${d.id}" aria-label="Simpan ${esc(d.n)} sebagai design baharu" title="Simpan sebagai design baharu">${ic("plus", "w-4 h-4")}</button></div></article>`;
 function applyPreset(d, edit = true) {
-  const p = S.profile; p.template = d.tpl; p.profileStyle = d.sty || "classic"; p.theme = designTheme(d);
+  const p = S.profile;
+  if (p.activeDesign === p.publishedDesign) { const nd = newDesign({ template: d.tpl, profileStyle: d.sty || "classic", theme: designTheme(d) }, d.n); if (nd) { toast(`Design baharu “${d.n}” dibuat. Design yang diterbitkan tidak berubah.`); if (edit) editDesign(); } return; }
+  p.template = d.tpl; p.profileStyle = d.sty || "classic"; p.theme = designTheme(d);
   saveProfile(); refreshPreview(true); toast(`Design “${d.n}” dipilih ✓ (boleh ditukar bila-bila masa)`); if (edit) editDesign();
 }
 async function designTab() {
+  const keep = { y: window.scrollY, g: $("#galw")?.scrollTop || 0, m: $("#minew")?.scrollTop || 0 };
   try { await hydrateImages(S.profile, S.links); } catch {}
   const pane = $("#pane"), p = S.profile, url = profileUrl(p.username);
-  pane.innerHTML = `<div class="glass" style="border-radius:20px;padding:16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:0 0 14px"><div style="flex:1;min-width:200px"><div class="lbl" style="margin:0 0 2px">Pautan anda</div><div style="font-weight:700;color:#7DD3FC;word-break:break-all">${esc(url)}</div></div><button id="hcp" class="btn btn-red btn-sm">${ic("copy", "w-4 h-4")} Salin pautan</button></div>
+  pane.innerHTML = `<div class="glass" style="border-radius:20px;padding:16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:0 0 14px"><div style="flex:1;min-width:200px"><div class="lbl" style="margin:0 0 2px">Pautan anda (design diterbitkan: ${esc((p.designs.find(d => d.id === p.publishedDesign) || {}).name || "")})</div><div style="font-weight:700;color:#7DD3FC;word-break:break-all">${esc(url)}</div><div class="hint" style="margin-top:4px">Salin pautan ini ke profil media sosial anda. Ia memaparkan design yang diterbitkan.</div></div><button id="hcp" class="btn btn-red btn-sm">${ic("copy", "w-4 h-4")} Salin pautan</button></div>
     ${S.links.length ? "" : `<div class="glass" style="border-radius:20px;padding:16px;margin-bottom:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:200px"><b>Mula di sini</b><p style="margin:4px 0 0;color:#C7C9D1;font-size:14.5px">Halaman anda masih kosong. Tambah pautan pertama anda.</p></div><button id="hlk" class="btn btn-red btn-sm">${ic("plus", "w-4 h-4")} Tambah pautan</button></div>`}
-    <h2 class="lbl" style="font-size:15px;color:#fff;margin:0 0 10px">Design saya (${p.designs.length}/${MAXD})</h2>
-    <div class="dgrid2" id="mine">${p.designs.map(d => designCard(d, p.activeDesign)).join("")}</div>
+    <h2 class="lbl" style="font-size:15px;color:#fff;margin:0 0 10px">Design saya (${p.designs.length})</h2>
+    <div class="galwrap" id="minew"><div class="dgrid2" id="mine">${p.designs.map(d => designCard(d, p.activeDesign)).join("")}</div></div>
     <h2 class="lbl" style="font-size:15px;color:#fff;margin:22px 0 10px">Galeri template (5 sebaris, skrol ke bawah untuk lagi). Klik untuk pilih dan edit</h2>
     <div class="galwrap" id="galw"><div class="dgrid2" id="gal">${DESIGNS.map(presetCard).join("")}</div></div>`;
   $("#hcp").onclick = () => copyText(url); if ($("#hlk")) $("#hlk").onclick = () => openView("links");
   const mine = $("#mine");
   $$(".gal-card", mine).forEach(c => (c.onclick = e => { if (e.target.closest("button")) return; const id = c.dataset.id; if (S.profile.activeDesign !== id) activateDesign(id, true); editDesign(); }));
-  $$("[data-use]", mine).forEach(b => (b.onclick = () => { activateDesign(b.dataset.use); designTab(); }));
+  $$("[data-use]", mine).forEach(b => (b.onclick = () => { publishDesign(b.dataset.use); designTab(); }));
   $$("[data-edit]", mine).forEach(b => (b.onclick = () => { if (S.profile.activeDesign !== b.dataset.edit) activateDesign(b.dataset.edit, true); editDesign(); }));
   $$("[data-dup]", mine).forEach(b => (b.onclick = () => { const d = S.profile.designs.find(x => x.id === b.dataset.dup); if (newDesign(d, d.name + " (salinan)")) { toast("Design disalin dan digunakan ✓"); designTab(); } }));
   $$("[data-del]", mine).forEach(b => (b.onclick = () => { const d = S.profile.designs.find(x => x.id === b.dataset.del); modal(`<h2 style="font-size:19px;font-weight:700;margin:0 0 8px">Padam “${esc(d.name)}”?</h2><p style="color:#9CA3AF;margin:0 0 16px">Pautan anda tak akan hilang. Hanya design ini yang dipadam.</p><div style="display:flex;gap:10px"><button class="btn btn-ghost" style="flex:1" data-x2>Batal</button><button class="btn btn-red" style="flex:1" id="yes">Padam</button></div>`, bg => { $("[data-x2]", bg).onclick = bg.close; $("#yes", bg).onclick = () => { bg.close(); deleteDesign(d.id); designTab(); }; }); }));
@@ -1606,8 +1679,8 @@ async function designTab() {
   $$(".gal-card", gal).forEach(c => (c.onclick = e => { if (e.target.closest("[data-an]")) return; applyPreset(DESIGNS.find(x => x.id === c.dataset.p)); }));
   $$("[data-an]", gal).forEach(b => (b.onclick = e => { e.stopPropagation(); const d = DESIGNS.find(x => x.id === b.dataset.an); if (newDesign({ template: d.tpl, profileStyle: d.sty || "classic", theme: designTheme(d) }, d.n)) { toast(`“${d.n}” disimpan sebagai design baharu ✓`); designTab(); } }));
   fitMinis();
-  const fitGal = () => { const g = $("#galw"), c = g && $(".gal-card", g); if (c) g.style.maxHeight = c.offsetHeight + 8 + "px"; };
-  requestAnimationFrame(() => { fitGal(); const c = $("#gal .gal-card"); if (c) new ResizeObserver(fitGal).observe(c); });
+  const fitGal = () => { const g = $("#galw"), c = g && $(".gal-card", g); if (c) g.style.maxHeight = c.offsetHeight + 8 + "px"; const m = $("#minew"), mc = m && $(".gal-card", m); if (mc) m.style.maxHeight = mc.offsetHeight * 2 + 18 + "px"; };
+  requestAnimationFrame(() => { fitGal(); const c = $("#gal .gal-card"); if (c) new ResizeObserver(fitGal).observe(c); requestAnimationFrame(() => { const g = $("#galw"), m = $("#minew"); if (g) g.scrollTop = keep.g; if (m) m.scrollTop = keep.m; window.scrollTo(0, keep.y); [180, 500].forEach(ms => setTimeout(() => { const g2 = $("#galw"), m2 = $("#minew"); if (g2 && Math.abs(g2.scrollTop - keep.g) > 2) g2.scrollTop = keep.g; if (m2 && Math.abs(m2.scrollTop - keep.m) > 2) m2.scrollTop = keep.m; if (Math.abs(window.scrollY - keep.y) > 2) window.scrollTo(0, keep.y); }, ms)); }); });
 }
 
 /* ---------- Popup edit design: semua boleh diedit ---------- */
@@ -1667,10 +1740,10 @@ async function zfetch(path, opt = {}) {
   return j || {};
 }
 async function zload() {
-  const [a, ps] = await Promise.all([zfetch("/accounts"), zfetch("/posts?status=scheduled&limit=100")]);
+  const [a, ps] = await Promise.all([zfetch("/accounts"), zfetch("/posts?limit=100")]);
   SC.accounts = (a.accounts || (Array.isArray(a) ? a : [])).filter(x => x.isActive !== false);
   const arr = ps.posts || ps.data || (Array.isArray(ps) ? ps : []);
-  SC.posts = arr.map(p => ({ id: p._id || p.id, text: p.content || "", ts: new Date(p.scheduledFor).getTime(), plats: (p.platforms || []).map(x => x.platform), status: p.status || "scheduled" })).filter(p => p.id && !isNaN(p.ts));
+  SC.posts = arr.map(p => ({ id: p._id || p.id, text: p.content || "", ts: new Date(p.scheduledFor || p.publishedAt || p.createdAt).getTime(), plats: (p.platforms || []).map(x => x.platform), accs: (p.platforms || []).map(x => x.accountId?._id || x.accountId), media: ((p.mediaItems || [])[0] || {}).url || "", status: p.status || "scheduled" })).filter(p => p.id && !isNaN(p.ts));
 }
 async function zconnect(pl) {
   const pr = await zfetch("/profiles"), pid = (pr.profiles || (Array.isArray(pr) ? pr : []))[0]?._id;
@@ -1681,63 +1754,127 @@ const mcGet = () => { try { return JSON.parse(lsGet("fl_mc") || "[]"); } catch {
 const mcSet = a => lsSet("fl_mc", JSON.stringify(a));
 const PLAT = { instagram: "Instagram", facebook: "Facebook", tiktok: "TikTok", youtube: "YouTube", linkedin: "LinkedIn", twitter: "X (Twitter)", threads: "Threads", pinterest: "Pinterest" };
 const MC_NETS = ["instagram", "facebook", "tiktok", "youtube", "linkedin", "twitter"];
-const schedItems = () => (SC.prov === "zernio" ? SC.posts : mcGet().map(x => ({ ...x, status: x.done ? "siap" : x.ts <= Date.now() ? "due" : "dirancang" })));
+const schedItems = () => (SC.prov === "zernio" ? SC.posts : mcGet().map(x => ({ ...x, status: x.draft ? "draft" : x.done ? "published" : x.ts <= Date.now() ? "due" : "scheduled" })));
+const ST_NAME = { scheduled: "Dijadualkan", draft: "Draf", published: "Diterbitkan", failed: "Gagal", partial: "Separa", due: "Masa posting", cancelled: "Dibatalkan", pending_approval: "Menunggu kelulusan", publishing: "Sedang diterbitkan" };
+const stCls = st => (["scheduled", "draft", "published", "failed", "due"].includes(st) ? st : st === "partial" ? "failed" : "scheduled");
+const infoCard = (title, lines) => `<details class="glass sc-info"><summary><b>${title}</b> <span class="hint">(maklumat had dan cara kerja)</span></summary><ul>${lines.map(l => `<li>${l}</li>`).join("")}</ul></details>`;
+const netIc = pl => brandIc(pl === "twitter" ? "x" : pl, "w-4 h-4");
+const pad2 = n => String(n).padStart(2, "0");
+const mcMonthCount = ym => { ym = ym || dayIn(new Date(), SC.tz).slice(0, 7); return mcGet().filter(x => !x.draft && dayIn(new Date(x.ts), SC.tz).slice(0, 7) === ym).length; };
 function scheduleTab() {
   clearInterval(SC.timer); const pane = $("#pane");
   if (!SC.ym) SC.ym = dayIn(new Date(), SC.tz).slice(0, 7);
-  pane.innerHTML = `<div class="seg" role="tablist" aria-label="Pilih perkhidmatan" style="margin-bottom:14px">${[["zernio", "Zernio"], ["metricool", "Metricool"]].map(([k, n]) => `<button role="tab" data-pv="${k}" aria-selected="${SC.prov === k}">${n}</button>`).join("")}</div>
+  if (!SC.sel) SC.sel = dayIn(new Date(), SC.tz);
+  SC.view = ["month", "week", "list"].includes(SC.view) ? SC.view : (lsGet("fl_pview") || "month");
+  pane.innerHTML = `<div class="seg" role="tablist" aria-label="Pilih perkhidmatan" style="margin-bottom:12px">${[["zernio", "Zernio"], ["metricool", "Metricool"]].map(([k, n]) => `<button role="tab" data-pv="${k}" aria-selected="${SC.prov === k}">${n}</button>`).join("")}</div>
   <div id="sc-info"></div><div class="glass sc-clock" id="sc-clock" aria-live="off"></div><div id="sc-body"></div>`;
   $$("[data-pv]").forEach(b => (b.onclick = () => { SC.prov = b.dataset.pv; lsSet("fl_prov", SC.prov); scheduleTab(); }));
-  const tick = () => { const c = $("#sc-clock"); if (!c) return clearInterval(SC.timer); const n = new Date(), f = tz => new Intl.DateTimeFormat("ms-MY", { timeZone: tz, weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }).format(n); c.innerHTML = `<span>${ic("clock", "w-4 h-4")} Malaysia: <b>${f("Asia/Kuala_Lumpur")}</b></span>${SC.tz !== "Asia/Kuala_Lumpur" ? `<span>${esc((TZS.find(t => t[0] === SC.tz) || [0, SC.tz])[1])}: <b>${f(SC.tz)}</b></span>` : ""}<span>UTC: <b>${f("UTC")}</b></span>`; if (SC.prov === "metricool" && n.getSeconds() === 0 && $("#sc-list")) drawDay(); };
+  const tick = () => { const c = $("#sc-clock"); if (!c) return clearInterval(SC.timer); const n = new Date(), f = tz => new Intl.DateTimeFormat("ms-MY", { timeZone: tz, weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }).format(n); c.innerHTML = `<span>${ic("clock", "w-4 h-4")} Malaysia: <b>${f("Asia/Kuala_Lumpur")}</b></span>${SC.tz !== "Asia/Kuala_Lumpur" ? `<span>${esc((TZS.find(t => t[0] === SC.tz) || [0, SC.tz])[1])}: <b>${f(SC.tz)}</b></span>` : ""}<span>UTC: <b>${f("UTC")}</b></span>`; if (SC.prov === "metricool" && n.getSeconds() === 0 && $("#pl-main")) drawPlanner(); };
   tick(); SC.timer = setInterval(tick, 1000);
   if (SC.prov === "zernio") return zernioView(); metricoolView();
 }
-const infoCard = (title, lines) => `<div class="glass sc-info"><b>${title}</b><ul>${lines.map(l => `<li>${l}</li>`).join("")}</ul></div>`;
-function calHtml() {
-  const [y, m] = SC.ym.split("-").map(Number), first = new Date(Date.UTC(y, m - 1, 1)), dim = new Date(Date.UTC(y, m, 0)).getUTCDate(), off = (first.getUTCDay() + 6) % 7, today = dayIn(new Date(), SC.tz), cnt = {};
-  schedItems().forEach(p => { const d = dayIn(new Date(p.ts), SC.tz); cnt[d] = (cnt[d] || 0) + 1; });
-  const cells = Array.from({ length: off }, () => `<i class="sc-c e"></i>`).concat(Array.from({ length: dim }, (_, i) => { const d = `${SC.ym}-${String(i + 1).padStart(2, "0")}`; return `<button class="sc-c${d === today ? " t" : ""}${d === SC.sel ? " s" : ""}" data-d="${d}" aria-label="${i + 1} ${new Date(Date.UTC(y, m - 1, 1)).toLocaleDateString("ms-MY", { month: "long", timeZone: "UTC" })}${cnt[d] ? ", " + cnt[d] + " post" : ""}"><span>${i + 1}</span>${cnt[d] ? `<em>${cnt[d]}</em>` : ""}</button>`; }));
-  return `<div class="glass sc-cal"><div class="sc-nav"><button class="btn btn-ghost btn-sm" id="cpv" aria-label="Bulan sebelum">${ic("chevl", "w-4 h-4")}</button><b>${new Date(Date.UTC(y, m - 1, 1)).toLocaleDateString("ms-MY", { month: "long", year: "numeric", timeZone: "UTC" })}</b><button class="btn btn-ghost btn-sm" id="cnx" aria-label="Bulan seterusnya">${ic("chevr", "w-4 h-4")}</button></div><div class="sc-grid">${["Isn", "Sel", "Rab", "Kha", "Jum", "Sab", "Ahd"].map(d => `<span class="sc-h">${d}</span>`).join("")}${cells.join("")}</div></div><div class="glass" style="border-radius:20px;padding:14px;margin-top:12px"><div class="lbl" id="sc-dl"></div><div id="sc-list" class="scrollbox"></div></div>`;
+/* ---- Planner: pandangan Bulan / Minggu / Senarai, gaya planner Metricool ---- */
+function plToolbar() {
+  const [y, m] = SC.ym.split("-").map(Number), label = new Date(Date.UTC(y, m - 1, 1)).toLocaleDateString("ms-MY", { month: "long", year: "numeric", timeZone: "UTC" });
+  return `<div class="pl-bar"><div class="pl-nav"><button class="btn btn-ghost btn-sm" id="pl-today">Hari ini</button><button class="btn btn-ghost btn-sm" id="pl-prev" aria-label="Sebelum">${ic("chevl", "w-4 h-4")}</button><button class="btn btn-ghost btn-sm" id="pl-next" aria-label="Seterusnya">${ic("chevr", "w-4 h-4")}</button><b class="pl-title">${label}</b></div>
+    <div class="seg" role="tablist" aria-label="Pandangan">${[["month", "Bulan"], ["week", "Minggu"], ["list", "Senarai"]].map(([k, n]) => `<button role="tab" data-plv="${k}" aria-selected="${SC.view === k}">${n}</button>`).join("")}</div>
+    <select id="pl-tz" class="lsel" aria-label="Zon waktu">${TZS.map(([k, n]) => `<option value="${k}" ${SC.tz === k ? "selected" : ""}>${esc(n)}</option>`).join("")}</select>
+    <button class="btn btn-red" id="pl-new">${ic("plus", "w-4 h-4")} Cipta post</button></div>`;
 }
-function drawDay() {
-  const list = $("#sc-list"); if (!list) return; const day = SC.sel || dayIn(new Date(), SC.tz);
-  $("#sc-dl").textContent = "Post pada " + new Date(day + "T00:00:00Z").toLocaleDateString("ms-MY", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
-  const items = schedItems().filter(p => dayIn(new Date(p.ts), SC.tz) === day).sort((a, b) => a.ts - b.ts);
-  list.innerHTML = items.length ? items.map(p => `<div class="srow glass${p.status === "due" ? " due" : ""}" data-id="${esc(p.id)}"><div class="srow-t"><b>${timeIn(new Date(p.ts), SC.tz)} · ${esc((p.plats || []).map(x => PLAT[x] || x).join(", ") || "Media sosial")}</b><span style="color:#C7C9D1;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(p.text)}</span>${p.status === "due" ? `<small style="color:#FFD166">Masa posting! Salin teks dan hantar melalui Metricool.</small>` : `<small style="color:#9CA3AF">${esc({ scheduled: "Dijadualkan", dirancang: "Dirancang", siap: "Siap" }[p.status] || p.status)}</small>`}</div>${SC.prov === "metricool" ? `<button class="btn btn-ghost btn-sm" data-cp="${esc(p.id)}" aria-label="Salin teks">${ic("copy", "w-4 h-4")}</button>${p.status === "siap" ? "" : `<button class="btn btn-ghost btn-sm" data-ok="${esc(p.id)}" aria-label="Tandakan siap">${ic("check", "w-4 h-4")}</button>`}` : ""}<button class="btn btn-ghost btn-sm" data-rm="${esc(p.id)}" aria-label="Buang post">${ic("trash", "w-4 h-4")}</button></div>`).join("") : `<p style="color:#9CA3AF;margin:0">Tiada post pada hari ini.</p>`;
-  $$("[data-cp]", list).forEach(b => (b.onclick = () => copyText((mcGet().find(x => x.id === b.dataset.cp) || {}).text || "")));
-  $$("[data-ok]", list).forEach(b => (b.onclick = () => { mcSet(mcGet().map(x => (x.id === b.dataset.ok ? { ...x, done: true } : x))); drawCal(); }));
-  $$("[data-rm]", list).forEach(b => (b.onclick = async () => {
-    if (SC.prov === "metricool") { mcSet(mcGet().filter(x => x.id !== b.dataset.rm)); return drawCal(); }
-    b.disabled = true; try { await zfetch("/posts/" + encodeURIComponent(b.dataset.rm), { method: "DELETE" }); SC.posts = SC.posts.filter(x => x.id !== b.dataset.rm); toast("Post dibuang."); drawCal(); } catch (e) { b.disabled = false; toast("Gagal membuang: " + e.message, "bad"); }
-  }));
+const chipHtml = p => `<button type="button" class="pl-chip st-${stCls(p.status)}" data-id="${esc(p.id)}" title="${esc(ST_NAME[p.status] || p.status)}: ${esc(p.text)}"><span class="pl-t">${timeIn(new Date(p.ts), SC.tz)}</span><span class="pl-n">${(p.plats || []).slice(0, 3).map(netIc).join("")}</span><span class="pl-x">${esc(p.text || "(media)")}</span></button>`;
+function plMonth(items) {
+  const [y, m] = SC.ym.split("-").map(Number), first = new Date(Date.UTC(y, m - 1, 1)), dim = new Date(Date.UTC(y, m, 0)).getUTCDate(), off = (first.getUTCDay() + 6) % 7, today = dayIn(new Date(), SC.tz), by = {};
+  items.forEach(p => { (by[dayIn(new Date(p.ts), SC.tz)] = by[dayIn(new Date(p.ts), SC.tz)] || []).push(p); });
+  const cells = [];
+  for (let i = 0; i < off; i++) cells.push('<div class="pl-cell e"></div>');
+  for (let d = 1; d <= dim; d++) { const day = `${SC.ym}-${pad2(d)}`, list = (by[day] || []).sort((a, b) => a.ts - b.ts); cells.push(`<div class="pl-cell${day === today ? " t" : ""}${day === SC.sel ? " s" : ""}" data-day="${day}"><div class="pl-dn"><span>${d}</span><button type="button" class="pl-add" data-add="${day}" aria-label="Cipta post pada ${d}">${ic("plus", "w-4 h-4")}</button></div>${list.slice(0, 3).map(chipHtml).join("")}${list.length > 3 ? `<button type="button" class="pl-more" data-more="${day}">+${list.length - 3} lagi</button>` : ""}</div>`); }
+  return `<div class="pl-month"><div class="pl-wd">${["Isn", "Sel", "Rab", "Kha", "Jum", "Sab", "Ahd"].map(d => `<span>${d}</span>`).join("")}</div><div class="pl-grid">${cells.join("")}</div></div>`;
 }
-function drawCal() {
-  const box = $("#sc-cal"); if (!box) return; box.innerHTML = calHtml();
-  $("#cpv").onclick = () => { const [y, m] = SC.ym.split("-").map(Number); SC.ym = new Date(Date.UTC(y, m - 2, 1)).toISOString().slice(0, 7); drawCal(); };
-  $("#cnx").onclick = () => { const [y, m] = SC.ym.split("-").map(Number); SC.ym = new Date(Date.UTC(y, m, 1)).toISOString().slice(0, 7); drawCal(); };
-  $$(".sc-c[data-d]", box).forEach(b => (b.onclick = () => { SC.sel = b.dataset.d; $$(".sc-c.s", box).forEach(x => x.classList.remove("s")); b.classList.add("s"); drawDay(); const dt = $("#sc-date"); if (dt) dt.value = SC.sel; }));
-  drawDay(); const cnt = $("#mc-count"); if (cnt) cnt.textContent = mcMonthCount();
+function weekStart() { const d = new Date(SC.sel + "T00:00:00Z"); d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7)); return d; }
+function plWeek(items) {
+  const ws = weekStart(), days = Array.from({ length: 7 }, (_, i) => { const d = new Date(ws); d.setUTCDate(d.getUTCDate() + i); return d.toISOString().slice(0, 10); }), today = dayIn(new Date(), SC.tz), by = {};
+  items.forEach(p => { const k = dayIn(new Date(p.ts), SC.tz) + "T" + timeIn(new Date(p.ts), SC.tz).slice(0, 2); (by[k] = by[k] || []).push(p); });
+  const head = days.map(d => `<div class="pl-wh${d === today ? " t" : ""}">${new Date(d + "T00:00:00Z").toLocaleDateString("ms-MY", { weekday: "short", day: "numeric", timeZone: "UTC" })}</div>`).join("");
+  const rows = Array.from({ length: 24 }, (_, h) => `<div class="pl-hr">${pad2(h)}:00</div>` + days.map(d => `<div class="pl-slot" data-slot="${d}T${pad2(h)}">${(by[d + "T" + pad2(h)] || []).sort((a, b) => a.ts - b.ts).map(chipHtml).join("")}</div>`).join("")).join("");
+  return `<div class="pl-week"><div class="pl-wgrid"><div class="pl-wh"></div>${head}${rows}</div></div>`;
 }
-const mcMonthCount = (ym) => { ym = ym || dayIn(new Date(), SC.tz).slice(0, 7); return mcGet().filter(x => dayIn(new Date(x.ts), SC.tz).slice(0, 7) === ym).length; };
-function composerHtml(nets) {
-  const def = addMin(wallIn(new Date(), SC.tz), 15).slice(0, 16);
-  return `<div class="glass" style="border-radius:20px;padding:16px;margin-top:12px"><div class="lbl">Post baharu</div>
-  <textarea id="sc-text" class="inp" rows="4" maxlength="2200" placeholder="Tulis kapsyen / teks post anda…" aria-label="Teks post"></textarea>
-  <input id="sc-media" class="inp" style="margin-top:10px" inputmode="url" placeholder="Pautan gambar/video awam (pilihan, https://…)" aria-label="Pautan media">
-  <div class="lbl" style="margin-top:12px">Hantar ke</div><div class="sc-nets">${nets}</div>
-  <div class="sc-dt"><div><label class="lbl" for="sc-date">Tarikh</label><input id="sc-date" type="date" class="inp" value="${def.slice(0, 10)}"></div><div><label class="lbl" for="sc-time">Masa</label><input id="sc-time" type="time" class="inp" value="${def.slice(11, 16)}"></div>
-  <div><label class="lbl" for="sc-tz">Zon waktu</label><select id="sc-tz" class="inp">${TZS.map(([k, n]) => `<option value="${k}" ${SC.tz === k ? "selected" : ""}>${esc(n)}</option>`).join("")}</select></div></div>
-  <div id="sc-err" class="err" role="alert"></div><button id="sc-go" class="btn btn-red" style="width:100%;margin-top:12px;min-height:50px">${ic("calendar", "w-5 h-5")} Jadualkan</button></div>`;
+function plList(items) {
+  const [y, m] = SC.ym.split("-").map(Number), list = items.filter(p => dayIn(new Date(p.ts), SC.tz).slice(0, 7) === SC.ym).sort((a, b) => a.ts - b.ts), by = {};
+  list.forEach(p => { (by[dayIn(new Date(p.ts), SC.tz)] = by[dayIn(new Date(p.ts), SC.tz)] || []).push(p); });
+  const keys = Object.keys(by);
+  return `<div class="pl-list">${keys.length ? keys.map(d => `<div class="pl-lg"><div class="pl-ld">${new Date(d + "T00:00:00Z").toLocaleDateString("ms-MY", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" })}</div>${by[d].map(p => `<button type="button" class="pl-li st-${stCls(p.status)}" data-id="${esc(p.id)}"><span class="pl-t">${timeIn(new Date(p.ts), SC.tz)}</span><span class="pl-n">${(p.plats || []).map(netIc).join("")}</span><span class="pl-x">${esc(p.text || "(media)")}</span><em>${esc(ST_NAME[p.status] || p.status)}</em></button>`).join("")}</div>`).join("") : `<p style="color:#9CA3AF;margin:8px 0">Tiada post dalam bulan ini. Tekan <b>Cipta post</b>.</p>`}</div>`;
 }
-function readComposer() {
-  const text = $("#sc-text").value.trim(), date = $("#sc-date").value, time = $("#sc-time").value, tz = $("#sc-tz").value, mu = $("#sc-media").value.trim(), er = $("#sc-err"); er.textContent = "";
-  if (!text && !mu) return (er.textContent = "Tulis teks atau letak pautan media."), null;
-  if (!date || !time) return (er.textContent = "Pilih tarikh dan masa."), null;
-  const wall = `${date}T${time}:00`; if (wall < addMin(wallIn(new Date(), tz), 2)) return (er.textContent = "Masa mesti sekurang-kurangnya 2 minit dari sekarang (zon waktu yang dipilih). Masa lepas akan dihantar serta-merta, jadi ia disekat."), null;
-  let media = ""; if (mu) { media = safeUrl(mu); if (!/^https:\/\//.test(media)) return (er.textContent = "Pautan media mesti https:// dan awam."), null; }
-  return { text, wall, tz, media, ts: zonedToUtc(wall, tz).getTime() };
+function drawPlanner() {
+  const box = $("#pl-main"); if (!box) return; const items = schedItems();
+  box.innerHTML = plToolbar() + `<div class="pl-legend">${[["scheduled", "Dijadualkan"], ["draft", "Draf"], ["published", "Diterbitkan"], ["failed", "Gagal"]].concat(SC.prov === "metricool" ? [["due", "Masa posting"]] : []).map(([k, n]) => `<span class="st-${k}"><i></i>${n}</span>`).join("")}</div>` + (SC.view === "week" ? plWeek(items) : SC.view === "list" ? plList(items) : plMonth(items));
+  const mv = (d) => { if (SC.view === "week") { const w = weekStart(); w.setUTCDate(w.getUTCDate() + 7 * d); SC.sel = w.toISOString().slice(0, 10); SC.ym = SC.sel.slice(0, 7); } else { const [y, m] = SC.ym.split("-").map(Number); SC.ym = new Date(Date.UTC(y, m - 1 + d, 1)).toISOString().slice(0, 7); SC.sel = SC.ym + "-01"; } drawPlanner(); };
+  $("#pl-prev").onclick = () => mv(-1); $("#pl-next").onclick = () => mv(1); $("#pl-today").onclick = () => { SC.sel = dayIn(new Date(), SC.tz); SC.ym = SC.sel.slice(0, 7); drawPlanner(); };
+  $$("[data-plv]").forEach(b => (b.onclick = () => { SC.view = b.dataset.plv; lsSet("fl_pview", SC.view); drawPlanner(); }));
+  $("#pl-tz").onchange = e => { SC.tz = e.target.value; lsSet("fl_tz", SC.tz); SC.sel = dayIn(new Date(), SC.tz); SC.ym = SC.sel.slice(0, 7); drawPlanner(); };
+  $("#pl-new").onclick = () => planComposer(null, SC.sel);
+  const byId = id => schedItems().find(x => String(x.id) === id);
+  $$("[data-id]", box).forEach(b => (b.onclick = e => { e.stopPropagation(); const p = byId(b.dataset.id); if (p) planComposer(p); }));
+  $$("[data-add]", box).forEach(b => (b.onclick = e => { e.stopPropagation(); SC.sel = b.dataset.add; planComposer(null, b.dataset.add); }));
+  $$("[data-more]", box).forEach(b => (b.onclick = e => { e.stopPropagation(); SC.sel = b.dataset.more; SC.view = "week"; drawPlanner(); }));
+  $$("[data-day]", box).forEach(c => (c.onclick = e => { if (e.target.closest("button")) return; SC.sel = c.dataset.day; $$(".pl-cell.s", box).forEach(x => x.classList.remove("s")); c.classList.add("s"); }));
+  $$("[data-slot]", box).forEach(c => (c.onclick = e => { if (e.target.closest("button")) return; const [d, h] = c.dataset.slot.split("T"); planComposer(null, d, +h); }));
+  const cnt = $("#mc-count"); if (cnt) cnt.textContent = mcMonthCount();
 }
-function bindTz() { $("#sc-tz").onchange = e => { SC.tz = e.target.value; lsSet("fl_tz", SC.tz); SC.ym = dayIn(new Date(), SC.tz).slice(0, 7); drawCal(); }; }
+/* ---- Cipta / edit post (panel sisi + pratonton) ---- */
+function planComposer(post, day, hour) {
+  const edit = !!post, locked = edit && ["published", "failed", "partial", "publishing", "cancelled"].includes(post.status);
+  const nets = SC.prov === "zernio" ? SC.accounts.map(a => ({ id: a._id, pl: a.platform, label: a.username || a.displayName || PLAT[a.platform] })) : MC_NETS.map(k => ({ id: k, pl: k, label: PLAT[k] }));
+  if (SC.prov === "zernio" && !nets.length) return toast("Sambung sekurang-kurangnya satu akaun media sosial dahulu.", "bad");
+  let def; if (edit) def = wallIn(new Date(post.ts), SC.tz).slice(0, 16); else { const nowW = wallIn(new Date(), SC.tz); def = day && day !== nowW.slice(0, 10) ? `${day}T${pad2(hour ?? 9)}:00` : addMin(nowW, 15).slice(0, 16); if (hour != null && day) def = `${day}T${pad2(hour)}:00`; }
+  const sel0 = edit ? (SC.prov === "zernio" ? (post.accs || []) : (post.plats || [])) : [];
+  const m = modal(`<h2 class="font-display" style="font-size:21px;font-weight:700;margin:0 0 4px">${edit ? (locked ? "Butiran post" : "Edit post") : "Cipta post"}</h2><p class="hint" style="margin:0 0 10px">${SC.prov === "zernio" ? "Dihantar automatik oleh Zernio pada masa dipilih." : "Disimpan dalam kalendar Flash Link sebagai peringatan; hantar sebenar dalam Metricool."}</p>
+    <div class="pl-comp"><div class="pl-form">
+      <div class="lbl">Rangkaian</div><div class="sc-nets" id="pc-nets">${nets.map(n => `<button type="button" class="pc-net" data-n="${esc(n.id)}" data-pl="${esc(n.pl)}" aria-pressed="${sel0.includes(n.id) || (!edit && nets.length === 1)}" ${locked ? "disabled" : ""}>${netIc(n.pl)}<span>${esc(n.label)}</span></button>`).join("")}</div>
+      <label class="lbl" for="pc-text" style="margin-top:12px">Teks post <span id="pc-cnt" style="float:right;color:#9CA3AF;font-weight:400"></span></label><textarea id="pc-text" class="inp" rows="6" maxlength="2200" placeholder="Tulis kapsyen, hashtag dan pautan anda…" ${locked ? "disabled" : ""}>${esc(edit ? post.text : "")}</textarea>
+      <label class="lbl" for="pc-media" style="margin-top:10px">Gambar / video (pautan awam https://)</label><input id="pc-media" class="inp" inputmode="url" placeholder="https://…" value="${esc(edit ? post.media || "" : "")}" ${locked ? "disabled" : ""}>
+      <div class="sc-dt"><div><label class="lbl" for="pc-date">Tarikh</label><input id="pc-date" type="date" class="inp" value="${def.slice(0, 10)}" ${locked ? "disabled" : ""}></div><div><label class="lbl" for="pc-time">Masa</label><input id="pc-time" type="time" class="inp" value="${def.slice(11, 16)}" ${locked ? "disabled" : ""}></div></div>
+      <div class="lbl" style="margin-top:10px">Waktu popular (cadangan)</div><div class="sc-nets">${["08:00", "12:30", "17:30", "20:00", "21:30"].map(t => `<button type="button" class="chip pc-best" data-t="${t}" ${locked ? "disabled" : ""}>${t}</button>`).join("")}</div>
+      <p class="hint" style="margin:6px 0 0">Zon waktu: <b>${esc((TZS.find(t => t[0] === SC.tz) || [0, SC.tz])[1])}</b> (tukar di atas kalendar).</p>
+      <div id="pc-err" class="err" role="alert"></div>
+      <div class="pl-act">${locked ? "" : `<button type="button" class="btn btn-ghost" id="pc-draft">Simpan draf</button><button type="button" class="btn btn-red" id="pc-go">${edit ? "Simpan perubahan" : "Jadualkan"}</button>`}${edit && post.status !== "published" ? `<button type="button" class="btn btn-ghost" id="pc-del" aria-label="Buang post">${ic("trash", "w-4 h-4")}</button>` : ""}</div></div>
+    <div class="pl-prev"><div class="lbl">Pratonton</div><div class="pl-card"><div class="pl-ch"><span class="pl-av" id="pv-av"></span><div><b id="pv-nm">Akaun anda</b><small id="pv-st">${edit ? esc(ST_NAME[post.status] || post.status) : "Baharu"}</small></div></div><div class="pl-txt" id="pv-tx"></div><div class="pl-med" id="pv-md"></div></div></div></div>`, bg => {
+    const $c = id => $("#" + id, bg), er = $c("pc-err");
+    const chosen = () => $$(".pc-net[aria-pressed=true]", bg).map(b => b.dataset.n);
+    const upd = () => { const t = $c("pc-text").value, ch = chosen(), first = $(".pc-net[aria-pressed=true]", bg); $c("pc-cnt").textContent = `${t.length}/2200` + (ch.length && $$(".pc-net[aria-pressed=true]", bg).some(b => b.dataset.pl === "twitter") ? " · X: 280" : ""); $c("pv-tx").textContent = t || "Teks post anda akan dipaparkan di sini."; $c("pv-av").innerHTML = first ? netIc(first.dataset.pl) : ""; $c("pv-nm").textContent = first ? first.textContent.trim() : "Akaun anda"; const mu = safeUrl($c("pc-media").value.trim()); $c("pv-md").innerHTML = mu && /\.(png|jpe?g|webp|gif|avif)(\?|#|$)/i.test(mu) ? `<img src="${esc(mu)}" alt="">` : mu ? `<div class="pl-vid">${ic("link", "w-5 h-5")} Media</div>` : ""; };
+    $$(".pc-net", bg).forEach(b => (b.onclick = () => { b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") !== "true"); upd(); }));
+    $$(".pc-best", bg).forEach(b => (b.onclick = () => ($c("pc-time").value = b.dataset.t)));
+    $c("pc-text").oninput = upd; $c("pc-media").oninput = upd; upd();
+    const read = isDraft => {
+      er.textContent = ""; const text = $c("pc-text").value.trim(), date = $c("pc-date").value, time = $c("pc-time").value, mu = $c("pc-media").value.trim(), ids = chosen();
+      if (!ids.length) return (er.textContent = "Pilih sekurang-kurangnya satu rangkaian."), null;
+      if (!text && !mu) return (er.textContent = "Tulis teks atau letak pautan media."), null;
+      if (!date || !time) return (er.textContent = "Pilih tarikh dan masa."), null;
+      const wall = `${date}T${time}:00`; if (!isDraft && wall < addMin(wallIn(new Date(), SC.tz), 2)) return (er.textContent = "Masa mesti sekurang-kurangnya 2 minit dari sekarang. Masa lepas akan dihantar serta-merta, jadi ia disekat."), null;
+      let media = ""; if (mu) { media = safeUrl(mu); if (!/^https:\/\//.test(media)) return (er.textContent = "Pautan media mesti https:// dan awam."), null; }
+      return { text, wall, media, ids, ts: zonedToUtc(wall, SC.tz).getTime() };
+    };
+    const save = async isDraft => {
+      const v = read(isDraft); if (!v) return; const bt = $c(isDraft ? "pc-draft" : "pc-go"); bt.disabled = true;
+      try {
+        if (SC.prov === "zernio") {
+          const body = { content: v.text, platforms: v.ids.map(id => ({ platform: SC.accounts.find(a => a._id === id).platform, accountId: id })) };
+          if (isDraft) body.isDraft = true; else { body.scheduledFor = v.wall; body.timezone = SC.tz; }
+          if (v.media) body.mediaItems = [{ type: /\.(mp4|mov|webm|m4v)(\?|#|$)/i.test(v.media) ? "video" : "image", url: v.media }];
+          if (edit) await zfetch("/posts/" + encodeURIComponent(post.id), { method: "PUT", body: JSON.stringify(body) }); else await zfetch("/posts", { method: "POST", body: JSON.stringify(body) });
+          await zload();
+        } else {
+          const ym = v.wall.slice(0, 7); if (!isDraft && mcGet().filter(x => !x.draft && x.id !== post?.id && dayIn(new Date(x.ts), SC.tz).slice(0, 7) === ym).length >= MC_LIMIT) { bt.disabled = false; return (er.textContent = `Had ${MC_LIMIT} post untuk bulan itu sudah penuh.`); }
+          const rec = { id: edit ? post.id : "m" + genId(8), text: v.text, media: v.media, plats: v.ids, ts: v.ts, tz: SC.tz, done: false, draft: !!isDraft };
+          mcSet(edit ? mcGet().map(x => (x.id === post.id ? rec : x)) : [...mcGet(), rec]);
+        }
+        SC.sel = v.wall.slice(0, 10); SC.ym = SC.sel.slice(0, 7); bg.close(); toast(isDraft ? "Draf disimpan ✓" : edit ? "Post dikemas kini ✓" : "Post dijadualkan ✓"); drawPlanner();
+      } catch (e) { bt.disabled = false; er.textContent = "Gagal: " + e.message; }
+    };
+    if (!locked) { $c("pc-go").onclick = () => save(false); $c("pc-draft").onclick = () => save(true); }
+    if ($c("pc-del")) $c("pc-del").onclick = async () => { try { if (SC.prov === "zernio") { await zfetch("/posts/" + encodeURIComponent(post.id), { method: "DELETE" }); SC.posts = SC.posts.filter(x => x.id !== post.id); } else mcSet(mcGet().filter(x => x.id !== post.id)); bg.close(); toast("Post dibuang."); drawPlanner(); } catch (e) { er.textContent = "Gagal membuang: " + e.message; } };
+    if (SC.prov === "metricool" && edit && !locked && !post.done) { const dn = document.createElement("button"); dn.type = "button"; dn.className = "btn btn-ghost"; dn.textContent = "Tandakan siap"; dn.onclick = () => { mcSet(mcGet().map(x => (x.id === post.id ? { ...x, done: true } : x))); bg.close(); drawPlanner(); }; $(".pl-act", bg).appendChild(dn); const cp = document.createElement("button"); cp.type = "button"; cp.className = "btn btn-ghost"; cp.innerHTML = ic("copy", "w-4 h-4") + " Salin teks"; cp.onclick = () => copyText(post.text); $(".pl-act", bg).appendChild(cp); }
+  }, { side: true, cls: "wide" });
+}
 async function zernioView() {
   const info = $("#sc-info"), body = $("#sc-body");
   info.innerHTML = infoCard("Zernio (hantar automatik)", ["Percuma: <b>2 akaun media sosial serentak</b>. Akaun ketiga dan seterusnya perlukan kad dan pelan berbayar.", "Post tidak terhad; Zernio menghantar pada masa dijadualkan <b>walaupun app ditutup</b>.", "Anda guna API key akaun Zernio sendiri. Ia disimpan hanya dalam pelayar ini dan dihantar terus ke Zernio. Jangan kongsi komputer yang tidak dipercayai."]);
@@ -1747,42 +1884,23 @@ async function zernioView() {
     return;
   }
   body.innerHTML = `<div style="display:grid;place-items:center;padding:30px"><div class="spin" role="status" aria-label="Memuatkan"></div></div>`;
-  try { await zload(); } catch (e) { return (body.innerHTML = `<div class="glass" style="border-radius:20px;padding:16px">${e.status === 401 || e.status === 403 ? "API key tidak lagi sah." : "Tak dapat hubungi Zernio: " + esc(e.message)}<div style="margin-top:10px"><button class="btn btn-ghost btn-sm" id="zout">Tukar API key</button> <button class="btn btn-ghost btn-sm" id="zre">Cuba lagi</button></div></div>`), ($("#zout").onclick = () => { lsSet("fl_zkey", ""); scheduleTab(); }), ($("#zre").onclick = () => scheduleTab()); }
+  try { await zload(); } catch (e) { body.innerHTML = `<div class="glass" style="border-radius:20px;padding:16px">${e.status === 401 || e.status === 403 ? "API key tidak lagi sah." : "Tak dapat hubungi Zernio: " + esc(e.message)}<div style="margin-top:10px"><button class="btn btn-ghost btn-sm" id="zout">Tukar API key</button> <button class="btn btn-ghost btn-sm" id="zre">Cuba lagi</button></div></div>`; $("#zout").onclick = () => { lsSet("fl_zkey", ""); scheduleTab(); }; $("#zre").onclick = () => scheduleTab(); return; }
   const full = SC.accounts.length >= ZFREE;
-  body.innerHTML = `<div class="glass" style="border-radius:20px;padding:16px"><div class="lbl" style="display:flex;justify-content:space-between;gap:8px;align-items:center"><span>Akaun disambung (${SC.accounts.length})</span><button class="btn btn-ghost btn-sm" id="zout">Putus Zernio</button></div>
-    <div class="sc-accs">${SC.accounts.length ? SC.accounts.map(a => `<span class="chip" style="min-height:36px">${esc(PLAT[a.platform] || a.platform)} · ${esc(a.username || a.displayName || "")}</span>`).join("") : `<p style="color:#9CA3AF;margin:0">Belum ada akaun media sosial.</p>`}</div>
-    <div class="lbl" style="margin-top:12px">Sambung akaun baharu</div><div class="sc-accs">${Object.keys(PLAT).map(k => `<button class="chip" data-zc="${k}">${ic("plus", "w-4 h-4")} ${PLAT[k]}</button>`).join("")}</div>${full ? `<p class="hint" style="margin:8px 0 0;color:#FFD166">Plan percuma Zernio sudah mencapai ${ZFREE} akaun. Menyambung akaun lagi mungkin diminta kad.</p>` : ""}<div id="zce" class="err" role="alert"></div></div>
-    ${composerHtml(SC.accounts.length ? SC.accounts.map(a => `<label class="sc-net"><input type="checkbox" value="${esc(a._id)}"><span>${esc(PLAT[a.platform] || a.platform)} · ${esc(a.username || a.displayName || "")}</span></label>`).join("") : `<p style="color:#9CA3AF;margin:0">Sambung sekurang-kurangnya satu akaun dahulu.</p>`)}
-    <div id="sc-cal"></div>`;
+  body.innerHTML = `<div class="glass" style="border-radius:18px;padding:12px 14px"><div class="sc-accs" style="margin:0;align-items:center"><b style="font-size:13.5px">Akaun (${SC.accounts.length})</b>${SC.accounts.map(a => `<span class="chip" style="min-height:34px">${netIc(a.platform)} ${esc(a.username || a.displayName || "")}</span>`).join("")}<details style="margin-left:auto"><summary class="chip" style="min-height:34px;cursor:pointer">${ic("plus", "w-4 h-4")} Sambung akaun</summary><div class="sc-accs" style="margin-top:8px">${Object.keys(PLAT).map(k => `<button class="chip" data-zc="${k}">${netIc(k)} ${PLAT[k]}</button>`).join("")}</div>${full ? `<p class="hint" style="margin:8px 0 0;color:#FFD166">Plan percuma Zernio sudah ${ZFREE} akaun. Menyambung lagi mungkin diminta kad.</p>` : ""}<div id="zce" class="err" role="alert"></div></details><button class="btn btn-ghost btn-sm" id="zout">Putus Zernio</button></div></div>
+    <div id="pl-main" style="margin-top:12px"></div>`;
   $("#zout").onclick = () => { lsSet("fl_zkey", ""); SC.posts = []; SC.accounts = []; scheduleTab(); };
   $$("[data-zc]").forEach(b => (b.onclick = async () => { b.disabled = true; try { await zconnect(b.dataset.zc); } catch (e) { b.disabled = false; $("#zce").textContent = "Gagal: " + e.message; } }));
-  bindTz(); drawCal();
-  $("#sc-go").onclick = async () => {
-    const v = readComposer(); if (!v) return; const ids = $$(".sc-net input:checked").map(x => x.value), er = $("#sc-err");
-    if (!ids.length) return (er.textContent = "Pilih sekurang-kurangnya satu akaun.");
-    const body = { content: v.text, platforms: ids.map(id => ({ platform: SC.accounts.find(a => a._id === id).platform, accountId: id })), scheduledFor: v.wall, timezone: v.tz };
-    if (v.media) body.mediaItems = [{ type: /\.(mp4|mov|webm|m4v)(\?|#|$)/i.test(v.media) ? "video" : "image", url: v.media }];
-    const b = $("#sc-go"); b.disabled = true;
-    try { await zfetch("/posts", { method: "POST", body: JSON.stringify(body) }); toast("Post dijadualkan ✓"); $("#sc-text").value = ""; $("#sc-media").value = ""; SC.sel = v.wall.slice(0, 10); SC.ym = SC.sel.slice(0, 7); await zload(); drawCal(); }
-    catch (e) { er.textContent = "Gagal menjadualkan: " + e.message; }
-    b.disabled = false;
-  };
+  drawPlanner();
 }
 function metricoolView() {
-  $("#sc-info").innerHTML = infoCard("Metricool (kalendar + peringatan)", ["Percuma: kira-kira <b>20 post sebulan</b> (semak kaunter dalam akaun Metricool anda).", "API Metricool hanya untuk pelan <b>Advanced/Custom</b> dan pelayar tidak dibenarkan memanggilnya terus, jadi Flash Link <b>tidak boleh menghantar</b> ke Metricool bagi pelan percuma.", "Apa yang berfungsi di sini: rancang post dalam kalendar, kaunter had 20 sebulan, dan peringatan bila tiba masanya (app perlu dibuka). Kemudian salin teks dan jadualkan/hantar dalam <a href=\"https://app.metricool.com\" target=\"_blank\" rel=\"noopener\" style=\"color:#7DD3FC\">Metricool</a>. Data disimpan dalam pelayar ini sahaja."]);
-  $("#sc-body").innerHTML = `<div class="glass" style="border-radius:20px;padding:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span>${ic("calendar", "w-5 h-5")} Dirancang bulan ini: <b id="mc-count">0</b> / ${MC_LIMIT}</span><a class="btn btn-ghost btn-sm" style="margin-left:auto" href="https://app.metricool.com" target="_blank" rel="noopener">${ic("ext", "w-4 h-4")} Buka Metricool</a></div>
-    ${composerHtml(MC_NETS.map(k => `<label class="sc-net"><input type="checkbox" value="${k}"><span>${PLAT[k]}</span></label>`).join(""))}<div id="sc-cal"></div>`;
-  bindTz(); drawCal();
-  $("#sc-go").onclick = () => {
-    const v = readComposer(); if (!v) return; const er = $("#sc-err"), ym = v.wall.slice(0, 7);
-    if (mcGet().filter(x => dayIn(new Date(x.ts), v.tz).slice(0, 7) === ym).length >= MC_LIMIT) return (er.textContent = `Had ${MC_LIMIT} post untuk bulan itu sudah penuh.`);
-    const plats = $$(".sc-net input:checked").map(x => x.value);
-    mcSet([...mcGet(), { id: "m" + genId(8), text: v.text, media: v.media, plats, ts: v.ts, tz: v.tz, done: false }]); toast("Ditambah ke kalendar ✓"); $("#sc-text").value = ""; $("#sc-media").value = ""; SC.sel = v.wall.slice(0, 10); SC.ym = SC.sel.slice(0, 7); drawCal();
-  };
+  $("#sc-info").innerHTML = infoCard("Metricool (kalendar + peringatan)", ["Percuma: kira-kira <b>20 post sebulan</b> (semak kaunter dalam akaun Metricool anda).", "API Metricool hanya untuk pelan <b>Advanced/Custom</b> dan pelayar tidak dibenarkan memanggilnya terus, jadi Flash Link <b>tidak boleh menghantar</b> ke Metricool bagi pelan percuma.", "Apa yang berfungsi di sini: rancang post dalam planner, kaunter had 20 sebulan, dan peringatan bila tiba masanya (app perlu dibuka). Kemudian salin teks dan jadualkan/hantar dalam <a href=\"https://app.metricool.com\" target=\"_blank\" rel=\"noopener\" style=\"color:#7DD3FC\">Metricool</a>. Data disimpan dalam pelayar ini sahaja."]);
+  $("#sc-body").innerHTML = `<div class="glass" style="border-radius:18px;padding:12px 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap"><span>${ic("calendar", "w-5 h-5")} Dirancang bulan ini: <b id="mc-count">0</b> / ${MC_LIMIT}</span><a class="btn btn-ghost btn-sm" style="margin-left:auto" href="https://app.metricool.com" target="_blank" rel="noopener">${ic("ext", "w-4 h-4")} Buka Metricool</a></div><div id="pl-main" style="margin-top:12px"></div>`;
+  drawPlanner();
 }
 
 /* ---------- Shorten link ---------- */
-const shortUrl = c => `${location.origin}/s/${c}`;
+const slugHandle = v => String(v || "").toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "").replace(/-{2,}/g, "-").slice(0, 24);
+const shortUrl = c => (c.includes("_") ? `${location.origin}/${c.split("_")[0]}/webapps/${c.split("_").slice(1).join("_")}` : `${location.origin}/s/${c}`);
 async function loadShort() { const sn = await FB.getDocs(FB.query(FB.collection(db, "flashlink_short"), FB.where("uid", "==", S.user.uid))); S.short = sn.docs.map(d => ({ code: d.id, ...d.data() })).sort((a, b) => (a.order ?? 0) - (b.order ?? 0)); }
 async function shortTab() {
   const pane = $("#pane"); pane.innerHTML = `<div style="display:grid;place-items:center;padding:40px"><div class="spin" role="status" aria-label="Memuatkan"></div></div>`;
@@ -1800,11 +1918,14 @@ async function shortTab() {
   draw();
   $("#sadd").onclick = async () => {
     const nm = $("#sn").value.trim(), u = normUrl($("#su").value), er = $("#se"); er.textContent = "";
+    if (!S.profile.handle || S.profile.handle.length < 3) { er.innerHTML = `Isi <b>Username</b> (minimum 3 aksara) di Profil dahulu. <button type="button" class="linkbtn" id="gohn">Buka Profil</button>`; $("#gohn").onclick = () => openView("profile"); return; }
     if (!nm) return (er.textContent = "Isi nama pautan, cth. WhatsApp."); if (!u) return (er.textContent = "Pautan tidak sah. Mesti ada domain, cth. contoh.com/halaman.");
     const b = $("#sadd"); b.disabled = true;
     try {
       const order = S.short.length ? Math.max(...S.short.map(z => z.order ?? 0)) + 1 : 0; let made = null;
-      for (let i = 0; i < 8 && !made; i++) { const code = genId(6); try { await FB.runTransaction(db, async tx => { const r = FB.doc(db, "flashlink_short", code); if ((await tx.get(r)).exists()) throw Object.assign(new Error("taken"), { code: "taken" }); tx.set(r, { uid: S.user.uid, name: nm.slice(0, 60), url: u, order, createdAt: FB.serverTimestamp() }); }); made = code; } catch (e) { if (e.code !== "taken") throw e; } }
+      const uc = S.profile.username, hd = S.profile.handle;
+      for (let i = 0; i < 40 && !made; i++) { const slug = i ? `${hd.slice(0, 36)}-${i + 1}` : hd, code = `${uc}_${slug}`; try { await FB.runTransaction(db, async tx => { const r = FB.doc(db, "flashlink_short", code); if ((await tx.get(r)).exists()) throw Object.assign(new Error("taken"), { code: "taken" }); tx.set(r, { uid: S.user.uid, name: nm.slice(0, 60), url: u, order, createdAt: FB.serverTimestamp() }); }); made = code; } catch (e) { if (e.code !== "taken") throw e; } }
+      if (!made) throw new Error("penuh");
       S.short.push({ code: made, uid: S.user.uid, name: nm.slice(0, 60), url: u, order }); $("#sn").value = ""; $("#su").value = ""; draw(); toast("Pautan dipendekkan ✓"); copyText(shortUrl(made));
     } catch (e) { console.error(e); er.textContent = e.code === "permission-denied" ? "Kebenaran ditolak." : "Gagal memendekkan. Cuba lagi."; }
     b.disabled = false;
@@ -1922,7 +2043,7 @@ function linkModal({ link, platform, type } = {}) {
     $m("thu").onclick = () => $m("thf").click();
     $m("tha").onclick = async () => { if (!th) return status("Tiada gambar untuk dilaras."); const r = await recropImage(th, { ...TH_OPTS, aspects: lay === "featured" ? [["1.9:1", 1.9], ["16:9", 16 / 9], ["1:1", 1]] : TH_OPTS.aspects }); if (r) { th = r; thTouched = true; drawTh(); status("Gambar dilaras ✓"); } };
     $m("thr").onclick = () => { th = ""; thTouched = true; $m("thi").value = ""; drawTh(); status("Gambar dibuang."); };
-    $m("thf").onchange = async e => { const file = e.target.files[0]; e.target.value = ""; if (!file) return; const d = await cropImage(file, { ...TH_OPTS, aspects: lay === "featured" ? [["1.9:1", 1.9], ["16:9", 16 / 9], ["1:1", 1]] : TH_OPTS.aspects }); if (!d) return; status("Menyimpan gambar…"); try { th = await saveImage(d); thTouched = true; drawTh(); status("Gambar anda dimuat naik ✓"); } catch { status("Gagal menyimpan gambar."); } };
+    $m("thf").onchange = async e => { const file = e.target.files[0]; e.target.value = ""; if (!file) return; const d = await cropImage(file, { ...TH_OPTS, aspects: lay === "featured" ? [["1.9:1", 1.9], ["16:9", 16 / 9], ["1:1", 1]] : TH_OPTS.aspects }); if (!d) return; const meta = LASTCROP; status("Menyimpan gambar…"); try { const [r, o] = await Promise.all([saveImage(d), saveOriginal(file).catch(() => "")]); th = r; recordOrig(r, o, meta); thTouched = true; drawTh(); status("Gambar anda dimuat naik ✓"); } catch { status("Gagal menyimpan gambar."); } };
     $m("thi").addEventListener("input", e => { const v = e.target.value.trim(); if (!v) return; const u = normUrl(v); if (u) { th = u; thTouched = true; drawTh(); status("Guna URL gambar anda."); } });
   }
   if (needUrl) {
@@ -1962,7 +2083,7 @@ function profileTab() {
   $("#pane").innerHTML = `<div style="display:flex;flex-direction:column;gap:16px">
   <section class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Gambar & maklumat</h2>
     ${imgFieldHtml("f-av", "Gambar profil / hero", "round")}${imgFieldHtml("f-bn", "Banner (untuk gaya Banner)", "wide")}${imgQualityHtml("pq")}
-    ${inp("dn", "Nama paparan", p.displayName, "Tulis nama anda", 'maxlength="40"')}<div style="margin-top:12px"><label class="lbl" for="bio">Bio</label><textarea id="bio" class="inp" rows="2" maxlength="140" placeholder="Terangkan diri/kedai anda">${esc(p.bio)}</textarea></div></section>
+    ${inp("dn", "Nama paparan", p.displayName, "Tulis nama anda", 'maxlength="40"')}${inp("hn", "Username", p.handle, "cth. izzul", 'maxlength="24" autocapitalize="off" spellcheck="false"')}<p class="hint" style="margin:4px 0 0">Huruf kecil, nombor dan sempang. Digunakan di hujung pautan pendek anda.</p><div style="margin-top:12px"><label class="lbl" for="bio">Bio</label><textarea id="bio" class="inp" rows="2" maxlength="140" placeholder="Terangkan diri/kedai anda">${esc(p.bio)}</textarea></div></section>
   <section class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Gaya profil</h2><p class="hint" style="margin:0 0 10px">Pilih rupa kepala halaman anda, seperti profil premium.</p>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px">${STYLES.map(([k, n, d]) => `<button type="button" class="stybtn" data-s="${k}" aria-pressed="${(p.profileStyle || "classic") === k}"><span class="stymini sty-${k}"><i></i><b></b></span><span style="font-weight:700;font-size:14px">${n}</span><small style="color:#C7C9D1;font-size:11.5px;line-height:1.3">${d}</small></button>`).join("")}</div></section>
   <section class="glass" id="pwsec" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Kata laluan</h2><p class="hint" style="margin:0 0 10px">E-mel log masuk: <b>${esc(S.user.email || "")}</b>. Kata laluan disimpan dengan selamat (di-hash) oleh Firebase, jadi tidak boleh dipaparkan semula. Gunakan ikon mata semasa menaip untuk menyemak apa yang anda taip. Lupa kata laluan? Guna "Lupa kata laluan?" di halaman log masuk.</p><button type="button" class="btn btn-ghost" id="pwopen">${ic("eye", "w-4 h-4")} Tukar kata laluan</button></section>
@@ -1983,7 +2104,8 @@ function profileTab() {
   bindQ("pq"); bindImgField("f-av", () => S.profile.avatarUrl, v => (S.profile.avatarUrl = v), AV_OPTS, commit);
   bindImgField("f-bn", () => S.profile.bannerUrl, v => (S.profile.bannerUrl = v), BN_OPTS, commit);
   const on = (id, fn) => { const el = $("#" + id); if (el) el.addEventListener("input", e => fn(e.target.value)); };
-  on("dn", v => { S.profile.displayName = v.slice(0, 40); commit(); }); on("bio", v => { S.profile.bio = v; commit(); });
+  on("dn", v => { S.profile.displayName = v.slice(0, 40); commit(); });
+  on("hn", v => { const h = slugHandle(v); if (h !== v) $("#hn").value = h; S.profile.handle = h; saveProfile(); }); on("bio", v => { S.profile.bio = v; commit(); });
   $$(".stybtn").forEach(b => (b.onclick = () => { S.profile.profileStyle = b.dataset.s; $$(".stybtn").forEach(x => x.setAttribute("aria-pressed", x === b)); commit(); }));
   const drawSoc = () => {
     const list = S.profile.socialIcons || [];
@@ -2139,7 +2261,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-44";
+const APP_VERSION = "V-47";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
@@ -2195,7 +2317,8 @@ new MutationObserver(() => renderUpdateBtn()).observe($("#app"), { childList: tr
    Pangkalan jawapan dibina daripada pendaftaran sebenar app (NAV, DESIGNS, STYLES, TPL, BRANDS, APP_VERSION),
    jadi ciri baharu yang didaftarkan di situ masuk sendiri. Ciri tanpa pendaftaran: tambah di CB_EXTRA. */
 const CB_EXTRA = [
-  { k: "shorten pendek short ringkas", q: "Shorten link", a: "Di bahagian Shorten link: isi nama (cth. WhatsApp) dan tampal pautan panjang, tekan Pendekkan. Setiap baris ada butang salin, edit, buang, dan pemegang di kiri untuk susun naik atau turun.", go: "short" },
+  { k: "shorten pendek short ringkas username webapps", q: "Shorten link", a: "Isi Username dahulu di Profil. Kemudian di Shorten link: isi nama (cth. WhatsApp) dan tampal pautan panjang. Pautan pendek berbentuk alamat/kod-anda/webapps/username-anda. Setiap baris ada butang salin, edit, buang, dan pemegang di kiri untuk susun.", go: "short" },
+  { k: "terbit terbitkan publish design salin pautan diterbitkan draf", q: "Terbitkan design", a: "Anda boleh buat design sebanyak mana pun (tiada had). Pilih satu dan tekan Terbit: itulah design yang dipaparkan pada Pautan anda (butang Salin pautan). Design lain kekal sebagai draf. Tukar design terbitan bila-bila masa.", go: "design" },
   { k: "crop potong laras zum zoom gambar pecah kabur 4k kualiti resolusi tajam jelas 1080", q: "Gambar & kualiti", a: "Setiap gambar ada butang Laras (seret, zum, kiri/kanan/atas/bawah). Kualiti gambar ada pilihan Auto (ikut peranti anda), 1080p, 2K atau 4K, di Profil atau dalam tetingkap Laras. Gambar baharu disimpan pada kualiti itu (tidak dibesarkan melebihi saiz asal). Gambar lama yang sudah kecil: muat naik semula.", go: "profile" },
   { k: "pautan tambah link url tampal platform logo", q: "Tambah pautan", a: "Pergi Pautan, tekan Tambah, tampal URL atau pilih platform. Logo dan gambar kecil dikesan automatik. Seret untuk susun. Boleh pilih bentuk bar atau featured.", go: "links" },
   { k: "analitik statistik klik lawatan graf prestasi", q: "Analitik", a: "Bahagian Analitik tunjuk lawatan, klik, kadar klik, graf bar harian (merah/biru berselang), pautan yang naik dan sumber pelawat. Pilih satu pautan di sebelah Muat semula, atau klik baris pautan, untuk analitik pautan itu sahaja.", go: "insights" },
@@ -2211,7 +2334,7 @@ const CB_EXTRA = [
 function cbKB() {
   const out = [...CB_EXTRA];
   NAV.forEach(n => out.push({ k: n.n.toLowerCase() + " " + n.k, q: n.n, a: n.d, go: n.k }));
-  out.push({ k: "design template templat tema gaya papar rupa warna fon", q: "Design & template", a: () => `Di bahagian Design anda ada ${DESIGNS.length} template siap: ${DESIGNS.map(d => d.n).join(", ")}. Klik template untuk pilih, lalu ubah nama, bio, gambar, warna, fon, saiz kad dan bentuk butang dalam panel edit. Boleh simpan sehingga ${MAXD} design dan tukar bila-bila masa. Pautan anda tidak hilang bila design bertukar.`, go: "design" });
+  out.push({ k: "design template templat tema gaya papar rupa warna fon", q: "Design & template", a: () => `Di bahagian Design anda ada ${DESIGNS.length} template siap: ${DESIGNS.map(d => d.n).join(", ")}. Klik template untuk pilih, lalu ubah nama, bio, gambar, warna, fon, saiz kad dan bentuk butang dalam panel edit. Boleh simpan tanpa had bilangan design dan tukar bila-bila masa. Pautan anda tidak hilang bila design bertukar.`, go: "design" });
   out.push({ k: "gaya profil kepala klasik hero banner cincin kaca sebelah header", q: "Gaya profil", a: () => `Ada ${STYLES.length} gaya kepala profil: ${STYLES.map(x => x[1]).join(", ")}. Tukar di Profil atau dalam panel edit design.`, go: "profile" });
   out.push({ k: "susun atur layout poster grid katalog bento", q: "Susun atur", a: () => `Susun atur tersedia: ${Object.values(TPL).map(x => x.name).join(", ")}.`, go: "design" });
   out.push({ k: "platform sokongan whatsapp shopee tiktok instagram lazada youtube", q: "Platform disokong", a: () => `Logo platform dikesan automatik untuk: ${LINK_KEYS.map(k => BRANDS[k].n).join(", ")}.`, go: "links" });
@@ -2261,6 +2384,7 @@ function route() {
   if (p === "/login") return loginView();
   if (p === "/dashboard") return dashView();
   if (seg.length === 2 && seg[0] === "s" && /^[a-z0-9]{4,12}$/.test(seg[1])) return shortView(seg[1]);
+  if (seg.length === 3 && seg[1] === "webapps" && /^[a-z0-9]{4,12}$/.test(seg[0]) && /^[a-z0-9-]{3,40}$/.test(seg[2])) return shortView(seg[0] + "_" + seg[2]);
   if (seg.length === 1 && USER_RE.test(seg[0]) && !RESERVED.has(seg[0])) return publicView(seg[0]);
   notFound();
 }
