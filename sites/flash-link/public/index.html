@@ -1283,15 +1283,17 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-23";
+const APP_VERSION = "V-24";
+const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
+const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "flashlink.geniusdigital.space", "localhost", "127.0.0.1"].includes(location.hostname);
 async function checkUpdate() {
   if (!S.user) return;
   try {
-    const r = await fetch("/version.json?t=" + Date.now(), { cache: "no-store" }); const j = await r.json();
+    const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); const j = await r.json();
     if (j.version && j.version !== APP_VERSION && !$("#updbar")) {
       const d = document.createElement("div"); d.id = "updbar"; d.setAttribute("role", "status");
-      d.innerHTML = `<span>${ic("zap", "w-5 h-5")}<b>Versi baharu ${esc(j.version)} tersedia</b>${j.notes ? `<small>${esc(j.notes)}</small>` : ""}</span><button id="updgo" class="btn btn-red btn-sm">Kemas kini sekarang</button>`;
-      document.body.appendChild(d); $("#updgo").onclick = () => location.reload();
+      d.innerHTML = `<span>${ic("zap", "w-5 h-5")}<b>Versi baharu ${esc(j.version)} tersedia</b>${j.notes ? `<small>${esc(j.notes)}</small>` : ""}${IS_CENTRAL ? "" : "<small>Muat turun ZIP terbaru dan deploy semula.</small>"}</span><button id="updgo" class="btn btn-red btn-sm">${IS_CENTRAL ? "Kemas kini sekarang" : "Muat turun kemas kini"}</button>`;
+      document.body.appendChild(d); $("#updgo").onclick = () => (IS_CENTRAL ? location.reload() : window.open(ZIP_URL, "_blank", "noopener"));
     }
   } catch {}
 }
