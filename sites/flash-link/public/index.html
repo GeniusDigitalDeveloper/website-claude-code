@@ -2708,7 +2708,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-64";
+const APP_VERSION = "V-65";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
@@ -2738,25 +2738,26 @@ async function startUpdate(btn) {
     }; tick();
   });
   txt.textContent = ms ? "Siap 100% ✓" : "Done 100% ✓"; btn.classList.add("upd-done");
-  await new Promise(r => setTimeout(r, 450));
+  await new Promise(r => setTimeout(r, 200));
   // peralihan gaya iOS: paparan lama mengecil dan kabur, tirai kaca muncul, kemudian muat semula
   try { sessionStorage.setItem("fl_upd", ver || "V"); } catch {}
   const cur = document.createElement("div"); cur.id = "updcurtain"; cur.setAttribute("aria-hidden", "true");
   cur.style.cssText = "position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;background:rgba(6,8,16,.86);backdrop-filter:blur(26px) saturate(160%);-webkit-backdrop-filter:blur(26px) saturate(160%)";
   cur.innerHTML = `<div class="upd-card"><div class="upd-ck"><svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><b>${ms ? "Dikemas kini ke " : "Updated to "}${esc(ver)}</b></div>`;
   document.body.appendChild(cur);
-  if (!REDUCE()) { $("#app").animate([{ transform: "scale(1)", filter: "blur(0)", opacity: 1 }, { transform: "scale(.94)", filter: "blur(10px)", opacity: .5 }], { duration: 650, easing: EZ, fill: "forwards" }); cur.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 650, easing: EZ, fill: "both" }); $(".upd-card", cur).animate([{ transform: "scale(.82)", opacity: 0 }, { transform: "scale(1.04)", opacity: 1, offset: .65 }, { transform: "scale(1)", opacity: 1 }], { duration: 800, easing: EZ, fill: "both" }); await new Promise(r => setTimeout(r, 950)); }
+  if (!REDUCE()) { $("#app").animate([{ transform: "scale(1)", filter: "blur(0)", opacity: 1 }, { transform: "scale(.94)", filter: "blur(10px)", opacity: .5 }], { duration: 420, easing: EZ, fill: "forwards" }); cur.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 420, easing: EZ, fill: "both" }); $(".upd-card", cur).animate([{ transform: "scale(.82)", opacity: 0 }, { transform: "scale(1.04)", opacity: 1, offset: .65 }, { transform: "scale(1)", opacity: 1 }], { duration: 480, easing: EZ, fill: "both" }); await new Promise(r => setTimeout(r, 520)); }
   hardReload();
 }
 function playUpdateIn() {
   const c = document.getElementById("updcurtain"); if (!c || c.dataset.in) return; c.dataset.in = "1"; try { sessionStorage.removeItem("fl_upd"); } catch {}
   const EZ = "cubic-bezier(.32,.72,0,1)", app = $("#app"), card = $(".upd-card", c);
   if (REDUCE()) return c.remove();
+  setTimeout(() => c.isConnected && c.remove(), 2400); // jaminan: tirai tidak kekal lebih 2.4 saat
   setTimeout(() => {
-    if (card) card.animate([{ transform: "scale(1)", opacity: 1 }, { transform: "scale(1.12)", opacity: 0 }], { duration: 600, easing: EZ, fill: "forwards" });
-    app && app.animate([{ transform: "scale(1.06)", filter: "blur(12px)", opacity: .4 }, { transform: "scale(1)", filter: "blur(0)", opacity: 1 }], { duration: 900, easing: EZ });
-    c.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 900, easing: EZ, fill: "forwards" }).onfinish = () => c.remove();
-  }, 700);
+    if (card) card.animate([{ transform: "scale(1)", opacity: 1 }, { transform: "scale(1.1)", opacity: 0 }], { duration: 420, easing: EZ, fill: "forwards" });
+    app && app.animate([{ transform: "scale(1.05)", filter: "blur(10px)", opacity: .4 }, { transform: "scale(1)", filter: "blur(0)", opacity: 1 }], { duration: 650, easing: EZ });
+    c.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 650, easing: EZ, fill: "forwards" }).onfinish = () => c.remove();
+  }, 450);
 }
 function hardReload() { try { navigator.serviceWorker?.getRegistrations?.().then(rs => rs.forEach(r => r.unregister())); } catch {} location.reload(); }
 /* Butang Kemas kini (kuning): hanya wujud bila ada versi baharu; hilang selepas dikemas kini. Diletak di kanan "Mula sekarang". */
@@ -2872,6 +2873,61 @@ function cbAnswer(text) {
   const scored = docs.map(d => { let sc = 0, m = 0; qw.forEach(w => { const hk = hit(w, d.key), ha = hit(w, d.ans), h = Math.max(hk * 2.4, ha * .45); if (h) { sc += h * idf(w); m++; } }); sc *= 1 + m / qw.length; return { e: d.e, sc }; }).filter(x => x.sc > 0).sort((a, b) => b.sc - a.sc);
   return scored;
 }
+/* ---------- Chatbot: jawapan langsung daripada data dalam app (waktu solat, jam, zon, statistik, akaun) ---------- */
+const CB_PN = [["fajr", "Subuh", /\b(subuh|subuk|fajr|fajar)\b/], ["dhuhr", "Zuhur", /\b(zuhur|zohor|dhuhr|zuhr|zhuhr|duhur)\b/], ["asr", "Asar", /\b(asar|asr|asur)\b/], ["maghrib", "Maghrib", /\b(maghrib|magrib|maghrib)\b/], ["isha", "Isyak", /\b(isyak|isya|isha|isyak|esyak)\b/]];
+const cbDur = d => { const h = Math.floor(d / 3600), m = Math.floor((d % 3600) / 60); return LANG === "ms" ? (h ? `${h}j ${m}m` : `${m}m`) : (h ? `${h}h ${m}m` : `${m}m`); };
+const CB_MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], CB_PM = {};
+async function cbTimes(offset) {
+  if (!PR.times) { try { await ensurePray(); } catch {} } if (!PR.times) return null; if (!offset) return { t: PR.times, exact: true };
+  const d = klDay(new Date(klNow().getTime() + 864e5 * offset)), [y, m, dd] = d.split("-"), key = `${dd}-${CB_MON[+m - 1]}-${y}`, mk = `${PR.zone}_${y}-${m}`;
+  try { if (!CB_PM[mk]) CB_PM[mk] = (await (await fetch(`https://www.e-solat.gov.my/index.php?r=esolatApi/TakwimSolat&period=month&zone=${PR.zone}`, { cache: "no-store" })).json()).prayerTime || []; const r = CB_PM[mk].find(x => x.date === key); if (r) return { t: r, exact: true }; } catch {}
+  return { t: PR.times, exact: false };
+}
+async function cbLive(raw) {
+  const q = " " + String(raw).toLowerCase().replace(/[^a-z0-9\s:]/g, " ").replace(/\s+/g, " ") + " ", en = LANG === "en";
+  const has = re => re.test(q), pn = CB_PN.find(p => p[2].test(q)), tomorrow = has(/\b(esok|besok|tomorrow)\b/), yest = has(/\b(semalam|yesterday)\b/);
+  const strong = has(/\b(jam|pukul|bila|berapa|when|what time|time is|starts?|masuk)\b/), weak = has(/\b(waktu|time|times|masa)\b/), blocked = has(/\b(siapa|who|muazzin|kredit|credit|gambar|foto|photo|picture|suis|switch|tutup|off|hidup|on)\b/);
+  const zi = zInfo(PR.zone) || ["", "", ""], where = `${zi[1]} ${PR.zone}`.trim();
+  const pray = has(/\b(solat|sembahyang|prayer|prayers|salah)\b/) || !!pn;
+  const need = async off => { const r = await cbTimes(off); return r; };
+  const noData = () => ({ text: en ? "Prayer times are not loaded yet. Check your internet connection and try again." : "Waktu solat belum dapat dimuatkan. Semak sambungan internet dan cuba lagi.", go: null });
+  // 1) satu waktu solat tertentu
+  if (pn && (strong || (weak && !blocked)) && !has(/\b(azan|azan)\b.*\b(siapa|who)\b/)) {
+    const off = tomorrow ? 1 : yest ? -1 : 0; if (off < 0) return { text: en ? "I can only show today's and tomorrow's prayer times." : "Saya hanya boleh tunjuk waktu solat hari ini dan esok." };
+    const r = await need(off); if (!r) return noData(); const t = r.t[pn[0]].slice(0, 5), t12 = to12(t), nm = pn[1];
+    let ex = ""; if (!off) { const sec = secOf(wallIn(klNow(), "Asia/Kuala_Lumpur").slice(11)), ts = secOf(t); ex = ts > sec ? (en ? ` (in ${cbDur(ts - sec)})` : ` (lagi ${cbDur(ts - sec)})`) : (en ? " (already begun)" : " (sudah masuk)"); }
+    const day = off ? (en ? "tomorrow" : "esok") : (en ? "today" : "hari ini"), appr = r.exact ? "" : (en ? " (approximate, tomorrow's data was not available)" : " (anggaran, data esok belum tersedia)");
+    return { text: en ? `${nm} ${day} is at ${t12}${ex} for ${where}${appr}.` : `Waktu ${nm} ${day} ialah ${t12}${ex} bagi ${where}${appr}.` };
+  }
+  // 2) senarai semua waktu solat
+  if (pray && !pn && has(/\b(semua|senarai|jadual|list|all|schedule|hari ini|today|esok|besok|tomorrow|waktu solat|prayer times?)\b/) && !has(/\b(seterusnya|next|sekarang|now|semasa|current)\b/) && !blocked) {
+    const off = tomorrow ? 1 : 0, r = await need(off); if (!r) return noData();
+    const L = CB_PN.map(p => `${p[1]} ${to12(r.t[p[0]].slice(0, 5))}`).join(en ? ", " : ", ");
+    return { text: en ? `Prayer times ${off ? "tomorrow" : "today"} for ${where}: ${L}.${r.exact ? "" : " (approximate)"}` : `Waktu solat ${off ? "esok" : "hari ini"} bagi ${where}: ${L}.${r.exact ? "" : " (anggaran)"}` };
+  }
+  // 3) solat seterusnya / semasa
+  if (pray && has(/\b(seterusnya|next|lagi|berapa lama|countdown|kira detik|remaining|left)\b/) && !pn && !blocked) { const r = await need(0); if (!r) return noData(); const x = prayIdx(); return { text: en ? `The next prayer is ${CB_PN[x.ni][1]}${x.tomorrow ? " (tomorrow)" : ""} at ${to12(PR.times[CB_PN[x.ni][0]].slice(0, 5))}, in ${cbDur(x.diff)}.` : `Waktu solat seterusnya ialah ${CB_PN[x.ni][1]}${x.tomorrow ? " (esok)" : ""} pada ${to12(PR.times[CB_PN[x.ni][0]].slice(0, 5))}, lagi ${cbDur(x.diff)}.` }; }
+  if (pray && has(/\b(sekarang|now|semasa|current|currently)\b/) && !pn && !blocked) { const r = await need(0); if (!r) return noData(); const x = prayIdx(), c = x.cur < 0 ? 4 : x.cur; return { text: en ? `The current prayer time is ${CB_PN[c][1]} (began at ${to12(PR.times[CB_PN[c][0]].slice(0, 5))}). Next: ${CB_PN[x.ni][1]} in ${cbDur(x.diff)}.` : `Waktu solat semasa ialah ${CB_PN[c][1]} (masuk pada ${to12(PR.times[CB_PN[c][0]].slice(0, 5))}). Seterusnya ${CB_PN[x.ni][1]}, lagi ${cbDur(x.diff)}.` }; }
+  // 4) jam / tarikh
+  if (!pn && has(/\b(jam berapa|pukul berapa|what time is it|current time|time now|tarikh|date today|hari apa|today s date|what day|tarikh hari ini)\b/)) { const n = klNow(), t = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Kuala_Lumpur", hour: "numeric", minute: "2-digit", hour12: true }).format(n), d = new Intl.DateTimeFormat(en ? "en-GB" : "ms-MY", { timeZone: "Asia/Kuala_Lumpur", weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(n); return { text: en ? `It is ${t} (Malaysia time), ${d}.` : `Sekarang ${t} (waktu Malaysia), ${d}.` }; }
+  // 5) zon
+  if (has(/\b(zon|zone)\b/) && has(/\b(saya|aku|ini|sekarang|my|current|mana|which|apa)\b/) && !has(/\b(tukar|change|ubah)\b/)) return { text: en ? `Your prayer time zone is ${PR.zone} (${zi[1]}: ${zi[2]}), ${PR.auto ? "detected automatically" : "chosen by you"}. Change it with the Change zone button.` : `Zon waktu solat anda ialah ${PR.zone} (${zi[1]}: ${zi[2]}), ${PR.auto ? "dikesan automatik" : "pilihan anda"}. Tukar dengan butang Tukar zon.` };
+  // 6) versi
+  if (has(/\b(versi|version)\b/) && !has(/\b(kemas kini|update|baharu|new)\b/)) return { text: en ? `You are using version ${APP_VERSION}.` : `Anda menggunakan versi ${APP_VERSION}.` };
+  // 7) statistik
+  if (has(/\b(berapa|how many|jumlah|bilangan|total|ramai)\b/) && has(/\b(pengguna|users?|pelawat|visitors?)\b/)) { const c = statCache || {}, f = fmtN; return { text: en ? `Users: ${f(c.s_users)}. Visitors today: ${f(c.s_day)}, this month: ${f(c.s_month)}, total: ${f(c.s_total)}.` : `Pengguna: ${f(c.s_users)}. Pelawat hari ini: ${f(c.s_day)}, bulan ini: ${f(c.s_month)}, keseluruhan: ${f(c.s_total)}.` }; }
+  // 8) akaun pengguna (jika log masuk)
+  if (S.user && S.profile) {
+    const p = S.profile;
+    if (has(/\b(berapa|how many)\b/) && has(/\b(pautan|links?)\b/)) return { text: en ? `You have ${S.links.length} link${S.links.length === 1 ? "" : "s"} and ${p.designs.length} design${p.designs.length === 1 ? "" : "s"}.` : `Anda ada ${S.links.length} pautan dan ${p.designs.length} design.`, go: "links" };
+    if (has(/\b(pautan|link|url)\b/) && has(/\b(saya|aku|my|anda|your)\b/) && !has(/\b(tambah|add|pendek|short)\b/)) return { text: en ? `Your public link is ${profileUrl(p.username)}. Use the Copy link button to copy it.` : `Pautan awam anda ialah ${profileUrl(p.username)}. Guna butang Salin pautan untuk menyalinnya.` };
+    if (has(/\b(username|nama pengguna|handle)\b/) && has(/\b(saya|aku|my)\b/)) return { text: en ? `Your username is ${p.handle || p.username}.` : `Username anda ialah ${p.handle || p.username}.`, go: "profile" };
+    if (has(/\b(design)\b/) && has(/\b(terbit|publish|published|diterbitkan)\b/) && has(/\b(apa|which|what|mana)\b/)) { const d = p.designs.find(x => x.id === p.publishedDesign); return { text: en ? `Your published design is “${d ? d.name : ""}”.` : `Design yang diterbitkan ialah “${d ? d.name : ""}”.`, go: "design" }; }
+  }
+  // 9) status azan
+  if (has(/\b(azan)\b/) && has(/\b(status|sekarang|now|current|hidup ke|on ke|is it on)\b/)) return { text: en ? `The azan is currently ${AZAN.on() ? "ON" : "OFF"}. Change it with the speaker button next to Change zone.` : `Azan sekarang ${AZAN.on() ? "HIDUP" : "TUTUP"}. Tukar dengan butang speaker di sebelah Tukar zon.` };
+  return null;
+}
 function cbInit() {
   const fabs = $("#fabs"); if (!fabs || $("#cbfab")) return;
   const fab = document.createElement("button"); fab.id = "cbfab"; fab.type = "button"; fab.setAttribute("aria-label", "Buka pembantu bantuan Flash Link"); fab.setAttribute("aria-expanded", "false");
@@ -2883,8 +2939,9 @@ function cbInit() {
   const msgs = $("#cbmsgs", panel);
   const say = (t, who, go) => { const d = document.createElement("div"); d.className = "cbm " + who; d.textContent = t; msgs.appendChild(d); if (go && NAV.some(n => n.k === go)) { const nv = NAV.find(n => n.k === go), bt = document.createElement("button"); bt.type = "button"; bt.className = "cbgo"; bt.textContent = "Buka " + nv.n; bt.onclick = () => { if (S.user && S.profile && $("#stage")) openView(go); else nav("/dashboard"); panel.hidden = true; fab.setAttribute("aria-expanded", "false"); }; msgs.appendChild(bt); } msgs.scrollTop = msgs.scrollHeight; };
   const chips = () => { const c = $("#cbchips", panel); c.innerHTML = ""; ["Cara tambah pautan", "Gambar pecah", "Shorten link", "Kemas kini", "Analitik"].forEach(t => { const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = t; b.onclick = () => ask(t); c.appendChild(b); }); };
-  const ask = t => {
+  const ask = async t => {
     t = t.trim(); if (!t) return; say(t, "me");
+    try { const lv = await cbLive(t); if (lv) return say(lv.text, "bot", lv.go); } catch (e) { console.error(e); }
     const r = cbAnswer(cbNorm(t));
     if (!r || !r.length || r[0].sc < 1.1) { say("Maaf, saya hanya menjawab tentang Flash Link dan belum pasti maksud soalan itu. Adakah salah satu topik ini yang anda cari? Atau cuba soalan pendek, cth. “tambah pautan”, “azan”, “kemas kini”.", "bot"); const row = document.createElement("div"); row.className = "cbsug"; (r || []).slice(0, 4).forEach(x => { const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = x.e.q; b.onclick = () => ask(x.e.q); row.appendChild(b); }); if (row.children.length) { msgs.appendChild(row); msgs.scrollTop = msgs.scrollHeight; } return; }
     const top = r[0].e, a = typeof top.a === "function" ? top.a() : top.a; say(a, "bot", top.go);
