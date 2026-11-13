@@ -1,0 +1,8 @@
+"flashlink": {
+  "live": {
+    "$uid": {
+      ".read": "auth != null && auth.uid == $uid",
+      ".write": true
+    }
+  }
+}

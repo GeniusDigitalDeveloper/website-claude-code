@@ -1,0 +1,40 @@
+// ===== FLASH LINK RULES (tambahan) =====
+function fl_isOwner(uid) {
+  return request.auth != null && request.auth.uid == uid;
+}
+
+match /flashlink_users/{uid} {
+  allow read: if true;
+  allow create, update, delete: if fl_isOwner(uid);
+}
+
+match /flashlink_usernames/{username} {
+  allow read: if true;
+  allow create: if request.auth != null
+    && request.resource.data.uid == request.auth.uid;
+  allow update: if false;
+  allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+}
+
+match /flashlink_links/{linkId} {
+  allow read: if true;
+  allow create: if request.auth != null
+    && request.resource.data.uid == request.auth.uid;
+  allow update: if (request.auth != null && resource.data.uid == request.auth.uid)
+    || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['clicks'])
+        && request.resource.data.clicks == resource.data.clicks + 1);
+  allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+}
+
+match /flashlink_events/{eventId} {
+  allow create: if request.resource.data.keys().hasOnly(['uid','linkId','type','device','referrer','createdAt']);
+  allow read: if request.auth != null && resource.data.uid == request.auth.uid;
+  allow update, delete: if false;
+}
+
+match /flashlink_leads/{leadId} {
+  allow create: if request.resource.data.keys().hasOnly(['uid','name','email','phone','message','createdAt']);
+  allow read, delete: if request.auth != null && resource.data.uid == request.auth.uid;
+  allow update: if false;
+}
+// ===== TAMAT FLASH LINK RULES =====
