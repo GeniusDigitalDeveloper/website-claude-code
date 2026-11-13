@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Flash Link — Satu pautan untuk semua jualan anda</title>
-<meta name="description" content="Flash Link: halaman link-in-bio paling laju. Letak WhatsApp, Shopee, TikTok Shop dan YouTube dalam satu pautan. Siap dalam 2 minit, percuma.">
+<meta name="description" content="Flash Link: halaman link-in-bio paling laju. Letak WhatsApp, Shopee, TikTok Shop dan YouTube dalam satu pautan. Siap dalam 2 minit, kemas kini automatik.">
 <meta name="theme-color" content="#07070A">
 <meta property="og:site_name" content="Flash Link">
 <meta property="og:type" content="website">
@@ -92,12 +92,74 @@ select.inp option{color:#111}
 
 #sfxbtn{position:fixed;left:14px;bottom:14px;z-index:60;width:42px;height:42px;border-radius:50%;display:none;place-items:center;color:#E5E7EB;background:rgba(16,16,21,.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);transition:transform .3s var(--ease,ease),border-color .3s}
 #sfxbtn.on{display:grid}#sfxbtn:hover{transform:scale(1.08);border-color:#FF6B6B}#sfxbtn:active{transform:scale(.94)}
+/* ============ LATAR GRADIEN MERAH + BIRU CERAH (bergerak kiri-kanan) ============ */
+#bgflow{position:fixed;inset:0;z-index:-1;overflow:hidden;display:none;pointer-events:none;background:#05060B}
+body.flow #bgflow{display:block}
+#bgflow i{position:absolute;border-radius:50%;filter:blur(90px);will-change:transform;opacity:.62}
+#bgflow .g1{width:60vmax;height:60vmax;left:-20vmax;top:-26vmax;background:radial-gradient(circle,#FF2A2A 0%,rgba(255,42,42,0) 66%);animation:gfx1 24s ease-in-out infinite alternate}
+#bgflow .g2{width:62vmax;height:62vmax;right:-22vmax;top:-10vmax;background:radial-gradient(circle,#38BDF8 0%,rgba(37,99,235,.5) 38%,rgba(37,99,235,0) 68%);animation:gfx2 28s ease-in-out infinite alternate}
+#bgflow .g3{width:56vmax;height:56vmax;left:18vw;bottom:-30vmax;background:radial-gradient(circle,#4FC3F7 0%,rgba(79,195,247,0) 66%);animation:gfx3 32s ease-in-out infinite alternate;opacity:.42}
+@keyframes gfx1{0%{transform:translate3d(0,0,0) scale(1)}100%{transform:translate3d(70vw,12vh,0) scale(1.18)}}
+@keyframes gfx2{0%{transform:translate3d(0,0,0) scale(1.05)}100%{transform:translate3d(-75vw,18vh,0) scale(.92)}}
+@keyframes gfx3{0%{transform:translate3d(-30vw,0,0)}100%{transform:translate3d(46vw,-8vh,0) scale(1.15)}}
+.aurora{display:none}
+/* ============ iPHONE ============ */
+.iphone{position:relative;width:292px;height:604px;border-radius:56px;padding:10px;background:linear-gradient(145deg,#9a9aa3 0%,#2b2b31 16%,#5d5d66 50%,#26262c 84%,#8b8b94 100%);box-shadow:0 0 0 1px #0b0b0d,inset 0 0 0 2px rgba(255,255,255,.2),0 40px 90px -25px rgba(56,189,248,.4),0 30px 70px -30px rgba(225,6,0,.55)}
+.iscreen{height:100%;border-radius:46px;overflow:auto;background:#000;scrollbar-width:none;position:relative;isolation:isolate}
+.iscreen::-webkit-scrollbar{display:none}
+.iisland{position:absolute;top:19px;left:50%;width:94px;height:28px;margin-left:-47px;background:#000;border-radius:20px;z-index:4;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+.istatus{position:absolute;top:22px;left:40px;right:40px;display:flex;justify-content:space-between;align-items:center;z-index:3;font-size:13px;font-weight:700;color:#fff;pointer-events:none;mix-blend-mode:difference}
+.ihome{position:absolute;bottom:18px;left:50%;width:104px;height:4px;margin-left:-52px;border-radius:9px;background:#fff;mix-blend-mode:difference;z-index:3;opacity:.85}
+.ib{position:absolute;width:3.5px;background:linear-gradient(#a0a0a8,#4a4a52);border-radius:2px}
+.ib1{left:-3px;top:112px;height:28px}.ib2{left:-3px;top:160px;height:50px}.ib3{left:-3px;top:222px;height:50px}.ib4{right:-3px;top:180px;height:84px}
+.iscreen.pv-wrap .fl-wrap{padding-top:54px}
+.iscreen.pv-wrap .fl-sty-hero .fl-wrap{padding-top:0}
+/* ============ ANIMASI SKROL ============ */
+[data-fx]{opacity:0;will-change:transform,opacity}
+@media (prefers-reduced-motion:reduce){[data-fx]{opacity:1}#bgflow i{animation:none}}
+/* ============ PEMILIH PLATFORM ============ */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px}
+.ptile{display:flex;flex-direction:column;align-items:center;gap:7px;padding:12px 6px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid var(--line);color:#F4F4F5;font-size:12.5px;font-weight:600;text-align:center;line-height:1.25;transition:transform .35s var(--ease,ease),border-color .25s,background .25s}
+.ptile:hover{transform:translate3d(0,-3px,0) scale(1.04);border-color:rgba(125,211,252,.7);background:rgba(56,189,248,.1)}
+.ptile:active{transform:scale(.95)}
+.pt-i{width:50px;height:50px;border-radius:15px;display:grid;place-items:center;flex:none;box-shadow:0 8px 18px -8px rgba(0,0,0,.6)}
+.ptile.mini{width:50px;height:50px;padding:0;border:0;display:grid;place-items:center;border-radius:15px}
+.stybtn{display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center;padding:10px 6px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--line);color:#fff;transition:transform .3s var(--ease,ease),border-color .25s}
+.stybtn[aria-pressed=true]{border-color:#38BDF8;box-shadow:0 0 0 2px rgba(56,189,248,.35)}
+.stybtn:active{transform:scale(.96)}
+.stymini{position:relative;display:block;width:52px;height:74px;border-radius:12px;background:#1b1e2b;overflow:hidden;border:1px solid rgba(255,255,255,.2)}
+.stymini i{position:absolute;left:50%;margin-left:-9px;top:10px;width:18px;height:18px;border-radius:50%;background:#7DD3FC}
+.stymini b{position:absolute;left:8px;right:8px;bottom:9px;height:7px;border-radius:5px;background:#FF4D4D;box-shadow:0 -12px 0 #FF4D4D}
+.sty-hero i{left:0;margin:0;top:0;width:100%;height:46px;border-radius:0;background:linear-gradient(180deg,#7DD3FC,#1b3a5a)}
+.sty-cover{background:linear-gradient(180deg,#3b82b6,#0b1220)}.sty-cover i{display:none}
+/* ============ PROFIL: GAYA FOTO (macam Linktree Pro) ============ */
+.fl-bi{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex:none}
+.fl-th{width:44px;height:44px;border-radius:10px;object-fit:cover;flex:none}
+.fl-heroimg{margin:0 -16px;position:relative;aspect-ratio:4/5;max-height:560px;background-size:cover;background-position:center top;background-color:#0b0b10;border-radius:0 0 30px 30px;overflow:hidden;display:flex;align-items:flex-end;color:#fff}
+.fl-heroimg.noimg{background-image:linear-gradient(160deg,color-mix(in srgb,var(--btn) 70%,#000),#0b0b10)}
+.fl-heroov{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05) 28%,rgba(0,0,0,.78) 100%)}
+.fl-heroini{position:absolute;inset:0;display:grid;place-items:center;font-size:110px;font-weight:800;opacity:.3}
+.fl-herotxt{position:relative;width:100%;padding:0 20px 22px;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.55)}
+.fl-herotxt .fl-name{text-align:left;font-size:28px;margin:0}
+.fl-herotxt .fl-bio{text-align:left;margin:6px 0 0;color:#fff;opacity:.94}
+.fl-herotxt .fl-social{justify-content:flex-start;margin-top:12px}
+.fl-herotxt .fl-social a{color:#fff;background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.32)}
+.fl-sty-hero .fl-wrap{padding-top:0}
+.fl-coverspace{height:200px}
+.fl-sty-cover{--text:#fff}
+.fl-sty-cover .fl-name{text-shadow:0 2px 16px rgba(0,0,0,.6)}
+.fl-sty-cover .fl-btn{background:rgba(255,255,255,.13);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.25);color:#fff}
+.fl-sty-cover .fl-foot,.fl-sty-cover .fl-foot a{color:#fff}
+/* ============ BAR KEMAS KINI ============ */
+#updbar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:90;display:flex;gap:14px;align-items:center;max-width:94vw;padding:10px 12px 10px 16px;border-radius:18px;background:rgba(16,18,28,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(56,189,248,.6);box-shadow:0 16px 50px rgba(0,0,0,.6),0 0 30px -6px rgba(56,189,248,.5);animation:updin .7s var(--ease,ease) both}
+#updbar span{display:flex;flex-direction:column;gap:1px;font-size:14px}#updbar span svg{display:none}#updbar small{color:#C7C9D1;font-size:12.5px}
+@keyframes updin{from{opacity:0;transform:translate(-50%,30px) scale(.94)}}
 /* ============ BANNER 3 ZON (1920x110, kiri | tengah | kanan) ============ */
 .fl-banner3{position:relative;width:100%;height:clamp(72px,5.73vw,110px);overflow:hidden;border-bottom:1px solid rgba(255,77,77,.28);isolation:isolate}
 .b3-bg{position:absolute;inset:0;z-index:-1;background:
-  radial-gradient(40% 140% at 50% 50%,rgba(255,42,42,.30),transparent 70%),
+  radial-gradient(34% 140% at 18% 50%,rgba(255,42,42,.34),transparent 70%),radial-gradient(34% 140% at 84% 50%,rgba(56,189,248,.34),transparent 70%),
   repeating-linear-gradient(115deg,transparent 0 46px,rgba(255,255,255,.035) 46px 48px),
-  linear-gradient(100deg,#120305 0%,#34060a 38%,#14070b 66%,#07070A 100%)}
+  linear-gradient(100deg,#150306 0%,#2a0a14 34%,#0b1d34 70%,#07101c 100%)}
 .b3-bg::after{content:"";position:absolute;inset:0;width:40%;transform:translateX(-120%) skewX(-22deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent);animation:b3sweep 7s cubic-bezier(.32,.72,0,1) infinite;will-change:transform}
 @keyframes b3sweep{0%,55%{transform:translateX(-120%) skewX(-22deg)}100%{transform:translateX(330%) skewX(-22deg)}}
 .b3-in{height:100%;max-width:1920px;margin:0 auto;display:grid;grid-template-columns:1fr 1.5fr 1fr;align-items:center}
@@ -187,13 +249,14 @@ select.inp option{color:#111}
 </style>
 </head>
 <body>
+<div id="bgflow" aria-hidden="true"><i class="g1"></i><i class="g2"></i><i class="g3"></i></div>
 <div id="app"></div>
 <div id="toasts" aria-live="polite"></div>
 
 <script type="module">
 /* =====================================================================
    FLASH LINK — sistem link-in-bio (satu fail: HTML + CSS + JS)
-   Versi: V-22
+   Versi: V-23
    =====================================================================
    >>> TAMPAL CONFIG APP "FLASH LINK" SAHAJA DI SINI <<<
    Firebase Console > Project Settings > Your apps > FLASH LINK > SDK setup and configuration > Config.
@@ -313,7 +376,54 @@ const P = {
 const ic = (n, c = "w-5 h-5") => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="${c}" aria-hidden="true">${P[n] || P.link}</svg>`;
 const TYPE_ICON = { link: "link", whatsapp: "whatsapp", product: "bag", youtube: "youtube", email_form: "mail", header: "heading" };
 const TYPE_NAME = { link: "Pautan", whatsapp: "WhatsApp", product: "Produk", youtube: "YouTube", email_form: "Borang e-mel", header: "Tajuk bahagian" };
-const SOCIALS = [["instagram", "Instagram", "instagram"], ["tiktok", "TikTok", "tiktok"], ["facebook", "Facebook", "facebook"], ["youtube", "YouTube", "youtube"], ["mail", "E-mel", "mail"]];
+const BP = {"whatsapp":"M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z","instagram":"M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077","tiktok":"M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z","facebook":"M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z","youtube":"M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z","shopee":"M15.9414 17.9633c.229-1.879-.981-3.077-4.1758-4.0969-1.548-.528-2.277-1.22-2.26-2.1719.065-1.056 1.048-1.825 2.352-1.85a5.2898 5.2898 0 0 1 2.8838.89c.116.072.197.06.263-.039.09-.145.315-.494.39-.62.051-.081.061-.187-.068-.281-.185-.1369-.704-.4149-.983-.5319a6.4697 6.4697 0 0 0-2.5118-.514c-1.909.008-3.4129 1.215-3.5389 2.826-.082 1.1629.494 2.1078 1.73 2.8278.262.152 1.6799.716 2.2438.892 1.774.552 2.695 1.5419 2.478 2.6969-.197 1.047-1.299 1.7239-2.818 1.7439-1.2039-.046-2.2878-.537-3.1278-1.19l-.141-.11c-.104-.08-.218-.075-.287.03-.05.077-.376.547-.458.67-.077.108-.035.168.045.234.35.293.817.613 1.134.775a6.7097 6.7097 0 0 0 2.8289.727 4.9048 4.9048 0 0 0 2.0759-.354c1.095-.465 1.8029-1.394 1.9449-2.554zM11.9986 1.4009c-2.068 0-3.7539 1.95-3.8329 4.3899h7.6657c-.08-2.44-1.765-4.3899-3.8328-4.3899zm7.8516 22.5981-.08.001-15.7843-.002c-1.074-.04-1.863-.91-1.971-1.991l-.01-.195L1.298 6.2858a.459.459 0 0 1 .45-.494h4.9748C6.8448 2.568 9.1607 0 11.9996 0c2.8388 0 5.1537 2.5689 5.2757 5.7898h4.9678a.459.459 0 0 1 .458.483l-.773 15.5883-.007.131c-.094 1.094-.979 1.9769-2.0709 2.0059z","telegram":"M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z","x":"M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z","linkedin":"M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z","threads":"M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.783 3.631 2.698 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.285 1.33-3.082.88-.76 2.119-1.207 3.583-1.291a13.853 13.853 0 0 1 3.02.142c-.126-.742-.375-1.332-.75-1.757-.513-.586-1.308-.883-2.359-.89h-.029c-.844 0-1.992.232-2.721 1.32L7.734 7.847c.98-1.454 2.568-2.256 4.478-2.256h.044c3.194.02 5.097 1.975 5.287 5.388.108.046.216.094.321.142 1.49.7 2.58 1.761 3.154 3.07.797 1.82.871 4.79-1.548 7.158-1.85 1.81-4.094 2.628-7.277 2.65Zm1.003-11.69c-.242 0-.487.007-.739.021-1.836.103-2.98.946-2.916 2.143.067 1.256 1.452 1.839 2.784 1.767 1.224-.065 2.818-.543 3.086-3.71a10.5 10.5 0 0 0-2.215-.221z","spotify":"M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z","pinterest":"M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z","snapchat":"M12.206.793c.99 0 4.347.276 5.93 3.821.529 1.193.403 3.219.299 4.847l-.003.06c-.012.18-.022.345-.03.51.075.045.203.09.401.09.3-.016.659-.12 1.033-.301.165-.088.344-.104.464-.104.182 0 .359.029.509.09.45.149.734.479.734.838.015.449-.39.839-1.213 1.168-.089.029-.209.075-.344.119-.45.135-1.139.36-1.333.81-.09.224-.061.524.12.868l.015.015c.06.136 1.526 3.475 4.791 4.014.255.044.435.27.42.509 0 .075-.015.149-.045.225-.24.569-1.273.988-3.146 1.271-.059.091-.12.375-.164.57-.029.179-.074.36-.134.553-.076.271-.27.405-.555.405h-.03c-.135 0-.313-.031-.538-.074-.36-.075-.765-.135-1.273-.135-.3 0-.599.015-.913.074-.6.104-1.123.464-1.723.884-.853.599-1.826 1.288-3.294 1.288-.06 0-.119-.015-.18-.015h-.149c-1.468 0-2.427-.675-3.279-1.288-.599-.42-1.107-.779-1.707-.884-.314-.045-.629-.074-.928-.074-.54 0-.958.089-1.272.149-.211.043-.391.074-.54.074-.374 0-.523-.224-.583-.42-.061-.192-.09-.389-.135-.567-.046-.181-.105-.494-.166-.57-1.918-.222-2.95-.642-3.189-1.226-.031-.063-.052-.15-.055-.225-.015-.243.165-.465.42-.509 3.264-.54 4.73-3.879 4.791-4.02l.016-.029c.18-.345.224-.645.119-.869-.195-.434-.884-.658-1.332-.809-.121-.029-.24-.074-.346-.119-1.107-.435-1.257-.93-1.197-1.273.09-.479.674-.793 1.168-.793.146 0 .27.029.383.074.42.194.789.3 1.104.3.234 0 .384-.06.465-.105l-.046-.569c-.098-1.626-.225-3.651.307-4.837C7.392 1.077 10.739.807 11.727.807l.419-.015h.06z","twitch":"M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z","discord":"M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z","github":"M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12","paypal":"M7.016 19.198h-4.2a.562.562 0 0 1-.555-.65L5.093.584A.692.692 0 0 1 5.776 0h7.222c3.417 0 5.904 2.488 5.846 5.5-.006.25-.027.5-.066.747A6.794 6.794 0 0 1 12.071 12H8.743a.69.69 0 0 0-.682.583l-.325 2.056-.013.083-.692 4.39-.015.087zM19.79 6.142c-.01.087-.01.175-.023.261a7.76 7.76 0 0 1-7.695 6.598H9.007l-.283 1.795-.013.083-.692 4.39-.134.843-.014.088H6.86l-.497 3.15a.562.562 0 0 0 .555.65h3.612c.34 0 .63-.249.683-.585l.952-6.031a.692.692 0 0 1 .683-.584h2.126a6.793 6.793 0 0 0 6.707-5.752c.306-1.95-.466-3.744-1.89-4.906z","kofi":"M11.351 2.715c-2.7 0-4.986.025-6.83.26C2.078 3.285 0 5.154 0 8.61c0 3.506.182 6.13 1.585 8.493 1.584 2.701 4.233 4.182 7.662 4.182h.83c4.209 0 6.494-2.234 7.637-4a9.5 9.5 0 0 0 1.091-2.338C21.792 14.688 24 12.22 24 9.208v-.415c0-3.247-2.13-5.507-5.792-5.87-1.558-.156-2.65-.208-6.857-.208m0 1.947c4.208 0 5.09.052 6.571.182 2.624.311 4.13 1.584 4.13 4v.39c0 2.156-1.792 3.844-3.87 3.844h-.935l-.156.649c-.208 1.013-.597 1.818-1.039 2.546-.909 1.428-2.545 3.064-5.922 3.064h-.805c-2.571 0-4.831-.883-6.078-3.195-1.09-2-1.298-4.155-1.298-7.506 0-2.181.857-3.402 3.012-3.714 1.533-.233 3.559-.26 6.39-.26m6.547 2.287c-.416 0-.65.234-.65.546v2.935c0 .311.234.545.65.545 1.324 0 2.051-.754 2.051-2s-.727-2.026-2.052-2.026m-10.39.182c-1.818 0-3.013 1.48-3.013 3.142 0 1.533.858 2.857 1.949 3.897.727.701 1.87 1.429 2.649 1.896a1.47 1.47 0 0 0 1.507 0c.78-.467 1.922-1.195 2.623-1.896 1.117-1.039 1.974-2.364 1.974-3.897 0-1.662-1.247-3.142-3.039-3.142-1.065 0-1.792.545-2.338 1.298-.493-.753-1.246-1.298-2.312-1.298","gmail":"M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"};  // logo jenama sebenar (Simple Icons, CC0)
+
+const BRANDS = {
+  whatsapp: { n: "WhatsApp", c: "#25D366", kind: "phone", ph: "0123456789", t: "Hubungi di WhatsApp", m: /wa\.me|whatsapp\.com/i, u: "" },
+  instagram: { n: "Instagram", c: "#E4405F", ph: "instagram.com/nama_anda", t: "Instagram", m: /instagram\.com/i, u: "https://instagram.com/" },
+  tiktokshop: { n: "TikTok Shop", c: "#111111", ic: "tiktok", ph: "shop.tiktok.com/...", t: "Beli di TikTok Shop", m: /shop\.tiktok|tiktokshop|tiktok\.com\/.*shop/i },
+  tiktok: { n: "TikTok", c: "#111111", ph: "tiktok.com/@nama_anda", t: "TikTok", m: /tiktok\.com/i, u: "https://tiktok.com/@" },
+  shopee: { n: "Shopee", c: "#EE4D2D", ph: "shopee.com.my/kedai_anda", t: "Kedai Shopee", m: /shopee\./i },
+  lazada: { n: "Lazada", c: "#0F146D", ph: "lazada.com.my/shop/kedai", t: "Kedai Lazada", m: /lazada\./i },
+  facebook: { n: "Facebook", c: "#0866FF", ph: "facebook.com/halaman_anda", t: "Facebook", m: /facebook\.com|fb\.com|fb\.me/i, u: "https://facebook.com/" },
+  youtube: { n: "YouTube", c: "#FF0000", ph: "youtube.com/@saluran atau pautan video", t: "YouTube", m: /youtube\.com|youtu\.be/i, u: "https://youtube.com/@" },
+  telegram: { n: "Telegram", c: "#26A5E4", ph: "t.me/nama_anda", t: "Telegram", m: /t\.me|telegram\./i, u: "https://t.me/" },
+  x: { n: "X (Twitter)", c: "#111111", ph: "x.com/nama_anda", t: "X", m: /(^|\.)x\.com|twitter\.com/i, u: "https://x.com/" },
+  threads: { n: "Threads", c: "#111111", ph: "threads.net/@nama_anda", t: "Threads", m: /threads\.(net|com)/i, u: "https://threads.net/@" },
+  linkedin: { n: "LinkedIn", c: "#0A66C2", ph: "linkedin.com/in/nama_anda", t: "LinkedIn", m: /linkedin\.com/i, u: "https://linkedin.com/in/" },
+  spotify: { n: "Spotify", c: "#1ED760", ph: "open.spotify.com/...", t: "Spotify", m: /spotify\.com/i },
+  pinterest: { n: "Pinterest", c: "#BD081C", ph: "pinterest.com/nama_anda", t: "Pinterest", m: /pinterest\./i, u: "https://pinterest.com/" },
+  snapchat: { n: "Snapchat", c: "#FFFC00", ph: "snapchat.com/add/nama_anda", t: "Snapchat", m: /snapchat\.com/i, u: "https://snapchat.com/add/" },
+  twitch: { n: "Twitch", c: "#9146FF", ph: "twitch.tv/nama_anda", t: "Twitch", m: /twitch\.tv/i, u: "https://twitch.tv/" },
+  discord: { n: "Discord", c: "#5865F2", ph: "discord.gg/jemputan", t: "Sertai Discord", m: /discord\.(gg|com)/i },
+  github: { n: "GitHub", c: "#181717", ph: "github.com/nama_anda", t: "GitHub", m: /github\.com/i, u: "https://github.com/" },
+  paypal: { n: "PayPal", c: "#003087", ph: "paypal.me/nama_anda", t: "Sokong melalui PayPal", m: /paypal\./i },
+  kofi: { n: "Ko-fi", c: "#FF6433", ph: "ko-fi.com/nama_anda", t: "Belanja saya kopi", m: /ko-fi\.com/i },
+  email: { n: "E-mel", c: "#EA4335", ic: "gmail", kind: "email", ph: "nama@contoh.com", t: "E-mel" },
+  web: { n: "Pautan lain (mana-mana URL)", c: "#38BDF8", ph: "contoh.com/halaman", t: "Laman web saya" },
+};
+const LINK_KEYS = ["whatsapp", "instagram", "tiktok", "tiktokshop", "shopee", "lazada", "facebook", "youtube", "telegram", "x", "threads", "linkedin", "spotify", "pinterest", "snapchat", "twitch", "discord", "github", "paypal", "kofi", "web"];
+const SOCIAL_KEYS = ["instagram", "tiktok", "facebook", "youtube", "x", "threads", "telegram", "whatsapp", "linkedin", "spotify", "pinterest", "snapchat", "twitch", "discord", "github", "email"];
+const FALL = { lazada: "bag", web: "globe", email: "mail" };
+const brandIc = (k, c = "w-5 h-5") => { const key = BRANDS[k]?.ic || k; return BP[key] ? `<svg viewBox="0 0 24 24" fill="currentColor" class="${c}" aria-hidden="true"><path d="${BP[key]}"/></svg>` : ic(FALL[k] || "link", c); };
+const detectPlatform = url => { try { const u = new URL(normUrl(url)); const h = u.hostname + u.pathname; for (const [k, b] of Object.entries(BRANDS)) if (b.m && b.m.test(h)) return k; } catch {} return "web"; };
+const imgUrl = u => { u = String(u || ""); if (/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(u) && u.length < 450000) return u; return safeUrl(u); };
+function socialHref(type, v) {
+  v = String(v || "").trim(); if (!v) return "";
+  if (type === "email") return /^\S+@\S+\.\S+$/.test(v) ? "mailto:" + v : "";
+  if (type === "whatsapp") return waLink(v) || "";
+  if (v.startsWith("@") && BRANDS[type]?.u) return BRANDS[type].u + encodeURIComponent(v.slice(1));
+  return safeUrl(v);
+}
+function compressImage(file, w, h, q = .82) {
+  return new Promise((res, rej) => {
+    if (!file || !/^image\//.test(file.type)) return rej(new Error("Fail mesti gambar."));
+    const url = URL.createObjectURL(file), im = new Image();
+    im.onload = () => { const c = document.createElement("canvas"); c.width = w; c.height = h; const x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, w, h); const r = Math.max(w / im.width, h / im.height), dw = im.width * r, dh = im.height * r; x.drawImage(im, (w - dw) / 2, (h - dh) * (h > w ? .3 : .5), dw, dh); URL.revokeObjectURL(url); res(c.toDataURL("image/jpeg", q)); };
+    im.onerror = () => { URL.revokeObjectURL(url); rej(new Error("Gambar tidak boleh dibaca.")); };
+    im.src = url;
+  });
+}
 
 /* ---------- Templat ---------- */
 const TPL = {
@@ -361,7 +471,7 @@ async function loadProfile() {
 }
 function normProfile(p) {
   const tpl = TPL[p.template] ? p.template : "minimal";
-  return { username: "", displayName: "", bio: "", avatarUrl: "", bannerUrl: "", socialIcons: [], testimonials: [], plan: "free", ...p, template: tpl, theme: { ...TPL[tpl].theme, auto: false, ...(p.theme || {}) } };
+  return { username: "", displayName: "", bio: "", avatarUrl: "", bannerUrl: "", socialIcons: [], testimonials: [], profileStyle: "classic", plan: "free", ...p, template: tpl, theme: { ...TPL[tpl].theme, auto: false, ...(p.theme || {}) } };
 }
 async function loadLinks(uid = S.user.uid) {
   const q = FB.query(FB.collection(db, "flashlink_links"), FB.where("uid", "==", uid));
@@ -376,18 +486,16 @@ function rootStyle(p) {
   const t = p.theme, btn = hex(t.btn, "#111111");
   let bg = hex(t.bg1, "#ffffff");
   if (t.bgType === "gradient") bg = `linear-gradient(160deg,${hex(t.bg1, "#05060F")},${hex(t.bg2, "#1A0A12")})`;
-  if (t.bgType === "image" && safeUrl(t.bgImg)) bg = `linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.5)),url('${encodeURI(safeUrl(t.bgImg)).replace(/'/g, "%27")}') center/cover`;
+  if (t.bgType === "image" && imgUrl(t.bgImg)) bg = `linear-gradient(rgba(0,0,0,.5),rgba(0,0,0,.5)),url('${encodeURI(imgUrl(t.bgImg)).replace(/'/g, "%27")}') center/cover`;
   const font = FONTS.includes(t.font) ? t.font : "Inter";
-  return `--bgcss:${bg};--text:${hex(t.text, "#111111")};--btn:${btn};--btnText:${onColor(btn)};--r:${SHAPES[t.shape] || "16px"};--font:'${font}'`;
+  let extra = "";
+  if (p.template !== "landing" && p.profileStyle === "cover" && imgUrl(p.avatarUrl)) { bg = `linear-gradient(rgba(4,5,12,.4),rgba(4,5,12,.9)),url('${encodeURI(imgUrl(p.avatarUrl)).replace(/'/g, "%27")}') center top/cover`; extra = ";--text:#FFFFFF"; }
+  return `--bgcss:${bg};--text:${hex(t.text, "#111111")};--btn:${btn};--btnText:${onColor(btn)};--r:${SHAPES[t.shape] || "16px"};--font:'${font}'${extra}`;
 }
 function socialHtml(p) {
-  const items = (p.socialIcons || []).filter(s => s.url);
+  const items = (p.socialIcons || []).map(s => ({ s, href: socialHref(s.type, s.url) })).filter(x => x.href && BRANDS[x.s.type]);
   if (!items.length) return "";
-  return `<div class="fl-social">${items.map(s => {
-    const meta = SOCIALS.find(x => x[0] === s.type); if (!meta) return "";
-    const href = s.type === "mail" ? "mailto:" + encodeURIComponent(s.url).replace(/%40/g, "@") : safeUrl(s.url);
-    return href ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer" aria-label="${meta[1]}">${ic(meta[2], "w-5 h-5")}</a>` : "";
-  }).join("")}</div>`;
+  return `<div class="fl-social">${items.map(({ s, href }) => `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(BRANDS[s.type].n)}">${brandIc(s.type, "w-5 h-5")}</a>`).join("")}</div>`;
 }
 const linkAttrs = l => `href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener noreferrer" data-link="${esc(l.id)}"`;
 function formHtml(l) {
@@ -401,30 +509,38 @@ function formHtml(l) {
     <button type="submit">Hantar</button><div class="fl-msg" role="status" style="font-size:13px"></div></form>`;
 }
 function productHtml(l, badgeFirst) {
-  const img = safeUrl(l.thumbnailUrl);
+  const img = imgUrl(l.thumbnailUrl);
   const badge = l.promoLabel ? `<span class="fl-badge">${esc(l.promoLabel)}</span>` : badgeFirst ? `<span class="fl-badge">Terlaris</span>` : "";
   return `<a class="fl-card fl-prod" ${linkAttrs(l)}>${img ? `<img src="${esc(img)}" alt="${esc(l.title)}" loading="lazy" decoding="async">` : `<div class="fl-ph">${ic("bag", "w-7 h-7")}</div>`}
     <div class="fl-pi">${badge}<b>${esc(l.title)}</b>${Number(l.price) ? `<div class="fl-price">${rm(l.price)}</div>` : ""}<span class="fl-buy">Beli sekarang ${ic("ext", "w-4 h-4")}</span></div></a>`;
 }
+const platOf = l => (l.platform && BRANDS[l.platform] ? l.platform : l.type === "whatsapp" ? "whatsapp" : l.type === "youtube" ? "youtube" : detectPlatform(l.url || ""));
+function iconTile(l) {
+  const th = imgUrl(l.thumbnailUrl); if (th) return `<img class="fl-th" src="${esc(th)}" alt="" loading="lazy" decoding="async">`;
+  const k = platOf(l), c = BRANDS[k]?.c || "#38BDF8";
+  return `<span class="fl-bi" style="background:${c};color:${onColor(c)}">${/\.pdf(\?|$)/i.test(l.url || "") ? ic("file", "w-5 h-5") : brandIc(k, "w-5 h-5")}</span>`;
+}
 function buttonHtml(l) {
-  const icon = l.type === "youtube" ? "youtube" : l.type === "whatsapp" ? "whatsapp" : /\.pdf(\?|$)/i.test(l.url || "") ? "file" : /shopee|tiktok|lazada/i.test(l.url || "") ? "bag" : "link";
-  const yt = l.type === "youtube" && ytId(l.url);
-  if (yt) return `<a class="fl-card" ${linkAttrs(l)} style="display:block"><img src="https://i.ytimg.com/vi/${yt}/hqdefault.jpg" alt="${esc(l.title)}" loading="lazy" decoding="async" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block"><div style="padding:10px 14px;font-weight:700;display:flex;gap:8px;align-items:center">${ic("youtube", "w-5 h-5")}${esc(l.title)}</div></a>`;
-  return `<a class="fl-btn" ${linkAttrs(l)}>${ic(icon, "w-5 h-5")}<span class="fl-t">${esc(l.title)}</span></a>`;
+  const yt = ytId(l.url || "");
+  if (yt && platOf(l) === "youtube") return `<a class="fl-card" ${linkAttrs(l)} style="display:block"><img src="https://i.ytimg.com/vi/${yt}/hqdefault.jpg" alt="${esc(l.title)}" loading="lazy" decoding="async" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block"><div style="padding:10px 14px;font-weight:700;display:flex;gap:8px;align-items:center">${brandIc("youtube", "w-5 h-5")}${esc(l.title)}</div></a>`;
+  return `<a class="fl-btn" ${linkAttrs(l)}>${iconTile(l)}<span class="fl-t">${esc(l.title)}</span></a>`;
 }
 function tileHtml(l) {
   if (l.type === "product") return productHtml(l);
-  const img = safeUrl(l.thumbnailUrl);
-  const icon = l.type === "whatsapp" ? "whatsapp" : l.type === "youtube" ? "youtube" : "link";
-  return `<a class="fl-card fl-tile" ${linkAttrs(l)}>${img ? `<img class="fl-img" src="${esc(img)}" alt="" loading="lazy" decoding="async">` : `<div class="fl-img" style="color:var(--btn)">${ic(icon, "w-12 h-12")}</div>`}<div class="fl-tt">${esc(l.title)}</div></a>`;
+  const img = imgUrl(l.thumbnailUrl), k = platOf(l);
+  return `<a class="fl-card fl-tile" ${linkAttrs(l)}>${img ? `<img class="fl-img" src="${esc(img)}" alt="" loading="lazy" decoding="async">` : `<div class="fl-img" style="color:${BRANDS[k]?.c || "var(--btn)"}">${brandIc(k, "w-12 h-12")}</div>`}<div class="fl-tt">${esc(l.title)}</div></a>`;
 }
 function renderProfile(p, links, { preview = false } = {}) {
   const t = p.theme, tpl = p.template, act = links.filter(l => l.active !== false);
   loadFont(t.font);
-  const avatar = safeUrl(p.avatarUrl);
-  const head = `${avatar ? `<img class="fl-avatar" src="${esc(avatar)}" alt="Foto ${esc(p.displayName)}" width="96" height="96" ${preview ? "" : 'fetchpriority="high"'}>` : `<div class="fl-avatar" style="display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:800">${esc((p.displayName || p.username || "F").trim().charAt(0).toUpperCase())}</div>`}
-    <h1 class="fl-name">${esc(p.displayName || "@" + p.username)}</h1>${p.bio ? `<p class="fl-bio">${esc(p.bio)}</p>` : ""}${socialHtml(p)}`;
-  const banner = safeUrl(p.bannerUrl) ? `<div class="fl-banner" style="background-image:url('${esc(encodeURI(safeUrl(p.bannerUrl)).replace(/'/g, "%27"))}')"></div>` : "";
+  const avatar = imgUrl(p.avatarUrl), sty = tpl === "landing" ? "classic" : (p.profileStyle || "classic");
+  const initial = esc((p.displayName || p.username || "F").trim().charAt(0).toUpperCase());
+  const nameBio = `<h1 class="fl-name">${esc(p.displayName || "@" + p.username)}</h1>${p.bio ? `<p class="fl-bio">${esc(p.bio)}</p>` : ""}${socialHtml(p)}`;
+  let head;
+  if (sty === "hero") head = `<div class="fl-heroimg${avatar ? "" : " noimg"}" ${avatar ? `style="background-image:url('${esc(encodeURI(avatar).replace(/'/g, "%27"))}')"` : ""}><div class="fl-heroov"></div>${avatar ? "" : `<div class="fl-heroini">${initial}</div>`}<div class="fl-herotxt">${nameBio}</div></div>`;
+  else if (sty === "cover") head = `<div class="fl-coverspace"></div>${nameBio}`;
+  else head = `${avatar ? `<img class="fl-avatar" src="${esc(avatar)}" alt="Foto ${esc(p.displayName)}" width="96" height="96" ${preview ? "" : 'fetchpriority="high"'}>` : `<div class="fl-avatar" style="display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:800">${initial}</div>`}${nameBio}`;
+  const banner = sty === "classic" && imgUrl(p.bannerUrl) ? `<div class="fl-banner" style="background-image:url('${esc(encodeURI(imgUrl(p.bannerUrl)).replace(/'/g, "%27"))}')"></div>` : "";
   const foot = `<div class="fl-foot"><a href="/" ${preview ? 'tabindex="-1"' : ""}>${ic("zap", "w-4 h-4")} Dibuat dengan Flash Link</a></div>`;
   let body = "";
   if (!act.length) body = `<p class="fl-bio" style="margin-top:20px">Belum ada pautan.</p>`;
@@ -446,7 +562,7 @@ function renderProfile(p, links, { preview = false } = {}) {
       (cta ? `<a class="fl-btn" style="margin-top:8px" ${linkAttrs(cta)}>${ic("whatsapp")}<span class="fl-t">Hubungi sekarang</span></a>` : "");
     return `<div class="fl-root fl-tpl-landing ${t.auto ? "fl-auto" : ""}" style="${esc(rootStyle(p))}"><div class="fl-wrap">${banner}${body}${foot}</div></div>`;
   } else body = act.map(blockHtml).join("");
-  return `<div class="fl-root fl-tpl-${tpl} ${t.auto ? "fl-auto" : ""}" style="${esc(rootStyle(p))}"><div class="fl-wrap">${banner}${head}<div style="height:6px"></div>${body}${foot}</div></div>`;
+  return `<div class="fl-root fl-tpl-${tpl} fl-sty-${sty} ${t.auto && sty !== "cover" ? "fl-auto" : ""}" style="${esc(rootStyle(p))}"><div class="fl-wrap">${banner}${head}<div style="height:6px"></div>${body}${foot}</div></div>`;
 }
 function tileProduct(l) { return productHtml(l); }
 function blockHtml(l) {
@@ -570,56 +686,87 @@ function fillStat() {
   });
 }
 
-/* ---------- Pandangan: landing ---------- */
+/* ---------- iPhone frame (digunakan di landing & pratonton dashboard) ---------- */
+const phoneFrame = (inner = "", id = "") => `<div class="iphone"><span class="ib ib1"></span><span class="ib ib2"></span><span class="ib ib3"></span><span class="ib ib4"></span>
+  <div class="iscreen pv-wrap"${id ? ` id="${id}"` : ""}>${inner}</div><div class="iisland"></div>
+  <div class="istatus"><b>9:41</b><span style="display:flex;gap:5px;align-items:center"><svg width="17" height="11" viewBox="0 0 17 11" fill="#fff"><rect x="0" y="7" width="3" height="4" rx=".8"/><rect x="4.5" y="5" width="3" height="6" rx=".8"/><rect x="9" y="2.5" width="3" height="8.5" rx=".8"/><rect x="13.5" y="0" width="3" height="11" rx=".8"/></svg><svg width="16" height="11" viewBox="0 0 16 11" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"><path d="M1.5 4a9.5 9.5 0 0 1 13 0"/><path d="M4 6.6a6 6 0 0 1 8 0"/><circle cx="8" cy="9.2" r="1" fill="#fff" stroke="none"/></svg><svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.2" stroke="#fff" opacity=".6"/><rect x="2" y="2" width="16" height="8" rx="2" fill="#fff"/><rect x="22.5" y="4" width="1.8" height="4" rx=".9" fill="#fff" opacity=".6"/></svg></span></div>
+  <div class="ihome"></div></div>`;
+let parOff = null;
+function parallaxInit() {
+  parOff && parOff(); parOff = null;
+  const els = $$("[data-par]"); if (!els.length || REDUCE()) return;
+  let tick = false; const f = () => { tick = false; const y = scrollY; els.forEach(e => (e.style.transform = `translate3d(0,${(y * parseFloat(e.dataset.par)).toFixed(1)}px,0)`)); };
+  const on = () => { if (!tick) { tick = true; requestAnimationFrame(f); } };
+  addEventListener("scroll", on, { passive: true }); parOff = () => removeEventListener("scroll", on);
+}
 function landing() {
   document.title = "Flash Link — Satu pautan untuk semua jualan anda";
   const logged = !!S.user;
   const demo = renderProfile(demoProfile("dark"), DEMO_LINKS.slice(0, 5), { preview: true });
-  const feats = [
-    ["zap", "Siap dalam 2 minit", "Daftar, pilih nama, tampal URL. Pautan wa.me dijana automatik."],
-    ["layers", "5 templat cantik", "Minimalis, grid visual, gelap kaca, laman mini dan katalog jualan."],
-    ["bag", "Blok jualan", "Produk, harga, lencana promosi terus ke Shopee, TikTok Shop & WhatsApp. Tiada potongan."],
-    ["chart", "Statistik jelas", "Lawatan dan klik setiap pautan, 7 atau 30 hari."],
-    ["qr", "Kod QR percuma", "Cetak pada kad atau kedai — pelanggan imbas terus."],
-    ["phone", "Edit dari telefon", "Pratonton langsung semasa anda reka. Ringan dan laju."],
-  ];
   const go = logged ? "/dashboard" : "/login?daftar=1";
+  const hooks = [
+    ["zap", "Pelanggan terus ke tujuan", "Tak perlu lagi tanya “link mana?”. Satu pautan di bio, semua WhatsApp, Shopee, TikTok Shop dan YouTube anda sedia diklik."],
+    ["bag", "Jualan nampak profesional", "Produk dengan gambar, harga dan lencana promosi. Pelanggan klik, terus ke kedai anda. Tiada potongan jualan."],
+    ["chart", "Tahu apa yang menjadi", "Lihat berapa orang melawat dan pautan mana paling laku, supaya anda gandakan yang berhasil."],
+  ];
+  const feats = [
+    ["layers", "Pautan dengan logo sebenar", "TikTok, Instagram, WhatsApp, Shopee dan 20 platform lain. Gambar kecil dikesan automatik."],
+    ["palette", "5 templat + gaya foto", "Minimalis, grid, gelap kaca, laman mini, katalog. Tambah gaya foto penuh seperti profil premium."],
+    ["users", "Kumpul pelanggan", "Borang e-mel dan tempahan terus masuk ke dashboard anda."],
+    ["qr", "Kod QR sedia ada", "Cetak pada kad atau kedai. Pelanggan imbas terus."],
+    ["phone", "Edit dari telefon", "Pratonton langsung semasa anda reka. Ringan dan laju."],
+    ["zap", "Kemas kini automatik", "Setiap penambahbaikan sampai kepada anda secara langsung, dengan butang kemas kini."],
+  ];
   $("#app").innerHTML = `
   <div class="fl-banner3" role="region" aria-label="Promosi Flash Link"><div class="b3-bg" aria-hidden="true"></div><div class="b3-in">
-    <div class="b3-zone b3-l">${ic("zap", "w-7 h-7")}<span><b>Setup 2 minit</b><small>Tanpa kod, tanpa kad kredit</small></span></div>
+    <div class="b3-zone b3-l">${ic("zap", "w-7 h-7")}<span><b>Setup 2 minit</b><small>Tanpa kod, terus guna</small></span></div>
     <div class="b3-zone b3-c"><span class="b3-title gradtxt">Satu pautan. Semua jualan.</span><small>WhatsApp · Shopee · TikTok Shop · YouTube</small></div>
-    <div class="b3-zone b3-r"><span>Percuma selamanya</span><a class="btn btn-red btn-sm" href="${go}" data-nav>Mula percuma</a></div>
+    <div class="b3-zone b3-r"><span>Sentiasa dikemas kini</span><a class="btn btn-red btn-sm" href="${go}" data-nav>Mula sekarang</a></div>
   </div></div>
   <header class="container" style="display:flex;align-items:center;justify-content:space-between;height:68px;position:relative;z-index:5">
     <a href="/" data-nav aria-label="Flash Link"><img src="/assets/logo.png" alt="Flash Link" width="132" height="66" style="height:44px;width:auto"></a>
-    <nav style="display:flex;gap:8px"><a class="btn btn-ghost btn-sm" href="${logged ? "/dashboard" : "/login"}" data-nav>${logged ? "Dashboard" : "Masuk"}</a><a class="btn btn-red btn-sm" href="${logged ? "/dashboard" : "/login?daftar=1"}" data-nav>Mula percuma</a></nav>
+    <nav style="display:flex;gap:8px"><a class="btn btn-ghost btn-sm" href="${logged ? "/dashboard" : "/login"}" data-nav>${logged ? "Dashboard" : "Masuk"}</a><a class="btn btn-red btn-sm" href="${go}" data-nav>Mula sekarang</a></nav>
   </header>
   <main>
-  <section style="position:relative;padding:40px 0 72px;overflow:hidden"><div class="aurora" aria-hidden="true"></div>
+  <section style="position:relative;padding:40px 0 72px">
     <div class="container" style="position:relative;display:grid;gap:40px;align-items:center" id="hero-grid">
-      <div class="reveal" style="text-align:center;max-width:620px;margin:0 auto">
-        <img src="/assets/logo.png" alt="" aria-hidden="true" class="logo-glow float" width="360" height="180" fetchpriority="high" style="width:min(300px,72vw);height:auto;margin:0 auto 8px">
-        <h1 class="font-display" style="font-size:clamp(32px,6vw,54px);line-height:1.08;font-weight:700;margin:8px 0 14px">Satu pautan untuk <span class="gradtxt">semua jualan</span> anda</h1>
-        <p style="font-size:18px;color:#D1D5DB;margin:0 auto 24px;max-width:520px">WhatsApp, Shopee, TikTok Shop, YouTube — tampal di bio Instagram & TikTok. Setup semudah Linktree, ciri sehebat Beacons.</p>
-        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap"><a class="btn btn-red shine" style="min-height:52px;padding:0 28px;font-size:17px" href="${logged ? "/dashboard" : "/login?daftar=1"}" data-nav>${ic("zap")} Cipta Flash Link saya</a><a class="btn btn-ghost" style="min-height:52px" href="/demo" data-nav>${ic("eye")} Lihat contoh</a></div>
-        <p class="hint" style="margin-top:14px">Percuma · Tiada kad kredit · Tiada potongan jualan</p>
+      <div style="text-align:center;max-width:620px;margin:0 auto">
+        <img data-fx="pop" src="/assets/logo.png" alt="" aria-hidden="true" class="logo-glow" width="360" height="180" fetchpriority="high" style="width:min(300px,72vw);height:auto;margin:0 auto 8px">
+        <h1 data-fx="up" data-d="120" class="font-display" style="font-size:clamp(32px,6vw,54px);line-height:1.08;font-weight:700;margin:8px 0 14px">Satu pautan untuk <span class="gradtxt">semua jualan</span> anda</h1>
+        <p data-fx="up" data-d="240" style="font-size:18px;color:#D1D5DB;margin:0 auto 24px;max-width:520px">Tampal satu pautan di bio Instagram & TikTok. Pelanggan terus ke WhatsApp, Shopee, TikTok Shop atau YouTube anda, tanpa tersesat.</p>
+        <div data-fx="up" data-d="360" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap"><a class="btn btn-red shine" style="min-height:54px;padding:0 30px;font-size:17px" href="${go}" data-nav>${ic("zap")} Cipta Flash Link saya</a></div>
+        <p data-fx="up" data-d="440" class="hint" style="margin-top:14px">Setup 2 minit · Kemas kini automatik · Tiada potongan jualan</p>
       </div>
-      <div class="reveal" style="display:flex;justify-content:center"><div class="phone float" style="animation-delay:-2s"><div class="screen pv-wrap">${demo}</div></div></div>
+      <div data-fx="pop" data-d="200" style="display:flex;justify-content:center"><div data-par=".07"><div class="float" style="animation-delay:-2s">${phoneFrame(demo)}</div></div></div>
     </div></section>
-  <section class="container reveal" style="padding:24px 16px 64px"><h2 class="font-display" style="font-size:clamp(26px,4vw,36px);text-align:center;margin:0 0 8px;font-weight:700">Semua yang anda perlukan, tanpa serabut</h2><p style="text-align:center;color:#9CA3AF;margin:0 0 32px">Ciri lanjutan tersembunyi di bawah butang “Tambah blok”.</p>
-    <div style="display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">${feats.map(f => `<article class="glass" style="border-radius:18px;padding:22px"><div style="width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:rgba(225,6,0,.2);color:#FF6B6B;margin-bottom:12px">${ic(f[0], "w-6 h-6")}</div><h3 style="font-weight:700;font-size:18px;margin:0 0 6px">${f[1]}</h3><p style="margin:0;color:#C7C9D1;font-size:15px">${f[2]}</p></article>`).join("")}</div></section>
-  <section class="container reveal" style="padding:0 16px 72px"><h2 class="font-display" style="font-size:clamp(26px,4vw,36px);text-align:center;margin:0 0 28px;font-weight:700">4 langkah. Itu sahaja.</h2>
-    <ol style="list-style:none;padding:0;margin:0;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">${["Daftar dengan Google atau e-mel", "Pilih username anda", "Tampal pautan penting", "Pilih templat & tekan Terbit"].map((s, i) => `<li class="glass" style="border-radius:16px;padding:18px;display:flex;gap:12px;align-items:center"><span class="font-display" style="font-size:28px;font-weight:700;color:#FF4D4D">${i + 1}</span><span style="font-weight:600">${s}</span></li>`).join("")}</ol>
-    <div style="text-align:center;margin-top:32px"><a class="btn btn-red" style="min-height:52px;padding:0 28px" href="${logged ? "/dashboard" : "/login?daftar=1"}" data-nav>Mula sekarang</a></div></section>
+  <section class="container" style="padding:8px 16px 64px"><h2 data-fx="up" class="font-display" style="font-size:clamp(26px,4vw,36px);text-align:center;margin:0 0 28px;font-weight:700">Kenapa pemilik bisnes pilih Flash Link</h2>
+    <div style="display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">${hooks.map((f, i) => `<article data-fx="pop" data-d="${i * 110}" class="glass" style="border-radius:22px;padding:26px"><div class="dtile" style="margin-bottom:14px">${ic(f[0], "w-6 h-6")}</div><h3 class="font-display" style="font-weight:700;font-size:20px;margin:0 0 8px">${f[1]}</h3><p style="margin:0;color:#D1D5DB;font-size:15.5px;line-height:1.55">${f[2]}</p></article>`).join("")}</div></section>
+  <section class="container" style="padding:0 16px 64px"><h2 data-fx="up" class="font-display" style="font-size:clamp(26px,4vw,36px);text-align:center;margin:0 0 8px;font-weight:700">Semua yang anda perlukan, tanpa serabut</h2><p data-fx="up" data-d="80" style="text-align:center;color:#9CA3AF;margin:0 0 32px">Ciri lanjutan tersembunyi di bawah butang “Tambah pautan”.</p>
+    <div style="display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">${feats.map((f, i) => `<article data-fx="${i % 2 ? "right" : "left"}" data-d="${(i % 3) * 90}" class="glass" style="border-radius:18px;padding:22px"><div style="width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:rgba(56,189,248,.16);color:#7DD3FC;margin-bottom:12px">${ic(f[0], "w-6 h-6")}</div><h3 style="font-weight:700;font-size:18px;margin:0 0 6px">${f[1]}</h3><p style="margin:0;color:#C7C9D1;font-size:15px">${f[2]}</p></article>`).join("")}</div></section>
+  <section class="container" style="padding:0 16px 72px"><h2 data-fx="up" class="font-display" style="font-size:clamp(26px,4vw,36px);text-align:center;margin:0 0 28px;font-weight:700">3 langkah. Itu sahaja.</h2>
+    <ol style="list-style:none;padding:0;margin:0;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">${["Daftar dengan Google atau e-mel", "Pilih username dan templat anda", "Tekan Tambah pautan, pilih platform, siap"].map((s, i) => `<li data-fx="up" data-d="${i * 120}" class="glass" style="border-radius:16px;padding:18px;display:flex;gap:12px;align-items:center"><span class="font-display" style="font-size:28px;font-weight:700;color:#7DD3FC">${i + 1}</span><span style="font-weight:600">${s}</span></li>`).join("")}</ol>
+    <div data-fx="pop" style="text-align:center;margin-top:32px"><a class="btn btn-red shine" style="min-height:54px;padding:0 30px;font-size:17px" href="${go}" data-nav>Mula sekarang</a></div></section>
   </main>
   ${siteFooter()}`;
   const mq = matchMedia("(min-width:900px)"); const g = $("#hero-grid"); const fit = () => (g.style.gridTemplateColumns = mq.matches ? "1.1fr .9fr" : "1fr"); fit(); mq.addEventListener("change", fit);
-  revealInit(); fillStat(); sfxScope(true);
+  revealInit(); parallaxInit(); fillStat(); sfxScope(true);
 }
 function revealInit() {
-  const els = $$(".reveal");
-  if (!("IntersectionObserver" in window)) return els.forEach(e => e.classList.add("in"));
-  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: .12 });
+  const els = $$("[data-fx]");
+  if (!("IntersectionObserver" in window) || REDUCE()) return els.forEach(e => (e.style.opacity = 1));
+  const FX = {
+    up: [{ opacity: 0, transform: "translate3d(0,48px,0) scale(.985)" }, { opacity: 1, transform: "none" }],
+    pop: [{ opacity: 0, transform: "translate3d(0,30px,0) scale(.8)" }, { opacity: 1, transform: "translate3d(0,-5px,0) scale(1.035)", offset: .68 }, { opacity: 1, transform: "none" }],
+    left: [{ opacity: 0, transform: "translate3d(-64px,0,0) scale(.96)" }, { opacity: 1, transform: "none" }],
+    right: [{ opacity: 0, transform: "translate3d(64px,0,0) scale(.96)" }, { opacity: 1, transform: "none" }],
+  };
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return; io.unobserve(e.target);
+    const el = e.target, d = +(el.dataset.d || 0);
+    setTimeout(() => SFX.pop(), d + 60); // bunyi pop ketika elemen keluar
+    const a = el.animate(FX[el.dataset.fx] || FX.up, { duration: 950, delay: d, easing: EASE, fill: "both" });
+    a.finished.then(() => { el.style.opacity = 1; a.cancel(); }).catch(() => {});
+  }), { threshold: .14, rootMargin: "0px 0px -6% 0px" });
   els.forEach(e => io.observe(e));
 }
 
@@ -632,14 +779,14 @@ async function loginView() {
   const draw = () => {
     $("#app").innerHTML = `<main class="container" style="min-height:100vh;display:grid;place-items:center;padding:24px 16px"><div class="glass" style="width:100%;max-width:420px;border-radius:24px;padding:28px">
       <a href="/" data-nav style="display:block;text-align:center"><img src="/assets/logo.png" alt="Flash Link" width="220" height="110" style="height:76px;width:auto;margin:0 auto 12px"></a>
-      <h1 class="font-display" style="font-size:24px;font-weight:700;text-align:center;margin:0 0 4px">${mode === "in" ? "Selamat kembali" : "Cipta akaun percuma"}</h1>
+      <h1 class="font-display" style="font-size:24px;font-weight:700;text-align:center;margin:0 0 4px">${mode === "in" ? "Selamat kembali" : "Cipta akaun anda"}</h1>
       <p style="text-align:center;color:#9CA3AF;margin:0 0 20px;font-size:15px">${mode === "in" ? "Log masuk untuk urus Flash Link anda." : "Langkah 1 daripada 4 — kurang 2 minit."}</p>
       <button id="g" class="btn btn-ghost" style="width:100%;min-height:50px"><svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg> Teruskan dengan Google</button>
       <div style="display:flex;align-items:center;gap:10px;margin:18px 0;color:#9CA3AF;font-size:13px"><span style="flex:1;height:1px;background:var(--line)"></span>atau e-mel<span style="flex:1;height:1px;background:var(--line)"></span></div>
       <form id="f" novalidate><label class="lbl" for="em">E-mel</label><input id="em" class="inp" type="email" autocomplete="email" placeholder="nama@contoh.com" required>
       <label class="lbl" for="pw" style="margin-top:12px">Kata laluan</label><input id="pw" class="inp" type="password" autocomplete="${mode === "in" ? "current-password" : "new-password"}" placeholder="Minimum 6 aksara" required>
       <div id="e" class="err" role="alert"></div><button class="btn btn-red" style="width:100%;min-height:50px;margin-top:16px" type="submit">${mode === "in" ? "Log masuk" : "Daftar & teruskan"}</button></form>
-      <p style="text-align:center;margin:18px 0 0;font-size:14.5px;color:#C7C9D1">${mode === "in" ? "Belum ada akaun?" : "Sudah ada akaun?"} <button id="sw" class="gradtxt" style="font-weight:700;background:none;border:0;text-decoration:underline;color:#FF6B6B;-webkit-text-fill-color:#FF6B6B">${mode === "in" ? "Daftar percuma" : "Log masuk"}</button></p></div></main>${siteFooter()}`;
+      <p style="text-align:center;margin:18px 0 0;font-size:14.5px;color:#C7C9D1">${mode === "in" ? "Belum ada akaun?" : "Sudah ada akaun?"} <button id="sw" class="gradtxt" style="font-weight:700;background:none;border:0;text-decoration:underline;color:#FF6B6B;-webkit-text-fill-color:#FF6B6B">${mode === "in" ? "Daftar sekarang" : "Log masuk"}</button></p></div></main>${siteFooter()}`;
     fillStat(); sfxScope(true);
     const fail = e => { $("#e").textContent = AUTH_ERR[e.code] || "Ralat: " + (e.message || "cuba lagi."); };
     $("#sw").onclick = () => { mode = mode === "in" ? "up" : "in"; draw(); };
@@ -665,8 +812,7 @@ async function dashView() {
 }
 
 /* Wizard (langkah 2-4; langkah 1 = log masuk) */
-const W = { step: 2, username: "", avail: null, display: "", q: { whatsapp: "", shopee: "", tiktokshop: "", web: "", youtube: "" }, tpl: "minimal", color: "#E10600", busy: false };
-const QUICK = [["whatsapp", "WhatsApp", "whatsapp", "No. telefon, cth 0123456789"], ["shopee", "Shopee", "bag", "Tampal URL kedai Shopee"], ["tiktokshop", "TikTok Shop", "bag", "Tampal URL TikTok Shop"], ["web", "Laman web", "globe", "Tampal URL laman web"], ["youtube", "YouTube", "youtube", "Tampal URL saluran / video"]];
+const W = { step: 2, username: "", avail: null, display: "", tpl: "minimal", color: "#E10600", busy: false };
 const checkName = debounce(async () => {
   const n = W.username, el = $("#av"); if (!el) return;
   if (!n) { el.innerHTML = ""; W.avail = null; return; }
@@ -677,7 +823,7 @@ const checkName = debounce(async () => {
 }, 350);
 function wizHead() {
   return `<header class="container" style="display:flex;justify-content:space-between;align-items:center;height:64px"><img src="/assets/logo.png" alt="Flash Link" width="120" height="60" style="height:40px;width:auto"><button id="lo" class="btn btn-ghost btn-sm" aria-label="Log keluar">${ic("logout", "w-4 h-4")} Keluar</button></header>
-  <div class="container" style="max-width:560px"><div style="display:flex;gap:6px;margin:8px 0 6px" role="progressbar" aria-valuemin="1" aria-valuemax="4" aria-valuenow="${W.step}">${[1, 2, 3, 4].map(i => `<span style="flex:1;height:5px;border-radius:9px;background:${i <= W.step ? "#FF4D4D" : "rgba(255,255,255,.15)"}"></span>`).join("")}</div><div class="hint" style="margin:0 0 16px">Langkah ${W.step} daripada 4</div></div>`;
+  <div class="container" style="max-width:560px"><div style="display:flex;gap:6px;margin:8px 0 6px" role="progressbar" aria-valuemin="1" aria-valuemax="3" aria-valuenow="${W.step}">${[1, 2, 3].map(i => `<span style="flex:1;height:5px;border-radius:9px;background:${i <= W.step ? "linear-gradient(90deg,#FF4D4D,#38BDF8)" : "rgba(255,255,255,.15)"}"></span>`).join("")}</div><div class="hint" style="margin:0 0 16px">Langkah ${W.step} daripada 3</div></div>`;
 }
 function wizard() {
   const app = $("#app");
@@ -695,30 +841,18 @@ function wizard() {
     $("#nx").onclick = async () => {
       if (!W.display.trim()) return toast("Isi nama paparan dahulu.", "bad");
       if (!USER_RE.test(W.username) || RESERVED.has(W.username)) return toast("Username tidak sah atau dikhaskan.", "bad");
-      if (W.avail !== true) { await checkName.flush?.(); try { const s = await FB.getDoc(FB.doc(db, "flashlink_usernames", W.username)); W.avail = !s.exists(); } catch { return toast("Tak dapat semak username.", "bad"); } }
+      if (W.avail !== true) { try { const s = await FB.getDoc(FB.doc(db, "flashlink_usernames", W.username)); W.avail = !s.exists(); } catch { return toast("Tak dapat semak username.", "bad"); } }
       if (!W.avail) return toast("Username sudah diambil.", "bad");
       W.step = 3; wizard();
     };
-  } else if (W.step === 3) {
-    shell(`<h1 class="font-display" style="font-size:28px;font-weight:700;margin:0 0 6px">Tambah pautan penting</h1><p style="color:#9CA3AF;margin:0 0 20px">Tampal URL atau nombor telefon sahaja. Kosongkan yang tiada — boleh tambah kemudian.</p>
-    ${QUICK.map(([k, n, i, ph]) => `<div style="margin-bottom:14px"><label class="lbl" for="q_${k}" style="display:flex;gap:8px;align-items:center">${ic(i, "w-4 h-4")} ${n}</label><input id="q_${k}" class="inp" data-k="${k}" ${k === "whatsapp" ? 'type="tel" inputmode="tel"' : 'type="url" inputmode="url"'} placeholder="${ph}" value="${esc(W.q[k])}"><div class="err" id="qe_${k}"></div></div>`).join("")}
-    <div style="display:flex;gap:10px;margin-top:20px"><button id="bk" class="btn btn-ghost" style="min-height:52px">Kembali</button><button id="nx" class="btn btn-red" style="flex:1;min-height:52px">Seterusnya</button></div>`);
-    $$("input[data-k]").forEach(i => (i.oninput = () => (W.q[i.dataset.k] = i.value)));
-    $("#bk").onclick = () => { W.step = 2; wizard(); };
-    $("#nx").onclick = () => {
-      let bad = false;
-      QUICK.forEach(([k]) => { const v = W.q[k].trim(), e = $("#qe_" + k); e.textContent = ""; if (!v) return; const ok = k === "whatsapp" ? waLink(v) : normUrl(v); if (!ok) { e.textContent = k === "whatsapp" ? "Nombor tidak sah. Cuba 0123456789." : "URL tidak sah. Cuba https://…"; bad = true; } });
-      if (bad) return;
-      W.step = 4; wizard();
-    };
   } else {
-    shell(`<h1 class="font-display" style="font-size:28px;font-weight:700;margin:0 0 6px">Pilih rupa anda</h1><p style="color:#9CA3AF;margin:0 0 16px">Templat dan warna boleh ditukar bila-bila masa.</p>
+    shell(`<h1 class="font-display" style="font-size:28px;font-weight:700;margin:0 0 6px">Pilih rupa anda</h1><p style="color:#9CA3AF;margin:0 0 16px">Templat dan warna boleh ditukar bila-bila masa. Pautan ditambah selepas ini.</p>
     <div id="tp" style="display:grid;gap:10px;margin-bottom:18px">${Object.entries(TPL).map(([k, t]) => `<button type="button" class="glass" data-t="${k}" aria-pressed="${W.tpl === k}" style="text-align:left;border-radius:16px;padding:14px;color:#fff;display:flex;gap:12px;align-items:center;${W.tpl === k ? "border-color:#FF4D4D;box-shadow:0 0 0 2px rgba(255,77,77,.4)" : ""}"><span style="width:36px;height:56px;border-radius:9px;flex:none;background:${t.theme.bgType === "gradient" ? `linear-gradient(160deg,${t.theme.bg1},${t.theme.bg2})` : t.theme.bg1};border:1px solid rgba(255,255,255,.25);display:flex;flex-direction:column;gap:4px;padding:8px 5px"><i style="height:6px;border-radius:9px;background:${t.theme.btn}"></i><i style="height:6px;border-radius:9px;background:${t.theme.btn}"></i></span><span><b style="display:block">${t.name}</b><small style="color:#C7C9D1">${t.desc}</small></span></button>`).join("")}</div>
     <div class="lbl">Warna utama butang</div><div id="cl" style="display:flex;gap:10px;flex-wrap:wrap">${COLORS.map(c => `<button type="button" data-c="${c}" aria-label="Warna ${c}" aria-pressed="${W.color === c}" style="width:44px;height:44px;border-radius:50%;background:${c};border:3px solid ${W.color === c ? "#fff" : "rgba(255,255,255,.2)"}"></button>`).join("")}</div>
     <div style="display:flex;gap:10px;margin-top:28px"><button id="bk" class="btn btn-ghost" style="min-height:52px">Kembali</button><button id="pub" class="btn btn-red shine" style="flex:1;min-height:52px">${ic("zap")} Terbit</button></div>`);
     $$("[data-t]").forEach(b => (b.onclick = () => { W.tpl = b.dataset.t; wizard(); }));
     $$("[data-c]").forEach(b => (b.onclick = () => { W.color = b.dataset.c; wizard(); }));
-    $("#bk").onclick = () => { W.step = 3; wizard(); };
+    $("#bk").onclick = () => { W.step = 2; wizard(); };
     $("#pub").onclick = publish;
   }
 }
@@ -726,7 +860,7 @@ async function publish() {
   if (W.busy) return; W.busy = true; const b = $("#pub"); b.disabled = true; b.innerHTML = `<span class="spin"></span> Menerbitkan…`;
   const uid = S.user.uid, name = W.username;
   const theme = mkTheme(W.tpl, W.color); theme.auto = false;
-  const profile = { username: name, displayName: W.display.trim().slice(0, 40), bio: "", avatarUrl: S.user.photoURL || "", bannerUrl: "", template: W.tpl, theme, socialIcons: [], testimonials: [], createdAt: FB.serverTimestamp(), plan: "free" };
+  const profile = { username: name, displayName: W.display.trim().slice(0, 40), bio: "", avatarUrl: S.user.photoURL || "", bannerUrl: "", template: W.tpl, theme, socialIcons: [], testimonials: [], profileStyle: "classic", createdAt: FB.serverTimestamp(), plan: "free" };
   try {
     await FB.runTransaction(db, async tx => {
       const ur = FB.doc(db, "flashlink_usernames", name);
@@ -735,15 +869,6 @@ async function publish() {
       tx.set(FB.doc(db, "flashlink_users", uid), profile);
     });
     bump("flashlink/stats/users");
-    const defs = [];
-    if (W.q.whatsapp.trim()) defs.push({ type: "whatsapp", title: "WhatsApp saya", url: waLink(W.q.whatsapp) });
-    if (W.q.shopee.trim()) defs.push({ type: "link", title: "Kedai Shopee", url: normUrl(W.q.shopee) });
-    if (W.q.tiktokshop.trim()) defs.push({ type: "link", title: "TikTok Shop", url: normUrl(W.q.tiktokshop) });
-    if (W.q.web.trim()) defs.push({ type: "link", title: "Laman web", url: normUrl(W.q.web) });
-    if (W.q.youtube.trim()) defs.push({ type: "youtube", title: "YouTube", url: normUrl(W.q.youtube) });
-    const batch = FB.writeBatch(db);
-    defs.forEach((d, i) => batch.set(FB.doc(FB.collection(db, "flashlink_links")), { uid, thumbnailUrl: "", price: 0, promoLabel: "", order: i, active: true, clicks: 0, createdAt: FB.serverTimestamp(), ...d }));
-    if (defs.length) await batch.commit();
     await loadProfile(); S.celebrate = true; W.busy = false; route(true);
   } catch (e) {
     console.error(e); W.busy = false;
@@ -760,17 +885,18 @@ function success() {
   <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button id="cp" class="btn btn-red">${ic("copy")} Salin Pautan</button><button id="sh" class="btn btn-ghost">${ic("share")} Kongsi</button><a class="btn btn-ghost" href="${esc(url)}" target="_blank" rel="noopener">${ic("ext")} Buka</a></div>
   <div class="glass" style="border-radius:20px;padding:20px;margin:24px auto;max-width:300px"><div style="background:#fff;border-radius:14px;padding:10px;color:#000" id="qr" role="img" aria-label="Kod QR untuk ${esc(url)}">${qrSvg(url)}</div><button id="dq" class="btn btn-ghost btn-sm" style="margin-top:12px">${ic("qr", "w-4 h-4")} Muat turun QR</button></div>
   <div class="glass" style="border-radius:16px;padding:16px;text-align:left"><b>Tampal di bio anda</b><p style="margin:6px 0 0;color:#C7C9D1;font-size:15px">Buka profil Instagram / TikTok → <b>Edit profil</b> → ruangan <b>Website / Pautan</b> → tampal pautan di atas.</p></div>
-  <button id="go" class="btn btn-red" style="width:100%;min-height:52px;margin-top:20px">Ke Dashboard</button></main>`;
+  <div class="glass" style="border-radius:16px;padding:16px;text-align:left;margin-top:12px"><b>Langkah seterusnya</b><p style="margin:6px 0 0;color:#C7C9D1;font-size:15px">Halaman anda masih kosong. Tekan butang di bawah untuk tambah pautan pertama anda.</p></div>
+  <button id="go" class="btn btn-red" style="width:100%;min-height:52px;margin-top:20px">Tambah pautan pertama</button></main>`;
   $("#cp").onclick = () => copyText(url);
   $("#sh").onclick = async () => { if (navigator.share) { try { await navigator.share({ title: S.profile.displayName, url }); } catch {} } else copyText(url); };
-  $("#go").onclick = () => { S.celebrate = false; dashView(); };
+  $("#go").onclick = () => { S.celebrate = false; S.view = "links"; dashView(); };
   $("#dq").onclick = () => { const svg = $("#qr svg"); if (!svg) return; const blob = new Blob([svg.outerHTML], { type: "image/svg+xml" }); const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `flashlink-${S.profile.username}-qr.svg`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); };
 }
 
 /* Dashboard (3 tab) */
 const saveProfile = debounce(async () => {
-  const { username, displayName, bio, avatarUrl, bannerUrl, template, theme, socialIcons, testimonials } = S.profile;
-  try { await FB.setDoc(FB.doc(db, "flashlink_users", S.user.uid), { displayName, bio, avatarUrl, bannerUrl, template, theme, socialIcons, testimonials, username }, { merge: true }); const el = $("#sv"); if (el) { el.textContent = "Disimpan ✓"; setTimeout(() => el && (el.textContent = ""), 1500); } }
+  const { username, displayName, bio, avatarUrl, bannerUrl, template, theme, testimonials, profileStyle } = S.profile; const socialIcons = (S.profile.socialIcons || []).filter(x => x.url);
+  try { await FB.setDoc(FB.doc(db, "flashlink_users", S.user.uid), { displayName, bio, avatarUrl, bannerUrl, template, theme, socialIcons, testimonials, profileStyle, username }, { merge: true }); const el = $("#sv"); if (el) { el.textContent = "Disimpan ✓"; setTimeout(() => el && (el.textContent = ""), 1500); } }
   catch (e) { console.error(e); toast("Gagal simpan reka bentuk.", "bad"); }
 }, 700);
 const refreshPreview = () => { const el = $("#pvbox"); if (el) el.innerHTML = renderProfile(S.profile, S.links, { preview: true }); const m = $("#pvmobile"); if (m) m.innerHTML = renderProfile(S.profile, S.links, { preview: true }); };
@@ -781,9 +907,9 @@ const EASE = "cubic-bezier(.32,.72,0,1)";
 const anim = (el, kf, o = {}) => (!el || REDUCE() ? null : el.animate(kf, { duration: 520, easing: EASE, fill: "both", ...o }));
 function stagger(sel, base = 0, gap = 55) { $$(sel).forEach((el, i) => anim(el, [{ opacity: 0, transform: "translate3d(0,18px,0) scale(.98)" }, { opacity: 1, transform: "none" }], { delay: base + i * gap, fill: "backwards", duration: 600 })); }
 const SECTIONS = [
-  { k: "links", n: "Pautan", i: "layers", cta: "Tambah pautan", d: "Di sini anda tambah pautan WhatsApp, Shopee, TikTok Shop, YouTube dan lain-lain. Seret untuk susun, hidup atau matikan bila-bila masa.", meta: () => `${S.links.length} pautan` },
+  { k: "links", n: "Pautan", i: "layers", cta: "Tambah pautan", d: "Tambah pautan anda di sini: tampal mana-mana URL atau pilih platform. Logo dan gambar kecil dikesan automatik. Seret untuk susun.", meta: () => `${S.links.length} pautan` },
+  { k: "profile", n: "Profil", i: "users", cta: "Edit profil", d: "Muat naik gambar profil, letak nama dan bio, pilih gaya foto premium dan tambah ikon sosial anda sendiri.", meta: () => "@" + S.profile.username },
   { k: "design", n: "Reka Bentuk", i: "palette", cta: "Ubah reka bentuk", d: "Pilih templat, tukar warna, fon dan bentuk butang. Pratonton langsung muncul di sebelah.", meta: () => TPL[S.profile.template]?.name || "" },
-  { k: "profile", n: "Profil", i: "users", cta: "Edit profil", d: "Letak nama paparan, bio, gambar profil, ikon sosial dan testimoni anda.", meta: () => "@" + S.profile.username },
   { k: "stats", n: "Statistik", i: "chart", cta: "Lihat statistik", d: "Lihat berapa lawatan dan klik pada setiap pautan dalam 7 atau 30 hari.", meta: () => "7 / 30 hari" },
   { k: "leads", n: "Pelanggan", i: "mail", cta: "Lihat pelanggan", d: "Semua mesej dan tempahan daripada borang e-mel anda terkumpul di sini.", meta: () => "Borang e-mel" },
   { k: "share", n: "Kongsi & QR", i: "qr", cta: "Kongsi sekarang", d: "Salin pautan, kongsi kepada rakan dan muat turun kod QR untuk dicetak.", meta: () => profileUrl(S.profile.username).replace(/^https?:\/\//, "") },
@@ -823,10 +949,10 @@ async function openView(view, o = {}) {
 function homeHtml() {
   const p = S.profile, url = profileUrl(p.username), h = new Date().getHours();
   const hi = h < 12 ? "Selamat pagi" : h < 15 ? "Selamat tengah hari" : h < 19 ? "Selamat petang" : "Selamat malam";
-  const av = safeUrl(p.avatarUrl);
+  const av = imgUrl(p.avatarUrl);
   return `<div id="home"><div class="dwel glass" style="border-radius:24px;padding:20px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:18px">
       ${av ? `<img src="${esc(av)}" alt="" width="64" height="64" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid #FF4D4D">` : `<div style="width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font-size:26px;font-weight:800;background:linear-gradient(135deg,#FF2A2A,#9B0000)">${esc((p.displayName || p.username).charAt(0).toUpperCase())}</div>`}
-      <div style="flex:1;min-width:200px"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><h1 class="font-display" style="font-size:24px;font-weight:700;margin:0">${hi}, ${esc(p.displayName || p.username)}</h1><span class="vbadge">Dashboard V22</span></div>
+      <div style="flex:1;min-width:200px"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><h1 class="font-display" style="font-size:24px;font-weight:700;margin:0">${hi}, ${esc(p.displayName || p.username)}</h1><span class="vbadge">Dashboard ${APP_VERSION}</span></div>
       <p style="margin:4px 0 0;color:#C7C9D1;font-size:15px">Pilih bahagian di bawah untuk mula menetapkan Flash Link anda.</p></div>
       <button id="wc" class="btn btn-ghost btn-sm" style="max-width:100%" aria-label="Salin pautan anda">${ic("copy", "w-4 h-4")}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(url.replace(/^https?:\/\//, ""))}</span></button></div>
     <div id="dgr" style="display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(270px,1fr))">${SECTIONS.map(x => `<button class="dcard" data-open="${x.k}" aria-label="Buka ${x.n}"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div class="dtile">${ic(x.i, "w-6 h-6")}</div><span style="font-size:12.5px;color:#C7C9D1;background:rgba(255,255,255,.08);padding:4px 10px;border-radius:999px;max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.meta())}</span></div>
@@ -843,13 +969,13 @@ function sectionHtml(k) {
   return `<div id="sec"><button id="bk" class="btn btn-ghost btn-sm sec-in" style="margin-bottom:14px">${ic("chev", "w-4 h-4")} Dashboard</button>
     <div class="sec-in" style="display:flex;gap:14px;align-items:center;margin-bottom:6px"><div class="dtile">${ic(x.i, "w-6 h-6")}</div><h1 class="font-display" style="font-size:26px;font-weight:700;margin:0">${x.n}</h1></div>
     <p class="sec-in" style="margin:0 0 18px;color:#C7C9D1;max-width:640px;line-height:1.55">${x.d}</p>
-    <div id="dgrid" style="display:grid;gap:24px"><section id="pane" aria-live="polite"></section>${prev ? `<aside class="hidden lg:block" style="position:sticky;top:84px;align-self:start"><div class="phone"><div class="screen pv-wrap" id="pvbox"></div></div><div class="hint" style="text-align:center">Pratonton langsung <span id="sv" style="color:#6EE7A8"></span></div></aside>` : ""}</div></div>`;
+    <div id="dgrid" style="display:grid;gap:24px"><section id="pane" aria-live="polite"></section>${prev ? `<aside class="hidden lg:block" style="position:sticky;top:84px;align-self:start">${phoneFrame("", "pvbox")}<div class="hint" style="text-align:center">Pratonton langsung <span id="sv" style="color:#6EE7A8"></span></div></aside>` : ""}</div></div>`;
 }
 const mqWide = matchMedia("(min-width:1024px)");
 function bindSection(el, k) {
   $("#bk").onclick = () => openView("home");
   const g = $("#dgrid"), fit = () => (g.style.gridTemplateColumns = PREVIEW.has(k) && mqWide.matches ? "1fr 320px" : "1fr"); fit(); mqWide.onchange = fit;
-  ({ links: linksTab, design: () => designTab("design"), profile: () => designTab("profile"), stats: () => statsTab("stats"), leads: () => statsTab("leads"), share: shareTab })[k]();
+  ({ links: linksTab, design: designTab, profile: profileTab, stats: () => statsTab("stats"), leads: () => statsTab("leads"), share: shareTab })[k]();
   refreshPreview();
   stagger("#pane > .glass, #pane > div > section, #ll > *", 260, 55);
 }
@@ -875,19 +1001,26 @@ function modal(html, after) {
 /* --- Tab Pautan --- */
 function linksTab() {
   const pane = $("#pane");
-  const blocks = [["link", "Pautan", "link"], ["whatsapp", "WhatsApp", "whatsapp"], ["product", "Produk jualan", "bag"], ["youtube", "YouTube", "youtube"], ["email_form", "Borang e-mel / tempahan", "mail"], ["header", "Tajuk bahagian", "heading"], ["media", "Media kit (PDF)", "file"]];
-  pane.innerHTML = `<div class="glass" style="border-radius:18px;padding:16px;margin-bottom:16px"><div class="lbl" style="margin-bottom:10px">Tambah pantas (3 ketik sahaja)</div><div style="display:flex;gap:8px;flex-wrap:wrap">${QUICK.map(([k, n, i]) => `<button class="chip" data-q="${k}">${ic(i, "w-4 h-4")}${n}</button>`).join("")}</div>
-    <details style="margin-top:12px"><summary style="cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center;gap:8px;color:#FF8A8A">${ic("plus", "w-4 h-4")} Tambah blok…</summary><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">${blocks.map(([k, n, i]) => `<button class="chip" data-b="${k}">${ic(i, "w-4 h-4")}${n}</button>`).join("")}</div></details></div>
-  <div id="ll" style="display:flex;flex-direction:column;gap:8px"></div>`;
-  $$("[data-q]").forEach(b => (b.onclick = () => linkModal({ quick: b.dataset.q })));
-  $$("[data-b]").forEach(b => (b.onclick = () => linkModal({ type: b.dataset.b })));
+  pane.innerHTML = `<button id="addl" class="btn btn-red shine" style="width:100%;min-height:58px;font-size:17px;border-radius:16px">${ic("plus", "w-6 h-6")} Tambah pautan</button>
+  <div class="glass" style="border-radius:18px;padding:14px;margin-top:12px"><div class="lbl" style="margin-bottom:10px">Atau pilih terus platform</div><div style="display:flex;gap:10px;flex-wrap:wrap">${["whatsapp", "instagram", "tiktok", "shopee", "facebook", "youtube", "telegram", "web"].map(k => `<button class="ptile mini" data-p="${k}" aria-label="${esc(BRANDS[k].n)}" style="background:${BRANDS[k].c};color:${onColor(BRANDS[k].c)}">${brandIc(k, "w-6 h-6")}</button>`).join("")}</div></div>
+  <div id="ll" style="display:flex;flex-direction:column;gap:8px;margin-top:14px"></div>`;
+  $("#addl").onclick = () => linkModal({});
+  $$("[data-p]").forEach(b => (b.onclick = () => linkModal({ platform: b.dataset.p })));
   drawLinks();
+}
+function rowIcon(l) {
+  const th = imgUrl(l.thumbnailUrl); if (th) return `<img src="${esc(th)}" alt="" width="40" height="40" style="width:40px;height:40px;border-radius:11px;object-fit:cover;flex:none">`;
+  if (l.type === "header") return `<span class="fl-bi" style="background:#64748B;color:#fff;width:40px;height:40px">${ic("heading", "w-5 h-5")}</span>`;
+  if (l.type === "email_form") return `<span class="fl-bi" style="background:#EA4335;color:#fff;width:40px;height:40px">${ic("mail", "w-5 h-5")}</span>`;
+  if (l.type === "product") return `<span class="fl-bi" style="background:#F59E0B;color:#111;width:40px;height:40px">${ic("bag", "w-5 h-5")}</span>`;
+  const k = platOf(l), c = BRANDS[k]?.c || "#38BDF8";
+  return `<span class="fl-bi" style="background:${c};color:${onColor(c)};width:40px;height:40px">${brandIc(k, "w-5 h-5")}</span>`;
 }
 function drawLinks() {
   const ll = $("#ll"); if (!ll) return;
-  if (!S.links.length) { ll.innerHTML = `<div class="glass" style="border-radius:18px;padding:32px;text-align:center"><img src="/assets/icon.png" alt="" width="72" height="72" style="margin:0 auto 10px;height:72px;width:72px"><h3 style="font-weight:700;margin:0 0 4px">Belum ada pautan</h3><p style="color:#9CA3AF;margin:0">Tekan WhatsApp atau Shopee di atas untuk mula.</p></div>`; refreshPreview(); return; }
+  if (!S.links.length) { ll.innerHTML = `<div class="glass" style="border-radius:18px;padding:32px;text-align:center"><img src="/assets/icon.png" alt="" width="72" height="72" style="margin:0 auto 10px;height:72px;width:72px"><h3 style="font-weight:700;margin:0 0 4px">Belum ada pautan</h3><p style="color:#9CA3AF;margin:0">Tekan butang Tambah pautan di atas untuk mula.</p></div>`; refreshPreview(); return; }
   ll.innerHTML = S.links.map(l => `<div class="glass row" data-id="${l.id}" style="${l.active === false ? "opacity:.55" : ""}"><span class="grip" style="color:#9CA3AF;cursor:grab;touch-action:none;padding:6px" aria-label="Seret untuk susun" role="img">${ic("grip")}</span>
-    <span style="width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:rgba(225,6,0,.2);color:#FF8A8A;flex:none">${ic(TYPE_ICON[l.type] || "link", "w-5 h-5")}</span>
+    ${rowIcon(l)}
     <div style="min-width:0;flex:1"><b style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(l.title)}</b><small style="color:#9CA3AF;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.type === "header" || l.type === "email_form" ? TYPE_NAME[l.type] : esc((l.url || "").replace(/^https?:\/\//, ""))}</small>${l.type !== "header" ? `<small style="color:#FF8A8A">${l.clicks || 0} klik</small>` : ""}</div>
     <button class="toggle" role="switch" aria-checked="${l.active !== false}" data-tg="${l.id}" aria-label="Hidup/matikan ${esc(l.title)}"></button>
     <button class="btn btn-ghost btn-sm" data-ed="${l.id}" aria-label="Edit ${esc(l.title)}">${ic("pencil", "w-4 h-4")}</button>
@@ -900,33 +1033,85 @@ function drawLinks() {
     try { const b = FB.writeBatch(db); S.links.forEach((l, i) => b.update(FB.doc(db, "flashlink_links", l.id), { order: i })); await b.commit(); } catch { toast("Gagal simpan susunan.", "bad"); } } }); }
   refreshPreview();
 }
-function linkModal({ link, quick, type }) {
-  const edit = !!link; let t = link?.type || type || "link"; let title = link?.title || "", preset = "";
-  if (quick) { const m = { whatsapp: ["whatsapp", "WhatsApp saya"], shopee: ["link", "Kedai Shopee"], tiktokshop: ["link", "TikTok Shop"], web: ["link", "Laman web"], youtube: ["youtube", "YouTube"] }[quick]; t = m[0]; title = m[1]; preset = quick; }
-  if (type === "media") { t = "link"; title = "Muat turun Media Kit"; preset = "media"; }
-  if (type === "header") title = title || "Produk saya";
-  if (type === "email_form") title = title || "Hubungi / tempah";
+function linkPicker() {
+  const tile = (k, n, c, inner) => `<button type="button" class="ptile" data-k="${k}"><span class="pt-i" style="background:${c};color:${onColor(c)}">${inner}</span><span class="pt-n">${esc(n)}</span></button>`;
+  const m = modal(`<h2 class="font-display" style="font-size:21px;font-weight:700;margin:0 0 4px">Tambah pautan</h2><p style="margin:0 0 14px;color:#C7C9D1;font-size:14.5px">Pilih platform atau tampal pautan mana-mana. Logo dan gambar kecil dikesan automatik.</p>
+    <div class="lbl">Platform</div><div class="pgrid">${LINK_KEYS.map(k => tile(k, BRANDS[k].n, BRANDS[k].c, brandIc(k, "w-6 h-6"))).join("")}</div>
+    <div class="lbl" style="margin-top:16px">Blok lain</div><div class="pgrid">${[["product", "Produk jualan", "#F59E0B", "bag"], ["email_form", "Borang e-mel", "#EA4335", "mail"], ["header", "Tajuk bahagian", "#64748B", "heading"], ["media", "Media kit (PDF)", "#0EA5E9", "file"]].map(([k, n, c, i]) => tile("blk:" + k, n, c, ic(i, "w-6 h-6"))).join("")}</div>`);
+  $$(".ptile", m).forEach(b => (b.onclick = () => { const k = b.dataset.k; m.close(); k.startsWith("blk:") ? linkModal({ type: k.slice(4) }) : linkModal({ platform: k }); }));
+}
+function socPicker(done) {
+  const m = modal(`<h2 class="font-display" style="font-size:21px;font-weight:700;margin:0 0 4px">Tambah ikon sosial</h2><p style="margin:0 0 14px;color:#C7C9D1;font-size:14.5px">Pilih platform. Ikon ini muncul di bawah nama anda.</p><div class="pgrid">${SOCIAL_KEYS.map(k => `<button type="button" class="ptile" data-k="${k}"><span class="pt-i" style="background:${BRANDS[k].c};color:${onColor(BRANDS[k].c)}">${brandIc(k, "w-6 h-6")}</span><span class="pt-n">${esc(BRANDS[k].n)}</span></button>`).join("")}</div>`);
+  $$(".ptile", m).forEach(b => (b.onclick = () => { m.close(); done(b.dataset.k); }));
+}
+async function fetchThumb(url) {
+  const yt = ytId(url); if (yt) return { image: `https://i.ytimg.com/vi/${yt}/hqdefault.jpg` };
+  try {
+    const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 7000);
+    const r = await fetch("https://api.microlink.io/?url=" + encodeURIComponent(url), { signal: ctl.signal }); clearTimeout(to);
+    const j = await r.json(); if (j.status === "success") return { image: j.data?.image?.url || "", title: j.data?.title || "" };
+  } catch {}
+  return {};
+}
+function linkModal({ link, platform, type } = {}) {
+  if (!link && !platform && !type) return linkPicker();
+  const edit = !!link;
+  let t = link?.type || (platform === "whatsapp" ? "whatsapp" : type || "link");
+  if (type === "media") t = "link";
+  let plat = link?.platform || platform || (t === "link" ? detectPlatform(link?.url || "") : t === "whatsapp" ? "whatsapp" : "");
+  if (type === "media") plat = "web";
+  const isWeb = plat === "web" || (!plat && t === "link");
+  const needUrl = !["header", "email_form"].includes(t), wantThumb = needUrl || t === "product";
+  let B = BRANDS[plat] || null, th = link?.thumbnailUrl || "", thTouched = !!th, titleTouched = edit;
+  const title0 = link?.title || (type === "media" ? "Muat turun Media Kit" : type === "header" ? "Produk saya" : type === "email_form" ? "Hubungi / tempah" : B?.t || "");
   const f = (id, label, val, ph, extra = "") => `<div style="margin-top:12px"><label class="lbl" for="${id}">${label}</label><input id="${id}" class="inp" value="${esc(val ?? "")}" placeholder="${esc(ph)}" ${extra}></div>`;
-  const needUrl = !["header", "email_form"].includes(t);
-  const urlLabel = t === "whatsapp" ? "No. telefon atau pautan wa.me" : preset === "media" ? "Pautan PDF media kit" : "URL";
-  const urlPh = t === "whatsapp" ? "0123456789" : preset === "media" ? "https://…/media-kit.pdf" : "https://";
-  const m = modal(`<h2 class="font-display" style="font-size:21px;font-weight:700;margin:0">${edit ? "Edit" : "Tambah"} ${TYPE_NAME[t]}</h2>
-    ${f("mt", "Tajuk", title, "cth. Kedai Shopee", 'maxlength="60"')}
-    ${needUrl ? f("mu", urlLabel, link?.url || "", urlPh, t === "whatsapp" ? 'inputmode="tel"' : 'inputmode="url"') : ""}
+  const urlLabel = t === "whatsapp" ? "No. telefon atau pautan wa.me" : type === "media" ? "Pautan PDF media kit" : "URL pautan";
+  const urlPh = t === "whatsapp" ? "0123456789" : type === "media" ? "https://…/media-kit.pdf" : (B?.ph || "contoh.com/halaman");
+  const heading = B && !isWeb ? B.n : TYPE_NAME[t] || "Pautan";
+  const m = modal(`<div style="display:flex;gap:12px;align-items:center"><span id="mi"></span><h2 class="font-display" style="font-size:21px;font-weight:700;margin:0">${edit ? "Edit" : "Tambah"} ${esc(heading)}</h2></div>
+    ${f("mt", "Tajuk butang", title0, "cth. Kedai Shopee", 'maxlength="60"')}
+    ${needUrl ? f("mu", urlLabel, link?.url || "", urlPh, (t === "whatsapp" ? 'inputmode="tel"' : 'inputmode="url"') + ' autocomplete="off"') + `<div id="mdet" class="hint"></div>` : ""}
     ${t === "whatsapp" && !edit ? f("mm", "Mesej pembuka (pilihan)", "", "Hai, saya berminat dengan…", 'maxlength="120"') : ""}
-    ${t === "product" ? f("mp", "Harga (RM)", link?.price || "", "49.90", 'inputmode="decimal"') + f("ml", "Lencana promosi (pilihan)", link?.promoLabel || "", "cth. Diskaun 20%", 'maxlength="24"') + f("mi", "URL gambar produk", link?.thumbnailUrl || "", "https://…/gambar.jpg", 'inputmode="url"') : ""}
-    ${t === "link" && !preset ? f("mi", "URL gambar kecil (pilihan, untuk templat Grid)", link?.thumbnailUrl || "", "https://…/gambar.jpg", 'inputmode="url"') : ""}
-    <div id="me" class="err" role="alert"></div><button id="ms" class="btn btn-red" style="width:100%;min-height:50px;margin-top:16px">${edit ? "Simpan" : "Tambah"}</button>`);
-  $("#mt", m).focus();
-  $("#ms", m).onclick = async () => {
-    const e = $("#me", m), v = id => ($("#" + id, m)?.value || "").trim();
-    const ttl = v("mt"); if (!ttl) return (e.textContent = "Sila isi tajuk.");
+    ${t === "product" ? f("mp", "Harga (RM)", link?.price || "", "49.90", 'inputmode="decimal"') + f("ml", "Lencana promosi (pilihan)", link?.promoLabel || "", "cth. Diskaun 20%", 'maxlength="24"') : ""}
+    ${wantThumb ? `<div style="margin-top:14px"><div class="lbl">${t === "product" ? "Gambar produk" : "Gambar kecil (thumbnail)"}</div>
+      <div style="display:flex;gap:12px;align-items:center"><div id="thp" style="width:76px;height:76px;border-radius:16px;overflow:hidden;background:rgba(255,255,255,.08);display:grid;place-items:center;flex:none"></div>
+      <div style="min-width:0"><div id="ths" class="hint" style="margin:0 0 8px"></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn btn-ghost btn-sm" id="thu">${ic("plus", "w-4 h-4")} Muat naik gambar</button><button type="button" class="btn btn-ghost btn-sm" id="thr">Buang</button></div></div></div>
+      <input type="file" id="thf" accept="image/*" hidden>${f("thi", "atau tampal URL gambar", /^https?:/.test(th) && !/ytimg|microlink/.test(th) ? th : "", "https://…/gambar.jpg", 'inputmode="url"')}</div>` : ""}
+    <div id="me" class="err" role="alert"></div><button id="ms" class="btn btn-red" style="width:100%;min-height:50px;margin-top:16px">${edit ? "Simpan" : "Tambah ke halaman saya"}</button>`);
+  const $m = id => $("#" + id, m);
+  const drawIcon = () => { const c = BRANDS[plat]?.c || "#38BDF8"; $m("mi").innerHTML = `<span class="pt-i" style="background:${c};color:${onColor(c)};width:46px;height:46px">${t === "email_form" ? ic("mail") : t === "header" ? ic("heading") : t === "product" ? ic("bag") : brandIc(plat || "web", "w-6 h-6")}</span>`; };
+  const drawTh = () => { if (!wantThumb) return; const u = imgUrl(th); $m("thp").innerHTML = u ? `<img src="${esc(u)}" alt="" style="width:100%;height:100%;object-fit:cover">` : `<span style="color:#9CA3AF">${ic("eye", "w-6 h-6")}</span>`; };
+  const status = x => { if ($m("ths")) $m("ths").textContent = x; };
+  drawIcon(); drawTh(); status(th ? "Gambar sedia ada." : t === "whatsapp" ? "Pilihan. Muat naik gambar anda." : "Akan dicari automatik selepas anda tampal pautan.");
+  setTimeout(() => $m("mt").focus(), 60);
+  $m("mt").addEventListener("input", () => (titleTouched = true));
+  if (wantThumb) {
+    $m("thu").onclick = () => $m("thf").click();
+    $m("thr").onclick = () => { th = ""; thTouched = true; $m("thi").value = ""; drawTh(); status("Gambar dibuang."); };
+    $m("thf").onchange = async e => { const file = e.target.files[0]; if (!file) return; status("Memproses gambar…"); try { th = await compressImage(file, 320, 320, .82); thTouched = true; drawTh(); status("Gambar anda dimuat naik ✓"); } catch (er) { status(er.message); } };
+    $m("thi").addEventListener("input", e => { const v = e.target.value.trim(); if (!v) return; const u = normUrl(v); if (u) { th = u; thTouched = true; drawTh(); status("Guna URL gambar anda."); } });
+  }
+  if (needUrl) {
+    const onUrl = debounce(async () => {
+      const v = $m("mu").value.trim(); if (!v) return;
+      if (isWeb) { const k = detectPlatform(v); if (k !== plat) { plat = k; B = BRANDS[k]; drawIcon(); if (!titleTouched || !$m("mt").value) { $m("mt").value = B.t; } $m("mdet").textContent = k !== "web" ? "Dikesan: " + B.n : ""; } }
+      if (!wantThumb || thTouched || t === "whatsapp") return;
+      const u = normUrl(v); if (!u) return;
+      status("Mencari gambar…"); const r = await fetchThumb(u); if (thTouched) return;
+      if (r.image) { th = r.image; drawTh(); status("Gambar dijumpai ✓ Anda boleh tukar dengan gambar sendiri."); } else status("Tiada gambar ditemui. Anda boleh muat naik sendiri.");
+      if (isWeb && plat === "web" && r.title && !titleTouched) $m("mt").value = r.title.slice(0, 60);
+    }, 700);
+    $m("mu").addEventListener("input", onUrl); $m("mu").addEventListener("paste", () => setTimeout(onUrl, 0));
+    if (link?.url) $m("mu").dispatchEvent(new Event("input"));
+  }
+  $m("ms").onclick = async () => {
+    const e = $m("me"), v = id => ($m(id)?.value || "").trim();
+    const ttl = v("mt"); if (!ttl) return (e.textContent = "Sila isi tajuk butang.");
     let url = "";
-    if (needUrl) { url = t === "whatsapp" ? waLink(v("mu"), v("mm")) : normUrl(v("mu")); if (!url) return (e.textContent = t === "whatsapp" ? "Nombor telefon tidak sah. Cuba 0123456789." : "URL tidak sah. Mesti bermula dengan https:// dan ada domain."); }
-    const thumb = v("mi") ? normUrl(v("mi")) : ""; if (v("mi") && !thumb) return (e.textContent = "URL gambar tidak sah.");
-    const price = t === "product" ? parseFloat(v("mp").replace(",", ".")) || 0 : 0; if (t === "product" && v("mp") && price < 0) return (e.textContent = "Harga tidak sah.");
-    const data = { type: t, title: ttl.slice(0, 60), url, thumbnailUrl: thumb || "", price, promoLabel: v("ml").slice(0, 24) };
-    const btn = $("#ms", m); btn.disabled = true;
+    if (needUrl) { url = t === "whatsapp" ? waLink(v("mu"), v("mm")) : normUrl(v("mu")); if (!url) return (e.textContent = t === "whatsapp" ? "Nombor telefon tidak sah. Cuba 0123456789." : "URL tidak sah. Contoh: contoh.com/halaman"); }
+    const price = t === "product" ? parseFloat(v("mp").replace(",", ".")) || 0 : 0;
+    const data = { type: t, platform: isWeb && needUrl ? detectPlatform(url) : plat, title: ttl.slice(0, 60), url, thumbnailUrl: th || "", price, promoLabel: v("ml").slice(0, 24) };
+    const btn = $m("ms"); btn.disabled = true;
     try {
       if (edit) { await FB.updateDoc(FB.doc(db, "flashlink_links", link.id), data); Object.assign(link, data); }
       else { const order = S.links.length ? Math.max(...S.links.map(l => l.order ?? 0)) + 1 : 0; const full = { uid: S.user.uid, ...data, order, active: true, clicks: 0, createdAt: FB.serverTimestamp() }; const r = await FB.addDoc(FB.collection(db, "flashlink_links"), full); S.links.push({ id: r.id, ...full, createdAt: new Date() }); }
@@ -936,42 +1121,65 @@ function linkModal({ link, quick, type }) {
 }
 
 /* --- Tab Reka Bentuk --- */
-function designTab(part = "design") {
+function designTab() {
   const p = S.profile, t = p.theme;
   const inp = (id, label, val, ph = "", extra = "") => `<div style="margin-top:12px"><label class="lbl" for="${id}">${label}</label><input id="${id}" class="inp" value="${esc(val || "")}" placeholder="${esc(ph)}" ${extra}></div>`;
   const col = (id, label, v) => `<div><label class="lbl" for="${id}">${label}</label><input id="${id}" type="color" value="${hex(v, "#000000")}" style="width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.07);padding:3px"></div>`;
-  const soc = Object.fromEntries((p.socialIcons || []).map(s => [s.type, s.url]));
-  const tests = [0, 1, 2].map(i => (p.testimonials || [])[i] || {});
   $("#pane").innerHTML = `<div style="display:flex;flex-direction:column;gap:16px">
-  <section data-part="design" class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Templat</h2><div style="display:grid;gap:8px">${Object.entries(TPL).map(([k, x]) => `<button type="button" data-t="${k}" aria-pressed="${p.template === k}" class="glass" style="text-align:left;border-radius:14px;padding:12px;color:#fff;${p.template === k ? "border-color:#FF4D4D;box-shadow:0 0 0 2px rgba(255,77,77,.4)" : ""}"><b>${x.name}</b><br><small style="color:#C7C9D1">${x.desc}</small></button>`).join("")}</div></section>
-  <section data-part="profile" class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Profil</h2>${inp("dn", "Nama paparan", p.displayName, "", 'maxlength="40"')}<div style="margin-top:12px"><label class="lbl" for="bio">Bio</label><textarea id="bio" class="inp" rows="2" maxlength="140" placeholder="Terangkan diri/kedai anda">${esc(p.bio)}</textarea></div>${inp("av", "URL imej profil", p.avatarUrl, "https://…", 'inputmode="url"')}${inp("bn", "URL banner (pilihan)", p.bannerUrl, "https://…", 'inputmode="url"')}</section>
-  <section data-part="design" class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Warna & fon</h2>
+  <section class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Templat</h2><div style="display:grid;gap:8px">${Object.entries(TPL).map(([k, x]) => `<button type="button" data-t="${k}" aria-pressed="${p.template === k}" class="glass" style="text-align:left;border-radius:14px;padding:12px;color:#fff;${p.template === k ? "border-color:#FF4D4D;box-shadow:0 0 0 2px rgba(255,77,77,.4)" : ""}"><b>${x.name}</b><br><small style="color:#C7C9D1">${x.desc}</small></button>`).join("")}</div></section>
+  <section class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Warna & fon</h2>
     <label class="lbl" for="bt">Latar</label><select id="bt" class="inp"><option value="solid">Warna penuh</option><option value="gradient">Gradien</option><option value="image">Gambar</option></select>
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px">${col("c1", "Warna latar 1", t.bg1)}${col("c2", "Warna latar 2 (gradien)", t.bg2)}${col("ct", "Warna teks", t.text)}${col("cb", "Warna butang", t.btn)}</div>
-    <div id="bgi" style="${t.bgType === "image" ? "" : "display:none"}">${inp("bi", "URL gambar latar", t.bgImg, "https://…", 'inputmode="url"')}</div>
+    <div id="bgi" style="${t.bgType === "image" ? "" : "display:none"}"><div style="margin-top:12px"><button type="button" class="btn btn-ghost btn-sm" id="bgu">${ic("plus", "w-4 h-4")} Muat naik gambar latar</button><input type="file" id="bgf" accept="image/*" hidden></div></div>
     <div id="ctr" class="err"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px"><div><label class="lbl" for="ft">Fon</label><select id="ft" class="inp">${FONTS.map(f => `<option ${t.font === f ? "selected" : ""}>${f}</option>`).join("")}</select></div><div><label class="lbl" for="sh">Bentuk butang</label><select id="sh" class="inp"><option value="pill">Kapsul</option><option value="round">Bulat sudut</option><option value="square">Segi empat</option></select></div></div>
-    <label style="display:flex;gap:10px;align-items:center;margin-top:14px;min-height:44px;font-size:14.5px"><input type="checkbox" id="au" ${t.auto ? "checked" : ""} style="width:20px;height:20px;accent-color:#E10600"> Ikut mod cerah/gelap peranti (templat Minimalis, Grid, Jualan)</label></section>
-  <section data-part="profile" class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Ikon sosial</h2>${SOCIALS.map(([k, n]) => inp("s_" + k, n, soc[k], k === "mail" ? "nama@contoh.com" : "https://…")).join("")}</section>
-  <section data-part="profile" class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Testimoni (untuk templat Laman Mini)</h2>${tests.map((x, i) => inp("tn" + i, `Nama #${i + 1}`, x.name, "Nurul", 'maxlength="40"') + inp("tt" + i, `Ulasan #${i + 1}`, x.text, "Servis mesra dan laju!", 'maxlength="160"')).join("")}</section></div>`;
-  $$("#pane section[data-part]").forEach(x => x.dataset.part !== part && x.remove());
-  if ($("#bt")) { $("#bt").value = t.bgType || "solid"; $("#sh").value = t.shape || "pill"; }
-  const commit = (touchColors) => { if (touchColors) { S.profile.theme.auto = false; if ($("#au")) $("#au").checked = false; } checkContrast(); refreshPreview(); saveProfile(); };
-  const checkContrast = () => { const th = S.profile.theme, bg = hex(th.bg1, "#fff"); const c = contrast(hex(th.text, "#000"), bg), b = contrast(onColor(th.btn), hex(th.btn, "#000")); if ($("#ctr")) $("#ctr").textContent = c < 4.5 ? `Kontras teks/latar rendah (${c.toFixed(1)}:1). Cuba warna teks lebih berbeza supaya mudah dibaca.` : ""; };
-  $$("[data-t]").forEach(b => (b.onclick = () => { const k = b.dataset.t; const keep = S.profile.theme.btn; S.profile.template = k; S.profile.theme = { ...TPL[k].theme, auto: true, btn: S.profile.theme.auto ? TPL[k].theme.btn : keep }; if (!S.profile.theme.auto) S.profile.theme.auto = false; saveProfile(); designTab(part); refreshPreview(); }));
-  const on = (id, fn, ev = "input") => { const el = $("#" + id); if (el) el.addEventListener(ev, e => fn(e.target.value, e.target)); };
-  on("dn", v => { p.displayName = v.slice(0, 40); commit(); }); on("bio", v => { p.bio = v; commit(); });
-  on("av", v => { p.avatarUrl = v.trim(); commit(); }); on("bn", v => { p.bannerUrl = v.trim(); commit(); });
+    <label style="display:flex;gap:10px;align-items:center;margin-top:14px;min-height:44px;font-size:14.5px"><input type="checkbox" id="au" ${t.auto ? "checked" : ""} style="width:20px;height:20px;accent-color:#E10600"> Ikut mod cerah/gelap peranti (templat Minimalis, Grid, Jualan)</label></section></div>`;
+  $("#bt").value = t.bgType || "solid"; $("#sh").value = t.shape || "pill";
+  const checkContrast = () => { const th = S.profile.theme; const c = contrast(hex(th.text, "#000"), hex(th.bg1, "#fff")); $("#ctr").textContent = c < 4.5 ? `Kontras teks/latar rendah (${c.toFixed(1)}:1). Cuba warna teks lebih berbeza supaya mudah dibaca.` : ""; };
+  const commit = touch => { if (touch) { S.profile.theme.auto = false; $("#au").checked = false; } checkContrast(); refreshPreview(); saveProfile(); };
+  $$("[data-t]").forEach(b => (b.onclick = () => { const k = b.dataset.t; const keep = S.profile.theme.btn, wasAuto = S.profile.theme.auto; S.profile.template = k; S.profile.theme = { ...TPL[k].theme, auto: true, btn: wasAuto ? TPL[k].theme.btn : keep }; if (!wasAuto) S.profile.theme.auto = false; saveProfile(); designTab(); refreshPreview(); }));
+  const on = (id, fn, ev = "input") => $("#" + id).addEventListener(ev, e => fn(e.target.value, e.target));
   on("bt", v => { t.bgType = v; $("#bgi").style.display = v === "image" ? "" : "none"; commit(true); }, "change");
   on("c1", v => { t.bg1 = v; commit(true); }); on("c2", v => { t.bg2 = v; commit(true); }); on("ct", v => { t.text = v; commit(true); }); on("cb", v => { t.btn = v; commit(true); });
-  on("bi", v => { t.bgImg = v.trim(); commit(true); });
-  on("ft", v => { t.font = v; commit(); }, "change"); on("sh", v => { t.shape = v; commit(); }, "change");
-  on("au", (v, el) => { t.auto = el.checked; commit(); }, "change");
-  const socs = () => { p.socialIcons = SOCIALS.map(([k]) => ({ type: k, url: $("#s_" + k).value.trim() })).filter(s => s.url); commit(); };
-  SOCIALS.forEach(([k]) => on("s_" + k, socs));
-  const tst = () => { p.testimonials = [0, 1, 2].map(i => ({ name: $("#tn" + i).value.trim(), text: $("#tt" + i).value.trim() })).filter(x => x.text); commit(); };
-  [0, 1, 2].forEach(i => { on("tn" + i, tst); on("tt" + i, tst); });
+  on("ft", v => { t.font = v; commit(); }, "change"); on("sh", v => { t.shape = v; commit(); }, "change"); on("au", (v, el) => { t.auto = el.checked; commit(); }, "change");
+  $("#bgu").onclick = () => $("#bgf").click();
+  $("#bgf").onchange = async e => { const f = e.target.files[0]; if (!f) return; try { t.bgImg = await compressImage(f, 900, 1600, .78); commit(true); toast("Gambar latar dimuat naik ✓"); } catch (er) { toast(er.message, "bad"); } };
   checkContrast();
+}
+const STYLES = [["classic", "Klasik", "Gambar bulat kecil"], ["hero", "Foto Hero", "Gambar penuh dengan overlay, nama di atas gambar"], ["cover", "Foto Penuh", "Gambar jadi latar seluruh halaman"]];
+function profileTab() {
+  const p = S.profile, av = imgUrl(p.avatarUrl);
+  const tests = [0, 1, 2].map(i => (p.testimonials || [])[i] || {});
+  const inp = (id, label, val, ph = "", extra = "") => `<div style="margin-top:12px"><label class="lbl" for="${id}">${label}</label><input id="${id}" class="inp" value="${esc(val || "")}" placeholder="${esc(ph)}" ${extra}></div>`;
+  $("#pane").innerHTML = `<div style="display:flex;flex-direction:column;gap:16px">
+  <section class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Gambar & maklumat</h2>
+    <div style="display:flex;gap:16px;align-items:center"><div id="avp" style="width:92px;height:92px;border-radius:50%;overflow:hidden;background:rgba(255,255,255,.08);display:grid;place-items:center;flex:none;border:2px solid rgba(255,255,255,.2)"></div>
+    <div><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn btn-red btn-sm" id="upav">${ic("plus", "w-4 h-4")} Muat naik gambar</button><button type="button" class="btn btn-ghost btn-sm" id="rmav">Buang</button></div><p class="hint" style="margin:8px 0 0">Foto potret paling cantik untuk gaya Hero. Dikecilkan automatik.</p></div></div>
+    <input type="file" id="fav" accept="image/*" hidden>${inp("dn", "Nama paparan", p.displayName, "", 'maxlength="40"')}<div style="margin-top:12px"><label class="lbl" for="bio">Bio</label><textarea id="bio" class="inp" rows="2" maxlength="140" placeholder="Terangkan diri/kedai anda">${esc(p.bio)}</textarea></div></section>
+  <section class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Gaya profil</h2><p class="hint" style="margin:0 0 10px">Pilih rupa kepala halaman anda, seperti profil premium.</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">${STYLES.map(([k, n, d]) => `<button type="button" class="stybtn" data-s="${k}" aria-pressed="${(p.profileStyle || "classic") === k}"><span class="stymini sty-${k}"><i></i><b></b></span><span style="font-weight:700;font-size:14px">${n}</span><small style="color:#C7C9D1;font-size:11.5px;line-height:1.3">${d}</small></button>`).join("")}</div></section>
+  <section class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Ikon sosial</h2><p class="hint" style="margin:0 0 10px">Tiada ikon dipaparkan sehingga anda tambah sendiri.</p><div id="soc" style="display:flex;flex-direction:column;gap:8px"></div>
+    <button type="button" class="btn btn-ghost" id="adds" style="width:100%;margin-top:10px">${ic("plus", "w-4 h-4")} Tambah ikon sosial</button></section>
+  <details class="glass" style="border-radius:18px;padding:16px"><summary style="cursor:pointer;font-weight:700;min-height:32px">Testimoni (untuk templat Laman Mini)</summary>${tests.map((x, i) => inp("tn" + i, `Nama #${i + 1}`, x.name, "Nurul", 'maxlength="40"') + inp("tt" + i, `Ulasan #${i + 1}`, x.text, "Servis mesra dan laju!", 'maxlength="160"')).join("")}</details></div>`;
+  const drawAv = () => { const u = imgUrl(S.profile.avatarUrl); $("#avp").innerHTML = u ? `<img src="${esc(u)}" alt="" style="width:100%;height:100%;object-fit:cover">` : `<span style="font-size:34px;font-weight:800;color:#C7C9D1">${esc((S.profile.displayName || S.profile.username).charAt(0).toUpperCase())}</span>`; };
+  const commit = () => { refreshPreview(); saveProfile(); };
+  drawAv();
+  $("#upav").onclick = () => $("#fav").click();
+  $("#fav").onchange = async e => { const f = e.target.files[0]; if (!f) return; try { S.profile.avatarUrl = await compressImage(f, 720, 900, .8); drawAv(); commit(); toast("Gambar profil dimuat naik ✓"); } catch (er) { toast(er.message, "bad"); } };
+  $("#rmav").onclick = () => { S.profile.avatarUrl = ""; drawAv(); commit(); };
+  const on = (id, fn) => { const el = $("#" + id); if (el) el.addEventListener("input", e => fn(e.target.value)); };
+  on("dn", v => { S.profile.displayName = v.slice(0, 40); commit(); }); on("bio", v => { S.profile.bio = v; commit(); });
+  $$(".stybtn").forEach(b => (b.onclick = () => { S.profile.profileStyle = b.dataset.s; $$(".stybtn").forEach(x => x.setAttribute("aria-pressed", x === b)); commit(); }));
+  const drawSoc = () => {
+    const list = S.profile.socialIcons || [];
+    $("#soc").innerHTML = list.length ? list.map((x, i) => `<div class="row glass" style="padding:8px 10px"><span class="pt-i" style="background:${BRANDS[x.type].c};color:${onColor(BRANDS[x.type].c)};width:40px;height:40px;flex:none">${brandIc(x.type, "w-5 h-5")}</span><input class="inp" data-si="${i}" value="${esc(x.url)}" placeholder="${x.type === "email" ? "nama@contoh.com" : x.type === "whatsapp" ? "0123456789" : "@nama_anda atau URL"}" aria-label="${esc(BRANDS[x.type].n)}" style="min-height:42px"><button class="btn btn-ghost btn-sm" data-sr="${i}" aria-label="Buang ${esc(BRANDS[x.type].n)}">${ic("trash", "w-4 h-4")}</button></div>`).join("") : `<div style="color:#9CA3AF;font-size:14px;padding:4px 2px">Belum ada ikon sosial.</div>`;
+    $$("[data-si]").forEach(i => (i.oninput = () => { S.profile.socialIcons[+i.dataset.si].url = i.value.trim(); commit(); }));
+    $$("[data-sr]").forEach(b => (b.onclick = () => { S.profile.socialIcons.splice(+b.dataset.sr, 1); drawSoc(); commit(); }));
+  };
+  S.profile.socialIcons = S.profile.socialIcons || []; drawSoc();
+  $("#adds").onclick = () => socPicker(k => { S.profile.socialIcons.push({ type: k, url: "" }); drawSoc(); const last = $$("[data-si]").pop(); last && last.focus(); });
+  const tst = () => { S.profile.testimonials = [0, 1, 2].map(i => ({ name: $("#tn" + i).value.trim(), text: $("#tt" + i).value.trim() })).filter(x => x.text); commit(); };
+  [0, 1, 2].forEach(i => { on("tn" + i, tst); on("tt" + i, tst); });
 }
 
 /* --- Tab Statistik --- */
@@ -1004,20 +1212,20 @@ async function statsTab(part = "stats") {
   if (HAS_RTDB && $("#live")) { try { FB.rt.onValue(FB.rt.ref(rtdb, `flashlink/live/${S.user.uid}`), s => { const el = $("#live"); if (el) el.textContent = s.val() || 0; }); } catch {} }
 }
 
-/* ---------- Kesan bunyi gaya gaming (HANYA paparan sebelum register: laman utama & log masuk) ----------
-   Dijana dengan Web Audio (tiada fail audio). Volum sengaja rendah. Pelayar hanya benarkan bunyi selepas sentuhan pertama. */
+/* ---------- Bunyi gaya gaming + muzik latar (HANYA paparan sebelum register: laman utama & log masuk) ----------
+   Semua dijana dengan Web Audio (tiada fail audio, tiada hak cipta). Volum sengaja rendah.
+   Pelayar menyekat bunyi sebelum pelawat menyentuh skrin; muzik cuba mula serta-merta dan bermula pada sentuhan/klik/kekunci pertama. */
 const SFX = {
-  ctx: null, master: null, scope: false, last: null, lastT: 0,
+  ctx: null, master: null, mus: null, scope: false, last: null, lastPop: 0,
   get muted() { try { return localStorage.getItem("fl_sfx") === "0"; } catch { return false; } },
   init() {
-    if (this.ctx) { if (this.ctx.state === "suspended") this.ctx.resume().catch(() => {}); return !!this.ctx; }
+    if (this.ctx) return true;
     const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false;
-    try { this.ctx = new AC(); this.master = this.ctx.createGain(); this.master.gain.value = .55; this.master.connect(this.ctx.destination); } catch { return false; }
+    try { this.ctx = new AC(); this.master = this.ctx.createGain(); this.master.gain.value = .55; this.master.connect(this.ctx.destination); this.mus = this.ctx.createGain(); this.mus.gain.value = .0001; this.mus.connect(this.master); } catch { return false; }
     return true;
   },
-  // satu nada: jenis gelombang, frekuensi mula -> tamat, tempoh (s), kelantangan, lengah (s)
   tone(type, f1, f2, dur, vol, delay = 0) {
-    if (!this.scope || this.muted || !this.init() || this.ctx.state !== "running") return;
+    if (!this.scope || this.muted || !this.ctx || this.ctx.state !== "running") return;
     const c = this.ctx, t = c.currentTime + delay, o = c.createOscillator(), g = c.createGain();
     o.type = type; o.frequency.setValueAtTime(f1, t); if (f2 !== f1) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
     g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .008); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
@@ -1025,37 +1233,86 @@ const SFX = {
   },
   hover() { this.tone("triangle", 1500, 1900, .045, .03); },
   click() { this.tone("square", 520, 880, .07, .028); this.tone("triangle", 880, 1320, .09, .03, .05); },
-  power() { [523, 659, 784, 1047].forEach((f, i) => this.tone("square", f, f * 1.01, .1, .024, i * .07)); }, // arpeggio naik, "power-up"
+  power() { [523, 659, 784, 1047].forEach((f, i) => this.tone("square", f, f * 1.01, .1, .024, i * .07)); },
   type() { this.tone("sine", 700, 600, .03, .02); },
+  pop() { const n = performance.now(); if (n - this.lastPop < 110) return; this.lastPop = n; this.tone("sine", 320, 980, .09, .05); this.tone("triangle", 1250, 1650, .05, .018, .05); },
 };
+const MUSIC = {
+  on: false, timer: 0, next: 0, step: 0,
+  CH: [[110, [220, 261.63, 329.63]], [87.31, [174.61, 220, 261.63]], [130.81, [261.63, 329.63, 392]], [98, [196, 246.94, 293.66]]], // Am - F - C - G
+  start() {
+    const c = SFX.ctx; if (this.on || !SFX.scope || SFX.muted || !c || c.state !== "running") return;
+    this.on = true; SFX.mus.gain.cancelScheduledValues(c.currentTime); SFX.mus.gain.setValueAtTime(.0001, c.currentTime); SFX.mus.gain.exponentialRampToValueAtTime(1, c.currentTime + 2.5);
+    this.next = c.currentTime + .15; this.step = 0; this.sched(); this.timer = setInterval(() => this.sched(), 300);
+  },
+  stop() { if (!this.on) return; this.on = false; clearInterval(this.timer); const c = SFX.ctx; if (c) { SFX.mus.gain.cancelScheduledValues(c.currentTime); SFX.mus.gain.setTargetAtTime(.0001, c.currentTime, .25); } },
+  note(type, f, t, d, v) { const c = SFX.ctx, o = c.createOscillator(), g = c.createGain(); o.type = type; o.frequency.value = f; g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(v, t + Math.min(.4, d * .3)); g.gain.exponentialRampToValueAtTime(.0001, t + d); o.connect(g); g.connect(SFX.mus); o.start(t); o.stop(t + d + .05); },
+  sched() {
+    const c = SFX.ctx; if (!c) return;
+    while (this.next < c.currentTime + 1.5) {
+      const s = this.step, bar = Math.floor(s / 8) % 4, [root, ch] = this.CH[bar], t = this.next;
+      if (s % 8 === 0) { this.note("triangle", root, t, 4.0, .05); ch.forEach(f => this.note("sine", f, t, 4.0, .018)); }
+      if (s % 2 === 0) this.note("square", ch[(s / 2 + bar) % 3] * 2 * (s % 8 === 6 ? 1.5 : 1), t, .22, .006);
+      this.next += .52; this.step++;
+    }
+  },
+};
+function sfxUnlock() {
+  if (!SFX.scope || !SFX.init()) return Promise.resolve(false);
+  return SFX.ctx.resume().then(() => { MUSIC.start(); return SFX.ctx.state === "running"; }, () => false);
+}
 function sfxScope(on) {
   SFX.scope = on;
   let b = $("#sfxbtn");
-  if (!b) { b = document.createElement("button"); b.id = "sfxbtn"; document.body.appendChild(b); b.onclick = () => { const m = !SFX.muted; try { localStorage.setItem("fl_sfx", m ? "0" : "1"); } catch {} sfxIcon(); if (!m) { SFX.init(); SFX.click(); } }; }
-  b.classList.toggle("on", on); if (on) sfxIcon();
+  if (!b) { b = document.createElement("button"); b.id = "sfxbtn"; document.body.appendChild(b); b.onclick = () => { const m = !SFX.muted; try { localStorage.setItem("fl_sfx", m ? "0" : "1"); } catch {} sfxIcon(); if (m) MUSIC.stop(); else sfxUnlock().then(() => SFX.click()); }; }
+  b.classList.toggle("on", on);
+  if (on) { sfxIcon(); if (!SFX.muted) sfxUnlock(); } else MUSIC.stop();
 }
-function sfxIcon() { const b = $("#sfxbtn"), m = SFX.muted; b.innerHTML = ic(m ? "mute" : "vol", "w-5 h-5"); b.setAttribute("aria-label", m ? "Hidupkan kesan bunyi" : "Matikan kesan bunyi"); b.setAttribute("aria-pressed", String(!m)); }
-const SFX_SEL = "a.btn,button.btn,a[data-nav],.chip,.glass[role]";
-addEventListener("pointerdown", e => { if (!SFX.scope) return; SFX.init(); const t = e.target.closest(SFX_SEL + ",#sfxbtn"); if (!t || t.id === "sfxbtn") return; /Cipta Flash Link|Mula/.test(t.textContent) ? SFX.power() : SFX.click(); }, { passive: true });
-addEventListener("keydown", e => { if (!SFX.scope) return; SFX.init(); if (e.key.length === 1) SFX.type(); }, { passive: true });
+function sfxIcon() { const b = $("#sfxbtn"), m = SFX.muted; b.innerHTML = ic(m ? "mute" : "vol", "w-5 h-5"); b.setAttribute("aria-label", m ? "Hidupkan bunyi" : "Matikan bunyi"); b.setAttribute("aria-pressed", String(!m)); }
+const SFX_SEL = "a.btn,button.btn,a[data-nav],.chip,.ptile,.dcard";
+["pointerdown", "touchend", "keydown", "click"].forEach(ev => addEventListener(ev, e => {
+  if (!SFX.scope) return;
+  sfxUnlock().then(ok => {
+    if (!ok) return;
+    if (ev === "pointerdown") { const t = e.target.closest?.(SFX_SEL); if (t) /Cipta Flash Link|Mula sekarang|Tambah/.test(t.textContent) ? SFX.power() : SFX.click(); }
+    else if (ev === "keydown" && e.key.length === 1) SFX.type();
+  });
+}, { passive: true }));
 document.addEventListener("pointerover", e => { if (!SFX.scope || e.pointerType === "touch") return; const t = e.target.closest(SFX_SEL); if (!t || t === SFX.last) return; SFX.last = t; SFX.hover(); }, { passive: true });
 document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contains(e.relatedTarget)) SFX.last = null; }, { passive: true });
+document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
-/* ---------- Router ---------- */
+/* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
+const APP_VERSION = "V-23";
+async function checkUpdate() {
+  if (!S.user) return;
+  try {
+    const r = await fetch("/version.json?t=" + Date.now(), { cache: "no-store" }); const j = await r.json();
+    if (j.version && j.version !== APP_VERSION && !$("#updbar")) {
+      const d = document.createElement("div"); d.id = "updbar"; d.setAttribute("role", "status");
+      d.innerHTML = `<span>${ic("zap", "w-5 h-5")}<b>Versi baharu ${esc(j.version)} tersedia</b>${j.notes ? `<small>${esc(j.notes)}</small>` : ""}</span><button id="updgo" class="btn btn-red btn-sm">Kemas kini sekarang</button>`;
+      document.body.appendChild(d); $("#updgo").onclick = () => location.reload();
+    }
+  } catch {}
+}
+setInterval(checkUpdate, 60000); document.addEventListener("visibilitychange", () => !document.hidden && checkUpdate());
+
+/* ---------- Router ---------- *//* ---------- Router ---------- */
 function nav(path, replace) { replace ? history.replaceState({}, "", path) : history.pushState({}, "", path); route(true); window.scrollTo(0, 0); }
 function route() {
   document.documentElement.style.background = ""; sfxScope(false);
   const p = location.pathname.replace(/\/+$/, "") || "/", seg = p.split("/").filter(Boolean);
+  document.body.classList.toggle("flow", !(seg.length === 1 && USER_RE.test(seg[0]) && !RESERVED.has(seg[0])));
   if (p === "/" || p === "/index.html") return landing();
   if (p === "/login") return loginView();
   if (p === "/dashboard") return dashView();
-  if (seg.length === 1 && (USER_RE.test(seg[0]) || seg[0] === "demo") && !(RESERVED.has(seg[0]) && seg[0] !== "demo")) return publicView(seg[0]);
+  if (seg.length === 1 && USER_RE.test(seg[0]) && !RESERVED.has(seg[0])) return publicView(seg[0]);
   notFound();
 }
 document.addEventListener("click", e => { const a = e.target.closest("a[data-nav]"); if (!a || e.metaKey || e.ctrlKey) return; e.preventDefault(); nav(a.getAttribute("href")); });
 addEventListener("popstate", route);
 const initPromise = initFirebase().catch(e => { console.error(e); authReadyRes(); toast("Gagal menyambung ke Firebase. Semak config.", "bad"); });
-initPromise.then(countVisit);
+initPromise.then(() => { countVisit(); checkUpdate(); });
 route();
 </script>
 </body>
