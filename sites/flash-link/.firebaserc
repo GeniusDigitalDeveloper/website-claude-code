@@ -1,4 +1,4 @@
 {
-  "projects": { "default": "GANTI_DENGAN_PROJECT_ID_GENIUS_DIGITAL" },
-  "targets": { "GANTI_DENGAN_PROJECT_ID_GENIUS_DIGITAL": { "hosting": { "flashlink": ["flash-link"] } } }
+  "projects": { "default": "genius-digital-40bc9" },
+  "targets": { "genius-digital-40bc9": { "hosting": { "flashlink": ["flash-link"] } } }
 }
