@@ -90,6 +90,43 @@ select.inp option{color:#111}
 .sortable-ghost{opacity:.35}
 .bar{background:linear-gradient(180deg,#FF4D4D,#B80000);border-radius:6px 6px 0 0;min-height:2px}
 
+/* ============ BANNER 3 ZON (1920x110, kiri | tengah | kanan) ============ */
+.fl-banner3{position:relative;width:100%;height:clamp(72px,5.73vw,110px);overflow:hidden;border-bottom:1px solid rgba(255,77,77,.28);isolation:isolate}
+.b3-bg{position:absolute;inset:0;z-index:-1;background:
+  radial-gradient(40% 140% at 50% 50%,rgba(255,42,42,.30),transparent 70%),
+  repeating-linear-gradient(115deg,transparent 0 46px,rgba(255,255,255,.035) 46px 48px),
+  linear-gradient(100deg,#120305 0%,#34060a 38%,#14070b 66%,#07070A 100%)}
+.b3-bg::after{content:"";position:absolute;inset:0;width:40%;transform:translateX(-120%) skewX(-22deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent);animation:b3sweep 7s cubic-bezier(.32,.72,0,1) infinite;will-change:transform}
+@keyframes b3sweep{0%,55%{transform:translateX(-120%) skewX(-22deg)}100%{transform:translateX(330%) skewX(-22deg)}}
+.b3-in{height:100%;max-width:1920px;margin:0 auto;display:grid;grid-template-columns:1fr 1.5fr 1fr;align-items:center}
+.b3-zone{height:60%;display:flex;align-items:center;justify-content:center;gap:12px;padding:0 20px;min-width:0}
+.b3-zone+.b3-zone{border-left:1px solid rgba(255,255,255,.12)}
+.b3-zone small{display:block;color:#D1D5DB;font-size:12px;line-height:1.3}
+.b3-l b{display:block;font-size:14.5px;color:#fff}
+.b3-l svg{color:#FF6B6B;flex:none}
+.b3-c{flex-direction:column;gap:2px;text-align:center}
+.b3-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(17px,2vw,28px);line-height:1.15}
+.b3-r span{font-size:13px;color:#E5E7EB;font-weight:600}
+@media(max-width:760px){.b3-in{grid-template-columns:1fr auto}.b3-l,.b3-c small,.b3-r span{display:none}.b3-c{border-left:0!important}.b3-zone{padding:0 14px}.b3-title{font-size:17px}}
+/* ============ DASHBOARD V22 ============ */
+:root{--ease:cubic-bezier(.32,.72,0,1)}
+.dcard{position:relative;display:flex;flex-direction:column;gap:10px;text-align:left;width:100%;padding:20px;border-radius:22px;color:#fff;overflow:hidden;
+  background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.03));border:1px solid var(--line);
+  transition:transform .5s var(--ease),box-shadow .5s var(--ease),border-color .3s;will-change:transform;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.dcard::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .35s;
+  background:radial-gradient(280px circle at var(--mx,50%) var(--my,0%),rgba(255,77,77,.26),transparent 62%)}
+.dcard:hover{transform:translate3d(0,-5px,0) scale(1.012);border-color:rgba(255,107,107,.55);box-shadow:0 22px 50px -22px rgba(225,6,0,.65)}
+.dcard:hover::before{opacity:1}
+.dcard:active{transform:scale(.97);transition-duration:.18s}
+.dtile{width:50px;height:50px;border-radius:15px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,#FF2A2A,#9B0000);box-shadow:0 10px 24px -10px rgba(255,42,42,.8)}
+.dgo{display:flex;align-items:center;justify-content:space-between;margin-top:auto;font-weight:700;color:#FF8A8A;font-size:14.5px}
+.dgo svg{transition:transform .45s var(--ease)}
+.dcard:hover .dgo svg{transform:translateX(5px)}
+.pvfab{display:none;position:fixed;right:16px;bottom:16px;z-index:40;min-height:52px;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+@media(max-width:1023px){.pvfab.on{display:inline-flex}}
+.vbadge{display:inline-block;padding:2px 9px;border-radius:999px;background:rgba(255,77,77,.18);border:1px solid rgba(255,107,107,.5);color:#FFB4B4;font-size:11.5px;font-weight:700;letter-spacing:.04em}
+@media (prefers-reduced-motion:reduce){.b3-bg::after{animation:none}.dcard,.dgo svg{transition:none}.dcard:hover{transform:none}}
+
 /* ============ HALAMAN PROFIL AWAM (5 templat) ============ */
 .fl-root{--bgcss:#fff;--text:#111;--btn:#111;--btnText:#fff;--r:16px;--font:'Inter';font-family:var(--font),system-ui,sans-serif;color:var(--text);background:var(--bgcss);min-height:100%;line-height:1.45}
 .fl-root *{box-sizing:border-box}
@@ -236,6 +273,8 @@ function loadFont(f) {
 
 /* ---------- Ikon SVG (gaya lucide) ---------- */
 const P = {
+  chev: '<path d="m15 18-6-6 6-6"/>',
+  chevr: '<path d="m9 18 6-6-6-6"/>',
   link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
   whatsapp: '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',
   bag: '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>',
@@ -287,7 +326,7 @@ const mkTheme = (tpl, accent) => { const t = { ...TPL[tpl].theme, auto: true }; 
 /* ---------- Firebase (dimuat hanya jika config sah) ---------- */
 let FB = null, auth = null, db = null, rtdb = null;
 let authReadyRes; const authReady = new Promise(r => (authReadyRes = r));
-const S = { user: null, profile: null, links: [], tab: "links", events: null, leads: null, range: 7, loadingProfile: false, celebrate: false };
+const S = { user: null, profile: null, links: [], tab: "links", view: "home", events: null, leads: null, range: 7, loadingProfile: false, celebrate: false };
 
 async function initFirebase() {
   if (!CONFIGURED) { authReadyRes(); return; }
@@ -540,7 +579,13 @@ function landing() {
     ["qr", "Kod QR percuma", "Cetak pada kad atau kedai — pelanggan imbas terus."],
     ["phone", "Edit dari telefon", "Pratonton langsung semasa anda reka. Ringan dan laju."],
   ];
+  const go = logged ? "/dashboard" : "/login?daftar=1";
   $("#app").innerHTML = `
+  <div class="fl-banner3" role="region" aria-label="Promosi Flash Link"><div class="b3-bg" aria-hidden="true"></div><div class="b3-in">
+    <div class="b3-zone b3-l">${ic("zap", "w-7 h-7")}<span><b>Setup 2 minit</b><small>Tanpa kod, tanpa kad kredit</small></span></div>
+    <div class="b3-zone b3-c"><span class="b3-title gradtxt">Satu pautan. Semua jualan.</span><small>WhatsApp · Shopee · TikTok Shop · YouTube</small></div>
+    <div class="b3-zone b3-r"><span>Percuma selamanya</span><a class="btn btn-red btn-sm" href="${go}" data-nav>Mula percuma</a></div>
+  </div></div>
   <header class="container" style="display:flex;align-items:center;justify-content:space-between;height:68px;position:relative;z-index:5">
     <a href="/" data-nav aria-label="Flash Link"><img src="/assets/logo.png" alt="Flash Link" width="132" height="66" style="height:44px;width:auto"></a>
     <nav style="display:flex;gap:8px"><a class="btn btn-ghost btn-sm" href="${logged ? "/dashboard" : "/login"}" data-nav>${logged ? "Dashboard" : "Masuk"}</a><a class="btn btn-red btn-sm" href="${logged ? "/dashboard" : "/login?daftar=1"}" data-nav>Mula percuma</a></nav>
@@ -726,22 +771,93 @@ const saveProfile = debounce(async () => {
 }, 700);
 const refreshPreview = () => { const el = $("#pvbox"); if (el) el.innerHTML = renderProfile(S.profile, S.links, { preview: true }); const m = $("#pvmobile"); if (m) m.innerHTML = renderProfile(S.profile, S.links, { preview: true }); };
 
+/* ---------- Dashboard V22: hab bahagian + animasi gaya iOS ---------- */
+const REDUCE = () => matchMedia("(prefers-reduced-motion:reduce)").matches;
+const EASE = "cubic-bezier(.32,.72,0,1)";
+const anim = (el, kf, o = {}) => (!el || REDUCE() ? null : el.animate(kf, { duration: 520, easing: EASE, fill: "both", ...o }));
+function stagger(sel, base = 0, gap = 55) { $$(sel).forEach((el, i) => anim(el, [{ opacity: 0, transform: "translate3d(0,18px,0) scale(.98)" }, { opacity: 1, transform: "none" }], { delay: base + i * gap, fill: "backwards", duration: 600 })); }
+const SECTIONS = [
+  { k: "links", n: "Pautan", i: "layers", cta: "Tambah pautan", d: "Di sini anda tambah pautan WhatsApp, Shopee, TikTok Shop, YouTube dan lain-lain. Seret untuk susun, hidup atau matikan bila-bila masa.", meta: () => `${S.links.length} pautan` },
+  { k: "design", n: "Reka Bentuk", i: "palette", cta: "Ubah reka bentuk", d: "Pilih templat, tukar warna, fon dan bentuk butang. Pratonton langsung muncul di sebelah.", meta: () => TPL[S.profile.template]?.name || "" },
+  { k: "profile", n: "Profil", i: "users", cta: "Edit profil", d: "Letak nama paparan, bio, gambar profil, ikon sosial dan testimoni anda.", meta: () => "@" + S.profile.username },
+  { k: "stats", n: "Statistik", i: "chart", cta: "Lihat statistik", d: "Lihat berapa lawatan dan klik pada setiap pautan dalam 7 atau 30 hari.", meta: () => "7 / 30 hari" },
+  { k: "leads", n: "Pelanggan", i: "mail", cta: "Lihat pelanggan", d: "Semua mesej dan tempahan daripada borang e-mel anda terkumpul di sini.", meta: () => "Borang e-mel" },
+  { k: "share", n: "Kongsi & QR", i: "qr", cta: "Kongsi sekarang", d: "Salin pautan, kongsi kepada rakan dan muat turun kod QR untuk dicetak.", meta: () => profileUrl(S.profile.username).replace(/^https?:\/\//, "") },
+];
+const PREVIEW = new Set(["links", "design", "profile"]);
+let navBusy = false;
+
 function dashboard() {
-  const p = S.profile, url = profileUrl(p.username);
-  const tabs = [["links", "Pautan", "layers"], ["design", "Reka Bentuk", "palette"], ["stats", "Statistik", "chart"]];
-  $("#app").innerHTML = `<header style="position:sticky;top:0;z-index:30;background:rgba(7,7,10,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)"><div class="container" style="display:flex;align-items:center;justify-content:space-between;height:60px;gap:8px">
-    <img src="/assets/logo.png" alt="Flash Link" width="110" height="55" style="height:38px;width:auto"><div style="display:flex;gap:8px"><a class="btn btn-ghost btn-sm" href="${esc(url)}" target="_blank" rel="noopener" aria-label="Buka halaman awam">${ic("ext", "w-4 h-4")}<span class="hidden sm:inline">Halaman saya</span></a><button id="cp" class="btn btn-red btn-sm" aria-label="Salin pautan">${ic("copy", "w-4 h-4")}<span class="hidden sm:inline">Salin</span></button><button id="qrb" class="btn btn-ghost btn-sm" aria-label="Kod QR">${ic("qr", "w-4 h-4")}</button><button id="lo" class="btn btn-ghost btn-sm" aria-label="Log keluar">${ic("logout", "w-4 h-4")}</button></div></div>
-    <div class="container" role="tablist" style="display:flex">${tabs.map(([k, n, i]) => `<button role="tab" class="tabbtn" data-tab="${k}" aria-selected="${S.tab === k}">${ic(i, "w-4 h-4")}${n}</button>`).join("")}</div></header>
-  <div class="container" style="display:grid;gap:24px;padding-top:20px;padding-bottom:96px" id="dgrid"><section id="pane" aria-live="polite"></section>
-    <aside class="hidden lg:block" style="position:sticky;top:130px;align-self:start"><div class="phone"><div class="screen pv-wrap" id="pvbox"></div></div><div class="hint" style="text-align:center">Pratonton langsung <span id="sv" style="color:#6EE7A8"></span></div></aside></div>
-  <button id="pvb" class="btn btn-red lg:hidden" style="position:fixed;right:16px;bottom:16px;z-index:40;min-height:52px;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.6)">${ic("phone", "w-5 h-5")} Pratonton</button>`;
-  const g = $("#dgrid"); const mq = matchMedia("(min-width:1024px)"); const fit = () => (g.style.gridTemplateColumns = mq.matches ? "1fr 320px" : "1fr"); fit(); mq.addEventListener("change", fit);
-  $("#cp").onclick = () => copyText(url); $("#lo").onclick = () => { S.tab = "links"; FB.signOut(auth); };
-  $("#qrb").onclick = () => modal(`<h2 class="font-display" style="font-size:20px;font-weight:700;margin:0 0 12px;text-align:center">Kod QR anda</h2><div style="background:#fff;border-radius:14px;padding:12px;max-width:280px;margin:0 auto" role="img" aria-label="Kod QR">${qrSvg(url)}</div><p class="hint" style="text-align:center;word-break:break-all">${esc(url)}</p>`);
+  const url = profileUrl(S.profile.username);
+  $("#app").innerHTML = `<header style="position:sticky;top:0;z-index:30;background:rgba(7,7,10,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)"><div class="container" style="display:flex;align-items:center;justify-content:space-between;height:60px;gap:8px">
+    <button id="hm" aria-label="Dashboard utama"><img src="/assets/logo.png" alt="Flash Link" width="110" height="55" style="height:38px;width:auto"></button><div style="display:flex;gap:8px"><a class="btn btn-ghost btn-sm" href="${esc(url)}" target="_blank" rel="noopener" aria-label="Buka halaman awam">${ic("ext", "w-4 h-4")}<span class="hidden sm:inline">Halaman saya</span></a><button id="cp" class="btn btn-red btn-sm" aria-label="Salin pautan">${ic("copy", "w-4 h-4")}<span class="hidden sm:inline">Salin</span></button><button id="lo" class="btn btn-ghost btn-sm" aria-label="Log keluar">${ic("logout", "w-4 h-4")}</button></div></div></header>
+  <div class="container" id="stage" style="padding-top:22px;padding-bottom:96px;position:relative;min-height:70vh"></div>
+  <button id="pvb" class="btn btn-red pvfab">${ic("phone", "w-5 h-5")} Pratonton</button>`;
+  $("#cp").onclick = () => copyText(url); $("#lo").onclick = () => { S.view = "home"; FB.signOut(auth); };
+  $("#hm").onclick = () => S.view !== "home" && openView("home");
   $("#pvb").onclick = () => modal(`<div class="pv-wrap" id="pvmobile" style="border-radius:16px;overflow:hidden;max-height:76vh;overflow-y:auto"></div>`, () => refreshPreview());
-  $$("[data-tab]").forEach(b => (b.onclick = () => { S.tab = b.dataset.tab; dashboard(); }));
+  openView(S.view || "home", { instant: true });
+}
+
+async function openView(view, o = {}) {
+  const stage = $("#stage"); if (!stage || navBusy) return; navBusy = true;
+  try {
+    const old = stage.firstElementChild;
+    if (old && !o.instant) { const a = anim(old, [{ opacity: 1, transform: "none" }, { opacity: 0, transform: view === "home" ? "scale(1.035)" : "scale(.965)" }], { duration: 210, easing: "cubic-bezier(.4,0,1,1)" }); if (a) await a.finished.catch(() => {}); }
+    S.view = view;
+    stage.innerHTML = view === "home" ? homeHtml() : sectionHtml(view);
+    const el = stage.firstElementChild;
+    $("#pvb").classList.toggle("on", PREVIEW.has(view));
+    window.scrollTo({ top: 0 });
+    el.style.transformOrigin = o.x != null ? `${o.x}px ${o.y}px` : "50% 0";
+    anim(el, [{ opacity: 0, transform: view === "home" ? "scale(.975)" : "scale(.9) translate3d(0,30px,0)" }, { opacity: 1, transform: "none" }], { duration: 640 });
+    if (view === "home") bindHome(el); else bindSection(el, view);
+    stagger(view === "home" ? ".dcard, .dwel" : ".sec-in", 90, 70);
+  } finally { navBusy = false; }
+}
+
+function homeHtml() {
+  const p = S.profile, url = profileUrl(p.username), h = new Date().getHours();
+  const hi = h < 12 ? "Selamat pagi" : h < 15 ? "Selamat tengah hari" : h < 19 ? "Selamat petang" : "Selamat malam";
+  const av = safeUrl(p.avatarUrl);
+  return `<div id="home"><div class="dwel glass" style="border-radius:24px;padding:20px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:18px">
+      ${av ? `<img src="${esc(av)}" alt="" width="64" height="64" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid #FF4D4D">` : `<div style="width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font-size:26px;font-weight:800;background:linear-gradient(135deg,#FF2A2A,#9B0000)">${esc((p.displayName || p.username).charAt(0).toUpperCase())}</div>`}
+      <div style="flex:1;min-width:200px"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><h1 class="font-display" style="font-size:24px;font-weight:700;margin:0">${hi}, ${esc(p.displayName || p.username)}</h1><span class="vbadge">Dashboard V22</span></div>
+      <p style="margin:4px 0 0;color:#C7C9D1;font-size:15px">Pilih bahagian di bawah untuk mula menetapkan Flash Link anda.</p></div>
+      <button id="wc" class="btn btn-ghost btn-sm" style="max-width:100%" aria-label="Salin pautan anda">${ic("copy", "w-4 h-4")}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(url.replace(/^https?:\/\//, ""))}</span></button></div>
+    <div id="dgr" style="display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(270px,1fr))">${SECTIONS.map(x => `<button class="dcard" data-open="${x.k}" aria-label="Buka ${x.n}"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div class="dtile">${ic(x.i, "w-6 h-6")}</div><span style="font-size:12.5px;color:#C7C9D1;background:rgba(255,255,255,.08);padding:4px 10px;border-radius:999px;max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.meta())}</span></div>
+      <h2 class="font-display" style="font-size:20px;font-weight:700;margin:4px 0 0">${x.n}</h2><p style="margin:0;color:#C7C9D1;font-size:14.5px;line-height:1.5">${x.d.split(". ")[0].replace(/\.$/, "")}.</p><div class="dgo"><span>${x.cta}</span>${ic("chevr", "w-5 h-5")}</div></button>`).join("")}</div></div>`;
+}
+function bindHome(el) {
+  $("#wc").onclick = () => copyText(profileUrl(S.profile.username));
+  const g = $("#dgr");
+  g.addEventListener("pointermove", e => { const c = e.target.closest(".dcard"); if (!c) return; const r = c.getBoundingClientRect(); c.style.setProperty("--mx", e.clientX - r.left + "px"); c.style.setProperty("--my", e.clientY - r.top + "px"); });
+  $$(".dcard", g).forEach(c => (c.onclick = e => { const sr = $("#stage").getBoundingClientRect(), r = c.getBoundingClientRect(); openView(c.dataset.open, { x: r.left - sr.left + r.width / 2, y: r.top - sr.top + r.height / 2 }); }));
+}
+function sectionHtml(k) {
+  const x = SECTIONS.find(z => z.k === k), prev = PREVIEW.has(k);
+  return `<div id="sec"><button id="bk" class="btn btn-ghost btn-sm sec-in" style="margin-bottom:14px">${ic("chev", "w-4 h-4")} Dashboard</button>
+    <div class="sec-in" style="display:flex;gap:14px;align-items:center;margin-bottom:6px"><div class="dtile">${ic(x.i, "w-6 h-6")}</div><h1 class="font-display" style="font-size:26px;font-weight:700;margin:0">${x.n}</h1></div>
+    <p class="sec-in" style="margin:0 0 18px;color:#C7C9D1;max-width:640px;line-height:1.55">${x.d}</p>
+    <div id="dgrid" style="display:grid;gap:24px"><section id="pane" aria-live="polite"></section>${prev ? `<aside class="hidden lg:block" style="position:sticky;top:84px;align-self:start"><div class="phone"><div class="screen pv-wrap" id="pvbox"></div></div><div class="hint" style="text-align:center">Pratonton langsung <span id="sv" style="color:#6EE7A8"></span></div></aside>` : ""}</div></div>`;
+}
+const mqWide = matchMedia("(min-width:1024px)");
+function bindSection(el, k) {
+  $("#bk").onclick = () => openView("home");
+  const g = $("#dgrid"), fit = () => (g.style.gridTemplateColumns = PREVIEW.has(k) && mqWide.matches ? "1fr 320px" : "1fr"); fit(); mqWide.onchange = fit;
+  ({ links: linksTab, design: () => designTab("design"), profile: () => designTab("profile"), stats: () => statsTab("stats"), leads: () => statsTab("leads"), share: shareTab })[k]();
   refreshPreview();
-  if (S.tab === "links") linksTab(); else if (S.tab === "design") designTab(); else statsTab();
+  stagger("#pane > .glass, #pane > div > section, #ll > *", 260, 55);
+}
+function shareTab() {
+  const url = profileUrl(S.profile.username);
+  $("#pane").innerHTML = `<div class="glass" style="border-radius:20px;padding:18px"><div class="lbl">Pautan Flash Link anda</div><div style="font-weight:700;color:#FF8A8A;word-break:break-all;margin-bottom:14px">${esc(url)}</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap"><button id="cp2" class="btn btn-red">${ic("copy")} Salin Pautan</button><button id="sh2" class="btn btn-ghost">${ic("share")} Kongsi</button><a class="btn btn-ghost" href="${esc(url)}" target="_blank" rel="noopener">${ic("ext")} Buka</a></div></div>
+    <div class="glass" style="border-radius:20px;padding:18px;margin-top:14px;text-align:center"><div style="background:#fff;border-radius:14px;padding:10px;max-width:260px;margin:0 auto" id="qr" role="img" aria-label="Kod QR untuk ${esc(url)}">${qrSvg(url)}</div><button id="dq2" class="btn btn-ghost btn-sm" style="margin-top:12px">${ic("qr", "w-4 h-4")} Muat turun QR</button></div>
+    <div class="glass" style="border-radius:20px;padding:18px;margin-top:14px"><b>Tampal di bio anda</b><p style="margin:6px 0 0;color:#C7C9D1;font-size:15px">Buka profil Instagram / TikTok → <b>Edit profil</b> → ruangan <b>Website / Pautan</b> → tampal pautan di atas.</p></div>`;
+  $("#cp2").onclick = () => copyText(url);
+  $("#sh2").onclick = async () => { if (navigator.share) { try { await navigator.share({ title: S.profile.displayName, url }); } catch {} } else copyText(url); };
+  $("#dq2").onclick = () => { const svg = $("#qr svg"); if (!svg) return; const blob = new Blob([svg.outerHTML], { type: "image/svg+xml" }); const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `flashlink-${S.profile.username}-qr.svg`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); };
 }
 function modal(html, after) {
   const bg = document.createElement("div"); bg.className = "modal-bg";
@@ -816,29 +932,30 @@ function linkModal({ link, quick, type }) {
 }
 
 /* --- Tab Reka Bentuk --- */
-function designTab() {
+function designTab(part = "design") {
   const p = S.profile, t = p.theme;
   const inp = (id, label, val, ph = "", extra = "") => `<div style="margin-top:12px"><label class="lbl" for="${id}">${label}</label><input id="${id}" class="inp" value="${esc(val || "")}" placeholder="${esc(ph)}" ${extra}></div>`;
   const col = (id, label, v) => `<div><label class="lbl" for="${id}">${label}</label><input id="${id}" type="color" value="${hex(v, "#000000")}" style="width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.07);padding:3px"></div>`;
   const soc = Object.fromEntries((p.socialIcons || []).map(s => [s.type, s.url]));
   const tests = [0, 1, 2].map(i => (p.testimonials || [])[i] || {});
   $("#pane").innerHTML = `<div style="display:flex;flex-direction:column;gap:16px">
-  <section class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Templat</h2><div style="display:grid;gap:8px">${Object.entries(TPL).map(([k, x]) => `<button type="button" data-t="${k}" aria-pressed="${p.template === k}" class="glass" style="text-align:left;border-radius:14px;padding:12px;color:#fff;${p.template === k ? "border-color:#FF4D4D;box-shadow:0 0 0 2px rgba(255,77,77,.4)" : ""}"><b>${x.name}</b><br><small style="color:#C7C9D1">${x.desc}</small></button>`).join("")}</div></section>
-  <section class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Profil</h2>${inp("dn", "Nama paparan", p.displayName, "", 'maxlength="40"')}<div style="margin-top:12px"><label class="lbl" for="bio">Bio</label><textarea id="bio" class="inp" rows="2" maxlength="140" placeholder="Terangkan diri/kedai anda">${esc(p.bio)}</textarea></div>${inp("av", "URL imej profil", p.avatarUrl, "https://…", 'inputmode="url"')}${inp("bn", "URL banner (pilihan)", p.bannerUrl, "https://…", 'inputmode="url"')}</section>
-  <section class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Warna & fon</h2>
+  <section data-part="design" class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Templat</h2><div style="display:grid;gap:8px">${Object.entries(TPL).map(([k, x]) => `<button type="button" data-t="${k}" aria-pressed="${p.template === k}" class="glass" style="text-align:left;border-radius:14px;padding:12px;color:#fff;${p.template === k ? "border-color:#FF4D4D;box-shadow:0 0 0 2px rgba(255,77,77,.4)" : ""}"><b>${x.name}</b><br><small style="color:#C7C9D1">${x.desc}</small></button>`).join("")}</div></section>
+  <section data-part="profile" class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Profil</h2>${inp("dn", "Nama paparan", p.displayName, "", 'maxlength="40"')}<div style="margin-top:12px"><label class="lbl" for="bio">Bio</label><textarea id="bio" class="inp" rows="2" maxlength="140" placeholder="Terangkan diri/kedai anda">${esc(p.bio)}</textarea></div>${inp("av", "URL imej profil", p.avatarUrl, "https://…", 'inputmode="url"')}${inp("bn", "URL banner (pilihan)", p.bannerUrl, "https://…", 'inputmode="url"')}</section>
+  <section data-part="design" class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Warna & fon</h2>
     <label class="lbl" for="bt">Latar</label><select id="bt" class="inp"><option value="solid">Warna penuh</option><option value="gradient">Gradien</option><option value="image">Gambar</option></select>
     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px">${col("c1", "Warna latar 1", t.bg1)}${col("c2", "Warna latar 2 (gradien)", t.bg2)}${col("ct", "Warna teks", t.text)}${col("cb", "Warna butang", t.btn)}</div>
     <div id="bgi" style="${t.bgType === "image" ? "" : "display:none"}">${inp("bi", "URL gambar latar", t.bgImg, "https://…", 'inputmode="url"')}</div>
     <div id="ctr" class="err"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px"><div><label class="lbl" for="ft">Fon</label><select id="ft" class="inp">${FONTS.map(f => `<option ${t.font === f ? "selected" : ""}>${f}</option>`).join("")}</select></div><div><label class="lbl" for="sh">Bentuk butang</label><select id="sh" class="inp"><option value="pill">Kapsul</option><option value="round">Bulat sudut</option><option value="square">Segi empat</option></select></div></div>
     <label style="display:flex;gap:10px;align-items:center;margin-top:14px;min-height:44px;font-size:14.5px"><input type="checkbox" id="au" ${t.auto ? "checked" : ""} style="width:20px;height:20px;accent-color:#E10600"> Ikut mod cerah/gelap peranti (templat Minimalis, Grid, Jualan)</label></section>
-  <section class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Ikon sosial</h2>${SOCIALS.map(([k, n]) => inp("s_" + k, n, soc[k], k === "mail" ? "nama@contoh.com" : "https://…")).join("")}</section>
-  <section class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Testimoni (untuk templat Laman Mini)</h2>${tests.map((x, i) => inp("tn" + i, `Nama #${i + 1}`, x.name, "Nurul", 'maxlength="40"') + inp("tt" + i, `Ulasan #${i + 1}`, x.text, "Servis mesra dan laju!", 'maxlength="160"')).join("")}</section></div>`;
-  $("#bt").value = t.bgType || "solid"; $("#sh").value = t.shape || "pill";
-  const commit = (touchColors) => { if (touchColors) { S.profile.theme.auto = false; $("#au").checked = false; } checkContrast(); refreshPreview(); saveProfile(); };
-  const checkContrast = () => { const th = S.profile.theme, bg = hex(th.bg1, "#fff"); const c = contrast(hex(th.text, "#000"), bg), b = contrast(onColor(th.btn), hex(th.btn, "#000")); $("#ctr").textContent = c < 4.5 ? `Kontras teks/latar rendah (${c.toFixed(1)}:1). Cuba warna teks lebih berbeza supaya mudah dibaca.` : ""; };
-  $$("[data-t]").forEach(b => (b.onclick = () => { const k = b.dataset.t; const keep = S.profile.theme.btn; S.profile.template = k; S.profile.theme = { ...TPL[k].theme, auto: true, btn: S.profile.theme.auto ? TPL[k].theme.btn : keep }; if (!S.profile.theme.auto) S.profile.theme.auto = false; saveProfile(); designTab(); refreshPreview(); }));
-  const on = (id, fn, ev = "input") => $("#" + id).addEventListener(ev, e => fn(e.target.value, e.target));
+  <section data-part="profile" class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Ikon sosial</h2>${SOCIALS.map(([k, n]) => inp("s_" + k, n, soc[k], k === "mail" ? "nama@contoh.com" : "https://…")).join("")}</section>
+  <section data-part="profile" class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Testimoni (untuk templat Laman Mini)</h2>${tests.map((x, i) => inp("tn" + i, `Nama #${i + 1}`, x.name, "Nurul", 'maxlength="40"') + inp("tt" + i, `Ulasan #${i + 1}`, x.text, "Servis mesra dan laju!", 'maxlength="160"')).join("")}</section></div>`;
+  $$("#pane section[data-part]").forEach(x => x.dataset.part !== part && x.remove());
+  if ($("#bt")) { $("#bt").value = t.bgType || "solid"; $("#sh").value = t.shape || "pill"; }
+  const commit = (touchColors) => { if (touchColors) { S.profile.theme.auto = false; if ($("#au")) $("#au").checked = false; } checkContrast(); refreshPreview(); saveProfile(); };
+  const checkContrast = () => { const th = S.profile.theme, bg = hex(th.bg1, "#fff"); const c = contrast(hex(th.text, "#000"), bg), b = contrast(onColor(th.btn), hex(th.btn, "#000")); if ($("#ctr")) $("#ctr").textContent = c < 4.5 ? `Kontras teks/latar rendah (${c.toFixed(1)}:1). Cuba warna teks lebih berbeza supaya mudah dibaca.` : ""; };
+  $$("[data-t]").forEach(b => (b.onclick = () => { const k = b.dataset.t; const keep = S.profile.theme.btn; S.profile.template = k; S.profile.theme = { ...TPL[k].theme, auto: true, btn: S.profile.theme.auto ? TPL[k].theme.btn : keep }; if (!S.profile.theme.auto) S.profile.theme.auto = false; saveProfile(); designTab(part); refreshPreview(); }));
+  const on = (id, fn, ev = "input") => { const el = $("#" + id); if (el) el.addEventListener(ev, e => fn(e.target.value, e.target)); };
   on("dn", v => { p.displayName = v.slice(0, 40); commit(); }); on("bio", v => { p.bio = v; commit(); });
   on("av", v => { p.avatarUrl = v.trim(); commit(); }); on("bn", v => { p.bannerUrl = v.trim(); commit(); });
   on("bt", v => { t.bgType = v; $("#bgi").style.display = v === "image" ? "" : "none"; commit(true); }, "change");
@@ -854,7 +971,7 @@ function designTab() {
 }
 
 /* --- Tab Statistik --- */
-async function statsTab() {
+async function statsTab(part = "stats") {
   const pane = $("#pane"); pane.innerHTML = `<div style="display:grid;place-items:center;padding:48px"><div class="spin" role="status" aria-label="Memuatkan"></div></div>`;
   try {
     if (!S.events) { const [ev, ld] = await Promise.all([FB.getDocs(FB.query(FB.collection(db, "flashlink_events"), FB.where("uid", "==", S.user.uid))), FB.getDocs(FB.query(FB.collection(db, "flashlink_leads"), FB.where("uid", "==", S.user.uid)))]);
@@ -872,13 +989,14 @@ async function statsTab() {
     ${HAS_RTDB ? `<div class="glass" style="border-radius:16px;padding:12px;margin-top:10px;display:flex;gap:10px;align-items:center">${ic("users", "w-5 h-5")}<span>Pelawat aktif sekarang: <b id="live">0</b></span></div>` : ""}
     <div class="glass" style="border-radius:18px;padding:16px;margin-top:12px"><div class="lbl">Lawatan harian</div>${views || clicks ? `<div style="display:flex;align-items:flex-end;gap:${days > 7 ? 2 : 8}px;height:120px" role="img" aria-label="Carta lawatan harian">${byDay.map(x => `<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%" title="${x.d.toLocaleDateString("ms-MY")}: ${x.v} lawatan"><div class="bar" style="height:${x.v / max * 100}%"></div></div>`).join("")}</div>` : `<p style="color:#9CA3AF;margin:8px 0 0">Belum ada lawatan. Kongsi pautan anda untuk mula!</p>`}</div>
     <div class="glass" style="border-radius:18px;padding:16px;margin-top:12px"><div class="lbl">Klik setiap pautan</div>${per.length ? per.map(x => `<div style="margin:10px 0"><div style="display:flex;justify-content:space-between;font-size:14.5px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px">${esc(x.l.title)}</span><b>${x.n}</b></div><div style="height:8px;border-radius:9px;background:rgba(255,255,255,.1);overflow:hidden"><div style="height:100%;width:${x.n / pm * 100}%;background:linear-gradient(90deg,#B80000,#FF4D4D)"></div></div></div>`).join("") : `<p style="color:#9CA3AF;margin:0">Tiada pautan lagi.</p>`}</div>
-    <div class="glass" style="border-radius:18px;padding:16px;margin-top:12px"><div class="lbl">Pelanggan daripada borang (${S.leads.length})</div>${S.leads.length ? S.leads.slice(0, 20).map(x => `<div style="padding:10px 0;border-top:1px solid var(--line)"><b>${esc(x.name)}</b> · <a href="mailto:${esc(x.email)}" style="color:#FF8A8A">${esc(x.email)}</a>${x.phone ? ` · ${esc(x.phone)}` : ""}<div style="color:#C7C9D1;font-size:14px">${esc(x.message || "")}</div><small style="color:#9CA3AF">${x.t.toLocaleString("ms-MY")}</small></div>`).join("") : `<p style="color:#9CA3AF;margin:0">Belum ada. Tambah blok “Borang e-mel” untuk kumpul pelanggan.</p>`}</div>`;
+    <div id="leadsblk" class="glass" style="border-radius:18px;padding:16px;margin-top:12px"><div class="lbl">Pelanggan daripada borang (${S.leads.length})</div>${S.leads.length ? S.leads.slice(0, 20).map(x => `<div style="padding:10px 0;border-top:1px solid var(--line)"><b>${esc(x.name)}</b> · <a href="mailto:${esc(x.email)}" style="color:#FF8A8A">${esc(x.email)}</a>${x.phone ? ` · ${esc(x.phone)}` : ""}<div style="color:#C7C9D1;font-size:14px">${esc(x.message || "")}</div><small style="color:#9CA3AF">${x.t.toLocaleString("ms-MY")}</small></div>`).join("") : `<p style="color:#9CA3AF;margin:0">Belum ada. Tambah blok “Borang e-mel” untuk kumpul pelanggan.</p>`}</div>`;
+    if (part === "leads") { $$("#st > :not(#leadsblk)").forEach(x => x.remove()); const lb = $("#leadsblk"); if (lb) lb.style.marginTop = "0"; } else if ($("#leadsblk")) $("#leadsblk").remove();
     $$("[data-r]").forEach(b => b.setAttribute("aria-pressed", b.dataset.r == S.range));
   };
-  pane.innerHTML = `<div style="display:flex;gap:8px;margin-bottom:12px">${[7, 30].map(n => `<button class="chip" data-r="${n}" aria-pressed="${S.range === n}">${n} hari</button>`).join("")}<button class="chip" id="rf" style="margin-left:auto">Muat semula</button></div><div id="st"></div>`;
+  pane.innerHTML = `<div id="rangerow" style="display:flex;gap:8px;margin-bottom:12px">${[7, 30].map(n => `<button class="chip" data-r="${n}" aria-pressed="${S.range === n}">${n} hari</button>`).join("")}<button class="chip" id="rf" style="margin-left:auto">Muat semula</button></div><div id="st"></div>`;
   $$("[data-r]").forEach(b => (b.onclick = () => { S.range = +b.dataset.r; draw(); }));
-  $("#rf").onclick = () => { S.events = null; statsTab(); };
-  draw();
+  $("#rf").onclick = () => { S.events = null; statsTab(part); };
+  draw(); if (part === "leads") $("#rangerow").remove(); stagger("#st > *", 0, 60);
   if (HAS_RTDB && $("#live")) { try { FB.rt.onValue(FB.rt.ref(rtdb, `flashlink/live/${S.user.uid}`), s => { const el = $("#live"); if (el) el.textContent = s.val() || 0; }); } catch {} }
 }
 
