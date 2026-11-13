@@ -19,7 +19,7 @@ cpSync(src, dir, { recursive: true });
 // Netlify: laluan /username mesti memuatkan index.html
 writeFileSync(join(dir, "_redirects"), "/*    /index.html   200\n");
 writeFileSync(join(dir, "netlify.toml"), `[[headers]]\n  for = "/index.html"\n  [headers.values]\n    Cache-Control = "no-cache"\n\n[[headers]]\n  for = "/version.json"\n  [headers.values]\n    Cache-Control = "no-store"\n`);
-writeFileSync(join(dir, "BACA-SAYA.txt"), `FLASH LINK — versi web (${ver})
+writeFileSync(join(dir, "BACA-SAYA.txt"), `GENIUS DIGITAL FLASH LINK — versi web (${ver})
 =====================================
 
 CARA PASANG DI NETLIFY (2 minit)
@@ -32,7 +32,7 @@ Tambah domain Netlify anda dalam Firebase Console > Authentication > Settings > 
 Tanpa itu, log masuk Google tidak berfungsi (log masuk e-mel tetap berfungsi).
 
 KEMAS KINI
-Apabila versi baharu diterbitkan, aplikasi anda memaparkan bar "Versi baharu tersedia" dengan butang untuk memuat turun ZIP terbaru.
+Aplikasi ada butang "Kemas kini" (atas) dan pautan "Semak kemas kini" (bawah). Apabila versi baharu diterbitkan, bar "Versi baharu tersedia" muncul dengan butang memuat turun ZIP terbaru.
 Ganti fail di Netlify: Deploys > seret folder baharu ke kawasan "Drag and drop".
 (Versi EXE Windows dikemas kini serta-merta tanpa pasang semula.)
 

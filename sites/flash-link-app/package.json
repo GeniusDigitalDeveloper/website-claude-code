@@ -2,7 +2,7 @@
   "name": "flash-link-desktop",
   "version": "1.0.0",
   "private": true,
-  "description": "Flash Link — pembina halaman link-in-bio (aplikasi desktop Windows)",
+  "description": "Genius Digital Flash Link \u2014 pembina halaman link-in-bio (aplikasi desktop Windows)",
   "author": "Genius Digital",
   "main": "main.js",
   "scripts": {
@@ -16,12 +16,25 @@
   },
   "build": {
     "appId": "my.geniusdigital.flashlink",
-    "productName": "Flash Link",
+    "productName": "Genius Digital Flash Link",
     "copyright": "Genius Digital",
-    "directories": { "output": "dist" },
-    "files": ["main.js", "offline.html", "build/icon.png"],
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "offline.html",
+      "build/icon.png"
+    ],
     "win": {
-      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
       "icon": "build/icon.png"
     },
     "nsis": {

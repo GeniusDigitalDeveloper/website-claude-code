@@ -62,10 +62,10 @@ jobs:
         run: |
           VER=$(node -p "require('./sites/flash-link/public/version.json').version")
           EXEV=$(node -p "require('./sites/flash-link-app/package.json').version")
-          NOTES="Flash Link — web ${VER}, desktop ${EXEV}. Dibina automatik dari commit ${GITHUB_SHA::7}."
+          NOTES="Genius Digital Flash Link — web ${VER}, desktop ${EXEV}. Dibina automatik dari commit ${GITHUB_SHA::7}."
           ls -la files
           if ! gh release view flashlink-latest >/dev/null 2>&1; then
-            gh release create flashlink-latest --title "Flash Link — muat turun terkini" --notes "$NOTES" --target "$GITHUB_SHA"
+            gh release create flashlink-latest --title "Genius Digital Flash Link — muat turun terkini" --notes "$NOTES" --target "$GITHUB_SHA"
           else
             gh release edit flashlink-latest --notes "$NOTES"
           fi
