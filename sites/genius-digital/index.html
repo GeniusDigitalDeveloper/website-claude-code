@@ -507,20 +507,27 @@
       .fc-socials { justify-content: flex-start; }
     }
 
-    /* ---------- Badge harga istimewa (skala ikut lebar kad) ---------- */
-    .thumb { container-type: inline-size; }
-    .price-badge { position: absolute; z-index: 3; inset-inline-end: 3.5cqw; bottom: 3.5cqw; width: max-content; max-width: 80cqw; display: flex; flex-direction: column; align-items: stretch; padding: 0 clamp(2px, 1.1cqw, 5px) clamp(2px, 1.1cqw, 5px); border-radius: clamp(8px, 4.5cqw, 18px); background: #FFD23F; box-shadow: 0 5px 14px rgba(0, 0, 0, .35); font-family: var(--font-head); line-height: 1; pointer-events: none; transform-origin: 85% 100%; animation: pbPop 5s ease-in-out infinite; animation-delay: var(--pd, 0s); }
-    .pb-label { text-align: center; padding: .38em .5em .32em; font-size: clamp(6px, 4.1cqw, 13px); font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: #1B1B1B; white-space: nowrap; }
-    .pb-body { display: block; padding: .28em .55em .42em; border-radius: clamp(6px, 3.4cqw, 14px); background: #E8111F; color: #fff; text-align: center; }
+    /* ---------- Badge harga: kategori (kiri) + harga (kanan) dalam bahagian teks, tidak di atas gambar ---------- */
+    .product-card, .modal-body { container-type: inline-size; }
+    .card-top { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+    .card-top .category-pill { flex: 0 1 auto; align-self: center; }
+    .card-top.has-price .category-pill { flex: 1 1 0; min-width: 0; white-space: normal; line-height: 1.25; font-size: .54rem; letter-spacing: .02em; padding: .22rem .5rem; border-radius: 12px; }
+    .price-badge { position: relative; flex: none; width: max-content; display: flex; flex-direction: column; align-items: stretch; padding: 0 clamp(2px, .9cqw, 4px) clamp(2px, .9cqw, 4px); border-radius: clamp(8px, 3.6cqw, 14px); background: #FFD23F; box-shadow: 0 3px 9px rgba(120, 10, 15, .28); font-family: var(--font-head); line-height: 1; pointer-events: none; transform-origin: 100% 50%; animation: pbPop 5s ease-in-out infinite; animation-delay: var(--pd, 0s); }
+    [dir="rtl"] .price-badge { transform-origin: 0 50%; }
+    .pb-label { text-align: center; padding: .38em .5em .32em; font-size: clamp(6px, 3cqw, 10px); font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: #1B1B1B; white-space: nowrap; }
+    .pb-body { display: block; padding: .28em .55em .42em; border-radius: clamp(6px, 2.8cqw, 11px); background: #E8111F; color: #fff; text-align: center; }
     .pb-main { display: inline-flex; align-items: baseline; justify-content: center; gap: .14em; font-weight: 900; white-space: nowrap; }
-    .pb-cur { font-size: clamp(8px, 5.8cqw, 18px); }
-    .pb-int { font-size: clamp(14px, 12.5cqw, 36px); letter-spacing: -.02em; }
-    .pb-dec { align-self: flex-start; margin-top: .25em; font-size: clamp(7px, 5.2cqw, 16px); }
-    .price-badge.fixed { background: #00C8F5; }
-    .price-badge.fixed .pb-label { color: #061430; }
-    .price-badge.fixed .pb-body { background: linear-gradient(135deg, #0A1F44, #14346E); }
-    .pb-old { align-self: flex-end; padding: .35em .35em .12em; font-size: clamp(6px, 4cqw, 12px); font-weight: 700; color: #1B1B1B; white-space: nowrap; }
+    .pb-cur { font-size: clamp(8px, 4.2cqw, 13px); }
+    .pb-int { font-size: clamp(15px, 8.5cqw, 26px); letter-spacing: -.02em; }
+    .pb-dec { align-self: flex-start; margin-top: .25em; font-size: clamp(7px, 3.6cqw, 12px); }
+    /* Harga tetap (tanpa diskaun): merah, label kuning, harga putih */
+    .price-badge.fixed { background: #E8111F; box-shadow: 0 0 0 2px #FFD23F, 0 3px 9px rgba(120, 10, 15, .28); }
+    .price-badge.fixed .pb-label { color: #FFD23F; }
+    .price-badge.fixed .pb-body { background: #B80F19; }
+    .pb-old { align-self: flex-end; padding: .35em .35em .12em; font-size: clamp(6px, 3cqw, 10px); font-weight: 700; color: #1B1B1B; white-space: nowrap; }
     .pb-old s { text-decoration-color: #E8111F; text-decoration-thickness: .13em; }
+    .modal-price { margin-top: .9rem; display: flex; justify-content: center; }
+    .modal-price:empty { display: none; }
     @keyframes pbPop {   /* diam, kemudian bergegar & membesar setiap 5 saat */
       0%, 78%, 100% { transform: rotate(0) scale(1); }
       82% { transform: rotate(-7deg) scale(1.14); }
@@ -540,6 +547,9 @@
       .card-body p { display: none; }
       .card-body .btn { margin-top: 0; min-height: 36px; padding: .3rem .35rem; font-size: .58rem; letter-spacing: .02em; border-radius: 9px; }
       .card-body .btn svg { display: none; }
+      .card-top.has-price { flex-wrap: wrap; row-gap: .4rem; }
+      .card-top.has-price .category-pill { flex: 1 1 100%; font-size: .5rem; padding: .15rem .4rem; }
+      .card-top .price-badge { margin-inline-start: auto; }
       html[lang="ar"] .category-pill, html[lang="ar"] .status-badge { font-size: .62rem; }
       html[lang="ar"] .card-body h3 { font-size: .8rem; line-height: 1.4; }
       html[lang="ar"] .card-body .btn { font-size: .72rem; }
@@ -776,6 +786,7 @@
       <span class="category-pill" id="modalCategory"></span>
       <h3 id="modalTitle"></h3>
       <p class="desc" id="modalDesc"></p>
+      <div class="modal-price" id="modalPrice"></div>
       <div class="soon-msg" id="modalMsg" data-i18n="modal.msg">Produk Akan Datang.</div>
       <button class="btn btn-primary" type="button" id="modalOk" data-i18n="modal.ok">Tutup</button>
     </div>
@@ -1111,7 +1122,7 @@
 
     function fillModal(product) {
       const name = localized(product, "name") || t("product.noName");
-      $("#modalThumb").replaceChildren(thumbImage(product, name), ...[priceBadge(product)].filter(Boolean));
+      $("#modalThumb").replaceChildren(thumbImage(product, name)); $("#modalPrice").replaceChildren(...[priceBadge(product)].filter(Boolean));
       $("#modalCategory").textContent = localized(product, "category") || t("product.defaultCat");
       $("#modalTitle").textContent = name;
       $("#modalDesc").textContent = localized(product, "description");
@@ -1134,12 +1145,13 @@
     function productCard(product, index) {
       const name = localized(product, "name") || t("product.noName");
       const link = safeHttps(product.productURL);
-      const thumbKids = [statusBadge(product.status), thumbImage(product, t("thumb.alt", { name })), priceBadge(product, index)];
+      const thumbKids = [statusBadge(product.status), thumbImage(product, t("thumb.alt", { name }))];
+      const pb = priceBadge(product, index);
       const btnKids = [el("span", { text: t("btn.explore") }), icon("i-arrow")];
       return el("article", { class: "product-card reveal", style: `--d:${Math.min(index, 5) * .08}s`, "data-slug": product.slug }, [
         link ? el("a", { class: "thumb", href: link, target: "_blank", rel: "noopener noreferrer", "aria-label": name, tabindex: "-1" }, thumbKids) : el("div", { class: "thumb" }, thumbKids),
         el("div", { class: "card-body" }, [
-          el("span", { class: "category-pill", text: localized(product, "category") || t("product.defaultCat") }),
+          el("div", { class: "card-top" + (pb ? " has-price" : "") }, [el("span", { class: "category-pill", text: localized(product, "category") || t("product.defaultCat") }), pb]),
           el("h3", { text: name }),
           el("p", { text: localized(product, "description") }),
           link ? el("a", { class: "btn btn-primary", href: link, target: "_blank", rel: "noopener noreferrer" }, btnKids)
