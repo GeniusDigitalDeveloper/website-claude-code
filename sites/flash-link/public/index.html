@@ -90,6 +90,8 @@ select.inp option{color:#111}
 .sortable-ghost{opacity:.35}
 .bar{background:linear-gradient(180deg,#FF4D4D,#B80000);border-radius:6px 6px 0 0;min-height:2px}
 
+#sfxbtn{position:fixed;left:14px;bottom:14px;z-index:60;width:42px;height:42px;border-radius:50%;display:none;place-items:center;color:#E5E7EB;background:rgba(16,16,21,.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);transition:transform .3s var(--ease,ease),border-color .3s}
+#sfxbtn.on{display:grid}#sfxbtn:hover{transform:scale(1.08);border-color:#FF6B6B}#sfxbtn:active{transform:scale(.94)}
 /* ============ BANNER 3 ZON (1920x110, kiri | tengah | kanan) ============ */
 .fl-banner3{position:relative;width:100%;height:clamp(72px,5.73vw,110px);overflow:hidden;border-bottom:1px solid rgba(255,77,77,.28);isolation:isolate}
 .b3-bg{position:absolute;inset:0;z-index:-1;background:
@@ -273,6 +275,8 @@ function loadFont(f) {
 
 /* ---------- Ikon SVG (gaya lucide) ---------- */
 const P = {
+  vol: '<path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>',
+  mute: '<path d="M11 5 6 9H2v6h4l5 4z"/><path d="m22 9-6 6"/><path d="m16 9 6 6"/>',
   chev: '<path d="m15 18-6-6 6-6"/>',
   chevr: '<path d="m9 18 6-6-6-6"/>',
   link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
@@ -610,7 +614,7 @@ function landing() {
   </main>
   ${siteFooter()}`;
   const mq = matchMedia("(min-width:900px)"); const g = $("#hero-grid"); const fit = () => (g.style.gridTemplateColumns = mq.matches ? "1.1fr .9fr" : "1fr"); fit(); mq.addEventListener("change", fit);
-  revealInit(); fillStat();
+  revealInit(); fillStat(); sfxScope(true);
 }
 function revealInit() {
   const els = $$(".reveal");
@@ -636,7 +640,7 @@ async function loginView() {
       <label class="lbl" for="pw" style="margin-top:12px">Kata laluan</label><input id="pw" class="inp" type="password" autocomplete="${mode === "in" ? "current-password" : "new-password"}" placeholder="Minimum 6 aksara" required>
       <div id="e" class="err" role="alert"></div><button class="btn btn-red" style="width:100%;min-height:50px;margin-top:16px" type="submit">${mode === "in" ? "Log masuk" : "Daftar & teruskan"}</button></form>
       <p style="text-align:center;margin:18px 0 0;font-size:14.5px;color:#C7C9D1">${mode === "in" ? "Belum ada akaun?" : "Sudah ada akaun?"} <button id="sw" class="gradtxt" style="font-weight:700;background:none;border:0;text-decoration:underline;color:#FF6B6B;-webkit-text-fill-color:#FF6B6B">${mode === "in" ? "Daftar percuma" : "Log masuk"}</button></p></div></main>${siteFooter()}`;
-    fillStat();
+    fillStat(); sfxScope(true);
     const fail = e => { $("#e").textContent = AUTH_ERR[e.code] || "Ralat: " + (e.message || "cuba lagi."); };
     $("#sw").onclick = () => { mode = mode === "in" ? "up" : "in"; draw(); };
     $("#g").onclick = async () => { try { await FB.signInWithPopup(auth, new FB.GoogleAuthProvider()); } catch (e) { fail(e); } };
@@ -1000,10 +1004,47 @@ async function statsTab(part = "stats") {
   if (HAS_RTDB && $("#live")) { try { FB.rt.onValue(FB.rt.ref(rtdb, `flashlink/live/${S.user.uid}`), s => { const el = $("#live"); if (el) el.textContent = s.val() || 0; }); } catch {} }
 }
 
+/* ---------- Kesan bunyi gaya gaming (HANYA paparan sebelum register: laman utama & log masuk) ----------
+   Dijana dengan Web Audio (tiada fail audio). Volum sengaja rendah. Pelayar hanya benarkan bunyi selepas sentuhan pertama. */
+const SFX = {
+  ctx: null, master: null, scope: false, last: null, lastT: 0,
+  get muted() { try { return localStorage.getItem("fl_sfx") === "0"; } catch { return false; } },
+  init() {
+    if (this.ctx) { if (this.ctx.state === "suspended") this.ctx.resume().catch(() => {}); return !!this.ctx; }
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false;
+    try { this.ctx = new AC(); this.master = this.ctx.createGain(); this.master.gain.value = .55; this.master.connect(this.ctx.destination); } catch { return false; }
+    return true;
+  },
+  // satu nada: jenis gelombang, frekuensi mula -> tamat, tempoh (s), kelantangan, lengah (s)
+  tone(type, f1, f2, dur, vol, delay = 0) {
+    if (!this.scope || this.muted || !this.init() || this.ctx.state !== "running") return;
+    const c = this.ctx, t = c.currentTime + delay, o = c.createOscillator(), g = c.createGain();
+    o.type = type; o.frequency.setValueAtTime(f1, t); if (f2 !== f1) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .008); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    o.connect(g); g.connect(this.master); o.start(t); o.stop(t + dur + .02);
+  },
+  hover() { this.tone("triangle", 1500, 1900, .045, .03); },
+  click() { this.tone("square", 520, 880, .07, .028); this.tone("triangle", 880, 1320, .09, .03, .05); },
+  power() { [523, 659, 784, 1047].forEach((f, i) => this.tone("square", f, f * 1.01, .1, .024, i * .07)); }, // arpeggio naik, "power-up"
+  type() { this.tone("sine", 700, 600, .03, .02); },
+};
+function sfxScope(on) {
+  SFX.scope = on;
+  let b = $("#sfxbtn");
+  if (!b) { b = document.createElement("button"); b.id = "sfxbtn"; document.body.appendChild(b); b.onclick = () => { const m = !SFX.muted; try { localStorage.setItem("fl_sfx", m ? "0" : "1"); } catch {} sfxIcon(); if (!m) { SFX.init(); SFX.click(); } }; }
+  b.classList.toggle("on", on); if (on) sfxIcon();
+}
+function sfxIcon() { const b = $("#sfxbtn"), m = SFX.muted; b.innerHTML = ic(m ? "mute" : "vol", "w-5 h-5"); b.setAttribute("aria-label", m ? "Hidupkan kesan bunyi" : "Matikan kesan bunyi"); b.setAttribute("aria-pressed", String(!m)); }
+const SFX_SEL = "a.btn,button.btn,a[data-nav],.chip,.glass[role]";
+addEventListener("pointerdown", e => { if (!SFX.scope) return; SFX.init(); const t = e.target.closest(SFX_SEL + ",#sfxbtn"); if (!t || t.id === "sfxbtn") return; /Cipta Flash Link|Mula/.test(t.textContent) ? SFX.power() : SFX.click(); }, { passive: true });
+addEventListener("keydown", e => { if (!SFX.scope) return; SFX.init(); if (e.key.length === 1) SFX.type(); }, { passive: true });
+document.addEventListener("pointerover", e => { if (!SFX.scope || e.pointerType === "touch") return; const t = e.target.closest(SFX_SEL); if (!t || t === SFX.last) return; SFX.last = t; SFX.hover(); }, { passive: true });
+document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contains(e.relatedTarget)) SFX.last = null; }, { passive: true });
+
 /* ---------- Router ---------- */
 function nav(path, replace) { replace ? history.replaceState({}, "", path) : history.pushState({}, "", path); route(true); window.scrollTo(0, 0); }
 function route() {
-  document.documentElement.style.background = "";
+  document.documentElement.style.background = ""; sfxScope(false);
   const p = location.pathname.replace(/\/+$/, "") || "/", seg = p.split("/").filter(Boolean);
   if (p === "/" || p === "/index.html") return landing();
   if (p === "/login") return loginView();
