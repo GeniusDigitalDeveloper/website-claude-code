@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="ms" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>GENIUS DIGITAL — Digital Innovation. Intelligent Systems.</title>
+  <meta name="description" content="Genius Digital — syarikat teknologi digital yang membangunkan sistem, aplikasi web dan penyelesaian digital yang praktikal serta inovatif.">
+  <link rel="canonical" href="https://genius-digital-40bc9.web.app/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Genius Digital">
+  <meta property="og:title" content="GENIUS DIGITAL — Digital Innovation. Intelligent Systems.">
+  <meta property="og:description" content="Syarikat teknologi digital yang membangunkan sistem, aplikasi web dan penyelesaian digital yang praktikal serta inovatif.">
+  <meta property="og:url" content="https://genius-digital-40bc9.web.app/">
+  <meta property="og:image" content="https://genius-digital-40bc9.web.app/icons/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://genius-digital-40bc9.web.app/icons/og-image.png">
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://genius-digital-40bc9.web.app/#org","name":"Genius Digital","url":"https://genius-digital-40bc9.web.app/","logo":{"@type":"ImageObject","url":"https://genius-digital-40bc9.web.app/icons/logo-512.png","width":512,"height":512},"slogan":"Digital Innovation. Intelligent Systems."},{"@type":"WebSite","@id":"https://genius-digital-40bc9.web.app/#site","name":"Genius Digital","alternateName":"GENIUS DIGITAL","url":"https://genius-digital-40bc9.web.app/","inLanguage":"ms","publisher":{"@id":"https://genius-digital-40bc9.web.app/#org"}}]}</script>
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Genius Digital">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="application-name" content="Genius Digital">
+  <script>
+    /* Tetapkan bahasa/arah/tema sebelum paparan pertama (elak kelipan). Lalai: BM + mod cerah. */
+    (function () {
+      try {
+        var l = localStorage.getItem("gd-lang"), th = localStorage.getItem("gd-theme"), h = document.documentElement;
+        if (l === "en" || l === "ar" || l === "ms") { h.lang = l; h.dir = l === "ar" ? "rtl" : "ltr"; }
+        h.setAttribute("data-theme", th === "dark" ? "dark" : "light");
+      } catch (e) { document.documentElement.setAttribute("data-theme", "light"); }
+    })();
+  </script>
+  <link rel="icon" type="image/png" sizes="48x48" href="/icons/favicon-48.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/icons/favicon-96.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cairo:wght@400;600;700;800&family=Inter:wght@400;500;600&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* =====================================================================
+       GENIUS DIGITAL — Public website styles (mobile-first)
+       Edit warna di :root sahaja untuk menukar tema keseluruhan.
+       ===================================================================== */
+    :root {
+      --navy-950: #061430;
+      --navy-900: #0A1F44;   /* Primary — Deep Navy Blue */
+      --navy-700: #14346E;
+      --blue-500: #0A66FF;   /* Secondary — Electric Blue */
+      --blue-400: #3B87FF;
+      --cyan-400: #00C8F5;   /* Accent — Cyan */
+      --cyan-300: #5BE3FF;
+      --bg: #F4F7FC;         /* Background — Light Grey */
+      --bg-soft: #EAF0FA;
+      --white: #FFFFFF;
+      --surface: #FFFFFF;                 /* kad, modal, bahagian putih */
+      --head: #0A1F44;                    /* warna tajuk */
+      --head-2: #14346E;
+      --accent: #0A66FF;                  /* warna teks aksen */
+      --glass-1: rgba(255, 255, 255, .7);
+      --glass-2: rgba(255, 255, 255, .78);
+      --glass-3: rgba(255, 255, 255, .92);
+      --glass-4: rgba(255, 255, 255, .97);
+      --hero-top: #FFFFFF;
+      --sk-1: #E7ECF6; --sk-2: #F5F8FD;
+      --dots: #D7DFEE;
+      --plate-a: rgba(255, 255, 255, .92); --plate-b: rgba(255, 255, 255, .62); --plate-border: rgba(255, 255, 255, .9);
+      --ghost-border: rgba(10, 31, 68, .22);
+      --dash-border: rgba(10, 31, 68, .25);
+      color-scheme: light;
+      --text: #0B1B3A;       /* Text — Dark Navy */
+      --muted: #51607F;
+      --line: rgba(10, 31, 68, .10);
+      --ok: #0E9F6E;
+      --warn: #B7791F;
+      --danger: #D64545;
+
+      --shadow-sm: 0 2px 8px rgba(10, 31, 68, .06);
+      --shadow-md: 0 10px 30px rgba(10, 31, 68, .10);
+      --shadow-lg: 0 24px 60px rgba(10, 31, 68, .16);
+      --radius: 18px;
+      --radius-sm: 12px;
+      --header-h: 68px;
+      --container: 1180px;
+
+      --font-brand: "Bebas Neue", "Oswald", Impact, "Arial Narrow Bold", sans-serif;
+      --font-hero: "Bebas Neue", "Oswald", Impact, "Arial Narrow Bold", sans-serif;
+      --font-head: "Montserrat", "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+
+    /* ---------- Mod gelap ---------- */
+    :root[data-theme="dark"] {
+      --bg: #0A1326; --bg-soft: #0F1C38; --white: #101D3A; --surface: #112042;
+      --text: #E4ECFB; --muted: #9DB0D3; --line: rgba(160, 185, 235, .16);
+      --head: #F1F5FF; --head-2: #C3D4F5; --accent: #5AA2FF;
+      --glass-1: rgba(17, 32, 66, .72); --glass-2: rgba(10, 19, 38, .78); --glass-3: rgba(17, 32, 66, .92); --glass-4: rgba(10, 19, 38, .97);
+      --hero-top: #0D1A34;
+      --sk-1: #17294D; --sk-2: #20386A; --dots: #2B4170;
+      --plate-a: rgba(22, 40, 76, .92); --plate-b: rgba(14, 28, 56, .72); --plate-border: rgba(120, 160, 230, .28);
+      --ghost-border: rgba(160, 185, 235, .32); --dash-border: rgba(160, 185, 235, .3);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, .35); --shadow-md: 0 10px 30px rgba(0, 0, 0, .45); --shadow-lg: 0 24px 60px rgba(0, 0, 0, .55);
+      --warn: #F2B35A; --ok: #3DD6A0;
+      color-scheme: dark;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header-h) + 12px); -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0; font-family: var(--font-body); font-size: 1rem; line-height: 1.65;
+      color: var(--text); background: var(--bg); overflow-x: clip;
+      -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+    }
+    body.no-scroll { overflow: hidden; }
+    img, svg { max-width: 100%; display: block; }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; color: inherit; cursor: pointer; }
+    h1, h2, h3, h4 { font-family: var(--font-head); line-height: 1.15; margin: 0; letter-spacing: -.01em; }
+    p { margin: 0; }
+    :focus-visible { outline: 3px solid var(--cyan-400); outline-offset: 3px; border-radius: 6px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    [hidden] { display: none !important; }
+    .container { width: min(100% - 2rem, var(--container)); margin-inline: auto; }
+    .skip-link { position: absolute; inset-inline-start: 1rem; top: -4rem; background: var(--navy-900); color: #fff; padding: .6rem 1rem; border-radius: 8px; z-index: 200; }
+    .skip-link:focus { top: .75rem; }
+
+    /* ---------- Buttons ---------- */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: .55rem;
+      min-height: 48px; padding: .8rem 1.5rem; border-radius: 12px; border: 1.5px solid transparent;
+      font-family: var(--font-head); font-weight: 700; font-size: .92rem; letter-spacing: .04em; text-transform: uppercase;
+      transition: transform .2s ease, box-shadow .2s ease, background .2s ease, color .2s ease, border-color .2s ease;
+      -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+    }
+    .btn svg { width: 18px; height: 18px; flex: none; transition: transform .2s ease; }
+    .btn:hover svg { transform: translateX(3px); }
+    .btn-primary { color: #fff; background: linear-gradient(135deg, var(--blue-500), #1B4FD8 70%); box-shadow: 0 10px 24px rgba(10, 102, 255, .32); }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 32px rgba(10, 102, 255, .4); }
+    .btn-ghost { color: var(--head); background: var(--glass-1); border-color: var(--ghost-border); backdrop-filter: blur(6px); }
+    .btn-ghost:hover { transform: translateY(-2px); border-color: var(--accent); color: var(--accent); background: var(--surface); }
+    .btn-sm { min-height: 44px; padding: .6rem 1.1rem; font-size: .8rem; }
+
+    /* ---------- Header / Navigation ---------- */
+    .site-header {
+      position: fixed; inset: 0 0 auto 0; z-index: 100; height: var(--header-h);
+      background: var(--glass-2); backdrop-filter: saturate(160%) blur(14px); -webkit-backdrop-filter: saturate(160%) blur(14px);
+      border-bottom: 1px solid var(--line); transition: box-shadow .25s ease, background .25s ease;
+    }
+    .site-header.scrolled { box-shadow: var(--shadow-md); background: var(--glass-3); }
+    .nav-wrap { height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .brand { display: inline-flex; align-items: center; gap: .65rem; min-height: 44px; }
+    .brand-mark { width: 46px; height: 46px; flex: none; }
+    .brand-logo { width: 46px; height: 46px; flex: none; object-fit: contain; }
+    a.thumb { display: block; color: inherit; }
+    .brand-name { font-family: var(--font-brand); font-size: 1.65rem; letter-spacing: .08em; line-height: 1; color: var(--head); }
+    .brand-name b { font-weight: 400; color: var(--accent); }
+
+    .nav-toggle {
+      width: 46px; height: 46px; display: inline-flex; align-items: center; justify-content: center;
+      border-radius: 12px; border: 1px solid var(--line); background: var(--surface); -webkit-tap-highlight-color: transparent;
+    }
+    .nav-toggle .bars, .nav-toggle .bars::before, .nav-toggle .bars::after {
+      display: block; width: 20px; height: 2px; background: var(--head); border-radius: 2px; transition: transform .25s ease, background .25s ease;
+    }
+    .nav-toggle .bars { position: relative; }
+    .nav-toggle .bars::before, .nav-toggle .bars::after { content: ""; position: absolute; left: 0; }
+    .nav-toggle .bars::before { top: -6px; }
+    .nav-toggle .bars::after { top: 6px; }
+    .nav-toggle[aria-expanded="true"] .bars { background: transparent; }
+    .nav-toggle[aria-expanded="true"] .bars::before { transform: translateY(6px) rotate(45deg); }
+    .nav-toggle[aria-expanded="true"] .bars::after { transform: translateY(-6px) rotate(-45deg); }
+
+    .nav-menu {
+      position: fixed; top: var(--header-h); left: 0; right: 0; max-height: calc(100dvh - var(--header-h)); overflow-y: auto;
+      background: var(--glass-4); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); box-shadow: var(--shadow-lg);
+      padding: .75rem 1rem 1.25rem; display: none; flex-direction: column; gap: .25rem;
+    }
+    .nav-menu.open { display: flex; animation: dropIn .25s ease; }
+    .nav-menu a.nav-link {
+      display: flex; align-items: center; min-height: 52px; padding: 0 1rem; border-radius: 12px;
+      font-family: var(--font-head); font-weight: 700; font-size: 1rem; letter-spacing: .04em; text-transform: uppercase; color: var(--head);
+    }
+    .nav-menu a.nav-link:hover, .nav-menu a.nav-link.active { background: var(--bg-soft); color: var(--accent); }
+    .nav-menu .btn { margin-top: .5rem; }
+    @keyframes dropIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+
+    /* ---------- Sections ---------- */
+    section { position: relative; }
+    .section { padding: 4.5rem 0; }
+    .section-head { max-width: 760px; margin-bottom: 2.5rem; }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: .6rem; font-family: var(--font-head); font-weight: 700; font-size: .78rem;
+      letter-spacing: .22em; text-transform: uppercase; color: var(--accent); margin-bottom: .9rem;
+    }
+    .eyebrow::before { content: ""; width: 28px; height: 3px; border-radius: 3px; background: linear-gradient(90deg, var(--blue-500), var(--cyan-400)); }
+    .section-title {
+      font-family: var(--font-hero); font-weight: 400; text-transform: uppercase; letter-spacing: .03em; line-height: .98;
+      font-size: clamp(2.6rem, 8vw, 4.6rem); color: var(--head);
+    }
+    .section-title span { background: linear-gradient(90deg, var(--blue-500), var(--cyan-400)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .section-sub { margin-top: 1rem; color: var(--muted); font-size: 1.05rem; }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      padding: calc(var(--header-h) + 3rem) 0 4rem; overflow: hidden; isolation: isolate;
+      background:
+        radial-gradient(900px 500px at 85% 0%, rgba(0, 200, 245, .20), transparent 60%),
+        radial-gradient(700px 500px at 0% 20%, rgba(10, 102, 255, .14), transparent 60%),
+        linear-gradient(180deg, var(--hero-top) 0%, var(--bg) 100%);
+    }
+    .hero::before {
+      content: ""; position: absolute; inset: 0; z-index: -1; opacity: .55;
+      background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size: 44px 44px; -webkit-mask-image: radial-gradient(ellipse at 60% 30%, #000 10%, transparent 70%); mask-image: radial-gradient(ellipse at 60% 30%, #000 10%, transparent 70%);
+    }
+    .hero-grid { display: grid; gap: 3rem; align-items: center; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: .6rem; padding: .45rem .95rem; border-radius: 999px; font-size: .78rem; font-weight: 600;
+      color: var(--head-2); background: var(--glass-1); border: 1px solid var(--line); box-shadow: var(--shadow-sm); backdrop-filter: blur(8px);
+    }
+    .hero-badge i { width: 8px; height: 8px; border-radius: 50%; background: var(--cyan-400); box-shadow: 0 0 0 4px rgba(0, 200, 245, .25); animation: pulse 2s infinite; }
+    .hero h1 {
+      margin-top: 1.25rem; font-family: var(--font-brand); font-weight: 400; text-transform: uppercase; letter-spacing: .02em; line-height: .86;
+      font-size: clamp(4rem, 17vw, 9.5rem); color: var(--head);
+    }
+    .hero h1 .grad { display: block; background: linear-gradient(95deg, var(--blue-500) 10%, var(--cyan-400) 90%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero-tagline {
+      margin-top: 1.1rem; font-family: var(--font-head); font-weight: 800; font-size: clamp(1rem, 3.6vw, 1.5rem);
+      letter-spacing: .14em; text-transform: uppercase; color: var(--head-2);
+    }
+    .hero-quote { margin-top: 1rem; font-family: var(--font-head); font-weight: 600; font-style: italic; font-size: clamp(1.02rem, 2.6vw, 1.25rem); color: var(--accent); padding-inline-start: 1rem; border-inline-start: 4px solid var(--cyan-400); }
+    .hero-intro { margin-top: 1.25rem; max-width: 56ch; color: var(--muted); font-size: 1.05rem; }
+    .hero-actions { margin-top: 2rem; display: flex; flex-direction: column; gap: .85rem; }
+    .hero-points { margin: 2rem 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: .6rem; }
+    .hero-points li { font-size: .82rem; font-weight: 600; color: var(--head-2); padding: .4rem .85rem; border-radius: 999px; background: var(--glass-1); border: 1px solid var(--line); }
+
+    /* Hero visual — subtle 3D glass dashboard */
+    .hero-visual { position: relative; perspective: 1400px; min-height: 340px; display: grid; place-items: center; }
+    .scene { position: relative; width: min(100%, 520px); aspect-ratio: 1 / .86; transform-style: preserve-3d; transform: rotateX(var(--rx, 8deg)) rotateY(var(--ry, -14deg)); transition: transform .25s ease-out; }
+    .plate { position: absolute; inset: 0; border-radius: 26px; }
+    .plate.p3 { transform: translateZ(-70px) translate(26px, 26px); background: linear-gradient(135deg, rgba(10, 102, 255, .22), rgba(0, 200, 245, .22)); border: 1px solid rgba(10, 102, 255, .25); }
+    .plate.p2 { transform: translateZ(-34px) translate(13px, 13px); background: linear-gradient(135deg, rgba(10, 102, 255, .35), rgba(0, 200, 245, .35)); border: 1px solid rgba(10, 102, 255, .3); }
+    .plate.p1 {
+      transform: translateZ(0); background: linear-gradient(160deg, var(--plate-a), var(--plate-b));
+      border: 1px solid var(--plate-border); box-shadow: var(--shadow-lg), inset 0 1px 0 var(--plate-border); backdrop-filter: blur(10px);
+      padding: 1rem; display: flex; flex-direction: column; gap: .8rem;
+    }
+    .win-bar { display: flex; align-items: center; gap: .4rem; }
+    .win-bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--dots); }
+    .win-bar i:nth-child(1) { background: #FF6B6B; } .win-bar i:nth-child(2) { background: #FFC24B; } .win-bar i:nth-child(3) { background: #3DDC97; }
+    .win-bar span { margin-left: auto; font-family: var(--font-head); font-weight: 700; font-size: .66rem; letter-spacing: .18em; color: var(--muted); }
+    .win-body { flex: 1; display: grid; grid-template-columns: 1fr 1.25fr; gap: .8rem; min-height: 0; }
+    .win-col { display: grid; gap: .8rem; min-height: 0; }
+    .tile { border-radius: 14px; padding: .8rem; display: flex; flex-direction: column; justify-content: space-between; color: #fff; min-height: 0; }
+    .tile.qr { background: linear-gradient(145deg, var(--navy-900), var(--navy-700)); }
+    .tile.pdf { background: linear-gradient(145deg, var(--blue-500), #1B4FD8); }
+    .tile svg { width: 38px; height: 38px; }
+    .tile b { font-family: var(--font-head); font-size: .78rem; letter-spacing: .06em; }
+    .tile small { display: block; font-size: .64rem; opacity: .75; }
+    .chart { border-radius: 14px; background: var(--surface); border: 1px solid var(--line); padding: .8rem; display: flex; flex-direction: column; justify-content: space-between; min-height: 0; }
+    .chart .bars { flex: 1; display: flex; align-items: flex-end; gap: 6%; padding-top: .5rem; }
+    .chart .bars i { flex: 1; border-radius: 6px 6px 2px 2px; background: linear-gradient(180deg, var(--cyan-400), var(--blue-500)); height: var(--h); transform-origin: bottom; animation: grow 1.4s .3s both cubic-bezier(.2, .8, .2, 1); }
+    .chart .line { height: 6px; border-radius: 6px; background: var(--bg-soft); overflow: hidden; margin-top: .6rem; }
+    .chart .line::after { content: ""; display: block; height: 100%; width: 72%; background: linear-gradient(90deg, var(--blue-500), var(--cyan-400)); border-radius: 6px; animation: grow-x 1.6s .5s both ease-out; transform-origin: left; }
+    .chart small { font-size: .64rem; color: var(--muted); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+    .chip {
+      position: absolute; display: inline-flex; align-items: center; gap: .5rem; padding: .5rem .8rem; border-radius: 14px; font-family: var(--font-head);
+      font-weight: 700; font-size: .72rem; color: var(--head); background: var(--glass-3); border: 1px solid var(--plate-border);
+      box-shadow: var(--shadow-md); backdrop-filter: blur(8px); animation: float 6s ease-in-out infinite;
+    }
+    .chip svg { width: 18px; height: 18px; color: var(--accent); }
+    .chip.c1 { top: -4%; right: -2%; transform: translateZ(70px); }
+    .chip.c2 { bottom: -6%; left: 4%; transform: translateZ(90px); animation-delay: -2s; }
+    .chip.c3 { bottom: -5%; right: 6%; transform: translateZ(60px); animation-delay: -4s; }
+    @keyframes float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -10px; } }
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0, 200, 245, .5); } 70% { box-shadow: 0 0 0 9px rgba(0, 200, 245, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 200, 245, 0); } }
+    @keyframes grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+    @keyframes grow-x { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+    /* ---------- About ---------- */
+    .about { background: var(--surface); }
+    .about-grid { display: grid; gap: 2.5rem; }
+    .about-text { font-size: 1.1rem; color: var(--muted); line-height: 1.8; }
+    .pillars { display: grid; gap: 1.1rem; }
+    .pillar {
+      position: relative; display: flex; gap: 1.1rem; align-items: flex-start; padding: 1.4rem; border-radius: var(--radius);
+      background: linear-gradient(180deg, var(--surface), var(--bg)); border: 1px solid var(--line); box-shadow: var(--shadow-sm);
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; overflow: hidden;
+    }
+    .pillar::after { content: ""; position: absolute; inset-inline-start: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(180deg, var(--blue-500), var(--cyan-400)); }
+    .pillar:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: rgba(10, 102, 255, .35); }
+    .pillar-icon { flex: none; width: 54px; height: 54px; border-radius: 16px; display: grid; place-items: center; color: #fff; background: linear-gradient(135deg, var(--navy-900), var(--blue-500)); box-shadow: 0 8px 20px rgba(10, 102, 255, .28); }
+    .pillar-icon svg { width: 28px; height: 28px; }
+    .pillar h3 { font-size: 1.15rem; text-transform: uppercase; letter-spacing: .04em; color: var(--head); }
+    .pillar p { margin-top: .4rem; color: var(--muted); font-size: .96rem; }
+
+    /* ---------- Products ---------- */
+    .products { background: linear-gradient(180deg, var(--bg) 0%, var(--bg-soft) 100%); overflow: hidden; }
+    .products::before { content: ""; position: absolute; width: 520px; height: 520px; right: -200px; top: -120px; border-radius: 50%; background: radial-gradient(circle, rgba(0, 200, 245, .18), transparent 70%); pointer-events: none; }
+    .product-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .55rem; position: relative; }   /* Telefon: 3 sebaris */
+    .product-card {
+      display: flex; flex-direction: column; background: var(--surface); border-radius: var(--radius); border: 1px solid var(--line); overflow: hidden;
+      box-shadow: var(--shadow-sm); transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+    }
+    .product-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); border-color: rgba(10, 102, 255, .35); }
+    .thumb { position: relative; aspect-ratio: 1 / 1; overflow: hidden; background: var(--navy-900); }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s ease; }
+    .product-card:hover .thumb img { transform: scale(1.06); }
+    .thumb::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 55%, rgba(6, 20, 48, .35)); pointer-events: none; }
+    .status-badge {
+      position: absolute; top: .6rem; inset-inline-start: .6rem; z-index: 2; display: inline-flex; align-items: center; gap: .4rem; padding: .25rem .6rem; border-radius: 999px;
+      font-family: var(--font-head); font-weight: 700; font-size: .6rem; letter-spacing: .1em; text-transform: uppercase; background: var(--glass-3); backdrop-filter: blur(6px); box-shadow: var(--shadow-sm);
+    }
+    .status-badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--ok); }
+    .status-badge.soon { color: var(--warn); } .status-badge.soon::before { background: #F2A93B; }
+    .status-badge.live { color: var(--ok); }
+    .card-body { display: flex; flex-direction: column; flex: 1; padding: 1rem 1.1rem 1.15rem; }
+    .category-pill { align-self: flex-start; padding: .2rem .6rem; border-radius: 999px; font-size: .66rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); background: rgba(10, 102, 255, .12); }
+    .card-body h3 { margin-top: .6rem; font-size: 1.1rem; color: var(--head); }
+    .card-body p { margin-top: .4rem; color: var(--muted); font-size: .86rem; line-height: 1.55; flex: 1; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 6; line-clamp: 6; overflow: hidden; }
+    .card-body .btn { margin-top: 1rem; width: 100%; min-height: 44px; padding: .5rem 1rem; font-size: .76rem; }
+
+    .skeleton { pointer-events: none; }
+    .skeleton .thumb, .sk-line { background: linear-gradient(100deg, var(--sk-1) 30%, var(--sk-2) 50%, var(--sk-1) 70%); background-size: 200% 100%; animation: shimmer 1.4s infinite linear; }
+    .sk-line { height: 14px; border-radius: 8px; margin-top: .8rem; } .sk-line.w40 { width: 40%; } .sk-line.w70 { width: 70%; } .sk-line.btn-sk { height: 44px; border-radius: 12px; margin-top: 1rem; }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    .state-box { grid-column: 1 / -1; text-align: center; padding: 3rem 1.25rem; border-radius: var(--radius); background: var(--surface); border: 1px dashed var(--dash-border); }
+    .state-box .state-icon { width: 64px; height: 64px; margin: 0 auto 1rem; border-radius: 20px; display: grid; place-items: center; color: var(--accent); background: rgba(10, 102, 255, .12); }
+    .state-box.error .state-icon { color: var(--danger); background: rgba(214, 69, 69, .1); }
+    .state-box svg { width: 32px; height: 32px; }
+    .state-box h3 { font-size: 1.25rem; color: var(--head); }
+    .state-box p { margin: .5rem auto 0; max-width: 52ch; color: var(--muted); }
+    .state-box code { display: inline-block; margin-top: .75rem; padding: .2rem .6rem; border-radius: 8px; background: var(--bg-soft); font-size: .8rem; color: var(--head-2); word-break: break-word; }
+    .state-box .btn { margin-top: 1.25rem; }
+
+    /* ---------- Contact ---------- */
+    .contact { background: var(--surface); }
+    .contact-card {
+      display: grid; gap: 2rem; padding: 1.75rem; border-radius: 26px; color: #fff; overflow: hidden; position: relative;
+      background: radial-gradient(500px 300px at 100% 0%, rgba(0, 200, 245, .35), transparent 60%), linear-gradient(135deg, var(--navy-950), var(--navy-900) 55%, var(--navy-700));
+      box-shadow: var(--shadow-lg);
+    }
+    .contact-card .eyebrow { color: var(--cyan-300); } .contact-card .eyebrow::before { background: var(--cyan-300); }
+    .contact-card h2 { font-family: var(--font-hero); font-weight: 400; text-transform: uppercase; letter-spacing: .03em; font-size: clamp(2.4rem, 8vw, 4rem); line-height: 1; }
+    .contact-card .lead { margin-top: 1rem; color: rgba(255, 255, 255, .78); max-width: 46ch; }
+    .contact-list { display: grid; gap: .9rem; }
+    .contact-item { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.1rem; border-radius: 16px; background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .16); backdrop-filter: blur(8px); min-height: 68px; transition: background .2s ease, transform .2s ease; }
+    a.contact-item:hover { background: rgba(255, 255, 255, .16); transform: translateY(-2px); }
+    .contact-item .ci-icon { flex: none; width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: linear-gradient(135deg, var(--blue-500), var(--cyan-400)); }
+    .contact-item .ci-icon svg { width: 22px; height: 22px; }
+    .contact-item small { display: block; font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; color: var(--cyan-300); font-weight: 600; }
+    .contact-item span.val { display: block; font-weight: 600; word-break: break-word; }
+    .contact-item .ph { opacity: .6; font-style: italic; font-weight: 500; }
+    .socials { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .5rem; }
+    .social-chip { display: inline-flex; align-items: center; min-height: 40px; padding: .3rem .85rem; border-radius: 999px; font-size: .82rem; font-weight: 600; background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .2); }
+    a.social-chip:hover { background: rgba(255, 255, 255, .24); }
+    .social-chip.ph { opacity: .6; font-style: italic; }
+
+    /* ---------- Footer ---------- */
+    .site-footer { background: var(--navy-950); color: rgba(255, 255, 255, .75); padding: 3rem 0 calc(2rem + env(safe-area-inset-bottom)); text-align: center; }
+    .site-footer .brand { justify-content: center; }
+    .site-footer .brand-name { color: #fff; font-size: 2rem; }
+    .site-footer .brand-name b { color: var(--cyan-300); }
+    .site-footer .tag { margin-top: .5rem; font-family: var(--font-head); font-weight: 700; font-size: .8rem; letter-spacing: .2em; text-transform: uppercase; color: var(--cyan-300); }
+    .footer-links { margin: 1.5rem 0; display: flex; flex-wrap: wrap; justify-content: center; gap: .25rem 1.25rem; }
+    .footer-links a { min-height: 44px; display: inline-flex; align-items: center; font-size: .9rem; }
+    .footer-links a:hover { color: #fff; }
+    .copy { padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, .12); font-size: .85rem; }
+
+    /* ---------- Modal ---------- */
+    dialog.modal { width: min(calc(100% - 2rem), 460px); max-height: calc(100dvh - 2rem); padding: 0; border: 0; border-radius: 22px; background: var(--surface); color: var(--text); box-shadow: var(--shadow-lg); overflow: auto; }
+    dialog.modal::backdrop { background: rgba(6, 20, 48, .6); backdrop-filter: blur(4px); }
+    dialog.modal[open] { animation: pop .25s cubic-bezier(.2, .8, .2, 1); }
+    @keyframes pop { from { opacity: 0; transform: translateY(14px) scale(.97); } to { opacity: 1; transform: none; } }
+    .modal .thumb { aspect-ratio: 1 / 1; max-height: 55dvh; }
+    .modal-body { padding: 1.5rem; text-align: center; }
+    .modal-body h3 { font-size: 1.35rem; color: var(--head); margin-top: .75rem; }
+    .modal-body .desc { margin-top: .5rem; color: var(--muted); font-size: .95rem; }
+    .soon-msg { margin-top: 1.1rem; padding: .9rem 1rem; border-radius: 14px; font-family: var(--font-head); font-weight: 800; font-size: 1.15rem; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); background: rgba(10, 102, 255, .1); border: 1px dashed rgba(10, 102, 255, .5); }
+    .modal-body .btn { margin-top: 1.25rem; width: 100%; }
+    .modal-x { position: absolute; top: .7rem; inset-inline-end: .7rem; color: var(--head); z-index: 3; width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--glass-3); box-shadow: var(--shadow-sm); display: grid; place-items: center; }
+    .modal-x svg { width: 20px; height: 20px; }
+
+
+    /* ---------- Reveal animations (only when JS is active) ---------- */
+    .js .reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s cubic-bezier(.2, .8, .2, 1); transition-delay: var(--d, 0s); }
+    .js .reveal.in { opacity: 1; transform: none; }
+
+    /* ---------- Breakpoints (mobile-first) ---------- */
+    @media (min-width: 480px) {
+      .hero-actions { flex-direction: row; flex-wrap: wrap; }
+      .hero-actions .btn { min-width: 220px; }
+      .contact-card { padding: 2.25rem; }
+    }
+    @media (min-width: 640px) {
+      .product-grid { gap: 1rem; }    /* Tablet: 3 sebaris */
+      .section { padding: 5.5rem 0; }
+    }
+    @media (min-width: 900px) {
+      :root { --header-h: 76px; }
+      .nav-toggle { display: none; }
+      .nav-menu { position: static; display: flex; flex-direction: row; align-items: center; gap: .25rem; max-height: none; overflow: visible; padding: 0; background: none; border: 0; box-shadow: none; backdrop-filter: none; }
+      .nav-menu.open { animation: none; }
+      .nav-menu a.nav-link { min-height: 44px; padding: 0 .9rem; font-size: .82rem; }
+      .nav-menu .btn { margin: 0 0 0 .5rem; }
+      .hero-grid { grid-template-columns: 1.1fr .9fr; gap: 2rem; }
+      .about-grid { grid-template-columns: 1fr 1.1fr; gap: 4rem; align-items: start; }
+      .contact-card { grid-template-columns: 1fr 1fr; align-items: center; padding: 3.25rem; }
+    }
+    @media (min-width: 1024px) {
+      .hero { padding-bottom: 6rem; }
+    }
+    @media (min-width: 900px) { .product-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }                 /* Tablet besar / laptop kecil: 4 sebaris */
+    @media (min-width: 1100px) { .product-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1.1rem; } }   /* Desktop: 5 sebaris */
+    @media (min-width: 1920px) { :root { --container: 1600px; } }
+    @media (min-width: 2560px) { :root { --container: 1900px; } }
+    @media (min-width: 1600px) {
+      :root { --container: 1360px; }
+      body { font-size: 1.05rem; }
+    }
+    @media (hover: none) { .product-card:hover, .pillar:hover { transform: none; } .product-card:hover .thumb img { transform: none; } }
+    @media (max-width: 380px) {
+      .brand-name { font-size: 1.4rem; } .brand-mark { width: 34px; height: 34px; }
+      .win-body { gap: .55rem; } .tile { padding: .55rem; }
+    }
+
+    /* ---------- Kawalan bahasa + tema ---------- */
+    .header-end { display: flex; align-items: center; gap: .5rem; }
+    .theme-toggle { width: 46px; height: 46px; display: inline-grid; place-items: center; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--head); -webkit-tap-highlight-color: transparent; }
+    .theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+    .theme-toggle svg { width: 22px; height: 22px; }
+    .theme-toggle .i-sun { display: none; }
+    :root[data-theme="dark"] .theme-toggle .i-sun { display: block; }
+    :root[data-theme="dark"] .theme-toggle .i-moon { display: none; }
+    .lang-switch { display: flex; gap: 2px; padding: 3px; border-radius: 12px; background: var(--bg-soft); border: 1px solid var(--line); }
+    .lang-switch button { flex: 1; min-width: 44px; min-height: 40px; padding: 0 .7rem; border: 0; border-radius: 9px; background: transparent; color: var(--head-2); font-family: var(--font-head); font-weight: 800; font-size: .8rem; letter-spacing: .06em; -webkit-tap-highlight-color: transparent; }
+    .lang-switch button:hover { color: var(--accent); }
+    .lang-switch button[aria-pressed="true"] { background: linear-gradient(135deg, var(--blue-500), #1B4FD8); color: #fff; box-shadow: 0 4px 12px rgba(10, 102, 255, .35); }
+    .nav-menu .lang-switch { margin-top: .6rem; }
+    @media (min-width: 900px) { .nav-menu .lang-switch { margin: 0 0 0 .75rem; } [dir="rtl"] .nav-menu .lang-switch { margin: 0 .75rem 0 0; } }
+
+    /* ---------- Mod gelap: pelarasan khusus ---------- */
+    :root[data-theme="dark"] .hero { background: radial-gradient(900px 500px at 85% 0%, rgba(0, 200, 245, .12), transparent 60%), radial-gradient(700px 500px at 0% 20%, rgba(10, 102, 255, .18), transparent 60%), linear-gradient(180deg, var(--hero-top) 0%, var(--bg) 100%); }
+    :root[data-theme="dark"] .hero::before { opacity: .35; }
+    :root[data-theme="dark"] .tile.qr { background: linear-gradient(145deg, #0A1F44, #14346E); border: 1px solid rgba(160, 185, 235, .2); }
+    :root[data-theme="dark"] .thumb::after { background: linear-gradient(180deg, transparent 55%, rgba(0, 0, 0, .3)); }
+    :root[data-theme="dark"] .btn-primary { box-shadow: 0 10px 24px rgba(10, 102, 255, .4); }
+    :root[data-theme="dark"] .products::before { opacity: .6; }
+    :root[data-theme="dark"] .status-badge.live { color: var(--ok); }
+    :root[data-theme="dark"] .site-footer { background: #050C1C; }
+    :root[data-theme="dark"] .contact-card { box-shadow: var(--shadow-md), 0 0 0 1px rgba(160, 185, 235, .16); }
+
+
+    /* ---------- Pilihan bahasa (sebelah butang mod gelap/cerah) ---------- */
+    .lang-menu { position: relative; }
+    .lang-btn { height: 46px; padding: 0 .75rem; display: inline-flex; align-items: center; gap: .4rem; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--head); font-family: var(--font-head); font-weight: 800; font-size: .8rem; letter-spacing: .06em; -webkit-tap-highlight-color: transparent; }
+    .lang-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .lang-btn svg { width: 16px; height: 16px; flex: none; }
+    .lang-btn .chev { width: 12px; height: 12px; transition: transform .2s ease; }
+    .lang-btn[aria-expanded="true"] .chev { transform: rotate(180deg); }
+    .lang-pop { position: absolute; top: calc(100% + .5rem); inset-inline-end: 0; min-width: 200px; padding: 6px; display: grid; gap: 2px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-lg); z-index: 120; }
+    .lang-pop button { min-height: 44px; padding: 0 .9rem; display: flex; align-items: center; gap: .6rem; border: 0; border-radius: 10px; background: transparent; color: var(--head); text-align: start; font-family: var(--font-head); font-weight: 700; font-size: .88rem; }
+    .lang-pop button b { font-weight: 800; min-width: 2rem; }
+    .lang-pop button:hover { background: var(--bg-soft); }
+    .lang-pop button[aria-pressed="true"] { background: linear-gradient(135deg, var(--blue-500), #1B4FD8); color: #fff; }
+    @media (max-width: 480px) {
+      .nav-wrap { gap: .5rem; }
+      .header-end { gap: .35rem; }
+      .brand { gap: .45rem; }
+      .brand-name { font-size: 1.35rem; }
+      .brand-mark, .brand-logo { width: 38px; height: 38px; }
+      .theme-toggle, .nav-toggle { width: 42px; height: 42px; }
+      .lang-btn { height: 42px; padding: 0 .55rem; }
+      .lang-btn .globe { display: none; }
+    }
+
+    /* ---------- Footer: Hubungi Kami (kecil) + jenama di tengah ---------- */
+    .site-footer { padding: 2.75rem 0 calc(1.75rem + env(safe-area-inset-bottom)); }
+    .footer-grid { display: grid; gap: 1.75rem; justify-items: center; text-align: center; }
+    .footer-center { order: 1; }
+    .footer-links { order: 2; margin: 0; }
+    .footer-contact { order: 3; }
+    .site-footer .copy { margin-top: 2rem; }
+    .footer-contact h3 { font-family: var(--font-head); font-weight: 700; font-size: .72rem; letter-spacing: .2em; text-transform: uppercase; color: var(--cyan-300); margin-bottom: .6rem; }
+    .fc-list { display: grid; gap: .3rem; justify-items: center; }
+    .fc-item { display: inline-flex; align-items: center; gap: .55rem; min-height: 40px; font-size: .85rem; color: rgba(255, 255, 255, .85); word-break: break-word; }
+    .fc-item:hover { color: #fff; }
+    .fc-item svg { width: 18px; height: 18px; color: var(--cyan-300); flex: none; }
+    .fc-socials { display: flex; flex-wrap: wrap; gap: .4rem; justify-content: center; margin-top: .25rem; }
+    .fc-socials .social-chip { min-height: 36px; padding: .2rem .7rem; font-size: .78rem; }
+    .fc-empty { font-size: .82rem; opacity: .65; }
+    @media (min-width: 900px) {
+      .footer-grid { grid-template-columns: 1fr auto 1fr; align-items: start; text-align: start; justify-items: stretch; gap: 2.5rem; }
+      .footer-contact { order: 1; justify-self: start; }
+      .footer-center { order: 2; justify-self: center; text-align: center; }
+      .footer-links { order: 3; justify-self: end; flex-direction: column; align-items: flex-end; gap: 0; }
+      .footer-links a { min-height: 38px; }
+      .fc-list { justify-items: start; }
+      .fc-socials { justify-content: flex-start; }
+    }
+
+    /* ---------- Badge harga istimewa (skala ikut lebar kad) ---------- */
+    .thumb { container-type: inline-size; }
+    .price-badge { position: absolute; z-index: 3; inset-inline-end: 3.5cqw; bottom: 3.5cqw; width: max-content; max-width: 80cqw; display: flex; flex-direction: column; align-items: stretch; padding: 0 clamp(2px, 1.1cqw, 5px) clamp(2px, 1.1cqw, 5px); border-radius: clamp(8px, 4.5cqw, 18px); background: #FFD23F; box-shadow: 0 5px 14px rgba(0, 0, 0, .35); font-family: var(--font-head); line-height: 1; pointer-events: none; transform-origin: 85% 100%; animation: pbPop 5s ease-in-out infinite; animation-delay: var(--pd, 0s); }
+    .pb-label { text-align: center; padding: .38em .5em .32em; font-size: clamp(6px, 4.1cqw, 13px); font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: #1B1B1B; white-space: nowrap; }
+    .pb-body { display: block; padding: .28em .55em .42em; border-radius: clamp(6px, 3.4cqw, 14px); background: #E8111F; color: #fff; text-align: center; }
+    .pb-main { display: inline-flex; align-items: baseline; justify-content: center; gap: .14em; font-weight: 900; white-space: nowrap; }
+    .pb-cur { font-size: clamp(8px, 5.8cqw, 18px); }
+    .pb-int { font-size: clamp(14px, 12.5cqw, 36px); letter-spacing: -.02em; }
+    .pb-dec { align-self: flex-start; margin-top: .25em; font-size: clamp(7px, 5.2cqw, 16px); }
+    .pb-old { align-self: flex-end; padding: .35em .35em .12em; font-size: clamp(6px, 4cqw, 12px); font-weight: 700; color: #1B1B1B; white-space: nowrap; }
+    .pb-old s { text-decoration-color: #E8111F; text-decoration-thickness: .13em; }
+    @keyframes pbPop {   /* diam, kemudian bergegar & membesar setiap 5 saat */
+      0%, 78%, 100% { transform: rotate(0) scale(1); }
+      82% { transform: rotate(-7deg) scale(1.14); }
+      86% { transform: rotate(6deg) scale(1.14); }
+      90% { transform: rotate(-4deg) scale(1.08); }
+      94% { transform: rotate(2deg) scale(1.03); }
+    }
+
+    /* ---------- Kad produk padat pada telefon (3 sebaris) ---------- */
+    @media (max-width: 639px) {
+      .product-card { border-radius: 14px; }
+      .status-badge { top: .35rem; inset-inline-start: .35rem; padding: .15rem .4rem; font-size: .5rem; gap: .25rem; }
+      .status-badge::before { width: 5px; height: 5px; }
+      .card-body { padding: .6rem .5rem .65rem; }
+      .category-pill { font-size: .5rem; padding: .15rem .4rem; letter-spacing: .03em; }
+      .card-body h3 { font-size: .78rem; line-height: 1.25; margin: .45rem 0 .5rem; flex: 1; word-break: break-word; }
+      .card-body p { display: none; }
+      .card-body .btn { margin-top: 0; min-height: 36px; padding: .3rem .35rem; font-size: .58rem; letter-spacing: .02em; border-radius: 9px; }
+      .card-body .btn svg { display: none; }
+      html[lang="ar"] .category-pill, html[lang="ar"] .status-badge { font-size: .62rem; }
+      html[lang="ar"] .card-body h3 { font-size: .8rem; line-height: 1.4; }
+      html[lang="ar"] .card-body .btn { font-size: .72rem; }
+    }
+
+    /* ---------- Pasang Apps (PWA) ---------- */
+    .install-btn { display: flex; align-items: center; gap: .5rem; min-height: 52px; padding: 0 1rem; margin-top: .25rem; border: 1.5px dashed var(--ghost-border); border-radius: 12px; background: transparent; color: var(--accent); font-family: var(--font-head); font-weight: 700; font-size: 1rem; letter-spacing: .04em; text-transform: uppercase; text-align: start; }
+    .install-btn svg { width: 18px; height: 18px; flex: none; }
+    .install-btn:hover { background: var(--bg-soft); border-style: solid; }
+    @media (min-width: 900px) { .install-btn { min-height: 44px; padding: 0 .9rem; margin: 0 0 0 .5rem; font-size: .8rem; } }
+
+    /* ---------- Teks rata kiri-kanan (justify): Utama & Tentang Kami ---------- */
+    .hero-intro, .about-text { text-align: justify; text-justify: inter-word; }
+
+    /* ---------- RTL (Bahasa Arab) ---------- */
+    [dir="rtl"] .btn svg { transform: scaleX(-1); }
+    [dir="rtl"] .btn:hover svg { transform: scaleX(-1) translateX(3px); }
+    [dir="rtl"] .scene { --ry: 14deg; }
+    [dir="rtl"] .hero-quote { font-style: normal; }
+
+    /* ---------- Tipografi Arab: Cairo; tiada jarak huruf / huruf besar pada skrip Arab ---------- */
+    [lang="ar"] { --font-hero: "Cairo", system-ui, "Segoe UI", Tahoma, sans-serif; --font-head: "Cairo", system-ui, "Segoe UI", Tahoma, sans-serif; --font-body: "Cairo", system-ui, "Segoe UI", Tahoma, sans-serif; }
+    [lang="ar"] :not(.keep-ls):not(.keep-ls *) { letter-spacing: normal !important; text-transform: none !important; }
+    [lang="ar"] body { line-height: 1.8; }
+    [lang="ar"] .section-title, [lang="ar"] .contact-card h2 { font-weight: 800; line-height: 1.3; font-size: clamp(2rem, 6.2vw, 3.3rem); }
+    [lang="ar"] .hero-tagline { font-size: clamp(.95rem, 3vw, 1.25rem); }
+    [lang="ar"] .hero-quote { line-height: 1.8; }
+    [lang="ar"] .pillar h3, [lang="ar"] .card-body h3, [lang="ar"] .modal-body h3, [lang="ar"] .state-box h3 { line-height: 1.5; }
+    [lang="ar"] .card-body p, [lang="ar"] .pillar p, [lang="ar"] .about-text, [lang="ar"] .hero-intro { line-height: 1.85; }
+    [lang="ar"] .btn { font-size: 1rem; }
+    [lang="ar"] .btn-sm { font-size: .9rem; }
+    [lang="ar"] .lang-switch button { font-size: .85rem; }
+    [lang="ar"] .eyebrow, [lang="ar"] .category-pill, [lang="ar"] .status-badge { font-size: .8rem; }
+    [lang="ar"] .status-badge { font-size: .72rem; }
+    [lang="ar"] .category-pill { font-size: .78rem; }
+    [lang="ar"] .soon-msg { font-size: 1.25rem; }
+    .keep-ls { unicode-bidi: isolate; }
+    .lang-switch { direction: ltr; }                                      /* susunan sentiasa BM · BI · BA */
+    [dir="rtl"] .hero-tagline { direction: ltr; text-align: right; }      /* tagline Inggeris: noktah kekal di hujung */
+    .site-footer .tag { direction: ltr; }
+    [lang="ar"] .contact-item .ph, [lang="ar"] .social-chip.ph { font-style: normal; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+      .js .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#home" data-i18n="ui.skip">Terus ke kandungan</a>
+
+  <!-- SVG icon sprite -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="gdGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0A66FF"/><stop offset="1" stop-color="#00C8F5"/></linearGradient>
+      <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-chip" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><rect x="10" y="10" width="4" height="4" rx=".6" fill="currentColor"/></symbol>
+      <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c1.9.7 3.1 2.4 3.5 5.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-qr" viewBox="0 0 24 24"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M6 6h1v1H6zM17 6h1v1h-1zM6 17h1v1H6zM14 14h3v3h-3zM19 14h2v2h-2zM14 19h2v2h-2zM18 18h3v3h-3z" fill="currentColor"/></symbol>
+      <symbol id="i-pdf" viewBox="0 0 24 24"><path d="M6 2h8l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 2v5h5M8 13h8M8 17h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4.6 3.2 8 8 9 4.8-1 8-4.4 8-9V6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="m8.5 12 2.5 2.5 4.5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m3.5 7 8.5 6 8.5-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M3.5 20.5 5 15.8A8.5 8.5 0 1 1 8.4 19z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 8.5c.2 2.6 3.9 6.3 6.5 6.5l1.2-1.5-2.2-1.2-1 .7c-.9-.4-1.9-1.4-2.3-2.3l.7-1L10.700 7.500z" fill="currentColor"/></symbol>
+      <symbol id="i-share" viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.7" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="6" r="2.7" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="18" r="2.7" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m8.4 10.7 7.2-3.4M8.4 13.3l7.2 3.4" stroke="currentColor" stroke-width="1.8"/></symbol>
+      <symbol id="i-box" viewBox="0 0 24 24"><path d="M12 2.5 21 7.5v9L12 21.500 3 16.500v-9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M3.500 7.800 12 12.500l8.500-4.700M12 12.500v9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+      <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2 20h20z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 10v4.500M12 17.300v.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.500A8.500 8.500 0 0 1 9.500 4 8.500 8.500 0 1 0 20 14.500z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.200" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.500v2.200M12 19.300v2.200M2.500 12h2.200M19.300 12h2.200M5.300 5.300l1.500 1.500M17.200 17.200l1.500 1.500M18.700 5.300l-1.500 1.500M6.800 17.200l-1.500 1.500" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 12h18M12 3c2.8 2.7 4 5.7 4 9s-1.2 6.3-4 9c-2.8-2.7-4-5.7-4-9s1.2-6.3 4-9z" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+      <symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7 11l5 5 5-5M5 20h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+      <symbol id="i-logo" viewBox="0 0 64 64"><image href="/icons/logo-192.png" width="64" height="64"/></symbol>
+    </defs>
+  </svg>
+
+  <!-- ====================== HEADER ====================== -->
+  <header class="site-header" id="siteHeader">
+    <div class="container nav-wrap">
+      <a href="#home" class="brand" data-i18n-attr="aria-label:ui.homeAria" aria-label="Genius Digital">
+        <svg class="brand-mark" aria-hidden="true"><use href="#i-logo"/></svg>
+        <img class="brand-logo" alt="" hidden>
+        <span class="brand-name keep-ls">GENIUS <b>DIGITAL</b></span>
+      </a>
+      <div class="header-end">
+        <nav class="nav-menu" id="navMenu" data-i18n-attr="aria-label:ui.navMain" aria-label="Menu utama">
+          <a class="nav-link active" href="#home" data-i18n="nav.home">Utama</a>
+          <a class="nav-link" href="#about" data-i18n="nav.about">Tentang Kami</a>
+          <a class="nav-link" href="#products" data-i18n="nav.products">Produk</a>
+          <a class="nav-link" href="#contact" data-i18n="nav.contact">Hubungi Kami</a>
+          <button class="install-btn" id="installBtn" type="button" hidden><svg aria-hidden="true"><use href="#i-download"/></svg><span data-i18n="install.btn">Pasang Apps</span></button>
+        </nav>
+        <div class="lang-menu" id="langMenu">
+          <button class="lang-btn" id="langBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="langPop" data-i18n-attr="aria-label:ui.language" aria-label="Pilih bahasa">
+            <svg class="globe" aria-hidden="true"><use href="#i-globe"/></svg><span id="langCur">BM</span><svg class="chev" aria-hidden="true"><use href="#i-chev"/></svg>
+          </button>
+          <div class="lang-pop" id="langPop" role="group" data-i18n-attr="aria-label:ui.language" aria-label="Pilih bahasa" hidden>
+            <button type="button" data-lang="ms" lang="ms" aria-pressed="true"><b>BM</b> Bahasa Melayu</button>
+            <button type="button" data-lang="en" lang="en" aria-pressed="false"><b>BI</b> English</button>
+            <button type="button" data-lang="ar" lang="ar" aria-pressed="false"><b>BA</b> العربية</button>
+          </div>
+        </div>
+        <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="Tukar ke mod gelap" title="Tukar ke mod gelap">
+          <svg class="i-moon" aria-hidden="true"><use href="#i-moon"/></svg><svg class="i-sun" aria-hidden="true"><use href="#i-sun"/></svg>
+        </button>
+        <button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" aria-controls="navMenu" aria-label="Buka menu">
+          <span class="bars"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ====================== HERO ====================== -->
+    <section class="hero" id="home">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <span class="hero-badge reveal"><i></i><span data-i18n="hero.badge">Portal Produk dan Sistem Digital Korporat</span></span>
+          <h1 class="reveal keep-ls" style="--d:.08s">Genius <span class="grad">Digital</span></h1>
+          <p class="hero-tagline keep-ls reveal" style="--d:.16s">Digital Innovation. Intelligent Systems.</p>
+          <p class="hero-quote reveal" style="--d:.22s" data-i18n="hero.quote">“Memacu Inovasi Digital Melalui Sistem Pintar, Kreatif dan Efisien.”</p>
+          <p class="hero-intro reveal" style="--d:.28s" data-i18n="hero.intro">Genius Digital ialah sebuah syarikat yang membangunkan dan menawarkan pelbagai penyelesaian sistem digital untuk membantu individu, organisasi dan perniagaan mengurus tugasan dengan lebih mudah, sistematik dan efisien.</p>
+          <div class="hero-actions reveal" style="--d:.34s">
+            <a class="btn btn-primary" href="#products"><span data-i18n="hero.btnProducts">Terokai Produk Kami</span> <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            <a class="btn btn-ghost" href="#about" data-i18n="hero.btnAbout">Tentang Genius Digital</a>
+          </div>
+          <ul class="hero-points reveal" style="--d:.4s" data-i18n-attr="aria-label:hero.pointsAria" aria-label="Ciri utama">
+            <li data-i18n="hero.p1">Berasaskan web</li><li data-i18n="hero.p2">Mesra mudah alih</li><li data-i18n="hero.p3">Sentiasa dipertingkatkan</li>
+          </ul>
+        </div>
+
+        <div class="hero-visual reveal" style="--d:.2s" aria-hidden="true">
+          <div class="scene keep-ls" id="heroScene">
+            <div class="plate p3"></div>
+            <div class="plate p2"></div>
+            <div class="plate p1">
+              <div class="win-bar"><i></i><i></i><i></i><span>GENIUS · SYSTEMS</span></div>
+              <div class="win-body">
+                <div class="win-col">
+                  <div class="tile qr"><svg><use href="#i-qr"/></svg><div><b>QR ME</b><small data-i18n="hero.tileQr">Alatan Digital</small></div></div>
+                  <div class="tile pdf"><svg><use href="#i-pdf"/></svg><div><b>PDF TOOLS</b><small data-i18n="hero.tilePdf">Produktiviti</small></div></div>
+                </div>
+                <div class="chart">
+                  <small data-i18n="hero.efficiency">Kecekapan</small>
+                  <div class="bars"><i style="--h:35%"></i><i style="--h:55%"></i><i style="--h:42%"></i><i style="--h:72%"></i><i style="--h:60%"></i><i style="--h:92%"></i></div>
+                  <div class="line"></div>
+                </div>
+              </div>
+            </div>
+            <span class="chip c1"><svg><use href="#i-chip"/></svg><span data-i18n="hero.chip1">Sistem Pintar</span></span>
+            <span class="chip c2"><svg><use href="#i-shield"/></svg><span data-i18n="hero.chip2">Awan Selamat</span></span>
+            <span class="chip c3"><svg><use href="#i-bulb"/></svg><span data-i18n="hero.chip3">Inovasi</span></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================== ABOUT ====================== -->
+    <section class="section about" id="about">
+      <div class="container about-grid">
+        <div class="reveal">
+          <span class="eyebrow" data-i18n="about.eyebrow">Tentang Kami</span>
+          <h2 class="section-title" data-i18n-html="about.title">Tentang <span>Genius Digital</span></h2>
+          <p class="about-text" style="margin-top:1.25rem" data-i18n="about.text">Genius Digital merupakan sebuah syarikat teknologi digital yang memfokuskan pembangunan sistem, aplikasi web dan penyelesaian digital yang praktikal serta inovatif. Kami komited menghasilkan produk digital yang mesra pengguna, mudah diakses dan mampu meningkatkan kecekapan pengurusan serta produktiviti.</p>
+        </div>
+        <div class="pillars">
+          <article class="pillar reveal" style="--d:.05s">
+            <div class="pillar-icon"><svg aria-hidden="true"><use href="#i-bulb"/></svg></div>
+            <div><h3 data-i18n="about.p1.t">Inovasi Digital</h3><p data-i18n="about.p1.d">Menterjemahkan idea kepada sistem digital yang kreatif dan relevan, serta sentiasa dipertingkatkan dari semasa ke semasa.</p></div>
+          </article>
+          <article class="pillar reveal" style="--d:.12s">
+            <div class="pillar-icon"><svg aria-hidden="true"><use href="#i-chip"/></svg></div>
+            <div><h3 data-i18n="about.p2.t">Penyelesaian Pintar</h3><p data-i18n="about.p2.d">Penyelesaian pintar yang memudahkan tugasan harian dan menjadikan pengurusan lebih sistematik.</p></div>
+          </article>
+          <article class="pillar reveal" style="--d:.19s">
+            <div class="pillar-icon"><svg aria-hidden="true"><use href="#i-users"/></svg></div>
+            <div><h3 data-i18n="about.p3.t">Teknologi Berpaksikan Pengguna</h3><p data-i18n="about.p3.d">Teknologi yang dibina berdasarkan keperluan pengguna: mudah difahami dan boleh diakses pada mana-mana peranti.</p></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================== PRODUCTS ====================== -->
+    <section class="section products" id="products">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow" data-i18n="products.eyebrow">Katalog Produk</span>
+          <h2 class="section-title" data-i18n-html="products.title">Produk <span>Digital</span> Kami</h2>
+          <p class="section-sub" data-i18n="products.sub">Terokai koleksi sistem dan alatan digital inovatif kami.</p>
+        </div>
+        <div class="product-grid" id="productGrid" aria-live="polite" aria-busy="true"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ====================== FOOTER ====================== -->
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-contact" id="contact">
+        <h3 data-i18n="contact.h2">Hubungi Kami</h3>
+        <div class="fc-list" id="contactList"></div>
+      </div>
+      <div class="footer-center">
+        <a href="#home" class="brand" data-i18n-attr="aria-label:ui.backTop" aria-label="Kembali ke atas">
+          <svg class="brand-mark" aria-hidden="true"><use href="#i-logo"/></svg>
+          <img class="brand-logo" alt="" hidden>
+          <span class="brand-name keep-ls">GENIUS DIGITAL</span>
+        </a>
+        <p class="tag keep-ls">Digital Innovation. Intelligent Systems.</p>
+      </div>
+      <nav class="footer-links" data-i18n-attr="aria-label:ui.footerNav" aria-label="Pautan hujung halaman">
+        <a href="#home" data-i18n="nav.home">Utama</a><a href="#about" data-i18n="nav.about">Tentang Kami</a><a href="#products" data-i18n="nav.products">Produk</a><a href="#contact" data-i18n="nav.contact">Hubungi Kami</a>
+      </nav>
+    </div>
+    <div class="container"><p class="copy" data-i18n="footer.copy">© 2026 Genius Digital. Hak Cipta Terpelihara.</p></div>
+  </footer>
+
+  <!-- ====================== PASANG APPS (iPhone / iPad) ====================== -->
+  <dialog class="modal" id="installDialog" aria-labelledby="installTitle">
+    <div class="modal-body">
+      <h3 id="installTitle" data-i18n="install.title">Pasang Genius Digital</h3>
+      <p class="desc" data-i18n="install.ios">Tekan butang Kongsi, kemudian pilih “Tambah ke Skrin Utama”.</p>
+      <button class="btn btn-primary" type="button" id="installClose" data-i18n="modal.ok">Tutup</button>
+    </div>
+  </dialog>
+
+  <!-- ====================== PRODUCT MODAL ====================== -->
+  <dialog class="modal" id="productModal" aria-labelledby="modalTitle">
+    <button class="modal-x" type="button" id="modalClose" data-i18n-attr="aria-label:modal.close" aria-label="Tutup"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+    <div class="thumb" id="modalThumb"></div>
+    <div class="modal-body">
+      <span class="category-pill" id="modalCategory"></span>
+      <h3 id="modalTitle"></h3>
+      <p class="desc" id="modalDesc"></p>
+      <div class="soon-msg" id="modalMsg" data-i18n="modal.msg">Produk Akan Datang.</div>
+      <button class="btn btn-primary" type="button" id="modalOk" data-i18n="modal.ok">Tutup</button>
+    </div>
+  </dialog>
+
+
+  <script type="module">
+    /* =====================================================================
+       GENIUS DIGITAL — index.html script
+       Bahagian 1: KONFIGURASI (ubah di sini)
+       ===================================================================== */
+
+    // 1) Gantikan dengan Firebase Web App config sebenar anda
+    //    (Firebase Console → Project settings → Your apps → SDK setup and configuration).
+    const firebaseConfig = {
+      apiKey: "AIzaSyA6jQBsL6OahJ2FcMBFf38ISoGQiTTYg2s",
+      authDomain: "genius-digital-40bc9.firebaseapp.com",
+      projectId: "genius-digital-40bc9",
+      storageBucket: "genius-digital-40bc9.firebasestorage.app",   // tidak digunakan (tiada Firebase Storage); boleh dibiarkan
+      messagingSenderId: "508099045190",
+      appId: "1:508099045190:web:838eb28eb5e453b61e2747"
+    };
+
+    // 2) Versi Firebase JS SDK (modular). Tukar di sini sahaja jika mahu naik taraf.
+    const FIREBASE_SDK_VERSION = "12.12.0";
+
+    // Maklumat hubungan, logo, jenama dan teks diurus melalui Admin Panel (Tetapan Laman) dan
+    // dibaca daripada Firestore: genius_site/main. Pautan produk diisi pada setiap produk.
+
+
+    /* =====================================================================
+       Bahagian 2: Utiliti kecil
+       ===================================================================== */
+    const $ = (sel, root = document) => root.querySelector(sel);
+    const SVG_NS = "http://www.w3.org/2000/svg";
+    const isFirebaseConfigured = ["apiKey", "authDomain", "projectId", "appId"].every(k => typeof firebaseConfig[k] === "string" && !firebaseConfig[k].startsWith("YOUR_"));
+
+    function el(tag, props = {}, children = []) {
+      const node = document.createElement(tag);
+      for (const [k, v] of Object.entries(props)) {
+        if (k === "class") node.className = v;
+        else if (k === "text") node.textContent = v;
+        else if (k.startsWith("on")) node.addEventListener(k.slice(2), v);
+        else node.setAttribute(k, v);
+      }
+      for (const c of [].concat(children)) if (c) node.append(c);
+      return node;
+    }
+    function icon(id) {
+      const svg = document.createElementNS(SVG_NS, "svg");
+      svg.setAttribute("aria-hidden", "true");
+      const use = document.createElementNS(SVG_NS, "use");
+      use.setAttribute("href", "#" + id);
+      svg.append(use);
+      return svg;
+    }
+    const safeHttps = (u) => typeof u === "string" && /^https:\/\//i.test(u.trim()) ? u.trim() : "";
+    // Thumbnail: URL https:// ATAU data URL imej yang disimpan terus dalam Firestore.
+    const safeImage = (u) => typeof u === "string" && /^(https:\/\/|data:image\/(jpeg|png|webp);base64,)/i.test(u.trim()) ? u.trim() : "";
+
+    /* =====================================================================
+       Bahagian 2b: Enjin bahasa
+       - data-i18n="kunci"        → textContent
+       - data-i18n-html="kunci"   → innerHTML (kandungan daripada kamus sahaja, bukan data pengguna)
+       - data-i18n-attr="attr:kunci;attr2:kunci2" → atribut
+       ===================================================================== */
+    const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+    const DEFAULT_LANG = "ms", STORE_LANG = "gd-lang", STORE_THEME = "gd-theme";
+    const LANGS = { ms: { dir: "ltr", locale: "ms-MY" }, en: { dir: "ltr", locale: "en-GB" }, ar: { dir: "rtl", locale: "ar" } };
+    let lang = DEFAULT_LANG;
+    const readStore = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+    const writeStore = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* storan disekat: abaikan */ } };
+
+    /* =====================================================================
+       Kamus bahasa (i18n). Kunci yang sama wujud dalam ms, en dan ar.
+       ms = Bahasa Melayu (lalai), en = English (BI), ar = العربية (BA, RTL)
+       Nama jenama "Genius Digital" dan tagline kekal dalam Bahasa Inggeris.
+       ===================================================================== */
+    const I18N = {
+      ms: {
+        "meta.title": "GENIUS DIGITAL — Digital Innovation. Intelligent Systems.",
+        "meta.desc": "Genius Digital ialah syarikat teknologi digital yang membangunkan sistem, aplikasi web dan penyelesaian digital yang praktikal serta inovatif.",
+        "ui.skip": "Terus ke kandungan",
+        "ui.homeAria": "Genius Digital, kembali ke halaman utama",
+        "ui.menuOpen": "Buka menu", "ui.menuClose": "Tutup menu", "ui.navMain": "Menu utama",
+        "ui.language": "Pilih bahasa", "ui.footerNav": "Pautan hujung halaman", "ui.backTop": "Kembali ke atas",
+        "theme.toDark": "Tukar ke mod gelap", "theme.toLight": "Tukar ke mod cerah",
+        "nav.home": "Utama", "nav.about": "Tentang Kami", "nav.products": "Produk", "nav.contact": "Hubungi Kami",
+        "hero.badge": "Portal Produk dan Sistem Digital Korporat",
+        "hero.quote": "“Memacu Inovasi Digital Melalui Sistem Pintar, Kreatif dan Efisien.”",
+        "hero.intro": "Genius Digital ialah sebuah syarikat yang membangunkan dan menawarkan pelbagai penyelesaian sistem digital untuk membantu individu, organisasi dan perniagaan mengurus tugasan dengan lebih mudah, sistematik dan efisien.",
+        "hero.btnProducts": "Terokai Produk Kami", "hero.btnAbout": "Tentang Genius Digital",
+        "hero.pointsAria": "Ciri utama", "hero.p1": "Berasaskan web", "hero.p2": "Mesra mudah alih", "hero.p3": "Sentiasa dipertingkatkan",
+        "hero.chip1": "Sistem Pintar", "hero.chip2": "Awan Selamat", "hero.chip3": "Inovasi",
+        "hero.tileQr": "Alatan Digital", "hero.tilePdf": "Produktiviti", "hero.efficiency": "Kecekapan",
+        "about.eyebrow": "Tentang Kami", "about.title": "Tentang <span>Genius Digital</span>",
+        "about.text": "Genius Digital merupakan sebuah syarikat teknologi digital yang memfokuskan pembangunan sistem, aplikasi web dan penyelesaian digital yang praktikal serta inovatif. Kami komited menghasilkan produk digital yang mesra pengguna, mudah diakses dan mampu meningkatkan kecekapan pengurusan serta produktiviti.",
+        "about.p1.t": "Inovasi Digital", "about.p1.d": "Menterjemahkan idea kepada sistem digital yang kreatif dan relevan, serta sentiasa dipertingkatkan dari semasa ke semasa.",
+        "about.p2.t": "Penyelesaian Pintar", "about.p2.d": "Penyelesaian pintar yang memudahkan tugasan harian dan menjadikan pengurusan lebih sistematik.",
+        "about.p3.t": "Teknologi Berpaksikan Pengguna", "about.p3.d": "Teknologi yang dibina berdasarkan keperluan pengguna: mudah difahami dan boleh diakses pada mana-mana peranti.",
+        "products.eyebrow": "Katalog Produk", "products.title": "Produk <span>Digital</span> Kami",
+        "products.sub": "Terokai koleksi sistem dan alatan digital inovatif kami.",
+        "status.live": "Tersedia", "status.soon": "Akan Datang", "btn.explore": "Terokai Produk",
+        "thumb.alt": "Imej thumbnail {name}", "product.noName": "Tanpa Nama", "product.defaultCat": "Produk Digital",
+        "state.err.title": "Produk tidak dapat dimuatkan",
+        "state.err.permission": "Akses ke data ditolak. Pastikan Firestore Rules telah diterbitkan.",
+        "state.err.generic": "Maaf, senarai produk tidak dapat dimuatkan buat masa ini. Sila semak sambungan internet dan cuba lagi.",
+        "state.err.timeout": "Sambungan ke Firebase mengambil masa terlalu lama.",
+        "state.retry": "Cuba Lagi",
+        "state.empty.title": "Belum ada produk",
+        "state.empty.text": "Produk digital Genius Digital akan dipaparkan di sini tidak lama lagi. Sila kembali semula nanti.",
+        "modal.msg": "Produk Akan Datang.", "modal.close": "Tutup", "modal.ok": "Tutup",
+        "contact.eyebrow": "Perhubungan", "contact.h2": "Hubungi Kami", "contact.soon": "Maklumat hubungan akan dikemas kini tidak lama lagi.", "install.btn": "Pasang Apps", "price.label": "Harga Istimewa", "price.was": "harga asal", "install.title": "Pasang Genius Digital", "install.ios": "Pada iPhone / iPad: tekan butang Kongsi di Safari, kemudian pilih “Tambah ke Skrin Utama”.",
+        "contact.lead": "<strong>Genius Digital.</strong> Berminat dengan produk kami atau ingin bekerjasama? Hubungi kami melalui saluran di bawah.",
+        "contact.email": "E-mel", "contact.whatsapp": "WhatsApp", "contact.social": "Media Sosial",
+        "contact.phEmail": "Placeholder: tambah e-mel syarikat", "contact.phWhatsapp": "Placeholder: tambah nombor WhatsApp", "contact.phSocial": "(placeholder)",
+        "footer.copy": "© 2026 Genius Digital. Hak Cipta Terpelihara."
+      },
+
+      en: {
+        "meta.title": "GENIUS DIGITAL — Digital Innovation. Intelligent Systems.",
+        "meta.desc": "Genius Digital is a digital technology company that builds practical, innovative systems, web applications and digital solutions.",
+        "ui.skip": "Skip to content",
+        "ui.homeAria": "Genius Digital, back to the home page",
+        "ui.menuOpen": "Open menu", "ui.menuClose": "Close menu", "ui.navMain": "Main menu",
+        "ui.language": "Choose language", "ui.footerNav": "Footer links", "ui.backTop": "Back to top",
+        "theme.toDark": "Switch to dark mode", "theme.toLight": "Switch to light mode",
+        "nav.home": "Home", "nav.about": "About Us", "nav.products": "Products", "nav.contact": "Contact",
+        "hero.badge": "Corporate Digital Products and Systems Portal",
+        "hero.quote": "“Driving digital innovation through smart, creative and efficient systems.”",
+        "hero.intro": "Genius Digital develops and offers a range of digital system solutions that help individuals, organisations and businesses manage their work more simply, systematically and efficiently.",
+        "hero.btnProducts": "Explore Our Products", "hero.btnAbout": "About Genius Digital",
+        "hero.pointsAria": "Key features", "hero.p1": "Web-based", "hero.p2": "Mobile-first", "hero.p3": "Continuously improving",
+        "hero.chip1": "Smart Systems", "hero.chip2": "Secure Cloud", "hero.chip3": "Innovation",
+        "hero.tileQr": "Digital Tools", "hero.tilePdf": "Productivity", "hero.efficiency": "Efficiency",
+        "about.eyebrow": "Who We Are", "about.title": "About <span>Genius Digital</span>",
+        "about.text": "Genius Digital is a digital technology company focused on building practical, innovative systems, web applications and digital solutions. We are committed to creating digital products that are user-friendly, easy to access and able to improve management efficiency and productivity.",
+        "about.p1.t": "Digital Innovation", "about.p1.d": "We turn ideas into creative, relevant digital systems and keep improving them over time.",
+        "about.p2.t": "Smart Solutions", "about.p2.d": "Smart solutions that simplify everyday tasks and make management more systematic.",
+        "about.p3.t": "User-Centric Technology", "about.p3.d": "Technology built around what users need: easy to understand and accessible on any device.",
+        "products.eyebrow": "Product Catalogue", "products.title": "Our Digital <span>Products</span>",
+        "products.sub": "Explore our collection of innovative digital systems and tools.",
+        "status.live": "Available", "status.soon": "Coming Soon", "btn.explore": "Explore Product",
+        "thumb.alt": "{name} thumbnail", "product.noName": "Untitled", "product.defaultCat": "Digital Product",
+        "state.err.title": "Couldn't load the products",
+        "state.err.permission": "Access to the data was denied. Make sure the Firestore rules have been published.",
+        "state.err.generic": "Sorry, the product list can't be loaded right now. Check your internet connection and try again.",
+        "state.err.timeout": "The connection to Firebase is taking too long.",
+        "state.retry": "Try Again",
+        "state.empty.title": "No products yet",
+        "state.empty.text": "Genius Digital's products will appear here soon. Please check back later.",
+        "modal.msg": "Product Coming Soon.", "modal.close": "Close", "modal.ok": "Close",
+        "contact.eyebrow": "Get in Touch", "contact.h2": "Contact Us", "contact.soon": "Contact details will be updated soon.", "install.btn": "Install App", "price.label": "Special Price", "price.was": "original price", "install.title": "Install Genius Digital", "install.ios": "On iPhone / iPad: tap the Share button in Safari, then choose “Add to Home Screen”.",
+        "contact.lead": "<strong>Genius Digital.</strong> Interested in our products or looking to collaborate? Reach us through the channels below.",
+        "contact.email": "Email", "contact.whatsapp": "WhatsApp", "contact.social": "Social Media",
+        "contact.phEmail": "Placeholder: add the company email", "contact.phWhatsapp": "Placeholder: add the WhatsApp number", "contact.phSocial": "(placeholder)",
+        "footer.copy": "© 2026 Genius Digital. All Rights Reserved."
+      },
+
+      ar: {
+        "meta.title": "GENIUS DIGITAL — Digital Innovation. Intelligent Systems.",
+        "meta.desc": "جينيوس ديجيتال شركة تقنية رقمية تبني أنظمة وتطبيقات ويب وحلولاً رقمية عملية ومبتكرة.",
+        "ui.skip": "انتقل إلى المحتوى",
+        "ui.homeAria": "جينيوس ديجيتال، العودة إلى الصفحة الرئيسية",
+        "ui.menuOpen": "فتح القائمة", "ui.menuClose": "إغلاق القائمة", "ui.navMain": "القائمة الرئيسية",
+        "ui.language": "اختيار اللغة", "ui.footerNav": "روابط أسفل الصفحة", "ui.backTop": "العودة إلى الأعلى",
+        "theme.toDark": "التبديل إلى الوضع الداكن", "theme.toLight": "التبديل إلى الوضع الفاتح",
+        "nav.home": "الرئيسية", "nav.about": "من نحن", "nav.products": "المنتجات", "nav.contact": "اتصل بنا",
+        "hero.badge": "بوابة المنتجات والأنظمة الرقمية للشركات",
+        "hero.quote": "“نقود الابتكار الرقمي عبر أنظمة ذكية وإبداعية وكفؤة.”",
+        "hero.intro": "جينيوس ديجيتال شركة تطوّر وتقدّم مجموعة من الحلول والأنظمة الرقمية التي تساعد الأفراد والمؤسسات والشركات على إدارة مهامهم بسهولة وانتظام وكفاءة أكبر.",
+        "hero.btnProducts": "اكتشف منتجاتنا", "hero.btnAbout": "عن جينيوس ديجيتال",
+        "hero.pointsAria": "أبرز المزايا", "hero.p1": "تعمل عبر الويب", "hero.p2": "مصمّمة للجوال أولاً", "hero.p3": "تطوير مستمر",
+        "hero.chip1": "أنظمة ذكية", "hero.chip2": "سحابة آمنة", "hero.chip3": "ابتكار",
+        "hero.tileQr": "أدوات رقمية", "hero.tilePdf": "الإنتاجية", "hero.efficiency": "الكفاءة",
+        "about.eyebrow": "من نحن", "about.title": "عن <span>جينيوس ديجيتال</span>",
+        "about.text": "جينيوس ديجيتال شركة تقنية رقمية تُعنى ببناء الأنظمة وتطبيقات الويب والحلول الرقمية العملية والمبتكرة. نلتزم بتقديم منتجات رقمية سهلة الاستخدام ويسهل الوصول إليها، وتسهم في رفع كفاءة الإدارة والإنتاجية.",
+        "about.p1.t": "الابتكار الرقمي", "about.p1.d": "نحوّل الأفكار إلى أنظمة رقمية إبداعية وملائمة، ونواصل تطويرها باستمرار.",
+        "about.p2.t": "حلول ذكية", "about.p2.d": "حلول ذكية تبسّط المهام اليومية وتجعل الإدارة أكثر تنظيماً.",
+        "about.p3.t": "تقنية تتمحور حول المستخدم", "about.p3.d": "تقنية مبنية على احتياجات المستخدمين، سهلة الفهم ويمكن الوصول إليها من أي جهاز.",
+        "products.eyebrow": "كتالوج المنتجات", "products.title": "منتجاتنا <span>الرقمية</span>",
+        "products.sub": "اكتشف مجموعتنا من الأنظمة والأدوات الرقمية المبتكرة.",
+        "status.live": "متاح", "status.soon": "قريباً", "btn.explore": "استكشف المنتج",
+        "thumb.alt": "صورة مصغّرة لـ {name}", "product.noName": "بلا اسم", "product.defaultCat": "منتج رقمي",
+        "state.err.title": "تعذّر تحميل المنتجات",
+        "state.err.permission": "تم رفض الوصول إلى البيانات. تأكد من نشر قواعد Firestore.",
+        "state.err.generic": "عذراً، تعذّر تحميل قائمة المنتجات الآن. يُرجى التحقق من اتصال الإنترنت ثم المحاولة مرة أخرى.",
+        "state.err.timeout": "استغرق الاتصال بـ Firebase وقتاً أطول من المعتاد.",
+        "state.retry": "إعادة المحاولة",
+        "state.empty.title": "لا توجد منتجات بعد",
+        "state.empty.text": "ستظهر منتجات جينيوس ديجيتال هنا قريباً. يُرجى العودة لاحقاً.",
+        "modal.msg": "المنتج قريباً.", "modal.close": "إغلاق", "modal.ok": "إغلاق",
+        "contact.eyebrow": "التواصل", "contact.h2": "اتصل بنا", "contact.soon": "ستُحدَّث بيانات التواصل قريباً.", "install.btn": "تثبيت التطبيق", "price.label": "سعر خاص", "price.was": "السعر الأصلي", "install.title": "تثبيت جينيوس ديجيتال", "install.ios": "على iPhone / iPad: اضغط زر المشاركة في Safari ثم اختر «إضافة إلى الشاشة الرئيسية».",
+        "contact.lead": "<strong>جينيوس ديجيتال.</strong> هل أنت مهتم بمنتجاتنا أو ترغب في التعاون معنا؟ تواصل معنا عبر القنوات التالية.",
+        "contact.email": "البريد الإلكتروني", "contact.whatsapp": "WhatsApp", "contact.social": "وسائل التواصل الاجتماعي",
+        "contact.phEmail": "نص مؤقت: أضف البريد الإلكتروني للشركة", "contact.phWhatsapp": "نص مؤقت: أضف رقم WhatsApp", "contact.phSocial": "(نص مؤقت)",
+        "footer.copy": "© 2026 جينيوس ديجيتال. جميع الحقوق محفوظة."
+      }
+    };
+
+    // Tetapan laman (daripada Admin Panel) — menggantikan teks lalai jika ada.
+    let settings = {};
+    const esc = (v) => String(v).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    function override(key) {
+      const e = settings.texts && settings.texts[key.replace(/\./g, "_")], v = e && e[lang];
+      return typeof v === "string" && v.trim() ? v.trim() : null;
+    }
+    function t(key, params) {
+      let str = override(key);
+      if (str === null) str = (I18N[lang] && I18N[lang][key]);
+      if (str === undefined) str = I18N[DEFAULT_LANG][key];
+      if (str === undefined) return key;
+      if (params) for (const [k, v] of Object.entries(params)) str = str.split("{" + k + "}").join(v);
+      return str;
+    }
+    function applyStatic(scope = document) {
+      $$("[data-i18n]", scope).forEach(n => { n.textContent = t(n.dataset.i18n); });
+      $$("[data-i18n-html]", scope).forEach(n => {
+        const o = override(n.dataset.i18nHtml);   // teks admin: di-escape; [[teks]] = bahagian berwarna
+        n.innerHTML = o !== null ? esc(o).replace(/\[\[(.+?)\]\]/g, "<span>$1</span>") : t(n.dataset.i18nHtml);
+      });
+      $$("[data-i18n-attr]", scope).forEach(n => n.dataset.i18nAttr.split(";").forEach(pair => { const [attr, key] = pair.split(":"); n.setAttribute(attr.trim(), t(key.trim())); }));
+    }
+
+    /* =====================================================================
+       Bahagian 3: Thumbnail placeholder (SVG) — digunakan jika produk belum
+       mempunyai gambar atau gambar gagal dimuatkan. Tiada broken image.
+       ===================================================================== */
+    function seededRandom(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
+    function hashString(str) { let h = 2166136261; for (const ch of str) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+
+    function thumbQR(seed) {
+      const rnd = seededRandom(seed), n = 21, cell = 9, ox = 224, oy = 62;
+      let cells = "";
+      const inFinder = (x, y) => (x < 8 && y < 8) || (x > n - 9 && y < 8) || (x < 8 && y > n - 9);
+      for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) if (!inFinder(x, y) && rnd() > .5) cells += `<rect x="${ox + x * cell}" y="${oy + y * cell}" width="${cell - 1}" height="${cell - 1}" rx="1.5"/>`;
+      const finder = (fx, fy) => `<rect x="${ox + fx * cell}" y="${oy + fy * cell}" width="${7 * cell - 1}" height="${7 * cell - 1}" rx="5" fill="none" stroke="#0A1F44" stroke-width="${cell - 1}"/><rect x="${ox + (fx + 2) * cell}" y="${oy + (fy + 2) * cell}" width="${3 * cell - 1}" height="${3 * cell - 1}" rx="3" fill="#0A66FF"/>`;
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400"><defs><linearGradient id="a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#061430"/><stop offset=".6" stop-color="#14346E"/><stop offset="1" stop-color="#0A66FF"/></linearGradient><linearGradient id="s" x1="0" x2="1"><stop offset="0" stop-color="#00C8F5" stop-opacity="0"/><stop offset=".5" stop-color="#5BE3FF"/><stop offset="1" stop-color="#00C8F5" stop-opacity="0"/></linearGradient></defs><rect width="640" height="400" fill="url(#a)"/><g stroke="#fff" stroke-opacity=".06">${Array.from({ length: 16 }, (_, i) => `<path d="M${i * 44} 0V400M0 ${i * 28}H640"/>`).join("")}</g><circle cx="560" cy="60" r="150" fill="#00C8F5" opacity=".13"/><circle cx="60" cy="360" r="130" fill="#0A66FF" opacity=".3"/><rect x="204" y="42" width="232" height="232" rx="22" fill="#fff"/><g fill="#0A1F44">${cells}${finder(0, 0)}${finder(n - 7, 0)}${finder(0, n - 7)}</g><rect x="190" y="150" width="260" height="6" rx="3" fill="url(#s)"/><g font-family="Montserrat,Arial,sans-serif" font-weight="800" fill="#fff" text-anchor="middle"><text x="320" y="326" font-size="26" letter-spacing="6">QR CODE</text><rect x="232" y="344" width="176" height="26" rx="13" fill="#00C8F5"/><text x="320" y="362" font-size="13" fill="#061430" letter-spacing="3">GENERATOR</text></g></svg>`;
+    }
+    function thumbPDF() {
+      const lines = (x, y) => `<rect x="${x}" y="${y}" width="120" height="8" rx="4" fill="#C9D8F5"/><rect x="${x}" y="${y + 22}" width="90" height="8" rx="4" fill="#C9D8F5"/><rect x="${x}" y="${y + 44}" width="110" height="8" rx="4" fill="#C9D8F5"/>`;
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400"><defs><linearGradient id="a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0A1F44"/><stop offset=".55" stop-color="#0A4FD8"/><stop offset="1" stop-color="#00A8E8"/></linearGradient></defs><rect width="640" height="400" fill="url(#a)"/><g stroke="#fff" stroke-opacity=".07">${Array.from({ length: 16 }, (_, i) => `<path d="M${i * 44} 0V400M0 ${i * 28}H640"/>`).join("")}</g><circle cx="70" cy="60" r="140" fill="#00C8F5" opacity=".18"/><circle cx="580" cy="350" r="150" fill="#061430" opacity=".4"/><g transform="rotate(-9 250 200)"><rect x="150" y="70" width="190" height="240" rx="18" fill="#fff" opacity=".35"/></g><g transform="rotate(7 400 200)"><rect x="310" y="60" width="190" height="240" rx="18" fill="#fff" opacity=".55"/></g><g><path d="M215 50h130l60 60v210a18 18 0 0 1-18 18H215a18 18 0 0 1-18-18V68a18 18 0 0 1 18-18z" fill="#fff"/><path d="M345 50l60 60h-42a18 18 0 0 1-18-18z" fill="#C9D8F5"/><rect x="225" y="130" width="86" height="40" rx="10" fill="#0A66FF"/><text x="268" y="159" font-family="Montserrat,Arial,sans-serif" font-weight="800" font-size="22" fill="#fff" text-anchor="middle" letter-spacing="2">PDF</text>${lines(225, 200)}<circle cx="372" cy="294" r="26" fill="#00C8F5"/><path d="M372 281v18m-9-8 9 9 9-9" fill="none" stroke="#061430" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></g><g font-family="Montserrat,Arial,sans-serif" font-weight="800" fill="#fff" text-anchor="middle"><text x="320" y="372" font-size="20" letter-spacing="6" opacity=".92">DOCUMENT TOOLS</text></g></svg>`;
+    }
+    function thumbGeneric(seed) {
+      const rnd = seededRandom(seed);
+      const hexes = Array.from({ length: 14 }, () => { const x = 40 + rnd() * 560, y = 30 + rnd() * 340, r = 18 + rnd() * 38; return `<path d="M${x} ${y - r}l${r * .87} ${r * .5}v${r}l${-r * .87} ${r * .5}l${-r * .87} ${-r * .5}v${-r}z" fill="#fff" opacity="${(.05 + rnd() * .12).toFixed(2)}"/>`; }).join("");
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400"><defs><linearGradient id="a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#061430"/><stop offset=".6" stop-color="#14346E"/><stop offset="1" stop-color="#0A66FF"/></linearGradient><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0A66FF"/><stop offset="1" stop-color="#00C8F5"/></linearGradient></defs><rect width="640" height="400" fill="url(#a)"/>${hexes}<image href="data:image/png;base64,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" x="220" y="100" width="200" height="200"/></svg>`;
+    }
+    function placeholderThumbURL(product) {
+      const key = `${product.slug || ""} ${product.name || ""}`.toLowerCase();
+      const seed = hashString(key);
+      const svg = /\bqr\b|qr-/.test(key) ? thumbQR(seed) : /pdf/.test(key) ? thumbPDF() : thumbGeneric(seed);
+      return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    }
+    function thumbImage(product, alt = "") {
+      const url = safeImage(product.thumbnailURL);
+      const img = el("img", { alt, decoding: "async", width: "600", height: "600" });
+      img.loading = "lazy";
+      const fallback = placeholderThumbURL(product);
+      img.addEventListener("error", () => { if (img.src !== fallback) img.src = fallback; }, { once: true });
+      img.src = url || fallback;
+      return img;
+    }
+
+    /* =====================================================================
+       Bahagian 4: UI produk (loading / ralat / kosong / senarai) + modal
+       Semua teks melalui t() supaya bertukar serta-merta apabila bahasa ditukar.
+       ===================================================================== */
+    const grid = $("#productGrid");
+    const modal = $("#productModal");
+    let view = { kind: "loading", error: null, retry: null, products: [] };
+    let modalProduct = null;
+
+    // Teks produk mengikut bahasa. Jika terjemahan kosong, gunakan teks asal (Bahasa Melayu).
+    function localized(p, field) {
+      const sfx = lang === "en" ? "En" : lang === "ar" ? "Ar" : "";
+      const v = sfx ? p[field + sfx] : "";
+      return (typeof v === "string" && v.trim()) ? v.trim() : p[field];
+    }
+
+    function stateBox(kind, iconId, title, message, code, retry) {
+      const box = el("div", { class: "state-box " + kind, role: kind === "error" ? "alert" : "status" }, [
+        el("div", { class: "state-icon" }, icon(iconId)),
+        el("h3", { text: title }), el("p", { text: message })
+      ]);
+      if (code) box.append(el("code", { text: code, dir: "ltr" }));
+      if (retry) box.append(el("button", { class: "btn btn-primary btn-sm", type: "button", text: t("state.retry"), onclick: retry }));
+      return box;
+    }
+
+    function renderView() {
+      grid.setAttribute("aria-busy", String(view.kind === "loading"));
+      if (view.kind === "loading") {
+        grid.replaceChildren(...Array.from({ length: 5 }, () => el("article", { class: "product-card skeleton", "aria-hidden": "true" }, [
+          el("div", { class: "thumb" }),
+          el("div", { class: "card-body" }, [el("div", { class: "sk-line w40" }), el("div", { class: "sk-line w70" }), el("div", { class: "sk-line" }), el("div", { class: "sk-line btn-sk" })])
+        ])));
+      } else if (view.kind === "error") {
+        const err = view.error || {}, raw = String(err.code || err.message || "");
+        const hint = err.code === "timeout" ? t("state.err.timeout") : /permission/i.test(raw) ? t("state.err.permission") : t("state.err.generic");
+        grid.replaceChildren(stateBox("error", "i-alert", t("state.err.title"), hint, err.code === "timeout" ? "" : raw, view.retry));
+      } else if (view.kind === "empty") {
+        grid.replaceChildren(stateBox("empty", "i-box", t("state.empty.title"), t("state.empty.text")));
+      } else {
+        grid.replaceChildren(...view.products.map(productCard));
+        observeReveals(grid);
+      }
+    }
+    const showLoading = () => { view = { kind: "loading", error: null, retry: null, products: [] }; renderView(); };
+    const showError = (error, retry) => { view = { kind: "error", error, retry, products: [] }; renderView(); };
+
+    function statusBadge(status) {
+      return status === "coming-soon"
+        ? el("span", { class: "status-badge soon", text: t("status.soon") })
+        : el("span", { class: "status-badge live", text: t("status.live") });
+    }
+
+    // Badge harga istimewa (RM) + harga asal dicoret. Diurus dalam Admin Panel (price, originalPrice).
+    const priceNum = (v) => (typeof v === "number" && isFinite(v) && v > 0) ? v : null;
+    const fmtRM = (n) => "RM " + n.toLocaleString("en-US", { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 });
+    function priceBadge(product, index = 0) {
+      const price = priceNum(product.price); if (price === null) return null;
+      const old = priceNum(product.originalPrice), hasOld = old !== null && old > price;
+      const [ip, dp] = price.toFixed(2).split("."), label = t("price.label");
+      const aria = `${label}: ${fmtRM(price)}` + (hasOld ? `, ${t("price.was")} ${fmtRM(old)}` : "");
+      return el("div", { class: "price-badge", role: "img", "aria-label": aria, style: `--pd:${(-(index % 5) * 0.7).toFixed(1)}s` }, [
+        el("span", { class: "pb-label", text: label }),
+        el("span", { class: "pb-body", dir: "ltr" }, el("span", { class: "pb-main" }, [
+          el("span", { class: "pb-cur", text: "RM" }), el("span", { class: "pb-int", text: Number(ip).toLocaleString("en-US") }), dp !== "00" ? el("span", { class: "pb-dec", text: "." + dp }) : null])),
+        hasOld ? el("span", { class: "pb-old", dir: "ltr" }, el("s", { text: fmtRM(old) })) : null
+      ]);
+    }
+
+    function fillModal(product) {
+      const name = localized(product, "name") || t("product.noName");
+      $("#modalThumb").replaceChildren(thumbImage(product, name), ...[priceBadge(product)].filter(Boolean));
+      $("#modalCategory").textContent = localized(product, "category") || t("product.defaultCat");
+      $("#modalTitle").textContent = name;
+      $("#modalDesc").textContent = localized(product, "description");
+    }
+
+    function openProduct(product) {
+      // Jika admin isi Pautan Produk (https://), ke sana; jika tidak, modal "Produk Akan Datang".
+      const link = safeHttps(product.productURL);
+      if (link) { window.open(link, "_blank", "noopener,noreferrer"); return; }
+      modalProduct = product; fillModal(product);
+      if (typeof modal.showModal === "function") { modal.showModal(); document.body.classList.add("no-scroll"); }
+      else alert(t("modal.msg"));
+    }
+    function closeModal() { if (modal.open) modal.close(); }
+    modal.addEventListener("close", () => { document.body.classList.remove("no-scroll"); modalProduct = null; });
+    modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });   // klik backdrop
+    $("#modalClose").addEventListener("click", closeModal);
+    $("#modalOk").addEventListener("click", closeModal);
+
+    function productCard(product, index) {
+      const name = localized(product, "name") || t("product.noName");
+      const link = safeHttps(product.productURL);
+      const thumbKids = [statusBadge(product.status), thumbImage(product, t("thumb.alt", { name })), priceBadge(product, index)];
+      const btnKids = [el("span", { text: t("btn.explore") }), icon("i-arrow")];
+      return el("article", { class: "product-card reveal", style: `--d:${Math.min(index, 5) * .08}s`, "data-slug": product.slug }, [
+        link ? el("a", { class: "thumb", href: link, target: "_blank", rel: "noopener noreferrer", "aria-label": name, tabindex: "-1" }, thumbKids) : el("div", { class: "thumb" }, thumbKids),
+        el("div", { class: "card-body" }, [
+          el("span", { class: "category-pill", text: localized(product, "category") || t("product.defaultCat") }),
+          el("h3", { text: name }),
+          el("p", { text: localized(product, "description") }),
+          link ? el("a", { class: "btn btn-primary", href: link, target: "_blank", rel: "noopener noreferrer" }, btnKids)
+               : el("button", { class: "btn btn-primary", type: "button", onclick: () => openProduct(product) }, btnKids)
+        ])
+      ]);
+    }
+
+    function renderProducts(products) {
+      const str = (v) => (typeof v === "string" ? v : "");
+      const visible = products
+        .filter(p => p && (p.status === "active" || p.status === "coming-soon"))      // hidden tidak dipaparkan
+        .map(p => ({
+          ...p, name: str(p.name), category: str(p.category), description: str(p.description), displayOrder: Number(p.displayOrder) || 0,
+          nameEn: str(p.nameEn), categoryEn: str(p.categoryEn), descriptionEn: str(p.descriptionEn),
+          nameAr: str(p.nameAr), categoryAr: str(p.categoryAr), descriptionAr: str(p.descriptionAr)
+        }))
+        .sort((a, b) => a.displayOrder - b.displayOrder || a.name.localeCompare(b.name));
+      view = { kind: visible.length ? "list" : "empty", error: null, retry: null, products: visible };
+      renderView();
+    }
+
+    /* =====================================================================
+       Bahagian 5: Sumber data — Firestore (real-time) atau Preview Mode
+       ===================================================================== */
+    let stopListening = null, stopSettings = null, dbPromise = null;
+
+    function getDb() {
+      if (!dbPromise) dbPromise = (async () => {
+        const base = `https://www.gstatic.com/firebasejs/${FIREBASE_SDK_VERSION}/`;
+        const [{ initializeApp, getApps }, fs] = await Promise.all([import(base + "firebase-app.js"), import(base + "firebase-firestore.js")]);
+        const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+        const db = fs.getFirestore(app);
+        // Ujian setempat sahaja: http://localhost/index.html?emulator=1 → guna Firestore Emulator.
+        if (["localhost", "127.0.0.1"].includes(location.hostname) && new URLSearchParams(location.search).get("emulator") === "1") fs.connectFirestoreEmulator(db, "127.0.0.1", 8080);
+        return { db, fs };
+      })().catch((err) => { dbPromise = null; throw err; });
+      return dbPromise;
+    }
+
+    async function startProducts() {
+      if (stopListening) { stopListening(); stopListening = null; }
+      showLoading();
+      let slowTimer;
+      try {
+        const { db, fs } = await getDb();
+        // Awam hanya boleh query status active/coming-soon (selari dengan firestore.rules).
+        // Susunan mengikut displayOrder dibuat di klien supaya tiada composite index diperlukan.
+        const q = fs.query(fs.collection(db, "products"), fs.where("status", "in", ["active", "coming-soon"]));
+        slowTimer = setTimeout(() => showError({ code: "timeout" }, startProducts), 12000);
+        stopListening = fs.onSnapshot(q,
+          (snap) => { clearTimeout(slowTimer); renderProducts(snap.docs.map(d => ({ slug: d.id, ...d.data() }))); },
+          (err) => { clearTimeout(slowTimer); console.error("[Genius Digital] Firestore error:", err); showError(err, startProducts); }
+        );
+      } catch (err) {
+        clearTimeout(slowTimer);
+        console.error("[Genius Digital] Gagal memuatkan Firebase:", err);
+        showError(err, startProducts);
+      }
+    }
+
+    // Tetapan laman (logo, jenama, teks, hubungan) daripada Admin Panel. Jika gagal, teks lalai kekal.
+    async function startSettings() {
+      if (stopSettings) { stopSettings(); stopSettings = null; }
+      try {
+        const { db, fs } = await getDb();
+        stopSettings = fs.onSnapshot(fs.doc(db, "genius_site", "main"),
+          (snap) => { settings = snap.exists() ? snap.data() : {}; applySettings(); },
+          (err) => console.warn("[Genius Digital] Tetapan laman tidak dimuatkan:", err));
+      } catch (err) { console.warn("[Genius Digital] Tetapan laman tidak dimuatkan:", err); }
+    }
+
+    /* =====================================================================
+       Bahagian 6: Contact (placeholder yang mudah diubah)
+       ===================================================================== */
+    function renderContact() {
+      const c = settings.contact || {};
+      const email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.email || "") ? c.email : "";
+      const wa = String(c.whatsapp || "").replace(/\D/g, "");
+      const socials = (Array.isArray(c.socials) ? c.socials : []).map(s => ({ label: String((s && s.label) || ""), url: safeHttps(s && s.url) })).filter(s => s.label && s.url);
+      const nodes = [];
+      if (email) nodes.push(el("a", { class: "fc-item", href: "mailto:" + email }, [icon("i-mail"), el("span", { dir: "ltr", text: email })]));
+      if (wa) nodes.push(el("a", { class: "fc-item", href: "https://wa.me/" + wa, target: "_blank", rel: "noopener noreferrer" }, [icon("i-whatsapp"), el("span", { dir: "ltr", text: "+" + wa })]));
+      if (socials.length) nodes.push(el("div", { class: "fc-socials" }, socials.map(s => el("a", { class: "social-chip", href: s.url, target: "_blank", rel: "noopener noreferrer", text: s.label }))));
+      if (!nodes.length) nodes.push(el("p", { class: "fc-empty", text: t("contact.soon") }));
+      $("#contactList").replaceChildren(...nodes);
+    }
+
+    // Jenama (nama, tagline, logo) — lalai: Genius Digital / Digital Innovation. Intelligent Systems.
+    const DEFAULT_BRAND = "Genius Digital", DEFAULT_TAGLINE = "Digital Innovation. Intelligent Systems.";
+    const faviconEl = document.querySelector('link[rel="icon"]'), defaultFavicon = faviconEl ? faviconEl.getAttribute("href") : "";
+    function pageTitle() {
+      const n = (settings.brandName || "").trim(), tg = (settings.tagline || "").trim();
+      return (n || tg) ? `${(n || DEFAULT_BRAND).toUpperCase()} — ${tg || DEFAULT_TAGLINE}` : t("meta.title");
+    }
+    function applyBrand() {
+      const name = (settings.brandName || "").trim() || DEFAULT_BRAND, tagline = (settings.tagline || "").trim() || DEFAULT_TAGLINE;
+      const [first, ...rest] = name.split(/\s+/), restText = rest.join(" ");
+      const hb = $(".site-header .brand-name"), fb = $(".site-footer .brand-name"), h1 = $(".hero h1");
+      hb.replaceChildren(first.toUpperCase() + (restText ? " " : ""), ...(restText ? [el("b", { text: restText.toUpperCase() })] : []));
+      fb.textContent = name.toUpperCase();
+      h1.replaceChildren(first + (restText ? " " : ""), ...(restText ? [el("span", { class: "grad", text: restText })] : []));
+      $(".hero-tagline").textContent = tagline; $(".site-footer .tag").textContent = tagline;
+      const logo = safeImage(settings.logoURL);
+      $$(".brand-mark").forEach(n => n.toggleAttribute("hidden", !!logo));
+      $$(".brand-logo").forEach(i => { if (logo) { i.src = logo; i.hidden = false; } else { i.removeAttribute("src"); i.hidden = true; } });
+      if (faviconEl) faviconEl.setAttribute("href", logo || defaultFavicon);
+    }
+    function applySettings() { applyBrand(); setLang(lang, false); }
+
+    /* =====================================================================
+       Bahagian 7: Interaksi (menu mobile, scroll, animasi, 3D tilt)
+       ===================================================================== */
+    const header = $("#siteHeader"), toggle = $("#navToggle"), menu = $("#navMenu");
+    function setMenu(open) {
+      menu.classList.toggle("open", open);
+      toggle.setAttribute("aria-expanded", String(open));
+      toggle.setAttribute("aria-label", t(open ? "ui.menuClose" : "ui.menuOpen"));
+    }
+    toggle.addEventListener("click", () => setMenu(!menu.classList.contains("open")));
+    menu.addEventListener("click", (e) => { if (e.target.closest("a.nav-link")) setMenu(false); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") setMenu(false); });
+    document.addEventListener("click", (e) => { if (menu.classList.contains("open") && !e.target.closest("#siteHeader")) setMenu(false); });
+    window.matchMedia("(min-width: 900px)").addEventListener("change", (e) => { if (e.matches) setMenu(false); });
+
+    const onScroll = () => header.classList.toggle("scrolled", window.scrollY > 8);
+    window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
+
+    // Scroll-spy
+    const navLinks = [...menu.querySelectorAll("a.nav-link")];
+    const spy = new IntersectionObserver((entries) => {
+      for (const en of entries) if (en.isIntersecting) navLinks.forEach(a => a.classList.toggle("active", a.getAttribute("href") === "#" + en.target.id));
+    }, { rootMargin: "-45% 0px -50% 0px" });
+    ["home", "about", "products", "contact"].forEach(id => spy.observe(document.getElementById(id)));
+
+    // Reveal on scroll
+    document.documentElement.classList.add("js");
+    const revealer = "IntersectionObserver" in window ? new IntersectionObserver((entries) => {
+      for (const en of entries) if (en.isIntersecting) { en.target.classList.add("in"); revealer.unobserve(en.target); }
+    }, { threshold: .12, rootMargin: "0px 0px -40px 0px" }) : null;
+    // Dalam iframe (cth. preview.html) elemen di luar skrin induk tidak dikesan oleh IntersectionObserver,
+    // jadi kandungan dipaparkan serta-merta supaya pratonton sentiasa lengkap.
+    const embedded = window.self !== window.top;
+    function observeReveals(root = document) {
+      root.querySelectorAll(".reveal:not(.in)").forEach(n => (revealer && !embedded) ? revealer.observe(n) : n.classList.add("in"));
+    }
+
+    // Subtle 3D tilt (hanya pada peranti pointer halus & tanpa reduced-motion). Arah dicerminkan untuk RTL.
+    const scene = $("#heroScene");
+    if (window.matchMedia("(hover: hover) and (pointer: fine)").matches && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const visual = scene.parentElement;
+      visual.addEventListener("pointermove", (e) => {
+        const r = visual.getBoundingClientRect(), dir = LANGS[lang].dir === "rtl" ? -1 : 1;
+        const px = (e.clientX - r.left) / r.width - .5, py = (e.clientY - r.top) / r.height - .5;
+        scene.style.setProperty("--ry", (dir * (-14 + px * 14)).toFixed(2) + "deg");
+        scene.style.setProperty("--rx", (8 - py * 12).toFixed(2) + "deg");
+      });
+      visual.addEventListener("pointerleave", () => { scene.style.removeProperty("--ry"); scene.style.removeProperty("--rx"); });
+    }
+
+    /* =====================================================================
+       Bahagian 8: Bahasa (BM / BI / BA) dan tema (cerah / gelap)
+       Pilihan disimpan dalam localStorage. Lalai: BM dan mod cerah.
+       ===================================================================== */
+    const root = document.documentElement, themeBtn = $("#themeToggle");
+
+    function updateThemeButton() {
+      const dark = root.getAttribute("data-theme") === "dark", label = t(dark ? "theme.toLight" : "theme.toDark");
+      themeBtn.setAttribute("aria-label", label); themeBtn.setAttribute("title", label); themeBtn.setAttribute("aria-pressed", String(dark));
+    }
+    function setTheme(next, persist = true) {
+      const dark = next === "dark";
+      root.setAttribute("data-theme", dark ? "dark" : "light");
+      const meta = $('meta[name="theme-color"]'); if (meta) meta.setAttribute("content", dark ? "#0A1326" : "#FFFFFF");
+      if (persist) writeStore(STORE_THEME, dark ? "dark" : "light");
+      updateThemeButton();
+    }
+
+    function setLang(next, persist = true) {
+      if (!LANGS[next]) next = DEFAULT_LANG;
+      lang = next;
+      root.lang = next; root.dir = LANGS[next].dir;
+      if (persist) writeStore(STORE_LANG, next);
+      applyStatic();
+      document.title = pageTitle();
+      const desc = $('meta[name="description"]'); if (desc) desc.setAttribute("content", t("meta.desc"));
+      $$("[data-lang]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === next)));
+      $("#langCur").textContent = { ms: "BM", en: "BI", ar: "BA" }[next]; setLangPop(false);
+      setMenu(menu.classList.contains("open"));
+      updateThemeButton();
+      renderContact();
+      renderView();
+      if (modal.open && modalProduct) fillModal(modalProduct);
+    }
+    $$("[data-lang]").forEach(b => b.addEventListener("click", () => setLang(b.dataset.lang)));
+    const langBtn = $("#langBtn"), langPop = $("#langPop");
+    function setLangPop(open) { langPop.hidden = !open; langBtn.setAttribute("aria-expanded", String(open)); }
+    langBtn.addEventListener("click", (e) => { e.stopPropagation(); setLangPop(langPop.hidden); });
+    document.addEventListener("click", (e) => { if (!e.target.closest("#langMenu")) setLangPop(false); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") setLangPop(false); });
+    themeBtn.addEventListener("click", () => setTheme(root.getAttribute("data-theme") === "dark" ? "light" : "dark"));
+
+    /* ---------- Pasang Apps (PWA) ---------- */
+    let deferredInstall = null;
+    const installBtn = $("#installBtn"), installDialog = $("#installDialog");
+    const isStandalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferredInstall = e; if (!isStandalone()) installBtn.hidden = false; });
+    window.addEventListener("appinstalled", () => { deferredInstall = null; installBtn.hidden = true; });
+    if (isIOS && !isStandalone()) installBtn.hidden = false;
+    installBtn.addEventListener("click", async () => {
+      setMenu(false);
+      if (deferredInstall) { deferredInstall.prompt(); try { await deferredInstall.userChoice; } catch (e) {} deferredInstall = null; installBtn.hidden = true; }
+      else if (typeof installDialog.showModal === "function") installDialog.showModal();
+    });
+    $("#installClose").addEventListener("click", () => installDialog.close());
+    installDialog.addEventListener("click", (e) => { if (e.target === installDialog) installDialog.close(); });
+
+    // PWA: service worker (boleh dipasang ke skrin utama / desktop)
+    if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js").catch(() => {}));
+
+    /* ---------- Mula ---------- */
+    setTheme(readStore(STORE_THEME) === "dark" ? "dark" : "light", false);
+    setLang(readStore(STORE_LANG), false);
+    applyBrand();
+    observeReveals();
+    startProducts();
+    startSettings();
+  </script>
+</body>
+</html>
