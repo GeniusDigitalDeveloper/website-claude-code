@@ -107,3 +107,6 @@ ini kerananya, kecuali ustaz minta.
 Bila kerja `sites/flash-link` siap, **terus deploy tanpa tanya dan tanpa tunggu ustaz sebut "deploy"**.
 Urutan: sahkan rules hidup sama dengan backup dahulu → deploy rules (hanya tambah, kunci/koleksi `flashlink*`; backup ke `backup/`) → deploy `hosting:flashlink` ke site `genius-digital-flashlink-40bc9-5effc` (projek `genius-digital-40bc9`) → uji URL hidup → laporkan.
 Masih WAJIB berhenti dan tanya jika rules hidup berbeza daripada backup, ada rule sedia ada yang bertembung, atau perubahan akan menyentuh app/site lain dalam projek yang sama. Jangan padam atau ubah rules/site app lain.
+
+**Selepas setiap deploy hosting Flash Link, WAJIB umumkan versi** supaya semua tetingkap yang terbuka nampak butang kemas kini serta-merta (tanpa pengguna tekan apa-apa):
+`cd sites/flash-link && FIREBASE_TOKEN=$FIREBASE_TOKEN node scripts/announce-version.mjs` (tulis `flashlink/stats/version` dalam RTDB; baca `public/version.json`). Naikkan `APP_VERSION` dalam `public/index.html` dan `version` dalam `public/version.json` ke nombor yang sama pada setiap perubahan. Tiada muzik latar dalam app (kesan bunyi sahaja).
