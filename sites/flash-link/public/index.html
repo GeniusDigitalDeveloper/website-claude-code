@@ -2708,7 +2708,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-65";
+const APP_VERSION = "V-66";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
@@ -2738,26 +2738,26 @@ async function startUpdate(btn) {
     }; tick();
   });
   txt.textContent = ms ? "Siap 100% ✓" : "Done 100% ✓"; btn.classList.add("upd-done");
-  await new Promise(r => setTimeout(r, 200));
+  await new Promise(r => setTimeout(r, 120));
   // peralihan gaya iOS: paparan lama mengecil dan kabur, tirai kaca muncul, kemudian muat semula
   try { sessionStorage.setItem("fl_upd", ver || "V"); } catch {}
   const cur = document.createElement("div"); cur.id = "updcurtain"; cur.setAttribute("aria-hidden", "true");
   cur.style.cssText = "position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;background:rgba(6,8,16,.86);backdrop-filter:blur(26px) saturate(160%);-webkit-backdrop-filter:blur(26px) saturate(160%)";
   cur.innerHTML = `<div class="upd-card"><div class="upd-ck"><svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><b>${ms ? "Dikemas kini ke " : "Updated to "}${esc(ver)}</b></div>`;
   document.body.appendChild(cur);
-  if (!REDUCE()) { $("#app").animate([{ transform: "scale(1)", filter: "blur(0)", opacity: 1 }, { transform: "scale(.94)", filter: "blur(10px)", opacity: .5 }], { duration: 420, easing: EZ, fill: "forwards" }); cur.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 420, easing: EZ, fill: "both" }); $(".upd-card", cur).animate([{ transform: "scale(.82)", opacity: 0 }, { transform: "scale(1.04)", opacity: 1, offset: .65 }, { transform: "scale(1)", opacity: 1 }], { duration: 480, easing: EZ, fill: "both" }); await new Promise(r => setTimeout(r, 520)); }
+  if (!REDUCE()) { $("#app").animate([{ transform: "scale(1)", filter: "blur(0)", opacity: 1 }, { transform: "scale(.94)", filter: "blur(10px)", opacity: .5 }], { duration: 260, easing: EZ, fill: "forwards" }); cur.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 260, easing: EZ, fill: "both" }); $(".upd-card", cur).animate([{ transform: "scale(.82)", opacity: 0 }, { transform: "scale(1.04)", opacity: 1, offset: .65 }, { transform: "scale(1)", opacity: 1 }], { duration: 300, easing: EZ, fill: "both" }); await new Promise(r => setTimeout(r, 300)); }
   hardReload();
 }
 function playUpdateIn() {
   const c = document.getElementById("updcurtain"); if (!c || c.dataset.in) return; c.dataset.in = "1"; try { sessionStorage.removeItem("fl_upd"); } catch {}
   const EZ = "cubic-bezier(.32,.72,0,1)", app = $("#app"), card = $(".upd-card", c);
   if (REDUCE()) return c.remove();
-  setTimeout(() => c.isConnected && c.remove(), 2400); // jaminan: tirai tidak kekal lebih 2.4 saat
+  setTimeout(() => c.isConnected && c.remove(), 1300); // jaminan: tirai tidak kekal lebih 1.3 saat
   setTimeout(() => {
-    if (card) card.animate([{ transform: "scale(1)", opacity: 1 }, { transform: "scale(1.1)", opacity: 0 }], { duration: 420, easing: EZ, fill: "forwards" });
-    app && app.animate([{ transform: "scale(1.05)", filter: "blur(10px)", opacity: .4 }, { transform: "scale(1)", filter: "blur(0)", opacity: 1 }], { duration: 650, easing: EZ });
-    c.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 650, easing: EZ, fill: "forwards" }).onfinish = () => c.remove();
-  }, 450);
+    if (card) card.animate([{ transform: "scale(1)", opacity: 1 }, { transform: "scale(1.1)", opacity: 0 }], { duration: 300, easing: EZ, fill: "forwards" });
+    app && app.animate([{ transform: "scale(1.04)", filter: "blur(8px)", opacity: .5 }, { transform: "scale(1)", filter: "blur(0)", opacity: 1 }], { duration: 450, easing: EZ });
+    c.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 450, easing: EZ, fill: "forwards" }).onfinish = () => c.remove();
+  }, 250);
 }
 function hardReload() { try { navigator.serviceWorker?.getRegistrations?.().then(rs => rs.forEach(r => r.unregister())); } catch {} location.reload(); }
 /* Butang Kemas kini (kuning): hanya wujud bila ada versi baharu; hilang selepas dikemas kini. Diletak di kanan "Mula sekarang". */
