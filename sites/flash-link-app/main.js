@@ -5,6 +5,9 @@ const { app, BrowserWindow, Menu, session, shell } = require("electron");
 const path = require("path");
 const fs = require("fs");
 
+// Bunyi "shing" logo berbunyi sebaik app dibuka tanpa perlu klik dahulu.
+app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
+
 // Zum: lalai sedikit dikecilkan (-1 ≈ 83%) supaya muat skrin PC; pilihan pengguna disimpan.
 const ZOOM_FILE = () => path.join(app.getPath("userData"), "zoom.json");
 const loadZoom = () => { try { const z = JSON.parse(fs.readFileSync(ZOOM_FILE(), "utf8")).level; if (typeof z === "number") return Math.max(-4, Math.min(4, z)); } catch {} return -1; };
