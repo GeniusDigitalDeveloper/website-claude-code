@@ -521,6 +521,8 @@ body:not(.flow) #cbfab,body:not(.flow) #cbtip,body:not(.flow) #cbpanel{display:n
 .gal-name{font-size:12.5px}.gal-card .vbadge{font-size:11px;padding:1px 8px}
 .gal-act{gap:4px;justify-content:flex-start}.gal-card .btn{min-height:30px;padding:0 8px;font-size:12px;border-radius:9px;flex:none}.gal-card .btn svg{width:14px;height:14px}
 .gal-card:hover{transform:translate3d(0,-3px,0)}
+.orline{display:flex;align-items:center;gap:10px;color:#9CA3AF;font-size:13px;margin:18px 0 12px}.orline::before,.orline::after{content:"";flex:1;height:1px;background:var(--line)}
+.linkbtn{color:#7DD3FC;text-decoration:underline;min-height:40px;padding:0 10px;font-weight:600;font-size:14.5px;background:none}
 </style>
 </head>
 <body>
@@ -1226,7 +1228,7 @@ function revealInit() {
 }
 
 /* ---------- Pandangan: log masuk ---------- */
-const AUTH_ERR = { "auth/popup-closed-by-user": "Tetingkap pemilihan e-mel ditutup. Cuba lagi.", "auth/cancelled-popup-request": "Cuba lagi.", "auth/popup-blocked": "Pelayar menyekat tetingkap. Benarkan pop-up dan cuba lagi.", "auth/too-many-requests": "Terlalu banyak percubaan. Tunggu sebentar.", "auth/network-request-failed": "Tiada sambungan internet.", "auth/operation-not-allowed": "Kaedah log masuk ini belum diaktifkan dalam Firebase Authentication.", "auth/unauthorized-domain": "Domain ini belum dibenarkan untuk log masuk. Tambah domain ini di Firebase Console > Authentication > Settings > Authorized domains.", "auth/account-exists-with-different-credential": "E-mel ini didaftarkan dengan kaedah lain. Cuba lagi." };
+const AUTH_ERR = { "auth/popup-closed-by-user": "Tetingkap pemilihan e-mel ditutup. Cuba lagi.", "auth/cancelled-popup-request": "Cuba lagi.", "auth/popup-blocked": "Pelayar menyekat tetingkap. Benarkan pop-up dan cuba lagi.", "auth/too-many-requests": "Terlalu banyak percubaan. Tunggu sebentar.", "auth/network-request-failed": "Tiada sambungan internet.", "auth/operation-not-allowed": "Kaedah log masuk ini belum diaktifkan dalam Firebase Authentication.", "auth/unauthorized-domain": "Domain ini belum dibenarkan untuk log masuk. Tambah domain ini di Firebase Console > Authentication > Settings > Authorized domains.", "auth/invalid-credential": "E-mel atau kata laluan salah.", "auth/wrong-password": "E-mel atau kata laluan salah.", "auth/user-not-found": "E-mel atau kata laluan salah.", "auth/invalid-email": "Format e-mel tidak sah.", "auth/weak-password": "Kata laluan terlalu lemah (minimum 8 aksara).", "auth/requires-recent-login": "Sila log masuk semula untuk menukar kata laluan.", "auth/email-already-in-use": "E-mel ini sudah ada kata laluan.", "auth/credential-already-in-use": "E-mel ini sudah ada kata laluan.", "auth/account-exists-with-different-credential": "E-mel ini didaftarkan dengan kaedah lain. Cuba lagi." };
 function okFx(msg) {
   SFX.success();
   const d = document.createElement("div"); d.className = "okfx"; d.setAttribute("role", "status");
@@ -1236,25 +1238,86 @@ function okFx(msg) {
 function failFx(card, el, msg) { SFX.error(); el.textContent = msg; card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake"); }
 const authShell = inner => { $("#app").innerHTML = `<a href="/" data-nav class="backarrow" aria-label="Kembali ke laman asal">${ic("arrowl", "w-6 h-6")}</a><main class="container" style="min-height:100vh;display:grid;place-items:center;padding:24px 16px"><div id="acard" class="glass" style="width:100%;max-width:420px;border-radius:24px;padding:28px"><a href="/" data-nav style="display:block;text-align:center"><img src="/assets/logo.png" alt="Genius Digital Flash Link" width="220" height="110" style="height:76px;width:auto;margin:0 auto 12px"></a>${inner}</div></main>${siteFooter(false)}`; sfxScope(true); };
 function startFail() { $("#app").innerHTML = `<main class="container" style="min-height:100vh;display:grid;place-items:center;text-align:center;padding:24px 16px"><div><img src="/assets/icon.png" alt="" width="80" height="80" style="margin:0 auto 12px;height:80px;width:80px"><h1 class="font-display" style="font-size:24px;font-weight:700;margin:0 0 8px">Tak dapat sediakan dashboard anda</h1><p style="color:#C7C9D1;margin:0 0 18px">Semak sambungan internet, kemudian cuba lagi.</p><button id="rt" class="btn btn-red">Cuba lagi</button></div></main>`; $("#rt").onclick = () => dashView(); }
+const pwField = (id, label, ac, ph = "") => `<div style="margin-top:12px"><label class="lbl" for="${id}">${label}</label><div class="pwwrap"><input id="${id}" class="inp" type="password" autocomplete="${ac}" placeholder="${ph}" maxlength="64"><button type="button" class="eye" data-eye="${id}" aria-label="Tunjuk kata laluan" aria-pressed="false">${ic("eye", "w-5 h-5")}</button></div></div>`;
+function bindEyes(root) {
+  root.querySelectorAll("[data-eye]").forEach(b => (b.onclick = () => {
+    const i = root.querySelector("#" + b.dataset.eye), show = i.type === "password"; i.type = show ? "text" : "password";
+    b.innerHTML = ic(show ? "eyeoff" : "eye", "w-5 h-5"); b.setAttribute("aria-pressed", String(show)); b.setAttribute("aria-label", show ? "Sembunyi kata laluan" : "Tunjuk kata laluan");
+  }));
+}
+/* Tetapkan kata laluan (sekali, selepas daftar dengan e-mel Google). Tidak boleh ditutup. */
+function setPasswordModal(u) {
+  return new Promise(res => {
+    modal(`<h2 class="font-display" style="font-size:21px;font-weight:700;margin:0 0 6px">Tetapkan kata laluan</h2><p style="color:#C7C9D1;margin:0;font-size:14.5px;line-height:1.5">E-mel anda: <b>${esc(u.email || "")}</b>. Selepas ini, anda log masuk dengan e-mel dan kata laluan ini.</p>
+      ${pwField("np1", "Kata laluan baharu", "new-password", "Minimum 8 aksara")}${pwField("np2", "Sahkan kata laluan", "new-password")}
+      <div id="npe" class="err" role="alert"></div><button id="npb" class="btn btn-red" style="width:100%;min-height:50px;margin-top:14px">Simpan kata laluan</button>
+      <button id="npo" type="button" class="linkbtn" style="display:block;margin:10px auto 0">Log keluar</button>`, bg => {
+      bindEyes(bg); const er = $("#npe", bg);
+      $("#npo", bg).onclick = async () => { bg.close(); try { await FB.signOut(auth); } catch {} res(false); };
+      $("#npb", bg).onclick = async () => {
+        const p1 = $("#np1", bg).value, p2 = $("#np2", bg).value; er.textContent = "";
+        if (p1.length < 8) return (er.textContent = "Kata laluan minimum 8 aksara.");
+        if (p1 !== p2) return (er.textContent = "Kata laluan dan pengesahan tidak sama.");
+        const b = $("#npb", bg); b.disabled = true;
+        try { await FB.linkWithCredential(u, FB.EmailAuthProvider.credential(u.email, p1)); bg.close(); toast("Kata laluan disimpan ✓"); res(true); }
+        catch (e) { b.disabled = false; er.textContent = AUTH_ERR[e.code] || "Gagal menyimpan: " + (e.code || e.message); }
+      };
+      setTimeout(() => $("#np1", bg).focus(), 80);
+    }, { lock: true });
+  });
+}
+function forgotModal(prefill) {
+  modal(`<h2 class="font-display" style="font-size:21px;font-weight:700;margin:0 0 6px">Lupa kata laluan</h2><p style="color:#C7C9D1;margin:0 0 12px;font-size:14.5px;line-height:1.5">Masukkan e-mel yang anda daftarkan. Kami hantar pautan pengesahan ke e-mel itu untuk tetapkan kata laluan baharu.</p>
+    <label class="lbl" for="fe">E-mel berdaftar</label><input id="fe" type="email" class="inp" autocomplete="email" value="${esc(prefill || "")}" placeholder="nama@contoh.com"><div id="fer" class="err" role="alert"></div>
+    <button id="fb" class="btn btn-red" style="width:100%;min-height:50px;margin-top:14px">Hantar pautan pengesahan</button>`, bg => {
+    const er = $("#fer", bg);
+    $("#fb", bg).onclick = async () => {
+      const em = $("#fe", bg).value.trim(); er.textContent = ""; if (!/^\S+@\S+\.\S+$/.test(em)) return (er.textContent = "Masukkan e-mel yang sah.");
+      const b = $("#fb", bg); b.disabled = true;
+      try {
+        await FB.sendPasswordResetEmail(auth, em, { url: location.origin + "/login" });
+        $("#fe", bg).disabled = true; b.textContent = "Pautan dihantar ✓";
+        er.style.color = "#6EE7A8"; er.textContent = "Jika e-mel itu berdaftar, pautan pengesahan sudah dihantar. Buka e-mel (semak juga folder spam), klik pautan, dan tetapkan kata laluan baharu. Kemudian log masuk di sini.";
+        setTimeout(() => { b.disabled = false; b.textContent = "Hantar semula"; }, 60000);
+      } catch (e) { b.disabled = false; er.textContent = AUTH_ERR[e.code] || "Gagal menghantar: " + (e.code || e.message); }
+    };
+    setTimeout(() => $("#fe", bg).focus(), 80);
+  });
+}
 async function loginView() {
   if (!CONFIGURED) return notice("Flash Link belum disambung ke Firebase. Tampal config app FLASH LINK dalam index.html.");
   await authReady;
   if (S.user) return nav("/dashboard", true);
   document.title = "Log masuk — Genius Digital Flash Link";
-  authShell(`<h1 class="font-display" style="font-size:24px;font-weight:700;text-align:center;margin:0 0 6px">Log masuk</h1>
-    <p style="text-align:center;color:#C7C9D1;margin:0 0 22px;font-size:15px;line-height:1.55">Pilih e-mel pada peranti anda. Google akan mengesahkan anda bukan robot, kemudian anda terus ke dashboard.</p>
-    <button id="g" class="btn btn-red shine" style="width:100%;min-height:56px;font-size:16.5px;gap:12px"><span style="width:28px;height:28px;border-radius:50%;background:#fff;display:grid;place-items:center"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg></span> Log masuk dengan e-mel</button>
-    <div id="e" class="err" role="alert" style="text-align:center;margin-top:12px"></div>
-    <p class="hint" style="text-align:center;margin-top:14px">Tiada kata laluan. Anda boleh pilih akaun e-mel lain bila-bila masa.</p>`);
-  const card = $("#acard"), err = $("#e");
+  authShell(`<h1 class="font-display" style="font-size:24px;font-weight:700;text-align:center;margin:0 0 14px">Log masuk</h1>
+    <form id="lf" novalidate><label class="lbl" for="le">E-mel</label><input id="le" class="inp" type="email" autocomplete="username" inputmode="email" placeholder="nama@contoh.com">
+      ${pwField("lp", "Kata laluan", "current-password")}
+      <div id="e" class="err" role="alert" style="text-align:center;margin-top:12px"></div>
+      <button id="lb" class="btn btn-red shine" style="width:100%;min-height:54px;font-size:16.5px;margin-top:12px">Log masuk</button>
+      <div style="text-align:center;margin-top:8px"><button type="button" id="lforgot" class="linkbtn">Lupa kata laluan?</button></div></form>
+    <div class="orline">pengguna baharu</div>
+    <button id="g" class="btn btn-ghost" style="width:100%;min-height:52px;font-size:15.5px;gap:12px"><span style="width:28px;height:28px;border-radius:50%;background:#fff;display:grid;place-items:center"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.8 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg></span>Daftar dengan e-mel (Google)</button>
+    <p class="hint" style="text-align:center;margin-top:12px">Pilihan Google ini untuk pendaftaran kali pertama sahaja. Selepas itu anda tetapkan kata laluan dan log masuk dengan e-mel dan kata laluan.</p>`);
+  const card = $("#acard"), err = $("#e"); bindEyes(document);
+  $("#lforgot").onclick = () => forgotModal($("#le").value.trim());
+  $("#lf").onsubmit = async ev => {
+    ev.preventDefault(); const em = $("#le").value.trim(), pw = $("#lp").value; err.textContent = "";
+    if (!/^\S+@\S+\.\S+$/.test(em)) return failFx(card, err, "Masukkan e-mel yang sah."); if (!pw) return failFx(card, err, "Masukkan kata laluan.");
+    const b = $("#lb"); b.disabled = true; S.holdRoute = true;
+    try { await FB.signInWithEmailAndPassword(auth, em, pw); await onAuthChange(auth.currentUser); await okFx("Berjaya log masuk"); S.holdRoute = false; route(true); }
+    catch (e) { S.holdRoute = false; b.disabled = false; failFx(card, err, AUTH_ERR[e.code] || "Log masuk gagal: " + (e.code || e.message)); }
+  };
   $("#g").onclick = async () => {
     const pr = new FB.GoogleAuthProvider(); pr.setCustomParameters({ prompt: "select_account" }); // paparan pilih e-mel
     S.holdRoute = true;
     try {
       await FB.signInWithPopup(auth, pr);
+      const u = auth.currentUser;
+      if (hasPassword(u)) { try { await FB.signOut(auth); } catch {} await new Promise(r => setTimeout(r, 300)); S.holdRoute = false; return failFx(card, err, "Akaun ini sudah berdaftar. Log masuk dengan e-mel dan kata laluan anda."); }
+      if (!(await setPasswordModal(u))) { S.holdRoute = false; return; }
       await onAuthChange(auth.currentUser);
-      await okFx("Berjaya log masuk"); S.holdRoute = false; route(true);
-    } catch (e) { S.holdRoute = false; failFx(card, err, AUTH_ERR[e.code] || "Log masuk gagal: " + (e.code || e.message)); }
+      await okFx("Pendaftaran berjaya"); S.holdRoute = false; route(true);
+    } catch (e) { S.holdRoute = false; failFx(card, err, AUTH_ERR[e.code] || "Pendaftaran gagal: " + (e.code || e.message)); }
   };
 }
 
@@ -1263,6 +1326,7 @@ async function dashView() {
   if (!CONFIGURED) return notice("Flash Link belum disambung ke Firebase. Tampal config app FLASH LINK dalam index.html.");
   await authReady; if (!S.user) return nav("/login", true);
   document.title = "Dashboard — Genius Digital Flash Link";
+  if (!hasPassword(S.user)) { $("#app").innerHTML = `<div style="min-height:100vh"></div>`; if (!(await setPasswordModal(S.user))) return; }
   if (!S.profile) {
     $("#app").innerHTML = `<div style="display:grid;place-items:center;min-height:100vh"><div style="text-align:center"><div class="spin" role="status" aria-label="Memuatkan" style="margin:0 auto 12px"></div><div style="color:#C7C9D1">Menyediakan dashboard anda…</div></div></div>`;
     try { await autoCreateProfile(); } catch (e) { console.error(e); return startFail(); }
@@ -1650,7 +1714,7 @@ function modal(html, after, opts = {}) {
   const close = () => { bg.remove(); document.removeEventListener("keydown", k); };
   const k = e => e.key === "Escape" && close(); document.addEventListener("keydown", k);
   bg.onclick = e => { if (e.target === bg && !opts.side) close(); }; $("[data-x]", bg).onclick = close;
-  document.body.appendChild(bg); bg.close = close; after && after(bg); return bg;
+  document.body.appendChild(bg); bg.close = close; if (opts.lock) { $("[data-x]", bg).style.display = "none"; bg.onclick = null; document.removeEventListener("keydown", k); } after && after(bg); return bg;
 }
 
 /* --- Tab Pautan --- */
@@ -1790,9 +1854,20 @@ function profileTab() {
     ${inp("dn", "Nama paparan", p.displayName, "Tulis nama anda", 'maxlength="40"')}<div style="margin-top:12px"><label class="lbl" for="bio">Bio</label><textarea id="bio" class="inp" rows="2" maxlength="140" placeholder="Terangkan diri/kedai anda">${esc(p.bio)}</textarea></div></section>
   <section class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Gaya profil</h2><p class="hint" style="margin:0 0 10px">Pilih rupa kepala halaman anda, seperti profil premium.</p>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px">${STYLES.map(([k, n, d]) => `<button type="button" class="stybtn" data-s="${k}" aria-pressed="${(p.profileStyle || "classic") === k}"><span class="stymini sty-${k}"><i></i><b></b></span><span style="font-weight:700;font-size:14px">${n}</span><small style="color:#C7C9D1;font-size:11.5px;line-height:1.3">${d}</small></button>`).join("")}</div></section>
+  <section class="glass" id="pwsec" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Kata laluan</h2><p class="hint" style="margin:0 0 10px">E-mel log masuk: <b>${esc(S.user.email || "")}</b>. Kata laluan disimpan dengan selamat (di-hash) oleh Firebase, jadi tidak boleh dipaparkan semula. Gunakan ikon mata semasa menaip untuk menyemak apa yang anda taip. Lupa kata laluan? Guna "Lupa kata laluan?" di halaman log masuk.</p><button type="button" class="btn btn-ghost" id="pwopen">${ic("eye", "w-4 h-4")} Tukar kata laluan</button></section>
   <section class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Ikon sosial</h2><p class="hint" style="margin:0 0 10px">Tiada ikon dipaparkan sehingga anda tambah sendiri.</p><div id="soc" style="display:flex;flex-direction:column;gap:8px"></div>
     <button type="button" class="btn btn-ghost" id="adds" style="width:100%;margin-top:10px">${ic("plus", "w-4 h-4")} Tambah ikon sosial</button></section>
   <details class="glass" style="border-radius:18px;padding:16px"><summary style="cursor:pointer;font-weight:700;min-height:32px">Testimoni (untuk templat Laman Mini)</summary>${tests.map((x, i) => inp("tn" + i, `Nama #${i + 1}`, x.name, "Nurul", 'maxlength="40"') + inp("tt" + i, `Ulasan #${i + 1}`, x.text, "Servis mesra dan laju!", 'maxlength="160"')).join("")}</details></div>`;
+  $("#pwopen").onclick = () => modal(`<h2 class="font-display" style="font-size:21px;font-weight:700;margin:0 0 6px">Tukar kata laluan</h2>${pwField("cp0", "Kata laluan semasa", "current-password")}${pwField("cp1", "Kata laluan baharu", "new-password", "Minimum 8 aksara")}${pwField("cp2", "Sahkan kata laluan baharu", "new-password")}<div id="cpe" class="err" role="alert"></div><button id="cpb" class="btn btn-red" style="width:100%;min-height:50px;margin-top:14px">Simpan</button>`, bg => {
+    bindEyes(bg); const er = $("#cpe", bg);
+    $("#cpb", bg).onclick = async () => {
+      const c0 = $("#cp0", bg).value, p1 = $("#cp1", bg).value, p2 = $("#cp2", bg).value; er.textContent = "";
+      if (!c0) return (er.textContent = "Masukkan kata laluan semasa."); if (p1.length < 8) return (er.textContent = "Kata laluan baharu minimum 8 aksara."); if (p1 !== p2) return (er.textContent = "Kata laluan baharu dan pengesahan tidak sama.");
+      const b = $("#cpb", bg); b.disabled = true;
+      try { await FB.reauthenticateWithCredential(S.user, FB.EmailAuthProvider.credential(S.user.email, c0)); await FB.updatePassword(S.user, p1); bg.close(); toast("Kata laluan ditukar ✓"); }
+      catch (e) { b.disabled = false; er.textContent = AUTH_ERR[e.code] || "Gagal menukar: " + (e.code || e.message); }
+    };
+  });
   const commit = () => { refreshPreview(); saveProfile(); };
   bindImgField("f-av", () => S.profile.avatarUrl, v => (S.profile.avatarUrl = v), AV_OPTS, commit);
   bindImgField("f-bn", () => S.profile.bannerUrl, v => (S.profile.bannerUrl = v), BN_OPTS, commit);
@@ -1953,7 +2028,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-36";
+const APP_VERSION = "V-37";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
@@ -2014,7 +2089,7 @@ const CB_EXTRA = [
   { k: "pautan tambah link url tampal platform logo", q: "Tambah pautan", a: "Pergi Pautan, tekan Tambah, tampal URL atau pilih platform. Logo dan gambar kecil dikesan automatik. Seret untuk susun. Boleh pilih bentuk bar atau featured.", go: "links" },
   { k: "analitik statistik klik lawatan graf prestasi", q: "Analitik", a: "Bahagian Analitik tunjuk lawatan, klik, kadar klik, graf bar harian (merah/biru berselang), pautan yang naik dan sumber pelawat. Pilih satu pautan di sebelah Muat semula, atau klik baris pautan, untuk analitik pautan itu sahaja.", go: "insights" },
   { k: "pelanggan lead borang mesej tempahan e-mel email", q: "Pelanggan", a: "Mesej daripada blok Borang e-mel masuk ke bahagian Pelanggan. Senarai boleh skrol dan setiap mesej ada e-mel serta masa.", go: "leads" },
-  { k: "masuk login log daftar akaun google signin sign in", q: "Log masuk", a: "Log masuk guna akaun Google (pilih akaun). Tiada kata laluan untuk diingat. Jika tetingkap tidak muncul, benarkan popup untuk laman ini dan cuba lagi." },
+  { k: "masuk login log daftar akaun google signin sign in kata laluan password lupa reset tukar e-mel email", q: "Log masuk & kata laluan", a: "Daftar kali pertama dengan e-mel Google, kemudian tetapkan kata laluan (minimum 8 aksara, taip dua kali). Selepas itu log masuk dengan e-mel dan kata laluan. Lupa kata laluan? Tekan Lupa kata laluan? di halaman log masuk, masukkan e-mel berdaftar, dan klik pautan pengesahan yang dihantar ke e-mel itu. Tukar kata laluan di Profil." },
   { k: "kemas kini update versi baharu muat semula exe zip desktop", q: "Kemas kini", a: () => `Versi anda ialah ${APP_VERSION}. Bila ada versi lebih baharu, butang kuning Kemas kini muncul di sebelah Mula sekarang, serta-merta tanpa perlu tekan apa-apa. Aplikasi EXE/ZIP juga sambung ke pangkalan data yang sama.` },
   { k: "domain dns cname nama sendiri custom", q: "Domain", a: "Pautan anda ialah halaman Flash Link dengan ID unik, cth. alamat/ID-anda. Domain sendiri tidak digunakan buat masa ini." },
   { k: "jadual schedule auto post posting kalendar zernio metricool waktu masa", q: "Jadual posting", a: "Di Jadual posting, pilih Zernio atau Metricool. Zernio: tampal API key, sambung akaun media sosial (plan percuma 2 akaun serentak), tulis post, pilih tarikh, masa dan zon waktu, dan Zernio hantar automatik. Metricool: Flash Link jadi kalendar dan peringatan (had percuma 20 post sebulan); penghantaran sebenar dibuat dalam Metricool kerana API-nya hanya untuk pelan Advanced.", go: "schedule" },
