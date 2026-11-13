@@ -797,9 +797,23 @@ body[data-s] .dnav-i[aria-current=page]{color:#fff;background:color-mix(in srgb,
 .pp-c{position:relative;padding:12px 14px 12px;font-size:10.5px;color:rgba(255,255,255,.8);text-shadow:0 1px 4px #000;font-family:'Montserrat',sans-serif}
 .pp-x{z-index:2;background:rgba(255,255,255,.22)!important;backdrop-filter:blur(8px)}
 @media(max-width:560px){.pray-act .az-btn{min-width:40px}.pray-src{font-size:10px}}
+
+/* ===== V-60: butang Kemas kini dengan peratusan + tirai peralihan ===== */
+.btn-yellow{position:relative;overflow:hidden}
+.btn-yellow.upd-run{animation:none!important;min-width:150px;background:#FFF1B8;cursor:progress}
+.btn-yellow.upd-run:disabled{opacity:1}
+.upd-fill{position:absolute;inset:0;transform-origin:left center;transform:scaleX(0);background:linear-gradient(90deg,#FFC61A,#FF9F00);will-change:transform}
+.upd-txt{position:relative;font-weight:800;color:#1A1200;font-variant-numeric:tabular-nums;white-space:nowrap}
+.btn-yellow.upd-done .upd-fill{background:linear-gradient(90deg,#7CF0A4,#22C55E)}
+.upd-card{display:flex;flex-direction:column;align-items:center;gap:16px;padding:34px 44px;border-radius:30px;background:linear-gradient(160deg,rgba(255,255,255,.2),rgba(255,255,255,.06));border:1px solid rgba(255,255,255,.4);box-shadow:inset 0 1.5px 0 rgba(255,255,255,.6),0 30px 80px -20px rgba(0,0,0,.7);color:#fff;font-family:'Montserrat','DM Sans',sans-serif;font-size:19px;text-align:center}
+.upd-ck{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#34D399,#16A34A);box-shadow:0 10px 30px -8px rgba(34,197,94,.8)}
+.btn-yellow .upd-txt,.b3-r .btn-yellow .upd-txt{color:#1A1200!important;font-size:13px;text-shadow:0 1px 0 rgba(255,255,255,.35)}
+.pray-card{max-width:1060px!important;margin:0 auto!important}
+.btn-yellow,.btn-yellow span,.btn-yellow svg,.b3-r .btn-yellow span{color:#111!important}.btn-yellow .upd-txt,.b3-r .btn-yellow .upd-txt{color:#111!important}
 </style>
 </head>
 <body>
+<script>try{var u=sessionStorage.getItem("fl_upd");if(u){var o=document.createElement("div");o.id="updcurtain";o.setAttribute("aria-hidden","true");o.style.cssText="position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;background:rgba(6,8,16,.86);backdrop-filter:blur(26px) saturate(160%);-webkit-backdrop-filter:blur(26px) saturate(160%)";o.innerHTML='<div class="upd-card"><div class="upd-ck"><svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><b>'+(localStorage.getItem("fl_lang")==="ms"?"Dikemas kini ke ":"Updated to ")+u+'</b></div>';document.body.appendChild(o)}}catch(e){}</script>
 <div id="bgflow" aria-hidden="true"><div class="bg-grid"></div><div class="bg-em bg-em1"></div><div class="bg-em bg-em2"></div><div class="bg-vig"></div></div>
 <div id="app"></div>
 <div id="toasts" aria-live="polite"></div>
@@ -2672,10 +2686,56 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-59";
+const APP_VERSION = "V-60";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
+const UPD_FILES = [["/", 430000], ["/assets/logo-2x.png", 90000], ["/assets/icon.png", 60000], ["/assets/mosque.jpg", 385000], ["/assets/pop-subuh.jpg", 245000], ["/assets/pop-zuhur.jpg", 140000], ["/assets/pop-asar.jpg", 200000], ["/assets/pop-maghrib.jpg", 230000], ["/assets/pop-isyak.jpg", 200000], ["/assets/azan.m4a", 730000], ["/assets/azan-subuh.m4a", 2513000]];
+let UPDBUSY = false;
+async function startUpdate(btn) {
+  if (UPDBUSY) return; UPDBUSY = true; const ver = (UPD && UPD.version) || "", ms = LANG === "ms", EZ = "cubic-bezier(.32,.72,0,1)";
+  btn.classList.add("upd-run"); btn.disabled = true; btn.setAttribute("aria-busy", "true"); btn.removeAttribute("title");
+  btn.innerHTML = `<span class="upd-fill" aria-hidden="true"></span><span class="upd-txt" translate="no" role="status" aria-live="polite">${ms ? "Mengemas kini" : "Updating"} 0%</span>`;
+  const fill = $(".upd-fill", btn), txt = $(".upd-txt", btn);
+  const loaded = UPD_FILES.map(() => 0), total = UPD_FILES.map(f => f[1]), t0 = performance.now(); let shown = 0, target = 0, done = false;
+  const jobs = UPD_FILES.map(async ([u], i) => {
+    try {
+      const r = await fetch(u + (u === "/" ? "?u=" + Date.now() : ""), { cache: "reload" }); const len = +r.headers.get("content-length") || 0; if (len) total[i] = len;
+      if (r.body && r.body.getReader) { const rd = r.body.getReader(); for (;;) { const { done: d, value } = await rd.read(); if (d) break; loaded[i] += value.length; if (loaded[i] > total[i]) total[i] = loaded[i]; } } else { const b = await r.arrayBuffer(); loaded[i] = b.byteLength; total[i] = loaded[i]; }
+    } catch {} loaded[i] = total[i];
+  });
+  Promise.all(jobs).then(() => (done = true));
+  await new Promise(res => {
+    const tick = () => {
+      const L = loaded.reduce((a, b) => a + b, 0), T = total.reduce((a, b) => a + b, 0); target = done ? 100 : Math.min(99, L / T * 100);
+      shown += (target - shown) * (done ? .22 : .12); if (done && target - shown < .4) shown = 100;
+      const p = Math.round(shown); fill.style.transform = `scaleX(${shown / 100})`;
+      const el = (performance.now() - t0) / 1000, rem = shown > 6 && !done ? Math.max(1, Math.round(el * (100 - shown) / shown)) : 0;
+      txt.textContent = `${ms ? "Mengemas kini" : "Updating"} ${p}%${rem > 1 ? ` · ${rem}s` : ""}`;
+      if (shown >= 100) return res(); requestAnimationFrame(tick);
+    }; tick();
+  });
+  txt.textContent = ms ? "Siap 100% ✓" : "Done 100% ✓"; btn.classList.add("upd-done");
+  await new Promise(r => setTimeout(r, 450));
+  // peralihan gaya iOS: paparan lama mengecil dan kabur, tirai kaca muncul, kemudian muat semula
+  try { sessionStorage.setItem("fl_upd", ver || "V"); } catch {}
+  const cur = document.createElement("div"); cur.id = "updcurtain"; cur.setAttribute("aria-hidden", "true");
+  cur.style.cssText = "position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;background:rgba(6,8,16,.86);backdrop-filter:blur(26px) saturate(160%);-webkit-backdrop-filter:blur(26px) saturate(160%)";
+  cur.innerHTML = `<div class="upd-card"><div class="upd-ck"><svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><b>${ms ? "Dikemas kini ke " : "Updated to "}${esc(ver)}</b></div>`;
+  document.body.appendChild(cur);
+  if (!REDUCE()) { $("#app").animate([{ transform: "scale(1)", filter: "blur(0)", opacity: 1 }, { transform: "scale(.94)", filter: "blur(10px)", opacity: .5 }], { duration: 650, easing: EZ, fill: "forwards" }); cur.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 650, easing: EZ, fill: "both" }); $(".upd-card", cur).animate([{ transform: "scale(.82)", opacity: 0 }, { transform: "scale(1.04)", opacity: 1, offset: .65 }, { transform: "scale(1)", opacity: 1 }], { duration: 800, easing: EZ, fill: "both" }); await new Promise(r => setTimeout(r, 950)); }
+  hardReload();
+}
+function playUpdateIn() {
+  const c = document.getElementById("updcurtain"); if (!c || c.dataset.in) return; c.dataset.in = "1"; try { sessionStorage.removeItem("fl_upd"); } catch {}
+  const EZ = "cubic-bezier(.32,.72,0,1)", app = $("#app"), card = $(".upd-card", c);
+  if (REDUCE()) return c.remove();
+  setTimeout(() => {
+    if (card) card.animate([{ transform: "scale(1)", opacity: 1 }, { transform: "scale(1.12)", opacity: 0 }], { duration: 600, easing: EZ, fill: "forwards" });
+    app && app.animate([{ transform: "scale(1.06)", filter: "blur(12px)", opacity: .4 }, { transform: "scale(1)", filter: "blur(0)", opacity: 1 }], { duration: 900, easing: EZ });
+    c.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 900, easing: EZ, fill: "forwards" }).onfinish = () => c.remove();
+  }, 700);
+}
 function hardReload() { try { navigator.serviceWorker?.getRegistrations?.().then(rs => rs.forEach(r => r.unregister())); } catch {} location.reload(); }
 /* Butang Kemas kini (kuning): hanya wujud bila ada versi baharu; hilang selepas dikemas kini. Diletak di kanan "Mula sekarang". */
 const verNum = v => parseInt(String(v || "").replace(/\D/g, ""), 10) || 0;
@@ -2688,7 +2748,7 @@ function renderUpdateBtn() {
   const b = document.createElement("button"); b.id = "updbtn"; b.type = "button"; b.className = "btn btn-yellow btn-sm";
   b.title = UPD.notes || ("Versi " + UPD.version); b.setAttribute("aria-label", "Kemas kini ke versi " + UPD.version);
   b.innerHTML = `${ic("refresh", "w-4 h-4")}<span class="hidden sm:inline">Kemas kini</span>`;
-  b.onclick = () => (IS_CENTRAL ? hardReload() : window.open(ZIP_URL, "_blank", "noopener"));
+  b.onclick = () => (IS_CENTRAL ? startUpdate(b) : window.open(ZIP_URL, "_blank", "noopener"));
   const host = $(".b3-btns") || $("#dhead-actions");
   if (host) host.appendChild(b); else { const d = document.createElement("div"); d.id = "updfix"; d.appendChild(b); document.body.appendChild(d); }
 }
@@ -2820,6 +2880,7 @@ addEventListener("popstate", route);
 const initPromise = initFirebase().catch(e => { console.error(e); authReadyRes(); toast("Gagal menyambung ke Firebase. Semak config.", "bad"); });
 initPromise.then(() => { countVisit(); checkUpdate(); watchVersion(); });
 route();
+playUpdateIn();
 </script>
 </body>
 </html>
