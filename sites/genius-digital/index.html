@@ -522,8 +522,13 @@
     .pb-dec { align-self: flex-start; margin-top: .25em; font-size: clamp(7px, 3.6cqw, 12px); }
     /* Harga tetap (tanpa diskaun): merah, label kuning, harga putih */
     .price-badge.fixed { background: #E8111F; box-shadow: 0 0 0 2px #FFD23F, 0 3px 9px rgba(120, 10, 15, .28); }
-    .price-badge.fixed .pb-label { color: #FFD23F; }
+    .price-badge.fixed .pb-label { color: #fff; }
     .price-badge.fixed .pb-body { background: #B80F19; }
+    /* Percuma: hijau muda (luar) + hijau gelap (dalam), border hitam, tab hitam, "PERCUMA" putih */
+    .price-badge.free { background: #5BE37E; box-shadow: 0 0 0 2px #0A0A0A, 0 3px 9px rgba(0, 0, 0, .28); }
+    .price-badge.free .pb-label { color: #0A0A0A; }
+    .price-badge.free .pb-body { background: #0B5D2A; }
+    .pb-free { display: block; padding: .12em .1em; font-size: clamp(12px, 6cqw, 18px); font-weight: 900; letter-spacing: .02em; text-transform: uppercase; color: #fff; white-space: nowrap; }
     .pb-old { align-self: flex-end; padding: .35em .35em .12em; font-size: clamp(6px, 3cqw, 10px); font-weight: 700; color: #1B1B1B; white-space: nowrap; }
     .pb-old s { text-decoration-color: #E8111F; text-decoration-thickness: .13em; }
     .modal-price { margin-top: .9rem; display: flex; justify-content: center; }
@@ -899,7 +904,7 @@
         "state.empty.title": "Belum ada produk",
         "state.empty.text": "Produk digital Genius Digital akan dipaparkan di sini tidak lama lagi. Sila kembali semula nanti.",
         "modal.msg": "Produk Akan Datang.", "modal.close": "Tutup", "modal.ok": "Tutup",
-        "contact.eyebrow": "Perhubungan", "contact.h2": "Hubungi Kami", "contact.soon": "Maklumat hubungan akan dikemas kini tidak lama lagi.", "install.btn": "Pasang Apps", "price.label": "Harga Istimewa", "price.was": "harga asal", "price.fixed": "Harga", "install.title": "Pasang Genius Digital", "install.ios": "Pada iPhone / iPad: tekan butang Kongsi di Safari, kemudian pilih “Tambah ke Skrin Utama”.",
+        "contact.eyebrow": "Perhubungan", "contact.h2": "Hubungi Kami", "contact.soon": "Maklumat hubungan akan dikemas kini tidak lama lagi.", "install.btn": "Pasang Apps", "price.label": "Harga Istimewa", "price.was": "harga asal", "price.fixed": "Harga", "price.free": "Percuma", "install.title": "Pasang Genius Digital", "install.ios": "Pada iPhone / iPad: tekan butang Kongsi di Safari, kemudian pilih “Tambah ke Skrin Utama”.",
         "contact.lead": "<strong>Genius Digital.</strong> Berminat dengan produk kami atau ingin bekerjasama? Hubungi kami melalui saluran di bawah.",
         "contact.email": "E-mel", "contact.whatsapp": "WhatsApp", "contact.social": "Media Sosial",
         "contact.phEmail": "Placeholder: tambah e-mel syarikat", "contact.phWhatsapp": "Placeholder: tambah nombor WhatsApp", "contact.phSocial": "(placeholder)",
@@ -939,7 +944,7 @@
         "state.empty.title": "No products yet",
         "state.empty.text": "Genius Digital's products will appear here soon. Please check back later.",
         "modal.msg": "Product Coming Soon.", "modal.close": "Close", "modal.ok": "Close",
-        "contact.eyebrow": "Get in Touch", "contact.h2": "Contact Us", "contact.soon": "Contact details will be updated soon.", "install.btn": "Install App", "price.label": "Special Price", "price.was": "original price", "price.fixed": "Price", "install.title": "Install Genius Digital", "install.ios": "On iPhone / iPad: tap the Share button in Safari, then choose “Add to Home Screen”.",
+        "contact.eyebrow": "Get in Touch", "contact.h2": "Contact Us", "contact.soon": "Contact details will be updated soon.", "install.btn": "Install App", "price.label": "Special Price", "price.was": "original price", "price.fixed": "Price", "price.free": "Free", "install.title": "Install Genius Digital", "install.ios": "On iPhone / iPad: tap the Share button in Safari, then choose “Add to Home Screen”.",
         "contact.lead": "<strong>Genius Digital.</strong> Interested in our products or looking to collaborate? Reach us through the channels below.",
         "contact.email": "Email", "contact.whatsapp": "WhatsApp", "contact.social": "Social Media",
         "contact.phEmail": "Placeholder: add the company email", "contact.phWhatsapp": "Placeholder: add the WhatsApp number", "contact.phSocial": "(placeholder)",
@@ -979,7 +984,7 @@
         "state.empty.title": "لا توجد منتجات بعد",
         "state.empty.text": "ستظهر منتجات جينيوس ديجيتال هنا قريباً. يُرجى العودة لاحقاً.",
         "modal.msg": "المنتج قريباً.", "modal.close": "إغلاق", "modal.ok": "إغلاق",
-        "contact.eyebrow": "التواصل", "contact.h2": "اتصل بنا", "contact.soon": "ستُحدَّث بيانات التواصل قريباً.", "install.btn": "تثبيت التطبيق", "price.label": "سعر خاص", "price.was": "السعر الأصلي", "price.fixed": "السعر", "install.title": "تثبيت جينيوس ديجيتال", "install.ios": "على iPhone / iPad: اضغط زر المشاركة في Safari ثم اختر «إضافة إلى الشاشة الرئيسية».",
+        "contact.eyebrow": "التواصل", "contact.h2": "اتصل بنا", "contact.soon": "ستُحدَّث بيانات التواصل قريباً.", "install.btn": "تثبيت التطبيق", "price.label": "سعر خاص", "price.was": "السعر الأصلي", "price.fixed": "السعر", "price.free": "مجاني", "install.title": "تثبيت جينيوس ديجيتال", "install.ios": "على iPhone / iPad: اضغط زر المشاركة في Safari ثم اختر «إضافة إلى الشاشة الرئيسية».",
         "contact.lead": "<strong>جينيوس ديجيتال.</strong> هل أنت مهتم بمنتجاتنا أو ترغب في التعاون معنا؟ تواصل معنا عبر القنوات التالية.",
         "contact.email": "البريد الإلكتروني", "contact.whatsapp": "WhatsApp", "contact.social": "وسائل التواصل الاجتماعي",
         "contact.phEmail": "نص مؤقت: أضف البريد الإلكتروني للشركة", "contact.phWhatsapp": "نص مؤقت: أضف رقم WhatsApp", "contact.phSocial": "(نص مؤقت)",
@@ -1108,6 +1113,11 @@
     const priceNum = (v) => (typeof v === "number" && isFinite(v) && v > 0) ? v : null;
     const fmtRM = (n) => "RM " + n.toLocaleString("en-US", { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 });
     function priceBadge(product, index = 0) {
+      if (product.price === 0) {   // Percuma
+        const lbl = t("price.fixed"), free = t("price.free");
+        return el("div", { class: "price-badge free", role: "img", "aria-label": `${lbl}: ${free}`, style: `--pd:${(-(index % 5) * 0.7).toFixed(1)}s` }, [
+          el("span", { class: "pb-label", text: lbl }), el("span", { class: "pb-body" }, el("span", { class: "pb-free", text: free }))]);
+      }
       const price = priceNum(product.price); if (price === null) return null;
       const old = priceNum(product.originalPrice), hasOld = old !== null && old > price;
       const [ip, dp] = price.toFixed(2).split("."), label = t(hasOld ? "price.label" : "price.fixed");
