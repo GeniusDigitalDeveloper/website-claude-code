@@ -1,4 +1,4 @@
 {
   "projects": { "default": "genius-digital-40bc9" },
-  "targets": { "genius-digital-40bc9": { "hosting": { "flashlink": ["flash-link"] } } }
+  "targets": { "genius-digital-40bc9": { "hosting": { "flashlink": ["genius-digital-flashlink-40bc9-5effc"] } } }
 }

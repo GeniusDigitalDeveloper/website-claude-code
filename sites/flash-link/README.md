@@ -14,8 +14,8 @@ Sistem link-in-bio satu fail: `public/index.html` (HTML + CSS + JS + Tailwind CD
 
 ## Deploy hosting (site baharu, tidak timpa yang sedia ada)
 ```
-firebase hosting:sites:create flash-link
-firebase target:apply hosting flashlink flash-link
+# site khas FLASH LINK sudah wujud (kosong): genius-digital-flashlink-40bc9-5effc
+firebase target:apply hosting flashlink genius-digital-flashlink-40bc9-5effc
 firebase deploy --only hosting:flashlink
 ```
 
