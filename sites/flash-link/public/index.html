@@ -386,6 +386,7 @@ html{scrollbar-width:thin;scrollbar-color:#FF4D4D rgba(255,255,255,.08)}
 .devs.land{--ps:.72;max-width:860px;gap:18px}
 @media(max-width:600px){.devs.land{--ps:.4;gap:8px}}
 .dprev-in{padding-bottom:8px;width:100%}
+@media(min-width:1180px){.dsh{column-gap:64px}.dprev{padding-left:12px}.dprev-in{display:flex;flex-direction:column;align-items:flex-end}.dprev .devs{margin-left:auto;margin-right:0}}
 .dprev .devs{flex-direction:column-reverse;align-items:center;gap:20px;--ps:.72}
 .dprev .devs-lap{width:min(100%,400px);flex:none}
 @media(min-width:1180px){.dsh{--pvw:420px}}@media(min-width:1500px){.dsh{--pvw:520px}}@media(min-width:2000px){.dsh{--pvw:580px}}
@@ -2058,7 +2059,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-39";
+const APP_VERSION = "V-40";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
