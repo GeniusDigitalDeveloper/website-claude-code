@@ -141,10 +141,14 @@ body.flow #bgflow{display:block}
 .fl-pcap{display:flex;align-items:center;justify-content:center;padding:12px 46px 8px;min-height:52px}
 .fl-pjoin{display:flex;align-items:center;justify-content:center;gap:8px;min-height:54px;border-radius:999px;background:#fff;color:#111;font-weight:700;text-decoration:none;margin-top:10px;transition:transform .45s cubic-bezier(.32,.72,0,1)}
 .fl-pjoin:active{transform:scale(.96)}
+.fl-ptitle-main.fl-phold{background:none;color:#fff;-webkit-text-fill-color:#fff;opacity:.4;font-size:clamp(26px,8vw,40px);filter:none}
+.fl-name.fl-phold{opacity:.45;font-weight:600}
+.fl-hint-img{position:absolute;left:16px;right:16px;top:34%;text-align:center;color:rgba(255,255,255,.55);font-size:14px;z-index:2}
 .fl-pmeta{text-align:center;font-size:12px;color:rgba(255,255,255,.7)}
 .fl-tpl-poster .fl-social{margin:8px 0}.fl-tpl-poster .fl-social a{background:none;border:0;color:#fff;width:50px;height:50px}.fl-tpl-poster .fl-social svg{width:30px;height:30px}
 .fl-tpl-poster .fl-header{color:var(--btn)}
 .iscreen.pv-wrap .fl-tpl-poster .fl-wrap{padding-top:0}
+.iscreen.pv-wrap .fl-pbtn{top:52px}
 /* ============ HELAIAN KONGSI ============ */
 .modal.light{background:#fff;color:#111;border-color:rgba(0,0,0,.08)}
 .modal.light .btn-ghost{color:#111;background:rgba(0,0,0,.06);border-color:rgba(0,0,0,.1)}
@@ -727,12 +731,12 @@ function tileHtml(l) {
   return `<a class="fl-card fl-tile" ${linkAttrs(l)}>${img ? `<span class="fl-thw fl-img"><img src="${esc(img)}" alt="" loading="lazy" decoding="async"><i class="fl-thov"></i></span>` : `<div class="fl-img" style="color:${BRANDS[k]?.c || "var(--btn)"}">${brandIc(k, "w-12 h-12")}</div>`}<div class="fl-tt">${esc(l.title)}</div></a>`;
 }
 function posterHtml(p, act, { preview = false, anim = true } = {}) {
-  const t = p.theme, avatar = imgUrl(p.avatarUrl), name = p.displayName || "@" + p.username;
-  const initial = esc(name.trim().charAt(0).toUpperCase());
+  const t = p.theme, avatar = imgUrl(p.avatarUrl), name = (p.displayName || "").trim();
+  const initial = name ? esc(name.charAt(0).toUpperCase()) : "";
   const Wi = (i, h) => `<div class="fl-in" style="--i:${i}">${h}</div>`;
-  const hero = `<div class="fl-phero${avatar ? "" : " noimg"}"><div class="fl-phero-media">${avatar ? `<div class="fl-phero-bg" style="background-image:url('${esc(encodeURI(avatar).replace(/'/g, "%27"))}')"></div>` : `<div class="fl-heroini">${initial}</div>`}<div class="fl-phero-ov"></div></div>
+  const hero = `<div class="fl-phero${avatar ? "" : " noimg"}"><div class="fl-phero-media">${avatar ? `<div class="fl-phero-bg" style="background-image:url('${esc(encodeURI(avatar).replace(/'/g, "%27"))}')"></div>` : `<div class="fl-heroini">${initial}</div>`}<div class="fl-phero-ov"></div></div>${!avatar && preview ? `<div class="fl-hint-img">Tambah gambar anda di bahagian Profil</div>` : ""}
     <a class="fl-pbtn fl-pbtn-l" href="/" aria-label="Flash Link" ${preview ? 'tabindex="-1"' : ""}>${ic("zap", "w-5 h-5")}</a><button class="fl-pbtn fl-pbtn-r" type="button" data-sharepage aria-label="Kongsi halaman">${ic("share", "w-5 h-5")}</button>
-    <div class="fl-phero-txt"><h1 class="fl-ptitle-main">${esc(name)}</h1>${p.bio ? `<p class="fl-pbio">${esc(p.bio)}</p>` : ""}</div></div>`;
+    <div class="fl-phero-txt">${name ? `<h1 class="fl-ptitle-main">${esc(name)}</h1>` : preview ? `<h1 class="fl-ptitle-main fl-phold">NAMA ANDA</h1>` : ""}${p.bio ? `<p class="fl-pbio">${esc(p.bio)}</p>` : ""}</div></div>`;
   const more = l => `<button class="fl-pmore" type="button" data-share="${esc(l.id)}" aria-label="Kongsi ${esc(l.title)}">${ic("more", "w-5 h-5")}</button>`;
   const item = (l, i) => {
     if (l.type === "header") return Wi(i, `<h3 class="fl-header">${esc(l.title)}</h3>`);
@@ -752,8 +756,9 @@ function renderProfile(p, links, { preview = false, anim = true } = {}) {
   loadFont(t.font);
   if (tpl === "poster") return posterHtml(p, act, { preview, anim });
   const avatar = imgUrl(p.avatarUrl), sty = tpl === "landing" ? "classic" : (p.profileStyle || "classic");
-  const initial = esc((p.displayName || p.username || "F").trim().charAt(0).toUpperCase());
-  const nameBio = `<h1 class="fl-name">${esc(p.displayName || "@" + p.username)}</h1>${p.bio ? `<p class="fl-bio">${esc(p.bio)}</p>` : ""}${socialHtml(p)}`;
+  const nm = (p.displayName || "").trim();
+  const initial = nm ? esc(nm.charAt(0).toUpperCase()) : ic("users", "w-10 h-10");
+  const nameBio = `${nm ? `<h1 class="fl-name">${esc(nm)}</h1>` : preview ? `<h1 class="fl-name fl-phold">Tulis nama anda</h1>` : ""}${p.bio ? `<p class="fl-bio">${esc(p.bio)}</p>` : ""}${socialHtml(p)}`;
   let head;
   if (sty === "hero") head = `<div class="fl-heroimg${avatar ? "" : " noimg"}" ${avatar ? `style="background-image:url('${esc(encodeURI(avatar).replace(/'/g, "%27"))}')"` : ""}><div class="fl-heroov"></div>${avatar ? "" : `<div class="fl-heroini">${initial}</div>`}<div class="fl-herotxt">${nameBio}</div></div>`;
   else if (sty === "cover") head = `<div class="fl-coverspace"></div>${nameBio}`;
@@ -1074,10 +1079,9 @@ async function dashView() {
 /* Kali pertama log masuk: profil + design pertama dicipta senyap (tiada wizard). ID pautan unik dijana automatik. */
 async function autoCreateProfile() {
   const uid = S.user.uid; let name = genId();
-  const base = (S.user.displayName || (S.user.email || "").split("@")[0] || "Pengguna").slice(0, 40);
   const d0 = DESIGNS.find(x => x.id === "poster"), theme = designTheme(d0);
   const design = { id: "d" + genId(6), name: "Design 1", template: d0.tpl, profileStyle: d0.sty || "classic", theme };
-  const profile = { username: name, displayName: base, bio: "", avatarUrl: S.user.photoURL || "", bannerUrl: "", template: design.template, theme: JSON.parse(JSON.stringify(theme)), profileStyle: design.profileStyle, socialIcons: [], testimonials: [], designs: [design], activeDesign: design.id, createdAt: FB.serverTimestamp(), plan: "free" };
+  const profile = { username: name, displayName: "", bio: "", avatarUrl: "", bannerUrl: "", template: design.template, theme: JSON.parse(JSON.stringify(theme)), profileStyle: design.profileStyle, socialIcons: [], testimonials: [], designs: [design], activeDesign: design.id, createdAt: FB.serverTimestamp(), plan: "free" };
   for (let i = 0; ; i++) {
     try {
       await FB.runTransaction(db, async tx => {
@@ -1396,7 +1400,7 @@ function profileTab() {
   <section class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Gambar & maklumat</h2>
     <div style="display:flex;gap:16px;align-items:center"><div id="avp" style="width:92px;height:92px;border-radius:50%;overflow:hidden;background:rgba(255,255,255,.08);display:grid;place-items:center;flex:none;border:2px solid rgba(255,255,255,.2)"></div>
     <div><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn btn-red btn-sm" id="upav">${ic("plus", "w-4 h-4")} Muat naik gambar</button><button type="button" class="btn btn-ghost btn-sm" id="rmav">Buang</button></div><p class="hint" style="margin:8px 0 0">Foto potret paling cantik untuk gaya Hero. Dikecilkan automatik.</p></div></div>
-    <input type="file" id="fav" accept="image/*" hidden>${inp("dn", "Nama paparan", p.displayName, "", 'maxlength="40"')}<div style="margin-top:12px"><label class="lbl" for="bio">Bio</label><textarea id="bio" class="inp" rows="2" maxlength="140" placeholder="Terangkan diri/kedai anda">${esc(p.bio)}</textarea></div></section>
+    <input type="file" id="fav" accept="image/*" hidden>${inp("dn", "Nama paparan", p.displayName, "Tulis nama anda", 'maxlength="40"')}<div style="margin-top:12px"><label class="lbl" for="bio">Bio</label><textarea id="bio" class="inp" rows="2" maxlength="140" placeholder="Terangkan diri/kedai anda">${esc(p.bio)}</textarea></div></section>
   <section class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Gaya profil</h2><p class="hint" style="margin:0 0 10px">Pilih rupa kepala halaman anda, seperti profil premium.</p>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">${STYLES.map(([k, n, d]) => `<button type="button" class="stybtn" data-s="${k}" aria-pressed="${(p.profileStyle || "classic") === k}"><span class="stymini sty-${k}"><i></i><b></b></span><span style="font-weight:700;font-size:14px">${n}</span><small style="color:#C7C9D1;font-size:11.5px;line-height:1.3">${d}</small></button>`).join("")}</div></section>
   <section class="glass" style="border-radius:18px;padding:16px"><h2 class="lbl" style="font-size:15px;color:#fff">Ikon sosial</h2><p class="hint" style="margin:0 0 10px">Tiada ikon dipaparkan sehingga anda tambah sendiri.</p><div id="soc" style="display:flex;flex-direction:column;gap:8px"></div>
@@ -1549,7 +1553,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-32";
+const APP_VERSION = "V-33";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
