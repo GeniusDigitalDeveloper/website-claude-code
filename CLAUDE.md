@@ -110,3 +110,5 @@ Masih WAJIB berhenti dan tanya jika rules hidup berbeza daripada backup, ada rul
 
 **Selepas setiap deploy hosting Flash Link, WAJIB umumkan versi** supaya semua tetingkap yang terbuka nampak butang kemas kini serta-merta (tanpa pengguna tekan apa-apa):
 `cd sites/flash-link && FIREBASE_TOKEN=$FIREBASE_TOKEN node scripts/announce-version.mjs` (tulis `flashlink/stats/version` dalam RTDB; baca `public/version.json`). Naikkan `APP_VERSION` dalam `public/index.html` dan `version` dalam `public/version.json` ke nombor yang sama pada setiap perubahan. Tiada muzik latar dalam app (kesan bunyi sahaja).
+
+**Chatbot Flash Link (pembantu "Ada masalah? Cek saya"):** jawapannya dibina daripada pendaftaran app (`NAV`, `DESIGNS`, `STYLES`, `TPL`, `BRANDS`, `LINK_KEYS`, `APP_VERSION`) dan senarai `CB_EXTRA` dalam `public/index.html`. Bila tambah/ubah ciri Flash Link, WAJIB daftar dalam `NAV`/pendaftaran sedia ada atau tambah entri `CB_EXTRA` supaya chatbot sentiasa terkini, tanpa ustaz perlu minta.

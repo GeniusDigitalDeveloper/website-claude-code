@@ -615,6 +615,37 @@ service cloud.firestore {
       allow read, delete: if request.auth != null && resource.data.uid == request.auth.uid;
       allow update: if false;
     }
+
+    // --- Shorten link (V-34) ---
+    match /flashlink_short/{code} {
+      allow get: if true;
+      allow list: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid
+        && code.matches('^[a-z0-9]{4,12}$')
+        && request.resource.data.keys().hasOnly(['uid','name','url','order','createdAt'])
+        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 60
+        && request.resource.data.url is string && request.resource.data.url.size() <= 2000
+        && request.resource.data.url.matches('^https?://.+');
+      allow update: if request.auth != null && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.keys().hasOnly(['uid','name','url','order','createdAt'])
+        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 60
+        && request.resource.data.url is string && request.resource.data.url.size() <= 2000
+        && request.resource.data.url.matches('^https?://.+');
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+
+    // --- Gambar resolusi tinggi (V-34): satu dokumen setiap gambar, rujukan "fli:ID" ---
+    match /flashlink_images/{id} {
+      allow get: if true;
+      allow list: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['uid','d','createdAt'])
+        && request.resource.data.d is string && request.resource.data.d.size() < 990000
+        && request.resource.data.d[0:23] == 'data:image/jpeg;base64,';
+      allow update: if false;
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
     // ===== TAMAT FLASH LINK RULES =====
   }
 }
