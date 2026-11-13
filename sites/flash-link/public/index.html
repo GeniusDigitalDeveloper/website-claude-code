@@ -534,6 +534,30 @@ html,body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;t
 .fl-bs-outline .fl-btn:hover{background:color-mix(in srgb,var(--btn) 14%,transparent);box-shadow:none}
 .fl-bs-hard .fl-btn{border:2.5px solid var(--bd);box-shadow:4px 4px 0 var(--bd);color:var(--btnText)}
 .fl-bs-hard .fl-btn:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--bd)}
+/* ===== animasi butang + kemasukan ===== */
+@keyframes flBounce{0%,55%,100%{transform:translateY(0)}20%{transform:translateY(-8px)}32%{transform:translateY(0)}42%{transform:translateY(-3px)}}
+@keyframes flWobble{0%,60%,100%{transform:rotate(0)}8%{transform:rotate(-2.4deg)}18%{transform:rotate(2deg)}28%{transform:rotate(-1.4deg)}38%{transform:rotate(1deg)}48%{transform:rotate(0)}}
+@keyframes flPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes flShake{0%,55%,100%{transform:translateX(0)}6%,18%,30%{transform:translateX(-5px)}12%,24%,36%{transform:translateX(5px)}}
+@keyframes flGlow{0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 24px 3px color-mix(in srgb,var(--btn) 75%,transparent)}}
+@keyframes flFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes flShine{0%,45%{transform:translateX(-130%)}100%{transform:translateX(130%)}}
+@keyframes flPop{0%{opacity:0;transform:scale(.55)}60%{opacity:1;transform:scale(1.07)}100%{transform:scale(1)}}
+@keyframes flFade{from{opacity:0}}
+.fl-en-pop:not(.fl-noanim) .fl-in{animation-name:flPop;animation-duration:.75s;animation-timing-function:cubic-bezier(.34,1.56,.64,1)}
+.fl-en-fade:not(.fl-noanim) .fl-in{animation-name:flFade;animation-duration:.9s;animation-timing-function:ease-out}
+.fl-en-none .fl-in{animation:none}
+[data-link]:hover{animation-play-state:paused}
+[data-link][data-an="none"]{animation:none!important}
+.fl-ba-bounce [data-link]:not([data-an]),[data-link][data-an="bounce"]{animation:flBounce 2.6s ease-in-out infinite}
+.fl-ba-wobble [data-link]:not([data-an]),[data-link][data-an="wobble"]{animation:flWobble 3.2s ease-in-out infinite}
+.fl-ba-pulse [data-link]:not([data-an]),[data-link][data-an="pulse"]{animation:flPulse 1.9s ease-in-out infinite}
+.fl-ba-shake [data-link]:not([data-an]),[data-link][data-an="shake"]{animation:flShake 3.4s ease-in-out infinite}
+.fl-ba-shine [data-link]:not([data-an]),[data-link][data-an="shine"]{position:relative;overflow:hidden}
+.fl-ba-shine [data-link]:not([data-an])::after,[data-link][data-an="shine"]::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.5) 50%,transparent 65%);animation:flShine 2.8s ease-in-out infinite;pointer-events:none}
+.fl-ba-glow [data-link]:not([data-an]),[data-link][data-an="glow"]{animation:flGlow 2.2s ease-in-out infinite}
+.fl-ba-float [data-link]:not([data-an]),[data-link][data-an="float"]{animation:flFloat 3.2s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){[data-link],[data-link]::after{animation:none!important}.fl-en-pop .fl-in,.fl-en-fade .fl-in{animation:none}}
 </style>
 </head>
 <body>
@@ -574,6 +598,9 @@ const USER_RE = /^[a-z0-9_]{3,20}$/;
 const FONTS = ["Inter", "Poppins", "Space Grotesk", "Playfair Display", "Nunito", "DM Sans", "Montserrat", "Oswald", "Bebas Neue", "Lora", "Raleway", "Roboto Slab", "Pacifico", "Cormorant Garamond", "Syne", "Archivo Black", "DM Serif Display", "Sora"];
 const BSTYLES = [["solid", "Pepejal"], ["glass", "Kaca"], ["outline", "Garisan"], ["hard", "Blok (bayang keras)"]];
 const PATS = { grid: "linear-gradient(color-mix(in srgb,var(--text) 9%,transparent) 1px,transparent 1px) 0 0/30px 30px,linear-gradient(90deg,color-mix(in srgb,var(--text) 9%,transparent) 1px,transparent 1px) 0 0/30px 30px", dots: "radial-gradient(color-mix(in srgb,var(--text) 18%,transparent) 1.5px,transparent 1.7px) 0 0/22px 22px", stripes: "repeating-linear-gradient(135deg,color-mix(in srgb,var(--text) 8%,transparent) 0 2px,transparent 2px 15px)" };
+const ANIMS = [["", "Tiada"], ["bounce", "Pantul"], ["wobble", "Goyang"], ["pulse", "Denyut"], ["shake", "Gegar"], ["shine", "Kilau"], ["glow", "Bercahaya"], ["float", "Terapung"]];
+const ENTRANCES = [["up", "Naik (lalai)"], ["pop", "Pop melantun"], ["fade", "Pudar"], ["none", "Tiada"]];
+const rootCls = t => `fl-bs-${BSTYLES.some(x => x[0] === t.bs) ? t.bs : "solid"} fl-ba-${ANIMS.some(x => x[0] && x[0] === t.ba) ? t.ba : "none"} fl-en-${["pop", "fade", "none"].includes(t.en) ? t.en : "up"}`;
 const PAT_NAMES = [["", "Tiada"], ["grid", "Grid"], ["dots", "Titik"], ["stripes", "Garis serong"]];
 const HEX = /^#[0-9a-f]{6}$/i;
 const hex = (v, d) => (HEX.test(v || "") ? v : d);
@@ -871,6 +898,35 @@ const DESIGNS = [
   { id: "t-peluh", n: "Peluh", d: "Biru ke magenta, butang biru", tpl: "minimal", theme: { bgType: "mesh", bg1: "#1F5BFF", bg2: "#E5309B", bg3: "#0B1020", bg4: "#10163A", text: "#FFFFFF", btn: "#4B83F0", font: "Poppins", shape: "pill" } },
   { id: "t-senja", n: "Senja", d: "Ungu senja, butang jambu", tpl: "minimal", theme: { bgType: "mesh", bg1: "#5B3FA0", bg2: "#B14EBF", bg3: "#2E5A8A", bg4: "#3A2A6E", text: "#FFFFFF", btn: "#EDB8F4", font: "Cormorant Garamond", shape: "pill" } },
   { id: "t-siaran", n: "Siaran", d: "Merah menyala, tajuk tebal", tpl: "minimal", theme: { bgType: "gradient", bg1: "#C1121F", bg2: "#5C040C", text: "#FFFFFF", btn: "#FFFFFF", bd: "#1A0003", font: "Bebas Neue", shape: "square", bs: "hard" } },
+  { id: "p-merah", n: "Poster Merah", d: "Hero penuh, merah delima", tpl: "poster", sty: "hero", theme: { bg1: "#7A0F1F", bg2: "#0A0306", btn: "#FFD166" } },
+  { id: "p-hijau", n: "Poster Hijau", d: "Hero penuh, hijau zamrud", tpl: "poster", sty: "hero", theme: { bg1: "#0B3D2E", bg2: "#03100B", btn: "#5EEAD4" } },
+  { id: "p-ungu", n: "Poster Ungu", d: "Hero penuh, ungu diraja", tpl: "poster", sty: "hero", theme: { bg1: "#2A0B4A", bg2: "#08030F", btn: "#C084FC" } },
+  { id: "p-jingga", n: "Poster Jingga", d: "Hero penuh, jingga senja", tpl: "poster", sty: "hero", theme: { bg1: "#4A1D05", bg2: "#0C0502", btn: "#FB923C" } },
+  { id: "p-mono", n: "Poster Mono", d: "Hero penuh, hitam putih", tpl: "poster", sty: "hero", theme: { bg1: "#1C1C1F", bg2: "#050506", btn: "#FFFFFF" } },
+  { id: "g-biru", n: "Dua Kotak Biru", d: "Dua lajur, biru langit", tpl: "grid", theme: { bg1: "#EAF3FF", bg2: "#EAF3FF", text: "#0B1E3F", btn: "#2563EB" } },
+  { id: "g-mint", n: "Dua Kotak Mint", d: "Dua lajur, hijau mint", tpl: "grid", theme: { bg1: "#E8FBF3", bg2: "#E8FBF3", text: "#052E22", btn: "#10B981" } },
+  { id: "g-gelap", n: "Dua Kotak Gelap", d: "Dua lajur, hitam dan emas", tpl: "grid", theme: { bg1: "#0F1115", bg2: "#0F1115", text: "#F4F4F5", btn: "#F59E0B" } },
+  { id: "c-merah", n: "Kad Besar Merah", d: "Kad penuh, merah menyala", tpl: "cards", theme: { bg1: "#2A0A0F", bg2: "#12060A", btn: "#EF4444" } },
+  { id: "c-hijau", n: "Kad Besar Hijau", d: "Kad penuh, hijau segar", tpl: "cards", theme: { bg1: "#06231A", bg2: "#031009", btn: "#22C55E" } },
+  { id: "c-emas", n: "Kad Besar Emas", d: "Kad penuh, emas mewah", tpl: "cards", theme: { bg1: "#1F1608", bg2: "#0B0803", btn: "#FBBF24" } },
+  { id: "i-oren", n: "Ikon Oren", d: "Ikon aplikasi, oren ke merah jambu", tpl: "icons", theme: { bg1: "#FB923C", bg2: "#DB2777" } },
+  { id: "i-hijau", n: "Ikon Hijau", d: "Ikon aplikasi, hijau ke biru", tpl: "icons", theme: { bg1: "#10B981", bg2: "#0EA5E9" } },
+  { id: "i-malam", n: "Ikon Malam", d: "Ikon aplikasi, biru malam", tpl: "icons", theme: { bg1: "#111827", bg2: "#312E81" } },
+  { id: "b-krim", n: "Bento Krim", d: "Petak, latar krim", tpl: "bento", theme: { bgType: "solid", bg1: "#F5EFE6", bg2: "#F5EFE6", text: "#1C1A16", btn: "#E10600" } },
+  { id: "b-biru", n: "Bento Biru", d: "Petak, biru malam", tpl: "bento", theme: { bg1: "#0B1730", bg2: "#0B1730", btn: "#38BDF8" } },
+  { id: "k-jambu", n: "Karusel Jambu", d: "Kad meluncur, merah jambu", tpl: "carousel", theme: { bg1: "#4A1034", bg2: "#1F0A33", btn: "#F472B6" } },
+  { id: "k-hijau", n: "Karusel Hijau", d: "Kad meluncur, hijau tosca", tpl: "carousel", theme: { bg1: "#052E2B", bg2: "#0B1F3A", btn: "#34D399" } },
+  { id: "s-biru", n: "Katalog Biru", d: "Kedai, biru bersih", tpl: "store", theme: { bg1: "#F1F7FF", bg2: "#F1F7FF", text: "#0B1E3F", btn: "#2563EB" } },
+  { id: "s-hijau", n: "Katalog Hijau", d: "Kedai, hijau segar", tpl: "store", theme: { bg1: "#F2FBF5", bg2: "#F2FBF5", text: "#0A2E1A", btn: "#16A34A" } },
+  { id: "d-biru", n: "Kaca Biru", d: "Butang kaca, biru laut", tpl: "dark", theme: { bg1: "#04121F", bg2: "#0A2540", btn: "#38BDF8" } },
+  { id: "d-hijau", n: "Kaca Hijau", d: "Butang kaca, hijau hutan", tpl: "dark", theme: { bg1: "#03140D", bg2: "#062B1B", btn: "#34D399" } },
+  { id: "d-emas", n: "Kaca Emas", d: "Butang kaca, emas hangat", tpl: "dark", theme: { bg1: "#140F03", bg2: "#2A1D06", btn: "#FBBF24" } },
+  { id: "m-biru", n: "Klasik Biru", d: "Senarai bersih, biru lembut", tpl: "minimal", theme: { bg1: "#EEF4FF", bg2: "#EEF4FF", text: "#0B1E3F", btn: "#2563EB" } },
+  { id: "m-mint", n: "Klasik Mint", d: "Senarai bersih, hijau mint", tpl: "minimal", theme: { bg1: "#ECFDF5", bg2: "#ECFDF5", text: "#052E22", btn: "#059669" } },
+  { id: "m-jambu", n: "Klasik Jambu", d: "Senarai bersih, merah jambu", tpl: "minimal", theme: { bg1: "#FFF1F5", bg2: "#FFF1F5", text: "#3B1D2E", btn: "#E11D48" } },
+  { id: "t-udara-pop", n: "Udara Pop", d: "Kelabu cerah, butang berdenyut", tpl: "minimal", theme: { bgType: "solid", bg1: "#E8E9EF", bg2: "#E8E9EF", text: "#111111", btn: "#FFFFFF", font: "Inter", shape: "pill", ba: "pulse", en: "pop" } },
+  { id: "t-blok-kilau", n: "Blok Kilau", d: "Teal blok, butang berkilau", tpl: "minimal", theme: { bgType: "solid", bg1: "#14B8A6", bg2: "#14B8A6", text: "#06201D", btn: "#FDE047", bd: "#06201D", font: "Poppins", shape: "square", bs: "hard", ba: "shine", en: "pop" } },
+  { id: "t-neon-glow", n: "Neon Bercahaya", d: "Hitam, butang bercahaya", tpl: "minimal", theme: { bgType: "gradient", bg1: "#050510", bg2: "#14052B", text: "#F5F3FF", btn: "#A78BFA", font: "Space Grotesk", shape: "pill", bs: "outline", ba: "glow", en: "fade" } },
   { id: "t-titik", n: "Titik Krim", d: "Krim bertitik, butang hitam", tpl: "minimal", theme: { bgType: "solid", bg1: "#F7F1E6", bg2: "#F7F1E6", text: "#1C1A16", btn: "#1C1A16", font: "Space Grotesk", shape: "pill", pat: "dots" } },
 ];
 const designTheme = d => ({ ...TPL[d.tpl].theme, ...(d.theme || {}), ov: d.ov ?? 70, auto: false });
@@ -945,7 +1001,7 @@ function socialHtml(p) {
   if (!items.length) return "";
   return `<div class="fl-social">${items.map(({ s, href }) => `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(BRANDS[s.type].n)}">${brandIc(s.type, "w-5 h-5")}</a>`).join("")}</div>`;
 }
-const linkAttrs = l => `href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener noreferrer" data-link="${esc(l.id)}"`;
+const linkAttrs = l => `href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener noreferrer" data-link="${esc(l.id)}"${l.anim === "none" || ANIMS.some(x => x[0] && x[0] === l.anim) ? ` data-an="${l.anim}"` : ""}`;
 function formHtml(l) {
   return `<form class="fl-card fl-form" data-lead="${esc(l.id)}" novalidate>
     <b>${esc(l.title || "Hubungi saya")}</b>
@@ -997,7 +1053,7 @@ function posterHtml(p, act, { preview = false, anim = true } = {}) {
   };
   const body = (act.length ? act.map(item).join("") : `<p class="fl-pbio" style="text-align:center">Belum ada pautan.</p>`) + socialHtml(p) +
     `<a class="fl-pjoin" href="/" ${preview ? 'tabindex="-1"' : ""}>${ic("zap", "w-5 h-5")} Buat Flash Link anda sendiri</a><div class="fl-pmeta">Genius Digital Flash Link</div>`;
-  return `<div class="fl-root fl-tpl-poster fl-sty-poster ${anim ? "" : "fl-noanim"}" style="${esc(rootStyle(p))}"><div class="fl-wrap fl-pwrap">${hero}<div class="fl-pbody">${body}</div></div></div>`;
+  return `<div class="fl-root fl-tpl-poster fl-sty-poster ${rootCls(p.theme)} ${anim ? "" : "fl-noanim"}" style="${esc(rootStyle(p))}"><div class="fl-wrap fl-pwrap">${hero}<div class="fl-pbody">${body}</div></div></div>`;
 }
 function renderProfile(p, links, { preview = false, anim = true } = {}) {
   const t = p.theme, tpl = p.template, act = links.filter(l => l.active !== false);
@@ -1055,9 +1111,9 @@ function renderProfile(p, links, { preview = false, anim = true } = {}) {
       (tests.length ? `<h2 class="fl-sec">Kata pelanggan</h2>` + tests.map((x, i) => Wi(i, `<div class="fl-card fl-quote">“${esc(x.text)}”<small>— ${esc(x.name || "Pelanggan")}</small></div>`)).join("") : "") +
       (forms.length ? `<h2 class="fl-sec">Tempahan</h2>` + forms.map(formHtml).join("") : "") +
       (cta ? `<a class="fl-btn" style="margin-top:8px" ${linkAttrs(cta)}>${ic("whatsapp")}<span class="fl-t">Hubungi sekarang</span></a>` : "");
-    return `<div class="fl-root fl-tpl-landing fl-bs-${BSTYLES.some(x => x[0] === t.bs) ? t.bs : "solid"} ${t.auto ? "fl-auto" : ""} ${anim ? "" : "fl-noanim"}" style="${esc(rootStyle(p))}"><div class="fl-wrap">${banner}${body}${foot}</div></div>`;
+    return `<div class="fl-root fl-tpl-landing ${rootCls(t)} ${t.auto ? "fl-auto" : ""} ${anim ? "" : "fl-noanim"}" style="${esc(rootStyle(p))}"><div class="fl-wrap">${banner}${body}${foot}</div></div>`;
   } else body = act.map((l, i) => Wi(i, blockHtml(l))).join("");
-  return `<div class="fl-root fl-tpl-${tpl} fl-sty-${sty} fl-bs-${BSTYLES.some(x => x[0] === t.bs) ? t.bs : "solid"} ${t.auto && sty !== "cover" ? "fl-auto" : ""} ${anim ? "" : "fl-noanim"}" style="${esc(rootStyle(p))}"><div class="fl-wrap">${banner}${head}<div style="height:6px"></div>${body}${foot}</div></div>`;
+  return `<div class="fl-root fl-tpl-${tpl} fl-sty-${sty} ${rootCls(t)} ${t.auto && sty !== "cover" ? "fl-auto" : ""} ${anim ? "" : "fl-noanim"}" style="${esc(rootStyle(p))}"><div class="fl-wrap">${banner}${head}<div style="height:6px"></div>${body}${foot}</div></div>`;
 }
 function tileProduct(l) { return productHtml(l); }
 function blockHtml(l) {
@@ -1569,7 +1625,8 @@ function editDesign() {
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px">${col("ed-c1", "Warna latar 1", t.bg1)}${col("ed-c2", "Warna latar 2", t.bg2)}${col("ed-c3", "Warna latar 3 (mesh)", t.bg3 || t.bg2)}${col("ed-ct", "Warna tulisan", t.text)}${col("ed-cb", "Warna butang / aksen", t.btn)}</div>
       <div id="ed-bgi" style="${t.bgType === "image" ? "" : "display:none"}">${imgFieldHtml("ed-bg", "Gambar latar", "round")}</div><div id="ed-ctr" class="err"></div>
       <label class="lbl" for="ed-ov" style="margin-top:12px">Overlay gambar: <b id="ed-ovv">${Math.round(t.ov ?? 70)}%</b> <span style="font-weight:400;color:#9CA3AF">(warna ikut latar)</span></label><input id="ed-ov" type="range" min="0" max="100" step="5" value="${Math.round(t.ov ?? 70)}" style="width:100%;accent-color:#FF4D4D"></div>
-    <div class="edsec"><h3>Corak & gaya butang</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">${sel("ed-pat", "Corak latar", PAT_NAMES, t.pat || "")}${sel("ed-bs", "Gaya butang", BSTYLES, t.bs || "solid")}</div><p class="hint" style="margin:8px 0 0">Gaya butang terpakai pada susun atur senarai (Minimalis, Gelap dan Laman Mini).</p></div>
+    <div class="edsec"><h3>Corak & gaya butang</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">${sel("ed-pat", "Corak latar", PAT_NAMES, t.pat || "")}${sel("ed-bs", "Gaya butang", BSTYLES, t.bs || "solid")}</div><p class="hint" style="margin:8px 0 0">Gaya butang terpakai pada susun atur senarai (Minimalis, Gelap dan Laman Mini).</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">${sel("ed-ba", "Animasi semua butang", ANIMS, t.ba || "")}${sel("ed-en", "Animasi kemunculan", ENTRANCES, t.en || "up")}</div><p class="hint" style="margin:8px 0 0">Setiap pautan juga boleh ada animasi sendiri (dalam tetingkap edit pautan).</p></div>
     <div class="edsec"><h3>Tulisan & saiz</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">${sel("ed-ft", "Jenis tulisan", FONTS.map(f => [f, f]), t.font)}${sel("ed-fs", "Saiz tulisan", [["s", "Kecil"], ["m", "Sederhana"], ["l", "Besar"]], t.fs || "m")}${sel("ed-sh", "Bentuk butang", [["pill", "Kapsul"], ["round", "Bulat sudut"], ["square", "Segi empat"]], t.shape || "pill")}${sel("ed-sz", "Saiz kad pautan", [["s", "Kecil"], ["m", "Sederhana"], ["l", "Besar"]], t.sz || "m")}</div></div>
     <button class="btn btn-red" id="ed-done" style="width:100%;min-height:50px;margin-top:18px">Siap</button>`, null, { side: true, cls: "wide" });
   const $e = id => $("#" + id, m);
@@ -1587,7 +1644,7 @@ function editDesign() {
   $e("ed-bt").onchange = e => { S.profile.theme.bgType = e.target.value; $e("ed-bgi").style.display = e.target.value === "image" ? "" : "none"; commit(); };
   [["ed-c1", "bg1"], ["ed-c2", "bg2"], ["ed-c3", "bg3"], ["ed-ct", "text"], ["ed-cb", "btn"]].forEach(([id, k]) => ($e(id).oninput = e => { S.profile.theme[k] = e.target.value; commit(); }));
   $e("ed-ov").oninput = e => { S.profile.theme.ov = +e.target.value; $e("ed-ovv").textContent = e.target.value + "%"; commit(); };
-  [["ed-ft", "font"], ["ed-fs", "fs"], ["ed-sh", "shape"], ["ed-sz", "sz"], ["ed-pat", "pat"], ["ed-bs", "bs"]].forEach(([id, k]) => ($e(id).onchange = e => { S.profile.theme[k] = e.target.value; commit(); }));
+  [["ed-ft", "font"], ["ed-fs", "fs"], ["ed-sh", "shape"], ["ed-sz", "sz"], ["ed-pat", "pat"], ["ed-bs", "bs"], ["ed-ba", "ba"], ["ed-en", "en"]].forEach(([id, k]) => ($e(id).onchange = e => { S.profile.theme[k] = e.target.value; commit(); }));
   $e("ed-done").onclick = () => m.close(); check();
   const mo = new MutationObserver(() => { if (!document.body.contains(m)) { mo.disconnect(); if (S.view === "design") designTab(); } }); mo.observe(document.body, { childList: true });
 }
@@ -1849,6 +1906,7 @@ function linkModal({ link, platform, type } = {}) {
       <div style="display:flex;gap:12px;align-items:center"><div id="thp" style="width:76px;height:76px;border-radius:16px;overflow:hidden;background:rgba(255,255,255,.08);display:grid;place-items:center;flex:none"></div>
       <div style="min-width:0"><div id="ths" class="hint" style="margin:0 0 8px"></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn btn-ghost btn-sm" id="thu">${ic("plus", "w-4 h-4")} Muat naik gambar</button><button type="button" class="btn btn-ghost btn-sm" id="tha">${ic("crop", "w-4 h-4")} Laras</button><button type="button" class="btn btn-ghost btn-sm" id="thr">Buang</button></div></div></div>
       <input type="file" id="thf" accept="image/*" hidden>${f("thi", "atau tampal URL gambar", /^https?:/.test(th) && !/ytimg|microlink/.test(th) ? th : "", "https://…/gambar.jpg", 'inputmode="url"')}</div>` : ""}
+    ${t !== "header" ? `<div style="margin-top:14px"><label class="lbl" for="man">Animasi butang</label><select id="man" class="inp"><option value="">Ikut design</option><option value="none">Tiada</option>${ANIMS.filter(x => x[0]).map(([k, n]) => `<option value="${k}" ${link?.anim === k ? "selected" : ""}>${n}</option>`).join("")}</select></div>` : ""}
     ${wantThumb && t !== "product" ? `<div style="margin-top:14px"><div class="lbl">Papar sebagai (design Poster)</div><div class="seg" id="lay"><button type="button" data-lay="bar" aria-selected="${lay === "bar"}">Bar</button><button type="button" data-lay="featured" aria-selected="${lay === "featured"}">Kad besar</button></div><p class="hint">Kad besar memaparkan gambar penuh di atas tajuk.</p></div>` : ""}
     <div id="me" class="err" role="alert"></div><button id="ms" class="btn btn-red" style="width:100%;min-height:50px;margin-top:16px">${edit ? "Simpan" : "Tambah ke halaman saya"}</button>`);
   const $m = id => $("#" + id, m);
@@ -1886,7 +1944,7 @@ function linkModal({ link, platform, type } = {}) {
     let url = "";
     if (needUrl) { url = t === "whatsapp" ? waLink(v("mu"), v("mm")) : normUrl(v("mu")); if (!url) return (e.textContent = t === "whatsapp" ? "Nombor telefon tidak sah. Cuba 0123456789." : "URL tidak sah. Contoh: contoh.com/halaman"); }
     const price = t === "product" ? parseFloat(v("mp").replace(",", ".")) || 0 : 0;
-    const data = { type: t, platform: isWeb && needUrl ? detectPlatform(url) : plat, title: ttl.slice(0, 60), url, thumbnailUrl: th || "", layout: lay, price, promoLabel: v("ml").slice(0, 24) };
+    const data = { type: t, platform: isWeb && needUrl ? detectPlatform(url) : plat, title: ttl.slice(0, 60), url, thumbnailUrl: th || "", layout: lay, price, promoLabel: v("ml").slice(0, 24), anim: ($m("man") && $m("man").value) || "" };
     const btn = $m("ms"); btn.disabled = true;
     try {
       if (edit) { await FB.updateDoc(FB.doc(db, "flashlink_links", link.id), data); Object.assign(link, data); }
@@ -2081,7 +2139,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-43";
+const APP_VERSION = "V-44";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
