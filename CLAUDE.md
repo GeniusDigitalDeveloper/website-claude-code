@@ -101,3 +101,9 @@ HyperFrames ikut dokumen itu.
 
 Ini tambahan sahaja. Jangan ubah skill, framework atau tools yang sedia ada dalam repo
 ini kerananya, kecuali ustaz minta.
+
+## Flash Link — deploy automatik (arahan tetap ustaz)
+
+Bila kerja `sites/flash-link` siap, **terus deploy tanpa tanya dan tanpa tunggu ustaz sebut "deploy"**.
+Urutan: sahkan rules hidup sama dengan backup dahulu → deploy rules (hanya tambah, kunci/koleksi `flashlink*`; backup ke `backup/`) → deploy `hosting:flashlink` ke site `genius-digital-flashlink-40bc9-5effc` (projek `genius-digital-40bc9`) → uji URL hidup → laporkan.
+Masih WAJIB berhenti dan tanya jika rules hidup berbeza daripada backup, ada rule sedia ada yang bertembung, atau perubahan akan menyentuh app/site lain dalam projek yang sama. Jangan padam atau ubah rules/site app lain.
