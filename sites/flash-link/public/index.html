@@ -10,7 +10,14 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="Flash Link — Satu pautan untuk semua jualan anda">
 <meta property="og:description" content="Siapkan halaman link-in-bio dalam 2 minit. WhatsApp, Shopee, TikTok Shop, YouTube — semua dalam satu pautan.">
-<meta property="og:image" content="/assets/logo-2x.png">
+<meta property="og:image" content="https://genius-digital-flashlink-40bc9-5effc.web.app/assets/og.jpg">
+<meta property="og:image:secure_url" content="https://genius-digital-flashlink-40bc9-5effc.web.app/assets/og.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://genius-digital-flashlink-40bc9-5effc.web.app/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://genius-digital-flashlink-40bc9-5effc.web.app/assets/og.jpg">
 <link rel="icon" type="image/png" href="/assets/icon.png">
 <link rel="apple-touch-icon" href="/assets/icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1547,7 +1554,7 @@ async function publicView(username) {
   document.title = `${p.displayName || "@" + p.username} — Flash Link`;
   const desc = p.bio || `Semua pautan ${p.displayName || p.username} di satu tempat.`;
   setMeta("description", desc); setMeta("og:title", document.title, 1); setMeta("og:description", desc, 1);
-  setMeta("og:image", safeUrl(p.avatarUrl) || origin() + "/assets/logo-2x.png", 1); setMeta("og:url", profileUrl(p.username), 1);
+  setMeta("og:image", safeUrl(p.avatarUrl) || origin() + "/assets/og.jpg", 1); setMeta("og:url", profileUrl(p.username), 1);
   document.documentElement.style.background = rootStyle(p).match(/--bgcss:([^;]+)/)?.[0] ? "" : "";
   app.innerHTML = `<main class="pubmain">${renderProfile(p, links)}</main>`; armReveal(app);
   try { const rt = $(".fl-root"); if (rt) { const cs = getComputedStyle(rt); document.documentElement.style.background = cs.backgroundImage !== "none" ? `${cs.backgroundColor} ${cs.backgroundImage}` : cs.backgroundColor; document.body.style.background = "transparent"; } } catch {}
@@ -2754,7 +2761,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-72";
+const APP_VERSION = "V-73";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
