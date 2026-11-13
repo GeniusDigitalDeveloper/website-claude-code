@@ -333,6 +333,14 @@
     .pricebox { border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1rem .4rem; margin-bottom: 1rem; background: var(--bg); }
     .pricebox-title { font-family: var(--font-head); font-weight: 800; font-size: .85rem; letter-spacing: .06em; text-transform: uppercase; color: #C4141C; margin-bottom: .8rem; }
     .pricebox .hint { display: block; margin: -.3rem 0 .8rem; }
+    .pmode { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; margin-bottom: 1rem; }
+    .pm { position: relative; cursor: pointer; }
+    .pm input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+    .pm span { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .15rem; min-height: 58px; padding: .5rem .4rem; border: 1.5px solid var(--input-border); border-radius: 12px; background: var(--surface); font-family: var(--font-head); font-weight: 700; font-size: .82rem; line-height: 1.2; text-align: center; color: var(--head); }
+    .pm small { font-family: var(--font-body); font-weight: 500; font-size: .7rem; color: var(--muted); }
+    .pm input:checked + span { border-color: var(--blue-500); box-shadow: 0 0 0 3px rgba(10, 102, 255, .15); color: var(--accent); }
+    .pm input:focus-visible + span { outline: 3px solid var(--cyan-400); outline-offset: 2px; }
+    @media (max-width: 420px) { .pmode { grid-template-columns: 1fr; } .pm span { min-height: 48px; } }
     .pprice { display: block; margin-top: .25rem; font-size: .8rem; font-weight: 700; color: #C4141C; }
     .pprice s { color: var(--muted); font-weight: 500; }
 
@@ -631,19 +639,24 @@
         </details>
         <div class="pricebox">
           <div class="pricebox-title">Badge Harga (RM)</div>
-          <div class="row2">
-            <div class="field">
-              <label for="fPrice"><span>Harga Istimewa (RM)</span> <span class="opt">(badge merah)</span></label>
+          <div class="pmode" role="radiogroup" aria-label="Jenis badge harga">
+            <label class="pm"><input type="radio" name="priceMode" value="none" checked><span>Tiada harga</span></label>
+            <label class="pm"><input type="radio" name="priceMode" value="fixed"><span>Harga Tetap<small>tanpa diskaun</small></span></label>
+            <label class="pm"><input type="radio" name="priceMode" value="special"><span>Harga Istimewa<small>ada potongan</small></span></label>
+          </div>
+          <div class="row2" id="priceFields" hidden>
+            <div class="field" id="fldPrice">
+              <label for="fPrice"><span id="lblPrice">Harga (RM)</span> <span class="opt" id="optPrice"></span></label>
               <input class="input" dir="ltr" id="fPrice" type="number" inputmode="decimal" min="0" max="1000000" step="0.01" placeholder="129.99">
               <span class="err" id="ePrice"></span>
             </div>
-            <div class="field">
-              <label for="fOrigPrice"><span>Harga Asal (RM)</span> <span class="opt">(dicoret, pilihan)</span></label>
+            <div class="field" id="fldOrig" hidden>
+              <label for="fOrigPrice"><span>Harga Asal (RM)</span> <span class="opt">(dicoret)</span></label>
               <input class="input" dir="ltr" id="fOrigPrice" type="number" inputmode="decimal" min="0" max="1000000" step="0.01" placeholder="199.99">
               <span class="err" id="eOrigPrice"></span>
             </div>
           </div>
-          <span class="hint">Kosongkan kedua-duanya jika produk tiada badge harga. Harga asal mesti lebih tinggi daripada harga istimewa. Badge terus muncul pada kad produk di laman awam.</span>
+          <span class="hint" id="priceHint">Produk tidak akan memaparkan badge harga.</span>
         </div>
         <div class="row2">
           <div class="field">
@@ -1165,7 +1178,7 @@
     const fmtRM = (n) => "RM " + (Number.isInteger(n) ? String(n) : n.toFixed(2));
     function priceLine(p) {
       if (p.price == null) return null;
-      return el("span", { class: "pprice" }, p.originalPrice != null ? [fmtRM(p.price) + "  ", el("s", { text: fmtRM(p.originalPrice) })] : fmtRM(p.price));
+      return el("span", { class: "pprice" }, p.originalPrice != null ? ["Istimewa: " + fmtRM(p.price) + "  ", el("s", { text: fmtRM(p.originalPrice) })] : "Tetap: " + fmtRM(p.price));
     }
     function renderProducts() {
       if (dragState) { dragState.pending = true; return; }   // jangan lukis semula ketika menyeret
@@ -1324,6 +1337,7 @@
       F.category.value = p ? p.category : ""; F.status.value = p ? p.status : "active"; F.desc.value = p ? p.description : "";
       F.url.value = p ? p.productURL : "";
       F.price.value = p && p.price != null ? p.price : ""; F.orig.value = p && p.originalPrice != null ? p.originalPrice : "";
+      setPriceMode(p && p.price != null ? (p.originalPrice != null ? "special" : "fixed") : "none");
       F.order.value = p ? p.displayOrder : (products.reduce((m, x) => Math.max(m, x.displayOrder), 0) + 1);
       F.nameEn.value = p ? p.nameEn : ""; F.catEn.value = p ? p.categoryEn : ""; F.descEn.value = p ? p.descriptionEn : "";
       F.nameAr.value = p ? p.nameAr : ""; F.catAr.value = p ? p.categoryAr : ""; F.descAr.value = p ? p.descriptionAr : "";
@@ -1356,6 +1370,19 @@
     });
     $("#thumbRemove").addEventListener("click", () => { thumb.dataURL = ""; thumb.removed = true; refreshThumbUI(); });
 
+    // Jenis badge harga: none (tiada), fixed (harga tetap, tanpa diskaun), special (harga istimewa + harga asal dicoret)
+    const PRICE_HINT = { none: "Produk tidak akan memaparkan badge harga.",
+      fixed: "Badge biru: satu harga tetap, tanpa diskaun. Terus muncul pada kad produk di laman awam.",
+      special: "Badge merah: harga istimewa dengan harga asal dicoret (ada potongan). Harga asal mesti lebih tinggi daripada harga istimewa." };
+    function setPriceMode(mode) {
+      const r = $(`input[name="priceMode"][value="${mode}"]`); if (r) r.checked = true;
+      $("#priceFields").hidden = mode === "none"; $("#fldOrig").hidden = mode !== "special";
+      $("#lblPrice").textContent = mode === "special" ? "Harga Istimewa (RM)" : "Harga Tetap (RM)";
+      $("#optPrice").textContent = mode === "special" ? "(badge merah)" : "(badge biru)";
+      $("#priceHint").textContent = PRICE_HINT[mode];
+    }
+    $$('input[name="priceMode"]').forEach(r => r.addEventListener("change", () => setPriceMode(r.value)));
+
     function validateForm() {
       clearErrors(); let ok = true;
       const name = F.name.value.trim(), slug = F.slug.value.trim(), cat = F.category.value.trim(), desc = F.desc.value.trim(), url = F.url.value.trim();
@@ -1368,12 +1395,16 @@
       if (desc.length > 1000) { fieldError(F.desc, "#eDesc", t("val.desc")); ok = false; }
       if (url && !/^https:\/\/[^\s]+$/i.test(url)) { fieldError(F.url, "#eUrl", t("val.url")); ok = false; }
       if (!Number.isInteger(order) || order < 0 || order > 100000) { fieldError(F.order, "#eOrder", t("val.order")); ok = false; }
+      const mode = $('input[name="priceMode"]:checked').value;
       const money = (i) => { const v = i.value.trim().replace(",", "."); return v === "" ? null : Number(v); };
-      const price = money(F.price), orig = money(F.orig);
-      if (price !== null && (!Number.isFinite(price) || price <= 0 || price > 1000000)) { fieldError(F.price, "#ePrice", "Masukkan harga lebih daripada 0 (contoh: 129.99)."); ok = false; }
-      if (orig !== null) {
-        if (price === null) { fieldError(F.orig, "#eOrigPrice", "Isi Harga Istimewa dahulu."); ok = false; }
-        else if (!Number.isFinite(orig) || orig <= price || orig > 1000000) { fieldError(F.orig, "#eOrigPrice", "Harga asal mesti lebih tinggi daripada harga istimewa."); ok = false; }
+      const price = mode === "none" ? null : money(F.price), orig = mode === "special" ? money(F.orig) : null;
+      if (mode !== "none") {
+        const okPrice = price !== null && Number.isFinite(price) && price > 0 && price <= 1000000;
+        if (!okPrice) { fieldError(F.price, "#ePrice", "Masukkan harga lebih daripada 0 (contoh: 129.99)."); ok = false; }
+        if (mode === "special") {
+          if (orig === null) { fieldError(F.orig, "#eOrigPrice", "Isi Harga Asal (harga yang dicoret)."); ok = false; }
+          else if (okPrice && (!Number.isFinite(orig) || orig <= price || orig > 1000000)) { fieldError(F.orig, "#eOrigPrice", "Harga asal mesti lebih tinggi daripada harga istimewa."); ok = false; }
+        }
       }
       const r2 = (n) => n === null ? null : Math.round(n * 100) / 100;
       if (!ok) { const first = form.querySelector(".invalid"); if (first) first.focus(); }
