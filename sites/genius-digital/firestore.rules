@@ -20,7 +20,7 @@ service cloud.firestore {
     }
 
     function isValidStatus(value) {
-      return value in ['active', 'coming-soon', 'hidden'];
+      return value in ['active', 'coming-soon', 'hidden', 'free', 'ended', 'soldout'];
     }
 
     // Medan yang dibenarkan dalam dokumen produk (selain ini ditolak).
@@ -95,11 +95,11 @@ service cloud.firestore {
     match /products/{productId} {
 
       // Baca satu dokumen: produk awam, atau admin (termasuk hidden).
-      allow get: if gdIsAdmin() || resource.data.status in ['active', 'coming-soon'];
+      allow get: if gdIsAdmin() || resource.data.status in ['active', 'coming-soon', 'free', 'ended', 'soldout'];
 
       // Senarai/query: admin boleh semua. Orang awam MESTI query dengan
       //   where('status', 'in', ['active', 'coming-soon'])
-      allow list: if gdIsAdmin() || resource.data.status in ['active', 'coming-soon'];
+      allow list: if gdIsAdmin() || resource.data.status in ['active', 'coming-soon', 'free', 'ended', 'soldout'];
 
       // Cipta: admin sahaja, ID dokumen == slug, createdAt/updatedAt == masa pelayan.
       allow create: if gdIsAdmin()

@@ -213,6 +213,12 @@
     .status-select { min-height: 44px; padding: .3rem 2rem .3rem .75rem; border-radius: 999px; border: 1.5px solid; font-family: var(--font-head); font-weight: 700; font-size: .75rem; letter-spacing: .06em; text-transform: uppercase; appearance: none; -webkit-appearance: none; cursor: pointer; background-repeat: no-repeat; background-position: right .6rem center; background-size: 10px; max-width: 100%; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='m1 1 4 4 4-4' fill='none' stroke='%2351607F' stroke-width='1.6' stroke-linecap='round'/%3E%3C/svg%3E"); }
     .status-select.active { color: var(--ok); border-color: rgba(14, 159, 110, .45); background-color: rgba(14, 159, 110, .08); }
     .status-select.coming-soon { color: var(--warn); border-color: rgba(183, 121, 31, .45); background-color: rgba(242, 169, 59, .1); }
+    .status-select.free { color: #0B7A36; border-color: rgba(11, 122, 54, .45); background-color: rgba(29, 185, 84, .12); }
+    .status-select.ended { color: #0A4FD8; border-color: rgba(10, 79, 216, .45); background-color: rgba(10, 102, 255, .1); }
+    .status-select.soldout { color: #C4141C; border-color: rgba(196, 20, 28, .45); background-color: rgba(232, 17, 31, .08); }
+    :root[data-theme="dark"] .status-select.free { color: #5BE37E; }
+    :root[data-theme="dark"] .status-select.ended { color: #7DB8FF; }
+    :root[data-theme="dark"] .status-select.soldout { color: #FF8A8F; }
     .status-select.hidden-s { color: var(--muted); border-color: rgba(81, 96, 127, .4); background-color: rgba(81, 96, 127, .08); }
 
     .state-box { text-align: center; padding: 2.5rem 1.25rem; border-radius: var(--radius); background: var(--surface); border: 1px dashed var(--dash-border); }
@@ -538,7 +544,7 @@
               <select class="input" id="categoryFilter"><option value="" data-i18n="filter.allCategories">Semua kategori</option></select>
               <label class="sr-only" for="statusFilter" data-i18n="filter.statusLabel">Tapis mengikut status</label>
               <select class="input" id="statusFilter">
-                <option value="" data-i18n="filter.allStatuses">Semua status</option><option value="active" data-i18n="status.active">Aktif</option><option value="coming-soon" data-i18n="status.soon">Akan Datang</option><option value="hidden" data-i18n="status.hidden">Tersembunyi</option>
+                <option value="" data-i18n="filter.allStatuses">Semua status</option><option value="active" data-i18n="status.active">Aktif</option><option value="coming-soon" data-i18n="status.soon">Akan Datang</option><option value="free" data-i18n="status.free">Percuma</option><option value="ended" data-i18n="status.ended">Tamat</option><option value="soldout" data-i18n="status.soldout">Habis Stok</option><option value="hidden" data-i18n="status.hidden">Tersembunyi</option>
               </select>
             </div>
           </div>
@@ -614,7 +620,7 @@
           </div>
           <div class="field">
             <label for="fStatus" data-i18n="dlg.status">Status Produk</label>
-            <select class="input" id="fStatus"><option value="active" data-i18n="status.active">Aktif</option><option value="coming-soon" data-i18n="status.soon">Akan Datang</option><option value="hidden" data-i18n="status.hidden">Tersembunyi</option></select>
+            <select class="input" id="fStatus"><option value="active" data-i18n="status.active">Aktif</option><option value="coming-soon" data-i18n="status.soon">Akan Datang</option><option value="free" data-i18n="status.free">Percuma</option><option value="ended" data-i18n="status.ended">Tamat</option><option value="soldout" data-i18n="status.soldout">Habis Stok</option><option value="hidden" data-i18n="status.hidden">Tersembunyi</option></select>
           </div>
         </div>
         <div class="field">
@@ -735,7 +741,7 @@
     };
     const FIREBASE_SDK_VERSION = "12.12.0";   // mesti sama dengan index.html
 
-    const statusLabel = (st) => ({ "active": t("status.active"), "coming-soon": t("status.soon"), "hidden": t("status.hidden") }[st] || st);
+    const statusLabel = (st) => ({ "active": t("status.active"), "coming-soon": t("status.soon"), "free": t("status.free"), "ended": t("status.ended"), "soldout": t("status.soldout"), "hidden": t("status.hidden") }[st] || st);
     const SAMPLE_PRODUCTS = [   // digunakan oleh butang "Masukkan produk contoh" (hanya jika belum wujud)
       { slug: "qr-me-generator", name: "QR Me Generator", category: "Digital Tools", status: "active", displayOrder: 1,
         description: "Sistem penjana kod QR yang membolehkan pengguna menghasilkan QR Code dengan mudah, pantas dan praktikal untuk pelbagai kegunaan.",
@@ -839,7 +845,7 @@
         "row.drag": "Seret untuk susun semula", "row.dragAria": "Seret {name} untuk susun semula", "toast.reordered": "Susunan disimpan. Laman awam dikemas kini.",
         "search.label": "Cari produk", "search.placeholder": "Cari nama, slug atau kategori…",
         "filter.categoryLabel": "Tapis mengikut kategori", "filter.allCategories": "Semua kategori", "filter.statusLabel": "Tapis mengikut status", "filter.allStatuses": "Semua status",
-        "status.active": "Aktif", "status.soon": "Akan Datang", "status.hidden": "Tersembunyi",
+        "status.active": "Tersedia", "status.soon": "Akan Datang", "status.free": "Percuma", "status.ended": "Tamat", "status.soldout": "Habis Stok", "status.hidden": "Tersembunyi",
         "th.order": "Susunan", "th.thumb": "Imej", "th.product": "Produk", "th.category": "Kategori", "th.status": "Status", "th.updated": "Dikemas kini",
         "row.updated": "{category} · Dikemas kini {date}", "row.edit": "Edit", "row.editAria": "Edit {name}", "row.deleteAria": "Padam {name}", "row.deleteSr": "Padam",
         "row.upAria": "Naikkan {name}", "row.downAria": "Turunkan {name}", "row.up": "Naik", "row.down": "Turun", "row.reorderBlocked": "Kosongkan carian dan penapis untuk menyusun semula",
@@ -1216,7 +1222,7 @@
       const tbody = el("tbody", {}, rows.map(p => {
         const idx = full.findIndex(x => x.slug === p.slug);
         const sel = el("select", { class: "status-select " + (p.status === "hidden" ? "hidden-s" : p.status), "aria-label": t("row.statusAria", { name: p.name }) },
-          ["active", "coming-soon", "hidden"].map((v) => el("option", { value: v, text: statusLabel(v), selected: v === p.status })));
+          ["active", "coming-soon", "free", "ended", "soldout", "hidden"].map((v) => el("option", { value: v, text: statusLabel(v), selected: v === p.status })));
         sel.addEventListener("change", () => changeStatus(p, sel));
         const up = el("button", { class: "icon-btn", type: "button", "aria-label": t("row.upAria", { name: p.name }), title: canReorder ? t("row.up") : t("row.reorderBlocked"), disabled: !canReorder || idx === 0, onclick: () => moveProduct(p.slug, -1) }, icon("i-up"));
         const down = el("button", { class: "icon-btn", type: "button", "aria-label": t("row.downAria", { name: p.name }), title: canReorder ? t("row.down") : t("row.reorderBlocked"), disabled: !canReorder || idx === full.length - 1, onclick: () => moveProduct(p.slug, 1) }, icon("i-down"));

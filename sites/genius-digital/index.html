@@ -321,6 +321,9 @@
     .status-badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--ok); }
     .status-badge.soon { color: var(--warn); } .status-badge.soon::before { background: #F2A93B; }
     .status-badge.live { color: var(--ok); }
+    .status-badge.free { color: #0B7A36; background: #E3F9E9; } .status-badge.free::before { background: #1DB954; }
+    .status-badge.ended { color: #0A4FD8; background: #E1EEFF; } .status-badge.ended::before { background: #0A66FF; }
+    .status-badge.soldout { color: #C4141C; background: #FFE4E6; } .status-badge.soldout::before { background: #E8111F; }
     .card-body { display: flex; flex-direction: column; flex: 1; padding: 1rem 1.1rem 1.15rem; }
     .category-pill { align-self: flex-start; padding: .2rem .6rem; border-radius: 999px; font-size: .66rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); background: rgba(10, 102, 255, .12); }
     .card-body h3 { margin-top: .6rem; font-size: 1.1rem; color: var(--head); }
@@ -910,7 +913,7 @@
         "about.p3.t": "Teknologi Berpaksikan Pengguna", "about.p3.d": "Teknologi yang dibina berdasarkan keperluan pengguna: mudah difahami dan boleh diakses pada mana-mana peranti.",
         "products.eyebrow": "Katalog Produk", "products.title": "Produk <span>Digital</span> Kami",
         "products.sub": "Terokai koleksi sistem dan alatan digital inovatif kami.",
-        "status.live": "Tersedia", "status.soon": "Akan Datang", "btn.explore": "Terokai Produk",
+        "status.live": "Tersedia", "status.free": "Percuma", "status.ended": "Tamat", "status.soldout": "Habis Stok", "status.soon": "Akan Datang", "btn.explore": "Terokai Produk",
         "thumb.alt": "Imej thumbnail {name}", "product.noName": "Tanpa Nama", "product.defaultCat": "Produk Digital",
         "state.err.title": "Produk tidak dapat dimuatkan",
         "state.err.permission": "Akses ke data ditolak. Pastikan Firestore Rules telah diterbitkan.",
@@ -950,7 +953,7 @@
         "about.p3.t": "User-Centric Technology", "about.p3.d": "Technology built around what users need: easy to understand and accessible on any device.",
         "products.eyebrow": "Product Catalogue", "products.title": "Our Digital <span>Products</span>",
         "products.sub": "Explore our collection of innovative digital systems and tools.",
-        "status.live": "Available", "status.soon": "Coming Soon", "btn.explore": "Explore Product",
+        "status.live": "Available", "status.free": "Free", "status.ended": "Ended", "status.soldout": "Sold Out", "status.soon": "Coming Soon", "btn.explore": "Explore Product",
         "thumb.alt": "{name} thumbnail", "product.noName": "Untitled", "product.defaultCat": "Digital Product",
         "state.err.title": "Couldn't load the products",
         "state.err.permission": "Access to the data was denied. Make sure the Firestore rules have been published.",
@@ -990,7 +993,7 @@
         "about.p3.t": "تقنية تتمحور حول المستخدم", "about.p3.d": "تقنية مبنية على احتياجات المستخدمين، سهلة الفهم ويمكن الوصول إليها من أي جهاز.",
         "products.eyebrow": "كتالوج المنتجات", "products.title": "منتجاتنا <span>الرقمية</span>",
         "products.sub": "اكتشف مجموعتنا من الأنظمة والأدوات الرقمية المبتكرة.",
-        "status.live": "متاح", "status.soon": "قريباً", "btn.explore": "استكشف المنتج",
+        "status.live": "متاح", "status.free": "مجاني", "status.ended": "انتهى", "status.soldout": "نفد المخزون", "status.soon": "قريباً", "btn.explore": "استكشف المنتج",
         "thumb.alt": "صورة مصغّرة لـ {name}", "product.noName": "بلا اسم", "product.defaultCat": "منتج رقمي",
         "state.err.title": "تعذّر تحميل المنتجات",
         "state.err.permission": "تم رفض الوصول إلى البيانات. تأكد من نشر قواعد Firestore.",
@@ -1120,10 +1123,12 @@
     const showError = (error, retry) => { view = { kind: "error", error, retry, products: [] }; renderView(); };
 
     function statusBadge(status) {
-      return status === "coming-soon"
-        ? el("span", { class: "status-badge soon", text: t("status.soon") })
-        : el("span", { class: "status-badge live", text: t("status.live") });
+      const map = { "coming-soon": ["soon", "status.soon"], free: ["free", "status.free"], ended: ["ended", "status.ended"], soldout: ["soldout", "status.soldout"] };
+      const [cls, key] = map[status] || ["live", "status.live"];
+      return el("span", { class: "status-badge " + cls, text: t(key) });
     }
+    // Tamat / Habis Stok (status atau jenis badge harga): produk tidak boleh ditekan
+    const isBlocked = (p) => ["ended", "soldout"].includes(p.status) || ["ended", "soldout"].includes(p.priceType);
 
     // Badge harga istimewa (RM) + harga asal dicoret. Diurus dalam Admin Panel (price, originalPrice).
     const priceNum = (v) => (typeof v === "number" && isFinite(v) && v > 0) ? v : null;
@@ -1161,7 +1166,7 @@
     }
 
     function openProduct(product) {
-      if (product.priceType === "ended" || product.priceType === "soldout") return;
+      if (isBlocked(product)) return;
       // Jika admin isi Pautan Produk (https://), ke sana; jika tidak, modal "Produk Akan Datang".
       const link = safeHttps(product.productURL);
       if (link) { window.open(link, "_blank", "noopener,noreferrer"); return; }
@@ -1177,7 +1182,7 @@
 
     function productCard(product, index) {
       const name = localized(product, "name") || t("product.noName");
-      const blocked = product.priceType === "ended" || product.priceType === "soldout";   // Tamat / Habis Stok: tidak boleh ditekan
+      const blocked = isBlocked(product);
       const link = blocked ? "" : safeHttps(product.productURL);
       const thumbKids = [statusBadge(product.status), thumbImage(product, t("thumb.alt", { name }))];
       const pb = priceBadge(product, index);
@@ -1198,7 +1203,7 @@
     function renderProducts(products) {
       const str = (v) => (typeof v === "string" ? v : "");
       const visible = products
-        .filter(p => p && (p.status === "active" || p.status === "coming-soon"))      // hidden tidak dipaparkan
+        .filter(p => p && ["active", "coming-soon", "free", "ended", "soldout"].includes(p.status))      // hidden tidak dipaparkan
         .map(p => ({
           ...p, name: str(p.name), category: str(p.category), description: str(p.description), displayOrder: Number(p.displayOrder) || 0,
           nameEn: str(p.nameEn), categoryEn: str(p.categoryEn), descriptionEn: str(p.descriptionEn),
@@ -1233,9 +1238,9 @@
       let slowTimer;
       try {
         const { db, fs } = await getDb();
-        // Awam hanya boleh query status active/coming-soon (selari dengan firestore.rules).
+        // Awam hanya boleh query status active/coming-soon/free/ended/soldout (selari dengan firestore.rules).
         // Susunan mengikut displayOrder dibuat di klien supaya tiada composite index diperlukan.
-        const q = fs.query(fs.collection(db, "products"), fs.where("status", "in", ["active", "coming-soon"]));
+        const q = fs.query(fs.collection(db, "products"), fs.where("status", "in", ["active", "coming-soon", "free", "ended", "soldout"]));
         slowTimer = setTimeout(() => showError({ code: "timeout" }, startProducts), 12000);
         stopListening = fs.onSnapshot(q,
           (snap) => { clearTimeout(slowTimer); renderProducts(snap.docs.map(d => ({ slug: d.id, ...d.data() }))); },
