@@ -199,6 +199,7 @@
     .ptable tr.prow { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem .9rem; padding: 1rem; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-sm); }
     .ptable td { padding: 0; min-width: 0; }
     .c-cat, .c-date { display: none; }
+    .c-sel { order: 0; flex: none; align-self: flex-start; }
     .c-thumb { order: 1; flex: none; align-self: flex-start; } .c-name { order: 2; flex: 1 1 calc(100% - 120px); } .c-status { order: 3; flex: none; } .c-order { order: 4; margin-inline-start: auto; flex: none; } .c-actions { order: 5; flex: 1 0 100%; padding-top: .35rem; border-top: 1px dashed var(--line); margin-top: .1rem; }
     .c-actions .inner { display: flex; gap: .6rem; width: 100%; margin-top: .75rem; }
     .c-actions .inner .btn:first-child { flex: 1; }
@@ -285,8 +286,8 @@
       .stats { grid-template-columns: repeat(5, 1fr); }
       .topbar { padding: 0 2rem; }
     }
-    @media (min-width: 1100px) {
-      /* Paparan jadual penuh */
+    @media (min-width: 1280px) {
+      /* Paparan jadual penuh (muat bersama sidebar) */
       .ptable thead { display: table-header-group; }
       .ptable thead th { text-align: start; padding: .8rem 1rem; font-family: var(--font-head); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); background: var(--bg-soft); border-bottom: 1px solid var(--line); }
       .ptable thead th:first-child { border-top-left-radius: var(--radius); } .ptable thead th:last-child { border-top-right-radius: var(--radius); }
@@ -350,6 +351,25 @@
     @media (max-width: 420px) { .pm span { min-height: 48px; } }
     .pprice { display: block; margin-top: .25rem; font-size: .8rem; font-weight: 700; color: #C4141C; }
     .pprice s { color: var(--muted); font-weight: 500; }
+
+    /* ---------- Pilih banyak produk (tukar status sekaligus) ---------- */
+    .bulkbar { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .9rem; padding: .5rem .9rem; margin-bottom: .8rem; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+    .bulkbar.active { border-color: var(--blue-500); background: rgba(10, 102, 255, .05); }
+    .bulk-all { display: inline-flex; align-items: center; gap: .55rem; min-height: 44px; cursor: pointer; font-family: var(--font-head); font-weight: 700; font-size: .85rem; color: var(--head); }
+    .bulk-all input, .c-sel input { width: 20px; height: 20px; margin: 0; accent-color: var(--blue-500); cursor: pointer; }
+    .bulk-count { font-family: var(--font-head); font-weight: 800; font-size: .85rem; color: var(--accent); }
+    .bulk-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; margin-inline-start: auto; }
+    .bulk-actions .input { width: auto; min-width: 190px; min-height: 44px; padding-block: .4rem; }
+    .c-sel label { display: grid; place-items: center; width: 40px; height: 44px; cursor: pointer; }
+    .ptable tr.prow.selected { background: rgba(10, 102, 255, .05); }
+    .ptable tr.prow.selected td { background: rgba(10, 102, 255, .05); }
+    @media (max-width: 640px) { .bulk-actions { margin-inline-start: 0; width: 100%; } .bulk-actions .input { flex: 1 1 100%; } .bulk-actions .btn { flex: 1; } }
+    @media (min-width: 1280px) {
+      .c-sel { width: 44px; padding-inline: .4rem !important; }
+      .ptable td { padding: .8rem .55rem; } .ptable thead th { padding: .8rem .55rem; }
+      .c-name { min-width: 180px; } .pthumb { width: 64px; }
+      .c-actions { padding-inline: .55rem; } .c-actions .inner { gap: .4rem; }
+    }
 
     /* ---------- Seret untuk susun semula ---------- */
     .drag-handle { width: 40px; height: 40px; flex: none; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--muted); cursor: grab; touch-action: none; -webkit-user-select: none; user-select: none; }
@@ -1014,6 +1034,11 @@
           for (const c of changes) batch.update(docRef(c.slug), { displayOrder: c.displayOrder, updatedAt: FS.serverTimestamp() });
           await batch.commit();
         },
+        async bulkStatus(slugs, status) {   // satu batch: status + updatedAt sahaja (badge harga tidak disentuh)
+          const batch = FS.writeBatch(db);
+          for (const s of slugs) batch.update(docRef(s), { status, updatedAt: FS.serverTimestamp() });
+          await batch.commit();
+        },
         subscribeSettings(onData, onError) {
           return FS.onSnapshot(FS.doc(db, "genius_site", "main"), (snap) => onData(snap.exists() ? snap.data() : {}), onError);
         },
@@ -1041,6 +1066,7 @@
         async update(slug, patch) { const i = items.find(x => x.slug === slug); if (!i) throw new Error(t("err.notFound")); touch(i, patch); emit(); },
         async remove(slug) { items = items.filter(i => i.slug !== slug); emit(); },
         async reorder(changes) { for (const c of changes) { const i = items.find(x => x.slug === c.slug); if (i) touch(i, { displayOrder: c.displayOrder }); } emit(); },
+        async bulkStatus(slugs, status) { for (const s of slugs) { const i = items.find(x => x.slug === s); if (i) touch(i, { status }); } emit(); },
         subscribeSettings(onData) { queueMicrotask(() => onData({})); return () => {}; },
         async saveSettings() {}
       };
@@ -1216,6 +1242,7 @@
         return;
       }
       const rows = filteredProducts();
+      for (const s of [...selected]) if (!rows.some(r => r.slug === s)) selected.delete(s);   // hanya baris yang kelihatan boleh dipilih
       if (!rows.length) { area.replaceChildren(stateBox("empty", t("nomatch.title"), t("nomatch.text"), [el("button", { class: "btn btn-ghost", type: "button", text: t("nomatch.reset"), onclick: resetFilters })])); return; }
 
       const full = sorted(), canReorder = !filters.q && !filters.category && !filters.status;
@@ -1228,7 +1255,11 @@
         const down = el("button", { class: "icon-btn", type: "button", "aria-label": t("row.downAria", { name: p.name }), title: canReorder ? t("row.down") : t("row.reorderBlocked"), disabled: !canReorder || idx === full.length - 1, onclick: () => moveProduct(p.slug, 1) }, icon("i-down"));
         const grip = el("button", { class: "drag-handle", type: "button", "aria-label": t("row.dragAria", { name: p.name }), title: canReorder ? t("row.drag") : t("row.reorderBlocked"), disabled: !canReorder }, icon("i-grip"));
         grip.addEventListener("pointerdown", startDrag);
-        return el("tr", { class: "prow", "data-slug": p.slug }, [
+        const chk = el("input", { type: "checkbox", class: "row-check", "data-slug": p.slug, "aria-label": "Pilih " + p.name });
+        chk.checked = selected.has(p.slug);
+        chk.addEventListener("change", () => { if (chk.checked) selected.add(p.slug); else selected.delete(p.slug); updateBulkUI(); });
+        return el("tr", { class: "prow" + (selected.has(p.slug) ? " selected" : ""), "data-slug": p.slug }, [
+          el("td", { class: "c-sel" }, el("label", {}, chk)),
           el("td", { class: "c-order" }, el("div", { class: "order-ctl" }, [grip, up, el("span", { class: "num", text: String(p.displayOrder), title: t("row.orderTitle") }), down])),
           el("td", { class: "c-thumb" }, thumbImg(p, "pthumb", t("row.thumbAlt", { name: p.name }))),
           el("td", { class: "c-name" }, [el("span", { class: "pname", text: p.name }), el("span", { class: "pslug", text: p.slug }), priceLine(p), el("span", { class: "pmeta", text: t("row.updated", { category: p.category, date: fmtDay(p.updatedAt) }) })]),
@@ -1241,8 +1272,9 @@
           ]))
         ]);
       }));
-      const thead = el("thead", {}, el("tr", {}, ["th.order", "th.thumb", "th.product", "th.category", "th.status", "th.updated", ""].map(k => el("th", { scope: "col", text: k ? t(k) : "" }))));
-      area.replaceChildren(el("div", { class: "table-card" }, el("table", { class: "ptable" }, [thead, tbody])));
+      const thead = el("thead", {}, el("tr", {}, ["", "th.order", "th.thumb", "th.product", "th.category", "th.status", "th.updated", ""].map(k => el("th", { scope: "col", text: k ? t(k) : "" }))));
+      area.replaceChildren(buildBulkBar(rows), el("div", { class: "table-card" }, el("table", { class: "ptable" }, [thead, tbody])));
+      updateBulkUI();
     }
 
     function resetFilters() {
@@ -1254,6 +1286,45 @@
     $("#searchInput").addEventListener("input", (e) => { clearTimeout(searchTimer); searchTimer = setTimeout(() => { filters.q = e.target.value; renderProducts(); }, 120); });
     $("#categoryFilter").addEventListener("change", (e) => { filters.category = e.target.value; renderProducts(); });
     $("#statusFilter").addEventListener("change", (e) => { filters.status = e.target.value; renderProducts(); });
+
+    /* ---------- Pilih banyak produk: tukar status sekaligus ---------- */
+    const selected = new Set();
+    let bulkStatusVal = "";
+    function buildBulkBar(rows) {
+      const all = el("input", { type: "checkbox", id: "bulkAll" });
+      all.addEventListener("change", () => { if (all.checked) rows.forEach(r => selected.add(r.slug)); else selected.clear(); $$(".row-check").forEach(c => { c.checked = selected.has(c.dataset.slug); }); updateBulkUI(); });
+      const sel = el("select", { class: "input", id: "bulkStatus", "aria-label": "Status baharu untuk produk yang dipilih" },
+        [el("option", { value: "", text: "Tukar status kepada…" }), ...["active", "coming-soon", "free", "ended", "soldout", "hidden"].map(v => el("option", { value: v, text: statusLabel(v) }))]);
+      sel.value = bulkStatusVal;
+      sel.addEventListener("change", () => { bulkStatusVal = sel.value; updateBulkUI(); });
+      const apply = el("button", { class: "btn btn-primary", type: "button", id: "bulkApply", text: "Terapkan", onclick: applyBulk });
+      const clear = el("button", { class: "btn btn-ghost", type: "button", text: "Batal pilihan", onclick: () => { selected.clear(); $$(".row-check").forEach(c => { c.checked = false; }); updateBulkUI(); } });
+      return el("div", { class: "bulkbar", id: "bulkBar" }, [
+        el("label", { class: "bulk-all" }, [all, el("span", { text: "Pilih semua" })]),
+        el("span", { class: "bulk-count", id: "bulkCount", hidden: "" }),
+        el("div", { class: "bulk-actions", id: "bulkActions", hidden: "" }, [sel, apply, clear])
+      ]);
+    }
+    function updateBulkUI() {
+      const bar = $("#bulkBar"); if (!bar) return;
+      const n = selected.size, total = $$(".row-check").length;
+      bar.classList.toggle("active", n > 0);
+      $("#bulkCount").hidden = n === 0; $("#bulkCount").textContent = n + " dipilih";
+      $("#bulkActions").hidden = n === 0;
+      const all = $("#bulkAll"); all.checked = total > 0 && n === total; all.indeterminate = n > 0 && n < total;
+      $("#bulkApply").disabled = !bulkStatusVal;
+      $$("tr.prow").forEach(r => r.classList.toggle("selected", selected.has(r.dataset.slug)));
+    }
+    async function applyBulk() {
+      const status = bulkStatusVal; if (!status || !selected.size) return;
+      const changes = [...selected].filter(s => { const p = products.find(x => x.slug === s); return p && p.status !== status; });
+      if (!changes.length) { toast("Semua produk yang dipilih sudah berstatus " + statusLabel(status) + ".", ""); return; }
+      if (!confirm("Tukar status " + changes.length + " produk kepada \u201c" + statusLabel(status) + "\u201d?\n\nBadge harga tidak berubah.")) return;
+      const btn = $("#bulkApply"); setBusy(btn, true, "Sedang menukar…");
+      try { await backend.bulkStatus(changes, status); toast(changes.length + " produk ditukar kepada " + statusLabel(status) + ".", "ok"); selected.clear(); bulkStatusVal = ""; }
+      catch (err) { toast(friendlyError(err), "err"); }
+      finally { setBusy(btn, false); renderProducts(); }
+    }
 
     /* ---------- Seret untuk susun semula (tetikus & sentuhan) ---------- */
     let dragState = null;
