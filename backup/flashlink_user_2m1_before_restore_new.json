@@ -1,0 +1,139 @@
+{
+ "name": "projects/genius-digital-40bc9/databases/(default)/documents/flashlink_users/2m1LFpEFaVdbhCMfsXI4Mcg2VBm1",
+ "fields": {
+  "username": {
+   "stringValue": "a323p5zb"
+  },
+  "avatarUrl": {
+   "stringValue": ""
+  },
+  "bannerUrl": {
+   "stringValue": ""
+  },
+  "plan": {
+   "stringValue": "free"
+  },
+  "theme": {
+   "mapValue": {
+    "fields": {
+     "ov": {
+      "integerValue": "70"
+     },
+     "bg1": {
+      "stringValue": "#FAF7F2"
+     },
+     "shape": {
+      "stringValue": "pill"
+     },
+     "auto": {
+      "booleanValue": false
+     },
+     "btn": {
+      "stringValue": "#18181B"
+     },
+     "font": {
+      "stringValue": "Inter"
+     },
+     "bg2": {
+      "stringValue": "#FAF7F2"
+     },
+     "bgType": {
+      "stringValue": "solid"
+     },
+     "text": {
+      "stringValue": "#18181B"
+     }
+    }
+   }
+  },
+  "socialIcons": {
+   "arrayValue": {}
+  },
+  "bio": {
+   "stringValue": ""
+  },
+  "createdAt": {
+   "timestampValue": "2026-11-13T17:07:44.893Z"
+  },
+  "profileStyle": {
+   "stringValue": "classic"
+  },
+  "designs": {
+   "arrayValue": {
+    "values": [
+     {
+      "mapValue": {
+       "fields": {
+        "id": {
+         "stringValue": "dvnn57b"
+        },
+        "name": {
+         "stringValue": "Design 1"
+        },
+        "template": {
+         "stringValue": "minimal"
+        },
+        "profileStyle": {
+         "stringValue": "classic"
+        },
+        "theme": {
+         "mapValue": {
+          "fields": {
+           "bgType": {
+            "stringValue": "solid"
+           },
+           "bg1": {
+            "stringValue": "#FAF7F2"
+           },
+           "bg2": {
+            "stringValue": "#FAF7F2"
+           },
+           "text": {
+            "stringValue": "#18181B"
+           },
+           "btn": {
+            "stringValue": "#18181B"
+           },
+           "font": {
+            "stringValue": "Inter"
+           },
+           "shape": {
+            "stringValue": "pill"
+           },
+           "ov": {
+            "integerValue": "70"
+           },
+           "auto": {
+            "booleanValue": false
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    ]
+   }
+  },
+  "template": {
+   "stringValue": "minimal"
+  },
+  "activeDesign": {
+   "stringValue": "dvnn57b"
+  },
+  "displayName": {
+   "stringValue": ""
+  },
+  "handle": {
+   "stringValue": ""
+  },
+  "publishedDesign": {
+   "stringValue": "dvnn57b"
+  },
+  "testimonials": {
+   "arrayValue": {}
+  }
+ },
+ "createTime": "2026-11-13T08:26:13.245906Z",
+ "updateTime": "2026-11-13T17:07:44.924762Z"
+}

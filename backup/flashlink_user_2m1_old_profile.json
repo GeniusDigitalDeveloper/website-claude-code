@@ -1,0 +1,379 @@
+{
+ "name": "projects/genius-digital-40bc9/databases/(default)/documents/flashlink_users/2m1LFpEFaVdbhCMfsXI4Mcg2VBm1",
+ "fields": {
+  "template": {
+   "stringValue": "dark"
+  },
+  "username": {
+   "stringValue": "syj4hmk2"
+  },
+  "testimonials": {
+   "arrayValue": {}
+  },
+  "socialIcons": {
+   "arrayValue": {}
+  },
+  "publishedDesign": {
+   "stringValue": "dytfq9m"
+  },
+  "designs": {
+   "arrayValue": {
+    "values": [
+     {
+      "mapValue": {
+       "fields": {
+        "theme": {
+         "mapValue": {
+          "fields": {
+           "bgType": {
+            "stringValue": "gradient"
+           },
+           "bg1": {
+            "stringValue": "#05060F"
+           },
+           "bg2": {
+            "stringValue": "#1A0A12"
+           },
+           "text": {
+            "stringValue": "#F4F6FF"
+           },
+           "btn": {
+            "stringValue": "#FF3B3B"
+           },
+           "font": {
+            "stringValue": "Space Grotesk"
+           },
+           "shape": {
+            "stringValue": "round"
+           },
+           "auto": {
+            "booleanValue": false
+           },
+           "bg3": {
+            "stringValue": "#A21CAF"
+           },
+           "bs": {
+            "stringValue": "glass"
+           },
+           "sz": {
+            "stringValue": "s"
+           },
+           "bg4": {
+            "stringValue": "#150D2B"
+           },
+           "ov": {
+            "integerValue": "70"
+           },
+           "fs": {
+            "stringValue": "s"
+           }
+          }
+         }
+        },
+        "profileStyle": {
+         "stringValue": "glass"
+        },
+        "name": {
+         "stringValue": "Foto Penuh Kaca"
+        },
+        "template": {
+         "stringValue": "dark"
+        },
+        "id": {
+         "stringValue": "dytfq9m"
+        }
+       }
+      }
+     },
+     {
+      "mapValue": {
+       "fields": {
+        "template": {
+         "stringValue": "minimal"
+        },
+        "profileStyle": {
+         "stringValue": "glass"
+        },
+        "id": {
+         "stringValue": "dmfa7ry"
+        },
+        "theme": {
+         "mapValue": {
+          "fields": {
+           "bgType": {
+            "stringValue": "solid"
+           },
+           "bg1": {
+            "stringValue": "#F4EAD5"
+           },
+           "bg2": {
+            "stringValue": "#F4EAD5"
+           },
+           "text": {
+            "stringValue": "#3B2A10"
+           },
+           "btn": {
+            "stringValue": "#9A6B1C"
+           },
+           "font": {
+            "stringValue": "Aref Ruqaa"
+           },
+           "shape": {
+            "stringValue": "round"
+           },
+           "auto": {
+            "booleanValue": false
+           },
+           "fx": {
+            "stringValue": "islamic"
+           },
+           "sz": {
+            "stringValue": "s"
+           },
+           "fr": {
+            "stringValue": "arch"
+           },
+           "pat": {
+            "stringValue": "dots"
+           },
+           "ov": {
+            "integerValue": "70"
+           },
+           "bg3": {
+            "stringValue": "#A21CAF"
+           },
+           "fs": {
+            "stringValue": "s"
+           },
+           "en": {
+            "stringValue": "fade"
+           },
+           "bs": {
+            "stringValue": "orn"
+           },
+           "bd": {
+            "stringValue": "#7CFC8E"
+           },
+           "bg4": {
+            "stringValue": "#150D2B"
+           }
+          }
+         }
+        },
+        "name": {
+         "stringValue": "Senarai Klasik"
+        }
+       }
+      }
+     }
+    ]
+   }
+  },
+  "avatarUrl": {
+   "stringValue": "fli:id9nqfj2t4e"
+  },
+  "bannerUrl": {
+   "stringValue": "fli:iyvm3cztxn9"
+  },
+  "handle": {
+   "stringValue": "izzul"
+  },
+  "theme": {
+   "mapValue": {
+    "fields": {
+     "fx": {
+      "stringValue": "islamic"
+     },
+     "bg4": {
+      "stringValue": "#150D2B"
+     },
+     "bg3": {
+      "stringValue": "#A21CAF"
+     },
+     "pat": {
+      "stringValue": "dots"
+     },
+     "text": {
+      "stringValue": "#F4F6FF"
+     },
+     "shape": {
+      "stringValue": "round"
+     },
+     "fs": {
+      "stringValue": "s"
+     },
+     "bs": {
+      "stringValue": "glass"
+     },
+     "auto": {
+      "booleanValue": false
+     },
+     "font": {
+      "stringValue": "Space Grotesk"
+     },
+     "bc": {
+      "booleanValue": false
+     },
+     "bg2": {
+      "stringValue": "#1A0A12"
+     },
+     "btn": {
+      "stringValue": "#FF3B3B"
+     },
+     "bd": {
+      "stringValue": "#7CFC8E"
+     },
+     "bgType": {
+      "stringValue": "gradient"
+     },
+     "fr": {
+      "stringValue": "arch"
+     },
+     "ov": {
+      "integerValue": "70"
+     },
+     "en": {
+      "stringValue": "fade"
+     },
+     "bg1": {
+      "stringValue": "#05060F"
+     },
+     "sz": {
+      "stringValue": "s"
+     }
+    }
+   }
+  },
+  "activeDesign": {
+   "stringValue": "dytfq9m"
+  },
+  "bio": {
+   "stringValue": "Digital Product & AI Developer System"
+  },
+  "displayName": {
+   "stringValue": "IBNU YAZID"
+  },
+  "plan": {
+   "stringValue": "free"
+  },
+  "profileStyle": {
+   "stringValue": "glass"
+  },
+  "createdAt": {
+   "timestampValue": "2026-11-13T08:26:13.169Z"
+  },
+  "imgOrig": {
+   "mapValue": {
+    "fields": {
+     "fli:iykj9x32um9": {
+      "mapValue": {
+       "fields": {
+        "z": {
+         "integerValue": "1"
+        },
+        "x": {
+         "doubleValue": 0.5
+        },
+        "o": {
+         "stringValue": "fli:i28ktk2r3pp"
+        },
+        "ai": {
+         "integerValue": "0"
+        },
+        "y": {
+         "integerValue": "0"
+        }
+       }
+      }
+     },
+     "fli:id9nqfj2t4e": {
+      "mapValue": {
+       "fields": {
+        "o": {
+         "stringValue": "fli:i28ktk2r3pp"
+        },
+        "x": {
+         "doubleValue": 0.5
+        },
+        "z": {
+         "integerValue": "1"
+        },
+        "ai": {
+         "integerValue": "1"
+        },
+        "y": {
+         "doubleValue": 0.1239
+        }
+       }
+      }
+     },
+     "fli:iyvm3cztxn9": {
+      "mapValue": {
+       "fields": {
+        "o": {
+         "stringValue": "fli:i8n3dnxmubh"
+        },
+        "z": {
+         "integerValue": "1"
+        },
+        "x": {
+         "doubleValue": 0.5
+        },
+        "y": {
+         "doubleValue": 0.1942
+        },
+        "ai": {
+         "integerValue": "0"
+        }
+       }
+      }
+     },
+     "fli:ik3uq7tbxr5": {
+      "mapValue": {
+       "fields": {
+        "ai": {
+         "integerValue": "2"
+        },
+        "o": {
+         "stringValue": "fli:id84qqwksqs"
+        },
+        "x": {
+         "doubleValue": 0.5782
+        },
+        "z": {
+         "doubleValue": 1.12
+        },
+        "y": {
+         "integerValue": "0"
+        }
+       }
+      }
+     },
+     "fli:i5gvuyac8ns": {
+      "mapValue": {
+       "fields": {
+        "ai": {
+         "integerValue": "2"
+        },
+        "z": {
+         "doubleValue": 1.12
+        },
+        "x": {
+         "doubleValue": 0.594
+        },
+        "o": {
+         "stringValue": "fli:id84qqwksqs"
+        },
+        "y": {
+         "integerValue": "0"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "createTime": "2026-11-13T08:26:13.245906Z",
+ "updateTime": "2026-11-13T15:28:19.586406Z"
+}
