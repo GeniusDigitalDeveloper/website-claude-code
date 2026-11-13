@@ -753,6 +753,14 @@ body[data-s] .dnav-i[aria-current=page]{color:#fff;background:color-mix(in srgb,
 @media(max-width:760px){.b3-in{grid-template-columns:auto 1fr auto}.b3-r{gap:8px!important;padding:0 8px}.b3-r .ck-d{display:none}.b3-r .langsw button{min-width:34px;padding:0 7px}}
 @media(max-width:760px){.b3-c,.b3-note{display:none}.b3-in{grid-template-columns:auto minmax(0,1fr)}.b3-zone{padding:6px 6px}.b3-logo img{height:34px}.b3-r{flex-wrap:nowrap!important;justify-content:flex-end;gap:5px!important;padding:0 6px!important}.b3-r .ck-d{display:block!important;font-size:8.5px}.b3-r .ck-t{font-size:10.5px!important}.b3-r .langsw button{min-width:26px;min-height:28px;padding:0 5px;font-size:10.5px}.b3-r .btn{min-height:30px;padding:0 8px;font-size:10.5px;border-radius:9px}.b3-r .b3-btns{flex-wrap:nowrap;gap:5px}}
 @media(max-width:400px){.b3-logo img{height:28px}.b3-r{gap:3px!important}.b3-r .ck-t{font-size:9.5px!important}.b3-r .btn{padding:0 6px;font-size:9.5px}}
+/* V-57: tajuk tepat di tengah halaman; logo di kiri (ada ruang dari tepi), jarak rapat ke "2-minute setup" */
+@media(min-width:761px){
+.b3-in{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)!important;padding:0 14px}
+.b3-l{justify-content:flex-start!important;gap:8px!important;padding:8px 6px 8px 4px!important}
+.b3-l .b3-sep{margin:0 2px}.b3-l .b3-logo img{display:block}
+.b3-c{justify-self:center;text-align:center;flex-direction:column;border-left:0!important;padding:8px 24px!important}
+.b3-r{justify-content:flex-end!important;border-left:0!important}
+}
 </style>
 </head>
 <body>
@@ -2588,7 +2596,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-56";
+const APP_VERSION = "V-57";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
