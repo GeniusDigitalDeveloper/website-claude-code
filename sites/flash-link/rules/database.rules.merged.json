@@ -1,0 +1,34 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "admins": {
+      "$uid": { ".read": "auth != null && auth.uid === $uid", ".write": false }
+    },
+    "apps": {
+      "$app": {
+        "visits": {
+          ".read": true,
+          "users":   { ".write": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
+          "total":   { ".write": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" },
+          "daily":   { "$day":   { ".write": "$day.matches(/^\\d{4}-\\d{2}-\\d{2}$/) && newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" } },
+          "monthly": { "$month": { ".write": "$month.matches(/^\\d{4}-\\d{2}$/) && newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" } }
+        },
+        "stats": {
+          ".read": "root.child('admins').child(auth.uid).val() === true",
+          "total": { "count": { ".write": "newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" } },
+          "daily": { "$day": { "count": { ".write": "$day.matches(/^\\d{4}-\\d{2}-\\d{2}$/) && newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" } } },
+          "tools": { "$tool": { "count": { ".write": "$tool.matches(/^[a-z0-9_-]{1,40}$/) && newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)" } } }
+        }
+      }
+    },
+    "flashlink": {
+      "live": {
+        "$uid": {
+          ".read": "auth != null && auth.uid == $uid",
+          ".write": true
+        }
+      }
+    }
+  }
+}
