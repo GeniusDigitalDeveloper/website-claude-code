@@ -28,11 +28,16 @@ function createWindow() {
   const wc = win.webContents;
   wc.on("dom-ready", () => wc.setZoomLevel(loadZoom()));
   // Ctrl + / Ctrl - / Ctrl 0 dan Ctrl + roda tetikus
+  // Ctrl/Cmd + (=, +, numpad +), - (_, numpad -), 0 (numpad 0), dengan atau tanpa Shift/Alt; semua susun atur papan kekunci
   wc.on("before-input-event", (e, i) => {
     if (i.type !== "keyDown" || !(i.control || i.meta)) return;
-    if (i.key === "+" || i.key === "=") { e.preventDefault(); setZoom(wc, wc.getZoomLevel() + 0.5); }
-    else if (i.key === "-" || i.key === "_") { e.preventDefault(); setZoom(wc, wc.getZoomLevel() - 0.5); }
-    else if (i.key === "0") { e.preventDefault(); setZoom(wc, -1); }
+    const k = String(i.key || ""), c = String(i.code || "");
+    const plus = k === "+" || k === "=" || k === "Add" || c === "Equal" || c === "NumpadAdd" || c === "BracketRight" && k === "+";
+    const minus = k === "-" || k === "_" || k === "Subtract" || c === "Minus" || c === "NumpadSubtract";
+    const zero = k === "0" || c === "Digit0" || c === "Numpad0";
+    if (plus) { e.preventDefault(); setZoom(wc, wc.getZoomLevel() + 0.5); }
+    else if (minus) { e.preventDefault(); setZoom(wc, wc.getZoomLevel() - 0.5); }
+    else if (zero) { e.preventDefault(); setZoom(wc, -1); }
   });
   wc.on("zoom-changed", (_e, dir) => setZoom(wc, wc.getZoomLevel() + (dir === "in" ? 0.5 : -0.5)));
   wc.on("context-menu", (_e, p) => { const t = [{ role: "cut", enabled: p.isEditable }, { role: "copy", enabled: !!p.selectionText || p.isEditable }, { role: "paste", enabled: p.isEditable }, { role: "selectAll" }]; Menu.buildFromTemplate(t).popup(); });
@@ -59,9 +64,9 @@ app.whenReady().then(() => {
   ] },
   { label: "Edit", submenu: [{ role: "undo" }, { role: "redo" }, { type: "separator" }, { role: "cut" }, { role: "copy" }, { role: "paste" }, { role: "selectAll" }] },
   { label: "Lihat", submenu: [
-    { label: "Zum masuk (Ctrl +)", click: (_i, w) => w && setZoom(w.webContents, w.webContents.getZoomLevel() + 0.5) },
-    { label: "Zum keluar (Ctrl -)", click: (_i, w) => w && setZoom(w.webContents, w.webContents.getZoomLevel() - 0.5) },
-    { label: "Saiz lalai (Ctrl 0)", click: (_i, w) => w && setZoom(w.webContents, -1) },
+    { label: "Zum masuk (Ctrl +)", accelerator: "CmdOrCtrl+Plus", click: (_i, w) => w && setZoom(w.webContents, w.webContents.getZoomLevel() + 0.5) },
+    { label: "Zum keluar (Ctrl -)", accelerator: "CmdOrCtrl+-", click: (_i, w) => w && setZoom(w.webContents, w.webContents.getZoomLevel() - 0.5) },
+    { label: "Saiz lalai (Ctrl 0)", accelerator: "CmdOrCtrl+0", click: (_i, w) => w && setZoom(w.webContents, -1) },
   ] }]));
   createWindow();
   app.on("activate", () => { if (!BrowserWindow.getAllWindows().length) createWindow(); });
