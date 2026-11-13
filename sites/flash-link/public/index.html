@@ -516,7 +516,7 @@ body:not(.flow) #cbfab,body:not(.flow) #cbtip,body:not(.flow) #cbpanel{display:n
 /* ===== v36: footer melekat bawah, galeri kecil ===== */
 #app{display:flex;flex-direction:column;min-height:100vh}
 #app>footer{margin-top:auto;width:100%}#app>main,#app>.dsh{flex:1 0 auto;width:100%}
-.dgrid2{display:grid;gap:10px;grid-template-columns:repeat(5,minmax(0,1fr))}
+.dgrid2{display:grid;gap:10px;grid-template-columns:repeat(4,minmax(0,1fr))}
 @media(max-width:900px){.dgrid2{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:520px){.dgrid2{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .galwrap{overflow-y:auto;overscroll-behavior:contain;padding:2px 4px 2px 2px;scrollbar-width:thin}
 .gal-card{padding:7px;gap:7px;border-radius:14px}.gal-card .mini{border-radius:10px}
@@ -679,6 +679,28 @@ html,body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;t
 .fl-bs-flame .fl-btn{background:linear-gradient(135deg,#ff3d00,#ff9100 55%,#ffd54a);color:#1a0600;border:0;font-weight:800;box-shadow:0 8px 24px -8px rgba(255,100,20,.75)}
 .mini .fl-root::before,.mini .fl-root::after{animation:none!important}
 .dtop-act{margin-left:auto}
+/* ===== latar formal (gradien lembut) ===== */
+#bgflow{background:linear-gradient(165deg,#0A1220 0%,#0E1A2E 45%,#0B1424 100%)}
+#bgflow .bg-grid{inset:-20%;background:radial-gradient(46% 36% at 14% 8%,rgba(96,165,250,.17),transparent 70%),radial-gradient(40% 32% at 90% 18%,rgba(148,163,184,.12),transparent 70%),radial-gradient(52% 40% at 52% 104%,rgba(56,189,248,.10),transparent 70%);-webkit-mask-image:none;mask-image:none;animation:bgdrift 48s ease-in-out infinite alternate}
+#bgflow .bg-em{display:none}
+#bgflow .bg-vig{background:radial-gradient(ellipse at 50% 40%,transparent 55%,rgba(0,0,0,.42) 100%)}
+@keyframes bgdrift{0%{transform:translate3d(-2%,-1%,0) scale(1)}100%{transform:translate3d(3%,2%,0) scale(1.06)}}
+/* ===== kesan klik ===== */
+.fx-rip{position:fixed;width:88px;height:88px;border-radius:50%;border:2px solid rgba(147,197,253,.9);box-shadow:0 0 18px rgba(96,165,250,.5),inset 0 0 14px rgba(147,197,253,.35);pointer-events:none;z-index:9999;will-change:transform,opacity}
+.fx-star{position:fixed;font-size:15px;line-height:1;color:#BFDBFE;text-shadow:0 0 8px rgba(147,197,253,.9);pointer-events:none;z-index:9999;will-change:transform,opacity}
+.gal-act .btn-red,.gal-act .btn[disabled]{flex:1 1 100%}
+/* ===== waktu solat ===== */
+.pray-card{max-width:900px;margin:0 auto;border-radius:26px;padding:22px;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.02));border:1px solid rgba(232,196,104,.3);box-shadow:0 30px 70px -40px rgba(232,196,104,.35)}
+.pray-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}.pray-t{font-size:22px;font-weight:700}.pray-z{font-size:13px;color:#C7C9D1;margin-top:2px}
+.pray-now{margin:16px 0;padding:14px 16px;border-radius:18px;background:rgba(232,196,104,.08);border:1px solid rgba(232,196,104,.25);display:flex;gap:6px 16px;align-items:center;justify-content:space-between;flex-wrap:wrap}.pray-now small{color:#C7C9D1;display:block}.pray-now b{font-size:20px;color:#F6E7B8}.pray-now .pn-c{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+.pray-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.pray-i{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 6px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid var(--line);transition:background .4s,border-color .4s,transform .5s cubic-bezier(.32,.72,0,1)}
+.pray-i.on{background:linear-gradient(180deg,rgba(232,196,104,.24),rgba(232,196,104,.06));border-color:rgba(232,196,104,.75);transform:translateY(-3px)}
+.pray-i svg{width:26px;height:26px;color:#E8C468}.pray-i b{font-size:14px}.pray-i span{font-size:15.5px;font-variant-numeric:tabular-nums;font-weight:700}
+.pray-src{margin-top:12px;font-size:12px;color:#9CA3AF;text-align:center}
+.zrow{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--line);color:#fff;font-size:14px}.zrow[aria-pressed=true]{border-color:#E8C468;background:rgba(232,196,104,.14)}.zrow b{color:#E8C468;margin-right:6px}
+@media(max-width:560px){.pray-card{padding:16px}.pray-row{gap:6px}.pray-i{padding:10px 2px}.pray-i b{font-size:11.5px}.pray-i span{font-size:12px}.pray-i svg{width:20px;height:20px}.pray-now b,.pray-now .pn-c{font-size:16px}}
+.fl-ringwrap{background:color-mix(in srgb,var(--btn) 85%,transparent)!important;animation:none!important}.fl-ringwrap .fl-avatar{animation:none!important}
 </style>
 </head>
 <body>
@@ -1023,39 +1045,31 @@ const SHAPES = { pill: "9999px", round: "16px", square: "4px" };
 const COLORS = ["#E10600", "#2563EB", "#16A34A", "#9333EA", "#F59E0B", "#0EA5E9", "#EC4899", "#18181B"];
 /* Pustaka design: setiap satu = susun atur + gaya kepala + tema. Pengguna boleh guna mana-mana, bila-bila masa. */
 const DESIGNS = [
-  { id: "poster", n: "Poster Emas", d: "Hero penuh, tajuk besar, bingkai emas", tpl: "poster", sty: "hero" },
-  { id: "posterblue", n: "Poster Biru", d: "Hero penuh, bingkai biru cerah", tpl: "poster", sty: "hero", theme: { bg1: "#0B2A5B", bg2: "#05060B", btn: "#38BDF8" } },
   { id: "classic", n: "Senarai Klasik", d: "Butang bersusun, krim lembut", tpl: "minimal" },
   { id: "glass", n: "Kaca Gelap", d: "Butang kaca, cahaya halus", tpl: "dark" },
-  { id: "cards", n: "Kad Besar", d: "Kad gambar penuh + overlay", tpl: "cards" },
-  { id: "icons", n: "Ikon Aplikasi", d: "Ikon bulat macam skrin utama", tpl: "icons" },
-  { id: "bento", n: "Bento", d: "Petak pelbagai saiz", tpl: "bento" },
-  { id: "carousel", n: "Karusel", d: "Kad meluncur ke tepi", tpl: "carousel" },
-  { id: "hero", n: "Foto Hero", d: "Gambar penuh di atas + overlay", tpl: "minimal", sty: "hero", theme: { bgType: "solid", bg1: "#0E1116", bg2: "#0E1116", text: "#F4F4F5", btn: "#F4F4F5", shape: "round", font: "Poppins" } },
-  { id: "cover", n: "Foto Penuh Kaca", d: "Gambar jadi latar penuh", tpl: "dark", sty: "cover" },
   { id: "store", n: "Katalog Kedai", d: "Produk, harga dan lencana", tpl: "store" },
   { id: "mini", n: "Laman Mini", d: "Hero, servis, testimoni", tpl: "landing" },
-  { id: "t-aura", n: "Aura", d: "Krim berfon serif, kaca", tpl: "minimal", theme: { bgType: "gradient", bg1: "#DEDDD0", bg2: "#C6C5B6", text: "#2B2B26", btn: "#FFFFFF", font: "Lora", shape: "pill", bs: "glass" } },
-  { id: "t-blok", n: "Blok Ungu", d: "Ungu terang, butang blok", tpl: "minimal", theme: { bgType: "solid", bg1: "#7A1FD8", bg2: "#7A1FD8", text: "#FFFFFF", btn: "#E04BD8", bd: "#1A0A2E", font: "Poppins", shape: "square", bs: "hard" } },
-  { id: "t-mekar", n: "Mekar", d: "Wain ke ungu, butang bergaris", tpl: "minimal", theme: { bgType: "mesh", bg1: "#8A1F5C", bg2: "#3F2BB8", bg3: "#B0245E", bg4: "#2B1346", text: "#FFFFFF", btn: "#FFFFFF", font: "DM Sans", shape: "pill", bs: "outline" } },
-  { id: "t-grid", n: "Grid Hijau", d: "Kertas grid, butang bayang keras", tpl: "minimal", theme: { bgType: "solid", bg1: "#DDEEB0", bg2: "#DDEEB0", text: "#10150A", btn: "#FFFFFF", bd: "#10150A", font: "Archivo Black", shape: "pill", bs: "hard", pat: "grid" } },
-  { id: "n-aurora", n: "Aurora", d: "Cahaya aurora bergerak, kaca beku", tpl: "minimal", theme: { bgType: "solid", bg1: "#070B1A", bg2: "#070B1A", text: "#F5F7FF", btn: "#8B5CF6", font: "Bricolage Grotesque", shape: "pill", bs: "glass", fx: "aurora", en: "pop" } },
-  { id: "n-api", n: "Api Membara", d: "Bunga api halus naik perlahan, butang api", tpl: "minimal", theme: { bgType: "gradient", bg1: "#1A0603", bg2: "#050101", text: "#FFE9D6", btn: "#FF6A1A", font: "Anton", shape: "pill", bs: "flame", fx: "embers", en: "pop" } },
-  { id: "n-gaming", n: "Gaming Neon", d: "Lantai grid retro, garisan neon berputar", tpl: "minimal", theme: { bgType: "solid", bg1: "#05010F", bg2: "#05010F", text: "#E8FBFF", btn: "#22D3EE", font: "Orbitron", shape: "round", bs: "conic", fx: "gamegrid", en: "pop" } },
-  { id: "n-piksel", n: "Piksel Arked", d: "Fon piksel, butang blok hijau", tpl: "minimal", theme: { bgType: "solid", bg1: "#07110A", bg2: "#07110A", text: "#7CFC8E", btn: "#7CFC8E", bd: "#7CFC8E", font: "Press Start 2P", shape: "square", bs: "hard", fx: "gamegrid", fs: "s" } },
-  { id: "n-islam-emas", n: "Islamik Emas", d: "Ornamen geometri bergerak, gerbang mihrab", tpl: "minimal", theme: { bgType: "gradient", bg1: "#063B2E", bg2: "#021410", text: "#F6E7B8", btn: "#E8C468", font: "Amiri", shape: "round", bs: "orn", fx: "islamic", fr: "arch", en: "fade" } },
-  { id: "n-ramadan", n: "Malam Ramadan", d: "Bintang berkelip dan bulan sabit", tpl: "minimal", theme: { bgType: "gradient", bg1: "#0B1030", bg2: "#05071A", text: "#FFF4D6", btn: "#F5D77A", font: "Reem Kufi", shape: "round", bs: "orn", fx: "stars", fr: "arch", en: "fade" } },
-  { id: "n-kaligrafi", n: "Kaligrafi Krim", d: "Kertas krim, fon kaligrafi, ornamen emas", tpl: "minimal", theme: { bgType: "solid", bg1: "#F4EAD5", bg2: "#F4EAD5", text: "#3B2A10", btn: "#9A6B1C", font: "Aref Ruqaa", shape: "round", bs: "orn", fx: "islamic", fr: "arch", en: "fade" } },
+  { id: "hero", n: "Foto Hero", d: "Gambar penuh di atas + overlay", tpl: "minimal", sty: "hero", theme: { bgType: "solid", bg1: "#0E1116", bg2: "#0E1116", text: "#F4F4F5", btn: "#F4F4F5", shape: "round", font: "Poppins" } },
+  { id: "cover", n: "Foto Penuh Kaca", d: "Gambar jadi latar penuh", tpl: "dark", sty: "cover" },
   { id: "n-poster-islam", n: "Poster Islamik", d: "Hero penuh, ornamen emas bergerak", tpl: "poster", sty: "hero", theme: { bg1: "#063B2E", bg2: "#021410", btn: "#E8C468", font: "Amiri", fx: "islamic" } },
-  { id: "n-kaca", n: "Kaca Cecair", d: "Orbit warna di belakang kaca beku", tpl: "minimal", theme: { bgType: "solid", bg1: "#E9EEF9", bg2: "#E9EEF9", text: "#0F172A", btn: "#0F172A", font: "Sora", shape: "round", bs: "glass", fx: "orbs", en: "pop" } },
   { id: "n-editorial", n: "Editorial", d: "Senarai bernombor gaya majalah", tpl: "minimal", theme: { bgType: "solid", bg1: "#FAF7F2", bg2: "#FAF7F2", text: "#111111", btn: "#111111", font: "Instrument Serif", shape: "square", bs: "editorial", fs: "l" } },
-  { id: "n-tiket", n: "Tiket Konsert", d: "Butang berbentuk tiket bertakuk", tpl: "minimal", theme: { bgType: "solid", bg1: "#111111", bg2: "#111111", text: "#FFFFFF", btn: "#FACC15", font: "Rajdhani", shape: "round", bs: "ticket", pat: "stripes", en: "pop" } },
-  { id: "n-pelangi", n: "Pelangi Neon", d: "Aurora lembut, garisan pelangi berputar", tpl: "minimal", theme: { bgType: "solid", bg1: "#0A0A12", bg2: "#0A0A12", text: "#FFFFFF", btn: "#A855F7", font: "Poppins", shape: "pill", bs: "conic", fx: "aurora" } },
-  { id: "n-senja", n: "Matahari Terbenam", d: "Gradien senja, butang putih, bingkai squircle", tpl: "minimal", theme: { bgType: "mesh", bg1: "#FF7A59", bg2: "#C4388C", bg3: "#FFB36B", bg4: "#6A2C8F", text: "#FFFFFF", btn: "#FFFFFF", font: "DM Serif Display", shape: "pill", fr: "squircle", en: "pop" } },
-  { id: "n-sakura", n: "Sakura", d: "Kelopak sakura gugur perlahan", tpl: "minimal", theme: { bgType: "gradient", bg1: "#FFF0F5", bg2: "#FFD9E6", text: "#5B2A3C", btn: "#EC4899", font: "Instrument Serif", shape: "pill", bs: "outline", fx: "petals", fs: "l" } },
-  { id: "n-kelip", n: "Hutan Kelip-kelip", d: "Kelip-kelip bercahaya di hutan malam", tpl: "minimal", theme: { bgType: "gradient", bg1: "#06190F", bg2: "#020A05", text: "#E7FFD6", btn: "#A3E635", font: "Sora", shape: "round", bs: "glass", fx: "fireflies" } },
-  { id: "n-mewah", n: "Hitam Emas Mewah", d: "Hitam pekat, emas, fon Cinzel", tpl: "minimal", theme: { bgType: "solid", bg1: "#0A0A0A", bg2: "#0A0A0A", text: "#E9D9A6", btn: "#C9A227", font: "Cinzel", shape: "square", bs: "orn", pat: "dots" } },
-  { id: "n-ombak", n: "Ombak Laut", d: "Ombak bergerak di bawah, butang kaca", tpl: "minimal", theme: { bgType: "gradient", bg1: "#0B3C5D", bg2: "#031B2C", text: "#F0FBFF", btn: "#7DD3FC", font: "Poppins", shape: "pill", bs: "glass", fx: "waves", fr: "squircle" } },
+  { id: "n-kaligrafi", n: "Kaligrafi Krim", d: "Kertas krim, fon kaligrafi, ornamen emas", tpl: "minimal", theme: { bgType: "solid", bg1: "#F4EAD5", bg2: "#F4EAD5", text: "#3B2A10", btn: "#9A6B1C", font: "Aref Ruqaa", shape: "round", bs: "orn", fr: "arch", en: "fade" } },
+  { id: "t-aura", n: "Aura", d: "Krim berfon serif, kaca", tpl: "minimal", theme: { bgType: "gradient", bg1: "#DEDDD0", bg2: "#C6C5B6", text: "#2B2B26", btn: "#FFFFFF", font: "Lora", shape: "pill", bs: "glass" } },
+  { id: "f-putih", n: "Formal Putih", d: "Putih bersih, butang bergaris", tpl: "minimal", sty: "classic", theme: {bgType: "solid", bg1: "#FFFFFF", bg2: "#FFFFFF", text: "#0F172A", btn: "#0F172A", font: "Inter", shape: "square", bs: "outline", bc: false} },
+  { id: "f-korporat", n: "Korporat Biru", d: "Banner, biru lembut dan butang biru tua", tpl: "minimal", sty: "banner", theme: {bgType: "gradient", bg1: "#F4F8FF", bg2: "#E3ECFA", text: "#0B2447", btn: "#1D4ED8", font: "Poppins", shape: "round", bs: "solid", bc: false} },
+  { id: "f-gading", n: "Gading Elegan", d: "Warna gading, fon serif, bingkai cincin", tpl: "minimal", sty: "ring", theme: {bgType: "solid", bg1: "#FBF8F3", bg2: "#FBF8F3", text: "#3A2F25", btn: "#5B4636", font: "Lora", shape: "pill", bs: "solid", bc: false} },
+  { id: "f-kelabu", n: "Kelabu Profesional", d: "Gambar di kiri, nama di kanan", tpl: "minimal", sty: "side", theme: {bgType: "solid", bg1: "#EEF0F3", bg2: "#EEF0F3", text: "#111827", btn: "#1F2937", font: "DM Sans", shape: "round", bs: "solid", bc: false} },
+  { id: "f-zaitun", n: "Hijau Zaitun", d: "Hijau zaitun lembut dan tenang", tpl: "minimal", sty: "classic", theme: {bgType: "gradient", bg1: "#EEF3E6", bg2: "#DCE6CB", text: "#26331B", btn: "#4D6B2F", font: "Nunito", shape: "round", bs: "solid", bc: false} },
+  { id: "f-laut", n: "Biru Laut", d: "Kepala kaca, latar biru muda", tpl: "minimal", sty: "classic", theme: {bgType: "gradient", bg1: "#EAF4FF", bg2: "#FFFFFF", text: "#0B2447", btn: "#0EA5E9", font: "DM Sans", shape: "pill", bs: "glass", bc: false} },
+  { id: "f-hitam", n: "Hitam Minimal", d: "Hitam pekat, garisan putih halus", tpl: "minimal", sty: "side", theme: {bgType: "solid", bg1: "#0A0A0A", bg2: "#0A0A0A", text: "#F5F5F5", btn: "#FFFFFF", font: "Space Grotesk", shape: "square", bs: "outline", bc: false} },
+  { id: "f-maroon", n: "Maroon Formal", d: "Krim dan maroon, fon Playfair", tpl: "minimal", sty: "ring", theme: {bgType: "solid", bg1: "#FAF3EC", bg2: "#FAF3EC", text: "#3B1010", btn: "#7A1F2B", font: "Playfair Display", shape: "square", bs: "solid", bc: false} },
+  { id: "f-coklat", n: "Krim Coklat", d: "Banner, krim dan coklat hangat", tpl: "minimal", sty: "banner", theme: {bgType: "gradient", bg1: "#F3E9DC", bg2: "#E7D8C4", text: "#3B2A1A", btn: "#7B5836", font: "Lora", shape: "pill", bs: "solid", bc: false} },
+  { id: "f-navy", n: "Biru Tua Eksekutif", d: "Biru tua pekat, butang bergaris perak", tpl: "minimal", sty: "classic", theme: {bgType: "gradient", bg1: "#0B1F3A", bg2: "#06101F", text: "#F1F5F9", btn: "#CBD5E1", font: "Raleway", shape: "round", bs: "outline", bc: false} },
+  { id: "f-pinus", n: "Hijau Pinus", d: "Hijau tua, garisan hijau pudina", tpl: "minimal", sty: "ring", theme: {bgType: "solid", bg1: "#0F2A1F", bg2: "#0F2A1F", text: "#ECFDF5", btn: "#A7F3D0", font: "Nunito", shape: "pill", bs: "outline", bc: false} },
+  { id: "f-lavender", n: "Lavender Lembut", d: "Kepala kaca, ungu muda", tpl: "minimal", sty: "classic", theme: {bgType: "gradient", bg1: "#F1ECFB", bg2: "#E4DBF5", text: "#2E1F4D", btn: "#6D5BD0", font: "Nunito", shape: "pill", bs: "glass", bc: false} },
+  { id: "f-rose", n: "Rose Estetik", d: "Merah jambu pudar, fon DM Serif", tpl: "minimal", sty: "ring", theme: {bgType: "solid", bg1: "#F6E7E4", bg2: "#F6E7E4", text: "#4A2A2A", btn: "#B4686B", font: "DM Serif Display", shape: "pill", bs: "solid", bc: false} },
+  { id: "f-arang", n: "Arang Eksekutif", d: "Kelabu arang, butang kaca", tpl: "minimal", sty: "classic", theme: {bgType: "solid", bg1: "#1C1F24", bg2: "#1C1F24", text: "#E5E7EB", btn: "#9CA3AF", font: "Inter", shape: "round", bs: "glass", bc: false} },
+  { id: "f-pasir", n: "Pasir Hangat", d: "Gambar di kiri, warna pasir", tpl: "minimal", sty: "side", theme: {bgType: "gradient", bg1: "#F7EFE5", bg2: "#EBD9C3", text: "#3A2B1D", btn: "#A47148", font: "Lora", shape: "pill", bs: "outline", bc: false} },
 ];
 const designTheme = d => ({ ...TPL[d.tpl].theme, ...(d.theme || {}), ov: d.ov ?? 70, auto: false });
 const mkTheme = (tpl, accent) => { const t = { ...TPL[tpl].theme, auto: true }; if (accent) { t.btn = accent; t.auto = false; if (tpl === "minimal") t.auto = false; } return t; };
@@ -1356,7 +1370,6 @@ function notFound(u) { $("#app").innerHTML = `<main class="container" style="tex
 function notice(m) { $("#app").innerHTML = `<main class="container" style="text-align:center;padding:96px 16px"><img src="/assets/icon.png" width="80" height="80" alt="" style="margin:0 auto"><p style="margin-top:16px;max-width:420px;margin-inline:auto">${esc(m)}</p></main>`; }
 
 /* ---------- Jam Malaysia (12 jam), tarikh Masihi dan Hijri rasmi JAKIM ---------- */
-const HIJRI_M = ["Muharram", "Safar", "Rabiulawal", "Rabiulakhir", "Jamadilawal", "Jamadilakhir", "Rejab", "Syaaban", "Ramadan", "Syawal", "Zulkaedah", "Zulhijjah"];
 const CLK = { off: 0, hij: null, day: "", busy: false };
 const klNow = () => new Date(Date.now() + CLK.off);
 const klDay = d => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kuala_Lumpur", year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
@@ -1365,22 +1378,73 @@ async function syncClock() {
   try {
     const r = await fetch("https://www.e-solat.gov.my/index.php?r=esolatApi/TakwimSolat&period=today&zone=SGR01", { cache: "no-store" }), j = await r.json();
     const st = String(j.serverTime || "").match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})$/); if (st) CLK.off = new Date(`${st[1]}T${st[2]}+08:00`).getTime() - Date.now();
-    const h = j.prayerTime && j.prayerTime[0] && j.prayerTime[0].hijri; if (h) { const [y, m, d] = h.split("-").map(Number); if (y && m && d) { CLK.hij = { y, m, d }; CLK.day = klDay(klNow()); } }
+    CLK.day = klDay(klNow());
   } catch {}
   CLK.busy = false;
 }
-function hijriText() {
-  if (CLK.hij && CLK.day === klDay(klNow())) return `${CLK.hij.d} ${HIJRI_M[CLK.hij.m - 1]} ${CLK.hij.y}H`;
-  try { const p = Object.fromEntries(new Intl.DateTimeFormat("en-u-ca-islamic-umalqura", { timeZone: "Asia/Kuala_Lumpur", day: "numeric", month: "numeric", year: "numeric" }).formatToParts(klNow()).map(x => [x.type, x.value])); return `${p.day} ${HIJRI_M[(+p.month || 1) - 1]} ${parseInt(p.year)}H`; } catch { return ""; }
-}
 function clockHtml(cls = "") { return `<div class="fl-clock ${cls}" role="timer" aria-label="Masa Malaysia"><b class="ck-t">--:--</b><span class="ck-d"></span></div>`; }
 function tickClock() {
+  tickPray();
   const els = document.querySelectorAll(".fl-clock"); if (!els.length) return; const n = klNow();
   if (klDay(n) !== CLK.day) syncClock();
-  const t = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Kuala_Lumpur", hour: "numeric", minute: "2-digit", second: "2-digit", hour12: true }).format(n), g = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Kuala_Lumpur", day: "numeric", month: "short", year: "numeric" }).format(n), h = hijriText();
-  els.forEach(e => { const a = e.querySelector(".ck-t"), b = e.querySelector(".ck-d"); if (a.textContent !== t) a.textContent = t; const d = h ? `${g} · ${h}` : g; if (b.textContent !== d) b.textContent = d; });
+  const t = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Kuala_Lumpur", hour: "numeric", minute: "2-digit", second: "2-digit", hour12: true }).format(n), g = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Kuala_Lumpur", day: "numeric", month: "short", year: "numeric" }).format(n);
+  els.forEach(e => { const a = e.querySelector(".ck-t"), b = e.querySelector(".ck-d"); if (a.textContent !== t) a.textContent = t; if (b.textContent !== g) b.textContent = g; });
 }
 syncClock().then(tickClock); setInterval(tickClock, 1000);
+
+/* ---------- Waktu solat: data rasmi JAKIM (e-solat.gov.my), ikut zon ---------- */
+const ZONES = [["JHR01", "Johor", "Pulau Aur dan Pulau Pemanggil"], ["JHR02", "Johor", "Johor Bahru, Kota Tinggi, Mersing, Kulai"], ["JHR03", "Johor", "Kluang, Pontian"], ["JHR04", "Johor", "Batu Pahat, Muar, Segamat, Gemas Johor, Tangkak"], ["KDH01", "Kedah", "Kota Setar, Kubang Pasu, Pokok Sena (Daerah Kecil)"], ["KDH02", "Kedah", "Kuala Muda, Yan, Pendang"], ["KDH03", "Kedah", "Padang Terap, Sik"], ["KDH04", "Kedah", "Baling"], ["KDH05", "Kedah", "Bandar Baharu, Kulim"], ["KDH06", "Kedah", "Langkawi"], ["KDH07", "Kedah", "Puncak Gunung Jerai"], ["KTN01", "Kelantan", "Bachok, Kota Bharu, Machang, Pasir Mas, Pasir Puteh, Tanah Merah, Tumpat, Kuala Krai, Mukim Chiku"], ["KTN02", "Kelantan", "Gua Musang (Daerah Galas Dan Bertam), Jeli, Jajahan Kecil Lojing"], ["MLK01", "Melaka", "SELURUH NEGERI MELAKA"], ["NGS01", "Negeri Sembilan", "Tampin, Jempol"], ["NGS02", "Negeri Sembilan", "Jelebu, Kuala Pilah, Rembau"], ["NGS03", "Negeri Sembilan", "Port Dickson, Seremban"], ["PHG01", "Pahang", "Pulau Tioman"], ["PHG02", "Pahang", "Kuantan, Pekan, Muadzam Shah"], ["PHG03", "Pahang", "Jerantut, Temerloh, Maran, Bera, Chenor, Jengka"], ["PHG04", "Pahang", "Bentong, Lipis, Raub"], ["PHG05", "Pahang", "Genting Sempah, Janda Baik, Bukit Tinggi"], ["PHG06", "Pahang", "Cameron Highlands, Genting Higlands, Bukit Fraser"], ["PHG07", "Pahang", "Zon Khas Daerah Rompin, (Mukim Rompin, Mukim Endau, Mukim Pontian)"], ["PRK01", "Perak", "Tapah, Slim River, Tanjung Malim"], ["PRK02", "Perak", "Kuala Kangsar, Sg. Siput , Ipoh, Batu Gajah, Kampar"], ["PRK03", "Perak", "Lenggong, Pengkalan Hulu, Grik"], ["PRK04", "Perak", "Temengor, Belum"], ["PRK05", "Perak", "Kg Gajah, Teluk Intan, Bagan Datuk, Seri Iskandar, Beruas, Parit, Lumut, Sitiawan, Pulau Pangkor"], ["PRK06", "Perak", "Selama, Taiping, Bagan Serai, Parit Buntar"], ["PRK07", "Perak", "Bukit Larut"], ["PLS01", "Perlis", "SELURUH NEGERI PERLIS"], ["PNG01", "Pulau Pinang", "SELURUH NEGERI PULAU PINANG"], ["SBH01", "Sabah", "Bahagian Sandakan (Timur), Bukit Garam, Semawang, Temanggong, Tambisan, Bandar Sandakan, Sukau"], ["SBH02", "Sabah", "Beluran, Telupid, Pinangah, Terusan, Kuamut, Bahagian Sandakan (Barat)"], ["SBH03", "Sabah", "Lahad Datu, Silabukan, Kunak, Sahabat, Semporna, Tungku, Bahagian Tawau (Timur)"], ["SBH04", "Sabah", "Bandar Tawau, Balong, Merotai, Kalabakan, Bahagian Tawau (Barat)"], ["SBH05", "Sabah", "Kudat, Kota Marudu, Pitas, Pulau Banggi, Bahagian Kudat"], ["SBH06", "Sabah", "Gunung Kinabalu"], ["SBH07", "Sabah", "Kota Kinabalu, Ranau, Kota Belud, Tuaran, Penampang, Papar, Putatan, Bahagian Pantai Barat"], ["SBH08", "Sabah", "Pensiangan, Keningau, Tambunan, Nabawan, Bahagian Pendalaman (Atas)"], ["SBH09", "Sabah", "Beaufort, Kuala Penyu, Sipitang, Tenom, Long Pasia, Membakut, Weston, Bahagian Pendalaman (Bawah)"], ["SWK01", "Sarawak", "Limbang, Lawas, Sundar, Trusan"], ["SWK02", "Sarawak", "Miri, Niah, Bekenu, Sibuti, Marudi"], ["SWK03", "Sarawak", "Pandan, Belaga, Suai, Tatau, Sebauh, Bintulu"], ["SWK04", "Sarawak", "Sibu, Mukah, Dalat, Song, Igan, Oya, Balingian, Kanowit, Kapit"], ["SWK05", "Sarawak", "Sarikei, Matu, Julau, Rajang, Daro, Bintangor, Belawai"], ["SWK06", "Sarawak", "Lubok Antu, Sri Aman, Roban, Debak, Kabong, Lingga, Engkelili, Betong, Spaoh, Pusa, Saratok"], ["SWK07", "Sarawak", "Serian, Simunjan, Samarahan, Sebuyau, Meludam"], ["SWK08", "Sarawak", "Kuching, Bau, Lundu, Sematan"], ["SWK09", "Sarawak", "Zon Khas (Kampung Patarikan)"], ["SGR01", "Selangor", "Gombak, Petaling, Sepang, Hulu Langat, Hulu Selangor, Shah Alam"], ["SGR02", "Selangor", "Kuala Selangor, Sabak Bernam"], ["SGR03", "Selangor", "Klang, Kuala Langat"], ["TRG01", "Terengganu", "Kuala Terengganu, Marang, Kuala Nerus"], ["TRG02", "Terengganu", "Besut, Setiu"], ["TRG03", "Terengganu", "Hulu Terengganu"], ["TRG04", "Terengganu", "Dungun, Kemaman"], ["WLY01", "Wilayah Persekutuan", "Kuala Lumpur, Putrajaya"], ["WLY02", "Wilayah Persekutuan", "Labuan"]];
+const PRAY_N = [["fajr", "Subuh", '<path d="M3 18h18M6 18a6 6 0 0 1 12 0M12 4v4M4.9 9.9l2.1 2.1M19.1 9.9 17 12M9 6l3-3 3 3"/>'], ["dhuhr", "Zuhur", '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'], ["asr", "Asar", '<circle cx="12" cy="13" r="3.5"/><path d="M12 4v2M3 13h2M19 13h2M5.6 6.6 7 8M18.4 6.6 17 8M3 20h18"/>'], ["maghrib", "Maghrib", '<path d="M3 18h18M6 18a6 6 0 0 1 12 0M12 5v4M9 8l3 3 3-3M4.9 11.9l2.1 2.1M19.1 11.9 17 14"/>'], ["isha", "Isyak", '<path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5Z"/>']];
+const PR = { zone: null, auto: true, times: null, err: "", busy: false };
+const zInfo = c => ZONES.find(z => z[0] === c);
+async function zoneFromCoords(lat, lon) { const j = await (await fetch(`https://api.waktusolat.app/zones/${lat}/${lon}`)).json(); if (!j.zone || !zInfo(j.zone)) throw new Error("zon"); return j.zone; }
+const geoZone = () => new Promise((res, rej) => { if (!navigator.geolocation) return rej(new Error("tiada")); navigator.geolocation.getCurrentPosition(p => zoneFromCoords(p.coords.latitude, p.coords.longitude).then(res, rej), rej, { timeout: 12000, maximumAge: 600000 }); });
+async function detectZone() {
+  try { if (navigator.permissions) { const st = await navigator.permissions.query({ name: "geolocation" }); if (st.state === "granted") return await geoZone(); } } catch {}
+  try { const g = await (await fetch("https://ipwho.is/")).json(); if (g.success && g.country_code === "MY") return await zoneFromCoords(g.latitude, g.longitude); } catch {}
+  return "SGR01";
+}
+async function loadPray(zone) {
+  const key = `fl_pt_${zone}_${klDay(klNow())}`; try { const c = JSON.parse(lsGet(key) || "null"); if (c) return c; } catch {}
+  const j = await (await fetch(`https://www.e-solat.gov.my/index.php?r=esolatApi/TakwimSolat&period=today&zone=${zone}`, { cache: "no-store" })).json(), t = j.prayerTime && j.prayerTime[0]; if (!t) throw new Error("tiada data");
+  const out = { fajr: t.fajr, dhuhr: t.dhuhr, asr: t.asr, maghrib: t.maghrib, isha: t.isha }; lsSet(key, JSON.stringify(out)); return out;
+}
+const to12 = t => { const [h, m] = t.split(":").map(Number); return `${h % 12 || 12}:${String(m).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`; };
+const secOf = t => { const [h, m, s = 0] = t.split(":").map(Number); return h * 3600 + m * 60 + (s || 0); };
+function prayHtml() { return `<div id="pray"><div class="pray-card"><div class="pray-t">Waktu Solat</div><p class="hint" style="margin:6px 0 0">Memuatkan waktu solat…</p></div></div>`; }
+function drawPray() {
+  const el = $("#pray"); if (!el) return; const z = zInfo(PR.zone) || ["", "", ""];
+  el.innerHTML = `<div class="pray-card"><div class="pray-top"><div><div class="pray-t">Waktu Solat</div><div class="pray-z">${esc(z[1])} · ${esc(PR.zone)} · ${esc(z[2])}</div></div><button class="chip" id="pz-btn" type="button">${ic("globe", "w-4 h-4")} Tukar zon</button></div>
+    ${PR.times ? `<div class="pray-now" id="pz-now"></div><div class="pray-row">${PRAY_N.map(([k, n, ic2]) => `<div class="pray-i" data-k="${k}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ic2}</svg><b>${n}</b><span>${to12(PR.times[k])}</span></div>`).join("")}</div>` : `<p class="hint" style="margin:14px 0 0;color:#FFD166">${esc(PR.err || "Memuatkan…")}</p>`}
+    <div class="pray-src">Sumber: JAKIM (e-solat.gov.my) · ${PR.auto ? "zon dikesan automatik" : "zon pilihan anda"}</div></div>`;
+  $("#pz-btn").onclick = zoneModal; tickPray();
+}
+function tickPray() {
+  const now = $("#pz-now"); if (!now || !PR.times) return; const w = wallIn(klNow(), "Asia/Kuala_Lumpur"), sec = secOf(w.slice(11)), ts = PRAY_N.map(([k]) => secOf(PR.times[k]));
+  let ni = ts.findIndex(t => t > sec), diff, tomorrow = false; if (ni < 0) { ni = 0; diff = ts[0] + 86400 - sec; tomorrow = true; } else diff = ts[ni] - sec;
+  const h = Math.floor(diff / 3600), m = Math.floor((diff % 3600) / 60), sc = diff % 60, cur = ts.filter(t => t <= sec).length - 1;
+  $$(".pray-i").forEach((e, i) => e.classList.toggle("on", i === ni));
+  now.innerHTML = `<div><small>${cur >= 0 ? "Waktu semasa: " + PRAY_N[cur][1] : "Sebelum Subuh"}</small><b>Seterusnya: ${PRAY_N[ni][1]}${tomorrow ? " (esok)" : ""} · ${to12(PR.times[PRAY_N[ni][0]])}</b></div><div class="pn-c" aria-label="Masa berbaki">${h ? h + "j " : ""}${m}m ${String(sc).padStart(2, "0")}s</div>`;
+}
+async function initPray(force) {
+  if (!$("#pray") || PR.busy) return; PR.busy = true;
+  if (PR.zone === null) { PR.zone = lsGet("fl_zone"); PR.auto = !PR.zone; }
+  try { if (!PR.zone || force) { PR.zone = await detectZone(); PR.auto = true; } PR.times = await loadPray(PR.zone); PR.err = ""; } catch { PR.err = "Waktu solat tidak dapat dimuatkan. Semak sambungan internet."; PR.times = null; }
+  PR.busy = false; drawPray();
+}
+function zoneModal() {
+  const states = [...new Set(ZONES.map(z => z[1]))], cur = zInfo(PR.zone);
+  modal(`<h2 class="font-display" style="font-size:21px;font-weight:700;margin:0 0 6px">Pilih zon waktu solat</h2><p class="hint" style="margin:0 0 10px">Semua zon JAKIM dalam Malaysia. Zon kini: <b>${esc(PR.zone)}</b>.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px"><button type="button" class="btn btn-red btn-sm" id="zm-geo">${ic("globe", "w-4 h-4")} Guna lokasi saya (tepat)</button><button type="button" class="btn btn-ghost btn-sm" id="zm-auto">Kesan automatik</button></div><div id="zm-err" class="err" role="alert"></div>
+    <label class="lbl" for="zm-st">Negeri</label><select id="zm-st" class="inp">${states.map(n => `<option ${cur && cur[1] === n ? "selected" : ""}>${esc(n)}</option>`).join("")}</select>
+    <div class="lbl" style="margin-top:12px">Zon dan daerah</div><div id="zm-list" style="display:grid;gap:6px;max-height:46vh;overflow:auto"></div>`, bg => {
+    const list = $("#zm-list", bg), er = $("#zm-err", bg);
+    const draw = () => { const st = $("#zm-st", bg).value; list.innerHTML = ZONES.filter(z => z[1] === st).map(z => `<button type="button" class="zrow" data-z="${z[0]}" aria-pressed="${z[0] === PR.zone}"><b>${z[0]}</b>${esc(z[2])}</button>`).join(""); $$("[data-z]", list).forEach(b => (b.onclick = () => { PR.zone = b.dataset.z; PR.auto = false; lsSet("fl_zone", PR.zone); bg.close(); initPray(); })); };
+    $("#zm-st", bg).onchange = draw; draw();
+    $("#zm-geo", bg).onclick = async () => { er.textContent = ""; try { PR.zone = await geoZone(); PR.auto = false; lsSet("fl_zone", PR.zone); bg.close(); initPray(); } catch { er.textContent = "Lokasi tidak dapat dikesan. Benarkan akses lokasi atau pilih zon di bawah."; } };
+    $("#zm-auto", bg).onclick = () => { lsSet("fl_zone", ""); PR.zone = ""; bg.close(); initPray(true); };
+  });
+}
 
 /* ---------- Statistik masa nyata (RTDB: flashlink/stats) + footer ----------
    Setiap lawatan (sekali setiap sesi pelayar) menaikkan TIGA kaunter serentak: hari, bulan, keseluruhan.
@@ -1481,11 +1545,12 @@ function landing() {
   <section class="container" style="padding:0 16px 72px"><h2 data-fx="up" class="font-display" style="font-size:clamp(26px,4vw,36px);text-align:center;margin:0 0 28px;font-weight:700">3 langkah. Itu sahaja.</h2>
     <ol style="list-style:none;padding:0;margin:0;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">${["Tekan Mula sekarang dan log masuk dengan Google", "Beri nama dan pilih templat anda", "Tambah pautan, salin pautan anda dan tampal di TikTok"].map((s, i) => `<li data-fx="up" data-d="${i * 120}" class="glass" style="border-radius:16px;padding:18px;display:flex;gap:12px;align-items:center"><span class="font-display" style="font-size:28px;font-weight:700;color:#7DD3FC">${i + 1}</span><span style="font-weight:600">${s}</span></li>`).join("")}</ol>
     <div data-fx="pop" style="text-align:center;margin-top:32px"><a class="btn btn-red shine" style="min-height:54px;padding:0 30px;font-size:17px" href="${go}" data-nav>Mula sekarang</a></div></section>
+  <section class="container" style="padding:0 16px 56px">${prayHtml()}</section>
   </main>
   ${siteFooter()}`;
   $$("#hero-devs .iscreen").forEach(el => (el.innerHTML = demo)); $$("#hero-devs .lap-scale").forEach(el => (el.innerHTML = demo)); fitLaptop(); tickClock(); armReveal($("#hero-devs"));
   const mq = matchMedia("(min-width:900px)"); const g = $("#hero-grid"); const fit = () => (g.style.gridTemplateColumns = mq.matches ? "minmax(0,1fr) minmax(0,1fr)" : "minmax(0,1fr)"); fit(); mq.addEventListener("change", fit);
-  revealInit(); parallaxInit(); fillStat(); sfxScope(true);
+  revealInit(); parallaxInit(); fillStat(); sfxScope(true); initPray();
 }
 function revealInit() {
   const els = $$("[data-fx]");
@@ -1615,7 +1680,7 @@ async function dashView() {
 /* Kali pertama log masuk: profil + design pertama dicipta senyap (tiada wizard). ID pautan unik dijana automatik. */
 async function autoCreateProfile() {
   const uid = S.user.uid; let name = genId();
-  const d0 = DESIGNS.find(x => x.id === "poster"), theme = designTheme(d0);
+  const d0 = DESIGNS.find(x => x.id === "classic"), theme = designTheme(d0);
   const design = { id: "d" + genId(6), name: "Design 1", template: d0.tpl, profileStyle: d0.sty || "classic", theme };
   const profile = { username: name, displayName: "", bio: "", avatarUrl: "", bannerUrl: "", template: design.template, theme: JSON.parse(JSON.stringify(theme)), profileStyle: design.profileStyle, socialIcons: [], testimonials: [], designs: [design], activeDesign: design.id, publishedDesign: design.id, handle: "", createdAt: FB.serverTimestamp(), plan: "free" };
   for (let i = 0; ; i++) {
@@ -1763,24 +1828,26 @@ function designCard(d, activeId) {
   const on = d.id === activeId, pub = d.id === S.profile.publishedDesign;
   return `<article class="gal-card clk${on ? " on" : ""}" data-id="${d.id}"><div class="mini" data-lz="d:${d.id}"></div>
     <div class="gal-meta"><div style="min-width:0;display:flex;flex-direction:column;gap:4px"><b class="gal-name">${esc(d.name)}</b><div style="display:flex;gap:4px;flex-wrap:wrap">${pub ? '<span class="vbadge" style="background:rgba(52,211,153,.18);color:#6EE7A8;border-color:rgba(52,211,153,.5)">Diterbitkan</span>' : ""}${on && !pub ? '<span class="vbadge">Diedit</span>' : ""}</div></div>
-    <div class="gal-act">${pub ? "" : `<button class="btn btn-red btn-sm" data-use="${d.id}" title="Terbitkan: pautan anda akan memaparkan design ini">Terbit</button>`}<button class="btn btn-ghost btn-sm" data-edit="${d.id}" aria-label="Edit ${esc(d.name)}">${ic("pencil", "w-4 h-4")}</button><button class="btn btn-ghost btn-sm" data-dup="${d.id}" aria-label="Pendua ${esc(d.name)}">${ic("copy", "w-4 h-4")}</button><button class="btn btn-ghost btn-sm" data-del="${d.id}" aria-label="Padam ${esc(d.name)}">${ic("trash", "w-4 h-4")}</button></div></div></article>`;
+    <div class="gal-act">${pub ? `<button class="btn btn-ghost btn-sm" disabled style="color:#6EE7A8;border-color:rgba(52,211,153,.5)">${ic("check", "w-4 h-4")} Diterbitkan</button>` : `<button class="btn btn-red btn-sm" data-use="${d.id}" title="Terbitkan: pautan anda akan memaparkan design ini">Terbitkan</button>`}<button class="btn btn-ghost btn-sm" data-edit="${d.id}" aria-label="Edit ${esc(d.name)}">${ic("pencil", "w-4 h-4")}</button><button class="btn btn-ghost btn-sm" data-dup="${d.id}" aria-label="Pendua ${esc(d.name)}">${ic("copy", "w-4 h-4")}</button><button class="btn btn-ghost btn-sm" data-del="${d.id}" aria-label="Padam ${esc(d.name)}">${ic("trash", "w-4 h-4")}</button></div></div></article>`;
 }
 const presetCard = d => `<article class="gal-card clk" data-p="${d.id}" title="${esc(d.n)}: ${esc(d.d)}"><div class="mini" data-lz="p:${d.id}"></div><div class="gal-meta row"><b class="gal-name" style="flex:1;min-width:0">${esc(d.n)}</b><button class="btn btn-ghost btn-sm" data-an="${d.id}" aria-label="Simpan ${esc(d.n)} sebagai design baharu" title="Simpan sebagai design baharu">${ic("plus", "w-4 h-4")}</button></div></article>`;
 function applyPreset(d, edit = true) {
-  const p = S.profile;
-  if (p.activeDesign === p.publishedDesign) { const nd = newDesign({ template: d.tpl, profileStyle: d.sty || "classic", theme: designTheme(d) }, d.n); if (nd) { toast(`Design baharu “${d.n}” dibuat. Design yang diterbitkan tidak berubah.`); if (edit) editDesign(); } return; }
+  const p = S.profile, snap = snapProfile();
+  if (p.activeDesign === p.publishedDesign) { const nd = newDesign({ template: d.tpl, profileStyle: d.sty || "classic", theme: designTheme(d) }, d.n); if (nd) { toast(`Design baharu “${d.n}” dibuat. Design yang diterbitkan tidak berubah.`); if (edit) editDesign(snap); } return; }
   p.template = d.tpl; p.profileStyle = d.sty || "classic"; p.theme = designTheme(d);
-  saveProfile(); refreshPreview(true); toast(`Design “${d.n}” dipilih ✓ (boleh ditukar bila-bila masa)`); if (edit) editDesign();
+  saveProfile(); refreshPreview(true); toast(`Design “${d.n}” dipilih`); if (edit) editDesign(snap);
 }
 async function designTab() {
   const keep = { y: window.scrollY, g: $("#galw")?.scrollTop || 0, m: $("#minew")?.scrollTop || 0 };
   const pane = $("#pane"), p = S.profile, url = profileUrl(p.username);
-  pane.innerHTML = `<div class="glass" style="border-radius:20px;padding:16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:0 0 14px"><div style="flex:1;min-width:200px"><div class="lbl" style="margin:0 0 2px">Pautan anda (design diterbitkan: ${esc((p.designs.find(d => d.id === p.publishedDesign) || {}).name || "")})</div><div style="font-weight:700;color:#7DD3FC;word-break:break-all">${esc(url)}</div><div class="hint" style="margin-top:4px">Salin pautan ini ke profil media sosial anda. Ia memaparkan design yang diterbitkan.</div></div><button id="hcp" class="btn btn-red btn-sm">${ic("copy", "w-4 h-4")} Salin pautan</button></div>
+  pane.innerHTML = `<div class="glass" style="border-radius:20px;padding:16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin:0 0 14px"><div style="flex:1;min-width:200px"><div class="lbl" style="margin:0 0 2px">Pautan anda (design diterbitkan: ${esc((p.designs.find(d => d.id === p.publishedDesign) || {}).name || "")})</div><div style="font-weight:700;color:#7DD3FC;word-break:break-all">${esc(url)}</div><div class="hint" style="margin-top:4px">Salin pautan ini ke profil media sosial anda. Ia memaparkan design yang diterbitkan.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px"><label class="lbl" for="pubsel" style="margin:0">Pilih design untuk diterbitkan</label><select id="pubsel" class="lsel" style="max-width:320px">${p.designs.map(d => `<option value="${d.id}" ${d.id === p.publishedDesign ? "selected" : ""}>${esc(d.name)}${d.id === p.publishedDesign ? " (sedang diterbitkan)" : ""}</option>`).join("")}</select><button id="pubgo" class="btn btn-red btn-sm">${ic("check", "w-4 h-4")} Terbitkan</button></div></div><button id="hcp" class="btn btn-red btn-sm">${ic("copy", "w-4 h-4")} Salin pautan</button></div>
     ${S.links.length ? "" : `<div class="glass" style="border-radius:20px;padding:16px;margin-bottom:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:200px"><b>Mula di sini</b><p style="margin:4px 0 0;color:#C7C9D1;font-size:14.5px">Halaman anda masih kosong. Tambah pautan pertama anda.</p></div><button id="hlk" class="btn btn-red btn-sm">${ic("plus", "w-4 h-4")} Tambah pautan</button></div>`}
     <h2 class="lbl" style="font-size:15px;color:#fff;margin:0 0 10px">Design saya (${p.designs.length})</h2>
     <div class="galwrap" id="minew"><div class="dgrid2" id="mine">${p.designs.map(d => designCard(d, p.activeDesign)).join("")}</div></div>
-    <h2 class="lbl" style="font-size:15px;color:#fff;margin:22px 0 10px">Galeri template (5 sebaris, skrol ke bawah untuk lagi). Klik untuk pilih dan edit</h2>
+    <h2 class="lbl" style="font-size:15px;color:#fff;margin:22px 0 10px">Galeri template (4 sebaris, skrol ke bawah untuk lagi). Klik untuk pilih dan edit</h2>
     <div class="galwrap" id="galw"><div class="dgrid2" id="gal">${DESIGNS.map(presetCard).join("")}</div></div>`;
+  $("#pubgo").onclick = () => { const id = $("#pubsel").value; if (id === S.profile.publishedDesign) return toast("Design ini sudah diterbitkan."); publishDesign(id); designTab(); };
   $("#hcp").onclick = () => copyText(url); if ($("#hlk")) $("#hlk").onclick = () => openView("links");
   const mine = $("#mine");
   $$(".gal-card", mine).forEach(c => (c.onclick = e => { if (e.target.closest("button")) return; const id = c.dataset.id; if (S.profile.activeDesign !== id) activateDesign(id, true); editDesign(); }));
@@ -1793,20 +1860,23 @@ async function designTab() {
   $$("[data-an]", gal).forEach(b => (b.onclick = e => { e.stopPropagation(); const d = DESIGNS.find(x => x.id === b.dataset.an); if (newDesign({ template: d.tpl, profileStyle: d.sty || "classic", theme: designTheme(d) }, d.n)) { toast(`“${d.n}” disimpan sebagai design baharu ✓`); designTab(); } }));
   fitMinis(); lazyMinis(pane);
   if (imgMissing(S.profile, S.links)) hydrateImages(S.profile, S.links).then(() => designTab());
-  const fitGal = () => { const g = $("#galw"), c = g && $(".gal-card", g); if (c) g.style.maxHeight = c.offsetHeight + 8 + "px"; const m = $("#minew"), mc = m && $(".gal-card", m); if (mc) m.style.maxHeight = mc.offsetHeight * 2 + 18 + "px"; };
+  const fitGal = () => { const g = $("#galw"), c = g && $(".gal-card", g); if (c) g.style.maxHeight = c.offsetHeight + 8 + "px"; const m = $("#minew"), mc = m && $(".gal-card", m); if (mc) m.style.maxHeight = mc.offsetHeight + 8 + "px"; };
   requestAnimationFrame(() => { fitGal(); const c = $("#gal .gal-card"); if (c) new ResizeObserver(fitGal).observe(c); requestAnimationFrame(() => { const g = $("#galw"), m = $("#minew"); if (g) g.scrollTop = keep.g; if (m) m.scrollTop = keep.m; window.scrollTo(0, keep.y); [180, 500].forEach(ms => setTimeout(() => { const g2 = $("#galw"), m2 = $("#minew"); if (g2 && Math.abs(g2.scrollTop - keep.g) > 2) g2.scrollTop = keep.g; if (m2 && Math.abs(m2.scrollTop - keep.m) > 2) m2.scrollTop = keep.m; if (Math.abs(window.scrollY - keep.y) > 2) window.scrollTo(0, keep.y); }, ms)); }); });
 }
 
 /* ---------- Popup edit design: semua boleh diedit ---------- */
-function editDesign() {
+const snapProfile = () => { syncActive(); const p = S.profile; return JSON.parse(JSON.stringify({ designs: p.designs, activeDesign: p.activeDesign, publishedDesign: p.publishedDesign, template: p.template, profileStyle: p.profileStyle, theme: p.theme, displayName: p.displayName, bio: p.bio, avatarUrl: p.avatarUrl, bannerUrl: p.bannerUrl, imgOrig: p.imgOrig || {}, handle: p.handle || "" })); };
+const restoreSnap = sn => { Object.assign(S.profile, JSON.parse(JSON.stringify(sn))); saveProfile(); refreshPreview(true); };
+function editDesign(snap0) {
+  const snap = snap0 || snapProfile(); let done = false;
   const p = S.profile, t = p.theme, cur = p.designs.find(x => x.id === p.activeDesign);
   const col = (id, label, v) => `<div><label class="lbl" for="${id}">${label}</label><input id="${id}" type="color" value="${hex(v, "#000000")}" style="width:100%;height:46px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.07);padding:3px"></div>`;
   const sel = (id, label, opts, v) => `<div><label class="lbl" for="${id}">${label}</label><select id="${id}" class="inp">${opts.map(([k, n]) => `<option value="${k}" ${String(v) === String(k) ? "selected" : ""}>${esc(n)}</option>`).join("")}</select></div>`;
-  const m = modal(`<h2 class="font-display" style="font-size:21px;font-weight:700;margin:0 0 2px">Edit design</h2><p class="hint" style="margin:0">Perubahan disimpan automatik dan pratonton berubah serta-merta.</p>
+  const m = modal(`<h2 class="font-display" style="font-size:21px;font-weight:700;margin:0 0 2px">Edit design</h2><p class="hint" style="margin:0">Pratonton berubah serta-merta. Tekan <b>Siap</b> untuk simpan. Tekan pangkah (X) untuk <b>batalkan</b> semua perubahan dalam tetingkap ini.</p>
     <div class="edsec"><h3>Nama design</h3><input id="ed-name" class="inp" maxlength="30" value="${esc(cur?.name || "")}" aria-label="Nama design"></div>
     <div class="edsec"><h3>Maklumat</h3><label class="lbl" for="ed-dn">Nama paparan</label><input id="ed-dn" class="inp" maxlength="40" placeholder="Tulis nama anda" value="${esc(p.displayName)}"><label class="lbl" for="ed-bio" style="margin-top:10px">Bio</label><textarea id="ed-bio" class="inp" rows="2" maxlength="140" placeholder="Terangkan diri/kedai anda">${esc(p.bio)}</textarea></div>
     <div class="edsec"><h3>Gambar (boleh laras / crop)</h3>${imgFieldHtml("ed-av", "Gambar profil / hero", "round")}${imgFieldHtml("ed-bn", "Banner", "wide")}</div>
-    <div class="edsec"><h3>Susun atur</h3><select id="ed-tpl" class="inp" aria-label="Susun atur">${Object.entries(TPL).map(([k, x]) => `<option value="${k}" ${p.template === k ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select></div>
+    <div class="edsec"><h3>Susun atur</h3><select id="ed-tpl" class="inp" aria-label="Susun atur">${Object.entries(TPL).filter(([k]) => ["minimal", "dark", "landing", "poster", "store"].includes(k) || p.template === k).map(([k, x]) => `<option value="${k}" ${p.template === k ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select></div>
     <div class="edsec" id="ed-stysec"><h3>Gaya kepala profil</h3><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px">${STYLES.map(([k, n, d]) => `<button type="button" class="stybtn" data-s="${k}" aria-pressed="${(p.profileStyle || "classic") === k}"><span class="stymini sty-${k}"><i></i><b></b></span><span style="font-weight:700;font-size:13px">${n}</span></button>`).join("")}</div></div>
     <div class="edsec"><h3>Warna & latar</h3><label class="lbl" for="ed-bt">Latar belakang</label><select id="ed-bt" class="inp"><option value="solid">Warna penuh</option><option value="gradient">Gradien</option><option value="mesh">Gradien lembut (mesh)</option><option value="image">Gambar</option></select>
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px">${col("ed-c1", "Warna latar 1", t.bg1)}${col("ed-c2", "Warna latar 2", t.bg2)}${col("ed-c3", "Warna latar 3 (mesh)", t.bg3 || t.bg2)}${col("ed-ct", "Warna tulisan", t.text)}${col("ed-cb", "Warna butang / aksen", t.btn)}</div>
@@ -1816,7 +1886,7 @@ function editDesign() {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">${sel("ed-fx", "Kesan latar bergerak", FX_NAMES, t.fx || "")}${sel("ed-fr", "Bingkai gambar profil", FR_NAMES, t.fr || "")}</div><div style="margin-top:12px">${sel("ed-bc", "Warna butang ikut jenama (WhatsApp hijau, Facebook biru, dll)", [["on", "Ya"], ["off", "Tidak"]], t.bc === false ? "off" : "on")}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">${sel("ed-ba", "Animasi semua butang", ANIMS, t.ba || "")}${sel("ed-en", "Animasi kemunculan", ENTRANCES, t.en || "up")}</div><p class="hint" style="margin:8px 0 0">Setiap pautan juga boleh ada animasi sendiri (dalam tetingkap edit pautan).</p></div>
     <div class="edsec"><h3>Tulisan & saiz</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">${sel("ed-ft", "Jenis tulisan", FONTS.map(f => [f, f]), t.font)}${sel("ed-fs", "Saiz tulisan", [["s", "Kecil"], ["m", "Sederhana"], ["l", "Besar"]], t.fs || "m")}${sel("ed-sh", "Bentuk butang", [["pill", "Kapsul"], ["round", "Bulat sudut"], ["square", "Segi empat"]], t.shape || "pill")}${sel("ed-sz", "Saiz kad pautan", [["s", "Kecil"], ["m", "Sederhana"], ["l", "Besar"]], t.sz || "m")}</div></div>
     <div class="edsec"><h3>Teks: fon, saiz, warna dan gradien</h3><p class="hint" style="margin:0">Laras nama, bio dan teks butang secara berasingan. Kosongkan fon untuk ikut design.</p>${[["n", "Nama"], ["b", "Bio"], ["l", "Teks butang"]].map(([k, label]) => { const o = (t.tx && t.tx[k]) || {}; return `<div class="txrow"><h4>${label}</h4><div class="txgrid">${sel("tx-" + k + "-f", "Fon", [["", "Ikut design"], ...FONTS.map(f => [f, f])], o.f || "")}<div><label class="lbl" for="tx-${k}-z">Saiz <b id="tx-${k}-zv">${o.z || 100}%</b></label><input id="tx-${k}-z" type="range" min="60" max="220" step="5" value="${o.z || 100}" style="width:100%;accent-color:#FF4D4D"></div><div><label class="lbl" for="tx-${k}-c">Warna</label><div style="display:flex;gap:6px"><input id="tx-${k}-c" type="color" value="${hex(o.c, "#FFFFFF")}" style="flex:1;height:44px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.07);padding:3px"><button type="button" class="chip" id="tx-${k}-cx" style="min-height:44px">Padam</button></div></div><div><label class="sc-net" style="margin-top:24px"><input type="checkbox" id="tx-${k}-g" ${o.g ? "checked" : ""}><span>Gradien</span></label></div><div id="tx-${k}-gr" style="display:${o.g ? "grid" : "none"};grid-column:1/-1;grid-template-columns:1fr 1fr;gap:10px">${col("tx-" + k + "-g1", "Gradien dari", o.g1 || "#FFD166")}${col("tx-" + k + "-g2", "Gradien ke", o.g2 || "#FF4D4D")}</div></div></div>`; }).join("")}</div>
-    <button class="btn btn-red" id="ed-done" style="width:100%;min-height:50px;margin-top:18px">Siap</button>`, null, { side: true, cls: "wide" });
+    <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap"><button class="btn btn-red" id="ed-done" style="flex:1;min-height:50px">Siap (simpan)</button><button class="btn btn-ghost" id="ed-pub" style="flex:1;min-height:50px">Simpan dan terbitkan</button></div>`, null, { side: true, cls: "wide" });
   const $e = id => $("#" + id, m);
   const check = () => { const th = S.profile.theme; const c = contrast(hex(th.text, "#000"), hex(th.bg1, "#fff")); $e("ed-ctr").textContent = c < 4.5 ? `Kontras tulisan/latar rendah (${c.toFixed(1)}:1). Pilih warna yang lebih berbeza.` : ""; };
   const commit = () => { S.profile.theme.auto = false; check(); refreshPreview(); saveProfile(); };
@@ -1841,8 +1911,10 @@ function editDesign() {
     $e(`tx-${k}-g1`).oninput = e => txSet(k, { g1: e.target.value }); $e(`tx-${k}-g2`).oninput = e => txSet(k, { g2: e.target.value });
   });
   $e("ed-bc").onchange = e => { S.profile.theme.bc = e.target.value !== "off"; commit(); };
-  $e("ed-done").onclick = () => m.close(); check();
-  const mo = new MutationObserver(() => { if (!document.body.contains(m)) { mo.disconnect(); if (S.view === "design") designTab(); } }); mo.observe(document.body, { childList: true });
+  $e("ed-done").onclick = () => { done = true; m.close(); };
+  $e("ed-pub").onclick = () => { done = true; publishDesign(S.profile.activeDesign); m.close(); };
+  check();
+  const mo = new MutationObserver(() => { if (!document.body.contains(m)) { mo.disconnect(); if (!done) { restoreSnap(snap); toast("Perubahan dibatalkan."); } if (S.view === "design") designTab(); } }); mo.observe(document.body, { childList: true });
 }
 
 /* ---------- Jadual posting: Zernio (API terus dari pelayar) atau Metricool (kalendar + peringatan) ---------- */
@@ -2391,7 +2463,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-50";
+const APP_VERSION = "V-51";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
@@ -2449,7 +2521,7 @@ new MutationObserver(() => renderUpdateBtn()).observe($("#app"), { childList: tr
 const CB_EXTRA = [
   { k: "shorten pendek short ringkas username webapps", q: "Shorten link", a: "Isi Username dahulu di Profil (boleh guna apa-apa aksara: huruf, nombor, simbol, garis bawah, tanda seru, titik, sempang, garis condong; maksimum 20). Kemudian di Shorten link: isi nama dan tampal pautan panjang. Pautan pendek berbentuk alamat/kod-anda/webapps/username-anda. Setiap baris ada butang salin, edit, buang, dan pemegang untuk susun.", go: "short" },
   { k: "teks font fon saiz warna gradien nama bio butang huruf", q: "Gaya teks", a: "Buka mana-mana design (klik kadnya), skrol ke bahagian Teks. Nama, bio dan teks butang masing-masing boleh ditukar fon, saiz, warna dan gradien.", go: "design" },
-  { k: "jam masa waktu tarikh hijri hijrah masihi", q: "Jam dan tarikh", a: "Jam di penjuru kanan atas menunjuk waktu Malaysia (12 jam), tarikh Masihi dan tarikh Hijri rasmi JAKIM." },
+  { k: "jam masa waktu tarikh masihi solat subuh zuhur asar maghrib isyak zon jakim", q: "Jam dan waktu solat", a: "Jam di penjuru kanan atas menunjuk waktu Malaysia (12 jam) dan tarikh. Di muka depan ada Waktu Solat ikut zon JAKIM (Subuh, Zuhur, Asar, Maghrib, Isyak). Zon dikesan automatik dan boleh ditukar dengan butang Tukar zon." },
   { k: "logo thumbnail gambar kecil butang jenama warna whatsapp tiktok facebook", q: "Logo dan warna butang", a: "Pautan media sosial hanya menunjuk logo jenama dan warna jenama (WhatsApp hijau, Facebook biru, dll). Gambar kecil (thumbnail) hanya untuk produk, pautan affiliate dan laman web; kalau tiada, butang hanya ada teks." },
   { k: "terbit terbitkan publish design salin pautan diterbitkan draf", q: "Terbitkan design", a: "Anda boleh buat design sebanyak mana pun (tiada had). Pilih satu dan tekan Terbit: itulah design yang dipaparkan pada Pautan anda (butang Salin pautan). Design lain kekal sebagai draf. Tukar design terbitan bila-bila masa.", go: "design" },
   { k: "crop potong laras zum zoom gambar pecah kabur 4k kualiti resolusi tajam jelas 1080", q: "Gambar & kualiti", a: "Setiap gambar ada butang Laras (seret, zum, kiri/kanan/atas/bawah). Kualiti gambar ada pilihan Auto (ikut peranti anda), 1080p, 2K atau 4K, di Profil atau dalam tetingkap Laras. Gambar baharu disimpan pada kualiti itu (tidak dibesarkan melebihi saiz asal). Gambar lama yang sudah kecil: muat naik semula.", go: "profile" },
@@ -2508,6 +2580,15 @@ function cbInit() {
 cbInit();
 
 /* ---------- Router ---------- */
+function fxClick(x, y) {
+  const r = document.createElement("span"); r.className = "fx-rip"; r.style.left = x - 44 + "px"; r.style.top = y - 44 + "px"; document.body.appendChild(r);
+  r.animate([{ transform: "scale(.15)", opacity: .95 }, { transform: "scale(1.15)", opacity: 0 }], { duration: 720, easing: "cubic-bezier(.22,.61,.36,1)" }).onfinish = () => r.remove();
+  for (let i = 0; i < 7; i++) {
+    const a = (i / 7) * Math.PI * 2 + Math.random() * .5, d = 34 + Math.random() * 34, st = document.createElement("span"); st.className = "fx-star"; st.textContent = i % 2 ? "✦" : "✧"; st.style.left = x - 7 + "px"; st.style.top = y - 7 + "px"; document.body.appendChild(st);
+    st.animate([{ transform: "translate(0,0) scale(.4) rotate(0deg)", opacity: 1 }, { transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d}px) scale(1) rotate(${(i % 2 ? 1 : -1) * 120}deg)`, opacity: 0 }], { duration: 640 + Math.random() * 200, easing: "cubic-bezier(.22,.61,.36,1)" }).onfinish = () => st.remove();
+  }
+}
+document.addEventListener("pointerdown", e => { if (e.button > 0 || REDUCE() || !document.body.classList.contains("flow")) return; fxClick(e.clientX, e.clientY); }, { passive: true });
 function nav(path, replace) { replace ? history.replaceState({}, "", path) : history.pushState({}, "", path); route(true); window.scrollTo(0, 0); }
 function route() {
   document.documentElement.style.background = ""; sfxScope(false); setTimeout(() => checkUpdate(), 1200);
