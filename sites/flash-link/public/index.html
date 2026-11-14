@@ -1018,9 +1018,9 @@ button.nxp[hidden]{display:none}
 button.nxp:hover{transform:translateY(-2px);box-shadow:0 20px 38px -16px rgba(56,189,248,.55),inset 0 1px 0 rgba(255,255,255,.5)}button.nxp:active{transform:scale(.97)}
 .nx-n,.nx-d{display:flex;justify-content:center}.nx-n{display:block}
 .dtop-in{height:66px;gap:14px;justify-content:flex-start}.dtop-in .dlogo{margin-right:2px;flex:none}.dtop-act{margin-left:auto}
-.dtop .nxp{min-width:0;padding:3px 12px 5px;border-radius:14px;border:1.5px solid #000;box-shadow:0 8px 18px -10px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.4)}
-.dtop .nx-n{font-size:10.5px;letter-spacing:.14em;line-height:1.3}.dtop .nx-d{margin-top:2px;gap:2px}.dtop .nx-d .dg{width:16px;height:24px;border-radius:6px}.dtop .nx-d .dg b{font-size:14px}
-@media(max-width:520px){.dtop-in{padding:0 8px;gap:8px}.dtop .nxp{padding:2px 7px 4px}.dtop .nx-d .dg{width:13px;height:21px}.dtop .nx-d .dg b{font-size:12px}.dtop .nx-n{font-size:9px}}
+.dnx .nxp{min-width:0;padding:3px 12px 5px;border-radius:14px;border:1.5px solid #000;box-shadow:0 8px 18px -10px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.4)}
+.dnx .nx-n{font-size:10.5px;letter-spacing:.14em;line-height:1.3}.dnx .nx-d{margin-top:2px;gap:2px}.dnx .nx-d .dg{width:16px;height:24px;border-radius:6px}.dnx .nx-d .dg b{font-size:14px}
+@media(max-width:520px){.dtop-in{padding:0 8px;gap:8px}.dnx .nxp{padding:2px 7px 4px}.dnx .nx-d .dg{width:13px;height:21px}.dnx .nx-d .dg b{font-size:12px}.dnx .nx-n{font-size:9px}}
 @media(min-width:761px){.b3-in{padding-left:2px!important}.b3-l{padding-left:0!important}}
 .pz-hl{animation:pzHl 2.2s ease-out}
 @keyframes pzHl{0%,100%{box-shadow:0 34px 60px -34px rgba(0,0,0,.9),inset 0 0 0 1.5px rgba(255,255,255,.14)}30%{box-shadow:0 0 0 4px rgba(125,211,252,.85),0 0 46px 6px rgba(56,189,248,.65),inset 0 0 0 1.5px rgba(255,255,255,.3)}}
@@ -1092,12 +1092,22 @@ button.nxp:focus{outline:none}button.nxp:focus-visible{outline:2px solid #000;ou
 .praysw:not(.on) .ps-ic{background:linear-gradient(145deg,#9CA3AF,#4B5563)}.praysw:not(.on) .ps-ic::after{content:"";position:absolute;left:5px;right:5px;top:50%;height:2.5px;border-radius:2px;background:#fff;transform:rotate(-40deg);box-shadow:0 0 0 1.5px rgba(0,0,0,.45)}
 .ps-tx b{display:block;font-size:12.5px;line-height:1.2;font-weight:800}.ps-tx small{display:block;font-size:10.5px;line-height:1.25;color:#E5E7EB}
 .ps-st{font-style:normal;font-weight:800;color:#86EFAC}.praysw:not(.on) .ps-st{color:#FCA5A5}
-.dtop .praysw{border-color:#000}
+.dnx .praysw{border-color:#000}
 body.pray-off #pray,body.pray-off #nxp,body.pray-off #praypop,body.pray-off section:has(>#pray){display:none!important}
 @media(max-width:760px){.fl-banner3 .ps-tx{display:none}.fl-banner3 .praysw{padding:4px}}
-@media(max-width:1179px){.dtop .ps-pre{display:none}.dtop .ps-tx b{font-size:11px}.dtop .praysw{padding:3px 8px 3px 4px}.dtop .ps-ic{width:26px;height:26px}}
+@media(max-width:1179px){.dnx .ps-pre{display:none}.dnx .ps-tx b{font-size:11px}.dnx .praysw{padding:3px 8px 3px 4px}.dnx .ps-ic{width:26px;height:26px}}
 @media(max-width:1699px){.b3-r .b3-note{display:none}}
 @media(max-width:1279px){.fl-banner3 .ps-tx{display:none}.fl-banner3 .praysw{padding:4px}}
+
+/* ===== V-101: baris countdown + suis solat di bawah header; saiz sama; grid header tanpa kotak countdown ===== */
+.nxp-w{gap:10px;align-items:stretch;flex-wrap:wrap}
+.nxp-w .nxp,.nxp-w .praysw{align-self:stretch}
+.nxp-w .praysw{padding:4px 14px 4px 8px}
+.dnx{max-width:1500px;margin:0 auto;padding:10px 16px 0!important}
+.dnx .praysw{border-color:#000}
+@media(max-width:1179px){.dtop-in{grid-template-areas:"logo . clock" "act act act"}.dnx{padding:10px 12px 0!important}}
+@media(max-width:520px){.nxp-w{gap:8px}.dnx .praysw{padding:3px 8px 3px 6px}.dnx .ps-ic{width:24px;height:24px}}
+.dnx{width:100%}
 </style>
 </head>
 <body>
@@ -2291,9 +2301,9 @@ function landing() {
   <div class="fl-banner3" role="region" aria-label="Promosi Flash Link"><div class="b3-bg" aria-hidden="true"><i class="b3-s1"></i></div><div class="b3-in">
     <div class="b3-zone b3-l"><a href="/" data-nav class="b3-logo" aria-label="Genius Digital Flash Link"><img src="/assets/logo-2x.png" alt="Genius Digital Flash Link" width="150" height="75"></a><span class="b3-sep" aria-hidden="true"></span>${ic("zap", "w-7 h-7")}<span><b>Setup 2 minit</b><small>Tanpa kod, terus guna</small></span></div>
     <div class="b3-zone b3-c"><span class="b3-title gradtxt">Satu pautan. Semua jualan.</span><small>WhatsApp · Shopee · TikTok Shop · YouTube</small></div>
-    <div class="b3-zone b3-r">${langSwitch()}${clockHtml("ck-ban")}<div class="b3-btns">${logged ? `<a class="btn btn-red btn-sm" href="/dashboard" data-nav>Mula sekarang</a>` : `<span class="cta-box cta-sm"><a class="btn btn-red btn-sm" href="/login?new=1" data-nav>Mula sekarang</a><small>(Pengguna baharu sahaja)</small></span>`}</div><span class="b3-note">Sentiasa dikemas kini</span>${praySwHtml()}</div>
+    <div class="b3-zone b3-r">${langSwitch()}${clockHtml("ck-ban")}<div class="b3-btns">${logged ? `<a class="btn btn-red btn-sm" href="/dashboard" data-nav>Mula sekarang</a>` : `<span class="cta-box cta-sm"><a class="btn btn-red btn-sm" href="/login?new=1" data-nav>Mula sekarang</a><small>(Pengguna baharu sahaja)</small></span>`}</div><span class="b3-note">Sentiasa dikemas kini</span></div>
   </div></div>
-  <div class="nxp-w"><button type="button" class="nxp" id="nxp" aria-label="Waktu solat akan datang. Tekan untuk lihat waktu solat penuh" hidden><span class="nx-n" id="nx-n" translate="no"></span><span class="nx-d" id="nx-d" translate="no"></span></button></div>
+  <div class="nxp-w"><button type="button" class="nxp" id="nxp" aria-label="Waktu solat akan datang. Tekan untuk lihat waktu solat penuh" hidden><span class="nx-n" id="nx-n" translate="no"></span><span class="nx-d" id="nx-d" translate="no"></span></button>${praySwHtml()}</div>
   <main>
   <section style="position:relative;padding:40px 0 72px">
     <div class="container" style="position:relative;display:grid;gap:40px;align-items:center" id="hero-grid">
@@ -2602,30 +2612,32 @@ function collabTab() {
 }
 function dashboard() {
   const url = profileUrl(S.profile.username);
-  $("#app").innerHTML = `<header class="dtop"><div class="dtop-in"><button id="hm" aria-label="Design" class="dlogo"><img src="/assets/logo-2x.png" alt="Genius Digital Flash Link" width="110" height="55"></button><button type="button" class="nxp" id="nxp" aria-label="Waktu solat akan datang. Tekan untuk lihat waktu solat penuh" hidden><span class="nx-n" id="nx-n" translate="no"></span><span class="nx-d" id="nx-d" translate="no"></span></button>
-    <div id="dhead-actions" class="dtop-act">${langSwitch()}<a id="gohome" class="btn btn-ghost btn-sm" href="/" data-nav aria-label="Laman utama">${ic("home", "w-4 h-4")}</a><button id="lo" class="btn btn-ghost btn-sm" aria-label="Log keluar">${ic("logout", "w-4 h-4")}</button>${praySwHtml()}</div>${clockHtml("ck-head")}</div></header>
+  $("#app").innerHTML = `<header class="dtop"><div class="dtop-in"><button id="hm" aria-label="Design" class="dlogo"><img src="/assets/logo-2x.png" alt="Genius Digital Flash Link" width="110" height="55"></button>
+    <div id="dhead-actions" class="dtop-act">${langSwitch()}<a id="gohome" class="btn btn-ghost btn-sm" href="/" data-nav aria-label="Laman utama">${ic("home", "w-4 h-4")}</a><button id="lo" class="btn btn-ghost btn-sm" aria-label="Log keluar">${ic("logout", "w-4 h-4")}</button></div>${clockHtml("ck-head")}</div></header>
+  <div class="nxp-w dnx"><button type="button" class="nxp" id="nxp" aria-label="Waktu solat akan datang. Tekan untuk lihat waktu solat penuh" hidden><span class="nx-n" id="nx-n" translate="no"></span><span class="nx-d" id="nx-d" translate="no"></span></button>${praySwHtml()}</div>
   <div class="dsh"><nav class="dnav" aria-label="Menu dashboard">${NAV.map(x => `<button class="dnav-i" data-k="${x.k}" aria-label="${x.n}">${ic(x.i, "w-5 h-5")}<span>${x.n}</span></button>`).join("")}</nav>
     <main id="stage" class="dmain"></main><aside class="dprev" id="dprev"></aside></div>
   <button id="pvb" class="btn btn-red pvfab on">${ic("phone", "w-5 h-5")} Pratonton</button>
   ${siteFooter(false)}`;
   if (!PR.times && !PR.busy) initPray(); applyPray();
   $("#nxp").onclick = () => { try { sessionStorage.setItem("fl_gopray", "1"); } catch {} nav("/"); };
-  tickClock(); $("#lo").onclick = () => { S.view = "design"; FB.signOut(auth); };
-  $("#hm").onclick = () => openView("design");
+  tickClock(); $("#lo").onclick = () => { S.view = "profile"; S.inDash = false; FB.signOut(auth); };
+  $("#hm").onclick = () => openView("profile");
   $$(".dnav-i").forEach(b => (b.onclick = () => { sfxUnlock().then(ok => ok && SFX.click()); openView(b.dataset.k); }));
   sfxScope(true);
   $("#pvb").onclick = () => modal(`<div id="pvmobile" style="max-height:78vh;overflow-y:auto">${devsHtml("land")}</div>`, () => refreshPreview(true));
   drawPreviewPanel();
+  if (!S.inDash) S.view = "profile"; S.inDash = true; // masuk dari laman utama / log masuk: terus ke Profil
   if (/[?&]zc=/.test(location.search)) { S.view = "schedule"; SC.prov = "zernio"; history.replaceState({}, "", "/dashboard"); }
-  if (S.view === "home") S.view = "design";
-  openView(NAV.some(x => x.k === S.view) ? S.view : "design", { instant: true });
+  if (S.view === "home") S.view = "profile";
+  openView(NAV.some(x => x.k === S.view) ? S.view : "profile", { instant: true });
 }
 let navTok = 0;
 function openView(view, o = {}) {
   const stage = $("#stage"); if (!stage) return;
   const old = $("#sec"); if (old && !o.instant && !REDUCE() && !o.x && view !== S.view) { const t = ++navTok; $$(".dnav-i").forEach(b => b.setAttribute("aria-current", b.dataset.k === view ? "page" : "false")); const a = old.animate([{ opacity: 1, transform: "none", filter: "blur(0)" }, { opacity: 0, transform: "scale(.975) translate3d(0,6px,0)", filter: "blur(6px)" }], { duration: 150, easing: "cubic-bezier(.4,0,1,1)", fill: "both" }); const go = () => { if (t !== navTok) return; navTok = t - 1; openView(view, { ...o, x: 1 }); }; a.onfinish = go; setTimeout(go, 200); return; }
 
-  if (view === "home") view = "design"; if (!NAV.some(x => x.k === view)) view = "design";
+  if (view === "home") view = "profile"; if (!NAV.some(x => x.k === view)) view = "profile";
   const prev = NAV.findIndex(n => n.k === S.view), next = NAV.findIndex(n => n.k === view), dir = next >= prev ? 1 : -1, tok = ++navTok;
   S.view = view; document.body.dataset.s = view; const x = NAV[next];
   $$(".dnav-i").forEach(b => b.setAttribute("aria-current", b.dataset.k === view ? "page" : "false")); // butang bertindak balas serta-merta
@@ -3401,7 +3413,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-100";
+const APP_VERSION = "V-101";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
@@ -3663,6 +3675,7 @@ function fxClick(x, y) {
 document.addEventListener("pointerdown", e => { if (e.button > 0 || REDUCE() || !document.body.classList.contains("flow")) return; fxClick(e.clientX, e.clientY); }, { passive: true });
 function nav(path, replace) { replace ? history.replaceState({}, "", path) : history.pushState({}, "", path); route(true); window.scrollTo(0, 0); }
 function route() {
+  if (location.pathname.replace(/\/+$/, "") !== "/dashboard") S.inDash = false;
   if (location.pathname.replace(/\/+$/, "") !== "/admin") $$("[data-adm]").forEach(e => e.remove());
   document.documentElement.style.background = ""; sfxScope(false); setTimeout(() => checkUpdate(), 1200);
   const p = location.pathname.replace(/\/+$/, "") || "/", seg = p.split("/").filter(Boolean);
