@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Smart Solat: Paparan Waktu Solat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:wght@400;500;700&family=Dancing+Script:wght@600;700&family=Amiri:wght@400;700&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+
+*{box-sizing:border-box}html,body{margin:0}body{background:#07080d;color:#F4F4F5;font-family:'DM Sans',system-ui,sans-serif;min-height:100vh;padding:28px 16px}
+button{font:inherit;cursor:pointer;color:inherit;background:none;border:0}.font-display{font-family:'Space Grotesk',sans-serif}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 20px;border-radius:12px;font-weight:700;border:1px solid transparent}
+.btn-ghost{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18);color:#F4F4F5}.btn-red{background:linear-gradient(135deg,#FF2A2A,#B80000);color:#fff}
+.btn-sm{min-height:36px;padding:0 12px;font-size:14px;border-radius:10px}.w-4{width:16px;height:16px}
+.inp{width:100%;min-height:46px;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:16px}
+.lbl{display:block;font-size:13px;font-weight:600;color:#D1D5DB;margin:0 0 6px}.hint{font-size:12.5px;color:#9CA3AF;margin-top:6px}.err{font-size:13px;color:#FF8A8A;margin-top:6px}
+.modal-bg{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{width:100%;max-width:520px;max-height:90vh;overflow:auto;background:#12121a;border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:20px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:300;background:#12121a;border:1px solid #34D399;border-radius:14px;padding:12px 18px}
+.az-row{display:flex;justify-content:space-between;gap:12px;align-items:center}
+
+/* ===== CSS paparan waktu solat (diekstrak daripada Flash Link) ===== */
+:root{--line:rgba(255,255,255,.12)}
+.pray-card{max-width:940px;margin:0 auto}
+.pray-tv{position:relative;padding:16px;border-radius:30px;background:linear-gradient(145deg,#2A3447,#0E1420 60%,#1D2636);box-shadow:0 34px 60px -34px rgba(0,0,0,.9),inset 0 0 0 1.5px rgba(255,255,255,.14)}
+.tv-led{position:absolute;right:26px;bottom:5px;width:7px;height:7px;border-radius:50%;background:#34D399;box-shadow:0 0 8px #34D399}
+.pray-scr{position:relative;overflow:hidden;border-radius:18px;background:#0b1d16 var(--img-mosque,url(assets/mosque.jpg)) center 30%/cover no-repeat;isolation:isolate}
+.pray-scr::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(3,10,14,.66) 0%,rgba(3,10,14,.30) 42%,rgba(3,10,14,.30) 58%,rgba(3,10,14,.78) 100%)}
+.pray-in{padding:22px 22px 16px;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.9),0 0 2px rgba(0,0,0,.95)}
+.pray-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.pray-t{font-family:'Dancing Script','Brush Script MT',cursive;font-size:40px;font-weight:700;line-height:1.1;color:#FFD66B}
+.pray-z{font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:#A5F3FC;margin-top:3px}
+.pray-now{margin:16px 0 20px;padding:0;background:none;border:0;display:flex;gap:10px 24px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}
+.pray-now small{display:block;font-family:'Montserrat',sans-serif;font-weight:700;font-size:14px}
+.pn-l small{color:#FDE68A}
+.pn-r small{color:#86EFAC}
+.pn-cur{font-family:'Dancing Script','Brush Script MT',cursive;font-size:56px;line-height:1.05;font-weight:700;color:#fff}
+.pn-r{text-align:right}
+.pn-c{font-family:'Poppins',sans-serif;font-size:42px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.02em;line-height:1.15;color:#fff}
+.pray-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.pray-i{display:flex;flex-direction:column;align-items:center;gap:2px;padding:16px 6px 14px;border-radius:18px;background:rgba(6,18,16,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1.5px solid rgba(255,255,255,.3);color:#fff;text-shadow:none;transition:background .5s,transform .6s cubic-bezier(.32,.72,0,1),box-shadow .5s}
+.pray-i .pr-n{font-family:'Dancing Script','Brush Script MT',cursive;font-size:30px;font-weight:700;line-height:1.1;color:#fff}
+.pray-i .pr-a{font-family:'Amiri',serif;font-style:normal;font-size:19px;line-height:1.25;color:#FFE08A}
+.pray-i .pr-t{font-family:'Poppins',sans-serif;font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:4px;color:#fff}
+.pray-i.on{background:#0B4A2E;border-color:#1B8A5A;transform:translateY(-4px);box-shadow:0 18px 26px -16px rgba(0,0,0,.9)}
+.pray-i.on .pr-a{color:#fff}
+.pray-src{margin-top:14px;font-family:'Montserrat',sans-serif;font-size:11.5px;color:#E5E7EB;text-align:center;font-weight:600}
+.pray-src a{color:#E5E7EB}
+.pray-err{margin:14px 0;color:#FFD166;font-weight:700}
+.zrow{display:block;width:100%;text-align:left;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--line);color:#fff;font-size:14px}
+.zrow[aria-pressed=true]{border-color:#34D399;background:rgba(52,211,153,.14)}
+.zrow b{color:#6EE7A8;margin-right:6px}
+@media(max-width:560px){.pray-tv{padding:9px;border-radius:22px}
+.pray-in{padding:14px 10px 12px}
+.pray-t{font-size:32px}
+.pn-cur{font-size:40px}
+.pn-c{font-size:28px}
+.pray-row{gap:5px}
+.pray-i{padding:10px 1px 9px;border-radius:13px}
+.pray-i .pr-n{font-size:18px}
+.pray-i .pr-a{font-size:14px}
+.pray-i .pr-t{font-size:11px}}
+#praypop{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:20px;background:rgba(2,6,14,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.pp-card{position:relative;width:min(380px,100%);padding:34px 24px 26px;border-radius:30px;background:#0B1F18;border:1.5px solid rgba(255,255,255,.2);color:#fff;text-align:center;box-shadow:0 40px 90px -30px rgba(0,0,0,.9);will-change:transform}
+.pp-x{position:absolute;top:12px;right:12px;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.12);color:#fff;transition:background .2s,transform .3s cubic-bezier(.32,.72,0,1)}
+.pp-x:hover{background:rgba(255,255,255,.22);transform:scale(1.06)}
+.pp-x:focus-visible{outline:3px solid #34D399;outline-offset:2px}
+.pp-s{font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;color:#86EFAC;margin-top:8px}
+.pp-t{font-family:'Dancing Script','Brush Script MT',cursive;font-size:54px;line-height:1.1;margin:2px 0 0;color:#fff;font-weight:700}
+.pp-ar{font-family:'Amiri',serif;font-size:28px;color:#FFE08A;margin-top:2px}
+.pp-tm{margin-top:10px;font-family:'Poppins',sans-serif;font-size:28px;font-weight:700;font-variant-numeric:tabular-nums;color:#fff}
+.pp-z{font-family:'Montserrat',sans-serif;font-size:13px;color:#A5F3FC;margin-top:4px;font-weight:700}
+@media(prefers-reduced-motion:reduce){.pray-i{transition:none}}
+.pray-tv{background:linear-gradient(145deg,#F1F3F6 0%,#B9BEC6 28%,#E8EAEE 52%,#9CA2AB 78%,#D7DADF 100%)!important;box-shadow:0 34px 60px -34px rgba(0,0,0,.9),inset 0 0 0 1.5px rgba(255,255,255,.75),inset 0 -2px 4px rgba(60,66,76,.45)!important}
+.tv-led{background:#34D399}
+.pray-scr{box-shadow:0 0 0 2px rgba(70,76,86,.55),inset 0 0 22px rgba(0,0,0,.35)}
+.pray-scr::before{background:linear-gradient(180deg,rgba(3,10,14,.58) 0%,rgba(3,10,14,.12) 40%,rgba(3,10,14,.12) 60%,rgba(3,10,14,.72) 100%)!important}
+.pray-i{background:rgba(6,18,16,.5)!important;backdrop-filter:blur(3px)!important;-webkit-backdrop-filter:blur(3px)!important}
+.pray-i.on{background:#0B4A2E!important}
+.pray-card{max-width:none!important;margin:0 10px!important}
+.pray-act{display:flex;gap:8px;align-items:center}
+.az-btn{min-width:44px;padding:0 12px}
+.az-btn svg{width:20px;height:20px}
+.az-row{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:12px 14px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.05)}
+.az-row small{display:block;color:#C7C9D1;font-size:12.5px;margin-top:2px}
+.az-sw{position:relative;flex:none;width:62px;height:34px;border-radius:999px;background:#6B7280;transition:background .3s;touch-action:none}
+.az-sw i{position:absolute;top:3px;left:3px;width:28px;height:28px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.4);transition:transform .35s cubic-bezier(.32,.72,0,1)}
+.az-sw.on{background:#22C55E}
+.az-sw.on i{transform:translateX(28px)}
+.pray-i{background:linear-gradient(160deg,rgba(255,255,255,.30),rgba(255,255,255,.07))!important;backdrop-filter:blur(22px) saturate(185%)!important;-webkit-backdrop-filter:blur(22px) saturate(185%)!important;border:1px solid rgba(255,255,255,.55)!important;box-shadow:inset 0 1.5px 0 rgba(255,255,255,.7),inset 0 -1px 0 rgba(255,255,255,.14),0 14px 30px -14px rgba(0,0,0,.6)!important;text-shadow:0 1px 6px rgba(0,0,0,.75)}
+.pray-i.on{background:linear-gradient(160deg,rgba(40,170,100,.88),rgba(8,84,48,.9))!important;border-color:rgba(190,255,215,.65)!important}
+.pray-src{display:flex;flex-direction:column;gap:2px;align-items:center}
+.pray-src>div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.pray-scr::before{background:linear-gradient(180deg,rgba(3,10,14,.5) 0%,rgba(3,10,14,.08) 40%,rgba(3,10,14,.1) 60%,rgba(3,10,14,.7) 100%)!important}
+#praypop{padding:16px!important;background:rgba(2,6,14,.55)!important}
+.pp-card{width:min(540px,100%)!important;min-height:520px;padding:0!important;overflow:hidden;background:#06121a var(--pp) center/cover no-repeat!important;border:1px solid rgba(255,255,255,.35)!important;display:flex;flex-direction:column;justify-content:flex-end}
+.pp-card::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,6,12,.35) 0%,rgba(0,6,12,.15) 28%,rgba(0,6,12,.72) 62%,rgba(0,6,12,.9) 100%)}
+.pp-body{position:relative;padding:24px 22px 8px;text-shadow:0 2px 10px rgba(0,0,0,.9)}
+.pp-s{margin-top:0!important}
+.pp-z{font-size:14px!important}
+.pp-d{font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;color:#FDE68A;margin-top:2px}
+.pp-m{font-family:'Montserrat',sans-serif;font-weight:600;font-size:14px;line-height:1.5;color:#fff;margin:14px auto 0;max-width:420px}
+.pp-c{position:relative;padding:12px 14px 12px;font-size:10.5px;color:rgba(255,255,255,.8);text-shadow:0 1px 4px #000;font-family:'Montserrat',sans-serif}
+.pp-x{z-index:2;background:rgba(255,255,255,.22)!important;backdrop-filter:blur(8px)}
+@media(max-width:560px){.pray-act .az-btn{min-width:40px}
+.pray-src{font-size:10px}}
+.pray-card{max-width:1060px!important;margin:0 auto!important}
+#praypop{perspective:1100px}
+.pp-card{--rx:0deg;--ry:0deg;--mx:50%;--my:30%;--tx:0px;--ty:0px;padding:10px!important;min-height:0!important;display:block!important;border-radius:36px!important;background:linear-gradient(150deg,rgba(255,255,255,.34),rgba(255,255,255,.1) 45%,rgba(255,255,255,.22))!important;backdrop-filter:blur(30px) saturate(190%);-webkit-backdrop-filter:blur(30px) saturate(190%);border:1px solid rgba(255,255,255,.65)!important;box-shadow:inset 0 2px 0 rgba(255,255,255,.75),inset 0 -2px 0 rgba(255,255,255,.2),inset 0 0 22px rgba(255,255,255,.18),0 40px 90px -25px rgba(0,0,0,.75)!important;transform:rotateX(var(--rx)) rotateY(var(--ry));transform-style:preserve-3d;transition:transform .7s cubic-bezier(.32,.72,0,1);will-change:transform}
+.pp-card.tilt{transition:transform .12s ease-out}
+.pp-card::before{display:none!important}
+.pp-gloss{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:3;background:radial-gradient(420px circle at var(--mx) var(--my),rgba(255,255,255,.42),rgba(255,255,255,.08) 38%,transparent 62%);mix-blend-mode:soft-light}
+.pp-in{position:relative;border-radius:27px;overflow:hidden;min-height:500px;display:flex;flex-direction:column;justify-content:flex-end;background:#06121a;transform:translateZ(18px)}
+.pp-in::before{content:"";position:absolute;inset:-18px;background:var(--pp) center/cover no-repeat;transform:translate3d(var(--tx),var(--ty),0);transition:transform .7s cubic-bezier(.32,.72,0,1)}
+.pp-card.tilt .pp-in::before{transition:transform .12s ease-out}
+.pp-in::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,6,12,.32) 0%,rgba(0,6,12,.12) 28%,rgba(0,6,12,.72) 62%,rgba(0,6,12,.9) 100%)}
+.pp-body,.pp-c{position:relative;z-index:1}
+.pp-c div+div{margin-top:2px}
+.pp-x{z-index:4!important;top:20px!important;right:20px!important}
+@media(prefers-reduced-motion:reduce){.pp-card{transform:none!important}}
+.pz-ss{position:absolute;inset:0;z-index:-2;overflow:hidden;border-radius:inherit}
+.pz-sl{position:absolute;inset:0;background-size:cover;background-position:center 30%;opacity:0;will-change:transform,opacity}
+.pz-sl.on{opacity:1}
+.pz-hl{animation:pzHl 2.2s ease-out}
+.nxp,.pray-tv{position:relative}
+.nxp.alert::after,.pray-tv.alert::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(120deg,rgba(56,189,248,.75),rgba(52,211,153,.75) 50%,rgba(14,165,233,.7));mix-blend-mode:screen;opacity:0;animation:alFlash 1.1s ease-in-out infinite;z-index:3}
+.pray-tv.alert{animation:alGlow 1.1s ease-in-out infinite}
+.nxp.alert10::after,.pray-tv.alert10::after,.nxp.alert10,.pray-tv.alert10{animation-duration:.45s}
+@media(prefers-reduced-motion:reduce){.nxp.alert,.pray-tv.alert,.nxp.alert::after,.pray-tv.alert::after{animation:none}
+.nxp.alert,.pray-tv.alert{box-shadow:0 0 0 3px rgba(52,211,153,.9),0 0 24px 4px rgba(56,189,248,.7)}}
+@keyframes pzHl{0%,100%{box-shadow:0 34px 60px -34px rgba(0,0,0,.9),inset 0 0 0 1.5px rgba(255,255,255,.14)}30%{box-shadow:0 0 0 4px rgba(125,211,252,.85),0 0 46px 6px rgba(56,189,248,.65),inset 0 0 0 1.5px rgba(255,255,255,.3)}}
+@keyframes alFlash{0%,100%{opacity:0}50%{opacity:.9}}
+@keyframes alGlow{0%,100%{box-shadow:0 0 0 0 rgba(56,189,248,0),0 0 0 rgba(52,211,153,0)}50%{box-shadow:0 0 0 3px rgba(56,189,248,.9),0 0 34px 8px rgba(52,211,153,.75)}}
+</style>
+</head>
+<body>
+<main style="max-width:1000px;margin:0 auto"><div id="pray"></div></main>
+<script>
+
+/* ===== Pembantu kecil (menggantikan kod app induk) ===== */
+const $ = (q, r = document) => r.querySelector(q), $$ = (q, r = document) => [...r.querySelectorAll(q)];
+const esc = v => String(v == null ? "" : v).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const lsGet = k => { try { return localStorage.getItem(k) || ""; } catch { return ""; } };
+const lsSet = (k, v) => { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch {} };
+const REDUCE = () => matchMedia("(prefers-reduced-motion:reduce)").matches;
+const wallIn = (d, tz) => { const p = Object.fromEntries(new Intl.DateTimeFormat("en-CA", { timeZone: tz, hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit" }).formatToParts(d).map(x => [x.type, x.value])); return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}:${p.second}`; };
+const ic = name => `<svg class="w-4 h-4" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>`;
+function toast(msg) { const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); }
+function modal(html, after) {
+  const bg = document.createElement("div"); bg.className = "modal-bg"; bg.innerHTML = `<div class="modal" role="dialog" aria-modal="true"><div style="display:flex;justify-content:flex-end"><button class="btn btn-ghost btn-sm" data-x aria-label="Tutup">&times;</button></div>${html}</div>`;
+  const close = () => { bg.remove(); document.removeEventListener("keydown", k); }, k = e => e.key === "Escape" && close();
+  document.addEventListener("keydown", k); bg.onclick = e => { if (e.target === bg) close(); }; $("[data-x]", bg).onclick = close; document.body.appendChild(bg); bg.close = close; after && after(bg); return bg;
+}
+
+/* ===== Slideshow latar (pilihan): letak sehingga 10 URL gambar dalam SLIDES.imgs ===== */
+/* ---- Slideshow latar waktu solat (maks. 10 gambar, gerakan slow-motion boleh dilaras) ---- */
+const SLIDES = { imgs: [], anim: "kenburns", secs: 10, zoom: 112, px: 50, py: 30 }, PS = { timers: [] };
+function psStart() {
+  PS.timers.forEach(clearInterval); PS.timers = [];
+  $$(".pray-scr").forEach(box => {
+    let ss = $(".pz-ss", box); const imgs = (SLIDES.imgs || []).slice(0, 10).filter(Boolean);
+    if (!imgs.length) { ss && ss.remove(); return; }
+    if (!ss) { ss = document.createElement("div"); ss.className = "pz-ss"; ss.setAttribute("aria-hidden", "true"); box.prepend(ss); }
+    ss.innerHTML = imgs.map(() => '<div class="pz-sl"></div>').join(""); const L = $$(".pz-sl", ss); L.forEach((e, i) => (e.style.backgroundImage = `url("${imgs[i]}")`));
+    const secs = Math.max(4, Math.min(30, +SLIDES.secs || 10)), z = Math.max(100, Math.min(150, +SLIDES.zoom || 112)) / 100, org = `${Math.max(0, Math.min(100, +SLIDES.px >= 0 ? +SLIDES.px : 50))}% ${Math.max(0, Math.min(100, +SLIDES.py >= 0 ? +SLIDES.py : 30))}%`;
+    const kinds = SLIDES.anim === "campur" ? ["in", "out", "l", "r"] : [SLIDES.anim === "zoomout" ? "out" : SLIDES.anim === "pan" ? "l" : SLIDES.anim === "fade" ? "none" : "in"];
+    const mk = (k, to) => (k === "in" ? (to ? `scale(${z})` : "scale(1)") : k === "out" ? (to ? "scale(1)" : `scale(${z})`) : k === "l" ? (to ? `translate3d(3%,0,0) scale(${z})` : `translate3d(-3%,0,0) scale(${z})`) : k === "r" ? (to ? `translate3d(-3%,0,0) scale(${z})` : `translate3d(3%,0,0) scale(${z})`) : "none");
+    let i = -1;
+    const step = () => {
+      if (!document.body.contains(ss)) return; const prev = L[i]; i = (i + 1) % L.length; const e = L[i], k = kinds[i % kinds.length];
+      if (prev && prev !== e) prev.classList.remove("on");
+      e.style.transition = "none"; e.style.transformOrigin = org; e.style.transform = REDUCE() ? "none" : mk(k, false); void e.offsetWidth;
+      e.style.transition = `opacity 1.8s ease, transform ${secs + 2.5}s linear`; e.classList.add("on"); if (!REDUCE()) e.style.transform = mk(k, true);
+    };
+    step(); if (L.length > 1) PS.timers.push(setInterval(step, secs * 1000));
+  });
+}
+
+/* ===== Jam Malaysia (segerak dengan pelayan JAKIM) ===== */
+const CLK = { off: 0, hij: null, day: "", busy: false };
+const klNow = () => new Date(Date.now() + CLK.off);
+const klDay = d => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Kuala_Lumpur", year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
+async function syncClock() {
+  if (CLK.busy) return; CLK.busy = true; const day = klDay(klNow());
+  try {
+    const r = await fetch("https://www.e-solat.gov.my/index.php?r=esolatApi/TakwimSolat&period=today&zone=SGR01", { cache: "no-store" }), j = await r.json();
+    const st = String(j.serverTime || "").match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})$/); if (st) CLK.off = new Date(`${st[1]}T${st[2]}+08:00`).getTime() - Date.now();
+    CLK.day = klDay(klNow());
+  } catch {}
+  CLK.busy = false;
+}
+
+/* ---------- Waktu solat: data rasmi JAKIM (e-solat.gov.my), ikut zon ---------- */
+const ZONES = [["JHR01", "Johor", "Pulau Aur dan Pulau Pemanggil"], ["JHR02", "Johor", "Johor Bahru, Kota Tinggi, Mersing, Kulai"], ["JHR03", "Johor", "Kluang, Pontian"], ["JHR04", "Johor", "Batu Pahat, Muar, Segamat, Gemas Johor, Tangkak"], ["KDH01", "Kedah", "Kota Setar, Kubang Pasu, Pokok Sena (Daerah Kecil)"], ["KDH02", "Kedah", "Kuala Muda, Yan, Pendang"], ["KDH03", "Kedah", "Padang Terap, Sik"], ["KDH04", "Kedah", "Baling"], ["KDH05", "Kedah", "Bandar Baharu, Kulim"], ["KDH06", "Kedah", "Langkawi"], ["KDH07", "Kedah", "Puncak Gunung Jerai"], ["KTN01", "Kelantan", "Bachok, Kota Bharu, Machang, Pasir Mas, Pasir Puteh, Tanah Merah, Tumpat, Kuala Krai, Mukim Chiku"], ["KTN02", "Kelantan", "Gua Musang (Daerah Galas Dan Bertam), Jeli, Jajahan Kecil Lojing"], ["MLK01", "Melaka", "SELURUH NEGERI MELAKA"], ["NGS01", "Negeri Sembilan", "Tampin, Jempol"], ["NGS02", "Negeri Sembilan", "Jelebu, Kuala Pilah, Rembau"], ["NGS03", "Negeri Sembilan", "Port Dickson, Seremban"], ["PHG01", "Pahang", "Pulau Tioman"], ["PHG02", "Pahang", "Kuantan, Pekan, Muadzam Shah"], ["PHG03", "Pahang", "Jerantut, Temerloh, Maran, Bera, Chenor, Jengka"], ["PHG04", "Pahang", "Bentong, Lipis, Raub"], ["PHG05", "Pahang", "Genting Sempah, Janda Baik, Bukit Tinggi"], ["PHG06", "Pahang", "Cameron Highlands, Genting Higlands, Bukit Fraser"], ["PHG07", "Pahang", "Zon Khas Daerah Rompin, (Mukim Rompin, Mukim Endau, Mukim Pontian)"], ["PRK01", "Perak", "Tapah, Slim River, Tanjung Malim"], ["PRK02", "Perak", "Kuala Kangsar, Sg. Siput , Ipoh, Batu Gajah, Kampar"], ["PRK03", "Perak", "Lenggong, Pengkalan Hulu, Grik"], ["PRK04", "Perak", "Temengor, Belum"], ["PRK05", "Perak", "Kg Gajah, Teluk Intan, Bagan Datuk, Seri Iskandar, Beruas, Parit, Lumut, Sitiawan, Pulau Pangkor"], ["PRK06", "Perak", "Selama, Taiping, Bagan Serai, Parit Buntar"], ["PRK07", "Perak", "Bukit Larut"], ["PLS01", "Perlis", "SELURUH NEGERI PERLIS"], ["PNG01", "Pulau Pinang", "SELURUH NEGERI PULAU PINANG"], ["SBH01", "Sabah", "Bahagian Sandakan (Timur), Bukit Garam, Semawang, Temanggong, Tambisan, Bandar Sandakan, Sukau"], ["SBH02", "Sabah", "Beluran, Telupid, Pinangah, Terusan, Kuamut, Bahagian Sandakan (Barat)"], ["SBH03", "Sabah", "Lahad Datu, Silabukan, Kunak, Sahabat, Semporna, Tungku, Bahagian Tawau (Timur)"], ["SBH04", "Sabah", "Bandar Tawau, Balong, Merotai, Kalabakan, Bahagian Tawau (Barat)"], ["SBH05", "Sabah", "Kudat, Kota Marudu, Pitas, Pulau Banggi, Bahagian Kudat"], ["SBH06", "Sabah", "Gunung Kinabalu"], ["SBH07", "Sabah", "Kota Kinabalu, Ranau, Kota Belud, Tuaran, Penampang, Papar, Putatan, Bahagian Pantai Barat"], ["SBH08", "Sabah", "Pensiangan, Keningau, Tambunan, Nabawan, Bahagian Pendalaman (Atas)"], ["SBH09", "Sabah", "Beaufort, Kuala Penyu, Sipitang, Tenom, Long Pasia, Membakut, Weston, Bahagian Pendalaman (Bawah)"], ["SWK01", "Sarawak", "Limbang, Lawas, Sundar, Trusan"], ["SWK02", "Sarawak", "Miri, Niah, Bekenu, Sibuti, Marudi"], ["SWK03", "Sarawak", "Pandan, Belaga, Suai, Tatau, Sebauh, Bintulu"], ["SWK04", "Sarawak", "Sibu, Mukah, Dalat, Song, Igan, Oya, Balingian, Kanowit, Kapit"], ["SWK05", "Sarawak", "Sarikei, Matu, Julau, Rajang, Daro, Bintangor, Belawai"], ["SWK06", "Sarawak", "Lubok Antu, Sri Aman, Roban, Debak, Kabong, Lingga, Engkelili, Betong, Spaoh, Pusa, Saratok"], ["SWK07", "Sarawak", "Serian, Simunjan, Samarahan, Sebuyau, Meludam"], ["SWK08", "Sarawak", "Kuching, Bau, Lundu, Sematan"], ["SWK09", "Sarawak", "Zon Khas (Kampung Patarikan)"], ["SGR01", "Selangor", "Gombak, Petaling, Sepang, Hulu Langat, Hulu Selangor, Shah Alam"], ["SGR02", "Selangor", "Kuala Selangor, Sabak Bernam"], ["SGR03", "Selangor", "Klang, Kuala Langat"], ["TRG01", "Terengganu", "Kuala Terengganu, Marang, Kuala Nerus"], ["TRG02", "Terengganu", "Besut, Setiu"], ["TRG03", "Terengganu", "Hulu Terengganu"], ["TRG04", "Terengganu", "Dungun, Kemaman"], ["WLY01", "Wilayah Persekutuan", "Kuala Lumpur, Putrajaya"], ["WLY02", "Wilayah Persekutuan", "Labuan"]];
+const PRAY_N = [["fajr", "Subuh", '<path d="M3 18h18M6 18a6 6 0 0 1 12 0M12 4v4M4.9 9.9l2.1 2.1M19.1 9.9 17 12M9 6l3-3 3 3"/>'], ["dhuhr", "Zuhur", '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'], ["asr", "Asar", '<circle cx="12" cy="13" r="3.5"/><path d="M12 4v2M3 13h2M19 13h2M5.6 6.6 7 8M18.4 6.6 17 8M3 20h18"/>'], ["maghrib", "Maghrib", '<path d="M3 18h18M6 18a6 6 0 0 1 12 0M12 5v4M9 8l3 3 3-3M4.9 11.9l2.1 2.1M19.1 11.9 17 14"/>'], ["isha", "Isyak", '<path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5Z"/>']];
+const PR = { zone: null, auto: true, times: null, day: "", err: "", busy: false };
+const zInfo = c => ZONES.find(z => z[0] === c);
+async function zoneFromCoords(lat, lon) { const j = await (await fetch(`https://api.waktusolat.app/zones/${lat}/${lon}`)).json(); if (!j.zone || !zInfo(j.zone)) throw new Error("zon"); return j.zone; }
+const geoZone = () => new Promise((res, rej) => { if (!navigator.geolocation) return rej(new Error("tiada")); navigator.geolocation.getCurrentPosition(p => zoneFromCoords(p.coords.latitude, p.coords.longitude).then(res, rej), rej, { timeout: 12000, maximumAge: 600000 }); });
+async function detectZone() {
+  try { if (navigator.permissions) { const st = await navigator.permissions.query({ name: "geolocation" }); if (st.state === "granted") return await geoZone(); } } catch {}
+  try { const g = await (await fetch("https://ipwho.is/")).json(); if (g.success && g.country_code === "MY") return await zoneFromCoords(g.latitude, g.longitude); } catch {}
+  return "SGR01";
+}
+async function loadPray(zone) {
+  const key = `fl_pt_${zone}_${klDay(klNow())}`; try { const c = JSON.parse(lsGet(key) || "null"); if (c) return c; } catch {}
+  const j = await (await fetch(`https://www.e-solat.gov.my/index.php?r=esolatApi/TakwimSolat&period=today&zone=${zone}`, { cache: "no-store" })).json(), t = j.prayerTime && j.prayerTime[0]; if (!t) throw new Error("tiada data");
+  const out = { fajr: t.fajr, dhuhr: t.dhuhr, asr: t.asr, maghrib: t.maghrib, isha: t.isha }; lsSet(key, JSON.stringify(out)); return out;
+}
+const to12 = t => { const [h, m] = t.split(":").map(Number); return `${h % 12 || 12}:${String(m).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`; };
+const secOf = t => { const [h, m, s = 0] = t.split(":").map(Number); return h * 3600 + m * 60 + (s || 0); };
+const PRAY_EN = { fajr: "Fajr", dhuhr: "Dhuhr", asr: "Asr", maghrib: "Maghrib", isha: "Isha" };
+const PRAY_AR = { fajr: "الفجر", dhuhr: "الظهر", asr: "العصر", maghrib: "المغرب", isha: "العشاء" };
+const PHOTO_CREDIT = "Photo: Muhammad Faqih, CC BY-SA 4.0, Wikimedia Commons";
+function prayHtml() { return `<div id="pray"><div class="pray-card"><div class="pray-tv"><div class="pray-scr"><div class="pray-in"><div class="pray-t">Waktu Solat</div><p class="hint" style="margin:6px 0 0">Memuatkan waktu solat…</p></div></div></div></div></div>`; }
+const prayIco = (k, c = "") => `<svg ${c ? `class="${c}" ` : ""}viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${PRAY_N.find(x => x[0] === k)[2]}</svg>`;
+function drawPray() {
+  const el = $("#pray"); if (!el) return; const z = zInfo(PR.zone) || ["", "", ""];
+  el.innerHTML = `<div class="pray-card"><div class="pray-tv"><span class="tv-led" aria-hidden="true"></span><div class="pray-scr"><div class="pray-in"><div class="pray-top"><div><div class="pray-t">Waktu Solat</div><div class="pray-z">${esc(z[1])} · ${esc(PR.zone)} · ${esc(z[2])}</div></div><div class="pray-act"><button class="btn btn-ghost btn-sm" id="pz-btn" type="button">${ic("globe", "w-4 h-4")} Tukar zon</button><button class="btn btn-ghost btn-sm az-btn${AZAN.on() ? " on" : ""}" id="pz-az" type="button" aria-label="Azan" title="Azan">${SPK_ICO}</button></div></div>
+    ${PR.times ? `<div class="pray-now" id="pz-now"></div><div class="pray-row">${PRAY_N.map(([k, n]) => `<div class="pray-i" data-k="${k}"><b class="pr-n" translate="no">${n}</b><em class="pr-a" lang="ar" dir="rtl" translate="no">${PRAY_AR[k]}</em><span class="pr-t">${to12(PR.times[k])}</span></div>`).join("")}</div>` : `<p class="pray-err">${esc(PR.err || "Memuatkan…")}</p>`}
+    <div class="pray-src"><div>Sumber: JAKIM (e-solat.gov.my) · ${PR.auto ? "zon dikesan automatik" : "zon pilihan anda"}</div><div translate="no">${PHOTO_CREDIT}</div><div translate="no">Azan: Ustaz Asri (Rabbani) / Furqan Fawaz</div></div></div></div></div></div>`;
+  $("#pz-btn").onclick = zoneModal; $("#pz-az").onclick = azanModal; tickPray(); psStart();
+}
+const AZAN = { on: () => lsGet("fl_azan") !== "0", src: i => (i === 0 ? "assets/azan-subuh.m4a" : "assets/azan.m4a") };
+const POP_BG = [["subuh", "Moataz Egbaria, CC BY-SA 3.0"], ["zuhur", "TheHadiRahim, CC0"], ["asar", "Ikhwan Salleh, CC BY-SA 4.0"], ["maghrib", "Ezry Abdul Rahman, CC BY 2.0"], ["isyak", "Uwe Aranas, CC BY-SA 3.0"]];
+const POP_PLACE = ["Masjidil Haram, Makkah", "Masjid Nabawi, Madinah", "Masjid Kristal, Terengganu", "Masjid Sultan Salahuddin Abdul Aziz Shah", "Masjid Wilayah Persekutuan"];
+const SPK_ICO = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="w-4 h-4"><path d="M11 5 6 9H3v6h3l5 4z" fill="#fff" fill-opacity=".18"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.3 5.7a9 9 0 0 1 0 12.6"/></svg>`;
+function azanModal() {
+  const cur = () => AZAN.on();
+  const m = modal(`<h2 class="font-display" style="font-size:21px;font-weight:700;margin:0 0 6px">Azan</h2>
+    <p class="hint" style="margin:0 0 14px">Bila waktu solat masuk dan app dibuka, azan dilaungkan bersama pop-up. Azan Subuh khas untuk Subuh; azan lain untuk empat waktu selebihnya.</p>
+    <div class="az-row"><div><b>Bunyi azan</b><small id="az-st"></small></div><button type="button" id="az-sw" class="az-sw" role="switch" aria-label="Bunyi azan"><i></i></button></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px"><button type="button" class="btn btn-ghost btn-sm" id="az-test">Cuba pop-up dan azan</button></div>`, bg => {
+    const sw = $("#az-sw", bg), st = $("#az-st", bg);
+    const paint = () => { const on = cur(); sw.setAttribute("aria-checked", on); sw.classList.toggle("on", on); st.textContent = on ? "Hidup: azan dibunyikan bersama pop-up." : "Tutup: hanya pop-up, tiada bunyi azan."; };
+    const set = on => { lsSet("fl_azan", on ? "1" : "0"); paint(); };
+    let x0 = null; sw.onpointerdown = e => { x0 = e.clientX; sw.setPointerCapture && sw.setPointerCapture(e.pointerId); };
+    sw.onpointerup = e => { const d = x0 === null ? 0 : e.clientX - x0; x0 = null; if (d > 12) set(true); else if (d < -12) set(false); else set(!cur()); };
+    sw.onkeydown = e => { if (e.key === "ArrowRight") set(true); else if (e.key === "ArrowLeft") set(false); else if (e.key === " " || e.key === "Enter") { e.preventDefault(); set(!cur()); } };
+    $("#az-test", bg).onclick = () => { bg.close(); if (!PR.times) return toast("Waktu solat belum dimuatkan.", "bad"); const i = prayIdx(); showPrayPop(i.cur < 0 ? PRAY_N.length - 1 : i.cur, null); };
+    paint();
+  });
+}
+const prayIdx = () => { const w = wallIn(klNow(), "Asia/Kuala_Lumpur"), sec = secOf(w.slice(11)), ts = PRAY_N.map(([k]) => secOf(PR.times[k])); let cur = -1; ts.forEach((t, i) => { if (t <= sec) cur = i; }); let ni = ts.findIndex(t => t > sec), diff, tomorrow = false; if (ni < 0) { ni = 0; diff = ts[0] + 86400 - sec; tomorrow = true; } else diff = ts[ni] - sec; return { sec, ts, cur, ni, diff, tomorrow }; };
+const hms = d => `${String(Math.floor(d / 3600)).padStart(2, "0")}:${String(Math.floor((d % 3600) / 60)).padStart(2, "0")}:${String(d % 60).padStart(2, "0")}`;
+function tickPray() {
+  prayWatch();
+  const now = $("#pz-now"); if (!now || !PR.times) return; const { cur, ni, diff, tomorrow } = prayIdx(), c = cur < 0 ? PRAY_N.length - 1 : cur;
+  { const t = Date.now(); if (diff <= 60 || $("#praypop")) PR.alAt = t; if (diff <= 10) PR.al10 = t; const on = PR.alAt && t - PR.alAt < 3000, tv = $(".pray-tv"); if (tv) { tv.classList.toggle("alert", !!on); tv.classList.toggle("alert10", !!(on && PR.al10 && t - PR.al10 < 14000)); } } // kelip 1 minit sebelum azan
+  $$(".pray-i").forEach((e, i) => e.classList.toggle("on", i === c));
+  const html = `<div class="pn-l"><small>Waktu semasa</small><strong class="pn-cur" translate="no">${PRAY_N[c][1]}</strong></div><div class="pn-r"><small>${PRAY_N[ni][1]}${tomorrow ? " (esok)" : ""} dalam</small><div class="pn-c" aria-label="Masa berbaki">${hms(diff)}</div></div>`;
+  const cd = $(".pn-c", now); if (cd && now.dataset.c === String(c) + String(ni)) cd.textContent = hms(diff); else { now.innerHTML = html; now.dataset.c = String(c) + String(ni); }
+}
+async function ensurePray(force) {
+  if (PR.busy) return; PR.busy = true;
+  if (PR.zone === null) { PR.zone = lsGet("fl_zone"); PR.auto = !PR.zone; }
+  try { if (!PR.zone || force) { PR.zone = await detectZone(); PR.auto = true; } PR.times = await loadPray(PR.zone); PR.day = klDay(klNow()); PR.err = ""; } catch { PR.err = "Waktu solat tidak dapat dimuatkan. Semak sambungan internet."; PR.times = null; }
+  PR.busy = false; drawPray();
+}
+const initPray = force => ensurePray(force);
+/* ---- Notifikasi pop-up bila masuk waktu solat (hanya semasa app dibuka; hilang bila dipangkah) ---- */
+function prayChime() {
+  const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return; let played = false;
+  try { PR.ctx = PR.ctx || new AC(); } catch { return; }
+  const c = PR.ctx, go = () => { if (played || c.state !== "running") return; played = true; const t0 = c.currentTime; [[659, 0], [880, .3], [1319, .6], [1760, .95]].forEach(([f, d]) => { const o = c.createOscillator(), g = c.createGain(); o.type = "sine"; o.frequency.value = f; g.gain.setValueAtTime(.0001, t0 + d); g.gain.exponentialRampToValueAtTime(.16, t0 + d + .03); g.gain.exponentialRampToValueAtTime(.0001, t0 + d + 1.7); o.connect(g); g.connect(c.destination); o.start(t0 + d); o.stop(t0 + d + 1.8); }); };
+  c.resume().then(go, () => {}); if (c.state === "running") go();
+  const again = () => { if (played || !$("#praypop")) return; c.resume().then(go, () => {}); }; addEventListener("pointerdown", again, { once: true }); addEventListener("keydown", again, { once: true });
+}
+function prayAudio(i) {
+  if (!AZAN.on()) return null; let a; try { a = new Audio(AZAN.src(i)); } catch { return null; } a.preload = "auto"; a.volume = 1;
+  const go = () => a.play().then(() => true, () => false);
+  go().then(ok => { if (ok || !$("#praypop")) return; const again = () => { if ($("#praypop") && !a.dataset.stop) go(); }; addEventListener("pointerdown", again, { once: true }); addEventListener("keydown", again, { once: true }); });
+  return a;
+}
+function stopAudio(a, ms) {
+  if (!a) return; a.dataset.stop = "1"; const v0 = a.volume, t0 = performance.now();
+  const f = () => { const p = Math.min(1, (performance.now() - t0) / ms); a.volume = Math.max(0, v0 * (1 - p)); if (p < 1) requestAnimationFrame(f); else { a.pause(); a.removeAttribute("src"); try { a.load(); } catch {} } }; f();
+}
+function showPrayPop(i, key) {
+  const [k, n] = PRAY_N[i], z = zInfo(PR.zone) || ["", "", ""], bg = document.createElement("div"); bg.id = "praypop"; const [pk, pc] = POP_BG[i];
+  bg.innerHTML = `<div class="pp-card" role="alertdialog" aria-modal="true" aria-labelledby="pp-t" ><span class="pp-gloss" aria-hidden="true"></span><button type="button" class="pp-x" aria-label="Tutup notifikasi waktu solat"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <div class="pp-in" style="--pp:url(assets/pop-${pk}.jpg)"><div class="pp-body"><div class="pp-s">Sekarang sudah masuk waktu solat</div><h2 class="pp-t" id="pp-t" translate="no">${n}</h2><div class="pp-ar" lang="ar" dir="rtl" translate="no">${PRAY_AR[k]}</div><div class="pp-tm">${to12(PR.times[k])}</div>
+    <div class="pp-z">Bagi negeri ${esc(z[1])}, zon ${esc(PR.zone)}</div><div class="pp-d">${esc(z[2])}</div>
+    <p class="pp-m">Jom sama-sama tunaikan solat awal waktu, semoga kita berjaya dunia dan akhirat.</p></div>
+    <div class="pp-c" translate="no"><div>${POP_PLACE[i]} · Photo: ${pc}</div><div>Azan by: ${i === 0 ? "Furqan Fawaz" : "Ustaz Asri (Rabbani)"}</div></div></div></div>`;
+  document.body.appendChild(bg); const card = $(".pp-card", bg), x = $(".pp-x", bg), audio = prayAudio(i);
+  const EZ = "cubic-bezier(.32,.72,0,1)";
+  const close = () => { document.removeEventListener("keydown", kd); if (key) lsSet(key, "1"); stopAudio(audio, 700); if (REDUCE()) return bg.remove(); bg.style.pointerEvents = "none"; bg.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 700, easing: "ease-out", fill: "forwards" }).onfinish = () => bg.remove(); };
+  const kd = e => e.key === "Escape" && close(); document.addEventListener("keydown", kd); x.onclick = close;
+  if (!REDUCE()) {
+    let raf = 0, px = .5, py = .5;
+    const apply = () => { raf = 0; const rx = (.5 - py) * 14, ry = (px - .5) * 18; card.style.setProperty("--rx", rx.toFixed(2) + "deg"); card.style.setProperty("--ry", ry.toFixed(2) + "deg"); card.style.setProperty("--mx", (px * 100).toFixed(1) + "%"); card.style.setProperty("--my", (py * 100).toFixed(1) + "%"); card.style.setProperty("--tx", ((px - .5) * -14).toFixed(1) + "px"); card.style.setProperty("--ty", ((py - .5) * -14).toFixed(1) + "px"); };
+    bg.addEventListener("pointermove", e => { const r = card.getBoundingClientRect(); px = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)); py = Math.max(0, Math.min(1, (e.clientY - r.top) / r.height)); card.classList.add("tilt"); if (!raf) raf = requestAnimationFrame(apply); });
+    bg.addEventListener("pointerleave", () => { card.classList.remove("tilt"); px = .5; py = .5; apply(); });
+  }
+  if (!REDUCE()) bg.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 800, easing: "ease-out" });
+  x.focus({ preventScroll: true }); if (!audio) prayChime();
+}
+function prayWatch() {
+  if (!PR.times || $("#praypop")) return;
+  const day = klDay(klNow()); if (PR.day && PR.day !== day) { if (!PR.roll) { PR.roll = true; PR.times = null; ensurePray().finally(() => (PR.roll = false)); } return; }
+  const { sec, ts, cur } = prayIdx(); if (cur < 0 || sec - ts[cur] > 1800) return;
+  const key = `fl_pd_${day}_${PRAY_N[cur][0]}`; if (lsGet(key)) return;
+  showPrayPop(cur, key);
+}
+function zoneModal() {
+  const states = [...new Set(ZONES.map(z => z[1]))], cur = zInfo(PR.zone);
+  modal(`<h2 class="font-display" style="font-size:21px;font-weight:700;margin:0 0 6px">Pilih zon waktu solat</h2><p class="hint" style="margin:0 0 10px">Semua zon JAKIM dalam Malaysia. Zon kini: <b>${esc(PR.zone)}</b>.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px"><button type="button" class="btn btn-red btn-sm" id="zm-geo">${ic("globe", "w-4 h-4")} Guna lokasi saya (tepat)</button><button type="button" class="btn btn-ghost btn-sm" id="zm-auto">Kesan automatik</button></div><div id="zm-err" class="err" role="alert"></div>
+    <label class="lbl" for="zm-st">Negeri</label><select id="zm-st" class="inp">${states.map(n => `<option ${cur && cur[1] === n ? "selected" : ""}>${esc(n)}</option>`).join("")}</select>
+    <div class="lbl" style="margin-top:12px">Zon dan daerah</div><div id="zm-list" style="display:grid;gap:6px;max-height:46vh;overflow:auto"></div>`, bg => {
+    const list = $("#zm-list", bg), er = $("#zm-err", bg);
+    const draw = () => { const st = $("#zm-st", bg).value; list.innerHTML = ZONES.filter(z => z[1] === st).map(z => `<button type="button" class="zrow" data-z="${z[0]}" aria-pressed="${z[0] === PR.zone}"><b>${z[0]}</b>${esc(z[2])}</button>`).join(""); $$("[data-z]", list).forEach(b => (b.onclick = () => { PR.zone = b.dataset.z; PR.auto = false; lsSet("fl_zone", PR.zone); bg.close(); initPray(); })); };
+    $("#zm-st", bg).onchange = draw; draw();
+    $("#zm-geo", bg).onclick = async () => { er.textContent = ""; try { PR.zone = await geoZone(); PR.auto = false; lsSet("fl_zone", PR.zone); bg.close(); initPray(); } catch { er.textContent = "Lokasi tidak dapat dikesan. Benarkan akses lokasi atau pilih zon di bawah."; } };
+    $("#zm-auto", bg).onclick = () => { lsSet("fl_zone", ""); PR.zone = ""; bg.close(); initPray(true); };
+  });
+}
+
+
+
+/* ===== Mula ===== */
+$("#pray").outerHTML = prayHtml();
+syncClock(); initPray(); setInterval(tickPray, 1000);
+
+</script>
+</body>
+</html>
