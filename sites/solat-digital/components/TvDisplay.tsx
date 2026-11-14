@@ -10,6 +10,7 @@ import { rtdb } from "@/lib/firebase";
 import type { AzanItem } from "@/lib/useAzan";
 import { PRAYERS, type Times, clk, detectZone, hms, klDay, klNow, klSec, loadTimes, prayIdx, syncClock, to12 } from "@/lib/prayer";
 import { zInfo } from "@/lib/zones";
+import { playRing } from "@/lib/ringtone";
 
 const reduce = () => typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -44,6 +45,8 @@ export default function TvDisplay({ m, mid, azan, extra }: { m: TvDoc; mid: stri
   const [full, setFull] = useState(false);
   const audio = useRef<HTMLAudioElement | null>(null);
   const day = useRef("");
+  const rang = useRef<Set<string>>(new Set());
+  const pre = Math.max(0, m.preMin ?? 5), delayS = Math.max(0, m.azanDelayMin ?? 0) * 60, vol = Math.max(5, m.volume ?? 100) / 100;
 
   const fetchTimes = useCallback(async () => {
     try { const z = m.zone || (await detectZone()); setZone(z); setTimes(await loadTimes(z)); day.current = klDay(klNow()); setErr(""); }
@@ -72,11 +75,17 @@ export default function TvDisplay({ m, mid, azan, extra }: { m: TvDoc; mid: stri
   const closePop = useCallback((key?: string) => { if (key) try { localStorage.setItem(key, "1"); } catch {} stop(); setPop(null); }, [stop]);
   const popKey = idx && idx.cur >= 0 ? `sd_pd_${mid || "demo"}_${klDay(d)}_${PRAYERS[idx.cur].k}` : "";
   useEffect(() => {
-    if (demo || !idx || pop !== null || idx.cur < 0 || idx.sec - idx.ts[idx.cur] > 1800) return;
+    if (demo || !idx || pop !== null || idx.cur < 0 || idx.sec - idx.ts[idx.cur] > 1800 + delayS || idx.sec - idx.ts[idx.cur] < delayS) return;
     try { if (localStorage.getItem(popKey)) return; } catch {}
     setPop(idx.cur);
-    if (azanOn) { const a = new Audio(idx.cur === 0 ? (azan?.fajrUrl || azan?.url || "/assets/azan-subuh.m4a") : (azan?.url || "/assets/azan.m4a")); audio.current = a; a.play().catch(() => { const again = () => audio.current === a && a.play().catch(() => {}); addEventListener("pointerdown", again, { once: true }); }); }
-  }, [idx?.cur, idx?.sec, pop, azanOn, popKey, demo]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (azanOn) { const a = new Audio(idx.cur === 0 ? (azan?.fajrUrl || azan?.url || "/assets/azan-subuh.m4a") : (azan?.url || "/assets/azan.m4a")); a.volume = vol; audio.current = a; a.play().catch(() => { const again = () => audio.current === a && a.play().catch(() => {}); addEventListener("pointerdown", again, { once: true }); }); }
+  }, [idx?.cur, idx?.sec, pop, azanOn, popKey, demo, delayS, vol]);
+  // nada sebelum azan: sekali setiap waktu apabila masuk tetingkap minit sebelum azan
+  useEffect(() => {
+    if (demo || !idx || !azanOn || pre === 0 || (m.ringtone ?? "chime") === "off" || idx.diff > pre * 60 || idx.diff <= 0) return;
+    const k = `${klDay(klNow())}_${idx.ni}`; if (rang.current.has(k)) return;
+    playRing(m.ringtone ?? "chime", m.ringRepeat ?? 1, vol * 100).then((ok) => { if (ok) rang.current.add(k); });
+  }, [idx?.diff, idx?.ni, demo, azanOn, pre, m.ringtone, m.ringRepeat, vol]); // eslint-disable-line react-hooks/exhaustive-deps // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (pop === null) return; const k = (e: KeyboardEvent) => e.key === "Escape" && closePop(popKey); addEventListener("keydown", k); return () => removeEventListener("keydown", k); }, [pop, popKey, closePop]);
 
   const toggleFull = () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen?.().catch(() => {}); };
@@ -88,6 +97,13 @@ export default function TvDisplay({ m, mid, azan, extra }: { m: TvDoc; mid: stri
   const date = new Intl.DateTimeFormat("ms-MY", { timeZone: "Asia/Kuala_Lumpur", weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(d);
   const hijri = (() => { try { return new Intl.DateTimeFormat("ms-MY-u-ca-islamic-umalqura", { timeZone: "Asia/Kuala_Lumpur", day: "numeric", month: "long", year: "numeric" }).format(d); } catch { return ""; } })();
   void clk;
+  const mmss = (n: number) => `${String(Math.floor(n / 60)).padStart(2, "0")}:${String(n % 60).padStart(2, "0")}`;
+  const sinceCur = idx && idx.cur >= 0 ? idx.sec - idx.ts[idx.cur] : -1;
+  const popDone = (() => { try { return !!popKey && !!localStorage.getItem(popKey); } catch { return false; } })();
+  const banner = !idx ? null
+    : pre > 0 && idx.diff > 0 && idx.diff <= pre * 60 ? { label: `${Math.ceil(idx.diff / 60)} minit sebelum azan ${PRAYERS[idx.ni].n}`, time: mmss(idx.diff) }
+    : !demo && delayS > 0 && sinceCur >= 0 && sinceCur < delayS && !popDone && pop === null ? { label: `Sudah masuk waktu ${PRAYERS[idx.cur].n}. Azan dalam`, time: mmss(delayS - sinceCur) }
+    : null;
 
   return (
     <main className={`relative min-h-dvh overflow-hidden ${ctl ? "" : "cursor-none"}`}>
@@ -107,10 +123,11 @@ export default function TvDisplay({ m, mid, azan, extra }: { m: TvDoc; mid: stri
         {demo && <div className="glass rounded-2xl p-3 text-center text-sm font-semibold md:text-lg" role="note">Mod DEMO: pop-up dan azan waktu solat tidak dimainkan. Langgan <b className="text-accent">sekali sahaja</b> (bayaran sekali, akses penuh seumur hidup) untuk membuka semua ciri. Tekan Tetapan untuk daftar.</div>}
         <section className={`glass mt-auto rounded-3xl p-4 md:p-8 ${alert ? (idx!.diff <= 10 ? "tv-alert tv-alert10" : "tv-alert") : ""}`} aria-live="off">
           {times && idx ? (<>
+            {banner && <div className="mb-5 rounded-2xl bg-accent px-4 py-3 text-center text-on-accent" role="status"><div className="text-base font-extrabold uppercase tracking-wide md:text-2xl">{banner.label}</div><div className="text-6xl font-extrabold tabular-nums leading-none md:text-9xl" aria-label="Masa berbaki sebelum azan">{banner.time}</div></div>}
             <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
-              <div><small className="text-sub md:text-lg">Waktu semasa</small><div className="text-3xl font-extrabold text-accent md:text-6xl">{PRAYERS[c].n}</div></div>
-              <div className="text-right"><small className="text-sub md:text-lg">{PRAYERS[idx.ni].n}{idx.tomorrow ? " (esok)" : ""} dalam</small>
-                <div className="text-4xl font-extrabold tabular-nums md:text-7xl" aria-label="Masa berbaki">{hms(idx.diff)}</div></div>
+              <div><small className="text-xs font-bold uppercase tracking-widest text-sub md:text-base">Waktu semasa</small><div className="text-4xl font-extrabold leading-tight text-accent md:text-7xl">{PRAYERS[c].n}</div></div>
+              <div className="text-right"><small className="text-xs font-bold uppercase tracking-widest text-sub md:text-base">{PRAYERS[idx.ni].n}{idx.tomorrow ? " (esok)" : ""} dalam</small>
+                <div className="text-4xl font-extrabold tabular-nums leading-tight md:text-7xl" aria-label="Masa berbaki">{hms(idx.diff)}</div></div>
             </div>
             <ul className="grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-5">
               {PRAYERS.map((p, i) => (

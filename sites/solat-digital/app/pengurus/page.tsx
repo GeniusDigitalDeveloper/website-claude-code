@@ -10,6 +10,7 @@ import { DEMO_TV, type TvDoc, uid } from "@/lib/types";
 import { authMsg, useUser } from "@/lib/useUser";
 import { useAzanLibrary } from "@/lib/useAzan";
 import { usePwaInstall } from "@/lib/usePwa";
+import { RINGS, playRing, type Ring } from "@/lib/ringtone";
 
 const states = [...new Set(ZONES.map((z) => z[1]))];
 const L = ({ id, children }: { id: string; children: React.ReactNode }) => <label htmlFor={id} className="lbl">{children}</label>;
@@ -86,7 +87,7 @@ function Panel({ uidv }: { uidv: string }) {
   if (!tv || !draft) return <p className="p-8">Memuatkan…</p>;
   const up = (p: Partial<TvDoc>) => { setDraft({ ...draft, ...p }); setDirty(true); };
   const save = async () => {
-    try { await updateDoc(doc(db, "tv", uidv), { updatedAt: Date.now(), name: draft.name, state: draft.state, zone: draft.zone, azanId: draft.azanId, announcements: draft.announcements, slides: draft.slides, anim: draft.anim, secs: draft.secs }); await updateDoc(doc(db, "registry", uidv), { name: draft.name, state: draft.state, zone: draft.zone }); setDirty(false); flash("Disimpan. TV dikemas kini serta-merta."); }
+    try { await updateDoc(doc(db, "tv", uidv), { updatedAt: Date.now(), name: draft.name, state: draft.state, zone: draft.zone, azanId: draft.azanId, announcements: draft.announcements, slides: draft.slides, anim: draft.anim, secs: draft.secs, preMin: draft.preMin ?? 5, ringtone: draft.ringtone ?? "chime", ringRepeat: draft.ringRepeat ?? 1, azanDelayMin: draft.azanDelayMin ?? 0, volume: draft.volume ?? 100 }); await updateDoc(doc(db, "registry", uidv), { name: draft.name, state: draft.state, zone: draft.zone }); setDirty(false); flash("Disimpan. TV dikemas kini serta-merta."); }
     catch { flash("Gagal simpan. Semak sambungan."); }
   };
   const addImg = async (fl?: FileList | null) => {
@@ -125,6 +126,18 @@ function Panel({ uidv }: { uidv: string }) {
         <L id="az">Pilihan azan</L>
         <select id="az" className="inp" value={draft.azanId} onChange={(e) => up({ azanId: e.target.value })}><option value="">Lalai (Ustaz Asri / Furqan Fawaz)</option>{lib.map((a) => <option key={a.id} value={a.id}>{a.name} · {a.credit}</option>)}</select>
         {draft.azanId && lib.find((a) => a.id === draft.azanId) && <audio className="mt-3 w-full" controls preload="none" src={lib.find((a) => a.id === draft.azanId)!.url} />}
+      </section>
+
+      <section className="card mt-5"><h2 className="text-lg font-bold">Pemberitahuan sebelum azan</h2><p className="text-sm text-sub">Tetapkan bila TV mula mengira detik, bila nada dimainkan, dan berapa lama menunggu sebelum azan dilaungkan.</p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div><L id="pm">Mula kiraan detik (minit sebelum azan)</L><input id="pm" type="number" min={0} max={30} className="inp" value={draft.preMin ?? 5} onChange={(e) => up({ preMin: Math.max(0, Math.min(30, Math.round(+e.target.value) || 0)) })} /><p className="mt-1 text-xs text-sub">0 = matikan.</p></div>
+          <div><L id="ad">Tunggu selepas masuk waktu, baru azan (minit)</L><input id="ad" type="number" min={0} max={30} className="inp" value={draft.azanDelayMin ?? 0} onChange={(e) => up({ azanDelayMin: Math.max(0, Math.min(30, Math.round(+e.target.value) || 0)) })} /><p className="mt-1 text-xs text-sub">0 = azan terus bila masuk waktu.</p></div>
+          <div><L id="rt">Nada sebelum azan</L><select id="rt" className="inp" value={draft.ringtone ?? "chime"} onChange={(e) => up({ ringtone: e.target.value as Ring })}>{RINGS.map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}</select></div>
+          <div><L id="rr">Berapa kali nada diulang</L><input id="rr" type="number" min={1} max={5} className="inp" value={draft.ringRepeat ?? 1} onChange={(e) => up({ ringRepeat: Math.max(1, Math.min(5, Math.round(+e.target.value) || 1)) })} /></div>
+        </div>
+        <L id="vl">Kelantangan: {draft.volume ?? 100}%</L><input id="vl" type="range" min={5} max={100} step={5} className="w-full accent-green-700" value={draft.volume ?? 100} onChange={(e) => up({ volume: +e.target.value })} />
+        <button type="button" className="btn mt-3" onClick={async () => { const ok = await playRing((draft.ringtone ?? "chime") as Ring, draft.ringRepeat ?? 1, draft.volume ?? 100); if (!ok) flash("Pelayar menyekat bunyi. Ketik skrin sekali dan cuba lagi."); }}>Cuba nada</button>
+        <p className="mt-2 text-xs text-sub">Pada TV, bunyi hanya bermula selepas skrin diketik/ditekan sekali (peraturan pelayar), dan hanya untuk akaun akses penuh.</p>
       </section>
 
       <section className="card mt-5"><h2 className="text-lg font-bold">Pengumuman (ticker di TV)</h2>

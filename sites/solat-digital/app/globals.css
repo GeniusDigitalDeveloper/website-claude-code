@@ -8,10 +8,10 @@ body { background: var(--color-bg); color: var(--color-fg); font-family: var(--f
 :focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
 .glass { background: rgba(15,23,42,.62); border: 1px solid rgba(255,255,255,.2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
 .btn { display:inline-flex; align-items:center; gap:.5rem; min-height:44px; padding:.5rem 1rem; border-radius:.75rem; font-weight:600; cursor:pointer; transition: background .2s, transform .2s; border:1px solid var(--color-line); background: var(--color-muted); color: var(--color-fg); }
-.btn:hover { background:#334155; }
+.btn:hover { background: var(--btn-hover,#334155); }
 .btn-primary { background: var(--color-accent); color: var(--color-on-accent); border-color: transparent; }
-.btn-primary:hover { background:#4ade80; }
-.inp { width:100%; min-height:44px; padding:.5rem .75rem; border-radius:.75rem; background:#0f172a; border:1px solid var(--color-line); color:var(--color-fg); }
+.btn-primary:hover { background: var(--primary-hover,#4ade80); }
+.inp { width:100%; min-height:44px; padding:.5rem .75rem; border-radius:.75rem; background:var(--color-inp,#0f172a); border:1px solid var(--color-line); color:var(--color-fg); }
 .tv-alert { animation: blink 1.2s ease-in-out infinite; }
 .tv-alert10 { animation-duration: .5s; }
 @keyframes blink { 0%,100% { opacity:1 } 50% { opacity:.55 } }
@@ -25,5 +25,13 @@ body { background: var(--color-bg); color: var(--color-fg); font-family: var(--f
 .card { border-radius: 1rem; border: 1px solid var(--color-line); background: var(--color-card); padding: 1.25rem; }
 .lbl { display:block; margin: 1rem 0 .25rem; font-size:.875rem; font-weight:600; color: var(--color-sub); }
 .chip { display:inline-flex; align-items:center; gap:.375rem; border-radius:999px; padding:.125rem .625rem; font-size:.8rem; font-weight:700; }
-.chip-ok { background: rgba(34,197,94,.18); color:#86efac; } .chip-demo { background: rgba(250,204,21,.16); color:#fde68a; }
-.toast { position:fixed; left:50%; bottom:1.5rem; transform:translateX(-50%); z-index:50; padding:.75rem 1.25rem; border-radius:.75rem; background:#fff; color:#0f172a; font-weight:700; }
+.chip-ok { background: var(--chip-ok-bg,rgba(34,197,94,.18)); color: var(--chip-ok,#86efac); } .chip-demo { background: var(--chip-demo-bg,rgba(250,204,21,.16)); color: var(--chip-demo,#fde68a); }
+.toast { position:fixed; left:50%; bottom:5rem; transform:translateX(-50%); z-index:50; padding:.75rem 1.25rem; border-radius:.75rem; background:#0f172a; color:#fff; font-weight:700; box-shadow:0 8px 24px rgba(15,23,42,.25); }
+
+/* Tema cerah untuk panel admin (login, pengurus, admin besar). TV kekal gelap. */
+.theme-light { --color-bg:#f1f5f9; --color-card:#ffffff; --color-muted:#eef2f7; --color-fg:#0f172a; --color-sub:#475569; --color-line:#cbd5e1;
+  --color-accent:#15803d; --color-on-accent:#ffffff; --color-danger:#b91c1c; --color-inp:#ffffff; --btn-hover:#e2e8f0; --primary-hover:#166534;
+  --chip-ok-bg:#dcfce7; --chip-ok:#166534; --chip-demo-bg:#fef3c7; --chip-demo:#92400e; color-scheme: light;
+  background: linear-gradient(180deg,#ffffff 0,#f1f5f9 320px); }
+.theme-light .card { box-shadow: 0 1px 2px rgba(15,23,42,.06), 0 8px 24px rgba(15,23,42,.05); }
+.theme-light :focus-visible { outline-color: #15803d; }

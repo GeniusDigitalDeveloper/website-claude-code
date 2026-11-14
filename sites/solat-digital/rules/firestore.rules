@@ -11,7 +11,12 @@ service cloud.firestore {
         && d.announcements is list && d.announcements.size() <= 30
         && d.slides is list && d.slides.size() <= 10
         && d.anim in ['kenburns', 'zoomout', 'fade'] && d.secs is number && d.secs >= 4 && d.secs <= 30
-        && d.plan in ['demo', 'full'];
+        && d.plan in ['demo', 'full']
+        && (!('preMin' in d) || (d.preMin is number && d.preMin >= 0 && d.preMin <= 30))
+        && (!('azanDelayMin' in d) || (d.azanDelayMin is number && d.azanDelayMin >= 0 && d.azanDelayMin <= 30))
+        && (!('ringRepeat' in d) || (d.ringRepeat is number && d.ringRepeat >= 1 && d.ringRepeat <= 5))
+        && (!('volume' in d) || (d.volume is number && d.volume >= 5 && d.volume <= 100))
+        && (!('ringtone' in d) || d.ringtone in ['chime', 'bell', 'beep', 'off']);
     }
 
     // Penanda admin besar: hanya boleh disemak oleh tuan akaun; tiada tulis dari klien.
