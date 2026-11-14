@@ -2006,7 +2006,7 @@ function showPrayPop(i, key) {
 }
 function prayWatch() {
   if (!PR.times || !document.body.classList.contains("flow") || $("#praypop")) return;
-  if ($("#stage") || /^\/(admin|dashboard)/.test(location.pathname)) return; // azan hanya di app awam
+  if (/^\/admin/.test(location.pathname)) return; // panel admin tiada azan; laman utama dan dashboard pengguna ada
   const day = klDay(klNow()); if (PR.day && PR.day !== day) { if (!PR.roll) { PR.roll = true; PR.times = null; ensurePray().finally(() => (PR.roll = false)); } return; }
   const { sec, ts, cur } = prayIdx(); if (cur < 0 || sec - ts[cur] > 1800) return;
   const key = `fl_pd_${day}_${PRAY_N[cur][0]}`; if (lsGet(key)) return;
@@ -2571,7 +2571,6 @@ function collabTab() {
   COLLAB.subs.add(f); f(); collabListen();
 }
 function dashboard() {
-  { const x = $("#praypop .pp-x"); if (x) x.click(); }
   const url = profileUrl(S.profile.username);
   $("#app").innerHTML = `<header class="dtop"><div class="dtop-in"><button id="hm" aria-label="Design" class="dlogo"><img src="/assets/logo-2x.png" alt="Genius Digital Flash Link" width="110" height="55"></button><button type="button" class="nxp" id="nxp" aria-label="Waktu solat akan datang. Tekan untuk lihat waktu solat penuh" hidden><span class="nx-n" id="nx-n" translate="no"></span><span class="nx-d" id="nx-d" translate="no"></span></button>
     <div id="dhead-actions" class="dtop-act">${langSwitch()}<button id="cp" class="btn btn-red btn-sm" aria-label="Salin pautan">${ic("copy", "w-4 h-4")}<span class="hidden sm:inline">Salin pautan</span></button><a class="btn btn-ghost btn-sm" href="${esc(url)}" target="_blank" rel="noopener" aria-label="Buka halaman awam">${ic("ext", "w-4 h-4")}<span class="hidden sm:inline">Halaman saya</span></a><a id="gohome" class="btn btn-ghost btn-sm" href="/" data-nav aria-label="Laman utama">${ic("home", "w-4 h-4")}<span class="hidden sm:inline">Laman utama</span></a><button id="lo" class="btn btn-ghost btn-sm" aria-label="Log keluar">${ic("logout", "w-4 h-4")}</button></div>${clockHtml("ck-head")}</div></header>
@@ -3369,7 +3368,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-97";
+const APP_VERSION = "V-98";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
