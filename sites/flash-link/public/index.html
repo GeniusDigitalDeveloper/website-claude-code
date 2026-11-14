@@ -1034,6 +1034,24 @@ button.nxp:hover{transform:translateY(-2px);box-shadow:0 20px 38px -16px rgba(56
 @keyframes alFlash{0%,100%{opacity:0}50%{opacity:.9}}
 @keyframes alGlow{0%,100%{box-shadow:0 0 0 0 rgba(56,189,248,0),0 0 0 rgba(52,211,153,0)}50%{box-shadow:0 0 0 3px rgba(56,189,248,.9),0 0 34px 8px rgba(52,211,153,.75)}}
 @media(prefers-reduced-motion:reduce){.nxp.alert,.pray-tv.alert,.nxp.alert::after,.pray-tv.alert::after{animation:none}.nxp.alert,.pray-tv.alert{box-shadow:0 0 0 3px rgba(52,211,153,.9),0 0 24px 4px rgba(56,189,248,.7)}}
+
+/* ===== V-92: mesra telefon/tablet: header kemas, pratonton di bawah, nav bawah sentiasa kekal ===== */
+html,body{overflow-x:clip}
+@media(max-width:1179px){
+  .dtop{position:relative}
+  .dtop-in{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"logo nx clock" "act act act";height:auto;padding:10px 12px;row-gap:10px;column-gap:10px;align-items:center;justify-content:stretch}
+  .dtop-in>#hm{grid-area:logo}.dtop-in>#nxp{grid-area:nx;justify-self:start}.dtop-in>.fl-clock{grid-area:clock;text-align:right;justify-self:end}
+  .dtop-in>#dhead-actions{grid-area:act;margin-left:0;display:flex;justify-content:space-between;align-items:center;gap:6px;width:100%}
+  .dtop-act .btn{flex:1 1 0;min-width:0;min-height:42px}.dtop-act .langsw{flex:none}
+  .dprev{display:flex;flex-direction:column;align-items:center;position:static;min-height:0;margin:8px 0 0;padding:0}
+  .dprev-in{width:100%;display:flex;flex-direction:column;align-items:center}
+  .dprev .devs{margin:0 auto}
+  .pvfab,.pvfab.on{display:none!important}
+  body:has(.dnav):has(.pvfab.on){--cbb:78px}
+}
+.dnav{transform:translate3d(0,0,0);z-index:60}
+#app{min-height:100vh;min-height:100dvh}
+.ft-logo{cursor:pointer;transition:transform .35s cubic-bezier(.32,.72,0,1)}.ft-logo:hover{transform:translateY(-3px) scale(1.04)}.ft-logo:active{transform:scale(.94)}
 </style>
 </head>
 <body>
@@ -2147,10 +2165,14 @@ async function countVisit() {
   const k = mytKeys();
   bump("flashlink/stats/total"); bump(`flashlink/stats/monthly/${k.m}`); bump(`flashlink/stats/daily/${k.d}`);
 }
+document.addEventListener("click", e => {
+  const a = e.target.closest && e.target.closest(".ft-logo"); if (!a) return; e.preventDefault();
+  if (location.pathname.replace(/\/+$/, "") === "") scrollTo({ top: 0, behavior: REDUCE() ? "auto" : "smooth" }); else nav("/");
+});
 function siteFooter(withStats = true) {
   const it = (id, l) => `<div><div id="${id}" class="font-display" style="font-size:15px;font-weight:600;color:#fff;font-variant-numeric:tabular-nums;line-height:1.3">${fmtN(statCache[id])}</div><div style="font-size:10.5px;color:#9CA3AF;line-height:1.25;margin-top:2px">${l}</div></div>`;
   return `<footer class="container" style="padding:28px 16px 44px;text-align:center;border-top:1px solid var(--line);margin-top:8px">
-    <img src="/assets/icon.png" alt="Genius Digital Flash Link" width="88" height="88" style="margin:0 auto 14px;height:88px;width:88px;filter:drop-shadow(0 0 18px rgba(255,64,64,.45))">
+    <a href="/" class="ft-logo" aria-label="Ke laman utama" style="display:block;width:88px;margin:0 auto 14px"><img src="/assets/icon.png" alt="Genius Digital Flash Link" width="88" height="88" style="display:block;height:88px;width:88px;filter:drop-shadow(0 0 18px rgba(255,64,64,.45))"></a>
     ${withStats ? `<div id="ustat" aria-label="Statistik Flash Link" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;max-width:560px;margin:0 auto 18px;align-items:start">${it("s_users", "Pengguna")}${it("s_day", "Pelawat hari ini")}${it("s_month", "Pelawat bulan ini")}${it("s_total", "Pelawat keseluruhan")}</div>` : ""}
     <p style="margin:0;font-size:clamp(10px,3.05vw,13.5px);font-weight:700;line-height:1.6;white-space:nowrap;background:linear-gradient(90deg,#E5E7EB 0%,#FF9A9A 35%,#FF4D4D 75%,#FF3B3B 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent">Hak Cipta Terpelihara Genius Digital | Flash Link 2026</p>
     <div role="separator" style="height:1px;width:min(100%,360px);margin:10px auto;background:#4B5563"></div>
@@ -2441,7 +2463,7 @@ const devsHtml = (cls = "") => `<div class="devs ${cls}"><div class="devs-lap">$
 function fitLaptop() { $$(".lap-scale .fl-root").forEach(r => r.classList.add("fl-wide")); $$(".lap-view").forEach(v => { if (!v.clientWidth) return; const k = v.clientWidth / 1280; v.style.height = Math.round(760 * k) + "px"; const sc = $(".lap-scale", v); if (sc) sc.style.zoom = k; if (!v._ro) { v._ro = new ResizeObserver(fitLaptop); v._ro.observe(v); } }); }
 const fitMini = m => { if (!m.clientWidth) return; const k = m.clientWidth / 375, i = $(".mini-in", m); m.style.height = Math.round(m.clientWidth * 1.3) + "px"; if (i) i.style.zoom = k; };
 function fitMinis() { $$(".mini").forEach(m => { if (!m._ro) { m._ro = new ResizeObserver(() => fitMini(m)); m._ro.observe(m); } fitMini(m); }); }
-const fitDevs = () => { const ps = Math.max(.5, Math.min(.82, (innerHeight - 470) / 604)); $$(".dprev .devs").forEach(d => d.style.setProperty("--ps", ps.toFixed(3))); };
+const fitDevs = () => { const ps = innerWidth >= 1180 ? Math.max(.5, Math.min(.82, (innerHeight - 470) / 604)) : Math.max(.5, Math.min(.82, (innerWidth - 56) / 420)); $$(".dprev .devs").forEach(d => d.style.setProperty("--ps", ps.toFixed(3))); };
 addEventListener("resize", () => { fitDevs(); fitLaptop(); fitMinis(); });
 function armReveal(host) {
   if (!host) return; const t0 = performance.now();
@@ -3315,7 +3337,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-91";
+const APP_VERSION = "V-92";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
