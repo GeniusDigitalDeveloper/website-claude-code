@@ -1052,6 +1052,15 @@ html,body{overflow-x:clip}
 .dnav{transform:translate3d(0,0,0);z-index:60}
 #app{min-height:100vh;min-height:100dvh}
 .ft-logo{cursor:pointer;transition:transform .35s cubic-bezier(.32,.72,0,1)}.ft-logo:hover{transform:translateY(-3px) scale(1.04)}.ft-logo:active{transform:scale(.94)}
+
+/* ===== V-93: pratonton di tengah skrin; latar tidak skrol bila popup dibuka ===== */
+html.mlock,body.mlock{overflow:hidden!important;overscroll-behavior:none}
+.modal-bg{overscroll-behavior:contain}.modal{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.modal-bg.ctr{align-items:center!important;justify-content:center;padding:16px!important}
+.modal.ctr{border-radius:22px!important;max-height:88vh;max-height:88dvh;width:min(100%,420px)}
+.vwwrap{max-height:62vh;max-height:62dvh;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.vwwrap .mini.vw{height:auto!important;overflow:visible;pointer-events:auto;border-radius:0}
+.vwwrap .mini.vw .mini-in{height:auto;min-height:488px;overflow:visible}
 </style>
 </head>
 <body>
@@ -2616,7 +2625,7 @@ function viewModal(pr, title, sub, btns) {
   const m = modal(`<h2 class="font-display" style="font-size:20px;font-weight:700;margin:0 0 2px">${esc(title)}</h2><p class="hint" style="margin:0 0 10px">${sub}</p><div class="vwwrap"><div class="mini vw"></div></div><div style="display:flex;gap:10px;margin-top:14px">${btns.map(b => `<button class="btn ${b.cls || "btn-red"}" id="${b.id}" style="flex:1;min-height:48px">${b.t}</button>`).join("")}</div>`, bg => {
     const mn = $(".mini.vw", bg); mn.innerHTML = miniHtml(pr); fitMinis(); requestAnimationFrame(fitMinis); hydrateImages && 0;
     btns.forEach(b => ($("#" + b.id, bg).onclick = () => { bg.close(); b.go(); }));
-  });
+  }, { cls: "ctr" });
   return m;
 }
 function createFromPreset(d) {
@@ -3001,8 +3010,9 @@ async function shortView(codes) {
   catch { notice("Pautan tidak dapat dibuka. Cuba lagi sebentar."); }
 }
 
+new MutationObserver(() => { const on = !!document.querySelector(".modal-bg:not(.side)"); document.documentElement.classList.toggle("mlock", on); document.body.classList.toggle("mlock", on); }).observe(document.body, { childList: true });
 function modal(html, after, opts = {}) {
-  const bg = document.createElement("div"); bg.className = "modal-bg" + (opts.side ? " side" : "");
+  const bg = document.createElement("div"); bg.className = "modal-bg" + (opts.side ? " side" : "") + (/\bctr\b/.test(opts.cls || "") ? " ctr" : "");
   bg.innerHTML = `<div class="modal${opts.cls ? " " + opts.cls : ""}" role="dialog" aria-modal="true"><div style="display:flex;justify-content:flex-end"><button class="btn btn-ghost btn-sm" data-x aria-label="Tutup">${ic("x", "w-4 h-4")}</button></div>${html}</div>`;
   let closing = false, outside = null;
   const close = () => {
@@ -3337,7 +3347,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-92";
+const APP_VERSION = "V-93";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
