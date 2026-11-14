@@ -1,0 +1,10 @@
+{
+  "name": "solat-digital-desktop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Solat Digital (aplikasi desktop)",
+  "author": "Solat Digital",
+  "main": "main.js",
+  "scripts": { "prepare-app": "node prepare.js", "dist": "electron-builder --win nsis --publish never" },
+  "devDependencies": { "electron": "^33.2.0", "electron-builder": "^25.1.8" }
+}

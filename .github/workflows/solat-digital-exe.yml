@@ -1,0 +1,51 @@
+name: Solat Digital - bina aplikasi .exe
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "sites/solat-digital/desktop/**"
+      - ".github/workflows/solat-digital-exe.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [tv, pengurus, admin]
+    defaults:
+      run:
+        working-directory: sites/solat-digital/desktop
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: node prepare.js ${{ matrix.app }}
+      - run: npx electron-builder --config electron-builder.cjs --win nsis --publish never
+      - uses: actions/upload-artifact@v4
+        with:
+          name: exe-${{ matrix.app }}
+          path: sites/solat-digital/desktop/dist/*.exe
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: exes
+          pattern: exe-*
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: solat-digital-latest
+          name: Solat Digital (aplikasi terkini)
+          body: "Muat turun aplikasi Windows: TV, Pengurus Masjid, dan Admin Solat Digital."
+          files: exes/*.exe
+          target_commitish: ${{ github.sha }}

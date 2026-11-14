@@ -15,6 +15,12 @@ service cloud.firestore {
         && (!('preMin' in d) || (d.preMin is number && d.preMin >= 0 && d.preMin <= 30))
         && (!('azanDelayMin' in d) || (d.azanDelayMin is number && d.azanDelayMin >= 0 && d.azanDelayMin <= 30))
         && (!('ringRepeat' in d) || (d.ringRepeat is number && d.ringRepeat >= 1 && d.ringRepeat <= 5))
+        && (!('slideList' in d) || (d.slideList is list && d.slideList.size() <= 15))
+        && (!('slideSecs' in d) || (d.slideSecs is number && d.slideSecs >= 4 && d.slideSecs <= 60))
+        && (!('slideAnim' in d) || d.slideAnim in ['fade', 'slide', 'up', 'zoom', 'flip'])
+        && (!('font' in d) || (d.font is string && d.font.size() <= 40))
+        && (!('azanMute' in d) || d.azanMute is bool)
+        && (!('jumaatTime' in d) || (d.jumaatTime is string && d.jumaatTime.size() <= 8))
         && (!('volume' in d) || (d.volume is number && d.volume >= 5 && d.volume <= 100))
         && (!('ringtone' in d) || d.ringtone in ['chime', 'bell', 'beep', 'off']);
     }
@@ -52,6 +58,9 @@ service cloud.firestore {
     }
 
     // Perpustakaan azan: baca awam; tambah/ubah oleh admin besar sahaja.
+    // Tetapan lalai sistem (cth. font): baca awam; ubah oleh admin besar sahaja.
+    match /config/{c} { allow read: if true; allow write: if isSuper(); }
+
     match /azan/{a} { allow read: if true; allow write: if isSuper(); }
   }
 }

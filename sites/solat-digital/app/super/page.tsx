@@ -1,11 +1,11 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { addDoc, collection, deleteDoc, doc, getDoc, onSnapshot, orderBy, query, updateDoc } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDoc, onSnapshot, orderBy, query, setDoc, updateDoc } from "firebase/firestore";
 import { onValue, ref } from "firebase/database";
 import { Building2, Copy, Download, LogOut, Pencil, Plus, Radio, Search, ShieldCheck, Trash2, Users } from "lucide-react";
 import { auth, db, rtdb } from "@/lib/firebase";
-import type { AzanDoc, Registry, TvDoc } from "@/lib/types";
+import { FONTS, type AzanDoc, type Registry, type TvDoc } from "@/lib/types";
 import { authMsg, useUser } from "@/lib/useUser";
 import { usePwaInstall } from "@/lib/usePwa";
 
@@ -18,13 +18,26 @@ function Login({ denied }: { denied: boolean }) {
   return (
     <main className="mx-auto grid min-h-dvh max-w-sm content-center px-4">
       <form className="card" onSubmit={async (ev) => { ev.preventDefault(); setErr(""); try { await signInWithEmailAndPassword(auth, e.trim(), p); } catch (x) { setErr(authMsg(x)); } }}>
-        <ShieldCheck className="text-accent" /><h1 className="mt-2 text-2xl font-extrabold">Admin Solat Digital</h1><p className="text-sm text-sub">Log masuk admin utama sahaja.</p>
+        <img src="/logo.png" alt="Solat Digital" className="mx-auto mb-2 h-24 w-auto" /><h1 className="mt-2 text-2xl font-extrabold">Admin Solat Digital</h1><p className="text-sm text-sub">Log masuk admin utama sahaja.</p>
         <L id="e">Emel</L><input id="e" type="email" className="inp" value={e} onChange={(x) => setE(x.target.value)} required />
         <L id="p">Kata laluan</L><input id="p" type="password" className="inp" value={p} onChange={(x) => setP(x.target.value)} required />
         {err && <p role="alert" className="mt-3 text-danger">{err}</p>}
         <button className="btn btn-primary mt-5 w-full justify-center">Log masuk</button>
       </form>
     </main>
+  );
+}
+
+function Defaults() {
+  const [font, setFont] = useState(""); const [ok, setOk] = useState("");
+  useEffect(() => onSnapshot(doc(db, "config", "defaults"), (s) => setFont((s.data()?.font as string) || ""), () => {}), []);
+  return (
+    <section className="card"><h2 className="text-lg font-bold">Tetapan lalai sistem</h2><p className="text-sm text-sub">Font lalai untuk semua TV masjid. Masjid boleh menukar fontnya sendiri; tetapan ini tidak kekal untuk mereka.</p>
+      <L id="df">Font lalai paparan TV</L>
+      <div className="flex gap-2"><select id="df" className="inp" value={font || FONTS[0]} onChange={(e) => setFont(e.target.value)}>{FONTS.map((f) => <option key={f}>{f}</option>)}</select>
+        <button className="btn btn-primary" onClick={async () => { try { await setDoc(doc(db, "config", "defaults"), { font: font || FONTS[0] }); setOk("Disimpan."); } catch { setOk("Gagal simpan."); } setTimeout(() => setOk(""), 2000); }}>Simpan</button></div>
+      {ok && <p role="status" className="mt-2 text-sm text-accent">{ok}</p>}
+    </section>
   );
 }
 
@@ -78,8 +91,8 @@ function Dashboard() {
   const week = rows.filter((r) => now - r.createdAt < 7 * 864e5).length;
   return (
     <main className="mx-auto max-w-6xl px-4 py-6">
-      <header className="flex flex-wrap items-center justify-between gap-3"><div><h1 className="text-2xl font-extrabold md:text-3xl">Admin Solat Digital</h1><p className="text-sm text-sub">Admin utama. Hanya data pendaftaran dipaparkan; tiada akses ke akaun masjid.</p></div>
-        <div className="flex gap-2">{pwa.canInstall && <button className="btn btn-primary" onClick={pwa.install}><Download size={18} /> Pasang aplikasi</button>}<button className="btn" aria-label="Log keluar" onClick={() => signOut(auth)}><LogOut size={18} /></button></div></header>
+      <header className="flex flex-wrap items-center justify-between gap-3"><div className="flex items-center gap-3"><img src="/logo.png" alt="Solat Digital" className="h-12 w-auto" /><div><h1 className="text-2xl font-extrabold md:text-3xl">Admin Solat Digital</h1><p className="text-sm text-sub">Admin utama. Hanya data pendaftaran dipaparkan; tiada akses ke akaun masjid.</p></div></div>
+        <div className="flex gap-2"><a className="btn" href="https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/solat-digital-latest/SolatDigital-Admin-Setup.exe"><Download size={18} /> Aplikasi (.exe)</a>{pwa.canInstall && <button className="btn btn-primary" onClick={pwa.install}><Download size={18} /> Pasang aplikasi</button>}<button className="btn" aria-label="Log keluar" onClick={() => signOut(auth)}><LogOut size={18} /></button></div></header>
       <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Stat icon={<Building2 size={16} />} label="Masjid berdaftar" v={rows.length} /><Stat icon={<Users size={16} />} label="Akaun admin masjid" v={rows.length} />
         <Stat icon={<ShieldCheck size={16} />} label="Akses penuh / demo" v={`${rows.filter((r) => r.plan === "full").length} / ${rows.filter((r) => r.plan !== "full").length}`} /><Stat icon={<Radio size={16} />} label="TV dalam talian" v={rows.filter((r) => online(r.id)).length} />
@@ -99,6 +112,7 @@ function Dashboard() {
               <button className="btn" onClick={() => { navigator.clipboard?.writeText(`${location.origin}/?m=${r.id}`); flash("Pautan TV disalin."); }}><Copy size={16} /> Pautan TV</button>
               <button className={`btn ${r.plan === "full" ? "" : "btn-primary"}`} onClick={async () => { try { await updateDoc(doc(db, "tv", r.id), { plan: r.plan === "full" ? "demo" : "full" }); } catch { flash("Gagal kemas kini."); } }}>{r.plan === "full" ? "Tukar ke demo" : "Aktifkan akses penuh"}</button></div></div></li>))}
           {!shown.length && <li className="text-sm text-sub">Tiada masjid dijumpai.</li>}</ul></section>
+      <div className="mt-5"><Defaults /></div>
       <div className="mt-5"><AzanManager /></div>
       {toast && <div className="toast" role="status">{toast}</div>}
     </main>
