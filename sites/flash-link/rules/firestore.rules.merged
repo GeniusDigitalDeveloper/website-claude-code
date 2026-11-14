@@ -648,6 +648,17 @@ service cloud.firestore {
       allow update: if false;
       allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
     }
+    // ===== V-77: Kolaborasi + ahli (tambahan sahaja, khusus flashlink_) =====
+    match /flashlink_collab/{id} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null && request.auth.token.admin == true;
+    }
+    match /flashlink_members/{uid} {
+      allow read: if request.auth != null && (request.auth.uid == uid || request.auth.token.admin == true);
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['email','displayName','createdAt','lastLogin','lang']);
+      allow delete: if request.auth != null && request.auth.token.admin == true;
+    }
     // ===== TAMAT FLASH LINK RULES =====
   }
 }

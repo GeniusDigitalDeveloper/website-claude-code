@@ -1,0 +1,14 @@
+{
+  "name": "Flash Link Admin",
+  "short_name": "FL Admin",
+  "description": "Panel admin Flash Link: kawal kolaborasi, produk dan lihat pengguna.",
+  "start_url": "/admin",
+  "scope": "/admin",
+  "display": "standalone",
+  "background_color": "#05060A",
+  "theme_color": "#05060A",
+  "icons": [
+    { "src": "/assets/icon-2x.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any" },
+    { "src": "/assets/icon-2x.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
