@@ -111,6 +111,11 @@ Masih WAJIB berhenti dan tanya jika rules hidup berbeza daripada backup, ada rul
 **Selepas setiap deploy hosting Flash Link, WAJIB umumkan versi** supaya semua tetingkap yang terbuka nampak butang kemas kini serta-merta (tanpa pengguna tekan apa-apa):
 `cd sites/flash-link && FIREBASE_TOKEN=$FIREBASE_TOKEN node scripts/announce-version.mjs` (tulis `flashlink/stats/version` dalam RTDB; baca `public/version.json`). Naikkan `APP_VERSION` dalam `public/index.html` dan `version` dalam `public/version.json` ke nombor yang sama pada setiap perubahan. Tiada muzik latar dalam app (kesan bunyi sahaja).
 
+**Selepas SETIAP kemas kini Flash Link (arahan tetap ustaz), WAJIB hantar semula 3 pautan ini di hujung balasan:**
+- Muat turun EXE: https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Setup.exe
+- Awam: https://genius-digital-flashlink-40bc9-5effc.web.app
+- Admin: https://genius-digital-flashlink-40bc9-5effc.web.app/admin
+
 **Chatbot Flash Link (pembantu "Ada masalah? Cek saya"):** jawapannya dibina daripada pendaftaran app (`NAV`, `DESIGNS`, `STYLES`, `TPL`, `BRANDS`, `LINK_KEYS`, `APP_VERSION`) dan senarai `CB_EXTRA` dalam `public/index.html`. Bila tambah/ubah ciri Flash Link, WAJIB daftar dalam `NAV`/pendaftaran sedia ada atau tambah entri `CB_EXTRA` supaya chatbot sentiasa terkini, tanpa ustaz perlu minta.
 
 ## Solat Digital — deploy automatik + 3 pautan (arahan tetap ustaz)
