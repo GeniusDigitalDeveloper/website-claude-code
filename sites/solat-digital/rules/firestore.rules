@@ -20,6 +20,9 @@ service cloud.firestore {
         && (!('slideAnim' in d) || d.slideAnim in ['fade', 'slide', 'up', 'zoom', 'flip'])
         && (!('font' in d) || (d.font is string && d.font.size() <= 40))
         && (!('arabicFont' in d) || (d.arabicFont is string && d.arabicFont.size() <= 60))
+        && (!('styles' in d) || d.styles is map)
+        && (!('azanByPrayer' in d) || d.azanByPrayer is map)
+        && (!('theme' in d) || (d.theme is string && d.theme.size() <= 20))
         && (!('azanMute' in d) || d.azanMute is bool)
         && (!('jumaatTime' in d) || (d.jumaatTime is string && d.jumaatTime.size() <= 8))
         && (!('volume' in d) || (d.volume is number && d.volume >= 5 && d.volume <= 100))
@@ -55,6 +58,18 @@ service cloud.firestore {
         allow read: if true;
         allow create, update: if me(u) && request.resource.data.data is string && request.resource.data.data.size() < 900000 && request.resource.data.order is number;
         allow delete: if me(u);
+      }
+    }
+
+    // Notifikasi / mesej: masjid <-> Owner (teks sahaja, emoji dibenarkan).
+    match /chats/{m} {
+      allow read: if me(m) || isSuper();
+      allow create, update: if isSuper() || (me(m) && request.resource.data.keys().hasOnly(['name', 'lastText', 'lastAt', 'lastFrom', 'unreadOwner', 'unreadMasjid']) && request.resource.data.lastFrom == 'masjid' || me(m) && request.resource.data.keys().hasOnly(['name', 'lastText', 'lastAt', 'lastFrom', 'unreadOwner', 'unreadMasjid']) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['unreadMasjid']));
+      allow delete: if false;
+      match /msgs/{id} {
+        allow read: if me(m) || isSuper();
+        allow create: if (isSuper() && request.resource.data.from == 'owner') || (me(m) && request.resource.data.from == 'masjid');
+        allow update, delete: if false;
       }
     }
 

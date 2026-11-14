@@ -129,3 +129,5 @@ Projek `sites/solat-digital/` (Firebase projek `solat-digital-my`, BUKAN Flash L
    - Solat Digital (TV): https://solat-digital-my.web.app/
    - Solat Digital (Pengurus Masjid): https://solat-digital-my.web.app/pengurus/
    - Solat Digital (Admin Owner): https://solat-digital-my.web.app/super/
+
+**Tarikh Hijrah Solat Digital:** dikira dengan kaedah ISTILAHI JAKIM (Kalkulator Umur Miladi-Hijri, https://www.e-solat.gov.my/index.php?siteId=27&pageId=39) dalam `sites/solat-digital/lib/hijri-core.mjs`, dikongsi oleh TV, panel masjid dan panel Owner (jam disegerakkan JAKIM, jadi sama di mana-mana). Sahkan terhadap JAKIM: `cd sites/solat-digital && node scripts/verify-hijri.mjs 150`. Jangan guna medan `hijri` API waktu solat (beza sehari).

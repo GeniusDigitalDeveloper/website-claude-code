@@ -1,4 +1,6 @@
-const { app, BrowserWindow, powerSaveBlocker, Menu, shell } = require("electron");
+const { app, BrowserWindow, powerSaveBlocker, Menu, shell, ipcMain, safeStorage } = require("electron");
+const fs = require("fs");
+const path = require("path");
 const cfg = require("./app-config.json");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required"); // azan/nada boleh berbunyi tanpa klik
@@ -9,7 +11,7 @@ function create() {
   win = new BrowserWindow({
     width: 1280, height: 800, backgroundColor: cfg.kiosk ? "#0f172a" : "#f1f5f9", title: cfg.name, autoHideMenuBar: true,
     fullscreen: cfg.kiosk, kiosk: cfg.kiosk, icon: __dirname + "/build/icon.png",
-    webPreferences: { backgroundThrottling: false },
+    webPreferences: { backgroundThrottling: false, preload: path.join(__dirname, "preload.js"), contextIsolation: true },
   });
   Menu.setApplicationMenu(null);
   const load = () => win.loadURL(cfg.url).catch(() => setTimeout(load, 15000)); // cuba semula jika tiada internet
@@ -24,6 +26,11 @@ function create() {
     setInterval(() => { if (!win.isDestroyed() && !win.isFullScreen()) win.setFullScreen(true); }, 60000);
   }
 }
+// Peti simpanan: hanya aplikasi Admin Owner (cfg.id === "admin")
+const vaultFile = () => path.join(app.getPath("userData"), "vault.bin");
+ipcMain.handle("vault:get", () => { if (cfg.id !== "admin" || !safeStorage.isEncryptionAvailable()) return null; try { return JSON.parse(safeStorage.decryptString(fs.readFileSync(vaultFile()))); } catch { return null; } });
+ipcMain.handle("vault:set", (_e, e, p) => { if (cfg.id !== "admin" || !safeStorage.isEncryptionAvailable()) return; try { fs.writeFileSync(vaultFile(), safeStorage.encryptString(JSON.stringify({ e: String(e), p: String(p) }))); } catch {} });
+
 app.whenReady().then(() => {
   create();
   if (cfg.kiosk && app.isPackaged) app.setLoginItemSettings({ openAtLogin: true }); // bermula sendiri bila Windows dihidupkan
