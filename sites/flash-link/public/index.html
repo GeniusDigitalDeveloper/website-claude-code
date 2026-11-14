@@ -1108,6 +1108,7 @@ body.pray-off #pray,body.pray-off #nxp,body.pray-off #praypop,body.pray-off sect
 @media(max-width:1179px){.dtop-in{grid-template-areas:"logo . clock" "act act act"}.dnx{padding:10px 12px 0!important}}
 @media(max-width:520px){.nxp-w{gap:8px}.dnx .praysw{padding:3px 8px 3px 6px}.dnx .ps-ic{width:24px;height:24px}}
 .dnx{width:100%}
+.nxp-w .praysw{margin-left:auto}
 </style>
 </head>
 <body>
@@ -3413,7 +3414,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-101";
+const APP_VERSION = "V-102";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
