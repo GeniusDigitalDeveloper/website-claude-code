@@ -20,6 +20,7 @@ import { useAzanLibrary } from "@/lib/useAzan";
 import { usePwaInstall } from "@/lib/usePwa";
 import { RINGS, playRing, type Ring } from "@/lib/ringtone";
 import DateBadge from "@/components/DateBadge";
+import { chatSfx } from "@/lib/sfx";
 
 const L = ({ id, children }: { id: string; children: React.ReactNode }) => <label htmlFor={id} className="lbl">{children}</label>;
 
@@ -88,13 +89,14 @@ function Panel({ uidv }: { uidv: string }) {
   const [tv, setTv] = useState<TvDoc | null>(null); const [draft, setDraft] = useState<TvDoc | null>(null);
   const [imgs, setImgs] = useState<{ id: string; data: string }[]>([]);
   const [toast, setToast] = useState(""); const [txt, setTxt] = useState(""); const [dirty, setDirty] = useState(false);
-  const [sec, setSec] = useState<Sec>("dash"); const [unread, setUnread] = useState(0);
+  const [sec, setSec] = useState<Sec>("dash"); const [unread, setUnread] = useState(0); const [ntoast, setNtoast] = useState(false); const prevUnread = useRef(0); const secRef = useRef<Sec>("dash");
+  useEffect(() => { secRef.current = sec; if (sec === "notif") setNtoast(false); }, [sec]);
   const lib = useAzanLibrary(); const pwa = usePwaInstall(); const file = useRef<HTMLInputElement>(null);
   const { raw, eff } = useDefaults(uidv); const pf = { styleEditor: true, slides: true, announcements: true, images: true, theme: true, ...(eff.panel ?? {}) };
   useEffect(() => {
     const u1 = onSnapshot(doc(db, "tv", uidv), (s) => { const d = s.data() as TvDoc | undefined; if (d) { setTv(d); setDraft((x) => x ?? d); } });
     const u2 = onSnapshot(query(collection(db, "tv", uidv, "img"), orderBy("order")), (s) => setImgs(s.docs.map((d) => ({ id: d.id, data: d.data().data }))));
-    const u3 = onSnapshot(doc(db, "chats", uidv), (s) => setUnread((s.data()?.unreadMasjid as number) || 0), () => {});
+    const u3 = onSnapshot(doc(db, "chats", uidv), (s) => { const n = (s.data()?.unreadMasjid as number) || 0; setUnread(n); if (n > prevUnread.current && secRef.current !== "notif") { setNtoast(true); chatSfx("recv"); } prevUnread.current = n; }, () => {});
     return () => { u1(); u2(); u3(); };
   }, [uidv]);
   useEffect(() => { try { localStorage.setItem("sd_last_m", uidv); } catch {} }, [uidv]);
@@ -138,7 +140,7 @@ function Panel({ uidv }: { uidv: string }) {
   return (
     <div>
       <header className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-3 pt-4 lg:px-5">
-        <div className="flex min-w-0 items-center gap-3"><img src="/logo.png" alt="Solat Digital" className="h-12 w-auto" /><div className="min-w-0"><h1 className="break-words text-lg font-extrabold md:text-2xl">{tv.name}</h1><span className="text-xs font-semibold text-sub">Solat Digital (Pengurus Masjid)</span> <DateBadge mode={eff.hijriMode ?? "jakim"} /> <span className={`chip ${tv.plan === "full" ? "chip-ok" : "chip-demo"}`}>{tv.plan === "full" ? <><CheckCircle2 size={14} /> Akses penuh (seumur hidup)</> : "Mod demo"}</span></div></div>
+        <div className="flex min-w-0 items-center gap-3"><img src="/logo.png" alt="Solat Digital" className="h-12 w-auto" /><div className="min-w-0"><h1 className="break-words text-xl font-extrabold md:text-3xl">{items.find((i) => i.id === sec)?.label}</h1><span className="text-xs font-semibold text-sub">Solat Digital (Pengurus Masjid)</span> <DateBadge mode={eff.hijriMode ?? "jakim"} /> <span className={`chip ${tv.plan === "full" ? "chip-ok" : "chip-demo"}`}>{tv.plan === "full" ? <><CheckCircle2 size={14} /> Akses penuh (seumur hidup)</> : "Mod demo"}</span></div></div>
         <div className="flex gap-2"><a className="btn btn-primary" href={tvUrl} target="_blank" rel="noreferrer"><MonitorPlay size={18} /> Buka TV</a><button className="btn btn-danger" onClick={() => signOut(auth)}><LogOut size={18} /> Log keluar</button></div>
       </header>
       <Shell brand={<div className="text-sm font-bold text-sub">Menu pengurusan</div>} items={items} active={sec} onSelect={(id) => setSec(id as Sec)}>
@@ -222,8 +224,7 @@ function Panel({ uidv }: { uidv: string }) {
           </section>)}
 
         {sec === "notif" && (
-          <section className="card"><h2 className="text-lg font-bold">Notifikasi</h2><p className="mb-3 text-sm text-sub">Hantar cadangan, masalah atau soalan kepada Owner Solat Digital. Anda juga menerima mesej dan siaran daripada Owner di sini.</p>
-            <Chat mid={uidv} me="masjid" mosqueName={tv.name} /></section>)}
+          <section className="card !p-3"><Chat mid={uidv} me="masjid" mosqueName={tv.name} title="Owner Solat Digital" subtitle="Hantar cadangan, masalah atau soalan. Siaran Owner juga diterima di sini." /></section>)}
 
         {sec === "muat" && (
           <section className="card"><h2 className="text-lg font-bold">Muat turun aplikasi</h2>
@@ -246,6 +247,7 @@ function Panel({ uidv }: { uidv: string }) {
       </Shell>
       <div className="bar-frost fixed inset-x-0 bottom-0 z-40 border-t border-white/60 p-3"><div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-2"><span className="text-sm text-sub">{dirty ? "Ada perubahan belum disimpan" : "Semua perubahan disimpan"}</span><button className="btn btn-primary" disabled={!dirty} onClick={save}><Save size={18} /> Simpan</button></div></div>
       {toast && <div className="toast" role="status">{toast}</div>}
+      {ntoast && <button type="button" className="notif-toast" onClick={() => { setSec("notif"); setNtoast(false); }}><Bell size={22} className="shrink-0 text-accent" /><span><b className="block">Mesej baharu</b><span className="text-sm text-sub">daripada Owner Solat Digital. Tekan untuk buka.</span></span></button>}
     </div>
   );
 }

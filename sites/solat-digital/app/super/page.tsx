@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { addDoc, collection, deleteDoc, doc, getDoc, onSnapshot, orderBy, query, setDoc, updateDoc } from "firebase/firestore";
 import { onValue, ref } from "firebase/database";
@@ -14,6 +14,7 @@ import PasswordInput from "@/components/PasswordInput";
 import Shell, { type NavItem } from "@/components/Shell";
 import Chat, { Broadcast } from "@/components/Chat";
 import DateBadge from "@/components/DateBadge";
+import { chatSfx } from "@/lib/sfx";
 import { useDefaults } from "@/lib/useDefaults";
 
 type Row = Registry & { id: string; plan: "demo" | "full" };
@@ -172,8 +173,8 @@ function Tetapan({ rows, sub }: { rows: Row[]; sub: string }) {
 }
 
 /* ---------------- Notifikasi ---------------- */
-function Notif({ rows }: { rows: Row[] }) {
-  const [metas, setMetas] = useState<Record<string, ChatMeta>>({}); const [sel, setSel] = useState(""); const [bc, setBc] = useState(false); const [flash, setFlash] = useState("");
+function Notif({ rows, sel, setSel }: { rows: Row[]; sel: string; setSel: (id: string) => void }) {
+  const [metas, setMetas] = useState<Record<string, ChatMeta>>({}); const [bc, setBc] = useState(false); const [flash, setFlash] = useState("");
   useEffect(() => onSnapshot(collection(db, "chats"), (s) => setMetas(Object.fromEntries(s.docs.map((d) => [d.id, d.data() as ChatMeta]))), () => {}), []);
   const list = rows.map((r) => ({ id: r.id, name: r.name, m: metas[r.id] })).sort((a, b) => (b.m?.lastAt ?? 0) - (a.m?.lastAt ?? 0));
   const cur = rows.find((r) => r.id === sel);
@@ -184,7 +185,7 @@ function Notif({ rows }: { rows: Row[] }) {
         {flash && <p role="status" className="mt-3 font-semibold text-accent">{flash}</p>}</section>
       <div className="grid gap-5 lg:grid-cols-[320px_minmax(0,1fr)]">
         <section className="card !p-3"><ul className="grid gap-1">{list.map((c) => (<li key={c.id}><button type="button" className="nav-item !items-start" data-active={sel === c.id} onClick={() => setSel(c.id)}><span className="min-w-0 flex-1"><b className="block truncate">{c.name}</b><span className="block truncate text-xs font-medium text-sub">{c.m?.lastText ?? "Belum ada mesej"}</span></span>{!!c.m?.unreadOwner && <span className="nav-badge">{c.m.unreadOwner}</span>}</button></li>))}{!list.length && <li className="p-3 text-sm text-sub">Belum ada masjid berdaftar.</li>}</ul></section>
-        <section className="card">{cur ? <><h3 className="mb-3 font-bold">{cur.name}</h3><Chat key={cur.id} mid={cur.id} me="owner" mosqueName={cur.name} /></> : <p className="py-10 text-center text-sm text-sub">Pilih masjid untuk melihat dan membalas mesej.</p>}</section>
+        <section className="card !p-3">{cur ? <><Chat key={cur.id} mid={cur.id} me="owner" mosqueName={cur.name} title={cur.name} subtitle={cur.email} /></> : <p className="py-10 text-center text-sm text-sub">Pilih masjid untuk melihat dan membalas mesej.</p>}</section>
       </div>
     </div>
   );
@@ -195,13 +196,14 @@ function Dashboard() {
   const [reg, setReg] = useState<Record<string, Registry>>({}); const [tv, setTv] = useState<Record<string, TvDoc>>({});
   const [pres, setPres] = useState<Record<string, { t: number }>>({}); const [metas, setMetas] = useState<Record<string, ChatMeta>>({});
   const [q, setQ] = useState(""); const [toast, setToast] = useState(""); const [now, setNow] = useState(Date.now());
-  const [sec, setSec] = useState<Sec>("dash"); const [sub, setSub] = useState("tv"); const [selSt, setSelSt] = useState(""); const [selZone, setSelZone] = useState(""); const [picked, setPicked] = useState<string[]>([]);
+  const [sec, setSec] = useState<Sec>("dash"); const [sub, setSub] = useState("tv"); const [openId, setOpenId] = useState(""); const [nt, setNt] = useState<{ id: string; name: string } | null>(null); const prevUn = useRef(0); const st = useRef({ sec: "dash" as Sec, openId: "" }); const [selSt, setSelSt] = useState(""); const [selZone, setSelZone] = useState(""); const [picked, setPicked] = useState<string[]>([]);
+  useEffect(() => { st.current = { sec, openId }; if (sec === "notif" && nt && nt.id === openId) setNt(null); }, [sec, openId]); // eslint-disable-line react-hooks/exhaustive-deps const [selSt, setSelSt] = useState(""); const [selZone, setSelZone] = useState(""); const [picked, setPicked] = useState<string[]>([]);
   const pwa = usePwaInstall();
   useEffect(() => {
     const u1 = onSnapshot(query(collection(db, "registry"), orderBy("createdAt", "desc")), (s) => setReg(Object.fromEntries(s.docs.map((d) => [d.id, d.data() as Registry]))));
     const u2 = onSnapshot(collection(db, "tv"), (s) => setTv(Object.fromEntries(s.docs.map((d) => [d.id, d.data() as TvDoc]))));
     const u3 = onValue(ref(rtdb, "presence"), (s) => setPres(s.val() ?? {}), () => {});
-    const u4 = onSnapshot(collection(db, "chats"), (s) => setMetas(Object.fromEntries(s.docs.map((d) => [d.id, d.data() as ChatMeta]))), () => {});
+    const u4 = onSnapshot(collection(db, "chats"), (s) => { const m = Object.fromEntries(s.docs.map((d) => [d.id, d.data() as ChatMeta])); setMetas(m); const un = Object.values(m).reduce((n, x) => n + (x.unreadOwner || 0), 0); if (un > prevUn.current) { const top = Object.entries(m).filter(([, x]) => x.lastFrom === "masjid").sort((a, b) => b[1].lastAt - a[1].lastAt)[0]; if (top && !(st.current.sec === "notif" && st.current.openId === top[0])) { setNt({ id: top[0], name: top[1].name }); chatSfx("recv"); } } prevUn.current = un; }, () => {});
     const t = setInterval(() => setNow(Date.now()), 30000); return () => { u1(); u2(); u3(); u4(); clearInterval(t); };
   }, []);
   const rows: Row[] = useMemo(() => Object.entries(reg).map(([id, r]) => ({ ...r, id, plan: tv[id]?.plan ?? "demo" })), [reg, tv]);
@@ -224,7 +226,7 @@ function Dashboard() {
   return (
     <div>
       <header className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-3 pt-4 lg:px-5">
-        <div className="flex items-center gap-3"><img src="/logo.png" alt="Solat Digital" className="h-12 w-auto" /><div><h1 className="text-xl font-extrabold md:text-2xl">Solat Digital (Admin Owner)</h1><p className="text-xs text-sub md:text-sm">Owner sistem. Hanya data pendaftaran dipaparkan; tiada akses ke akaun masjid.</p><div className="mt-1"><DateBadge mode={useDefaults("").raw.hijriMode ?? "jakim"} /></div></div></div>
+        <div className="flex items-center gap-3"><img src="/logo.png" alt="Solat Digital" className="h-12 w-auto" /><div><h1 className="text-xl font-extrabold md:text-3xl">{items.find((i) => i.id === sec)?.label}</h1><p className="text-xs font-semibold text-sub md:text-sm">Solat Digital (Admin Owner). Hanya data pendaftaran dipaparkan; tiada akses ke akaun masjid.</p><div className="mt-1"><DateBadge mode={useDefaults("").raw.hijriMode ?? "jakim"} /></div></div></div>
         <div className="flex gap-2"><a className="btn btn-dl" href="https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/solat-digital-latest/SolatDigital-Admin-Setup.exe"><Download size={18} /> Muat turun (.exe)</a>{pwa.canInstall && <button className="btn" onClick={pwa.install}><Download size={18} /> Pasang aplikasi</button>}<button className="btn btn-danger" onClick={() => signOut(auth)}><LogOut size={18} /> Log keluar</button></div>
       </header>
       <Shell brand={<div className="text-sm font-bold text-sub">Menu Owner</div>} items={items} active={sec} sub={sub} onSelect={(id, s) => { setSec(id as Sec); if (s) setSub(s); }}>
@@ -255,12 +257,13 @@ function Dashboard() {
                   <button className={`btn ${r.plan === "full" ? "" : "btn-primary"}`} onClick={() => setPlan([r.id], r.plan === "full" ? "demo" : "full")}>{r.plan === "full" ? "Tukar ke demo" : "Aktifkan akses penuh"}</button></div></div></li>))}
               {!shown.length && <li className="text-sm text-sub">Tiada masjid dijumpai.</li>}</ul></section>}
 
-          {sec === "notif" && <Notif rows={rows} />}
+          {sec === "notif" && <Notif rows={rows} sel={openId} setSel={setOpenId} />}
           {sec === "azan" && <AzanManager />}
           {sec === "tetapan" && <Tetapan rows={rows} sub={sub} />}
         </div>
       </Shell>
       {toast && <div className="toast" role="status">{toast}</div>}
+      {nt && <button type="button" className="notif-toast" onClick={() => { setSec("notif"); setOpenId(nt.id); setNt(null); }}><Bell size={22} className="shrink-0 text-accent" /><span><b className="block">Mesej baharu</b><span className="text-sm text-sub">daripada {nt.name}. Tekan untuk buka.</span></span></button>}
     </div>
   );
 }

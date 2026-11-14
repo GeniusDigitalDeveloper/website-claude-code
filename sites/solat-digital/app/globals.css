@@ -194,3 +194,22 @@ main > section.card:nth-of-type(6) { animation-delay: .24s; } main > section.car
 .date-badge b { color: var(--color-fg); }
 
 .nav-item { min-width: 0; overflow: hidden; } .card ul { min-width: 0; } .card li { min-width: 0; }
+
+/* ===== Sembang v2: warna terasing, sunting/padam, gambar ===== */
+.chat { border-color: #bbf7d0; background: #f3fbf7; }
+.chat-head { display: flex; align-items: center; gap: .7rem; padding: .7rem .9rem; border-bottom: 1px solid #bbf7d0; background: linear-gradient(180deg, #ffffff, #f1faf5); }
+.chat-avatar { display: grid; place-items: center; width: 40px; height: 40px; flex-shrink: 0; border-radius: 999px; font-weight: 800; color: #fff; background: linear-gradient(135deg, #22c55e, #15803d); }
+.chat-body { background: radial-gradient(120% 60% at 50% 0%, rgba(125,211,252,.16), transparent 70%), #f3fbf7; }
+.msg-row { display: flex; align-items: flex-end; gap: 6px; }
+.msg-row.mine { justify-content: flex-end; } .msg-row.theirs { justify-content: flex-start; }
+.bubble { max-width: min(82%, 520px); }
+.bubble.mine { background: #bbf7d0; color: #064e3b; border: 1px solid #86efac; }
+.bubble.theirs { background: #cff3fd; color: #0c4a6e; border: 1px solid #7dd3fc; }
+.msg-actions { display: flex; gap: 2px; opacity: 0; transition: opacity .25s var(--ease-ios); }
+.msg-row:hover .msg-actions, .msg-row:focus-within .msg-actions { opacity: 1; }
+@media (hover: none) { .msg-actions { opacity: 1; } }
+.msg-actions button { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 999px; border: 0; background: rgba(15,23,42,.06); color: var(--color-sub); cursor: pointer; transition: transform .25s var(--ease-ios), background-color .2s, color .2s; }
+.msg-actions button:hover { background: rgba(15,23,42,.12); color: var(--color-fg); transform: scale(1.1); } .msg-actions button:active { transform: scale(.9); }
+.notif-toast { position: fixed; right: 1rem; top: 1rem; z-index: 55; max-width: min(92vw, 360px); display: flex; gap: .7rem; align-items: center; padding: .75rem .9rem; border-radius: 1rem; border: 1px solid #86efac; background: rgba(255,255,255,.92); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); box-shadow: 0 14px 40px rgba(15,23,42,.22); text-align: left; cursor: pointer; animation: toastTop .55s var(--ease-ios) both; }
+@keyframes toastTop { from { opacity: 0; transform: translate3d(0,-24px,0) scale(.94) } to { opacity: 1; transform: none } }
+@media (prefers-reduced-motion: reduce) { .notif-toast { animation: none; } }

@@ -69,7 +69,9 @@ service cloud.firestore {
       match /msgs/{id} {
         allow read: if me(m) || isSuper();
         allow create: if (isSuper() && request.resource.data.from == 'owner') || (me(m) && request.resource.data.from == 'masjid');
-        allow update, delete: if false;
+        // sunting/padam mesej sendiri sahaja
+        allow update: if ((isSuper() && resource.data.from == 'owner') || (me(m) && resource.data.from == 'masjid')) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['text', 'edited']);
+        allow delete: if (isSuper() && resource.data.from == 'owner') || (me(m) && resource.data.from == 'masjid');
       }
     }
 
