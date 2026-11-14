@@ -2,13 +2,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Maximize, Minimize, Settings, Volume2, VolumeX, X } from "lucide-react";
 import Link from "next/link";
-import type { Masjid } from "@/lib/store";
+import { Download } from "lucide-react";
+import { usePwaInstall } from "@/lib/usePwa";
+import type { TvDoc } from "@/lib/types";
+import { ref, set, serverTimestamp, onDisconnect } from "firebase/database";
+import { rtdb } from "@/lib/firebase";
+import type { AzanItem } from "@/lib/useAzan";
 import { PRAYERS, type Times, clk, detectZone, hms, klDay, klNow, klSec, loadTimes, prayIdx, syncClock, to12 } from "@/lib/prayer";
 import { zInfo } from "@/lib/zones";
 
 const reduce = () => typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-function Slides({ imgs, anim, secs }: { imgs: string[]; anim: Masjid["anim"]; secs: number }) {
+function Slides({ imgs, anim, secs }: { imgs: string[]; anim: TvDoc["anim"]; secs: number }) {
   const list = (imgs.length ? imgs : ["/assets/mosque.jpg"]).slice(0, 10);
   const [i, setI] = useState(0);
   useEffect(() => { if (list.length < 2) return; const t = setInterval(() => setI((x) => (x + 1) % list.length), Math.max(4, secs) * 1000); return () => clearInterval(t); }, [list.length, secs]);
@@ -26,13 +31,15 @@ function Slides({ imgs, anim, secs }: { imgs: string[]; anim: Masjid["anim"]; se
   );
 }
 
-export default function TvDisplay({ m }: { m: Masjid }) {
+export default function TvDisplay({ m, mid, azan, extra }: { m: TvDoc; mid: string; azan: AzanItem | null; extra: string[] }) {
+  const demo = m.plan !== "full";
+  const pwa = usePwaInstall();
   const [times, setTimes] = useState<Times | null>(null);
   const [zone, setZone] = useState(m.zone);
   const [err, setErr] = useState("");
   const [now, setNow] = useState(0);
   const [pop, setPop] = useState<number | null>(null);
-  const [azanOn, setAzanOn] = useState(m.azan);
+  const [azanOn, setAzanOn] = useState(true);
   const [ctl, setCtl] = useState(true);
   const [full, setFull] = useState(false);
   const audio = useRef<HTMLAudioElement | null>(null);
@@ -42,7 +49,7 @@ export default function TvDisplay({ m }: { m: Masjid }) {
     try { const z = m.zone || (await detectZone()); setZone(z); setTimes(await loadTimes(z)); day.current = klDay(klNow()); setErr(""); }
     catch { setErr("Waktu solat tidak dapat dimuatkan. Semak sambungan internet."); }
   }, [m.zone]);
-  useEffect(() => { setAzanOn(m.azan); }, [m.azan]);
+  useEffect(() => { if (!mid) return; const r = ref(rtdb, `presence/${mid}`); const beat = () => set(r, { t: serverTimestamp() }).catch(() => {}); beat(); const t = setInterval(beat, 60000); return () => clearInterval(t); }, [mid]);
   useEffect(() => { syncClock().then(fetchTimes); const t = setInterval(syncClock, 30 * 60e3); return () => clearInterval(t); }, [fetchTimes]);
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 1000); setNow(Date.now()); return () => clearInterval(t); }, []);
   // wake lock + kursor/kawalan auto-sembunyi
@@ -63,13 +70,13 @@ export default function TvDisplay({ m }: { m: Masjid }) {
 
   const stop = useCallback(() => { const a = audio.current; if (!a) return; audio.current = null; let v = a.volume; const f = setInterval(() => { v -= 0.1; if (v <= 0) { clearInterval(f); a.pause(); } else a.volume = v; }, 70); }, []);
   const closePop = useCallback((key?: string) => { if (key) try { localStorage.setItem(key, "1"); } catch {} stop(); setPop(null); }, [stop]);
-  const popKey = idx && idx.cur >= 0 ? `ss_pd_${m.id}_${klDay(d)}_${PRAYERS[idx.cur].k}` : "";
+  const popKey = idx && idx.cur >= 0 ? `sd_pd_${mid || "demo"}_${klDay(d)}_${PRAYERS[idx.cur].k}` : "";
   useEffect(() => {
-    if (!idx || pop !== null || idx.cur < 0 || idx.sec - idx.ts[idx.cur] > 1800) return;
+    if (demo || !idx || pop !== null || idx.cur < 0 || idx.sec - idx.ts[idx.cur] > 1800) return;
     try { if (localStorage.getItem(popKey)) return; } catch {}
     setPop(idx.cur);
-    if (azanOn) { const a = new Audio(idx.cur === 0 ? "/assets/azan-subuh.m4a" : "/assets/azan.m4a"); audio.current = a; a.play().catch(() => { const again = () => audio.current === a && a.play().catch(() => {}); addEventListener("pointerdown", again, { once: true }); }); }
-  }, [idx?.cur, idx?.sec, pop, azanOn, popKey]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (azanOn) { const a = new Audio(idx.cur === 0 ? (azan?.fajrUrl || azan?.url || "/assets/azan-subuh.m4a") : (azan?.url || "/assets/azan.m4a")); audio.current = a; a.play().catch(() => { const again = () => audio.current === a && a.play().catch(() => {}); addEventListener("pointerdown", again, { once: true }); }); }
+  }, [idx?.cur, idx?.sec, pop, azanOn, popKey, demo]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (pop === null) return; const k = (e: KeyboardEvent) => e.key === "Escape" && closePop(popKey); addEventListener("keydown", k); return () => removeEventListener("keydown", k); }, [pop, popKey, closePop]);
 
   const toggleFull = () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen?.().catch(() => {}); };
@@ -84,7 +91,7 @@ export default function TvDisplay({ m }: { m: Masjid }) {
 
   return (
     <main className={`relative min-h-dvh overflow-hidden ${ctl ? "" : "cursor-none"}`}>
-      <Slides imgs={m.slides} anim={m.anim} secs={m.secs} />
+      <Slides imgs={[...extra, ...m.slides]} anim={m.anim} secs={m.secs} />
       <div className="relative z-10 flex min-h-dvh flex-col gap-4 p-4 md:p-8">
         <header className="flex flex-wrap items-start justify-between gap-3 pt-14">
           <div>
@@ -97,6 +104,7 @@ export default function TvDisplay({ m }: { m: Masjid }) {
           </div>
         </header>
 
+        {demo && <div className="glass rounded-2xl p-3 text-center text-sm font-semibold md:text-lg" role="note">Mod DEMO: pop-up dan azan waktu solat tidak dimainkan. Langgan <b className="text-accent">sekali sahaja</b> (bayaran sekali, akses penuh seumur hidup) untuk membuka semua ciri. Tekan Tetapan untuk daftar.</div>}
         <section className={`glass mt-auto rounded-3xl p-4 md:p-8 ${alert ? (idx!.diff <= 10 ? "tv-alert tv-alert10" : "tv-alert") : ""}`} aria-live="off">
           {times && idx ? (<>
             <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
@@ -113,7 +121,7 @@ export default function TvDisplay({ m }: { m: Masjid }) {
                 </li>))}
             </ul>
           </>) : <p className="py-8 text-center text-lg" role={err ? "alert" : undefined}>{err || "Memuatkan waktu solat…"}</p>}
-          <p className="mt-4 text-xs text-sub md:text-sm">Sumber: JAKIM (e-solat.gov.my) · {m.zone ? "zon pilihan" : "zon dikesan automatik"} · Latar: Muhammad Faqih, CC BY-SA 4.0 · Azan: Ustaz Asri (Rabbani) / Furqan Fawaz</p>
+          <p className="mt-4 text-xs text-sub md:text-sm">Sumber: JAKIM (e-solat.gov.my) · {m.zone ? "zon pilihan" : "zon dikesan automatik"} · Latar: Muhammad Faqih, CC BY-SA 4.0 · Azan: {azan ? azan.credit : "Ustaz Asri (Rabbani) / Furqan Fawaz"}</p>
         </section>
 
         {ann.length > 0 && (
@@ -125,9 +133,10 @@ export default function TvDisplay({ m }: { m: Masjid }) {
       </div>
 
       <div className={`fixed right-4 top-4 z-20 flex gap-2 transition-opacity duration-300 ${ctl ? "opacity-100" : "pointer-events-none opacity-0"}`}>
+        {pwa.canInstall && <button className="btn glass" aria-label="Pasang aplikasi TV" onClick={pwa.install}><Download size={20} /><span className="hidden md:inline">Pasang aplikasi TV</span></button>}
         <button className="btn glass" aria-label={azanOn ? "Matikan azan" : "Hidupkan azan"} onClick={() => setAzanOn((v) => !v)}>{azanOn ? <Volume2 size={20} /> : <VolumeX size={20} />}</button>
         <button className="btn glass" aria-label={full ? "Keluar skrin penuh" : "Skrin penuh"} onClick={toggleFull}>{full ? <Minimize size={20} /> : <Maximize size={20} />}</button>
-        <Link className="btn glass" aria-label="Tetapan admin" href={`/admin?m=${m.id}`}><Settings size={20} /></Link>
+        <Link className="btn glass" aria-label="Tetapan admin" href="/pengurus/"><Settings size={20} /><span className="hidden md:inline">Tetapan</span></Link>
       </div>
 
       {pop !== null && (
@@ -141,7 +150,7 @@ export default function TvDisplay({ m }: { m: Masjid }) {
               <p className="mt-2 text-4xl font-bold tabular-nums text-accent">{times && to12(times[PRAYERS[pop].k])}</p>
               <p className="mt-3">Bagi negeri {z[1]}, zon {zone}</p>
               <p className="mt-4 text-sub">Jom sama-sama tunaikan solat awal waktu, semoga kita berjaya dunia dan akhirat.</p>
-              <p className="mt-6 text-xs text-sub">{PRAYERS[pop].place} · Photo: {PRAYERS[pop].credit} · Azan by: {pop === 0 ? "Furqan Fawaz" : "Ustaz Asri (Rabbani)"}</p>
+              <p className="mt-6 text-xs text-sub">{PRAYERS[pop].place} · Photo: {PRAYERS[pop].credit} · Azan by: {azan ? azan.credit : pop === 0 ? "Furqan Fawaz" : "Ustaz Asri (Rabbani)"}</p>
             </div>
           </div>
         </div>)}

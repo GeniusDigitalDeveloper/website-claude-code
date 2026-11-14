@@ -1,0 +1,6 @@
+{
+  "firestore": { "rules": "rules/firestore.rules" },
+  "database": { "rules": "rules/database.rules.json" },
+  "hosting": { "public": "out", "ignore": ["firebase.json", "**/.*", "**/node_modules/**"], "cleanUrls": true, "trailingSlash": true,
+    "headers": [{ "source": "/sw.js", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] }] }
+}

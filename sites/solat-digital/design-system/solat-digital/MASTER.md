@@ -6,9 +6,9 @@
 
 ---
 
-**Project:** Smart Solat
-**Generated:** 2026-11-14 13:40:21
-**Category:** Smart Home/IoT Dashboard
+**Project:** Solat Digital
+**Generated:** 2026-11-14 14:03:15
+**Category:** SaaS (General)
 
 ---
 
@@ -18,35 +18,35 @@
 
 | Role | Hex | CSS Variable |
 |------|-----|--------------|
-| Primary | `#1E293B` | `--color-primary` |
+| Primary | `#2563EB` | `--color-primary` |
 | On Primary | `#FFFFFF` | `--color-on-primary` |
-| Secondary | `#334155` | `--color-secondary` |
-| On Secondary | `#FFFFFF` | `--color-on-secondary` |
-| Accent/CTA | `#22C55E` | `--color-accent` |
-| On Accent/CTA | `#0F172A` | `--color-on-accent` |
-| Background | `#0F172A` | `--color-background` |
-| Foreground | `#F8FAFC` | `--color-foreground` |
-| Card | `#1B2336` | `--color-card` |
-| Card Foreground | `#F8FAFC` | `--color-card-foreground` |
-| Muted | `#272F42` | `--color-muted` |
-| Muted Foreground | `#94A3B8` | `--color-muted-foreground` |
-| Border | `#475569` | `--color-border` |
-| Destructive | `#EF4444` | `--color-destructive` |
-| On Destructive | `#000000` | `--color-on-destructive` |
-| Ring | `#FFFFFF` | `--color-ring` |
+| Secondary | `#3B82F6` | `--color-secondary` |
+| On Secondary | `#000000` | `--color-on-secondary` |
+| Accent/CTA | `#EA580C` | `--color-accent` |
+| On Accent/CTA | `#000000` | `--color-on-accent` |
+| Background | `#F8FAFC` | `--color-background` |
+| Foreground | `#1E293B` | `--color-foreground` |
+| Card | `#FFFFFF` | `--color-card` |
+| Card Foreground | `#1E293B` | `--color-card-foreground` |
+| Muted | `#E9EFF8` | `--color-muted` |
+| Muted Foreground | `#475569` | `--color-muted-foreground` |
+| Border | `#E2E8F0` | `--color-border` |
+| Destructive | `#DC2626` | `--color-destructive` |
+| On Destructive | `#FFFFFF` | `--color-on-destructive` |
+| Ring | `#2563EB` | `--color-ring` |
 
-**Color Notes:** Dark tech + status green
+**Color Notes:** Trust blue + orange CTA contrast [Accent adjusted from #F97316]
 
 ### Typography
 
 - **Heading Font:** Plus Jakarta Sans
 - **Body Font:** Plus Jakarta Sans
-- **Mood:** neumorphism, soft ui, monochromatic, cool grey, minimal, physical, depth, ceramic, system font, utility
-- **Google Fonts:** [Plus Jakarta Sans + Plus Jakarta Sans](https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,700;1,400)
+- **Mood:** friendly, modern, saas, clean, approachable, professional
+- **Google Fonts:** [Plus Jakarta Sans + Plus Jakarta Sans](https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap)
 
 **CSS Import:**
 ```css
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 ```
 
 ### Spacing Variables
@@ -79,8 +79,8 @@
 ```css
 /* Primary Button */
 .btn-primary {
-  background: #22C55E;
-  color: #0F172A;
+  background: #EA580C;
+  color: #000000;
   padding: 12px 24px;
   border-radius: 8px;
   font-weight: 600;
@@ -96,8 +96,8 @@
 /* Secondary Button */
 .btn-secondary {
   background: transparent;
-  color: #F8FAFC;
-  border: 2px solid #1E293B;
+  color: #2563EB;
+  border: 2px solid #2563EB;
   padding: 12px 24px;
   border-radius: 8px;
   font-weight: 600;
@@ -110,7 +110,7 @@
 
 ```css
 .card {
-  background: #0F172A;
+  background: #F8FAFC;
   border-radius: 12px;
   padding: 24px;
   box-shadow: var(--shadow-md);
@@ -136,9 +136,9 @@
 }
 
 .input:focus {
-  border-color: #1E293B;
+  border-color: #2563EB;
   outline: none;
-  box-shadow: 0 0 0 3px #1E293B20;
+  box-shadow: 0 0 0 3px #2563EB20;
 }
 ```
 
@@ -174,18 +174,18 @@
 
 ### Page Pattern
 
-**Pattern Name:** Real-Time / Operations Landing
+**Pattern Name:** Hero + Features + CTA
 
-- **Conversion Strategy:** Offer a demo or sandbox and show trust signals. Label telemetry as live only when backed by a current source, with update time and stale state. Provide pause/hide or update-frequency controls for tickers and previews, stop offscreen/hidden work, support keyboard controls, and render a static final snapshot under reduced motion.
-- **CTA Placement:** Primary CTA in nav + After metrics
-- **Section Order:** Hero (product + live preview or status) > Key metrics/indicators > How it works > CTA (Start trial / Contact)
+- **Conversion Strategy:** Deep CTA placement. For CTA label text, verify at least 4.5:1 against the button fill; use 7:1 only when the product explicitly targets AAA normal-text contrast. Keep focus and component boundaries independently visible. Disable hero parallax under reduced motion and render its static final state.
+- **CTA Placement:** Hero (sticky) + Bottom
+- **Section Order:** Hero with headline/image > Value prop > Key features (3-5) > CTA section > Footer
 
 ---
 
 ## Anti-Patterns (Do NOT Use)
 
-- ❌ Slow updates
-- ❌ No automation
+- ❌ Excessive animation
+- ❌ Dark mode by default
 
 ### Additional Forbidden Patterns
 
