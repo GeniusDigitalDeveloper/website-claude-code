@@ -2219,7 +2219,7 @@ const NAV = [
 let navBusy = false;
 /* ---------- Kolaborasi: data pangkalan data (masa nyata), dikawal admin ---------- */
 const COLLAB_SEED = { main: { headline: "Kolaborasi Utama", title: "Genius Digital", sub: "Produk Kami", url: "", logo: "/assets/collab-g.jpg" }, items: [
-  { id: "s1", name: "QR ME Generator", url: "", logo: "/assets/collab-qr.jpg", order: 1 },
+  { id: "s1", name: "QR ME Generator", url: "", logo: "/assets/collab-qr2.jpg", order: 1 },
   { id: "s2", name: "Interactive Link", url: "", logo: "/assets/collab-interactive.jpg", order: 2 },
   { id: "s3", name: "Hermes Agent for Dummies", url: "", logo: "/assets/collab-hermes.jpg", order: 3 },
   { id: "s4", name: "Claude Code for Dummies", url: "", logo: "/assets/collab-claude.jpg", order: 4 }] };
@@ -2972,7 +2972,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-78";
+const APP_VERSION = "V-79";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
