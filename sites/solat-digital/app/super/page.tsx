@@ -5,7 +5,7 @@ import { addDoc, collection, deleteDoc, doc, getDoc, onSnapshot, orderBy, query,
 import { onValue, ref } from "firebase/database";
 import { Building2, Copy, Download, LogOut, Pencil, Plus, Radio, Search, ShieldCheck, Trash2, Users } from "lucide-react";
 import { auth, db, rtdb } from "@/lib/firebase";
-import { FONTS, type AzanDoc, type Registry, type TvDoc } from "@/lib/types";
+import { ARABIC_FONTS, FONTS, type AzanDoc, type CustomFont, type Registry, type TvDoc } from "@/lib/types";
 import { authMsg, useUser } from "@/lib/useUser";
 import { usePwaInstall } from "@/lib/usePwa";
 
@@ -29,13 +29,29 @@ function Login({ denied }: { denied: boolean }) {
 }
 
 function Defaults() {
-  const [font, setFont] = useState(""); const [ok, setOk] = useState("");
-  useEffect(() => onSnapshot(doc(db, "config", "defaults"), (s) => setFont((s.data()?.font as string) || ""), () => {}), []);
+  const [font, setFont] = useState(""); const [ar, setAr] = useState(""); const [custom, setCustom] = useState<CustomFont[]>([]); const [ok, setOk] = useState("");
+  const [nf, setNf] = useState({ name: "", url: "", credit: "" });
+  useEffect(() => onSnapshot(doc(db, "config", "defaults"), (s) => { const d = s.data() ?? {}; setFont(d.font || ""); setAr(d.arabicFont || ""); setCustom(d.customFonts || []); }, () => {}), []);
+  const persist = async (p: { font?: string; arabicFont?: string; customFonts?: CustomFont[] }) => { try { await setDoc(doc(db, "config", "defaults"), { font: p.font ?? (font || FONTS[0]), arabicFont: p.arabicFont ?? ar, customFonts: p.customFonts ?? custom }); setOk("Disimpan."); } catch { setOk("Gagal simpan."); } setTimeout(() => setOk(""), 2000); };
+  const addFont = (e: React.FormEvent) => { e.preventDefault(); if (!/^(https:\/\/|\/)/.test(nf.url)) return setOk("URL font mesti bermula https:// atau /."); const id = Math.random().toString(36).slice(2, 8); const l = [...custom, { id, name: nf.name.trim(), url: nf.url.trim(), credit: nf.credit.trim() }]; setCustom(l); setNf({ name: "", url: "", credit: "" }); persist({ customFonts: l }); };
   return (
-    <section className="card"><h2 className="text-lg font-bold">Tetapan lalai sistem</h2><p className="text-sm text-sub">Font lalai untuk semua TV masjid. Masjid boleh menukar fontnya sendiri; tetapan ini tidak kekal untuk mereka.</p>
-      <L id="df">Font lalai paparan TV</L>
-      <div className="flex gap-2"><select id="df" className="inp" value={font || FONTS[0]} onChange={(e) => setFont(e.target.value)}>{FONTS.map((f) => <option key={f}>{f}</option>)}</select>
-        <button className="btn btn-primary" onClick={async () => { try { await setDoc(doc(db, "config", "defaults"), { font: font || FONTS[0] }); setOk("Disimpan."); } catch { setOk("Gagal simpan."); } setTimeout(() => setOk(""), 2000); }}>Simpan</button></div>
+    <section className="card"><h2 className="text-lg font-bold">Tetapan lalai sistem dan pustaka font</h2><p className="text-sm text-sub">Lalai untuk semua TV masjid. Masjid boleh menukar fontnya sendiri; ini tidak kekal untuk mereka.</p>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div><L id="df">Font lalai (huruf Latin)</L><select id="df" className="inp" value={font || FONTS[0]} onChange={(e) => setFont(e.target.value)}>{FONTS.map((f) => <option key={f}>{f}</option>)}</select></div>
+        <div><L id="da">Font lalai tulisan Arab (Thuluth)</L><select id="da" className="inp" value={ar || "honorifics"} onChange={(e) => setAr(e.target.value)}>
+          {[...new Set(ARABIC_FONTS.map((a) => a.group))].map((g) => <optgroup key={g} label={g}>{ARABIC_FONTS.filter((a) => a.group === g).map((a) => <option key={a.id} value={a.id}>{a.label}</option>)}</optgroup>)}
+          {custom.length > 0 && <optgroup label="Font tersuai (Thuluth dll.)">{custom.map((c) => <option key={c.id} value={"custom:" + c.id}>{c.name}</option>)}</optgroup>}</select></div>
+      </div>
+      <button className="btn btn-primary mt-3" onClick={() => persist({})}>Simpan lalai</button>
+      <h3 className="mt-6 font-bold">Pustaka font Arab tersuai (Thuluth dll.)</h3>
+      <p className="text-sm text-sub">Tambah font berlesen anda (woff2/ttf/otf). Letak URL https:// atau fail di /fonts/. Semua masjid boleh memilihnya. Tulis kredit/lesen.</p>
+      <form className="mt-2 grid gap-2 md:grid-cols-4" onSubmit={addFont}>
+        <input className="inp" aria-label="Nama font" placeholder="Nama (cth: Thuluth Jali)" value={nf.name} onChange={(e) => setNf({ ...nf, name: e.target.value })} required />
+        <input className="inp" aria-label="URL font" placeholder="https://... atau /fonts/thuluth.woff2" value={nf.url} onChange={(e) => setNf({ ...nf, url: e.target.value })} required />
+        <input className="inp" aria-label="Kredit atau lesen" placeholder="Kredit / lesen" value={nf.credit} onChange={(e) => setNf({ ...nf, credit: e.target.value })} required />
+        <button className="btn btn-primary justify-center"><Plus size={18} /> Tambah</button></form>
+      <ul className="mt-3 grid gap-2">{custom.map((c) => (<li key={c.id} className="flex flex-wrap items-center gap-3 rounded-xl bg-muted p-3"><div className="min-w-0 flex-1"><b>{c.name}</b><div className="break-all text-xs text-sub">{c.credit} · {c.url}</div></div><button className="btn" aria-label="Padam font" onClick={() => { const l = custom.filter((x) => x.id !== c.id); setCustom(l); persist({ customFonts: l, arabicFont: ar === "custom:" + c.id ? "" : ar }); }}><Trash2 size={16} /></button></li>))}
+        {!custom.length && <li className="text-sm text-sub">Belum ada font tersuai.</li>}</ul>
       {ok && <p role="status" className="mt-2 text-sm text-accent">{ok}</p>}
     </section>
   );

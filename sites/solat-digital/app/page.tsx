@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { collection, doc, onSnapshot, orderBy, query } from "firebase/firestore";
 import TvDisplay from "@/components/TvDisplay";
 import { db } from "@/lib/firebase";
-import { DEMO_TV, type TvDoc } from "@/lib/types";
+import { DEMO_TV, type Defaults, type TvDoc } from "@/lib/types";
 import { useAzanLibrary } from "@/lib/useAzan";
 import { usePwaInstall } from "@/lib/usePwa";
 
@@ -15,9 +15,9 @@ function Inner() {
   const [cfg, setCfg] = useState<TvDoc>(DEMO_TV);
   const [extra, setExtra] = useState<string[]>([]);
   const [missing, setMissing] = useState(false);
-  const [defFont, setDefFont] = useState("");
+  const [defs, setDefs] = useState<Defaults>({});
   const lib = useAzanLibrary();
-  useEffect(() => onSnapshot(doc(db, "config", "defaults"), (s) => setDefFont((s.data()?.font as string) || ""), () => {}), []);
+  useEffect(() => onSnapshot(doc(db, "config", "defaults"), (s) => setDefs((s.data() as Defaults) || {}), () => {}), []);
   usePwaInstall();
   useEffect(() => {
     if (!mid) return;
@@ -28,6 +28,6 @@ function Inner() {
     return () => { u1(); u2(); };
   }, [mid]);
   if (missing) return <p className="grid min-h-dvh place-items-center p-8 text-center">Masjid tidak dijumpai. Semak pautan TV anda.</p>;
-  return <TvDisplay m={cfg} mid={mid} azan={lib.find((a) => a.id === cfg.azanId) ?? null} extra={extra} defaultFont={defFont} />;
+  return <TvDisplay m={cfg} mid={mid} azan={lib.find((a) => a.id === cfg.azanId) ?? null} extra={extra} defaults={defs} />;
 }
 export default function Page() { return <Suspense fallback={<p className="p-8">Memuatkan…</p>}><Inner /></Suspense>; }

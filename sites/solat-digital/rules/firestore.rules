@@ -19,6 +19,7 @@ service cloud.firestore {
         && (!('slideSecs' in d) || (d.slideSecs is number && d.slideSecs >= 4 && d.slideSecs <= 60))
         && (!('slideAnim' in d) || d.slideAnim in ['fade', 'slide', 'up', 'zoom', 'flip'])
         && (!('font' in d) || (d.font is string && d.font.size() <= 40))
+        && (!('arabicFont' in d) || (d.arabicFont is string && d.arabicFont.size() <= 60))
         && (!('azanMute' in d) || d.azanMute is bool)
         && (!('jumaatTime' in d) || (d.jumaatTime is string && d.jumaatTime.size() <= 8))
         && (!('volume' in d) || (d.volume is number && d.volume >= 5 && d.volume <= 100))

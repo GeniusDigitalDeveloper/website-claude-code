@@ -14,7 +14,7 @@ export default function SlidePanel({ slides, anim, secs }: { slides: SlideItem[]
       <div className="sl-box" style={{ aspectRatio: "16 / 9" }}>
         <div key={s.id + i} className={`sl-card sl-${anim} flex h-full flex-col justify-between`} style={{ padding: "4cqw 5cqw" }}>
           <div className="flex items-center justify-between gap-2">
-            <span className="sl-chip">{s.title || KIND_LABEL[s.kind]}</span>
+            <span className="sl-chip">{s.title || KIND_LABEL[s.kind]}{s.kind === "hadis" && <span className="ar" lang="ar" style={{ marginLeft: ".4em", fontSize: "1.3em" }}>ﷺ</span>}</span>
             <span style={{ fontSize: "2.6cqw" }} className="tabular-nums text-white/70">{(i % slides.length) + 1} / {slides.length}</span>
           </div>
           <p className="font-bold leading-snug text-white" style={{ fontSize: `${size}cqw` }}>{s.text}</p>

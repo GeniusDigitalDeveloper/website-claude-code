@@ -4,7 +4,7 @@ export type TvDoc = {
   name: string; state: string; zone: string; country: string; // zone "" = auto
   azanId: string; announcements: Announcement[]; slides: string[]; anim: "kenburns" | "zoomout" | "fade"; secs: number;
   plan: "demo" | "full"; ownerUid: string; updatedAt?: number;
-  preMin?: number; font?: string; azanMute?: boolean; jumaatTime?: string; slideList?: SlideItem[]; slideAnim?: "fade" | "slide" | "up" | "zoom" | "flip"; slideSecs?: number; ringtone?: "chime" | "bell" | "beep" | "off"; ringRepeat?: number; azanDelayMin?: number; volume?: number;
+  preMin?: number; font?: string; arabicFont?: string; azanMute?: boolean; jumaatTime?: string; slideList?: SlideItem[]; slideAnim?: "fade" | "slide" | "up" | "zoom" | "flip"; slideSecs?: number; ringtone?: "chime" | "bell" | "beep" | "off"; ringRepeat?: number; azanDelayMin?: number; volume?: number;
 };
 export type Registry = { name: string; address: string; city: string; postcode: string; state: string; zone: string; country: string; managerName: string; email: string; createdAt: number };
 export type AzanDoc = { name: string; credit: string; url: string; fajrUrl?: string; active: boolean };
@@ -15,3 +15,9 @@ export const SLIDE_ANIMS: { id: NonNullable<TvDoc["slideAnim"]>; label: string }
   { id: "fade", label: "Pudar (fade)" }, { id: "slide", label: "Tolak dari kanan" }, { id: "up", label: "Naik dari bawah" }, { id: "zoom", label: "Zum masuk" }, { id: "flip", label: "Pusing (flip)" },
 ];
 export const KIND_LABEL: Record<SlideItem["kind"], string> = { hadis: "Hadis", ayat: "Ayat al-Quran", hikmah: "Kata hikmah", ulama: "Kata ulama", jumaat: "Khas Jumaat", umum: "Pengumuman" };
+export type CustomFont = { id: string; name: string; url: string; credit: string };
+export type Defaults = { font?: string; arabicFont?: string; customFonts?: CustomFont[] };
+/** Hanya khat Thuluth. Fon bawaan ialah Arabic Honorifics Complete (CC BY 4.0): ligatur Thuluth untuk ungkapan hormat. Font Thuluth huruf penuh boleh ditambah admin besar. */
+export const ARABIC_FONTS: { id: string; label: string; group: string }[] = [
+  { id: "honorifics", label: "Thuluth (Arabic Honorifics Complete)", group: "Thuluth" },
+];

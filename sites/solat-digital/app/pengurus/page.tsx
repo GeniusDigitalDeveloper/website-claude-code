@@ -7,8 +7,9 @@ import { CheckCircle2, Copy, Download, ImagePlus, LogOut, MonitorPlay, Plus, Sav
 import { auth, db } from "@/lib/firebase";
 import { ZONES } from "@/lib/zones";
 import ZonePicker from "@/components/ZonePicker";
-import { DEMO_TV, FONTS, KIND_LABEL, SLIDE_ANIMS, type SlideItem, type TvDoc, uid } from "@/lib/types";
+import { ARABIC_FONTS, type Defaults, DEMO_TV, FONTS, KIND_LABEL, SLIDE_ANIMS, type SlideItem, type TvDoc, uid } from "@/lib/types";
 import { DEFAULT_SLIDES } from "@/lib/defaultSlides";
+import { ensureArabicFont } from "@/lib/arabicFont";
 import { authMsg, useUser } from "@/lib/useUser";
 import { useAzanLibrary } from "@/lib/useAzan";
 import { usePwaInstall } from "@/lib/usePwa";
@@ -79,6 +80,8 @@ function Panel({ uidv }: { uidv: string }) {
   const [imgs, setImgs] = useState<{ id: string; data: string }[]>([]);
   const [toast, setToast] = useState(""); const [txt, setTxt] = useState(""); const [dirty, setDirty] = useState(false);
   const lib = useAzanLibrary(); const pwa = usePwaInstall(); const file = useRef<HTMLInputElement>(null);
+  const [defs, setDefs] = useState<Defaults>({});
+  useEffect(() => onSnapshot(doc(db, "config", "defaults"), (s) => setDefs((s.data() as Defaults) || {}), () => {}), []);
   useEffect(() => {
     const u1 = onSnapshot(doc(db, "tv", uidv), (s) => { const d = s.data() as TvDoc | undefined; if (d) { setTv(d); setDraft((x) => x ?? d); } });
     const u2 = onSnapshot(query(collection(db, "tv", uidv, "img"), orderBy("order")), (s) => setImgs(s.docs.map((d) => ({ id: d.id, data: d.data().data }))));
@@ -92,7 +95,7 @@ function Panel({ uidv }: { uidv: string }) {
   const slides = draft.slideList;
   const setSlides = (l: SlideItem[]) => up({ slideList: l.slice(0, 15) });
   const save = async () => {
-    const data: Record<string, unknown> = { updatedAt: Date.now(), name: draft.name, state: draft.state, zone: draft.zone, azanId: draft.azanId, announcements: draft.announcements, slides: draft.slides, anim: draft.anim, secs: draft.secs, preMin: draft.preMin ?? 5, ringtone: draft.ringtone ?? "chime", ringRepeat: draft.ringRepeat ?? 1, azanDelayMin: draft.azanDelayMin ?? 0, volume: draft.volume ?? 100, font: draft.font ?? "", azanMute: !!draft.azanMute, jumaatTime: draft.jumaatTime ?? "", slideAnim: draft.slideAnim ?? "fade", slideSecs: draft.slideSecs ?? 10 };
+    const data: Record<string, unknown> = { updatedAt: Date.now(), name: draft.name, state: draft.state, zone: draft.zone, azanId: draft.azanId, announcements: draft.announcements, slides: draft.slides, anim: draft.anim, secs: draft.secs, preMin: draft.preMin ?? 5, ringtone: draft.ringtone ?? "chime", ringRepeat: draft.ringRepeat ?? 1, azanDelayMin: draft.azanDelayMin ?? 0, volume: draft.volume ?? 100, font: draft.font ?? "", azanMute: !!draft.azanMute, arabicFont: draft.arabicFont ?? "", jumaatTime: draft.jumaatTime ?? "", slideAnim: draft.slideAnim ?? "fade", slideSecs: draft.slideSecs ?? 10 };
     if (draft.slideList) data.slideList = draft.slideList;
     try { await updateDoc(doc(db, "tv", uidv), data); await updateDoc(doc(db, "registry", uidv), { name: draft.name, state: draft.state, zone: draft.zone }); setDirty(false); flash("Disimpan. TV dikemas kini serta-merta."); }
     catch { flash("Gagal simpan. Semak sambungan."); }
@@ -139,7 +142,14 @@ function Panel({ uidv }: { uidv: string }) {
 
       <section className="card mt-5"><h2 className="text-lg font-bold">Jenis tulisan (font)</h2>
         <L id="ft">Font paparan TV</L><select id="ft" className="inp" value={draft.font ?? ""} onChange={(e) => up({ font: e.target.value })}><option value="">Ikut lalai sistem</option>{FONTS.map((f) => <option key={f}>{f}</option>)}</select>
-        <p className="mt-2 text-xs text-sub">Tulisan Arab menggunakan khat (Thuluth/Ruqaah) berbaris.</p>
+        <L id="af">Font tulisan Arab (khat Thuluth)</L>
+        <select id="af" className="inp" value={draft.arabicFont ?? ""} onChange={(e) => up({ arabicFont: e.target.value })}>
+          <option value="">Ikut lalai sistem (Thuluth)</option>
+          {[...new Set(ARABIC_FONTS.map((a) => a.group))].map((g) => <optgroup key={g} label={g}>{ARABIC_FONTS.filter((a) => a.group === g).map((a) => <option key={a.id} value={a.id}>{a.label}</option>)}</optgroup>)}
+          {!!defs.customFonts?.length && <optgroup label="Thuluth dan font tersuai">{defs.customFonts.map((c) => <option key={c.id} value={"custom:" + c.id}>{c.name}</option>)}</optgroup>}
+        </select>
+        <p lang="ar" dir="rtl" className="mt-3 rounded-xl bg-muted p-4 text-center text-4xl" style={{ fontFamily: `"${ensureArabicFont(draft.arabicFont || defs.arabicFont || "honorifics", defs.customFonts)}", "Arabic Honorifics Complete", serif`, lineHeight: 1.8 }}>الْفَجْرُ الظُّهْرُ الْجُمُعَةُ ﷺ</p>
+        <p className="mt-2 text-xs text-sub">Khat Thuluth: Arabic Honorifics Complete oleh eraduz, berdasarkan karya BaAlwi Heritage (ID), lesen CC BY 4.0 (ligatur ungkapan hormat seperti ﷺ). Huruf lain menggunakan sandaran berkaligrafi sehingga admin Solat Digital menambah font Thuluth huruf penuh.</p>
       </section>
 
       <section className="card mt-5"><h2 className="text-lg font-bold">Azan</h2><p className="text-sm text-sub">Pilih azan daripada senarai admin Solat Digital. Kredit azan dipaparkan di TV.</p>

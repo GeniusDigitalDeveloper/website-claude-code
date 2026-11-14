@@ -10,6 +10,8 @@ import type { AzanItem } from "@/lib/useAzan";
 import { type Times, buildItems, clk, detectZone, fmtHijri, hms, isFriday, klDay, klNow, klSec, loadTimes, prayIdx, syncClock, to12 } from "@/lib/prayer";
 import SlidePanel from "@/components/SlidePanel";
 import { DEFAULT_SLIDES } from "@/lib/defaultSlides";
+import { ensureArabicFont } from "@/lib/arabicFont";
+import type { Defaults } from "@/lib/types";
 import { zInfo } from "@/lib/zones";
 import { playRing } from "@/lib/ringtone";
 
@@ -33,7 +35,7 @@ function Slides({ imgs, anim, secs }: { imgs: string[]; anim: TvDoc["anim"]; sec
   );
 }
 
-export default function TvDisplay({ m, mid, azan, extra, defaultFont }: { m: TvDoc; mid: string; azan: AzanItem | null; extra: string[]; defaultFont?: string }) {
+export default function TvDisplay({ m, mid, azan, extra, defaults }: { m: TvDoc; mid: string; azan: AzanItem | null; extra: string[]; defaults?: Defaults }) {
   const demo = m.plan !== "full";
   usePwaInstall();
   const [times, setTimes] = useState<Times | null>(null);
@@ -48,9 +50,12 @@ export default function TvDisplay({ m, mid, azan, extra, defaultFont }: { m: TvD
   const rang = useRef<Set<string>>(new Set());
   const pre = Math.max(0, m.preMin ?? 5), delayS = Math.max(0, m.azanDelayMin ?? 0) * 60, vol = Math.max(5, m.volume ?? 100) / 100;
   const azanOn = !m.azanMute; // senyap azan ditetapkan oleh admin masjid dalam panel (nada masuk waktu kekal berbunyi)
-  const font = m.font || defaultFont || "Plus Jakarta Sans";
+  const font = m.font || defaults?.font || "Plus Jakarta Sans";
+  const arChoice = m.arabicFont || defaults?.arabicFont || "honorifics";
+  const [arFam, setArFam] = useState("Arabic Honorifics Complete");
+  useEffect(() => { setArFam(ensureArabicFont(arChoice, defaults?.customFonts)); }, [arChoice, defaults?.customFonts]);
 
-  useEffect(() => { const id = "sd-font"; let l = document.getElementById(id) as HTMLLinkElement | null; if (!l) { l = document.createElement("link"); l.id = id; l.rel = "stylesheet"; document.head.appendChild(l); } l.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(font).replace(/%20/g, "+")}:wght@400;600;700;800&family=Aref+Ruqaa:wght@400;700&display=swap`; }, [font]);
+  useEffect(() => { const id = "sd-font"; let l = document.getElementById(id) as HTMLLinkElement | null; if (!l) { l = document.createElement("link"); l.id = id; l.rel = "stylesheet"; document.head.appendChild(l); } l.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(font).replace(/%20/g, "+")}:wght@400;600;700;800&display=swap`; }, [font]);
   const fetchTimes = useCallback(async () => {
     try { const z = m.zone || (await detectZone()); setZone(z); setTimes(await loadTimes(z)); day.current = klDay(klNow()); setErr(""); }
     catch { setErr("Waktu solat tidak dapat dimuatkan. Semak sambungan internet."); }
@@ -114,7 +119,7 @@ export default function TvDisplay({ m, mid, azan, extra, defaultFont }: { m: TvD
   const curKey = cur?.k;
 
   return (
-    <main className={`relative min-h-dvh overflow-hidden ${ctl ? "" : "cursor-none"}`} style={{ fontFamily: `"${font}", ui-sans-serif, system-ui, sans-serif` }}>
+    <main className={`relative min-h-dvh overflow-hidden ${ctl ? "" : "cursor-none"}`} style={{ fontFamily: `"${font}", ui-sans-serif, system-ui, sans-serif`, ["--ar-font" as string]: `"${arFam}"` }}>
       <Slides imgs={[...extra, ...m.slides]} anim={m.anim} secs={m.secs} />
       {entered && <div className="glow-now" aria-hidden="true" />}
       <div className="relative z-10 flex min-h-dvh flex-col gap-4 p-4 md:p-8">
