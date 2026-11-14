@@ -1109,6 +1109,10 @@ body.pray-off #pray,body.pray-off #nxp,body.pray-off #praypop,body.pray-off sect
 @media(max-width:520px){.nxp-w{gap:8px}.dnx .praysw{padding:3px 8px 3px 6px}.dnx .ps-ic{width:24px;height:24px}}
 .dnx{width:100%}
 .nxp-w .praysw{margin-left:auto}
+
+/* ===== V-103: chatbot: buka/tutup ala iOS ===== */
+#cbpanel{will-change:transform,opacity}
+#cbfab{transition:transform .35s cubic-bezier(.32,.72,0,1)}#cbfab:active{transform:scale(.88)}#cbfab[aria-expanded=true]{transform:scale(.94)}
 </style>
 </head>
 <body>
@@ -3414,7 +3418,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-102";
+const APP_VERSION = "V-103";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
@@ -3655,8 +3659,23 @@ function cbInit() {
     const top = r[0].e, a = typeof top.a === "function" ? top.a() : top.a; say(a, "bot", top.go);
     if (r[1] && r[1].sc >= r[0].sc * .7) say("Mungkin anda juga maksudkan: " + r[1].e.q + ".", "bot");
   };
-  const open = o => { panel.hidden = !o; fab.setAttribute("aria-expanded", String(o)); tip.classList.remove("on"); if (o) { if (!msgs.children.length) { say("Hai! Saya pembantu Flash Link. Saya boleh jawab soalan tentang pautan, design, gambar, analitik, shorten link dan kemas kini.", "bot"); chips(); } anim(panel, [{ opacity: 0, transform: "translate3d(0,18px,0) scale(.96)" }, { opacity: 1, transform: "none" }], { duration: 380 }); setTimeout(() => $("#cbin", panel).focus(), 60); } else fab.focus(); };
-  fab.onclick = () => open(panel.hidden); $("#cbx", panel).onclick = () => open(false);
+  let openState = false, cur = null;
+  const ORG = "calc(100% - 28px) calc(100% + 88px)"; // asal animasi: dari / ke gambar bot
+  const open = (o, refocus = true) => {
+    if (o === openState) return; openState = o; fab.setAttribute("aria-expanded", String(o)); tip.classList.remove("on"); if (cur) { try { cur.cancel(); } catch {} cur = null; }
+    if (o) {
+      panel.hidden = false; panel.style.transformOrigin = ORG;
+      if (!msgs.children.length) { say("Hai! Saya pembantu Flash Link. Saya boleh jawab soalan tentang pautan, design, gambar, analitik, shorten link dan kemas kini.", "bot"); chips(); }
+      if (!REDUCE()) cur = panel.animate([{ opacity: 0, transform: "scale(.12)" }, { opacity: 1, transform: "scale(1)" }], { duration: 540, easing: "cubic-bezier(.22,1.12,.36,1)" });
+      setTimeout(() => { if (openState) $("#cbin", panel).focus({ preventScroll: true }); }, 320);
+    } else {
+      if (REDUCE()) { panel.hidden = true; } else { cur = panel.animate([{ opacity: 1, transform: "scale(1)" }, { opacity: 0, transform: "scale(.12)" }], { duration: 360, easing: "cubic-bezier(.5,0,.75,0)", fill: "forwards" }); const me = cur; me.onfinish = () => { if (!openState && cur === me) { panel.hidden = true; try { me.cancel(); } catch {} cur = null; } }; }
+      if (refocus) fab.focus({ preventScroll: true });
+    }
+  };
+  fab.onclick = () => open(!openState); $("#cbx", panel).onclick = () => open(false);
+  // klik di mana-mana di luar chatbot menutupnya
+  document.addEventListener("pointerdown", e => { if (!openState) return; const t = e.target; if (panel.contains(t) || fab.contains(t) || tip.contains(t)) return; open(false, false); }, true);
   $("#cbform", panel).onsubmit = e => { e.preventDefault(); const i = $("#cbin", panel); const v = i.value; i.value = ""; ask(v); };
   panel.addEventListener("keydown", e => { if (e.key === "Escape") open(false); });
   $("button", tip).onclick = () => tip.classList.remove("on");
