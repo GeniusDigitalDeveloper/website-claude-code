@@ -1113,6 +1113,16 @@ body.pray-off #pray,body.pray-off #nxp,body.pray-off #praypop,body.pray-off sect
 /* ===== V-103: chatbot: buka/tutup ala iOS ===== */
 #cbpanel{will-change:transform,opacity}
 #cbfab{transition:transform .35s cubic-bezier(.32,.72,0,1)}#cbfab:active{transform:scale(.88)}#cbfab[aria-expanded=true]{transform:scale(.94)}
+
+/* ===== V-104: maksimum 5 produk sebaris; baris seterusnya bersambung melalui garis di kiri ===== */
+.cbo-row.multi{grid-template-columns:repeat(5,minmax(0,1fr));padding-left:14px;gap:0;margin-bottom:12px}
+.cbo-row.multi.last{margin-bottom:0}
+.cbo-row.multi .cbo-node{margin:0 4px}
+.cbo-row.multi .cbo-bar{left:0;right:calc((100% - 14px) * (5.5 - var(--k)) / 5)}
+.cbo-row.multi::before{content:"";position:absolute;left:0;top:0;bottom:-12px;width:3px;border-radius:3px;background:rgba(125,211,252,.28)}
+.cbo-row.multi.last::before{bottom:auto;height:3px}
+.cbo-row.multi .cbo-lg{width:min(78px,76%)}
+@media(max-width:520px){.cbo-row.multi{padding-left:10px}.cbo-row.multi .cbo-bar{right:calc((100% - 10px) * (5.5 - var(--k)) / 5)}.cbo-row.multi .cbo-node{margin:0 2px;padding:8px 2px 7px;border-radius:12px}.cbo-row.multi .cbo-node b{font-size:9px;line-height:1.2}.cbo-row.multi .cbo-lg{width:80%;border-radius:12px}}
 </style>
 </head>
 <body>
@@ -2604,11 +2614,12 @@ function collabImg(u) {
   return u.startsWith("/assets/") ? u : safeUrl(u);
 }
 function collabInner() {
-  const m = COLLAB.main, mu = safeUrl(m.url), mi = collabImg(m.logo), n = Math.max(1, COLLAB.items.length);
+  const m = COLLAB.main, mu = safeUrl(m.url), mi = collabImg(m.logo), PER = 5;
   const tile = x => { const u = safeUrl(x.url), im = collabImg(x.logo), tag = u ? "a" : "div"; return `<${tag} class="cbo-node" ${u ? `href="${esc(u)}" target="_blank" rel="noopener noreferrer"` : ""} aria-label="${esc(x.name)}"><span class="cbo-drop" aria-hidden="true"></span><span class="cbo-lg">${im ? `<img src="${esc(im)}" alt="" loading="lazy" decoding="async">` : `<span class="cbx-ph">${ic("layers", "w-6 h-6")}</span>`}</span><b>${esc(x.name)}</b></${tag}>`; };
-  return `<div class="cbo" style="--n:${n}"><${mu ? "a" : "div"} class="cbo-main" ${mu ? `href="${esc(mu)}" target="_blank" rel="noopener noreferrer"` : ""} aria-label="${esc(m.title || "")}"><span class="cbo-logo">${mi ? `<img src="${esc(mi)}" alt="">` : ""}</span><b>${esc(m.title || "")}</b></${mu ? "a" : "div"}>
-    <div class="cbo-stem" aria-hidden="true"><i></i><span class="cbo-pill">${esc(m.sub || "Produk Kami")}</span></div>
-    <div class="cbo-row">${COLLAB.items.length > 1 ? `<div class="cbo-bar" aria-hidden="true"><i></i><i></i></div>` : ""}${COLLAB.items.map(tile).join("")}</div></div>`;
+  const rows = []; for (let i = 0; i < COLLAB.items.length; i += PER) rows.push(COLLAB.items.slice(i, i + PER)); const multi = rows.length > 1;
+  const rowsHtml = rows.map((r, ri) => `<div class="cbo-row${multi ? " multi" : ""}${ri === rows.length - 1 ? " last" : ""}" style="--k:${r.length};--n:${multi ? PER : r.length}">${multi || r.length > 1 ? `<div class="cbo-bar" aria-hidden="true"><i></i><i></i></div>` : ""}${r.map(tile).join("")}</div>`).join("");
+  return `<div class="cbo"><${mu ? "a" : "div"} class="cbo-main" ${mu ? `href="${esc(mu)}" target="_blank" rel="noopener noreferrer"` : ""} aria-label="${esc(m.title || "")}"><span class="cbo-logo">${mi ? `<img src="${esc(mi)}" alt="">` : ""}</span><b>${esc(m.title || "")}</b></${mu ? "a" : "div"}>
+    <div class="cbo-stem" aria-hidden="true"><i></i><span class="cbo-pill">${esc(m.sub || "Produk Kami")}</span></div>${rowsHtml}</div>`;
 }
 function collabTab() {
   $("#pane").innerHTML = `<section class="cbx" id="collab-box" aria-label="Kolaborasi"></section>`;
@@ -3418,7 +3429,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-103";
+const APP_VERSION = "V-104";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
