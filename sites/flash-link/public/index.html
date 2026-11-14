@@ -1025,6 +1025,15 @@ button.nxp:hover{transform:translateY(-2px);box-shadow:0 20px 38px -16px rgba(56
 @media(min-width:761px){.b3-in{padding-left:2px!important}.b3-l{padding-left:0!important}}
 .pz-hl{animation:pzHl 2.2s ease-out}
 @keyframes pzHl{0%,100%{box-shadow:0 34px 60px -34px rgba(0,0,0,.9),inset 0 0 0 1.5px rgba(255,255,255,.14)}30%{box-shadow:0 0 0 4px rgba(125,211,252,.85),0 0 46px 6px rgba(56,189,248,.65),inset 0 0 0 1.5px rgba(255,255,255,.3)}}
+
+/* ===== V-91: 1 minit terakhir sebelum waktu solat: kelip gradien biru + hijau sehingga pop-up azan dipangkah ===== */
+.nxp,.pray-tv{position:relative}
+.nxp.alert::after,.pray-tv.alert::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(120deg,rgba(56,189,248,.75),rgba(52,211,153,.75) 50%,rgba(14,165,233,.7));mix-blend-mode:screen;opacity:0;animation:alFlash 1.1s ease-in-out infinite;z-index:3}
+.nxp.alert{animation:alGlow 1.1s ease-in-out infinite}.pray-tv.alert{animation:alGlow 1.1s ease-in-out infinite}
+.nxp.alert10::after,.pray-tv.alert10::after,.nxp.alert10,.pray-tv.alert10{animation-duration:.45s}
+@keyframes alFlash{0%,100%{opacity:0}50%{opacity:.9}}
+@keyframes alGlow{0%,100%{box-shadow:0 0 0 0 rgba(56,189,248,0),0 0 0 rgba(52,211,153,0)}50%{box-shadow:0 0 0 3px rgba(56,189,248,.9),0 0 34px 8px rgba(52,211,153,.75)}}
+@media(prefers-reduced-motion:reduce){.nxp.alert,.pray-tv.alert,.nxp.alert::after,.pray-tv.alert::after{animation:none}.nxp.alert,.pray-tv.alert{box-shadow:0 0 0 3px rgba(52,211,153,.9),0 0 24px 4px rgba(56,189,248,.7)}}
 </style>
 </head>
 <body>
@@ -1823,7 +1832,11 @@ function scrollPray() {
 }
 function tickNext() {
   const el = $("#nxp"); if (!el) return; if (!PR.times) { el.hidden = true; return; } el.hidden = false;
-  const { ni, diff } = prayIdx(), name = ({ asr: "ASAR", isha: "ISYAK", dhuhr: "ZUHUR", fajr: "SUBUH", maghrib: "MAGHRIB" }[PRAY_N[ni][0]] || PRAY_N[ni][1].toUpperCase()) + ":", n = $("#nx-n", el); if (n.textContent !== name) n.textContent = name;
+  const { ni, diff } = prayIdx();
+  const now = Date.now(); if (diff <= 60 || $("#praypop")) PR.alAt = now; if (diff <= 10) PR.al10 = now;
+  const on = PR.alAt && now - PR.alAt < 3000, fast = on && PR.al10 && now - PR.al10 < 14000;
+  [el, $(".pray-tv")].forEach(e => { if (!e) return; e.classList.toggle("alert", !!on); e.classList.toggle("alert10", !!fast); });
+  const name = ({ asr: "ASAR", isha: "ISYAK", dhuhr: "ZUHUR", fajr: "SUBUH", maghrib: "MAGHRIB" }[PRAY_N[ni][0]] || PRAY_N[ni][1].toUpperCase()) + ":", n = $("#nx-n", el); if (n.textContent !== name) n.textContent = name;
   const str = hms(diff), d = $("#nx-d", el); if (d.dataset.len !== String(str.length)) { d.innerHTML = str.split("").map(c => (c === ":" ? '<i class="nx-c">:</i>' : '<span class="dg"><b>' + c + "</b></span>")).join(""); d.dataset.len = String(str.length); }
   const chars = str.replace(/:/g, ""); $$(".dg b", d).forEach((b, i) => { if (b.textContent !== chars[i]) { b.textContent = chars[i]; if (!REDUCE()) b.animate([{ transform: "translateY(-70%)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 340, easing: EASE }); } });
 }
@@ -3302,7 +3315,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-90";
+const APP_VERSION = "V-91";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
