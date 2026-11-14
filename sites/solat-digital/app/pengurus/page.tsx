@@ -68,8 +68,8 @@ function AuthForm() {
           <L id="mn">Nama pengurus / pegawai masjid</L><input id="mn" className="inp" value={f.managerName} onChange={(e) => set({ managerName: e.target.value })} required />
           <ZonePicker zone={f.zone} onChange={(z) => set({ zone: z, state: ZONES.find((x) => x[0] === z)![1] })} idp="reg" />
         </>)}
-        <L id="em">Emel masjid / pengurus (untuk log masuk)</L><input id="em" type="email" autoComplete="username" name="email" className="inp" value={f.email} onChange={(e) => set({ email: e.target.value })} required />
-        <L id="pw">Kata laluan</L><PasswordInput id="pw" autoComplete={mode === "in" ? "current-password" : "new-password"} minLength={6} value={f.pw} onChange={(v) => set({ pw: v })} />
+        <L id="em">Emel masjid / pengurus (untuk log masuk)</L><input id="em" type="email" autoComplete="off" name="mosque-email" className="inp" value={f.email} onChange={(e) => set({ email: e.target.value })} required />
+        <L id="pw">Kata laluan</L><PasswordInput id="pw" autoComplete="new-password" minLength={6} value={f.pw} onChange={(v) => set({ pw: v })} />
         {err && <p role="alert" className="mt-3 text-danger">{err}</p>}{info && <p role="status" className="mt-3 text-accent">{info}</p>}
         <button className="btn btn-primary mt-5 w-full justify-center" disabled={busy}>{busy ? "Sila tunggu…" : mode === "in" ? "Log masuk" : "Daftar"}</button>
         <div className="mt-4 flex flex-wrap justify-between gap-2 text-sm">
@@ -89,19 +89,24 @@ function Panel({ uidv }: { uidv: string }) {
   const [tv, setTv] = useState<TvDoc | null>(null); const [draft, setDraft] = useState<TvDoc | null>(null);
   const [imgs, setImgs] = useState<{ id: string; data: string }[]>([]);
   const [toast, setToast] = useState(""); const [txt, setTxt] = useState(""); const [dirty, setDirty] = useState(false);
-  const [sec, setSec] = useState<Sec>("dash"); const [unread, setUnread] = useState(0); const [ntoast, setNtoast] = useState(false); const prevUnread = useRef(0); const secRef = useRef<Sec>("dash");
+  const [noDoc, setNoDoc] = useState(false); const [sec, setSec] = useState<Sec>("dash"); const [unread, setUnread] = useState(0); const [ntoast, setNtoast] = useState(false); const prevUnread = useRef(0); const secRef = useRef<Sec>("dash");
   useEffect(() => { secRef.current = sec; if (sec === "notif") setNtoast(false); }, [sec]);
   const lib = useAzanLibrary(); const pwa = usePwaInstall(); const file = useRef<HTMLInputElement>(null);
   const { raw, eff } = useDefaults(uidv); const pf = { styleEditor: true, slides: true, announcements: true, images: true, theme: true, ...(eff.panel ?? {}) };
   useEffect(() => {
-    const u1 = onSnapshot(doc(db, "tv", uidv), (s) => { const d = s.data() as TvDoc | undefined; if (d) { setTv(d); setDraft((x) => x ?? d); } });
+    const u1 = onSnapshot(doc(db, "tv", uidv), (s) => { const d = s.data() as TvDoc | undefined; if (d) { setNoDoc(false); setTv(d); setDraft((x) => x ?? d); try { localStorage.setItem("sd_last_m", uidv); } catch {} } else setNoDoc(true); });
     const u2 = onSnapshot(query(collection(db, "tv", uidv, "img"), orderBy("order")), (s) => setImgs(s.docs.map((d) => ({ id: d.id, data: d.data().data }))));
     const u3 = onSnapshot(doc(db, "chats", uidv), (s) => { const n = (s.data()?.unreadMasjid as number) || 0; setUnread(n); if (n > prevUnread.current && secRef.current !== "notif") { setNtoast(true); chatSfx("recv"); } prevUnread.current = n; }, () => {});
     return () => { u1(); u2(); u3(); };
   }, [uidv]);
-  useEffect(() => { try { localStorage.setItem("sd_last_m", uidv); } catch {} }, [uidv]);
   useEffect(() => { window.__sdBusy = dirty; return () => { window.__sdBusy = false; }; }, [dirty]);
   const flash = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2800); };
+  if (noDoc) return (
+    <main className="mx-auto grid min-h-dvh max-w-md content-center px-4"><div className="card text-center">
+      <img src="/logo.png" alt="Solat Digital" className="mx-auto mb-3 h-20 w-auto" />
+      <h1 className="text-xl font-extrabold">Akaun ini belum didaftarkan sebagai masjid</h1>
+      <p className="mt-2 text-sm text-sub">Log keluar, kemudian pilih <b>Daftar masjid</b> menggunakan emel masjid atau pengurus.</p>
+      <button className="btn btn-danger mt-5 w-full justify-center" onClick={() => signOut(auth)}><LogOut size={18} /> Log keluar</button></div></main>);
   if (!tv || !draft) return <p className="p-8">Memuatkan…</p>;
   const up = (p: Partial<TvDoc>) => { setDraft({ ...draft, ...p }); setDirty(true); };
   const live = (p: Partial<TvDoc>) => { setDraft((d) => (d ? { ...d, ...p } : d)); updateDoc(doc(db, "tv", uidv), { ...p, updatedAt: Date.now() }).catch(() => flash("Gagal kemas kini.")); };

@@ -13,7 +13,11 @@ const config = {
   appId: "1:743274540051:web:99ab2749c1ec73f01223e6",
   databaseURL: "https://solat-digital-my-default-rtdb.firebaseio.com",
 };
-const app = getApps()[0] ?? initializeApp(config);
+// Panel Owner (/super) guna aplikasi Firebase berasingan supaya sesi log masuknya TIDAK bercampur dengan panel masjid / TV
+// (kedua-duanya satu alamat web; tanpa pengasingan, akaun Owner boleh "terlog masuk" pada panel masjid).
+const isOwnerPanel = typeof location !== "undefined" && location.pathname.startsWith("/super");
+const appName = isOwnerPanel ? "owner" : "[DEFAULT]";
+const app = getApps().find((a) => a.name === appName) ?? (isOwnerPanel ? initializeApp(config, "owner") : initializeApp(config));
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const rtdb = getDatabase(app);
