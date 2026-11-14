@@ -1012,6 +1012,19 @@ a.cbx-main:hover .cbx-logo,a.cbx-it:hover .cbx-lg{transform:scale(1.05) translat
 @keyframes nxBlink{50%{opacity:.35}}
 @media(prefers-reduced-motion:reduce){.nx-c{animation:none}}
 @media(max-width:520px){.nxp{min-width:136px;padding:7px 12px 9px}.nx-d .dg{width:18px;height:28px}.nx-d .dg b{font-size:16px}}
+
+/* ===== V-90: kotak waktu solat boleh diklik; di dashboard (sebelah logo, sempadan hitam) ===== */
+button.nxp{font:inherit;color:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;transition:transform .35s cubic-bezier(.32,.72,0,1),box-shadow .3s}
+button.nxp[hidden]{display:none}
+button.nxp:hover{transform:translateY(-2px);box-shadow:0 20px 38px -16px rgba(56,189,248,.55),inset 0 1px 0 rgba(255,255,255,.5)}button.nxp:active{transform:scale(.97)}
+.nx-n,.nx-d{display:flex;justify-content:center}.nx-n{display:block}
+.dtop-in{height:66px;gap:14px;justify-content:flex-start}.dtop-in .dlogo{margin-right:2px;flex:none}.dtop-act{margin-left:auto}
+.dtop .nxp{min-width:0;padding:3px 12px 5px;border-radius:14px;border:1.5px solid #000;box-shadow:0 8px 18px -10px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.4)}
+.dtop .nx-n{font-size:10.5px;letter-spacing:.14em;line-height:1.3}.dtop .nx-d{margin-top:2px;gap:2px}.dtop .nx-d .dg{width:16px;height:24px;border-radius:6px}.dtop .nx-d .dg b{font-size:14px}
+@media(max-width:520px){.dtop-in{padding:0 8px;gap:8px}.dtop .nxp{padding:2px 7px 4px}.dtop .nx-d .dg{width:13px;height:21px}.dtop .nx-d .dg b{font-size:12px}.dtop .nx-n{font-size:9px}}
+@media(min-width:761px){.b3-in{padding-left:2px!important}.b3-l{padding-left:0!important}}
+.pz-hl{animation:pzHl 2.2s ease-out}
+@keyframes pzHl{0%,100%{box-shadow:0 34px 60px -34px rgba(0,0,0,.9),inset 0 0 0 1.5px rgba(255,255,255,.14)}30%{box-shadow:0 0 0 4px rgba(125,211,252,.85),0 0 46px 6px rgba(56,189,248,.65),inset 0 0 0 1.5px rgba(255,255,255,.3)}}
 </style>
 </head>
 <body>
@@ -1804,6 +1817,10 @@ async function syncClock() {
   CLK.busy = false;
 }
 function clockHtml(cls = "") { return `<div class="fl-clock ${cls}" role="timer" aria-label="Masa Malaysia"><b class="ck-t">--:--</b><span class="ck-d"></span></div>`; }
+function scrollPray() {
+  const el = $("#pray"); if (!el) return; el.scrollIntoView({ behavior: REDUCE() ? "auto" : "smooth", block: "center" });
+  const tv = $(".pray-tv", el); if (tv) { tv.classList.remove("pz-hl"); void tv.offsetWidth; tv.classList.add("pz-hl"); setTimeout(() => tv.classList.remove("pz-hl"), 2200); }
+}
 function tickNext() {
   const el = $("#nxp"); if (!el) return; if (!PR.times) { el.hidden = true; return; } el.hidden = false;
   const { ni, diff } = prayIdx(), name = ({ asr: "ASAR", isha: "ISYAK", dhuhr: "ZUHUR", fajr: "SUBUH", maghrib: "MAGHRIB" }[PRAY_N[ni][0]] || PRAY_N[ni][1].toUpperCase()) + ":", n = $("#nx-n", el); if (n.textContent !== name) n.textContent = name;
@@ -2180,7 +2197,7 @@ function landing() {
     <div class="b3-zone b3-c"><span class="b3-title gradtxt">Satu pautan. Semua jualan.</span><small>WhatsApp · Shopee · TikTok Shop · YouTube</small></div>
     <div class="b3-zone b3-r">${langSwitch()}${clockHtml("ck-ban")}<div class="b3-btns">${logged ? `<a class="btn btn-red btn-sm" href="/dashboard" data-nav>Mula sekarang</a>` : `<span class="cta-box cta-sm"><a class="btn btn-red btn-sm" href="/login?new=1" data-nav>Mula sekarang</a><small>(Pengguna baharu sahaja)</small></span>`}</div><span class="b3-note">Sentiasa dikemas kini</span></div>
   </div></div>
-  <div class="nxp-w"><div class="nxp" id="nxp" role="timer" aria-label="Waktu solat akan datang" hidden><div class="nx-n" id="nx-n" translate="no"></div><div class="nx-d" id="nx-d" translate="no"></div></div></div>
+  <div class="nxp-w"><button type="button" class="nxp" id="nxp" aria-label="Waktu solat akan datang. Tekan untuk lihat waktu solat penuh" hidden><span class="nx-n" id="nx-n" translate="no"></span><span class="nx-d" id="nx-d" translate="no"></span></button></div>
   <main>
   <section style="position:relative;padding:40px 0 72px">
     <div class="container" style="position:relative;display:grid;gap:40px;align-items:center" id="hero-grid">
@@ -2206,6 +2223,8 @@ function landing() {
   $$("#hero-devs .iscreen").forEach(el => (el.innerHTML = demo)); $$("#hero-devs .lap-scale").forEach(el => (el.innerHTML = demo)); fitLaptop(); tickClock(); armReveal($("#hero-devs"));
   const mq = matchMedia("(min-width:900px)"); const g = $("#hero-grid"); const fit = () => (g.style.gridTemplateColumns = mq.matches ? "minmax(0,1fr) minmax(0,1fr)" : "minmax(0,1fr)"); fit(); mq.addEventListener("change", fit);
   revealInit(); parallaxInit(); fillStat(); sfxScope(true); initPray();
+  if ($("#nxp")) $("#nxp").onclick = scrollPray;
+  try { if (sessionStorage.getItem("fl_gopray")) { sessionStorage.removeItem("fl_gopray"); setTimeout(scrollPray, 900); } } catch {}
 }
 function revealInit() {
   const els = $$("[data-fx]");
@@ -2488,12 +2507,14 @@ function collabTab() {
 function dashboard() {
   { const x = $("#praypop .pp-x"); if (x) x.click(); }
   const url = profileUrl(S.profile.username);
-  $("#app").innerHTML = `<header class="dtop"><div class="dtop-in"><button id="hm" aria-label="Design" class="dlogo"><img src="/assets/logo-2x.png" alt="Genius Digital Flash Link" width="110" height="55"></button>
+  $("#app").innerHTML = `<header class="dtop"><div class="dtop-in"><button id="hm" aria-label="Design" class="dlogo"><img src="/assets/logo-2x.png" alt="Genius Digital Flash Link" width="110" height="55"></button><button type="button" class="nxp" id="nxp" aria-label="Waktu solat akan datang. Tekan untuk lihat waktu solat penuh" hidden><span class="nx-n" id="nx-n" translate="no"></span><span class="nx-d" id="nx-d" translate="no"></span></button>
     <div id="dhead-actions" class="dtop-act">${langSwitch()}<button id="cp" class="btn btn-red btn-sm" aria-label="Salin pautan">${ic("copy", "w-4 h-4")}<span class="hidden sm:inline">Salin pautan</span></button><a class="btn btn-ghost btn-sm" href="${esc(url)}" target="_blank" rel="noopener" aria-label="Buka halaman awam">${ic("ext", "w-4 h-4")}<span class="hidden sm:inline">Halaman saya</span></a><a id="gohome" class="btn btn-ghost btn-sm" href="/" data-nav aria-label="Laman utama">${ic("home", "w-4 h-4")}<span class="hidden sm:inline">Laman utama</span></a><button id="lo" class="btn btn-ghost btn-sm" aria-label="Log keluar">${ic("logout", "w-4 h-4")}</button></div>${clockHtml("ck-head")}</div></header>
   <div class="dsh"><nav class="dnav" aria-label="Menu dashboard">${NAV.map(x => `<button class="dnav-i" data-k="${x.k}" aria-label="${x.n}">${ic(x.i, "w-5 h-5")}<span>${x.n}</span></button>`).join("")}</nav>
     <main id="stage" class="dmain"></main><aside class="dprev" id="dprev"></aside></div>
   <button id="pvb" class="btn btn-red pvfab on">${ic("phone", "w-5 h-5")} Pratonton</button>
   ${siteFooter(false)}`;
+  if (!PR.times && !PR.busy) initPray();
+  $("#nxp").onclick = () => { try { sessionStorage.setItem("fl_gopray", "1"); } catch {} nav("/"); };
   tickClock(); $("#cp").onclick = () => copyText(url); $("#lo").onclick = () => { S.view = "design"; FB.signOut(auth); };
   $("#hm").onclick = () => openView("design");
   $$(".dnav-i").forEach(b => (b.onclick = () => { sfxUnlock().then(ok => ok && SFX.click()); openView(b.dataset.k); }));
@@ -3281,7 +3302,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-89";
+const APP_VERSION = "V-90";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
