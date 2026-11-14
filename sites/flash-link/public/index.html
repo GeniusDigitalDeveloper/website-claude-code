@@ -3520,7 +3520,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-106";
+const APP_VERSION = "V-107";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
