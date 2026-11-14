@@ -1061,6 +1061,9 @@ html.mlock,body.mlock{overflow:hidden!important;overscroll-behavior:none}
 .vwwrap{max-height:62vh;max-height:62dvh;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
 .vwwrap .mini.vw{height:auto!important;overflow:visible;pointer-events:auto;border-radius:0}
 .vwwrap .mini.vw .mini-in{height:auto;min-height:488px;overflow:visible}
+
+.vwwrap{scrollbar-gutter:stable;contain:layout paint}.vwwrap .mini.vw,.vwwrap .mini-in{animation:none!important;transition:none!important}
+.vwwrap .mini.vw *{animation:none!important}
 </style>
 </head>
 <body>
@@ -2470,8 +2473,8 @@ const saveProfile = debounce(async () => {
 const laptopFrame = () => `<div class="lap"><div class="lap-lid"><i class="lap-cam"></i><div class="lap-screen"><div class="lap-bar"><i></i><i></i><i></i><span class="lap-url">${esc(location.host)}/${esc(S.profile?.username || "nama-anda")}</span></div><div class="lap-view"><div class="lap-scale"></div></div></div></div><div class="lap-base"></div></div>`;
 const devsHtml = (cls = "") => `<div class="devs ${cls}"><div class="devs-lap">${laptopFrame()}</div><div class="devs-ph">${phoneFrame("", "")}</div></div>`;
 function fitLaptop() { $$(".lap-scale .fl-root").forEach(r => r.classList.add("fl-wide")); $$(".lap-view").forEach(v => { if (!v.clientWidth) return; const k = v.clientWidth / 1280; v.style.height = Math.round(760 * k) + "px"; const sc = $(".lap-scale", v); if (sc) sc.style.zoom = k; if (!v._ro) { v._ro = new ResizeObserver(fitLaptop); v._ro.observe(v); } }); }
-const fitMini = m => { if (!m.clientWidth) return; const k = m.clientWidth / 375, i = $(".mini-in", m); m.style.height = Math.round(m.clientWidth * 1.3) + "px"; if (i) i.style.zoom = k; };
-function fitMinis() { $$(".mini").forEach(m => { if (!m._ro) { m._ro = new ResizeObserver(() => fitMini(m)); m._ro.observe(m); } fitMini(m); }); }
+const fitMini = m => { if (!m.clientWidth) return; const k = m.clientWidth / 375, i = $(".mini-in", m); if (!m.classList.contains("vw")) m.style.height = Math.round(m.clientWidth * 1.3) + "px"; if (i && i.style.zoom !== String(k)) i.style.zoom = k; };
+function fitMinis() { $$(".mini").forEach(m => { if (!m._ro && !m.classList.contains("vw")) { m._ro = new ResizeObserver(() => fitMini(m)); m._ro.observe(m); } fitMini(m); }); }
 const fitDevs = () => { const ps = innerWidth >= 1180 ? Math.max(.5, Math.min(.82, (innerHeight - 470) / 604)) : Math.max(.5, Math.min(.82, (innerWidth - 56) / 420)); $$(".dprev .devs").forEach(d => d.style.setProperty("--ps", ps.toFixed(3))); };
 addEventListener("resize", () => { fitDevs(); fitLaptop(); fitMinis(); });
 function armReveal(host) {
@@ -2623,7 +2626,7 @@ const withDesign = d => ({ ...S.profile, template: d.template, profileStyle: d.p
 const miniHtml = pr => { IMGMODE.thumb = true; try { return `<div class="mini-in">${renderProfile(pr, S.links, { preview: true, anim: false })}</div>`; } finally { IMGMODE.thumb = false; } };
 function viewModal(pr, title, sub, btns) {
   const m = modal(`<h2 class="font-display" style="font-size:20px;font-weight:700;margin:0 0 2px">${esc(title)}</h2><p class="hint" style="margin:0 0 10px">${sub}</p><div class="vwwrap"><div class="mini vw"></div></div><div style="display:flex;gap:10px;margin-top:14px">${btns.map(b => `<button class="btn ${b.cls || "btn-red"}" id="${b.id}" style="flex:1;min-height:48px">${b.t}</button>`).join("")}</div>`, bg => {
-    const mn = $(".mini.vw", bg); mn.innerHTML = miniHtml(pr); fitMinis(); requestAnimationFrame(fitMinis); hydrateImages && 0;
+    const mn = $(".mini.vw", bg); mn.innerHTML = miniHtml(pr); fitMinis(); requestAnimationFrame(fitMinis); setTimeout(fitMinis, 450); hydrateImages && 0;
     btns.forEach(b => ($("#" + b.id, bg).onclick = () => { bg.close(); b.go(); }));
   }, { cls: "ctr" });
   return m;
@@ -3347,7 +3350,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-93";
+const APP_VERSION = "V-94";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
