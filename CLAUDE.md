@@ -126,6 +126,6 @@ Projek `sites/solat-digital/` (Firebase projek `solat-digital-my`, BUKAN Flash L
 3. Hanya jika cangkerang Electron (`sites/solat-digital/desktop/`) berubah, push untuk bina semula .exe (workflow `solat-digital-exe.yml`, tag `solat-digital-latest`).
 4. Commit dan push ke branch semasa (tiada PR melainkan diminta).
 5. **Selepas SETIAP kemas kini, hantar semula 3 pautan kepada ustaz:**
-   - TV awam: https://solat-digital-my.web.app/
-   - Admin masjid: https://solat-digital-my.web.app/pengurus/
-   - Admin Solat Digital: https://solat-digital-my.web.app/super/
+   - Solat Digital (TV): https://solat-digital-my.web.app/
+   - Solat Digital (Pengurus Masjid): https://solat-digital-my.web.app/pengurus/
+   - Solat Digital (Admin Owner): https://solat-digital-my.web.app/super/

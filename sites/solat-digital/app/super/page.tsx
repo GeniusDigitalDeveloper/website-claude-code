@@ -15,11 +15,11 @@ const L = ({ id, children }: { id: string; children: React.ReactNode }) => <labe
 const Stat = ({ icon, label, v }: { icon: React.ReactNode; label: string; v: number | string }) => <div className="card"><div className="flex items-center gap-2 text-sm text-sub">{icon}{label}</div><div className="mt-2 text-3xl font-extrabold tabular-nums">{v}</div></div>;
 
 function Login({ denied }: { denied: boolean }) {
-  const [e, setE] = useState(""); const [p, setP] = useState(""); const [err, setErr] = useState(denied ? "Akaun ini bukan admin Solat Digital." : "");
+  const [e, setE] = useState(""); const [p, setP] = useState(""); const [err, setErr] = useState(denied ? "Akaun ini bukan Owner Solat Digital." : "");
   return (
     <main className="mx-auto grid min-h-dvh max-w-sm content-center px-4">
       <form className="card" onSubmit={async (ev) => { ev.preventDefault(); setErr(""); try { await signInWithEmailAndPassword(auth, e.trim(), p); } catch (x) { setErr(authMsg(x)); } }}>
-        <img src="/logo.png" alt="Solat Digital" className="mx-auto mb-2 h-24 w-auto" /><h1 className="mt-2 text-2xl font-extrabold">Admin Solat Digital</h1><p className="text-sm text-sub">Log masuk admin utama sahaja.</p>
+        <img src="/logo.png" alt="Solat Digital" className="mx-auto mb-2 h-24 w-auto" /><h1 className="mt-2 text-2xl font-extrabold">Solat Digital (Admin Owner)</h1><p className="text-sm text-sub">Log masuk Owner sahaja.</p>
         <L id="e">Emel</L><input id="e" type="email" className="inp" value={e} onChange={(x) => setE(x.target.value)} required />
         <L id="p">Kata laluan</L><PasswordInput id="p" autoComplete="current-password" value={p} onChange={setP} />
         {err && <p role="alert" className="mt-3 text-danger">{err}</p>}
@@ -108,8 +108,8 @@ function Dashboard() {
   const week = rows.filter((r) => now - r.createdAt < 7 * 864e5).length;
   return (
     <main className="mx-auto max-w-6xl px-4 py-6">
-      <header className="flex flex-wrap items-center justify-between gap-3"><div className="flex items-center gap-3"><img src="/logo.png" alt="Solat Digital" className="h-12 w-auto" /><div><h1 className="text-2xl font-extrabold md:text-3xl">Admin Solat Digital</h1><p className="text-sm text-sub">Admin utama. Hanya data pendaftaran dipaparkan; tiada akses ke akaun masjid.</p></div></div>
-        <div className="flex gap-2"><a className="btn" href="https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/solat-digital-latest/SolatDigital-Admin-Setup.exe"><Download size={18} /> Aplikasi (.exe)</a>{pwa.canInstall && <button className="btn btn-primary" onClick={pwa.install}><Download size={18} /> Pasang aplikasi</button>}<button className="btn" aria-label="Log keluar" onClick={() => signOut(auth)}><LogOut size={18} /></button></div></header>
+      <header className="flex flex-wrap items-center justify-between gap-3"><div className="flex items-center gap-3"><img src="/logo.png" alt="Solat Digital" className="h-12 w-auto" /><div><h1 className="text-2xl font-extrabold md:text-3xl">Solat Digital (Admin Owner)</h1><p className="text-sm text-sub">Owner sistem. Hanya data pendaftaran dipaparkan; tiada akses ke akaun masjid.</p></div></div>
+        <div className="flex gap-2"><a className="btn" href="https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/solat-digital-latest/SolatDigital-Admin-Setup.exe"><Download size={18} /> Muat turun (.exe)</a>{pwa.canInstall && <button className="btn btn-primary" onClick={pwa.install}><Download size={18} /> Pasang aplikasi</button>}<button className="btn" aria-label="Log keluar" onClick={() => signOut(auth)}><LogOut size={18} /></button></div></header>
       <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Stat icon={<Building2 size={16} />} label="Masjid berdaftar" v={rows.length} /><Stat icon={<Users size={16} />} label="Akaun admin masjid" v={rows.length} />
         <Stat icon={<ShieldCheck size={16} />} label="Akses penuh / demo" v={`${rows.filter((r) => r.plan === "full").length} / ${rows.filter((r) => r.plan !== "full").length}`} /><Stat icon={<Radio size={16} />} label="TV dalam talian" v={rows.filter((r) => online(r.id)).length} />

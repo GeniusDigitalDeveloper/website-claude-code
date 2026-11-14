@@ -51,7 +51,7 @@ function AuthForm() {
     <main className="mx-auto grid min-h-dvh max-w-md content-center px-4 py-10">
       <img src="/logo.png" alt="Solat Digital" className="mx-auto mb-4 h-24 w-auto" />
       <form className="card" onSubmit={submit}>
-        <h1 className="text-2xl font-extrabold">{mode === "in" ? "Log masuk Pengurus Masjid" : "Daftar akaun masjid"}</h1>
+        <h1 className="text-2xl font-extrabold">Solat Digital (Pengurus Masjid)</h1><p className="mt-1 font-semibold">{mode === "in" ? "Log masuk" : "Daftar akaun masjid"}</p>
         <p className="mt-1 text-sm text-sub">{mode === "in" ? "Urus paparan TV masjid anda." : "Setiap masjid hanya daftar sekali. Selepas daftar, anda terus masuk ke panel."}</p>
         {mode === "up" && (<>
           <L id="nm">Nama masjid / surau</L><input id="nm" className="inp" value={f.name} onChange={(e) => set({ name: e.target.value })} required />
@@ -113,16 +113,16 @@ function Panel({ uidv }: { uidv: string }) {
         <div className="flex min-w-0 items-center gap-3"><img src="/logo.png" alt="Solat Digital" className="h-12 w-auto" /><div className="min-w-0"><h1 className="break-words text-xl font-extrabold md:text-2xl">{tv.name}</h1><span className={`chip ${tv.plan === "full" ? "chip-ok" : "chip-demo"}`}>{tv.plan === "full" ? <><CheckCircle2 size={14} /> Akses penuh (seumur hidup)</> : "Mod demo"}</span></div></div>
         <div className="flex gap-2"><a className="btn btn-primary" href={tvUrl} target="_blank" rel="noreferrer"><MonitorPlay size={18} /> Buka TV</a><button className="btn" aria-label="Log keluar" onClick={() => signOut(auth)}><LogOut size={18} /></button></div>
       </header>
-      {tv.plan !== "full" && <div className="card mt-5 border-yellow-500/50" role="note"><b>Akaun anda masih mod demo.</b> Pop-up dan azan waktu solat belum aktif. Langgan sekali sahaja (bayaran sekali, akses penuh seumur hidup) dan admin Solat Digital akan aktifkan akaun anda.</div>}
+      {tv.plan !== "full" && <div className="card mt-5 border-yellow-500/50" role="note"><b>Akaun anda masih mod demo.</b> Pop-up dan azan waktu solat belum aktif. Langgan sekali sahaja (bayaran sekali, akses penuh seumur hidup) dan Owner Solat Digital akan aktifkan akaun anda.</div>}
 
       <section className="card mt-5"><h2 className="text-lg font-bold">Pasang aplikasi dan sambung TV</h2>
         <p className="mt-1 text-sm text-sub">Pautan TV masjid anda. Buka pada TV, ia terus memaparkan waktu solat masjid anda dan sentiasa dipasang (tidak tidur, tidak tertutup) sehingga TV dimatikan.</p>
         <div className="mt-3 flex gap-2"><input readOnly className="inp" aria-label="Pautan TV" value={tvUrl} /><button className="btn" aria-label="Salin pautan" onClick={() => { navigator.clipboard?.writeText(tvUrl); flash("Pautan disalin."); }}><Copy size={18} /></button></div>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <a className="btn btn-primary justify-center" href={REL + "SolatDigital-TV-Setup.exe"}><Download size={18} /> Aplikasi TV (Windows .exe)</a>
-          <a className="btn btn-primary justify-center" href={REL + "SolatDigital-Pengurus-Setup.exe"}><Download size={18} /> Aplikasi Admin Masjid (.exe)</a>
+          <a className="btn btn-primary justify-center" href={REL + "SolatDigital-TV-Setup.exe"}><Download size={18} /> Solat Digital (TV) .exe</a>
+          <a className="btn btn-primary justify-center" href={REL + "SolatDigital-Pengurus-Setup.exe"}><Download size={18} /> Solat Digital (Pengurus Masjid) .exe</a>
         </div>
-        {pwa.canInstall && <button className="btn mt-3" onClick={pwa.install}><Download size={18} /> Pasang aplikasi admin pada peranti ini</button>}
+        {pwa.canInstall && <button className="btn mt-3" onClick={pwa.install}><Download size={18} /> Pasang Solat Digital (Pengurus Masjid) pada peranti ini</button>}
         {pwa.installed && <p className="mt-3 text-sm text-accent">Aplikasi sudah dipasang pada peranti ini.</p>}
         <p className="mt-3 text-sm text-sub">Android, iPhone, iPad dan Mac: buka pautan TV di pelayar, pilih Share atau menu pelayar, kemudian Add to Home Screen / Install app. Aplikasi TV .exe akan terus dibuka berskrin penuh dan bermula sendiri bila Windows dihidupkan.</p>
         <h3 className="mt-5 font-bold">Di mana butang pada skrin TV?</h3>
@@ -150,10 +150,10 @@ function Panel({ uidv }: { uidv: string }) {
           {!!defs.customFonts?.length && <optgroup label="Thuluth dan font tersuai">{defs.customFonts.map((c) => <option key={c.id} value={"custom:" + c.id}>{c.name}</option>)}</optgroup>}
         </select>
         <p lang="ar" dir="rtl" className="mt-3 rounded-xl bg-muted p-4 text-center text-4xl" style={{ fontFamily: `"${ensureArabicFont(draft.arabicFont || defs.arabicFont || "honorifics", defs.customFonts)}", "Arabic Honorifics Complete", serif`, lineHeight: 1.8 }}>الْفَجْرُ الظُّهْرُ الْجُمُعَةُ ﷺ</p>
-        <p className="mt-2 text-xs text-sub">Khat Thuluth: Arabic Honorifics Complete oleh eraduz, berdasarkan karya BaAlwi Heritage (ID), lesen CC BY 4.0 (ligatur ungkapan hormat seperti ﷺ). Huruf lain menggunakan sandaran berkaligrafi sehingga admin Solat Digital menambah font Thuluth huruf penuh.</p>
+        <p className="mt-2 text-xs text-sub">Khat Thuluth: Arabic Honorifics Complete oleh eraduz, berdasarkan karya BaAlwi Heritage (ID), lesen CC BY 4.0 (ligatur ungkapan hormat seperti ﷺ). Huruf lain menggunakan sandaran berkaligrafi sehingga Owner Solat Digital menambah font Thuluth huruf penuh.</p>
       </section>
 
-      <section className="card mt-5"><h2 className="text-lg font-bold">Azan</h2><p className="text-sm text-sub">Pilih azan daripada senarai admin Solat Digital. Kredit azan dipaparkan di TV.</p>
+      <section className="card mt-5"><h2 className="text-lg font-bold">Azan</h2><p className="text-sm text-sub">Pilih azan daripada senarai Owner Solat Digital. Kredit azan dipaparkan di TV.</p>
         <L id="az">Pilihan azan</L>
         <select id="az" className="inp" value={draft.azanId} onChange={(e) => up({ azanId: e.target.value })}><option value="">Lalai (Ustaz Asri / Furqan Fawaz)</option>{lib.map((a) => <option key={a.id} value={a.id}>{a.name} · {a.credit}</option>)}</select>
         {draft.azanId && lib.find((a) => a.id === draft.azanId) && <audio className="mt-3 w-full" controls preload="none" src={lib.find((a) => a.id === draft.azanId)!.url} />}

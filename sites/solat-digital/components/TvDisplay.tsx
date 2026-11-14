@@ -49,7 +49,7 @@ export default function TvDisplay({ m, mid, azan, extra, defaults }: { m: TvDoc;
   const day = useRef("");
   const rang = useRef<Set<string>>(new Set());
   const pre = Math.max(0, m.preMin ?? 5), delayS = Math.max(0, m.azanDelayMin ?? 0) * 60, vol = Math.max(5, m.volume ?? 100) / 100;
-  const azanOn = !m.azanMute; // senyap azan ditetapkan oleh admin masjid dalam panel (nada masuk waktu kekal berbunyi)
+  const azanOn = !m.azanMute; // senyap azan ditetapkan oleh Pengurus Masjid dalam panel (nada masuk waktu kekal berbunyi)
   const font = m.font || defaults?.font || "Plus Jakarta Sans";
   const arChoice = m.arabicFont || defaults?.arabicFont || "honorifics";
   const [arFam, setArFam] = useState("Arabic Honorifics Complete");

@@ -5,8 +5,8 @@ Sistem paparan waktu solat untuk TV masjid/surau. Firebase projek `solat-digital
 | Laluan | Aplikasi |
 |---|---|
 | `/` (`/?m=<id>`) | TV awam. Tanpa `m` = demo (tiada pop-up/azan, nota langganan sekali seumur hidup) |
-| `/pengurus/` | Admin masjid: daftar sekali, log masuk, tetapan, gambar latar, azan, pengumuman |
-| `/super/` | Admin Solat Digital (admin besar): senarai masjid, statistik, aktifkan akses penuh, perpustakaan azan |
+| `/pengurus/` | Solat Digital (Pengurus Masjid): daftar sekali, log masuk, tetapan, gambar latar, azan, pengumuman |
+| `/super/` | Solat Digital (Admin Owner), iaitu Owner sistem: senarai masjid, statistik, aktifkan akses penuh, perpustakaan azan |
 
 Setiap satu ialah PWA berasingan (butang Pasang aplikasi).
 
