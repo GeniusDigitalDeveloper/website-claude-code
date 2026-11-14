@@ -659,6 +659,15 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly(['email','displayName','createdAt','lastLogin','lang']);
       allow delete: if request.auth != null && request.auth.token.admin == true;
     }
+    // ===== V-81: teks keseluruhan + imej tapak (tambahan sahaja, khusus flashlink_) =====
+    match /flashlink_texts/{id} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null && request.auth.token.admin == true;
+    }
+    match /flashlink_site/{id} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null && request.auth.token.admin == true;
+    }
     // ===== TAMAT FLASH LINK RULES =====
   }
 }

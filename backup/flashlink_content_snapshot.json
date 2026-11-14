@@ -1,0 +1,134 @@
+{
+ "flashlink_collab": [
+  {
+   "name": "projects/genius-digital-40bc9/databases/(default)/documents/flashlink_collab/main",
+   "fields": {
+    "url": {
+     "stringValue": ""
+    },
+    "title": {
+     "stringValue": "Genius Digital"
+    },
+    "kind": {
+     "stringValue": "main"
+    },
+    "headline": {
+     "stringValue": "Kolaborasi Utama"
+    },
+    "updatedAt": {
+     "timestampValue": "2026-11-14T02:00:21.210Z"
+    },
+    "sub": {
+     "stringValue": "Produk Kami"
+    },
+    "logo": {
+     "stringValue": "/assets/collab-g.jpg"
+    }
+   },
+   "createTime": "2026-11-14T02:00:21.234949Z",
+   "updateTime": "2026-11-14T02:00:21.234949Z"
+  },
+  {
+   "name": "projects/genius-digital-40bc9/databases/(default)/documents/flashlink_collab/p_s1",
+   "fields": {
+    "kind": {
+     "stringValue": "product"
+    },
+    "logo": {
+     "stringValue": "/assets/collab-qr2.jpg"
+    },
+    "name": {
+     "stringValue": "QR ME Generator"
+    },
+    "updatedAt": {
+     "timestampValue": "2026-11-14T02:00:21.246Z"
+    },
+    "order": {
+     "integerValue": "4"
+    },
+    "url": {
+     "stringValue": ""
+    }
+   },
+   "createTime": "2026-11-14T02:00:21.308262Z",
+   "updateTime": "2026-11-14T02:15:42.538456Z"
+  },
+  {
+   "name": "projects/genius-digital-40bc9/databases/(default)/documents/flashlink_collab/p_s2",
+   "fields": {
+    "updatedAt": {
+     "timestampValue": "2026-11-14T02:00:21.320Z"
+    },
+    "kind": {
+     "stringValue": "product"
+    },
+    "order": {
+     "integerValue": "2"
+    },
+    "url": {
+     "stringValue": ""
+    },
+    "logo": {
+     "stringValue": "/assets/collab-interactive.jpg"
+    },
+    "name": {
+     "stringValue": "Interactive Link"
+    }
+   },
+   "createTime": "2026-11-14T02:00:21.342194Z",
+   "updateTime": "2026-11-14T02:15:45.646719Z"
+  },
+  {
+   "name": "projects/genius-digital-40bc9/databases/(default)/documents/flashlink_collab/p_s3",
+   "fields": {
+    "logo": {
+     "stringValue": "/assets/collab-hermes.jpg"
+    },
+    "name": {
+     "stringValue": "Hermes Agent for Dummies"
+    },
+    "order": {
+     "integerValue": "3"
+    },
+    "kind": {
+     "stringValue": "product"
+    },
+    "updatedAt": {
+     "timestampValue": "2026-11-14T02:00:21.354Z"
+    },
+    "url": {
+     "stringValue": ""
+    }
+   },
+   "createTime": "2026-11-14T02:00:21.368854Z",
+   "updateTime": "2026-11-14T02:15:45.678855Z"
+  },
+  {
+   "name": "projects/genius-digital-40bc9/databases/(default)/documents/flashlink_collab/p_s4",
+   "fields": {
+    "name": {
+     "stringValue": "Claude Code for Dummies"
+    },
+    "logo": {
+     "stringValue": "/assets/collab-claude.jpg"
+    },
+    "updatedAt": {
+     "timestampValue": "2026-11-14T02:00:21.375Z"
+    },
+    "order": {
+     "integerValue": "1"
+    },
+    "kind": {
+     "stringValue": "product"
+    },
+    "url": {
+     "stringValue": ""
+    }
+   },
+   "createTime": "2026-11-14T02:00:21.407731Z",
+   "updateTime": "2026-11-14T02:15:35.928807Z"
+  }
+ ],
+ "flashlink_texts": [],
+ "flashlink_site": []
+}
