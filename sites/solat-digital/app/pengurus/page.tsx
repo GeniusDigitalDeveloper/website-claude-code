@@ -7,6 +7,7 @@ import { CheckCircle2, Copy, Download, ImagePlus, LogOut, MonitorPlay, Plus, Sav
 import { auth, db } from "@/lib/firebase";
 import { ZONES } from "@/lib/zones";
 import ZonePicker from "@/components/ZonePicker";
+import PasswordInput from "@/components/PasswordInput";
 import { ARABIC_FONTS, type Defaults, DEMO_TV, FONTS, KIND_LABEL, SLIDE_ANIMS, type SlideItem, type TvDoc, uid } from "@/lib/types";
 import { DEFAULT_SLIDES } from "@/lib/defaultSlides";
 import { ensureArabicFont } from "@/lib/arabicFont";
@@ -60,7 +61,7 @@ function AuthForm() {
           <ZonePicker zone={f.zone} onChange={(z) => set({ zone: z, state: ZONES.find((x) => x[0] === z)![1] })} idp="reg" />
         </>)}
         <L id="em">Emel masjid / pengurus (untuk log masuk)</L><input id="em" type="email" autoComplete="email" className="inp" value={f.email} onChange={(e) => set({ email: e.target.value })} required />
-        <L id="pw">Kata laluan</L><input id="pw" type="password" autoComplete={mode === "in" ? "current-password" : "new-password"} minLength={6} className="inp" value={f.pw} onChange={(e) => set({ pw: e.target.value })} required />
+        <L id="pw">Kata laluan</L><PasswordInput id="pw" autoComplete={mode === "in" ? "current-password" : "new-password"} minLength={6} value={f.pw} onChange={(v) => set({ pw: v })} />
         {err && <p role="alert" className="mt-3 text-danger">{err}</p>}{info && <p role="status" className="mt-3 text-accent">{info}</p>}
         <button className="btn btn-primary mt-5 w-full justify-center" disabled={busy}>{busy ? "Sila tunggu…" : mode === "in" ? "Log masuk" : "Daftar"}</button>
         <div className="mt-4 flex flex-wrap justify-between gap-2 text-sm">
@@ -157,7 +158,7 @@ function Panel({ uidv }: { uidv: string }) {
         <select id="az" className="inp" value={draft.azanId} onChange={(e) => up({ azanId: e.target.value })}><option value="">Lalai (Ustaz Asri / Furqan Fawaz)</option>{lib.map((a) => <option key={a.id} value={a.id}>{a.name} · {a.credit}</option>)}</select>
         {draft.azanId && lib.find((a) => a.id === draft.azanId) && <audio className="mt-3 w-full" controls preload="none" src={lib.find((a) => a.id === draft.azanId)!.url} />}
         <div className="mt-4 flex items-center justify-between gap-3 rounded-xl bg-muted p-3"><div><b>Bunyi azan: {draft.azanMute ? "Senyap" : "Hidup"}</b><p className="text-xs text-sub">Senyap hanya mematikan laungan azan. Nada masuk waktu dan pop-up tetap berfungsi.</p></div>
-          <button type="button" role="switch" aria-checked={!draft.azanMute} aria-label="Bunyi azan" onClick={() => up({ azanMute: !draft.azanMute })} className={`relative h-8 w-14 shrink-0 rounded-full transition-colors ${draft.azanMute ? "bg-slate-400" : "bg-green-700"}`}><span className={`absolute top-1 size-6 rounded-full bg-white transition-transform ${draft.azanMute ? "left-1" : "translate-x-7 left-1"}`} /></button></div>
+          <button type="button" role="switch" aria-checked={!draft.azanMute} aria-label="Bunyi azan" onClick={() => up({ azanMute: !draft.azanMute })} className={`relative h-8 w-14 shrink-0 rounded-full transition-colors duration-300 ${draft.azanMute ? "bg-slate-400" : "bg-green-700"}`}><span className={`absolute left-1 top-1 size-6 rounded-full bg-white shadow transition-transform duration-500 ${draft.azanMute ? "" : "translate-x-6"}`} style={{ transitionTimingFunction: "var(--ease-ios)" }} /></button></div>
       </section>
 
       <section className="card mt-5"><h2 className="text-lg font-bold">Pemberitahuan sebelum azan dan Jumaat</h2><p className="text-sm text-sub">Kiraan detik, nada dan masa menunggu sebelum azan.</p>
@@ -208,7 +209,7 @@ function Panel({ uidv }: { uidv: string }) {
           <div><L id="sc">Saat setiap gambar</L><input id="sc" type="number" min={4} max={30} className="inp" value={draft.secs} onChange={(e) => up({ secs: Math.max(4, Math.min(30, +e.target.value || 10)) })} /></div></div>
       </section>
 
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-white/95 p-3 backdrop-blur"><div className="mx-auto flex max-w-3xl items-center justify-between gap-3"><span className="text-sm text-sub">{dirty ? "Ada perubahan belum disimpan" : "Semua perubahan disimpan"}</span><button className="btn btn-primary" disabled={!dirty} onClick={save}><Save size={18} /> Simpan</button></div></div>
+      <div className="bar-frost fixed inset-x-0 bottom-0 z-40 border-t border-white/60 p-3"><div className="mx-auto flex max-w-3xl items-center justify-between gap-3"><span className="text-sm text-sub">{dirty ? "Ada perubahan belum disimpan" : "Semua perubahan disimpan"}</span><button className="btn btn-primary" disabled={!dirty} onClick={save}><Save size={18} /> Simpan</button></div></div>
       {toast && <div className="toast" role="status">{toast}</div>}
     </main>
   );

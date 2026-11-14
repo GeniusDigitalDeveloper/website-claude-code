@@ -8,6 +8,7 @@ import { auth, db, rtdb } from "@/lib/firebase";
 import { ARABIC_FONTS, FONTS, type AzanDoc, type CustomFont, type Registry, type TvDoc } from "@/lib/types";
 import { authMsg, useUser } from "@/lib/useUser";
 import { usePwaInstall } from "@/lib/usePwa";
+import PasswordInput from "@/components/PasswordInput";
 
 type Row = Registry & { id: string; plan: "demo" | "full" };
 const L = ({ id, children }: { id: string; children: React.ReactNode }) => <label htmlFor={id} className="lbl">{children}</label>;
@@ -20,7 +21,7 @@ function Login({ denied }: { denied: boolean }) {
       <form className="card" onSubmit={async (ev) => { ev.preventDefault(); setErr(""); try { await signInWithEmailAndPassword(auth, e.trim(), p); } catch (x) { setErr(authMsg(x)); } }}>
         <img src="/logo.png" alt="Solat Digital" className="mx-auto mb-2 h-24 w-auto" /><h1 className="mt-2 text-2xl font-extrabold">Admin Solat Digital</h1><p className="text-sm text-sub">Log masuk admin utama sahaja.</p>
         <L id="e">Emel</L><input id="e" type="email" className="inp" value={e} onChange={(x) => setE(x.target.value)} required />
-        <L id="p">Kata laluan</L><input id="p" type="password" className="inp" value={p} onChange={(x) => setP(x.target.value)} required />
+        <L id="p">Kata laluan</L><PasswordInput id="p" autoComplete="current-password" value={p} onChange={setP} />
         {err && <p role="alert" className="mt-3 text-danger">{err}</p>}
         <button className="btn btn-primary mt-5 w-full justify-center">Log masuk</button>
       </form>

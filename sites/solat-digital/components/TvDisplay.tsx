@@ -150,7 +150,7 @@ export default function TvDisplay({ m, mid, azan, extra, defaults }: { m: TvDoc;
               </div>
               <ul className={`grid grid-cols-2 gap-2 sm:grid-cols-3 md:gap-3 ${fri ? "lg:grid-cols-6" : "lg:grid-cols-5"}`}>
                 {items.map((p) => (
-                  <li key={p.k} className={`rounded-2xl border p-2 text-center md:p-3 ${p.k === (curKey ?? "isha") && !p.silent ? "card-now" : "border-white/25 bg-white/5"} ${p.silent ? "opacity-70" : ""}`}>
+                  <li key={p.k} className={`glass-tile p-2 text-center md:p-3 ${p.k === (curKey ?? "isha") && !p.silent ? "card-now" : ""} ${p.silent ? "opacity-70" : ""}`}>
                     <b className="block text-base text-white md:text-xl">{p.n}</b>
                     <span lang="ar" dir="rtl" className="ar block pt-1 text-xl text-white md:text-3xl">{p.ar}</span>
                     <span className="mt-1 block whitespace-nowrap text-lg font-bold tabular-nums text-white md:text-2xl xl:text-3xl">{to12(p.time)}</span>
@@ -174,8 +174,8 @@ export default function TvDisplay({ m, mid, azan, extra, defaults }: { m: TvDoc;
       </div>
 
       {popItem && (
-        <div className="fixed inset-0 z-40 grid place-items-center bg-slate-950/80 p-4" role="alertdialog" aria-modal="true" aria-labelledby="pp-t">
-          <div className="glass relative w-full max-w-xl overflow-hidden rounded-3xl text-center">
+        <div className="pp-overlay fixed inset-0 z-40 grid place-items-center bg-slate-950/80 p-4" role="alertdialog" aria-modal="true" aria-labelledby="pp-t">
+          <div className="pp-card glass relative w-full max-w-xl overflow-hidden rounded-3xl text-center">
             <button className="btn absolute right-3 top-3 z-10" aria-label="Tutup notifikasi waktu solat" onClick={() => closePop(popKey)}><X size={20} /></button>
             <div className="bg-cover bg-center p-8 pt-16 text-white" style={{ backgroundImage: `linear-gradient(rgba(15,23,42,.72),rgba(15,23,42,.88)),url(/assets/pop-${popItem.pop}.jpg)` }}>
               <p>Sekarang sudah masuk waktu solat</p>
