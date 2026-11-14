@@ -999,6 +999,19 @@ a.cbx-main:hover .cbx-logo,a.cbx-it:hover .cbx-lg{transform:scale(1.05) translat
 .adm-pst{display:flex;flex-direction:column;gap:8px}.adm-psi{display:grid;grid-template-columns:112px 24px 1fr;gap:12px;align-items:center;padding:8px 10px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04)}.adm-psi .adm-act4{justify-self:end}.adm-psi .adm-aimg{width:112px}
 .adm-psprev{margin-top:14px;height:150px;border-radius:14px}
 .pz-ss{position:absolute;inset:0;z-index:-2;overflow:hidden;border-radius:inherit}.pz-sl{position:absolute;inset:0;background-size:cover;background-position:center 30%;opacity:0;will-change:transform,opacity}.pz-sl.on{opacity:1}
+
+/* ===== V-89: waktu solat akan datang di bawah logo (laman utama) ===== */
+.nxp-w{padding:10px 14px 0;display:flex;justify-content:flex-start;position:relative;z-index:6}
+.nxp[hidden]{display:none}
+.nxp{min-width:152px;padding:9px 16px 11px;border-radius:20px;text-align:center;background:linear-gradient(160deg,rgba(255,255,255,.15),rgba(255,255,255,.04));border:1.5px solid rgba(255,255,255,.3);box-shadow:0 16px 34px -18px rgba(0,0,0,.85),inset 0 1px 0 rgba(255,255,255,.45);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.nx-n{font-family:'Montserrat',sans-serif;font-weight:800;font-size:14px;letter-spacing:.16em;color:#FDE68A;text-align:center}
+.nx-d{display:flex;justify-content:center;align-items:center;gap:3px;margin-top:6px}
+.nx-d .dg{display:grid;place-items:center;overflow:hidden;width:21px;height:32px;border-radius:8px;background:linear-gradient(180deg,rgba(0,0,0,.6),rgba(0,0,0,.35));border:1px solid rgba(255,255,255,.2);box-shadow:inset 0 -6px 8px -6px rgba(255,255,255,.2)}
+.nx-d .dg b{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:19px;color:#fff;line-height:1;will-change:transform,opacity}
+.nx-c{font-style:normal;font-weight:800;color:#7DD3FC;animation:nxBlink 1s steps(2,end) infinite}
+@keyframes nxBlink{50%{opacity:.35}}
+@media(prefers-reduced-motion:reduce){.nx-c{animation:none}}
+@media(max-width:520px){.nxp{min-width:136px;padding:7px 12px 9px}.nx-d .dg{width:18px;height:28px}.nx-d .dg b{font-size:16px}}
 </style>
 </head>
 <body>
@@ -1791,8 +1804,14 @@ async function syncClock() {
   CLK.busy = false;
 }
 function clockHtml(cls = "") { return `<div class="fl-clock ${cls}" role="timer" aria-label="Masa Malaysia"><b class="ck-t">--:--</b><span class="ck-d"></span></div>`; }
+function tickNext() {
+  const el = $("#nxp"); if (!el) return; if (!PR.times) { el.hidden = true; return; } el.hidden = false;
+  const { ni, diff } = prayIdx(), name = ({ asr: "ASAR", isha: "ISYAK", dhuhr: "ZUHUR", fajr: "SUBUH", maghrib: "MAGHRIB" }[PRAY_N[ni][0]] || PRAY_N[ni][1].toUpperCase()) + ":", n = $("#nx-n", el); if (n.textContent !== name) n.textContent = name;
+  const str = hms(diff), d = $("#nx-d", el); if (d.dataset.len !== String(str.length)) { d.innerHTML = str.split("").map(c => (c === ":" ? '<i class="nx-c">:</i>' : '<span class="dg"><b>' + c + "</b></span>")).join(""); d.dataset.len = String(str.length); }
+  const chars = str.replace(/:/g, ""); $$(".dg b", d).forEach((b, i) => { if (b.textContent !== chars[i]) { b.textContent = chars[i]; if (!REDUCE()) b.animate([{ transform: "translateY(-70%)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 340, easing: EASE }); } });
+}
 function tickClock() {
-  tickPray();
+  tickNext(); tickPray();
   const els = document.querySelectorAll(".fl-clock"); if (!els.length) return; const n = klNow();
   if (klDay(n) !== CLK.day) syncClock();
   const t = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Kuala_Lumpur", hour: "numeric", minute: "2-digit", second: "2-digit", hour12: true }).format(n), g = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Kuala_Lumpur", day: "numeric", month: "short", year: "numeric" }).format(n);
@@ -2161,6 +2180,7 @@ function landing() {
     <div class="b3-zone b3-c"><span class="b3-title gradtxt">Satu pautan. Semua jualan.</span><small>WhatsApp · Shopee · TikTok Shop · YouTube</small></div>
     <div class="b3-zone b3-r">${langSwitch()}${clockHtml("ck-ban")}<div class="b3-btns">${logged ? `<a class="btn btn-red btn-sm" href="/dashboard" data-nav>Mula sekarang</a>` : `<span class="cta-box cta-sm"><a class="btn btn-red btn-sm" href="/login?new=1" data-nav>Mula sekarang</a><small>(Pengguna baharu sahaja)</small></span>`}</div><span class="b3-note">Sentiasa dikemas kini</span></div>
   </div></div>
+  <div class="nxp-w"><div class="nxp" id="nxp" role="timer" aria-label="Waktu solat akan datang" hidden><div class="nx-n" id="nx-n" translate="no"></div><div class="nx-d" id="nx-d" translate="no"></div></div></div>
   <main>
   <section style="position:relative;padding:40px 0 72px">
     <div class="container" style="position:relative;display:grid;gap:40px;align-items:center" id="hero-grid">
@@ -3261,7 +3281,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-88";
+const APP_VERSION = "V-89";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
