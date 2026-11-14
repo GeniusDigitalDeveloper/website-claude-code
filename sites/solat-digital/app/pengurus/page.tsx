@@ -86,6 +86,7 @@ function Panel({ uidv }: { uidv: string }) {
   }, [uidv]);
   const flash = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2800); };
   useEffect(() => { try { localStorage.setItem("sd_last_m", uidv); } catch {} }, [uidv]);
+  useEffect(() => { window.__sdBusy = dirty; return () => { window.__sdBusy = false; }; }, [dirty]);
   if (!tv || !draft) return <p className="p-8">Memuatkan…</p>;
   const up = (p: Partial<TvDoc>) => { setDraft({ ...draft, ...p }); setDirty(true); };
   const slides = draft.slideList;

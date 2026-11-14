@@ -112,3 +112,15 @@ Masih WAJIB berhenti dan tanya jika rules hidup berbeza daripada backup, ada rul
 `cd sites/flash-link && FIREBASE_TOKEN=$FIREBASE_TOKEN node scripts/announce-version.mjs` (tulis `flashlink/stats/version` dalam RTDB; baca `public/version.json`). Naikkan `APP_VERSION` dalam `public/index.html` dan `version` dalam `public/version.json` ke nombor yang sama pada setiap perubahan. Tiada muzik latar dalam app (kesan bunyi sahaja).
 
 **Chatbot Flash Link (pembantu "Ada masalah? Cek saya"):** jawapannya dibina daripada pendaftaran app (`NAV`, `DESIGNS`, `STYLES`, `TPL`, `BRANDS`, `LINK_KEYS`, `APP_VERSION`) dan senarai `CB_EXTRA` dalam `public/index.html`. Bila tambah/ubah ciri Flash Link, WAJIB daftar dalam `NAV`/pendaftaran sedia ada atau tambah entri `CB_EXTRA` supaya chatbot sentiasa terkini, tanpa ustaz perlu minta.
+
+## Solat Digital — deploy automatik + 3 pautan (arahan tetap ustaz)
+
+Projek `sites/solat-digital/` (Firebase projek `solat-digital-my`, BUKAN Flash Link). Bila ustaz minta ubah/kemas kini Solat Digital:
+1. Siapkan perubahan, QA (build + tangkapan skrin), lalu **terus deploy tanpa tanya**: `cd sites/solat-digital && ./deploy.sh` (build, Rules Firestore/RTDB, Hosting). Jangan sentuh projek Firebase lain.
+2. Setiap build menulis `public/version.json`; TV, panel masjid dan admin besar yang sedang terbuka menyemak versi setiap minit dan **muat semula sendiri** (aplikasi .exe dan PWA memuatkan laman hidup, jadi tiada muat turun/buka semula/restart). Pop-up/azan atau suntingan belum disimpan menangguhkan muat semula.
+3. Hanya jika cangkerang Electron (`sites/solat-digital/desktop/`) berubah, push untuk bina semula .exe (workflow `solat-digital-exe.yml`, tag `solat-digital-latest`).
+4. Commit dan push ke branch semasa (tiada PR melainkan diminta).
+5. **Selepas SETIAP kemas kini, hantar semula 3 pautan kepada ustaz:**
+   - TV awam: https://solat-digital-my.web.app/
+   - Admin masjid: https://solat-digital-my.web.app/pengurus/
+   - Admin Solat Digital: https://solat-digital-my.web.app/super/

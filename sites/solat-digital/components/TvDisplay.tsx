@@ -93,6 +93,7 @@ export default function TvDisplay({ m, mid, azan, extra, defaultFont }: { m: TvD
   }, [idx?.diff, demo, pre, m.ringtone, m.ringRepeat, vol]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (pop === null) return; const k = (e: KeyboardEvent) => e.key === "Escape" && closePop(popKey); addEventListener("keydown", k); return () => removeEventListener("keydown", k); }, [pop, popKey, closePop]);
 
+  useEffect(() => { window.__sdBusy = pop !== null; return () => { window.__sdBusy = false; }; }, [pop]);
   const toggleFull = () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen?.().catch(() => {}); };
   const z = zInfo(zone) || ["", "", ""];
   const alert = !!idx && idx.diff <= 60;
