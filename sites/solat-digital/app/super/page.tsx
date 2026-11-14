@@ -39,7 +39,7 @@ function Login({ denied }: { denied: boolean }) {
     ev.preventDefault(); setErr("");
     try {
       await signInWithEmailAndPassword(auth, e.trim(), p);
-      try { localStorage.setItem("sd_email_o", e.trim()); } catch {}
+      try { localStorage.setItem("sd_email_o", e.trim()); localStorage.setItem("sd_owner_device", "1"); } catch {}
       try { await window.sdVault?.set(e.trim(), p); } catch {}
       try { const PC = (window as unknown as { PasswordCredential?: new (o: unknown) => unknown }).PasswordCredential; if (PC) await (navigator.credentials as unknown as { store: (c: unknown) => Promise<unknown> }).store(new PC({ id: e.trim(), password: p, name: "Owner Solat Digital" })); } catch {}
     } catch (x) { setErr(authMsg(x)); }

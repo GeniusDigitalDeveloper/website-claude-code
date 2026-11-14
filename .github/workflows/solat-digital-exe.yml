@@ -31,7 +31,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: exe-${{ matrix.app }}
-          path: sites/solat-digital/desktop/dist/*.exe
+          path: |
+            sites/solat-digital/desktop/dist/*.exe
+            sites/solat-digital/desktop/dist/*.zip
 
   release:
     needs: build
@@ -47,5 +49,7 @@ jobs:
           tag_name: solat-digital-latest
           name: Solat Digital (aplikasi terkini)
           body: "Muat turun aplikasi Windows: TV, Pengurus Masjid, dan Admin Solat Digital."
-          files: exes/*.exe
+          files: |
+            exes/*.exe
+            exes/*.zip
           target_commitish: ${{ github.sha }}

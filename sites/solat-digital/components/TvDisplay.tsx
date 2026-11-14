@@ -37,7 +37,7 @@ function Slides({ imgs, anim, secs }: { imgs: string[]; anim: TvDoc["anim"]; sec
   );
 }
 
-export default function TvDisplay({ m, mid, azanLib, extra, defs, preview = false }: { m: TvDoc; mid: string; azanLib: AzanItem[]; extra: string[]; defs?: Defaults; preview?: boolean }) {
+export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs, preview = false }: { m: TvDoc; mid: string; azanLib: AzanItem[]; extra: string[]; slideImgs?: Record<string, string>; defs?: Defaults; preview?: boolean }) {
   const demo = m.plan !== "full";
   usePwaInstall();
   const live = !preview; // pratonton dalam panel: tiada bunyi, pop-up, denyut dalam talian
@@ -124,7 +124,7 @@ export default function TvDisplay({ m, mid, azanLib, extra, defs, preview = fals
     : pre > 0 && idx.diff > 0 && idx.diff <= pre * 60 ? { label: `${Math.ceil(idx.diff / 60)} minit sebelum azan ${act[idx.ni].n}`, time: mmss(idx.diff) }
     : !demo && delayS > 0 && cur && sinceCur >= 0 && sinceCur < delayS && !popDone && pop === null ? { label: `Sudah masuk waktu ${cur.n}. Azan dalam`, time: mmss(delayS - sinceCur) }
     : null;
-  const pool = [...(m.slideList ?? DEFAULT_SLIDES), ...(defs?.platformSlides ?? [])].filter((x) => x.on && x.text.trim());
+  const pool = [...(m.slideList ?? DEFAULT_SLIDES), ...(defs?.platformSlides ?? [])].filter((x) => x.on && (x.kind === "gambar" ? !!x.imgId : !!x.text.trim()));
   const slides = !feat.slides ? [] : fri ? (pool.some((x) => x.jumaat) ? pool.filter((x) => x.jumaat) : pool) : pool.filter((x) => !x.jumaat);
   const popItem = pop ? items.find((x) => x.k === pop) : null;
   const curKey = cur?.k;
@@ -176,7 +176,7 @@ export default function TvDisplay({ m, mid, azanLib, extra, defs, preview = fals
             </>) : <p className="py-8 text-center text-lg" role={err ? "alert" : undefined}>{err || "Memuatkan waktu solat…"}</p>}
             <p className="mt-3 text-xs text-white/80 md:text-sm">Sumber: JAKIM (e-solat.gov.my) · {m.zone ? "zon pilihan" : "zon dikesan automatik"} · Latar: Muhammad Faqih, CC BY-SA 4.0 · Azan: {azanCredit(cur?.k ?? "dhuhr")}</p>
           </section>
-          {slides.length > 0 && <SlidePanel slides={slides} anim={m.slideAnim ?? "fade"} secs={m.slideSecs ?? 10} T={T} B={B} />}
+          {slides.length > 0 && <SlidePanel slides={slides} anim={m.slideAnim ?? "fade"} secs={m.slideSecs ?? 10} T={T} B={B} imgs={slideImgs} />}
         </div>
 
         {feat.ticker && ann.length > 0 && (

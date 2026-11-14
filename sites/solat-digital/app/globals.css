@@ -213,3 +213,16 @@ main > section.card:nth-of-type(6) { animation-delay: .24s; } main > section.car
 .notif-toast { position: fixed; right: 1rem; top: 1rem; z-index: 55; max-width: min(92vw, 360px); display: flex; gap: .7rem; align-items: center; padding: .75rem .9rem; border-radius: 1rem; border: 1px solid #86efac; background: rgba(255,255,255,.92); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); box-shadow: 0 14px 40px rgba(15,23,42,.22); text-align: left; cursor: pointer; animation: toastTop .55s var(--ease-ios) both; }
 @keyframes toastTop { from { opacity: 0; transform: translate3d(0,-24px,0) scale(.94) } to { opacity: 1; transform: none } }
 @media (prefers-reduced-motion: reduce) { .notif-toast { animation: none; } }
+
+/* ===== Pengurus slaid ===== */
+.blink-note { display: flex; gap: .5rem; align-items: flex-start; padding: .6rem .8rem; border-radius: .8rem; border: 1px solid #fecaca; background: #fef2f2; color: #b91c1c; font-weight: 800; font-size: .9rem; animation: noteBlink 1.2s ease-in-out infinite; }
+@keyframes noteBlink { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
+.sl-item { display: grid; grid-template-columns: auto 112px minmax(0,1fr) auto; gap: .75rem; align-items: center; padding: .6rem; border-radius: 1rem; border: 1px solid var(--color-line); background: var(--color-card); transition: transform .4s var(--ease-ios), box-shadow .4s var(--ease-ios), opacity .3s; }
+.sl-item[data-over="true"] { box-shadow: 0 0 0 3px var(--color-accent); transform: translate3d(0,-2px,0); }
+.sl-item[data-drag="true"] { opacity: .45; }
+.sl-grip { cursor: grab; color: var(--color-sub); display: grid; place-items: center; width: 28px; height: 44px; }
+.sl-thumb { width: 112px; aspect-ratio: 16 / 9; border-radius: .6rem; overflow: hidden; background: #0f172a center / cover; border: 1px solid rgba(15,23,42,.15); display: grid; place-items: center; color: #fff; font-size: .6rem; text-align: center; padding: 2px; }
+@media (max-width: 640px) { .sl-item { grid-template-columns: auto 88px minmax(0,1fr); } .sl-thumb { width: 88px; } .sl-actions { grid-column: 1 / -1; justify-content: flex-end; } }
+.sl-actions { display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; }
+.sl-edit { grid-column: 1 / -1; padding-top: .5rem; border-top: 1px dashed var(--color-line); animation: rise .45s var(--ease-ios) both; }
+@media (prefers-reduced-motion: reduce) { .blink-note { animation: none; } .sl-item, .sl-edit { transition: none; animation: none; } }

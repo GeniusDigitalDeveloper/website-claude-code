@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { createUserWithEmailAndPassword, sendPasswordResetEmail, signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { addDoc, collection, deleteDoc, doc, onSnapshot, orderBy, query, setDoc, updateDoc } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDoc, onSnapshot, orderBy, query, setDoc, updateDoc } from "firebase/firestore";
 import { Bell, Building2, CheckCircle2, Copy, Download, ImagePlus, Info, Layers, LayoutDashboard, LogOut, MonitorPlay, Palette, Plus, Save, Trash2, Volume2 } from "lucide-react";
 import { auth, db } from "@/lib/firebase";
 import { ZONES } from "@/lib/zones";
@@ -10,6 +10,7 @@ import PasswordInput from "@/components/PasswordInput";
 import Shell, { type NavItem } from "@/components/Shell";
 import Chat from "@/components/Chat";
 import PreviewEditor from "@/components/PreviewEditor";
+import SlideManager from "@/components/SlideManager";
 import { ARABIC_FONTS, DEMO_TV, FONTS, KIND_LABEL, PRAYER_OPTS, SLIDE_ANIMS, type SlideItem, type TvDoc, uid } from "@/lib/types";
 import { THEMES } from "@/lib/themes";
 import { DEFAULT_SLIDES } from "@/lib/defaultSlides";
@@ -36,7 +37,14 @@ function AuthForm() {
   const [mode, setMode] = useState<"in" | "up">("in");
   const [f, setF] = useState({ name: "", address: "", city: "", postcode: "", managerName: "", country: "Malaysia", state: "Selangor", zone: "", email: "", pw: "" });
   const [err, setErr] = useState(""); const [busy, setBusy] = useState(false); const [info, setInfo] = useState("");
-  useEffect(() => { try { const e = localStorage.getItem("sd_email_m"); if (e) setF((x) => ({ ...x, email: e })); } catch {} }, []);
+  // Lalai: KOSONG untuk semua pengguna. Emel diisi hanya jika peranti ini pernah log masuk/daftar. Kata laluan diisi
+  // HANYA pada peranti Owner (akaun Owner), melalui penyimpan kata laluan pelayar; admin masjid lain kena taip sendiri.
+  useEffect(() => {
+    (async () => {
+      try { const e = localStorage.getItem("sd_email_m"); if (e) setF((x) => ({ ...x, email: e })); } catch {}
+      try { if (localStorage.getItem("sd_owner_device") !== "1") return; const c = await (navigator.credentials as unknown as { get: (o: unknown) => Promise<{ id?: string; password?: string } | null> }).get({ password: true, mediation: "optional" }); if (c?.id && c.password) setF((x) => ({ ...x, email: c.id!, pw: c.password! })); } catch {}
+    })();
+  }, []);
   const set = (p: Partial<typeof f>) => setF((x) => ({ ...x, ...p }));
   const submit = async (e: React.FormEvent) => {
     e.preventDefault(); setErr(""); setInfo(""); setBusy(true);
@@ -51,6 +59,7 @@ function AuthForm() {
         await setDoc(doc(db, "tv", c.user.uid), { ...DEMO_TV, name: f.name.trim(), state: f.state, zone, country: f.country, ownerUid: c.user.uid });
       }
       try { localStorage.setItem("sd_email_m", f.email.trim()); } catch {}
+      if (mode === "in") { try { const u = auth.currentUser; if (u && (await getDoc(doc(db, "admins", u.uid))).exists()) { localStorage.setItem("sd_owner_device", "1"); const PC = (window as unknown as { PasswordCredential?: new (o: unknown) => unknown }).PasswordCredential; if (PC) await (navigator.credentials as unknown as { store: (c: unknown) => Promise<unknown> }).store(new PC({ id: f.email.trim(), password: f.pw, name: "Owner Solat Digital" })); } } catch {} }
     } catch (x) { const cd = (x as { code?: string }).code; setErr(cd === "x-name" ? "Sila lengkapkan nama masjid, alamat dan nama pengurus." : cd === "x-zone" ? "Sila pilih zon (atau tekan Kesan lokasi)." : authMsg(x)); }
     setBusy(false);
   };
@@ -146,7 +155,7 @@ function Panel({ uidv }: { uidv: string }) {
     <div>
       <header className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-3 pt-4 lg:px-5">
         <div className="flex min-w-0 items-center gap-3"><img src="/logo.png" alt="Solat Digital" className="h-12 w-auto" /><div className="min-w-0"><h1 className="break-words text-xl font-extrabold md:text-3xl">{items.find((i) => i.id === sec)?.label}</h1><span className="text-xs font-semibold text-sub">Solat Digital (Pengurus Masjid)</span> <DateBadge mode={eff.hijriMode ?? "jakim"} /> <span className={`chip ${tv.plan === "full" ? "chip-ok" : "chip-demo"}`}>{tv.plan === "full" ? <><CheckCircle2 size={14} /> Akses penuh (seumur hidup)</> : "Mod demo"}</span></div></div>
-        <div className="flex gap-2"><a className="btn btn-primary" href={tvUrl} target="_blank" rel="noreferrer"><MonitorPlay size={18} /> Buka TV</a><button className="btn btn-danger" onClick={() => signOut(auth)}><LogOut size={18} /> Log keluar</button></div>
+        <div className="flex flex-wrap gap-2"><a className="btn btn-dl" href={REL + "SolatDigital-TV.zip"}><Download size={18} /> Muat turun aplikasi TV</a><a className="btn btn-primary" href={tvUrl} target="_blank" rel="noreferrer"><MonitorPlay size={18} /> Buka TV</a><button className="btn btn-danger" onClick={() => signOut(auth)}><LogOut size={18} /> Log keluar</button></div>
       </header>
       <Shell brand={<div className="text-sm font-bold text-sub">Menu pengurusan</div>} items={items} active={sec} onSelect={(id) => setSec(id as Sec)}>
         <div key={sec} className="grid gap-5">
@@ -155,6 +164,8 @@ function Panel({ uidv }: { uidv: string }) {
           {tv.plan !== "full" && <div className="card border-yellow-500/50" role="note"><b>Akaun anda masih mod demo.</b> Pop-up dan azan waktu solat belum aktif. Langgan sekali sahaja (bayaran sekali, akses penuh seumur hidup) dan Owner Solat Digital akan aktifkan akaun anda.</div>}
           <section className="card"><h2 className="text-lg font-bold">Paparan live TV masjid anda</h2><p className="text-sm text-sub">Paparan TV terkini anda ({tv.name}).</p>
             <div className="mt-3"><PreviewEditor mid={uidv} tv={tv} customFonts={raw.customFonts} canEdit={pf.styleEditor} /></div></section>
+          {pf.slides && <section className="card"><h2 className="text-lg font-bold">Slaid TV</h2><p className="mb-3 text-sm text-sub">Slaid yang berpusing di sebelah kanan TV anda.</p>
+            <SlideManager mid={uidv} slides={draft.slideList} onLive={(l) => live({ slideList: l })} flash={flash} /></section>}
           <section className="card"><h2 className="text-lg font-bold">Pautan TV</h2><p className="mt-1 text-sm text-sub">Buka pautan ini pada TV. Ia terus memaparkan waktu solat masjid anda dan tidak tidur sehingga TV dimatikan.</p>
             <div className="mt-3 flex gap-2"><input readOnly className="inp" aria-label="Pautan TV" value={tvUrl} /><button className="btn" aria-label="Salin pautan" onClick={() => { navigator.clipboard?.writeText(tvUrl); flash("Pautan disalin."); }}><Copy size={18} /></button></div></section>
         </>)}
@@ -196,24 +207,9 @@ function Panel({ uidv }: { uidv: string }) {
         </>)}
 
         {sec === "kandungan" && (<>
-          {pf.slides && <section className="card"><h2 className="text-lg font-bold">Slaid kandungan ({(slides ?? DEFAULT_SLIDES).length} / 15)</h2>
-            <p className="text-sm text-sub">Slaid kecil di sebelah kanan TV (nisbah 1920 x 1080). Maksimum 15 slaid. Slaid bertanda Jumaat hanya keluar pada hari Jumaat.</p>
+          {pf.slides && <section className="card"><h2 className="text-lg font-bold">Animasi slaid</h2><p className="text-sm text-sub">Tambah, susun dan sunting slaid di <b>Dashboard</b>, di bawah paparan live TV.</p>
             <div className="mt-3 grid gap-3 sm:grid-cols-2"><div><L id="sa">Animasi (5 jenis)</L><select id="sa" className="inp" value={draft.slideAnim ?? "fade"} onChange={(e) => up({ slideAnim: e.target.value as TvDoc["slideAnim"] })}>{SLIDE_ANIMS.map((a) => <option key={a.id} value={a.id}>{a.label}</option>)}</select></div>
-              <div><L id="ss">Saat setiap slaid</L><input id="ss" type="number" min={4} max={60} className="inp" value={draft.slideSecs ?? 10} onChange={(e) => up({ slideSecs: Math.max(4, Math.min(60, Math.round(+e.target.value) || 10)) })} /></div></div>
-            {!slides && <div className="mt-3 rounded-xl bg-muted p-3 text-sm">Anda sedang guna <b>pek slaid asas</b> (hadis, ayat dan kata peringatan berserta rujukan). <button className="btn mt-2" onClick={() => setSlides(DEFAULT_SLIDES)}>Salin pek asas untuk disunting</button></div>}
-            {slides && <>
-              <ul className="mt-3 grid gap-3">{slides.map((sl) => (
-                <li key={sl.id} className="rounded-xl border border-line p-3">
-                  <div className="flex flex-wrap items-center gap-2"><select aria-label="Jenis slaid" className="inp !w-auto" value={sl.kind} onChange={(e) => updSlide(sl.id, { kind: e.target.value as SlideItem["kind"] })}>{KINDS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
-                    <label className="flex min-h-11 items-center gap-1 text-sm"><input type="checkbox" className="size-5 accent-green-700" checked={sl.on} onChange={(e) => updSlide(sl.id, { on: e.target.checked })} /> Aktif</label>
-                    <label className="flex min-h-11 items-center gap-1 text-sm"><input type="checkbox" className="size-5 accent-green-700" checked={!!sl.jumaat} onChange={(e) => updSlide(sl.id, { jumaat: e.target.checked })} /> Jumaat sahaja</label>
-                    <button className="btn ml-auto" aria-label="Padam slaid" onClick={() => setSlides(slides.filter((x) => x.id !== sl.id))}><Trash2 size={16} /></button></div>
-                  <textarea aria-label="Teks slaid" rows={3} maxLength={400} className="inp mt-2" value={sl.text} onChange={(e) => updSlide(sl.id, { text: e.target.value })} />
-                  <input aria-label="Rujukan slaid" className="inp mt-2" placeholder="Rujukan (cth: HR. al-Bukhari no. 1)" value={sl.source ?? ""} onChange={(e) => updSlide(sl.id, { source: e.target.value })} />
-                </li>))}</ul>
-              <div className="mt-3 flex flex-wrap gap-2"><button className="btn btn-primary" disabled={slides.length >= 15} onClick={() => setSlides([...slides, { id: uid(), kind: "umum", text: "", source: "", on: true }])}><Plus size={18} /> Tambah slaid</button>
-                <button className="btn" onClick={() => confirm("Gantikan semua slaid dengan pek asas?") && setSlides(DEFAULT_SLIDES)}>Set semula ke pek asas</button></div></>}
-          </section>}
+              <div><L id="ss">Saat setiap slaid</L><input id="ss" type="number" min={4} max={60} className="inp" value={draft.slideSecs ?? 10} onChange={(e) => up({ slideSecs: Math.max(4, Math.min(60, Math.round(+e.target.value) || 10)) })} /></div></div></section>}
           {pf.announcements && <section className="card"><h2 className="text-lg font-bold">Pengumuman (teks bergerak di footer)</h2>
             <form className="mt-3 flex gap-2" onSubmit={(e) => { e.preventDefault(); if (!txt.trim()) return; up({ announcements: [...draft.announcements, { id: uid(), text: txt.trim().slice(0, 200), on: true }] }); setTxt(""); }}>
               <input className="inp" aria-label="Teks pengumuman" placeholder="cth: Kuliah Maghrib bersama Ustaz, malam ini" value={txt} onChange={(e) => setTxt(e.target.value)} /><button className="btn btn-primary" aria-label="Tambah pengumuman"><Plus size={18} /></button></form>
@@ -234,6 +230,7 @@ function Panel({ uidv }: { uidv: string }) {
         {sec === "muat" && (
           <section className="card"><h2 className="text-lg font-bold">Muat turun aplikasi</h2>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              <a className="btn btn-dl justify-center" href={REL + "SolatDigital-TV.zip"}><Download size={18} /> Solat Digital (TV) .zip</a>
               <a className="btn btn-dl justify-center" href={REL + "SolatDigital-TV-Setup.exe"}><Download size={18} /> Solat Digital (TV) .exe</a>
               <a className="btn btn-dl justify-center" href={REL + "SolatDigital-Pengurus-Setup.exe"}><Download size={18} /> Solat Digital (Pengurus Masjid) .exe</a>
             </div>

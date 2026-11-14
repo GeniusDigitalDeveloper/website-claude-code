@@ -1,7 +1,7 @@
 import type { SlideItem } from "./types";
 // Pek asas. Hadis daripada Sahih al-Bukhari / Sahih Muslim dengan nombor rujukan. Sila semak oleh asatizah sebelum guna.
 const S = (id: string, kind: SlideItem["kind"], text: string, source: string, jumaat = false, title = ""): SlideItem => ({ id, kind, text, source, title, on: true, jumaat });
-export const DEFAULT_SLIDES: SlideItem[] = [
+const ALL: SlideItem[] = [
   S("d1", "hadis", "Sesungguhnya setiap amalan itu bergantung kepada niatnya, dan setiap orang hanya mendapat apa yang dia niatkan.", "HR. al-Bukhari (no. 1) dan Muslim (no. 1907)"),
   S("d2", "hadis", "Sebaik-baik kamu ialah orang yang mempelajari al-Quran dan mengajarkannya.", "HR. al-Bukhari (no. 5027)"),
   S("d3", "hadis", "Solat lima waktu, Jumaat ke Jumaat dan Ramadan ke Ramadan menghapuskan dosa-dosa di antaranya, selagi dosa-dosa besar dijauhi.", "HR. Muslim (no. 233)"),
@@ -17,3 +17,11 @@ export const DEFAULT_SLIDES: SlideItem[] = [
   S("j2", "jumaat", "Wahai orang-orang yang beriman, apabila diseru untuk menunaikan solat pada hari Jumaat, maka segeralah mengingati Allah dan tinggalkanlah jual beli.", "Surah al-Jumu'ah, ayat 9", true, "Hari Jumaat"),
   S("j3", "jumaat", "Apabila salah seorang kamu hendak datang menunaikan solat Jumaat, hendaklah dia mandi.", "HR. al-Bukhari (no. 877) dan Muslim (no. 844)", true, "Adab Jumaat"),
 ];
+
+// Latar foto sebenar berpusing mengikut jenis slaid
+// Pek asas: 9 slaid (7 biasa + 2 khas Jumaat). Had slaid ialah 15 termasuk gambar dan templat yang ditambah masjid.
+const KEEP = new Set(["d1", "d2", "d3", "d5", "d7", "d8", "d11", "j1", "j2"]);
+const BASE = ALL.filter((x) => KEEP.has(x.id));
+const PICK: Record<string, string[]> = { hadis: ["nabawi", "vakil", "putra"], ayat: ["quran-1", "quran-2"], ulama: ["quran-2"], hikmah: ["putra"], jumaat: ["vakil", "nabawi", "putra"], umum: ["putra"], gambar: [] };
+const cnt: Record<string, number> = {};
+export const DEFAULT_SLIDES: SlideItem[] = BASE.map((x) => { const l = PICK[x.kind] ?? []; const i = (cnt[x.kind] = (cnt[x.kind] ?? -1) + 1); return l.length ? { ...x, bg: l[i % l.length] } : x; });

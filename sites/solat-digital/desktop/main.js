@@ -20,7 +20,8 @@ function create() {
   win.webContents.setWindowOpenHandler(({ url }) => { if (!url.startsWith("https://solat-digital-my.web.app")) shell.openExternal(url); return { action: url.startsWith("https://solat-digital-my.web.app") ? "allow" : "deny" }; });
   if (cfg.kiosk) {
     // TV: tidak tidur, tidak tertutup sendiri; pulih jika beku
-    powerSaveBlocker.start("prevent-display-sleep");
+    powerSaveBlocker.start("prevent-display-sleep"); // skrin tak padam
+    powerSaveBlocker.start("prevent-app-suspension"); // sistem tak tidur
     win.on("unresponsive", () => win.reload());
     win.webContents.on("render-process-gone", () => win.reload());
     setInterval(() => { if (!win.isDestroyed() && !win.isFullScreen()) win.setFullScreen(true); }, 60000);

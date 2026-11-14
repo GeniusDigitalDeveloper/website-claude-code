@@ -1,4 +1,4 @@
-export type SlideItem = { id: string; kind: "hadis" | "ayat" | "hikmah" | "ulama" | "jumaat" | "umum"; title?: string; text: string; source?: string; on: boolean; jumaat?: boolean };
+export type SlideItem = { id: string; kind: "hadis" | "ayat" | "hikmah" | "ulama" | "jumaat" | "umum" | "gambar"; title?: string; text: string; source?: string; on: boolean; jumaat?: boolean; bg?: string; imgId?: string };
 export type Announcement = { id: string; text: string; on: boolean };
 export type ElStyle = { font?: string; color?: string; border?: string };
 export type TvDoc = {
@@ -17,7 +17,7 @@ export const FONTS = ["Plus Jakarta Sans", "Poppins", "Montserrat", "Nunito", "R
 export const SLIDE_ANIMS: { id: NonNullable<TvDoc["slideAnim"]>; label: string }[] = [
   { id: "fade", label: "Pudar (fade)" }, { id: "slide", label: "Tolak dari kanan" }, { id: "up", label: "Naik dari bawah" }, { id: "zoom", label: "Zum masuk" }, { id: "flip", label: "Pusing (flip)" },
 ];
-export const KIND_LABEL: Record<SlideItem["kind"], string> = { hadis: "Hadis", ayat: "Ayat al-Quran", hikmah: "Kata hikmah", ulama: "Kata ulama", jumaat: "Khas Jumaat", umum: "Pengumuman" };
+export const KIND_LABEL: Record<SlideItem["kind"], string> = { hadis: "Hadis", ayat: "Ayat al-Quran", hikmah: "Kata hikmah", ulama: "Kata ulama", jumaat: "Khas Jumaat", umum: "Pengumuman", gambar: "Gambar" };
 export type CustomFont = { id: string; name: string; url: string; credit: string };
 /** Tetapan paparan TV (peringkat sistem, ditetapkan Owner). */
 export type TvSettings = { font?: string; arabicFont?: string; theme?: string; hijriMode?: "maghrib" | "jakim"; features?: { slides?: boolean; ticker?: boolean; hijri?: boolean; banner?: boolean }; platformSlides?: SlideItem[] };
