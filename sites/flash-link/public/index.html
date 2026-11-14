@@ -357,7 +357,6 @@ html{scrollbar-width:thin;scrollbar-color:#FF4D4D rgba(255,255,255,.08)}
 .fl-banner3{position:relative;width:100%;height:clamp(72px,5.73vw,110px);overflow:hidden;border-bottom:1px solid rgba(255,77,77,.28);isolation:isolate}
 .b3-bg{position:absolute;inset:0;z-index:-1;background:
   radial-gradient(34% 140% at 18% 50%,rgba(255,42,42,.34),transparent 70%),radial-gradient(34% 140% at 84% 50%,rgba(56,189,248,.34),transparent 70%),
-  repeating-linear-gradient(115deg,transparent 0 46px,rgba(255,255,255,.035) 46px 48px),
   linear-gradient(100deg,#150306 0%,#2a0a14 34%,#0b1d34 70%,#07101c 100%)}
 .b3-bg::after{content:"";position:absolute;inset:0;width:40%;transform:translateX(-120%) skewX(-22deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent);animation:b3sweep 7s cubic-bezier(.32,.72,0,1) infinite;will-change:transform}
 @keyframes b3sweep{0%,55%{transform:translateX(-120%) skewX(-22deg)}100%{transform:translateX(330%) skewX(-22deg)}}
@@ -1079,21 +1078,11 @@ button.nxp:focus{outline:none}button.nxp:focus-visible{outline:2px solid #000;ou
 @keyframes alGold{0%,100%{filter:brightness(.93);box-shadow:0 0 0 0 rgba(255,193,7,0)}50%{filter:brightness(1.2);box-shadow:0 0 0 3px rgba(255,214,0,.95),0 0 34px 8px rgba(245,158,11,.8)}}
 @media(prefers-reduced-motion:reduce){.nxp.alert{animation:none;box-shadow:0 0 0 3px rgba(255,214,0,.95),0 0 24px 4px rgba(245,158,11,.7)}}
 
-/* ===== V-96: latar banner gaya gaming: garis serong, jalur neon dan imbasan bergerak ke kanan perlahan ===== */
+/* ===== V-97: latar asal banner (garis serong halus) sahaja, bergerak perlahan ke kanan ===== */
 .b3-bg{overflow:hidden}
-.b3-bg i{position:absolute;inset:0;pointer-events:none;will-change:background-position}
-.b3-s1{background:
-  repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0 1px,transparent 1px 3px),
-  linear-gradient(115deg,transparent 44%,rgba(56,189,248,.14) 44% 49%,transparent 49%) 0 0/84px 100% repeat-x,
-  linear-gradient(115deg,transparent 40%,rgba(255,64,64,.13) 40% 43%,transparent 43%) 0 0/140px 100% repeat-x;
-  animation:b3drift 60s linear infinite}
-.b3-s2{background:
-  linear-gradient(90deg,transparent,rgba(56,189,248,.65) 60%,rgba(190,240,255,.95) 100%) 0 24%/210px 2px repeat-x,
-  linear-gradient(90deg,transparent,rgba(255,77,77,.6) 60%,rgba(255,200,200,.9) 100%) 0 74%/280px 2px repeat-x,
-  linear-gradient(90deg,transparent,rgba(52,211,153,.4) 70%,rgba(167,243,208,.7) 100%) 0 50%/420px 1px repeat-x;
-  background-repeat:repeat-x;background-position-y:24%,74%,50%;-webkit-mask-image:linear-gradient(180deg,transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(180deg,transparent,#000 14%,#000 86%,transparent);animation:b3drift 16s linear infinite}
-@keyframes b3drift{to{background-position-x:840px,840px,840px,840px,840px,840px,840px}}
-@media(prefers-reduced-motion:reduce){.b3-s1,.b3-s2{animation:none}}
+.b3-s1{position:absolute;top:0;bottom:0;left:-106px;right:0;pointer-events:none;background:repeating-linear-gradient(115deg,transparent 0 46px,rgba(255,255,255,.035) 46px 48px);animation:b3slide 18s linear infinite;will-change:transform}
+@keyframes b3slide{to{transform:translate3d(105.94px,0,0)}}
+@media(prefers-reduced-motion:reduce){.b3-s1{animation:none}}
 </style>
 </head>
 <body>
@@ -2269,7 +2258,7 @@ function landing() {
     ["zap", "Kemas kini automatik", "Setiap penambahbaikan sampai kepada anda secara langsung, dengan butang kemas kini."],
   ];
   $("#app").innerHTML = `
-  <div class="fl-banner3" role="region" aria-label="Promosi Flash Link"><div class="b3-bg" aria-hidden="true"><i class="b3-s1"></i><i class="b3-s2"></i></div><div class="b3-in">
+  <div class="fl-banner3" role="region" aria-label="Promosi Flash Link"><div class="b3-bg" aria-hidden="true"><i class="b3-s1"></i></div><div class="b3-in">
     <div class="b3-zone b3-l"><a href="/" data-nav class="b3-logo" aria-label="Genius Digital Flash Link"><img src="/assets/logo-2x.png" alt="Genius Digital Flash Link" width="150" height="75"></a><span class="b3-sep" aria-hidden="true"></span>${ic("zap", "w-7 h-7")}<span><b>Setup 2 minit</b><small>Tanpa kod, terus guna</small></span></div>
     <div class="b3-zone b3-c"><span class="b3-title gradtxt">Satu pautan. Semua jualan.</span><small>WhatsApp · Shopee · TikTok Shop · YouTube</small></div>
     <div class="b3-zone b3-r">${langSwitch()}${clockHtml("ck-ban")}<div class="b3-btns">${logged ? `<a class="btn btn-red btn-sm" href="/dashboard" data-nav>Mula sekarang</a>` : `<span class="cta-box cta-sm"><a class="btn btn-red btn-sm" href="/login?new=1" data-nav>Mula sekarang</a><small>(Pengguna baharu sahaja)</small></span>`}</div><span class="b3-note">Sentiasa dikemas kini</span></div>
@@ -3380,7 +3369,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-96";
+const APP_VERSION = "V-97";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
