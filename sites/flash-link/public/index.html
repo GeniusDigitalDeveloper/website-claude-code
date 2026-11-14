@@ -1123,6 +1123,16 @@ body.pray-off #pray,body.pray-off #nxp,body.pray-off #praypop,body.pray-off sect
 .cbo-row.multi.last::before{bottom:auto;height:3px}
 .cbo-row.multi .cbo-lg{width:min(78px,76%)}
 @media(max-width:520px){.cbo-row.multi{padding-left:10px}.cbo-row.multi .cbo-bar{right:calc((100% - 10px) * (5.5 - var(--k)) / 5)}.cbo-row.multi .cbo-node{margin:0 2px;padding:8px 2px 7px;border-radius:12px}.cbo-row.multi .cbo-node b{font-size:9px;line-height:1.2}.cbo-row.multi .cbo-lg{width:80%;border-radius:12px}}
+
+/* ===== V-106: garisan kolaborasi dilukis pada kanvas (sentiasa bersambung), bebola neon ===== */
+.cbo{position:relative;isolation:isolate}
+.cbo-stem{background:none!important}.cbo-stem i,.cbo-bar,.cbo-drop{display:none!important}
+.cbo-row.multi{padding-left:0!important}.cbo-row.multi::before{display:none!important}
+.cbo-cv{position:absolute;top:0;pointer-events:none;z-index:5}
+.cbo-pill{z-index:6}
+.cbo-node:hover{transform:none!important}
+.cbx{padding-left:20px;padding-right:20px}
+@media(max-width:520px){.cbx{padding-left:16px;padding-right:16px}.cbo-row.multi{padding-left:0!important}}
 </style>
 </head>
 <body>
@@ -2615,15 +2625,96 @@ function collabImg(u) {
 }
 function collabInner() {
   const m = COLLAB.main, mu = safeUrl(m.url), mi = collabImg(m.logo), PER = 5;
-  const tile = x => { const u = safeUrl(x.url), im = collabImg(x.logo), tag = u ? "a" : "div"; return `<${tag} class="cbo-node" ${u ? `href="${esc(u)}" target="_blank" rel="noopener noreferrer"` : ""} aria-label="${esc(x.name)}"><span class="cbo-drop" aria-hidden="true"></span><span class="cbo-lg">${im ? `<img src="${esc(im)}" alt="" loading="lazy" decoding="async">` : `<span class="cbx-ph">${ic("layers", "w-6 h-6")}</span>`}</span><b>${esc(x.name)}</b></${tag}>`; };
+  const tile = x => { const u = safeUrl(x.url), im = collabImg(x.logo), tag = u ? "a" : "div"; return `<${tag} class="cbo-node" ${u ? `href="${esc(u)}" target="_blank" rel="noopener noreferrer"` : ""} aria-label="${esc(x.name)}"><span class="cbo-lg">${im ? `<img src="${esc(im)}" alt="" loading="lazy" decoding="async">` : `<span class="cbx-ph">${ic("layers", "w-6 h-6")}</span>`}</span><b>${esc(x.name)}</b></${tag}>`; };
   const rows = []; for (let i = 0; i < COLLAB.items.length; i += PER) rows.push(COLLAB.items.slice(i, i + PER)); const multi = rows.length > 1;
-  const rowsHtml = rows.map((r, ri) => `<div class="cbo-row${multi ? " multi" : ""}${ri === rows.length - 1 ? " last" : ""}" style="--k:${r.length};--n:${multi ? PER : r.length}">${multi || r.length > 1 ? `<div class="cbo-bar" aria-hidden="true"><i></i><i></i></div>` : ""}${r.map(tile).join("")}</div>`).join("");
+  const rowsHtml = rows.map((r, ri) => `<div class="cbo-row${multi ? " multi" : ""}${ri === rows.length - 1 ? " last" : ""}" style="--k:${r.length};--n:${multi ? PER : r.length}">${r.map(tile).join("")}</div>`).join("");
   return `<div class="cbo"><${mu ? "a" : "div"} class="cbo-main" ${mu ? `href="${esc(mu)}" target="_blank" rel="noopener noreferrer"` : ""} aria-label="${esc(m.title || "")}"><span class="cbo-logo">${mi ? `<img src="${esc(mi)}" alt="">` : ""}</span><b>${esc(m.title || "")}</b></${mu ? "a" : "div"}>
-    <div class="cbo-stem" aria-hidden="true"><i></i><span class="cbo-pill">${esc(m.sub || "Produk Kami")}</span></div>${rowsHtml}</div>`;
+    <div class="cbo-stem" aria-hidden="true"><span class="cbo-pill">${esc(m.sub || "Produk Kami")}</span></div>${rowsHtml}<canvas class="cbo-cv cbo-lines" aria-hidden="true"></canvas><canvas class="cbo-cv cbo-orbs" aria-hidden="true"></canvas></div>`;
+}
+
+/* ---- Kolaborasi: garisan bersambung (kanvas) + bebola neon yang berlegar dan mengelilingi border produk ---- */
+let CFX = 0;
+function collabFx(el) {
+  const cbo = $(".cbo", el); if (!cbo) return; const tok = ++CFX;
+  const cL = $(".cbo-lines", cbo), cO = $(".cbo-orbs", cbo), PAD = 14, dpr = Math.min(2, window.devicePixelRatio || 1);
+  const COLS = ["#00D4FF", "#FF2D55", "#FFC400", "#19FF8C", "#00D4FF", "#FF2D55", "#FFC400", "#19FF8C", "#00D4FF", "#FFC400"];
+  let V = [], E = [], W = 0, H = 0, orbs = [], sig = "", last = 0;
+  const perim = n => { const r = Math.min(n.r, n.w / 2, n.h / 2); return 2 * (n.w - 2 * r) + 2 * (n.h - 2 * r) + 2 * Math.PI * r; };
+  const perimPt = (n0, s0) => {
+    const n = { x: n0.x + 1.5, y: n0.y + 1.5, w: n0.w - 3, h: n0.h - 3, r: n0.r, s0: n0.s0 }, r = Math.min(n.r, n.w / 2, n.h / 2), w = n.w, h = n.h, P = perim(n);
+    const a = w / 2 - r, q = Math.PI * r / 2, v = h - 2 * r, hz = w - 2 * r; let d = ((s0 % P) + P) % P;
+    if (n.s0 === "bottom") d = (d + a + q + v + q + hz / 2) % P;
+    if (d < a) return [n.x + w / 2 + d, n.y]; d -= a;
+    if (d < q) { const t = d / r - Math.PI / 2; return [n.x + w - r + r * Math.cos(t), n.y + r + r * Math.sin(t)]; } d -= q;
+    if (d < v) return [n.x + w, n.y + r + d]; d -= v;
+    if (d < q) { const t = d / r; return [n.x + w - r + r * Math.cos(t), n.y + h - r + r * Math.sin(t)]; } d -= q;
+    if (d < hz) return [n.x + w - r - d, n.y + h]; d -= hz;
+    if (d < q) { const t = Math.PI / 2 + d / r; return [n.x + r + r * Math.cos(t), n.y + h - r + r * Math.sin(t)]; } d -= q;
+    if (d < v) return [n.x, n.y + h - r - d]; d -= v;
+    if (d < q) { const t = Math.PI + d / r; return [n.x + r + r * Math.cos(t), n.y + r + r * Math.sin(t)]; } d -= q;
+    return [n.x + r + d, n.y];
+  };
+  const build = () => {
+    const r0 = cbo.getBoundingClientRect(); W = r0.width + PAD * 2; H = r0.height; V = []; E = [];
+    const rel = e => { const r = e.getBoundingClientRect(); return { x: r.left - r0.left + PAD, y: r.top - r0.top, w: r.width, h: r.height }; };
+    const vtx = (x, y, node) => { V.push({ x, y, node, e: [] }); return V.length - 1; };
+    const edge = (a, b) => { const A = V[a], B = V[b], len = Math.abs(A.x - B.x) + Math.abs(A.y - B.y); E.push({ a, b, len }); const i = E.length - 1; A.e.push(i); B.e.push(i); };
+    const main = rel($(".cbo-main", cbo)), cx = main.x + main.w / 2, rows = $$(".cbo-row", cbo), multi = rows.length > 1 && rows[0].classList.contains("multi");
+    const mv = vtx(cx, main.y + main.h, { ...main, r: 24, s0: "bottom" }); let prevRail = -1;
+    rows.forEach((row, ri) => {
+      const ns = $$(".cbo-node", row).map(rel); if (!ns.length) return; const barY = Math.round(ns[0].y - 26), ids = [];
+      ns.forEach(n => ids.push({ x: n.x + n.w / 2, id: vtx(n.x + n.w / 2, barY), n }));
+      if (ri === 0) ids.push({ x: cx, id: vtx(cx, barY), junction: true });
+      if (multi) ids.push({ x: Math.min(...ns.map(n => n.x)) - 10, id: -1, rail: true });
+      ids.forEach(it => { if (it.rail) it.id = vtx(it.x, barY); });
+      ids.sort((a, b) => a.x - b.x || (a.junction ? 1 : 0) - (b.junction ? 1 : 0));
+      for (let i = 0; i < ids.length - 1; i++) edge(ids[i].id, ids[i + 1].id);
+      ids.forEach(it => { if (it.n) edge(it.id, vtx(it.x, it.n.y, { ...it.n, r: 20, s0: "top" })); if (it.junction) edge(mv, it.id); });
+      if (multi) { const rv = ids.find(i => i.rail).id; if (prevRail >= 0) edge(prevRail, rv); prevRail = rv; }
+    });
+    [cL, cO].forEach(c => { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); c.style.width = W + "px"; c.style.height = H + "px"; c.style.left = -PAD + "px"; });
+    const g = cL.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H); g.lineCap = "round"; g.lineJoin = "round";
+    [[8, "rgba(125,211,252,.16)"], [3, "rgba(150,225,255,.7)"]].forEach(([lw, col]) => { g.lineWidth = lw; g.strokeStyle = col; g.beginPath(); E.forEach(e => { g.moveTo(V[e.a].x, V[e.a].y); g.lineTo(V[e.b].x, V[e.b].y); }); g.stroke(); });
+    const good = E.map((e, i) => i).filter(i => E[i].len > 6); orbs = [];
+    for (let i = 0; i < Math.min(COLS.length, 6 + Math.round(E.length / 4)); i++) { const ei = good[Math.floor(Math.random() * good.length)]; if (ei === undefined) break; orbs.push({ c: COLS[i % COLS.length], mode: "edge", e: ei, t: Math.random() * E[ei].len, dir: Math.random() < .5 ? 1 : -1, sp: 70 + Math.random() * 60, hist: [] }); }
+  };
+  const arrive = (o, v) => {
+    if (V[v].node) { o.mode = "lap"; o.node = V[v].node; o.vtx = v; o.s = 0; o.ld = Math.random() < .5 ? 1 : -1; o.lapLen = perim(o.node) * (Math.random() < .5 ? 1 : 2); return; }
+    const opts = V[v].e.filter(i => i !== o.e), pick = opts.length ? opts[Math.floor(Math.random() * opts.length)] : o.e; o.e = pick; o.dir = E[pick].a === v ? 1 : -1; o.t = o.dir === 1 ? 0 : E[pick].len;
+  };
+  const posOf = o => {
+    if (o.mode === "lap") return perimPt(o.node, o.s * o.ld);
+    const e = E[o.e], A = V[e.a], B = V[e.b], k = e.len ? o.t / e.len : 0; return [A.x + (B.x - A.x) * k, A.y + (B.y - A.y) * k];
+  };
+  const step = dt => orbs.forEach(o => {
+    if (o.mode === "edge") { o.t += o.dir * o.sp * dt; const e = E[o.e]; if (o.t >= e.len) arrive(o, e.b); else if (o.t <= 0) arrive(o, e.a); }
+    else { o.s += o.sp * 1.5 * dt; if (o.s >= o.lapLen) { const v = o.vtx, ei = V[v].e[0]; o.mode = "edge"; o.e = ei; o.dir = E[ei].a === v ? 1 : -1; o.t = o.dir === 1 ? 0 : E[ei].len; } }
+    const p = posOf(o); o.hist.push(p); if (o.hist.length > 18) o.hist.shift();
+  });
+  const draw = () => {
+    const g = cO.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H); g.globalCompositeOperation = "lighter";
+    orbs.forEach(o => { const h = o.hist, n = h.length; g.fillStyle = o.c; g.shadowColor = o.c;
+      for (let i = 0; i < n; i++) { const k = (i + 1) / n; g.globalAlpha = k * k * .8; g.shadowBlur = 0; g.beginPath(); g.arc(h[i][0], h[i][1], 1 + k * 2.4, 0, 6.2832); g.fill(); }
+      if (n) { g.globalAlpha = 1; g.shadowBlur = 16; g.beginPath(); g.arc(h[n - 1][0], h[n - 1][1], 4.2, 0, 6.2832); g.fill(); g.fillStyle = "#fff"; g.shadowBlur = 0; g.globalAlpha = .9; g.beginPath(); g.arc(h[n - 1][0], h[n - 1][1], 1.6, 0, 6.2832); g.fill(); } });
+    g.globalAlpha = 1; g.shadowBlur = 0; g.globalCompositeOperation = "source-over";
+  };
+  const signature = () => { const r = cbo.getBoundingClientRect(), n = $(".cbo-node:last-of-type", cbo), m = n && n.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height), m ? Math.round(m.top - r.top) : 0, m ? Math.round(m.left - r.left) : 0].join("|"); };
+  build(); sig = signature();
+  if (REDUCE()) { orbs = []; return; }
+  const loop = ts => {
+    if (tok !== CFX || !document.body.contains(cbo)) return;
+    if (!document.hidden) { const dt = Math.min(.05, (ts - (last || ts)) / 1000); last = ts; step(dt); draw(); } else last = 0;
+    requestAnimationFrame(loop);
+  };
+  requestAnimationFrame(loop);
+  // sambung semula/ukur semula bila susun atur berubah (imej dimuat, saiz skrin, fon)
+  const heal = () => { if (tok !== CFX || !document.body.contains(cbo)) return; const s2 = signature(); if (s2 !== sig) { sig = s2; build(); } setTimeout(heal, 500); };
+  setTimeout(heal, 500);
+  if (window.ResizeObserver) { const ro = new ResizeObserver(() => { if (tok !== CFX) return ro.disconnect(); const s2 = signature(); if (s2 !== sig) { sig = s2; build(); } }); ro.observe(cbo); }
 }
 function collabTab() {
   $("#pane").innerHTML = `<section class="cbx" id="collab-box" aria-label="Kolaborasi"></section>`;
-  const f = () => { const el = $("#collab-box"); if (!el || S.view !== "collab") { COLLAB.subs.delete(f); return; } el.innerHTML = collabInner(); };
+  const f = () => { const el = $("#collab-box"); if (!el || S.view !== "collab") { COLLAB.subs.delete(f); return; } el.innerHTML = collabInner(); collabFx(el); };
   COLLAB.subs.add(f); f(); collabListen();
 }
 function dashboard() {
@@ -3429,7 +3520,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-105";
+const APP_VERSION = "V-106";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
