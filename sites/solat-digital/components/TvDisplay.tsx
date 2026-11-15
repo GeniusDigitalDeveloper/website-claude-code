@@ -154,7 +154,7 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
             <h1 className="break-words text-2xl font-extrabold uppercase tracking-wide text-white md:text-5xl" style={T("name")} {...el("name", "text", "Nama masjid")}>{m.name}</h1>
             <p className="mt-1 text-sm font-semibold text-white md:text-xl" style={T("sub")} {...el("sub", "text", "Negeri, zon dan daerah")}>{`${z[1]} · ${zone} · ${z[2]}`}</p>
           </div>
-          <div className="text-right text-white">
+          <div className="text-left text-white lg:text-right">
             <div className="text-3xl font-extrabold tabular-nums md:text-6xl" aria-label="Masa sekarang" style={T("clock")} {...el("clock", "text", "Jam")}>{clock}</div>
             <p className="text-sm font-semibold md:text-lg" style={T("date")} {...el("date", "text", "Tarikh")}>{date}</p>{hijri && <p className="text-sm font-semibold md:text-lg" style={T("hijri")} {...el("hijri", "text", "Tarikh Hijrah")}>{hijri}</p>}
           </div>
@@ -166,17 +166,17 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
           <div className="tv-shadow text-lg font-extrabold uppercase tracking-widest md:text-4xl" style={T("cdl")} {...el("cdl", "text", "Tulisan kiraan detik")}>{banner.label}</div>
           <div className="tv-shadow text-7xl font-extrabold tabular-nums leading-none md:text-[10rem]" aria-label="Masa berbaki sebelum azan" style={T("cdn")} {...el("cdn", "text", "Nombor kiraan detik")}>{banner.time}</div></div>}
 
-        <div className="mt-auto grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(280px,34%)] md:items-end">
+        <div className="mt-auto grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(280px,34%)] lg:items-end">
           <section className={`glass rounded-3xl p-4 md:p-6 ${alert ? "tv-alert" : ""}`} style={B("frame")} {...el("frame", "border", "Bingkai waktu solat")} aria-live="off">
             {times && idx ? (<>
-              <div className="mb-4 flex flex-wrap items-end justify-between gap-4 text-white">
+              <div className="mb-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-2 text-white">
                 <div><small className="text-xs font-bold uppercase tracking-widest md:text-base" style={T("curl")} {...el("curl", "text", "Label waktu semasa")}>{tx("curl", "Waktu semasa")}</small><div className="text-4xl font-extrabold leading-tight md:text-6xl" style={{ color: "var(--acc, #fcd34d)", ...T("curn") }} {...el("curn", "text", "Nama waktu semasa")}>{cur ? tx("ct-" + cur.k, cur.n) : tx("ct-isha", "Isyak")}</div></div>
-                <div className="text-right"><small className="text-xs font-bold uppercase tracking-widest md:text-base" style={T("nextl")} {...el("nextl", "text", "Label waktu seterusnya")}>{tx("nextl", "{waktu} dalam").replace("{waktu}", tx("ct-" + act[idx.ni].k, act[idx.ni].n) + (idx.tomorrow ? " (esok)" : ""))}</small>
+                <div className="text-right max-md:ml-auto"><small className="text-xs font-bold uppercase tracking-widest md:text-base" style={T("nextl")} {...el("nextl", "text", "Label waktu seterusnya")}>{tx("nextl", "{waktu} dalam").replace("{waktu}", tx("ct-" + act[idx.ni].k, act[idx.ni].n) + (idx.tomorrow ? " (esok)" : ""))}</small>
                   <div className="text-4xl font-extrabold tabular-nums leading-tight md:text-6xl" aria-label="Masa berbaki" style={T("nextt")} {...el("nextt", "text", "Masa ke waktu seterusnya")}>{hms(idx.diff)}</div></div>
               </div>
-              <ul className={`grid grid-cols-2 gap-2 sm:grid-cols-3 md:gap-3 ${fri ? "lg:grid-cols-6" : "lg:grid-cols-5"}`}>
+              <ul className={`grid grid-cols-1 gap-2 md:gap-3 ${fri ? "md:grid-cols-3 lg:grid-cols-6" : "md:grid-cols-5"}`}>
                 {items.map((p) => (
-                  <li key={p.k} className={`glass-tile p-2 text-center md:p-3 ${p.k === (curKey ?? "isha") && !p.silent ? "card-now" : ""} ${p.silent ? "opacity-70" : ""}`} style={B("card-" + p.k)} {...el("card-" + p.k, "border", "Bingkai " + p.n)}>
+                  <li key={p.k} className={`glass-tile flex items-center justify-between gap-3 px-4 py-2 text-center md:block md:p-3 ${p.k === (curKey ?? "isha") && !p.silent ? "card-now" : ""} ${p.silent ? "opacity-70" : ""}`} style={B("card-" + p.k)} {...el("card-" + p.k, "border", "Bingkai " + p.n)}>
                     <b className="block text-base text-white md:text-xl" style={T("ct-" + p.k)} {...el("ct-" + p.k, "text", "Nama " + p.n)}>{tx("ct-" + p.k, p.n)}</b>
                     <span lang="ar" dir="rtl" className="ar block pt-1 text-xl text-white md:text-3xl" data-noedit="1" style={arSty}>{p.ar}</span>
                     <span className="mt-1 block whitespace-nowrap text-lg font-bold tabular-nums text-white md:text-2xl xl:text-3xl" style={T("cm-" + p.k)} {...el("cm-" + p.k, "text", "Masa " + p.n)}>{to12(p.time)}</span>

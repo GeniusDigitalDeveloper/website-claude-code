@@ -74,7 +74,7 @@ function AzanManager() {
   };
   const tog = (k: string) => setF({ ...f, prayers: f.prayers.includes(k) ? f.prayers.filter((x) => x !== k) : [...f.prayers, k] });
   return (
-    <div className="grid gap-5">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-5">
       <section className="card">
         <h2 className="text-lg font-bold">{edit ? "Sunting azan" : "Tambah azan"}</h2><p className="text-sm text-sub">Letak pautan MP3 (https://...) atau pautan kongsi Google Drive (tetapkan "Anyone with the link"). Fail MP3 dalam komputer: hantar kepada pembangun untuk diletakkan dalam sistem.</p>
         <form className="mt-3 grid gap-3 md:grid-cols-2" onSubmit={save}>
@@ -159,7 +159,7 @@ function Tetapan({ rows, sub }: { rows: Row[]; sub: string }) {
   const addFont = (e: React.FormEvent) => { e.preventDefault(); if (!/^(https:\/\/|\/)/.test(nf.url)) return setMsg("URL font mesti bermula https:// atau /."); setEd({ ...ed, customFonts: [...custom, { id: uid(), name: nf.name.trim(), url: nf.url.trim(), credit: nf.credit.trim() }] }); setNf({ name: "", url: "", credit: "" }); };
   const toggleBeta = (id: string) => setEd({ ...ed, betaIds: ids.includes(id) ? ids.filter((x) => x !== id) : ids.length >= 2 ? ids : [...ids, id] });
   return (
-    <div className="grid gap-5">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-5">
       {sub === "tv" && <>
         <section className="card"><h2 className="text-lg font-bold">Tetapan TV (semua masjid)</h2><p className="text-sm text-sub">Tetapan lalai paparan TV di semua masjid. Masjid boleh menukar font dan warna mereka sendiri; ia tidak kekal untuk mereka.</p><div className="mt-3"><TvForm v={ed} set={(v) => setEd({ ...ed, ...v })} custom={custom} /></div></section>
         <section className="card"><h2 className="text-lg font-bold">Pustaka font Arab tersuai (Thuluth dll.)</h2><p className="text-sm text-sub">Tambah font berlesen anda (woff2/ttf/otf) melalui URL https:// atau fail di /fonts/. Semua masjid boleh memilihnya.</p>
@@ -186,11 +186,11 @@ function Notif({ rows, sel, setSel }: { rows: Row[]; sel: string; setSel: (id: s
   const list = rows.map((r) => ({ id: r.id, name: r.name, m: metas[r.id] })).sort((a, b) => (b.m?.lastAt ?? 0) - (a.m?.lastAt ?? 0));
   const cur = rows.find((r) => r.id === sel);
   return (
-    <div className="grid gap-5">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-5">
       <section className="card"><div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="text-lg font-bold">Notifikasi</h2><p className="text-sm text-sub">Mesej daripada masjid dan siaran kepada semua masjid.</p></div><button className="btn btn-primary" onClick={() => setBc((v) => !v)}><Megaphone size={18} /> Siaran kepada semua masjid</button></div>
         {bc && <div className="pop-card mt-4 rounded-xl border border-line p-3"><Broadcast targets={rows.map((r) => ({ id: r.id, name: r.name }))} onDone={(n) => { setFlash(`Dihantar kepada ${n} masjid.`); setBc(false); setTimeout(() => setFlash(""), 3000); }} /></div>}
         {flash && <p role="status" className="mt-3 font-semibold text-accent">{flash}</p>}</section>
-      <div className="grid gap-5 lg:grid-cols-[320px_minmax(0,1fr)]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[320px_minmax(0,1fr)]">
         <section className="card !p-3"><ul className="grid gap-1">{list.map((c) => (<li key={c.id}><button type="button" className="nav-item !items-start" data-active={sel === c.id} onClick={() => setSel(c.id)}><span className="min-w-0 flex-1"><b className="block truncate">{c.name}</b><span className="block truncate text-xs font-medium text-sub">{c.m?.lastText ?? "Belum ada mesej"}</span></span>{!!c.m?.unreadOwner && <span className="nav-badge">{c.m.unreadOwner}</span>}</button></li>))}{!list.length && <li className="p-3 text-sm text-sub">Belum ada masjid berdaftar.</li>}</ul></section>
         <section className="card !p-3">{cur ? <><Chat key={cur.id} mid={cur.id} me="owner" mosqueName={cur.name} title={cur.name} subtitle={cur.email} /></> : <p className="py-10 text-center text-sm text-sub">Pilih masjid untuk melihat dan membalas mesej.</p>}</section>
       </div>
@@ -237,7 +237,7 @@ function Dashboard() {
         <div className="flex gap-2"><a className="btn btn-dl" href="https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/solat-digital-latest/SolatDigital-Admin-Setup.exe"><Download size={18} /> Muat turun (.exe)</a>{pwa.canInstall && <button className="btn" onClick={pwa.install}><Download size={18} /> Pasang aplikasi</button>}<button className="btn btn-danger" onClick={() => signOut(auth)}><LogOut size={18} /> Log keluar</button></div>
       </header>
       <Shell brand={<div className="text-sm font-bold text-sub">Menu Owner</div>} items={items} active={sec} sub={sub} onSelect={(id, s) => { setSec(id as Sec); if (s) setSub(s); }}>
-        <div key={sec + sub} className="grid gap-5">
+        <div key={sec + sub} className="grid grid-cols-[minmax(0,1fr)] gap-5">
           {sec === "dash" && <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
             <Stat icon={<Building2 size={16} />} label="Masjid berdaftar" v={rows.length} /><Stat icon={<Users size={16} />} label="Akaun admin masjid" v={rows.length} />
             <Stat icon={<ShieldCheck size={16} />} label="Akses penuh / demo" v={`${rows.filter((r) => r.plan === "full").length} / ${rows.filter((r) => r.plan !== "full").length}`} /><Stat icon={<Radio size={16} />} label="TV dalam talian" v={rows.filter((r) => online(r.id)).length} /></div>}

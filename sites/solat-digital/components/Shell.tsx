@@ -5,8 +5,8 @@ export type NavItem = { id: string; label: string; icon: ReactNode; badge?: numb
 /** Susun atur panel: bar sisi kiri (desktop) / tab mendatar (telefon), kandungan di sebelah kanan. */
 export default function Shell({ brand, items, active, sub, onSelect, top, children }: { brand: ReactNode; items: NavItem[]; active: string; sub?: string; onSelect: (id: string, sub?: string) => void; top?: ReactNode; children: ReactNode }) {
   return (
-    <div className="mx-auto grid max-w-7xl gap-5 px-3 py-4 lg:grid-cols-[272px_minmax(0,1fr)] lg:px-5 lg:py-6">
-      <aside className="lg:sticky lg:top-5 lg:self-start">
+    <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)] gap-5 px-3 py-4 lg:grid-cols-[272px_minmax(0,1fr)] lg:px-5 lg:py-6">
+      <aside className="min-w-0 lg:sticky lg:top-5 lg:self-start">
         <div className="card !p-3 lg:!p-4">
           <div className="hidden lg:block">{brand}</div>
           <nav aria-label="Menu" className="nav-scroll flex gap-1 overflow-x-auto lg:mt-4 lg:flex-col lg:overflow-visible">

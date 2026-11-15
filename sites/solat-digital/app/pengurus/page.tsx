@@ -158,7 +158,7 @@ function Panel({ uidv }: { uidv: string }) {
         <div className="flex flex-wrap gap-2"><a className="btn btn-dl" href={REL + "SolatDigital-TV.zip"}><Download size={18} /> Muat turun aplikasi TV</a><a className="btn btn-primary" href={tvUrl} target="_blank" rel="noreferrer"><MonitorPlay size={18} /> Buka TV</a><button className="btn btn-danger" onClick={() => signOut(auth)}><LogOut size={18} /> Log keluar</button></div>
       </header>
       <Shell brand={<div className="text-sm font-bold text-sub">Menu pengurusan</div>} items={items} active={sec} onSelect={(id) => setSec(id as Sec)}>
-        <div key={sec} className="grid gap-5">
+        <div key={sec} className="grid grid-cols-[minmax(0,1fr)] gap-5">
         {sec === "dash" && (<>
           {eff.panel?.notice && <div className="card border-green-600/40" role="note"><Info size={18} className="mr-2 inline text-accent" />{eff.panel.notice}</div>}
           {tv.plan !== "full" && <div className="card border-yellow-500/50" role="note"><b>Akaun anda masih mod demo.</b> Pop-up dan azan waktu solat belum aktif. Langgan sekali sahaja (bayaran sekali, akses penuh seumur hidup) dan Owner Solat Digital akan aktifkan akaun anda.</div>}
