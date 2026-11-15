@@ -1,4 +1,6 @@
 "use client";
+import ZonePicker from "./ZonePicker";
+import { ZONES } from "@/lib/zones";
 import { useEffect, useRef, useState } from "react";
 import { deleteField, doc, updateDoc } from "firebase/firestore";
 import { Paintbrush, RotateCcw, X } from "lucide-react";
@@ -12,14 +14,13 @@ const TEXT_DEF = (key: string): { def: string; hint: string } | null => {
   if (key === "curl") return { def: "Waktu semasa", hint: "" };
   if (key === "nextl") return { def: "{waktu} dalam", hint: "{waktu} = nama waktu seterusnya." };
   if (key === "cdl") return { def: "{min} minit sebelum azan {waktu}", hint: "{min} = bilangan minit, {waktu} = nama waktu." };
-  if (key === "sub") return { def: "", hint: "Kosong = negeri, zon dan daerah automatik." };
   if (key.startsWith("ct-") && PR_NAMES[key.slice(3)]) return { def: PR_NAMES[key.slice(3)], hint: "Menggantikan nama waktu pada TV." };
   return null;
 };
 type Pick = { key: string; kind: "text" | "border" | "arabic"; label: string };
 
 /** Pratonton live TV (iframe) yang boleh diklik. Perubahan terus ditulis ke pangkalan data dan dipaparkan pada TV sebenar. */
-export default function PreviewEditor({ mid, tv, customFonts, canEdit = true, onRename }: { mid: string; tv: TvDoc; customFonts?: CustomFont[]; canEdit?: boolean; onRename?: (n: string) => void }) {
+export default function PreviewEditor({ mid, tv, customFonts, canEdit = true, onRename, onZone }: { mid: string; tv: TvDoc; customFonts?: CustomFont[]; canEdit?: boolean; onRename?: (n: string) => void; onZone?: (zone: string) => void }) {
   const [nm, setNm] = useState(tv.name); const nmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wrap = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.5); const [pick, setPick] = useState<Pick | null>(null);
@@ -47,6 +48,13 @@ export default function PreviewEditor({ mid, tv, customFonts, canEdit = true, on
           {pick.key === "name" && onRename && (<><label htmlFor="pe-nm" className="lbl">Teks nama masjid</label>
             <input id="pe-nm" className="inp" maxLength={120} value={nm} onChange={(e) => rename(e.target.value)} placeholder="Nama masjid / surau" />
             <p className="mt-1 text-xs text-sub">Disimpan sendiri dan terus berubah pada TV. Paparan guna HURUF BESAR.</p></>)}
+          {pick.key === "sub" && onZone && (<div className="mt-2">
+            <label htmlFor="pe-co" className="lbl">Negara</label>
+            <select id="pe-co" className="inp" value="Malaysia" onChange={() => {}}><option>Malaysia</option></select>
+            <p className="mt-1 text-xs text-sub">Waktu solat rasmi JAKIM hanya meliputi Malaysia.</p>
+            <label className="mt-3 flex min-h-11 cursor-pointer items-center gap-3"><input type="checkbox" className="size-5 accent-green-700" checked={!tv.zone} onChange={(e) => onZone(e.target.checked ? "" : (tv.state && ZONES.find((z) => z[1] === tv.state)?.[0]) || "SGR01")} /> Kesan zon secara automatik (ikut lokasi peranti TV)</label>
+            {tv.zone && <ZonePicker zone={tv.zone} onChange={onZone} idp="pe" />}
+            <p className="mt-2 text-xs text-sub">Senarai negeri, zon dan daerah ikut pembahagian rasmi JAKIM (e-solat.gov.my). Terus berubah pada TV.</p></div>)}
           {td && (<><label htmlFor="pe-tx" className="lbl">Teks</label>
             <input id="pe-tx" className="inp" maxLength={160} value={tt} onChange={(e) => retext(e.target.value)} placeholder={td.def || "Teks lalai"} />
             <p className="mt-1 text-xs text-sub">{td.hint ? td.hint + " " : ""}Kosongkan untuk kembali ke teks asal. Terus berubah pada TV.</p></>)}

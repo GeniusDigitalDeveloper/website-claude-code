@@ -152,7 +152,7 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
         <header className="flex flex-wrap items-start justify-between gap-3 pt-10">
           <div className="min-w-0">
             <h1 className="break-words text-2xl font-extrabold uppercase tracking-wide text-white md:text-5xl" style={T("name")} {...el("name", "text", "Nama masjid")}>{m.name}</h1>
-            <p className="mt-1 text-sm font-semibold text-white md:text-xl" style={T("sub")} {...el("sub", "text", "Negeri, zon dan daerah")}>{tx("sub", `${z[1]} · ${zone} · ${z[2]}`)}</p>
+            <p className="mt-1 text-sm font-semibold text-white md:text-xl" style={T("sub")} {...el("sub", "text", "Negeri, zon dan daerah")}>{`${z[1]} · ${zone} · ${z[2]}`}</p>
           </div>
           <div className="text-right text-white">
             <div className="text-3xl font-extrabold tabular-nums md:text-6xl" aria-label="Masa sekarang" style={T("clock")} {...el("clock", "text", "Jam")}>{clock}</div>
