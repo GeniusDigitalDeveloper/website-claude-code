@@ -1,4 +1,4 @@
-export type SlideItem = { id: string; kind: "hadis" | "ayat" | "hikmah" | "ulama" | "jumaat" | "umum" | "gambar" | "video"; title?: string; text: string; source?: string; on: boolean; jumaat?: boolean; bg?: string; imgId?: string; videoUrl?: string; vidPath?: string; mime?: string; dur?: number };
+export type SlideItem = { id: string; kind: "hadis" | "ayat" | "hikmah" | "ulama" | "jumaat" | "umum" | "gambar" | "video"; title?: string; text: string; source?: string; on: boolean; jumaat?: boolean; bg?: string; imgId?: string; videoUrl?: string; vidPath?: string; mime?: string; dur?: number; ar?: string; arFont?: string; arSz?: number; font?: string; sz?: number };
 export type Announcement = { id: string; text: string; on: boolean };
 export type ElStyle = { font?: string; color?: string; border?: string };
 export type TvDoc = {

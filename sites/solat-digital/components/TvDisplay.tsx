@@ -141,7 +141,7 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
   const el = (key: string, kind: "text" | "border" | "arabic", label: string) => ({ "data-el": key, "data-kind": kind, "data-label": label });
   const onPick = (e: React.MouseEvent) => {
     if (!preview) return; const tgt = e.target as HTMLElement; if (tgt.closest("[data-noedit]")) { e.preventDefault(); e.stopPropagation(); return; } const t = tgt.closest("[data-el]") as HTMLElement | null; if (!t) return;
-    e.preventDefault(); e.stopPropagation(); window.parent.postMessage({ sd: "pick", key: t.dataset.el, kind: t.dataset.kind, label: t.dataset.label }, location.origin);
+    e.preventDefault(); e.stopPropagation(); window.parent.postMessage({ sd: "pick", key: t.dataset.el, kind: t.dataset.kind, label: t.dataset.label, slide: t.closest("[data-slide]") ? (t.closest("[data-slide]") as HTMLElement).dataset.slide : undefined }, location.origin);
   };
 
   return (

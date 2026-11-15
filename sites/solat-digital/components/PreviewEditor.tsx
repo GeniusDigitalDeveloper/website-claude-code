@@ -20,12 +20,12 @@ const TEXT_DEF = (key: string): { def: string; hint: string } | null => {
 type Pick = { key: string; kind: "text" | "border" | "arabic"; label: string };
 
 /** Pratonton live TV (iframe) yang boleh diklik. Perubahan terus ditulis ke pangkalan data dan dipaparkan pada TV sebenar. */
-export default function PreviewEditor({ mid, tv, customFonts, canEdit = true, onRename, onZone }: { mid: string; tv: TvDoc; customFonts?: CustomFont[]; canEdit?: boolean; onRename?: (n: string) => void; onZone?: (zone: string) => void }) {
+export default function PreviewEditor({ mid, tv, customFonts, canEdit = true, onRename, onZone, onSlide }: { mid: string; tv: TvDoc; customFonts?: CustomFont[]; canEdit?: boolean; onRename?: (n: string) => void; onZone?: (zone: string) => void; onSlide?: (id: string) => void }) {
   const [nm, setNm] = useState(tv.name); const nmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wrap = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.5); const [pick, setPick] = useState<Pick | null>(null);
   useEffect(() => { const el = wrap.current; if (!el) return; const ro = new ResizeObserver(() => setScale(el.clientWidth / 1440)); ro.observe(el); setScale(el.clientWidth / 1440); return () => ro.disconnect(); }, []);
-  useEffect(() => { const f = (e: MessageEvent) => { if (e.origin === location.origin && e.data?.sd === "pick" && canEdit) setPick({ key: e.data.key, kind: e.data.kind, label: e.data.label }); }; addEventListener("message", f); return () => removeEventListener("message", f); }, [canEdit]);
+  useEffect(() => { const f = (e: MessageEvent) => { if (e.origin === location.origin && e.data?.sd === "pick" && canEdit) { if (e.data.kind === "slide") { onSlide?.(e.data.slide ?? ""); return; } setPick({ key: e.data.key, kind: e.data.kind, label: e.data.label }); } }; addEventListener("message", f); return () => removeEventListener("message", f); }, [canEdit, onSlide]);
   useEffect(() => { if (pick?.key === "name") setNm(tv.name); }, [pick?.key]); // eslint-disable-line react-hooks/exhaustive-deps
   const rename = (v: string) => { setNm(v); if (nmTimer.current) clearTimeout(nmTimer.current); nmTimer.current = setTimeout(() => { const t = v.trim(); if (t.length >= 3) onRename?.(t.slice(0, 120)); }, 700); };
   const td = pick ? TEXT_DEF(pick.key) : null;

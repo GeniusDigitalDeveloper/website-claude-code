@@ -226,3 +226,6 @@ main > section.card:nth-of-type(6) { animation-delay: .24s; } main > section.car
 .sl-actions { display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; }
 .sl-edit { grid-column: 1 / -1; padding-top: .5rem; border-top: 1px dashed var(--color-line); animation: rise .45s var(--ease-ios) both; }
 @media (prefers-reduced-motion: reduce) { .blink-note { animation: none; } .sl-item, .sl-edit { transition: none; animation: none; } }
+
+.sl-flash { animation: slFlash 2.4s ease-out 1; }
+@keyframes slFlash { 0%,40% { box-shadow: 0 0 0 4px #fbbf24, 0 0 28px rgba(251,191,36,.7); } 100% { box-shadow: 0 0 0 0 rgba(251,191,36,0); } }
