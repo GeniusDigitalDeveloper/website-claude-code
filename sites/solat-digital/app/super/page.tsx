@@ -14,6 +14,8 @@ import PasswordInput from "@/components/PasswordInput";
 import Shell, { type NavItem } from "@/components/Shell";
 import Chat, { Broadcast } from "@/components/Chat";
 import DateBadge from "@/components/DateBadge";
+import VideoAdder from "@/components/VideoAdder";
+import { deleteVideo } from "@/lib/media";
 import { chatSfx } from "@/lib/sfx";
 import { useDefaults } from "@/lib/useDefaults";
 
@@ -101,9 +103,13 @@ function AzanManager() {
 /* ---------------- Tetapan sistem ---------------- */
 function SlidesEdit({ list, set }: { list: SlideItem[]; set: (l: SlideItem[]) => void }) {
   const upd = (id: string, p: Partial<SlideItem>) => set(list.map((x) => (x.id === id ? { ...x, ...p } : x)));
+  const [vmsg, setVmsg] = useState("");
   return (
     <div>
-      <ul className="grid gap-3">{list.map((s) => (<li key={s.id} className="rounded-xl border border-line p-3">
+      <ul className="grid gap-3">{list.map((s) => s.kind === "video" ? (<li key={s.id} className="flex flex-wrap items-center gap-3 rounded-xl border border-line p-3"><span className="chip chip-ok">Video animasi</span><span className="min-w-0 flex-1 truncate text-sm text-sub">{s.vidPath ? "Dimuat naik" : s.videoUrl}</span>
+        <label className="flex items-center gap-1 text-sm">Saat <input type="number" min={5} max={120} className="inp !w-20 !min-h-9" aria-label="Tempoh video (saat)" value={s.dur ?? 15} onChange={(e) => upd(s.id, { dur: Math.max(5, Math.min(120, Math.round(+e.target.value) || 15)) })} /></label>
+        <label className="flex min-h-11 items-center gap-1 text-sm"><input type="checkbox" className="size-5 accent-green-700" checked={s.on} onChange={(e) => upd(s.id, { on: e.target.checked })} /> Aktif</label>
+        <button className="btn" aria-label="Padam video" onClick={() => { if (s.vidPath) deleteVideo(s.vidPath); set(list.filter((x) => x.id !== s.id)); }}><Trash2 size={16} /></button></li>) : (<li key={s.id} className="rounded-xl border border-line p-3">
         <div className="flex flex-wrap items-center gap-2"><select aria-label="Jenis slaid" className="inp !w-auto" value={s.kind} onChange={(e) => upd(s.id, { kind: e.target.value as SlideItem["kind"] })}>{Object.entries(KIND_LABEL).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
           <label className="flex min-h-11 items-center gap-1 text-sm"><input type="checkbox" className="size-5 accent-green-700" checked={s.on} onChange={(e) => upd(s.id, { on: e.target.checked })} /> Aktif</label>
           <label className="flex min-h-11 items-center gap-1 text-sm"><input type="checkbox" className="size-5 accent-green-700" checked={!!s.jumaat} onChange={(e) => upd(s.id, { jumaat: e.target.checked })} /> Jumaat sahaja</label>
@@ -111,7 +117,8 @@ function SlidesEdit({ list, set }: { list: SlideItem[]; set: (l: SlideItem[]) =>
         <textarea aria-label="Teks slaid" rows={2} maxLength={400} className="inp mt-2" value={s.text} onChange={(e) => upd(s.id, { text: e.target.value })} />
         <input aria-label="Rujukan" className="inp mt-2" placeholder="Rujukan" value={s.source ?? ""} onChange={(e) => upd(s.id, { source: e.target.value })} /></li>))}
         {!list.length && <li className="text-sm text-sub">Tiada slaid platform.</li>}</ul>
-      <button className="btn btn-primary mt-3" disabled={list.length >= 15} onClick={() => set([...list, { id: uid(), kind: "umum", text: "", source: "", on: true }])}><Plus size={18} /> Tambah slaid ({list.length} / 15)</button>
+      <button className="btn btn-primary mt-3" disabled={list.length >= 15} onClick={() => set([...list, { id: uid(), kind: "umum", text: "", source: "", on: true }])}><Plus size={18} /> Tambah slaid teks ({list.length} / 15)</button>
+      <div className="mt-4"><VideoAdder basePath="config/defaults/vid" disabled={list.length >= 15} flash={(m) => { setVmsg(m); setTimeout(() => setVmsg(""), 3500); }} onAdd={(it) => set([...list, { ...it, id: uid() }])} />{vmsg && <p role="status" className="mt-2 text-sm font-semibold text-accent">{vmsg}</p>}<p className="mt-2 text-xs text-sub">Video platform keluar di semua TV. Tekan "Simpan tetapan" selepas menambah.</p></div>
     </div>
   );
 }

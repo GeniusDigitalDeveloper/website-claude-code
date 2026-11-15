@@ -7,6 +7,8 @@ import { coverImage } from "@/lib/image";
 import { DEFAULT_SLIDES } from "@/lib/defaultSlides";
 import { SLIDE_BGS, bgOf } from "@/lib/slideBackgrounds";
 import { SLIDE_TEMPLATES } from "@/lib/slideTemplates";
+import VideoAdder from "@/components/VideoAdder";
+import { deleteVideo } from "@/lib/media";
 import { KIND_LABEL, uid, type SlideItem } from "@/lib/types";
 
 const MAX = 15;
@@ -39,12 +41,12 @@ export default function SlideManager({ mid, slides, onLive, flash }: { mid: stri
     if (nid && it) { if (it.imgId) deleteDoc(doc(db, "tv", mid, "slideimg", it.imgId)).catch(() => {}); commit(list.map((x) => (x.id === sid ? { ...x, imgId: nid } : x))); }
     setBusy(false); if (repl.current) repl.current.value = "";
   };
-  const remove = (it: SlideItem) => { if (!confirm("Padam slaid ini?")) return; if (it.imgId) deleteDoc(doc(db, "tv", mid, "slideimg", it.imgId)).catch(() => {}); commit(list.filter((x) => x.id !== it.id)); if (editId === it.id) { setEditId(null); setBuf(null); } };
+  const remove = (it: SlideItem) => { if (!confirm("Padam slaid ini?")) return; if (it.vidPath) deleteVideo(it.vidPath); if (it.imgId) deleteDoc(doc(db, "tv", mid, "slideimg", it.imgId)).catch(() => {}); commit(list.filter((x) => x.id !== it.id)); if (editId === it.id) { setEditId(null); setBuf(null); } };
   const move = (from: number, to: number) => { if (to < 0 || to >= list.length || from === to) return; const l = [...list]; const [x] = l.splice(from, 1); l.splice(to, 0, x); commit(l); };
   const upd = (id: string, p: Partial<SlideItem>) => commit(list.map((x) => (x.id === id ? { ...x, ...p } : x)));
   const startEdit = (it: SlideItem) => { setEditId(it.id); setBuf({ ...it }); };
   const saveEdit = () => { if (!buf) return; if (buf.kind !== "gambar" && !buf.text.trim()) return flash("Teks slaid tidak boleh kosong."); upd(buf.id, buf); setEditId(null); setBuf(null); };
-  const thumb = (it: SlideItem) => it.kind === "gambar" ? { backgroundImage: imgs[it.imgId ?? ""] ? `url(${imgs[it.imgId!]})` : undefined } : { backgroundImage: bgOf(it.bg) ? `linear-gradient(rgba(2,6,23,.45),rgba(2,6,23,.65)), url(${bgOf(it.bg)!.url})` : "linear-gradient(135deg,#064e3b,#0f172a)" };
+  const thumb = (it: SlideItem) => it.kind === "video" ? { backgroundImage: "linear-gradient(135deg,#1e1b4b,#0f172a)" } : it.kind === "gambar" ? { backgroundImage: imgs[it.imgId ?? ""] ? `url(${imgs[it.imgId!]})` : undefined } : { backgroundImage: bgOf(it.bg) ? `linear-gradient(rgba(2,6,23,.45),rgba(2,6,23,.65)), url(${bgOf(it.bg)!.url})` : "linear-gradient(135deg,#064e3b,#0f172a)" };
 
   return (
     <div>
@@ -55,23 +57,34 @@ export default function SlideManager({ mid, slides, onLive, flash }: { mid: stri
         <input ref={file} type="file" accept="image/*" multiple className="hidden" aria-label="Pilih gambar slaid" onChange={(e) => addFiles(e.target.files)} />
         <input ref={repl} type="file" accept="image/*" className="hidden" aria-label="Pilih gambar ganti" onChange={(e) => replaceImg(e.target.files?.[0])} />
       </div>
+      <div className="mt-3"><VideoAdder basePath={`tv/${mid}/slidevid`} disabled={full} flash={flash} onAdd={(it) => commit([...list, { ...it, id: uid() }])} /></div>
       <div className="mt-3"><span className="lbl !mt-0">Tambah daripada templat</span><div className="flex flex-wrap gap-2">{SLIDE_TEMPLATES.map((t) => <button key={t.id} type="button" className="btn" disabled={full} onClick={() => { commit([...list, { ...t.make(), id: uid() }]); flash(`Templat ${t.label} ditambah. Tekan pensel untuk sunting teks.`); }}>{t.label}</button>)}</div></div>
       <p className="mt-3 text-sm text-sub">{list.length} / {MAX} slaid. Seret <GripVertical size={14} className="inline" /> atau guna anak panah untuk susun. {!slides && "Anda sedang guna pek slaid asas; sebarang perubahan akan menyalinnya untuk disunting."}</p>
       <ul className="mt-3 grid gap-2" aria-label="Senarai slaid">
         {list.map((it, i) => (
           <li key={it.id} className="sl-item" data-over={over === i && drag !== i} data-drag={drag === i} draggable onDragStart={(e) => { setDrag(i); e.dataTransfer.effectAllowed = "move"; }} onDragOver={(e) => { e.preventDefault(); setOver(i); }} onDragLeave={() => setOver((o) => (o === i ? null : o))} onDrop={(e) => { e.preventDefault(); if (drag !== null) move(drag, i); setDrag(null); setOver(null); }} onDragEnd={() => { setDrag(null); setOver(null); }}>
             <span className="sl-grip" aria-hidden="true"><GripVertical size={20} /></span>
-            <div className="sl-thumb" style={thumb(it)}>{it.kind !== "gambar" && <span className="line-clamp-3 font-bold [text-shadow:0_1px_2px_rgba(0,0,0,.8)]">{it.text}</span>}</div>
-            <div className="min-w-0"><b className="block truncate">{it.kind === "gambar" ? "Gambar slaid" : it.title || KIND_LABEL[it.kind]}</b><span className="block truncate text-xs text-sub">{it.kind === "gambar" ? "Kekal seperti dimuat naik" : it.source || it.text}</span>{it.jumaat && <span className="chip chip-demo !text-[.68rem]">Jumaat sahaja</span>}</div>
+            <div className="sl-thumb" style={thumb(it)}>{it.kind === "video" && <span className="font-extrabold tracking-wider">VIDEO</span>}{it.kind !== "gambar" && it.kind !== "video" && <span className="line-clamp-3 font-bold [text-shadow:0_1px_2px_rgba(0,0,0,.8)]">{it.text}</span>}</div>
+            <div className="min-w-0"><b className="block truncate">{it.kind === "gambar" ? "Gambar slaid" : it.kind === "video" ? "Video animasi" : it.title || KIND_LABEL[it.kind]}</b><span className="block truncate text-xs text-sub">{it.kind === "gambar" ? "Kekal seperti dimuat naik" : it.kind === "video" ? `${it.vidPath ? "Dimuat naik" : "Pautan"} · ${it.dur || 15} saat` : it.source || it.text}</span>{it.jumaat && <span className="chip chip-demo !text-[.68rem]">Jumaat sahaja</span>}</div>
             <div className="sl-actions">
               <button type="button" className="switch" role="switch" aria-checked={it.on} aria-label={`Aktifkan slaid ${i + 1}`} onClick={() => upd(it.id, { on: !it.on })} />
               <button type="button" className="btn !min-h-9 !px-2" aria-label="Naik" disabled={i === 0} onClick={() => move(i, i - 1)}><ArrowUp size={16} /></button>
               <button type="button" className="btn !min-h-9 !px-2" aria-label="Turun" disabled={i === list.length - 1} onClick={() => move(i, i + 1)}><ArrowDown size={16} /></button>
-              {it.kind === "gambar" ? <button type="button" className="btn !min-h-9 !px-2" aria-label="Ganti gambar" onClick={() => { replFor.current = it.id; repl.current?.click(); }}><RefreshCw size={16} /></button>
+              {it.kind === "video" ? <button type="button" className="btn !min-h-9 !px-2" aria-label="Sunting video" onClick={() => (editId === it.id ? (setEditId(null), setBuf(null)) : startEdit(it))}><Pencil size={16} /></button>
+                : it.kind === "gambar" ? <button type="button" className="btn !min-h-9 !px-2" aria-label="Ganti gambar" onClick={() => { replFor.current = it.id; repl.current?.click(); }}><RefreshCw size={16} /></button>
                 : <button type="button" className="btn !min-h-9 !px-2" aria-label="Sunting slaid" onClick={() => (editId === it.id ? (setEditId(null), setBuf(null)) : startEdit(it))}><Pencil size={16} /></button>}
               <button type="button" className="btn !min-h-9 !px-2 text-danger" aria-label="Padam slaid" onClick={() => remove(it)}><Trash2 size={16} /></button>
             </div>
-            {editId === it.id && buf && it.kind !== "gambar" && (
+            {editId === it.id && buf && it.kind === "video" && (
+              <div className="sl-edit">
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <div><label htmlFor={"vd" + it.id} className="lbl !mt-0">Tempoh paparan (saat, 5 hingga 120)</label><input id={"vd" + it.id} type="number" min={5} max={120} className="inp" value={buf.dur ?? 15} onChange={(e) => setBuf({ ...buf, dur: Math.max(5, Math.min(120, Math.round(+e.target.value) || 15)) })} /></div>
+                  {!it.vidPath && <div><label htmlFor={"vu" + it.id} className="lbl !mt-0">Pautan video</label><input id={"vu" + it.id} className="inp" value={buf.videoUrl ?? ""} onChange={(e) => setBuf({ ...buf, videoUrl: e.target.value })} /></div>}
+                </div>
+                <label className="mt-2 flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" className="size-5 accent-green-700" checked={!!buf.jumaat} onChange={(e) => setBuf({ ...buf, jumaat: e.target.checked })} /> Jumaat sahaja</label>
+                <div className="mt-2 flex gap-2"><button type="button" className="btn btn-primary" onClick={() => { upd(buf.id, buf); setEditId(null); setBuf(null); }}><Check size={18} /> Simpan video</button><button type="button" className="btn" onClick={() => { setEditId(null); setBuf(null); }}>Batal</button></div>
+              </div>)}
+            {editId === it.id && buf && it.kind !== "gambar" && it.kind !== "video" && (
               <div className="sl-edit">
                 <label htmlFor={"st" + it.id} className="lbl !mt-0">Teks slaid</label><textarea id={"st" + it.id} rows={3} maxLength={400} className="inp" value={buf.text} onChange={(e) => setBuf({ ...buf, text: e.target.value })} />
                 <div className="mt-2 grid gap-2 sm:grid-cols-2">

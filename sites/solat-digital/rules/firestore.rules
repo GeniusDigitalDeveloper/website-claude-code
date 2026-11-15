@@ -23,6 +23,9 @@ service cloud.firestore {
         && (!('styles' in d) || d.styles is map)
         && (!('azanByPrayer' in d) || d.azanByPrayer is map)
         && (!('theme' in d) || (d.theme is string && d.theme.size() <= 20))
+        && (!('popupMin' in d) || (d.popupMin is number && d.popupMin >= 1 && d.popupMin <= 10))
+        && (!('texts' in d) || d.texts is map)
+        && (!('arabicColor' in d) || (d.arabicColor is string && d.arabicColor.size() <= 9))
         && (!('azanMute' in d) || d.azanMute is bool)
         && (!('jumaatTime' in d) || (d.jumaatTime is string && d.jumaatTime.size() <= 8))
         && (!('volume' in d) || (d.volume is number && d.volume >= 5 && d.volume <= 100))
@@ -54,6 +57,17 @@ service cloud.firestore {
       allow update: if (me(u) && validTv(request.resource.data) && request.resource.data.plan == resource.data.plan && request.resource.data.ownerUid == resource.data.ownerUid)
         || (isSuper() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['plan']) && request.resource.data.plan in ['demo', 'full']);
       allow delete: if false;
+      // Video animasi (kepingan kecil): metadata + kepingan dalam sub-koleksi c
+      match /slidevid/{v} {
+        allow read: if true;
+        allow create, update: if me(u) && request.resource.data.size() < 2000;
+        allow delete: if me(u);
+        match /c/{n} {
+          allow read: if true;
+          allow create, update: if me(u) && request.resource.data.d is string && request.resource.data.d.size() < 900000;
+          allow delete: if me(u);
+        }
+      }
       match /slideimg/{i} {
         allow read: if true;
         allow create, update: if me(u) && request.resource.data.data is string && request.resource.data.data.size() < 900000;
@@ -81,6 +95,12 @@ service cloud.firestore {
     }
 
     // Perpustakaan azan: baca awam; tambah/ubah oleh admin besar sahaja.
+    // Video platform (Owner): metadata + kepingan
+    match /config/{c}/vid/{v} {
+      allow read: if true; allow write: if isSuper();
+      match /c/{n} { allow read: if true; allow write: if isSuper(); }
+    }
+
     // Tetapan lalai sistem (cth. font): baca awam; ubah oleh admin besar sahaja.
     match /config/{c} { allow read: if true; allow write: if isSuper(); }
 

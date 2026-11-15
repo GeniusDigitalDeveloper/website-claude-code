@@ -6,14 +6,31 @@ import { db } from "@/lib/firebase";
 import { ARABIC_FONTS, FONTS, type CustomFont, type ElStyle, type TvDoc } from "@/lib/types";
 
 const SWATCH = ["#ffffff", "#fde047", "#fbbf24", "#86efac", "#34d399", "#67e8f9", "#60a5fa", "#f0abfc", "#fca5a5", "#0f172a"];
+const PR_NAMES: Record<string, string> = { fajr: "Subuh", dhuhr: "Zuhur", asr: "Asar", maghrib: "Maghrib", isha: "Isyak", jumaat: "Jumaat" };
+/** Teks yang boleh diganti kandungannya (kunci elemen -> teks asal / petunjuk). Teks lain dikira sistem (jam, tarikh, nombor). */
+const TEXT_DEF = (key: string): { def: string; hint: string } | null => {
+  if (key === "curl") return { def: "Waktu semasa", hint: "" };
+  if (key === "nextl") return { def: "{waktu} dalam", hint: "{waktu} = nama waktu seterusnya." };
+  if (key === "cdl") return { def: "{min} minit sebelum azan {waktu}", hint: "{min} = bilangan minit, {waktu} = nama waktu." };
+  if (key === "sub") return { def: "", hint: "Kosong = negeri, zon dan daerah automatik." };
+  if (key.startsWith("ct-") && PR_NAMES[key.slice(3)]) return { def: PR_NAMES[key.slice(3)], hint: "Menggantikan nama waktu pada TV." };
+  return null;
+};
 type Pick = { key: string; kind: "text" | "border" | "arabic"; label: string };
 
 /** Pratonton live TV (iframe) yang boleh diklik. Perubahan terus ditulis ke pangkalan data dan dipaparkan pada TV sebenar. */
-export default function PreviewEditor({ mid, tv, customFonts, canEdit = true }: { mid: string; tv: TvDoc; customFonts?: CustomFont[]; canEdit?: boolean }) {
+export default function PreviewEditor({ mid, tv, customFonts, canEdit = true, onRename }: { mid: string; tv: TvDoc; customFonts?: CustomFont[]; canEdit?: boolean; onRename?: (n: string) => void }) {
+  const [nm, setNm] = useState(tv.name); const nmTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wrap = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0.5); const [pick, setPick] = useState<Pick | null>(null);
   useEffect(() => { const el = wrap.current; if (!el) return; const ro = new ResizeObserver(() => setScale(el.clientWidth / 1440)); ro.observe(el); setScale(el.clientWidth / 1440); return () => ro.disconnect(); }, []);
   useEffect(() => { const f = (e: MessageEvent) => { if (e.origin === location.origin && e.data?.sd === "pick" && canEdit) setPick({ key: e.data.key, kind: e.data.kind, label: e.data.label }); }; addEventListener("message", f); return () => removeEventListener("message", f); }, [canEdit]);
+  useEffect(() => { if (pick?.key === "name") setNm(tv.name); }, [pick?.key]); // eslint-disable-line react-hooks/exhaustive-deps
+  const rename = (v: string) => { setNm(v); if (nmTimer.current) clearTimeout(nmTimer.current); nmTimer.current = setTimeout(() => { const t = v.trim(); if (t.length >= 3) onRename?.(t.slice(0, 120)); }, 700); };
+  const td = pick ? TEXT_DEF(pick.key) : null;
+  const [tt, setTt] = useState(""); const ttTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => { if (pick) setTt(tv.texts?.[pick.key] ?? ""); }, [pick?.key]); // eslint-disable-line react-hooks/exhaustive-deps
+  const retext = (v: string) => { setTt(v); if (ttTimer.current) clearTimeout(ttTimer.current); ttTimer.current = setTimeout(() => { if (!pick) return; const t = v.trim(); updateDoc(doc(db, "tv", mid), { [`texts.${pick.key}`]: t ? t.slice(0, 160) : deleteField() }).catch(() => {}); }, 700); };
   const st: ElStyle = (pick && tv.styles?.[pick.key]) || {};
   const write = (p: Partial<ElStyle>) => { if (!pick) return; const next = { ...st, ...p }; Object.keys(next).forEach((k) => !(next as Record<string, string>)[k] && delete (next as Record<string, string>)[k]); updateDoc(doc(db, "tv", mid), { [`styles.${pick.key}`]: Object.keys(next).length ? next : deleteField() }).catch(() => {}); };
   const colorKey = pick?.kind === "border" ? "border" : "color";
@@ -27,6 +44,13 @@ export default function PreviewEditor({ mid, tv, customFonts, canEdit = true }: 
       {pick && (
         <div className="pop-card mt-3 card" role="dialog" aria-label={`Ubah ${pick.label}`}>
           <div className="flex items-center justify-between gap-2"><h3 className="font-bold">Ubah: {pick.label}</h3><button className="btn !px-3" aria-label="Tutup" onClick={() => setPick(null)}><X size={18} /></button></div>
+          {pick.key === "name" && onRename && (<><label htmlFor="pe-nm" className="lbl">Teks nama masjid</label>
+            <input id="pe-nm" className="inp" maxLength={120} value={nm} onChange={(e) => rename(e.target.value)} placeholder="Nama masjid / surau" />
+            <p className="mt-1 text-xs text-sub">Disimpan sendiri dan terus berubah pada TV. Paparan guna HURUF BESAR.</p></>)}
+          {td && (<><label htmlFor="pe-tx" className="lbl">Teks</label>
+            <input id="pe-tx" className="inp" maxLength={160} value={tt} onChange={(e) => retext(e.target.value)} placeholder={td.def || "Teks lalai"} />
+            <p className="mt-1 text-xs text-sub">{td.hint ? td.hint + " " : ""}Kosongkan untuk kembali ke teks asal. Terus berubah pada TV.</p></>)}
+          {pick.kind === "text" && !td && pick.key !== "name" && <p className="mt-2 rounded-xl bg-muted p-3 text-sm text-sub">{["clock", "date", "hijri", "cdn", "nextt"].includes(pick.key) ? "Nilai ini dikira sistem (masa dan tarikh sebenar), jadi hanya font dan warna boleh diubah." : pick.key === "slide-text" ? "Sunting teks slaid di bahagian Slaid TV di bawah." : pick.key === "tickert" ? "Teks bergerak diurus di menu Slaid dan pengumuman." : "Font dan warna boleh diubah."}</p>}
           {pick.kind === "arabic" ? (<>
             <label htmlFor="pe-ar" className="lbl">Font Arab (khat Thuluth)</label>
             <select id="pe-ar" className="inp" value={tv.arabicFont ?? ""} onChange={(e) => updateDoc(doc(db, "tv", mid), { arabicFont: e.target.value }).catch(() => {})}>

@@ -57,6 +57,8 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
   const [arFam, setArFam] = useState("Arabic Honorifics Complete");
   const feat = { slides: true, ticker: true, hijri: true, banner: true, ...(defs?.features ?? {}) };
   const sty: Record<string, ElStyle> = m.styles ?? {};
+  const tx = (k: string, d: string) => m.texts?.[k]?.trim() || d;
+  const arSty: CSSProperties = m.arabicColor ? { color: m.arabicColor } : {};
   const T = (k: string): CSSProperties => { const e = sty[k]; return e ? { ...(e.color ? { color: e.color } : {}), ...(e.font ? { fontFamily: `"${e.font}", ui-sans-serif, system-ui, sans-serif` } : {}) } : {}; };
   const B = (k: string): CSSProperties => (sty[k]?.border ? ({ ["--bc" as string]: sty[k].border } as CSSProperties) : {});
 
@@ -108,6 +110,13 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
     playRing(m.ringtone ?? "chime", m.ringRepeat ?? 1, vol * 100).then((ok) => { if (ok) rang.current.add(k); });
   }, [idx?.diff, demo, pre, m.ringtone, m.ringRepeat, vol, live]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (pop === null) return; const k = (e: KeyboardEvent) => e.key === "Escape" && closePop(popKey); addEventListener("keydown", k); return () => removeEventListener("keydown", k); }, [pop, popKey, closePop]);
+  // Pop-up "waktu solat telah masuk" tutup sendiri selepas beberapa minit (lalai 3). Jika azan masih berbunyi, tunggu sehingga azan habis (maks 8 minit).
+  const popRef = useRef({ key: "", close: closePop }); popRef.current = { key: popKey, close: closePop };
+  useEffect(() => {
+    if (pop === null || !live) return; const t0 = Date.now(), min = Math.max(1, Math.min(10, m.popupMin ?? 3)) * 60e3; let t: ReturnType<typeof setTimeout>;
+    const tryClose = () => { const a = audio.current; const playing = !!a && !a.ended && !a.paused; if (playing && Date.now() - t0 < 8 * 60e3) { t = setTimeout(tryClose, 5000); return; } popRef.current.close(popRef.current.key); };
+    t = setTimeout(tryClose, min); return () => clearTimeout(t);
+  }, [pop, live, m.popupMin]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { window.__sdBusy = pop !== null; return () => { window.__sdBusy = false; }; }, [pop]);
 
   const toggleFull = () => { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen?.().catch(() => {}); };
@@ -121,17 +130,17 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
   const mmss = (n: number) => `${String(Math.floor(n / 60)).padStart(2, "0")}:${String(n % 60).padStart(2, "0")}`;
   const popDone = (() => { try { return !!popKey && !!localStorage.getItem(popKey); } catch { return false; } })();
   const banner = !idx || !feat.banner ? null
-    : pre > 0 && idx.diff > 0 && idx.diff <= pre * 60 ? { label: `${Math.ceil(idx.diff / 60)} minit sebelum azan ${act[idx.ni].n}`, time: mmss(idx.diff) }
+    : pre > 0 && idx.diff > 0 && idx.diff <= pre * 60 ? { label: tx("cdl", "{min} minit sebelum azan {waktu}").replace("{min}", String(Math.ceil(idx.diff / 60))).replace("{waktu}", tx("ct-" + act[idx.ni].k, act[idx.ni].n)), time: mmss(idx.diff) }
     : !demo && delayS > 0 && cur && sinceCur >= 0 && sinceCur < delayS && !popDone && pop === null ? { label: `Sudah masuk waktu ${cur.n}. Azan dalam`, time: mmss(delayS - sinceCur) }
     : null;
-  const pool = [...(m.slideList ?? DEFAULT_SLIDES), ...(defs?.platformSlides ?? [])].filter((x) => x.on && (x.kind === "gambar" ? !!x.imgId : !!x.text.trim()));
+  const pool = [...(m.slideList ?? DEFAULT_SLIDES), ...(defs?.platformSlides ?? [])].filter((x) => x.on && (x.kind === "gambar" ? !!x.imgId : x.kind === "video" ? !!(x.videoUrl || x.vidPath) : !!x.text.trim()));
   const slides = !feat.slides ? [] : fri ? (pool.some((x) => x.jumaat) ? pool.filter((x) => x.jumaat) : pool) : pool.filter((x) => !x.jumaat);
   const popItem = pop ? items.find((x) => x.k === pop) : null;
   const curKey = cur?.k;
   const tvars = { ...themeVars(m.theme || defs?.theme), fontFamily: `"${font}", ui-sans-serif, system-ui, sans-serif`, ["--ar-font" as string]: `"${arFam}"` } as CSSProperties;
   const el = (key: string, kind: "text" | "border" | "arabic", label: string) => ({ "data-el": key, "data-kind": kind, "data-label": label });
   const onPick = (e: React.MouseEvent) => {
-    if (!preview) return; const t = (e.target as HTMLElement).closest("[data-el]") as HTMLElement | null; if (!t) return;
+    if (!preview) return; const tgt = e.target as HTMLElement; if (tgt.closest("[data-noedit]")) { e.preventDefault(); e.stopPropagation(); return; } const t = tgt.closest("[data-el]") as HTMLElement | null; if (!t) return;
     e.preventDefault(); e.stopPropagation(); window.parent.postMessage({ sd: "pick", key: t.dataset.el, kind: t.dataset.kind, label: t.dataset.label }, location.origin);
   };
 
@@ -143,7 +152,7 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
         <header className="flex flex-wrap items-start justify-between gap-3 pt-10">
           <div className="min-w-0">
             <h1 className="break-words text-2xl font-extrabold uppercase tracking-wide text-white md:text-5xl" style={T("name")} {...el("name", "text", "Nama masjid")}>{m.name}</h1>
-            <p className="mt-1 text-sm font-semibold text-white md:text-xl" style={T("sub")} {...el("sub", "text", "Negeri, zon dan daerah")}>{z[1]} · {zone} · {z[2]}</p>
+            <p className="mt-1 text-sm font-semibold text-white md:text-xl" style={T("sub")} {...el("sub", "text", "Negeri, zon dan daerah")}>{tx("sub", `${z[1]} · ${zone} · ${z[2]}`)}</p>
           </div>
           <div className="text-right text-white">
             <div className="text-3xl font-extrabold tabular-nums md:text-6xl" aria-label="Masa sekarang" style={T("clock")} {...el("clock", "text", "Jam")}>{clock}</div>
@@ -161,15 +170,15 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
           <section className={`glass rounded-3xl p-4 md:p-6 ${alert ? "tv-alert" : ""}`} style={B("frame")} {...el("frame", "border", "Bingkai waktu solat")} aria-live="off">
             {times && idx ? (<>
               <div className="mb-4 flex flex-wrap items-end justify-between gap-4 text-white">
-                <div><small className="text-xs font-bold uppercase tracking-widest md:text-base" style={T("curl")} {...el("curl", "text", "Label waktu semasa")}>Waktu semasa</small><div className="text-4xl font-extrabold leading-tight md:text-6xl" style={{ color: "var(--acc, #fcd34d)", ...T("curn") }} {...el("curn", "text", "Nama waktu semasa")}>{cur ? cur.n : "Isyak"}</div></div>
-                <div className="text-right"><small className="text-xs font-bold uppercase tracking-widest md:text-base" style={T("nextl")} {...el("nextl", "text", "Label waktu seterusnya")}>{act[idx.ni].n}{idx.tomorrow ? " (esok)" : ""} dalam</small>
+                <div><small className="text-xs font-bold uppercase tracking-widest md:text-base" style={T("curl")} {...el("curl", "text", "Label waktu semasa")}>{tx("curl", "Waktu semasa")}</small><div className="text-4xl font-extrabold leading-tight md:text-6xl" style={{ color: "var(--acc, #fcd34d)", ...T("curn") }} {...el("curn", "text", "Nama waktu semasa")}>{cur ? tx("ct-" + cur.k, cur.n) : tx("ct-isha", "Isyak")}</div></div>
+                <div className="text-right"><small className="text-xs font-bold uppercase tracking-widest md:text-base" style={T("nextl")} {...el("nextl", "text", "Label waktu seterusnya")}>{tx("nextl", "{waktu} dalam").replace("{waktu}", tx("ct-" + act[idx.ni].k, act[idx.ni].n) + (idx.tomorrow ? " (esok)" : ""))}</small>
                   <div className="text-4xl font-extrabold tabular-nums leading-tight md:text-6xl" aria-label="Masa berbaki" style={T("nextt")} {...el("nextt", "text", "Masa ke waktu seterusnya")}>{hms(idx.diff)}</div></div>
               </div>
               <ul className={`grid grid-cols-2 gap-2 sm:grid-cols-3 md:gap-3 ${fri ? "lg:grid-cols-6" : "lg:grid-cols-5"}`}>
                 {items.map((p) => (
                   <li key={p.k} className={`glass-tile p-2 text-center md:p-3 ${p.k === (curKey ?? "isha") && !p.silent ? "card-now" : ""} ${p.silent ? "opacity-70" : ""}`} style={B("card-" + p.k)} {...el("card-" + p.k, "border", "Bingkai " + p.n)}>
-                    <b className="block text-base text-white md:text-xl" style={T("ct-" + p.k)} {...el("ct-" + p.k, "text", "Nama " + p.n)}>{p.n}</b>
-                    <span lang="ar" dir="rtl" className="ar block pt-1 text-xl text-white md:text-3xl" {...el("ca", "arabic", "Tulisan Arab")}>{p.ar}</span>
+                    <b className="block text-base text-white md:text-xl" style={T("ct-" + p.k)} {...el("ct-" + p.k, "text", "Nama " + p.n)}>{tx("ct-" + p.k, p.n)}</b>
+                    <span lang="ar" dir="rtl" className="ar block pt-1 text-xl text-white md:text-3xl" data-noedit="1" style={arSty}>{p.ar}</span>
                     <span className="mt-1 block whitespace-nowrap text-lg font-bold tabular-nums text-white md:text-2xl xl:text-3xl" style={T("cm-" + p.k)} {...el("cm-" + p.k, "text", "Masa " + p.n)}>{to12(p.time)}</span>
                   </li>))}
               </ul>
@@ -197,7 +206,7 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
             <div className="bg-cover bg-center p-8 pt-16 text-white" style={{ backgroundImage: `linear-gradient(rgba(15,23,42,.72),rgba(15,23,42,.88)),url(/assets/pop-${popItem.pop}.jpg)` }}>
               <p>Sekarang sudah masuk waktu solat</p>
               <h2 id="pp-t" className="mt-1 text-5xl font-extrabold md:text-6xl">{popItem.n}</h2>
-              <p lang="ar" dir="rtl" className="ar text-5xl">{popItem.ar}</p>
+              <p lang="ar" dir="rtl" className="ar text-5xl" style={arSty}>{popItem.ar}</p>
               <p className="mt-2 text-4xl font-bold tabular-nums" style={{ color: "var(--acc, #fcd34d)" }}>{to12(popItem.time)}</p>
               <p className="mt-3">Bagi negeri {z[1]}, zon {zone}</p>
               <p className="mt-4">{popItem.k === "jumaat" ? "Marilah menuju ke masjid untuk khutbah dan solat Jumaat. Sebaik-baik hari ialah hari Jumaat." : "Jom sama-sama tunaikan solat awal waktu, semoga kita berjaya dunia dan akhirat."}</p>
