@@ -1,7 +1,8 @@
 "use client";
+import { createPortal } from "react-dom";
 import { useEffect, useRef, useState } from "react";
 import { addDoc, collection, deleteDoc, doc, onSnapshot } from "firebase/firestore";
-import { ArrowDown, ArrowUp, Check, GripVertical, ImagePlus, Info, Pencil, Plus, RefreshCw, Trash2 } from "lucide-react";
+import { X, ArrowDown, ArrowUp, Check, GripVertical, ImagePlus, Info, Pencil, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { db } from "@/lib/firebase";
 import { coverImage } from "@/lib/image";
 import { DEFAULT_SLIDES } from "@/lib/defaultSlides";
@@ -17,6 +18,7 @@ export default function SlideManager({ mid, slides, onLive, flash }: { mid: stri
   const [imgs, setImgs] = useState<Record<string, string>>({});
   const [editId, setEditId] = useState<string | null>(null); const [buf, setBuf] = useState<SlideItem | null>(null);
   const [drag, setDrag] = useState<number | null>(null); const [over, setOver] = useState<number | null>(null); const [busy, setBusy] = useState(false);
+  const [dlg, setDlg] = useState<{ text: string; source: string; data: string; bg: string } | null>(null); const dfile = useRef<HTMLInputElement>(null);
   const file = useRef<HTMLInputElement>(null); const repl = useRef<HTMLInputElement>(null); const replFor = useRef<string>("");
   useEffect(() => onSnapshot(collection(db, "tv", mid, "slideimg"), (s) => setImgs(Object.fromEntries(s.docs.map((d) => [d.id, d.data().data as string]))), () => {}), [mid]);
   const list = slides ?? DEFAULT_SLIDES;
@@ -36,6 +38,22 @@ export default function SlideManager({ mid, slides, onLive, flash }: { mid: stri
     for (const f of Array.from(fl)) { if (list.length + add.length >= MAX) { flash(`Maksimum ${MAX} slaid.`); break; } if (!f.type.startsWith("image/")) continue; const id = await upload(f); if (id) add.push({ id: uid(), kind: "gambar", text: "", on: true, imgId: id }); }
     if (add.length) commit([...list, ...add]); setBusy(false); if (file.current) file.current.value = "";
   };
+  const pickDlgImg = async (f?: File | null) => {
+    if (!f || !dlg) return; if (!f.type.startsWith("image/")) return flash("Pilih fail gambar.");
+    try { const { data } = await coverImage(f); if (data.length > 900000) return flash("Gambar terlalu besar."); setDlg((d) => (d ? { ...d, data, bg: "" } : d)); } catch { flash("Gambar tidak sah."); }
+    if (dfile.current) dfile.current.value = "";
+  };
+  const saveDlg = async () => {
+    if (!dlg) return; if (!dlg.text.trim()) return flash("Tulis teks untuk slaid.");
+    if (!dlg.data && !dlg.bg) return flash("Pilih gambar latar dahulu (muat naik atau pilih foto).");
+    setBusy(true);
+    try {
+      const imgId = dlg.data ? (await addDoc(collection(db, "tv", mid, "slideimg"), { data: dlg.data, at: Date.now() })).id : undefined;
+      commit([...list, { id: uid(), kind: "umum", text: dlg.text.trim(), source: dlg.source.trim(), on: true, ...(imgId ? { imgId } : { bg: dlg.bg }) }]);
+      setDlg(null);
+    } catch { flash("Gagal menyimpan slaid."); }
+    setBusy(false);
+  };
   const replaceImg = async (f?: File | null) => {
     const sid = replFor.current; if (!f || !sid) return; setBusy(true); const it = list.find((x) => x.id === sid); const nid = await upload(f);
     if (nid && it) { if (it.imgId) deleteDoc(doc(db, "tv", mid, "slideimg", it.imgId)).catch(() => {}); commit(list.map((x) => (x.id === sid ? { ...x, imgId: nid } : x))); }
@@ -46,17 +64,40 @@ export default function SlideManager({ mid, slides, onLive, flash }: { mid: stri
   const upd = (id: string, p: Partial<SlideItem>) => commit(list.map((x) => (x.id === id ? { ...x, ...p } : x)));
   const startEdit = (it: SlideItem) => { setEditId(it.id); setBuf({ ...it }); };
   const saveEdit = () => { if (!buf) return; if (buf.kind !== "gambar" && !buf.text.trim()) return flash("Teks slaid tidak boleh kosong."); upd(buf.id, buf); setEditId(null); setBuf(null); };
-  const thumb = (it: SlideItem) => it.kind === "video" ? { backgroundImage: "linear-gradient(135deg,#1e1b4b,#0f172a)" } : it.kind === "gambar" ? { backgroundImage: imgs[it.imgId ?? ""] ? `url(${imgs[it.imgId!]})` : undefined } : { backgroundImage: bgOf(it.bg) ? `linear-gradient(rgba(2,6,23,.45),rgba(2,6,23,.65)), url(${bgOf(it.bg)!.url})` : "linear-gradient(135deg,#064e3b,#0f172a)" };
+  const thumb = (it: SlideItem) => it.kind === "video" ? { backgroundImage: "linear-gradient(135deg,#1e1b4b,#0f172a)" } : it.kind === "gambar" ? { backgroundImage: imgs[it.imgId ?? ""] ? `url(${imgs[it.imgId!]})` : undefined } : { backgroundImage: it.imgId && imgs[it.imgId] ? `linear-gradient(rgba(2,6,23,.45),rgba(2,6,23,.65)), url(${imgs[it.imgId]})` : bgOf(it.bg) ? `linear-gradient(rgba(2,6,23,.45),rgba(2,6,23,.65)), url(${bgOf(it.bg)!.url})` : "linear-gradient(135deg,#064e3b,#0f172a)" };
 
   return (
     <div>
       <div className="blink-note" role="note"><Info size={18} className="mt-0.5 shrink-0" aria-hidden="true" /><span>Saiz slaid gambar yang dimasukkan hendaklah <b>1920 x 1080 piksel</b> (nisbah 16:9). Gambar lain saiz akan dipotong.</span></div>
       <div className="mt-3 flex flex-wrap gap-2">
         <button type="button" className="btn btn-primary" disabled={full || busy} onClick={() => file.current?.click()}><ImagePlus size={18} /> {busy ? "Memuat naik…" : "Muat naik gambar slaid"}</button>
-        <button type="button" className="btn" disabled={full} onClick={() => commit([...list, { id: uid(), kind: "umum", text: "Tulis teks slaid anda di sini.", source: "", on: true, bg: "putra" }])}><Plus size={18} /> Slaid teks</button>
+        <button type="button" className="btn" disabled={full} onClick={() => setDlg({ text: "", source: "", data: "", bg: "" })}><Plus size={18} /> Slaid teks</button>
         <input ref={file} type="file" accept="image/*" multiple className="hidden" aria-label="Pilih gambar slaid" onChange={(e) => addFiles(e.target.files)} />
         <input ref={repl} type="file" accept="image/*" className="hidden" aria-label="Pilih gambar ganti" onChange={(e) => replaceImg(e.target.files?.[0])} />
       </div>
+      {dlg && typeof document !== "undefined" && createPortal((() => { const pv = dlg.data || bgOf(dlg.bg)?.url || ""; return (
+        <div className="theme-light fixed inset-0 z-[90] grid place-items-center bg-black/50 p-3" role="dialog" aria-modal="true" aria-label="Tambah slaid teks" onClick={(e) => { if (e.target === e.currentTarget) setDlg(null); }}>
+          <div className="card max-h-[92vh] w-full max-w-2xl overflow-y-auto">
+            <div className="flex items-center justify-between gap-2"><h3 className="text-lg font-bold" style={{ color: "var(--color-fg)" }}>Tambah slaid teks</h3><button type="button" className="btn !px-3" aria-label="Tutup" onClick={() => setDlg(null)}><X size={18} /></button></div>
+            <p className="mt-1 text-sm text-sub">1. Pilih gambar latar. 2. Tulis teks yang akan terletak di atas gambar. 3. Semak pratonton di bawah, kemudian simpan.</p>
+            <span className="lbl">Gambar latar</span>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" className="btn btn-primary" onClick={() => dfile.current?.click()}><ImagePlus size={18} /> {dlg.data ? "Tukar gambar" : "Muat naik gambar"}</button>
+              <select aria-label="Atau pilih foto sedia ada" className="inp !w-auto" value={dlg.bg} onChange={(e) => setDlg({ ...dlg, bg: e.target.value, data: "" })}><option value="">Atau pilih foto sedia ada</option>{SLIDE_BGS.map((b) => <option key={b.id} value={b.id}>{b.label}</option>)}</select>
+              <input ref={dfile} type="file" accept="image/*" className="hidden" aria-label="Pilih gambar latar" onChange={(e) => pickDlgImg(e.target.files?.[0])} />
+            </div>
+            <label htmlFor="dl-tx" className="lbl">Teks atas gambar</label>
+            <textarea id="dl-tx" rows={3} maxLength={400} className="inp" value={dlg.text} onChange={(e) => setDlg({ ...dlg, text: e.target.value })} placeholder="Tulis teks slaid anda di sini." />
+            <label htmlFor="dl-sr" className="lbl">Rujukan / sumber (pilihan)</label>
+            <input id="dl-sr" className="inp" maxLength={120} value={dlg.source} onChange={(e) => setDlg({ ...dlg, source: e.target.value })} placeholder="cth: HR. al-Bukhari no. 1" />
+            <span className="lbl">Pratonton</span>
+            <div className="relative mx-auto grid w-full max-w-md overflow-hidden rounded-2xl bg-slate-800" style={{ aspectRatio: "16 / 9", containerType: "inline-size", ...(pv ? { backgroundImage: `linear-gradient(180deg, rgba(2,6,23,.45), rgba(2,6,23,.75)), url(${pv})`, backgroundSize: "cover", backgroundPosition: "center" } : {}) }}>
+              {!pv && <span className="place-self-center text-sm text-white/70">Belum ada gambar</span>}
+              {pv && <div className="flex h-full flex-col justify-center" style={{ padding: "5cqw" }}><p className="font-bold leading-snug text-white" style={{ fontSize: dlg.text.length > 170 ? "4cqw" : dlg.text.length > 110 ? "4.8cqw" : "5.6cqw" }}>{dlg.text || "Teks anda akan keluar di sini."}</p>{dlg.source && <p className="mt-2 font-semibold" style={{ fontSize: "3cqw", color: "#fde68a" }}>{dlg.source}</p>}</div>}
+            </div>
+            <div className="mt-4 flex gap-2"><button type="button" className="btn btn-primary" disabled={busy} onClick={saveDlg}><Check size={18} /> {busy ? "Menyimpan…" : "Simpan slaid"}</button><button type="button" className="btn" onClick={() => setDlg(null)}>Batal</button></div>
+          </div>
+        </div>); })(), document.body)}
       <div className="mt-3"><VideoAdder basePath={`tv/${mid}/slidevid`} disabled={full} flash={flash} onAdd={(it) => commit([...list, { ...it, id: uid() }])} /></div>
       <div className="mt-3"><span className="lbl !mt-0">Tambah daripada templat</span><div className="flex flex-wrap gap-2">{SLIDE_TEMPLATES.map((t) => <button key={t.id} type="button" className="btn" disabled={full} onClick={() => { commit([...list, { ...t.make(), id: uid() }]); flash(`Templat ${t.label} ditambah. Tekan pensel untuk sunting teks.`); }}>{t.label}</button>)}</div></div>
       <p className="mt-3 text-sm text-sub">{list.length} / {MAX} slaid. Seret <GripVertical size={14} className="inline" /> atau guna anak panah untuk susun. {!slides && "Anda sedang guna pek slaid asas; sebarang perubahan akan menyalinnya untuk disunting."}</p>

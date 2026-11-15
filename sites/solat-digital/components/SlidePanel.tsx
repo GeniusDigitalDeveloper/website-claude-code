@@ -20,10 +20,11 @@ export default function SlidePanel({ slides, anim, secs, T, B, imgs }: { slides:
   const len = s.text.length, size = len > 170 ? 3.6 : len > 110 ? 4.3 : 5.2;
   const bg = bgOf(s.bg);
   const photo = s.kind === "gambar" ? imgs[s.imgId ?? ""] : undefined;
+  const tphoto = s.kind !== "gambar" && s.kind !== "video" && s.imgId ? imgs[s.imgId] : undefined;
   const yt = s.kind === "video" && s.videoUrl ? youtubeId(s.videoUrl) : null;
   return (
     <div className="sl-wrap glass overflow-hidden rounded-3xl" style={B("slide-frame")} data-el="slide-frame" data-kind="border" data-label="Bingkai slaid" role="region" aria-label="Slaid" aria-live="off">
-      <div className="sl-box" style={{ aspectRatio: "16 / 9", ...(bg ? { backgroundImage: `linear-gradient(180deg, rgba(2,6,23,.50), rgba(2,6,23,.78)), url(${bg.url})`, backgroundSize: "cover", backgroundPosition: "center" } : {}) }}>
+      <div className="sl-box" style={{ aspectRatio: "16 / 9", ...(tphoto ? { backgroundImage: `linear-gradient(180deg, rgba(2,6,23,.45), rgba(2,6,23,.75)), url(${tphoto})`, backgroundSize: "cover", backgroundPosition: "center" } : bg ? { backgroundImage: `linear-gradient(180deg, rgba(2,6,23,.50), rgba(2,6,23,.78)), url(${bg.url})`, backgroundSize: "cover", backgroundPosition: "center" } : {}) }}>
         {s.kind === "video" ? (
           <div key={s.id + i} className={`sl-card sl-${anim} h-full w-full bg-black`}>
             {yt ? <iframe title="Video slaid" src={ytEmbed(yt)} allow="autoplay; encrypted-media" className="h-full w-full border-0" /> : <VideoEl s={s} />}
@@ -39,7 +40,7 @@ export default function SlidePanel({ slides, anim, secs, T, B, imgs }: { slides:
             <p className="font-bold leading-snug text-white sl-text" data-el="slide-text" data-kind="text" data-label="Teks slaid" style={{ fontSize: `${size}cqw`, ...T("slide-text") }}>{s.text}</p>
             <div className="flex items-end justify-between gap-2">
               {s.source ? <p className="font-semibold" style={{ fontSize: "2.8cqw", color: "var(--acc, #fde68a)" }}>{s.source}</p> : <span />}
-              {bg && <span className="text-right text-white/70" style={{ fontSize: "1.5cqw", maxWidth: "46%" }}>{bg.credit}</span>}
+              {bg && !tphoto && <span className="text-right text-white/70" style={{ fontSize: "1.5cqw", maxWidth: "46%" }}>{bg.credit}</span>}
             </div>
           </div>)}
       </div>
