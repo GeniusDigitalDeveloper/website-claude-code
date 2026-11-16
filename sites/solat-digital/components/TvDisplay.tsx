@@ -94,7 +94,7 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
     let lock: { release: () => Promise<void> } | null = null;
     const get = async () => { try { lock = await (navigator as unknown as { wakeLock: { request: (t: string) => Promise<{ release: () => Promise<void> }> } }).wakeLock.request("screen"); } catch {} };
     get(); const wl = setInterval(get, 5 * 60e3); const v = () => document.visibilityState === "visible" && get(); document.addEventListener("visibilitychange", v);
-    let h: ReturnType<typeof setTimeout>; const show = () => { setCtl(true); clearTimeout(h); h = setTimeout(() => setCtl(false), 4000); };
+    let h: ReturnType<typeof setTimeout>; const show = () => { setCtl(true); clearTimeout(h); h = setTimeout(() => setCtl(false), 2000); };
     show(); addEventListener("pointermove", show); addEventListener("keydown", show);
     const fs = () => setFull(!!document.fullscreenElement); document.addEventListener("fullscreenchange", fs);
     return () => { clearInterval(wl); lock?.release().catch(() => {}); document.removeEventListener("visibilitychange", v); removeEventListener("pointermove", show); removeEventListener("keydown", show); document.removeEventListener("fullscreenchange", fs); clearTimeout(h); };
@@ -155,10 +155,12 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
   const el = (key: string, kind: "text" | "border" | "arabic", label: string) => ({ "data-el": key, "data-kind": kind, "data-label": label });
   const ph = preview || !idx || !times ? { view: "full" as const, remain: 0, label: "" } : computePhase({ sec: klSec(d), day: klDay(d), fri, items: act, cur: idx.cur, ni: idx.ni, diff: idx.diff, hasSlides: slides.length > 0 && !demo, sc: { ...DEF_SCHED, ...(m.sched ?? {}), finalMin: Math.max(1, m.preMin ?? 5) } as typeof DEF_SCHED });
   const nxt = idx ? act[idx.ni] : null;
+  const redZone = !!idx && idx.diff > 0 && idx.diff <= 600; const last10 = !!idx && idx.diff > 0 && idx.diff <= 10;
+  const cdCls = last10 ? "cd-last" : redZone ? "cd-red" : "";
   const big = (label: string, time: string, sub?: string, k = "cd") => (
     <div className="my-auto text-center text-white" role="status">
       <div className="tv-shadow text-xl font-extrabold uppercase tracking-widest md:text-4xl" style={T("cdl")} {...(k === "cd" ? el("cdl", "text", "Tulisan kiraan detik") : {})}>{label}</div>
-      <div className="tv-shadow text-7xl font-extrabold tabular-nums leading-none md:text-[11rem]" aria-label="Masa berbaki" style={T("cdn")} {...(k === "cd" ? el("cdn", "text", "Nombor kiraan detik") : {})}>{time}</div>
+      <div className={`tv-shadow text-7xl font-extrabold tabular-nums leading-none md:text-[11rem] ${k === "cd" ? cdCls : ""}`} aria-label="Masa berbaki" style={T("cdn")} {...(k === "cd" ? el("cdn", "text", "Nombor kiraan detik") : {})}>{time}</div>
       {sub && <p className="mx-auto mt-4 max-w-4xl text-base font-semibold text-white/90 md:text-3xl">{sub}</p>}
     </div>);
   const panel = (kicker: string, title: string, status: string, time: string, msg: string) => (
@@ -203,7 +205,7 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
   };
 
   return (
-    <main className={`relative min-h-dvh overflow-hidden ${preview ? "pv" : ""} ${ctl || preview ? "" : "cursor-none"}`} style={tvars} onClickCapture={onPick}>
+    <main className={`relative min-h-dvh overflow-hidden ${preview ? "pv" : ""} ${ctl || preview ? "" : "tv-nocursor"}`} style={tvars} onClickCapture={onPick}>
       {(() => { const yid = m.bgVideo?.url ? youtubeId(m.bgVideo.url) : null; return yid && !preview ? (<div className="pointer-events-none absolute inset-0 -z-0 overflow-hidden bg-black" aria-hidden="true"><iframe title="Latar video" src={ytEmbed(yid)} allow="autoplay; encrypted-media" tabIndex={-1} className="absolute left-1/2 top-1/2 h-[56.25vw] min-h-full w-[177.78vh] min-w-full -translate-x-1/2 -translate-y-1/2 border-0" /><div className="absolute inset-0 bg-slate-950/35" /></div>) : <Slides imgs={[...extra, ...m.slides]} anim={m.anim} secs={m.secs} />; })()}
       {entered && <div className="glow-now" aria-hidden="true" />}
       {liveOn && (
@@ -237,7 +239,7 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
               <div className="mb-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-2 text-white">
                 <div><small className="text-xs font-bold uppercase tracking-widest md:text-base" style={T("curl")} {...el("curl", "text", "Label waktu semasa")}>{tx("curl", "Waktu semasa")}</small><div className="text-4xl font-extrabold leading-tight md:text-6xl" style={{ color: "var(--acc, #fcd34d)", ...T("curn") }} {...el("curn", "text", "Nama waktu semasa")}>{cur ? tx("ct-" + cur.k, cur.n) : tx("ct-isha", "Isyak")}</div></div>
                 <div className="text-right max-md:ml-auto"><small className="text-xs font-bold uppercase tracking-widest md:text-base" style={T("nextl")} {...el("nextl", "text", "Label waktu seterusnya")}>{tx("nextl", "{waktu} dalam").replace("{waktu}", tx("ct-" + act[idx.ni].k, act[idx.ni].n) + (idx.tomorrow ? " (esok)" : ""))}</small>
-                  <div className="text-4xl font-extrabold tabular-nums leading-tight md:text-6xl" aria-label="Masa berbaki" style={T("nextt")} {...el("nextt", "text", "Masa ke waktu seterusnya")}>{hms(idx.diff)}</div></div>
+                  <div className={`text-4xl font-extrabold tabular-nums leading-tight md:text-6xl ${cdCls}`} aria-label="Masa berbaki" style={T("nextt")} {...el("nextt", "text", "Masa ke waktu seterusnya")}>{hms(idx.diff)}</div></div>
               </div>
               <ul className={`grid grid-cols-1 gap-2 md:gap-3 ${fri ? "md:grid-cols-3 lg:grid-cols-6" : "md:grid-cols-5"}`}>
                 {items.map((p) => (
@@ -257,16 +259,16 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
           </div>)}
       </div>}
 
-      {live && !liveOn && <div className={`fixed right-0 top-0 z-30 flex items-center transition-opacity duration-500 ${ctl ? "opacity-100" : "opacity-40"}`}>
+      {live && !liveOn && <div className={`fixed right-0 top-0 z-30 flex items-center tv-ctl transition-opacity duration-500`}>
         <button className="tv-ico" aria-label={full ? "Keluar skrin penuh" : "Skrin penuh"} onClick={toggleFull}>{full ? <Minimize size={30} strokeWidth={2.75} /> : <Maximize size={30} strokeWidth={2.75} />}</button>
         <Link className="tv-ico" aria-label="Tetapan" href="/pengurus/"><Settings size={30} strokeWidth={2.5} /></Link>
       </div>}
 
       {live && popItem && (
         <div className="pp-overlay fixed inset-0 z-40 grid place-items-center bg-slate-950/80 p-4" role="alertdialog" aria-modal="true" aria-labelledby="pp-t">
-          <div className="pp-card glass relative w-full max-w-xl overflow-hidden rounded-3xl text-center">
+          <div className="pp-card pp-glass relative w-full max-w-xl overflow-hidden rounded-3xl text-center">
             <button className="btn absolute right-3 top-3 z-10" aria-label="Tutup notifikasi waktu solat" onClick={() => closePop(popKey)}><X size={20} /></button>
-            <div className="bg-cover bg-center p-8 pt-16 text-white" style={{ backgroundImage: `linear-gradient(rgba(15,23,42,.72),rgba(15,23,42,.88)),url(/assets/pop-${popItem.pop}.jpg)` }}>
+            <div className="bg-cover bg-center p-8 pt-16 text-white" style={{ backgroundImage: `linear-gradient(rgba(10,20,45,.38),rgba(10,20,45,.52)),url(/assets/pop-${popItem.pop}.jpg)` }}>
               <p>Sekarang sudah masuk waktu solat</p>
               <h2 id="pp-t" className="mt-1 text-5xl font-extrabold md:text-6xl">{popItem.n}</h2>
               <p lang="ar" dir="rtl" className="ar text-5xl" style={arSty}>{popItem.ar}</p>
