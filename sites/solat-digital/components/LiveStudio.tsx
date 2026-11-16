@@ -72,17 +72,17 @@ export default function LiveStudio({ mid, live: liveProp, setLive: commit, flash
 
       <section className="card"><h2 className="text-lg font-bold">Setup Siaran Sosial Media (Facebook, YouTube, TikTok)</h2><p className="text-sm text-sub">Facebook, YouTube dan TikTok: masukkan server dan Stream Key seperti dalam OBS. Kunci disimpan secara peribadi dan hanya boleh dibaca oleh akaun anda.</p>
         <p className="mt-2 flex items-start gap-2 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900"><AlertTriangle size={16} className="mt-0.5 shrink-0" /> Penghantaran video terus ke Facebook, YouTube dan TikTok memerlukan pelayan relay RTMP khas (pelayar tidak boleh menghantar RTMP). Pelayan itu belum diaktifkan pada sistem ini, jadi tetapan di bawah tersimpan dan sedia, tetapi siaran ke platform belum bermula. Siaran ke skrin TV di atas sudah berfungsi.</p>
-        <div className="mt-4 grid gap-4 lg:grid-cols-3">
+        <div className="mt-4 grid items-stretch gap-4 lg:grid-cols-3">
           {PLATS.map((p) => { const v = P(p.id); return (
-            <div key={p.id} className="rounded-2xl border border-line p-4">
+            <div key={p.id} className="flex flex-col rounded-2xl border border-line p-4">
               <div className="flex items-center justify-between gap-2"><b>{p.name}</b><button type="button" className="switch" role="switch" aria-checked={v.on} aria-label={`${p.name} hidup atau mati`} onClick={() => setP(p.id, { on: !v.on })} /></div>
-              <p className="mt-1 text-xs text-sub">{p.hint}</p>
+              <p className="mt-1 min-h-[4.5rem] text-xs text-sub">{p.hint}</p>
               <Lb id={p.id + "ac"}>Akaun / halaman (pengesahan)</Lb><input id={p.id + "ac"} className="inp" maxLength={80} placeholder={p.id === "tt" ? "Nama pengguna TikTok" : "Nama akaun atau pautan halaman"} value={v.account} onChange={(e) => setP(p.id, { account: e.target.value })} />
               <Lb id={p.id + "sv"}>Server</Lb>
               {p.servers.length > 1 || p.servers[0][1] ? <select id={p.id + "sv"} className="inp" value={v.server} onChange={(e) => setP(p.id, { server: e.target.value })}>{p.servers.map(([n, u]) => <option key={u} value={u}>{n}</option>)}</select> : <input id={p.id + "sv"} className="inp" placeholder="rtmp://…" value={v.server} onChange={(e) => setP(p.id, { server: e.target.value })} />}
               <Lb id={p.id + "ky"}>Stream Key</Lb><div className="relative"><input id={p.id + "ky"} className="inp !pr-11" type={show[p.id] ? "text" : "password"} autoComplete="off" value={v.key} onChange={(e) => setP(p.id, { key: e.target.value })} /><button type="button" className="eye" aria-label={show[p.id] ? "Sembunyikan kunci" : "Tunjukkan kunci"} onClick={() => setShow({ ...show, [p.id]: !show[p.id] })}>{show[p.id] ? <EyeOff size={18} /> : <Eye size={18} />}</button></div>
               <Lb id={p.id + "ql"}>Kualiti</Lb><select id={p.id + "ql"} className="inp" value={v.quality} onChange={(e) => setP(p.id, { quality: e.target.value })}><option value="1080">1080p</option><option value="720">720p</option><option value="480">480p</option></select>
-              <button type="button" className="btn btn-primary mt-3 w-full justify-center" onClick={() => applyP(p.id)}><Save size={16} /> Apply / OK</button>
+              <button type="button" className="btn btn-primary mt-auto w-full justify-center" style={{ marginTop: "1rem" }} onClick={() => applyP(p.id)}><Save size={16} /> Apply / OK</button>
             </div>); })}
         </div></section>
 
