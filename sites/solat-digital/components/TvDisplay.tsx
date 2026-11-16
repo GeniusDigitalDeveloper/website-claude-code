@@ -15,6 +15,7 @@ import SlidePanel from "@/components/SlidePanel";
 import { DEFAULT_SLIDES } from "@/lib/defaultSlides";
 import { youtubeId, ytEmbed } from "@/lib/media";
 import { watchLive } from "@/lib/liveRtc";
+import LowerThird from "@/components/LowerThird";
 import { ensureArabicFont } from "@/lib/arabicFont";
 import type { Defaults, ElStyle } from "@/lib/types";
 import { zInfo } from "@/lib/zones";
@@ -61,7 +62,7 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
   const [pop, setPop] = useState<string | null>(null);
   const [liveStream, setLiveStream] = useState<MediaStream | null>(null); const liveVid = useRef<HTMLVideoElement>(null);
   const liveOn = !preview && !!m.live?.on;
-  useEffect(() => { if (!liveOn || !mid) return; return watchLive(mid, setLiveStream); }, [liveOn, mid]);
+  useEffect(() => { if (!liveOn || !mid || m.live?.source === "youtube") return; return watchLive(mid, setLiveStream); }, [liveOn, mid]);
   useEffect(() => { const v = liveVid.current; if (v) { v.srcObject = liveStream; v.play().catch(() => {}); } }, [liveStream, liveOn]);
   const [ctl, setCtl] = useState(true);
   const [full, setFull] = useState(false);
@@ -207,19 +208,11 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
       {entered && <div className="glow-now" aria-hidden="true" />}
       {liveOn && (
         <div className="fixed inset-0 z-20 bg-black">
-          <video ref={liveVid} autoPlay playsInline muted className="size-full object-cover" />
-          {!liveStream && <div className="absolute inset-0 grid place-items-center text-center text-white"><div><div className="mx-auto mb-3 size-10 animate-spin rounded-full border-4 border-white/30 border-t-white" /><p className="text-xl font-bold md:text-3xl">Menunggu siaran kuliah…</p></div></div>}
+          {m.live?.source === "youtube" && m.live?.ytUrl && youtubeId(m.live.ytUrl) ? <iframe title="Siaran kuliah" src={ytEmbed(youtubeId(m.live.ytUrl)!)} allow="autoplay; encrypted-media" className="size-full border-0" /> : <video ref={liveVid} autoPlay playsInline muted className="size-full object-cover" />}
+          {!liveStream && !(m.live?.source === "youtube" && m.live?.ytUrl) && <div className="absolute inset-0 grid place-items-center text-center text-white"><div><div className="mx-auto mb-3 size-10 animate-spin rounded-full border-4 border-white/30 border-t-white" /><p className="text-xl font-bold md:text-3xl">Menunggu siaran kuliah…</p></div></div>}
           <div className="absolute right-3 top-3 rounded-xl bg-black/55 px-3 py-1.5 text-right text-white backdrop-blur md:right-6 md:top-5"><div className="text-lg font-extrabold tabular-nums md:text-3xl">{clock}</div><div className="text-[11px] font-semibold md:text-sm">{date}{hijri ? ` · ${hijri}` : ""}</div></div>
           <div className="absolute left-3 top-3 rounded-xl bg-black/55 px-3 py-1.5 text-white backdrop-blur md:left-6 md:top-5"><div className="flex items-center gap-2"><span className="rounded bg-red-600 px-2 py-0.5 text-xs font-extrabold md:text-sm">LIVE</span><b className="text-sm uppercase md:text-xl">{m.name}</b></div></div>
-          <div className="absolute inset-x-0 bottom-0">
-            <div className="mx-3 mb-2 rounded-2xl bg-slate-950/80 p-3 text-white backdrop-blur md:mx-8 md:mb-3 md:p-5">
-              {m.live?.session && <p className="text-xs font-extrabold uppercase tracking-widest md:text-base" style={{ color: "var(--acc, #fcd34d)" }}>{m.live.session}</p>}
-              <h2 className="text-xl font-extrabold uppercase md:text-5xl">{m.live?.speaker}</h2>
-              {m.live?.role && <p className="text-sm font-semibold text-white/85 md:text-2xl">{m.live.role}</p>}
-              {m.live?.topic && <p className="mt-1 text-sm font-bold md:text-3xl">{m.live.topic}</p>}
-            </div>
-            {(m.live?.ticker || ann.length > 0) && <div className="flex items-stretch overflow-hidden bg-red-600 text-white"><span className="shrink-0 bg-red-800 px-3 py-2 text-xs font-extrabold tracking-widest md:px-6 md:text-xl">HEBAHAN</span><div className="min-w-0 flex-1 overflow-hidden py-2 text-sm font-semibold md:text-2xl"><div className="marquee px-4" style={{ ["--dur" as string]: "28s" }}>{m.live?.ticker || ann.map((a) => a.text).join("   •   ")}</div></div></div>}
-          </div>
+          <LowerThird tpl={m.live?.tpl} session={m.live?.session} speaker={m.live?.speaker} role={m.live?.role} topic={m.live?.topic} ticker={m.live?.ticker || ann.map((x) => x.text).join("   •   ")} />
         </div>)}
       {ph.view === "slides" && !liveOn && <SlidePanel full slides={slides} anim={m.slideAnim ?? "fade"} secs={m.slideSecs ?? 10} T={T} B={B} imgs={slideImgs} />}
       {ph.view !== "slides" && !liveOn && <div className="relative z-10 flex min-h-dvh flex-col gap-4 p-4 md:p-8">
@@ -264,7 +257,7 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
           </div>)}
       </div>}
 
-      {live && <div className={`fixed right-0 top-0 z-30 flex items-center transition-opacity duration-500 ${ctl ? "opacity-100" : "opacity-40"}`}>
+      {live && !liveOn && <div className={`fixed right-0 top-0 z-30 flex items-center transition-opacity duration-500 ${ctl ? "opacity-100" : "opacity-40"}`}>
         <button className="tv-ico" aria-label={full ? "Keluar skrin penuh" : "Skrin penuh"} onClick={toggleFull}>{full ? <Minimize size={30} strokeWidth={2.75} /> : <Maximize size={30} strokeWidth={2.75} />}</button>
         <Link className="tv-ico" aria-label="Tetapan" href="/pengurus/"><Settings size={30} strokeWidth={2.5} /></Link>
       </div>}

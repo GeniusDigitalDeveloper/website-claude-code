@@ -8,7 +8,7 @@ export type TvDoc = {
   plan: "demo" | "full"; ownerUid: string; updatedAt?: number;
   preMin?: number; font?: string; arabicFont?: string; azanMute?: boolean; jumaatTime?: string; slideList?: SlideItem[]; slideAnim?: "fade" | "slide" | "up" | "zoom" | "flip"; slideSecs?: number;
   ringtone?: "chime" | "bell" | "beep" | "off"; ringRepeat?: number; azanDelayMin?: number; volume?: number;
-  popupMin?: number; theme?: string; styles?: Record<string, ElStyle>; texts?: Record<string, string>; arabicColor?: string; azanByPrayer?: Record<string, string>; sched?: Partial<Sched>; bgVideo?: { url: string; label?: string }; memos?: { id: string; title: string; body: string; on: boolean }[]; live?: { speaker?: string; role?: string; topic?: string; session?: string; ticker?: string; on?: boolean };
+  popupMin?: number; theme?: string; styles?: Record<string, ElStyle>; texts?: Record<string, string>; arabicColor?: string; azanByPrayer?: Record<string, string>; sched?: Partial<Sched>; bgVideo?: { url: string; label?: string }; memos?: { id: string; title: string; body: string; on: boolean }[]; live?: { speaker?: string; role?: string; topic?: string; session?: string; ticker?: string; on?: boolean; tpl?: string; source?: "camera" | "youtube"; ytUrl?: string };
 };
 export type Registry = { name: string; address: string; city: string; postcode: string; state: string; zone: string; country: string; managerName: string; email: string; createdAt: number };
 export type AzanDoc = { name: string; credit: string; url: string; fajrUrl?: string; active: boolean; prayers?: string[] };

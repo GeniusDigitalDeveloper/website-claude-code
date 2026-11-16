@@ -27,7 +27,11 @@ export default function SlideManager({ mid, slides, onLive, flash }: { mid: stri
   const file = useRef<HTMLInputElement>(null); const repl = useRef<HTMLInputElement>(null); const replFor = useRef<string>("");
   useEffect(() => onSnapshot(collection(db, "tv", mid, "slideimg"), (s) => setImgs(Object.fromEntries(s.docs.map((d) => [d.id, d.data().data as string]))), () => {}), [mid]);
   const list = slides ?? DEFAULT_SLIDES;
-  const commit = (l: SlideItem[]) => onLive(l.slice(0, MAX));
+  // Kekalkan kedudukan skrol semasa padam/susun/sunting slaid supaya halaman tidak melompat ke atas
+  const commit = (l: SlideItem[]) => {
+    const y = window.scrollY; onLive(l.slice(0, MAX)); const back = () => { if (Math.abs(window.scrollY - y) > 2) window.scrollTo({ top: y, behavior: "instant" as ScrollBehavior }); };
+    requestAnimationFrame(() => { back(); requestAnimationFrame(back); }); [60, 160, 350, 700].forEach((ms) => setTimeout(back, ms));
+  };
   const full = list.length >= MAX;
 
   const upload = async (f: Blob): Promise<string | null> => {
