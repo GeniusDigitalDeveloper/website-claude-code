@@ -14,6 +14,7 @@ import { detectZone, loadTimes, to12, type Times, PRAYERS } from "@/lib/prayer";
 import Chat from "@/components/Chat";
 import PreviewEditor from "@/components/PreviewEditor";
 import SlideManager from "@/components/SlideManager";
+import AddressPicker from "@/components/AddressPicker";
 import SlideLibrary from "@/components/SlideLibrary";
 import { useQuickBg } from "@/components/OwnerEditors";
 import { youtubeId } from "@/lib/media";
@@ -260,9 +261,8 @@ function Panel({ uidv, user }: { uidv: string; user: User }) {
           <section className="card"><h2 className="text-lg font-bold">Maklumat Masjid dan Zon Solat</h2><p className="text-sm text-sub">Nama, alamat dan zon solat rasmi JAKIM.</p>
             <L id="nm">Nama masjid / surau (dipaparkan HURUF BESAR)</L><input id="nm" className="inp" value={draft.name} onChange={(e) => up({ name: e.target.value })} />
             <L id="ad">Alamat penuh</L><input id="ad" className="inp" placeholder="Jalan, kampung atau taman" defaultValue={reg.address ?? ""} onBlur={(e) => updateDoc(doc(db, "registry", uidv), { address: e.target.value.trim().slice(0, 200) }).catch(() => {})} />
-            <div className="grid gap-3 sm:grid-cols-3"><div><L id="pc">Poskod</L><input id="pc" className="inp" inputMode="numeric" maxLength={5} placeholder="Cth: 50480" defaultValue={reg.postcode ?? ""} onBlur={(e) => updateDoc(doc(db, "registry", uidv), { postcode: e.target.value.replace(/\D/g, "").slice(0, 5) }).catch(() => {})} /></div>
-              <div><L id="ci">Bandar</L><input id="ci" className="inp" placeholder="Cth: Kuala Lumpur" defaultValue={reg.city ?? ""} onBlur={(e) => updateDoc(doc(db, "registry", uidv), { city: e.target.value.trim().slice(0, 60) }).catch(() => {})} /></div>
-              <div><L id="ng">Negeri</L><select id="ng" className="inp" value={draft.state ?? ""} onChange={(e) => { up({ state: e.target.value }); }}><option value="">Pilih negeri</option>{[...new Set(ZONES.map((z) => z[1]))].map((s) => <option key={s}>{s}</option>)}</select></div></div>
+            <AddressPicker idp="reg" state={(reg as { state?: string }).state ?? draft.state ?? ""} city={reg.city ?? ""} postcode={reg.postcode ?? ""} onChange={(v) => { up({ state: v.state }); updateDoc(doc(db, "registry", uidv), { state: v.state, city: v.city, postcode: v.postcode }).catch(() => flash("Gagal simpan alamat.")); }} />
+            <p className="mt-1 text-xs text-sub">Pilih negeri dahulu, kemudian bandar, kemudian poskod. Senarai mengikut data Pos Malaysia.</p>
             <h3 className="mt-5 font-bold">Zon waktu solat (JAKIM)</h3>
             <label className="mt-2 flex min-h-11 cursor-pointer items-center gap-3"><input type="checkbox" className="size-5 accent-green-700" checked={!draft.zone} onChange={(e) => up({ zone: e.target.checked ? "" : "SGR01" })} /> Kesan zon secara automatik (ikut lokasi peranti TV)</label>
             {draft.zone && <ZonePicker zone={draft.zone} onChange={(z) => up({ zone: z, state: ZONES.find((x) => x[0] === z)![1] })} idp="set" />}

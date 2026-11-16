@@ -46,7 +46,11 @@ service cloud.firestore {
         && request.resource.data.managerName is string && request.resource.data.managerName.size() <= 120
         && request.resource.data.email == request.auth.token.email
         && request.resource.data.name is string && request.resource.data.name.size() <= 120;
-      allow update: if me(u) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'state', 'zone']);
+      allow update: if me(u) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'state', 'zone', 'address', 'city', 'postcode', 'managerName'])
+        && request.resource.data.address is string && request.resource.data.address.size() <= 300
+        && request.resource.data.city is string && request.resource.data.city.size() <= 80
+        && request.resource.data.postcode is string && request.resource.data.postcode.size() <= 10
+        && request.resource.data.managerName is string && request.resource.data.managerName.size() <= 120;
       allow delete: if false;
     }
 
