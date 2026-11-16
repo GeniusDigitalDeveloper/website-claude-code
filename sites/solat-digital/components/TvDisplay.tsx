@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
-import { MicOff, Maximize, Minimize, PhoneOff, Settings, X } from "lucide-react";
+import { Maximize, Minimize, PhoneOff, Settings, X } from "lucide-react";
 import { computePhase, DEF_SCHED } from "@/lib/phase";
 import Link from "next/link";
 import { usePwaInstall } from "@/lib/usePwa";
@@ -36,6 +36,16 @@ function Slides({ imgs, anim, secs }: { imgs: string[]; anim: TvDoc["anim"]; sec
       <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, var(--ov1, rgba(2,6,23,.70)), var(--ov2, rgba(2,6,23,.42)) 45%, var(--ov3, rgba(2,6,23,.85)))" }} />
     </div>
   );
+}
+
+/** Ikon orang bercakap dipalang (dilarang bercakap). */
+function NoTalk({ className, strokeWidth = 2 }: { className?: string; strokeWidth?: number; "aria-hidden"?: boolean | "true" | "false" }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      <circle cx="9.5" cy="7" r="3.2" /><path d="M3.5 20c0-3.6 2.7-6 6-6s6 2.4 6 6" />
+      <path d="M17 5.5c1.3 1 2 2.3 2 3.7s-.7 2.7-2 3.7" /><path d="M19.6 3.4c2 1.5 3 3.5 3 5.8s-1 4.3-3 5.8" />
+      <path d="M3 3l18 18" strokeWidth={strokeWidth + .5} />
+    </svg>);
 }
 
 export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs, preview = false }: { m: TvDoc; mid: string; azanLib: AzanItem[]; extra: string[]; slideImgs?: Record<string, string>; defs?: Defaults; preview?: boolean }) {
@@ -170,8 +180,8 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
           <div className="mx-auto my-4 h-1 w-24 rounded-full md:my-5 md:w-40" style={{ background: "var(--acc, #fcd34d)" }} aria-hidden="true" />
           <p className="mx-auto max-w-4xl text-lg font-semibold leading-snug text-white/95 md:text-3xl">{tx("msg-solat", "Mohon rapatkan dan luruskan saf. Senyapkan telefon bimbit dan tenangkan hati untuk menghadap Allah.")}</p>
           <div className="mt-5 flex flex-wrap items-stretch justify-center gap-5 md:mt-6 md:gap-10">
-            {([[PhoneOff, "Senyapkan telefon bimbit"], [MicOff, "Dilarang bercakap"]] as const).map(([Ic, lb]) => (
-              <div key={lb} className="grid h-40 w-40 place-content-center justify-items-center gap-3 glass-tile rounded-3xl !border-4 !border-red-500 p-4 text-center shadow-[0_0_30px_rgba(239,68,68,.45)] md:h-52 md:w-64 md:gap-3">
+            {([[PhoneOff, "Senyapkan telefon bimbit"], [NoTalk, "Dilarang bercakap"]] as const).map(([Ic, lb]) => (
+              <div key={lb} className="grid h-40 w-40 place-content-center justify-items-center gap-3 rounded-3xl p-4 text-center text-white backdrop-blur-xl md:h-52 md:w-64 md:gap-3" style={{ background: "linear-gradient(160deg, rgba(255,105,105,.96), rgba(255,48,48,.88))", boxShadow: "inset 0 1px 0 rgba(255,255,255,.55), inset 0 -10px 24px rgba(255,255,255,.08), 0 12px 32px rgba(255,30,30,.35)" }}>
                 <Ic className="size-14 text-white md:size-20" strokeWidth={2.25} aria-hidden="true" /><b className="text-sm leading-tight text-white md:text-xl">{lb}</b>
               </div>))}
           </div>
