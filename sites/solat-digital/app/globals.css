@@ -267,8 +267,9 @@ select, input, textarea { transition: border-color .25s var(--ios), box-shadow .
 
 /* ===== Kawalan TV: 20% lutsinar, kursor hilang selepas 2 saat ===== */
 .tv-nocursor, .tv-nocursor * { cursor: none !important; }
-.tv-ctl { opacity: .2; }
-.tv-ctl:hover, .tv-ctl:focus-within { opacity: 1; }
+.tv-ctl { opacity: .2 !important; }
+.tv-ctl .tv-ico { opacity: 1; }
+.tv-ctl:has(.tv-ico:hover) { opacity: 1 !important; }
 
 /* ===== Kiraan detik: merah dalam 10 minit terakhir, cahaya besar 10 saat terakhir ===== */
 .cd-red { color: #fff !important; text-shadow: 0 0 8px rgba(255,69,58,.5), 0 0 20px rgba(255,69,58,.22); }

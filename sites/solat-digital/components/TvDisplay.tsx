@@ -260,7 +260,7 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
       </div>}
 
       {live && !liveOn && <div className={`fixed right-0 top-0 z-30 flex items-center tv-ctl transition-opacity duration-500`}>
-        <button className="tv-ico" aria-label={full ? "Keluar skrin penuh" : "Skrin penuh"} onClick={toggleFull}>{full ? <Minimize size={30} strokeWidth={2.75} /> : <Maximize size={30} strokeWidth={2.75} />}</button>
+        <button className="tv-ico" aria-label={full ? "Keluar skrin penuh" : "Skrin penuh"} onClick={(e) => { toggleFull(); (e.currentTarget as HTMLElement).blur(); }}>{full ? <Minimize size={30} strokeWidth={2.75} /> : <Maximize size={30} strokeWidth={2.75} />}</button>
         <Link className="tv-ico" aria-label="Tetapan" href="/pengurus/"><Settings size={30} strokeWidth={2.5} /></Link>
       </div>}
 
