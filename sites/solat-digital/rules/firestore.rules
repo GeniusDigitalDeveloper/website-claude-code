@@ -46,8 +46,9 @@ service cloud.firestore {
         && request.resource.data.managerName is string && request.resource.data.managerName.size() <= 120
         && request.resource.data.email == request.auth.token.email
         && request.resource.data.name is string && request.resource.data.name.size() <= 120;
-      allow update: if me(u) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'state', 'zone', 'address', 'city', 'postcode', 'managerName', 'photo'])
+      allow update: if me(u) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'state', 'zone', 'address', 'city', 'postcode', 'managerName', 'photo', 'photoSrc'])
         && (!('photo' in request.resource.data) || (request.resource.data.photo is string && request.resource.data.photo.size() <= 90000))
+        && (!('photoSrc' in request.resource.data) || (request.resource.data.photoSrc is string && request.resource.data.photoSrc.size() <= 200000))
         && request.resource.data.address is string && request.resource.data.address.size() <= 300
         && request.resource.data.city is string && request.resource.data.city.size() <= 80
         && request.resource.data.postcode is string && request.resource.data.postcode.size() <= 10
@@ -73,6 +74,10 @@ service cloud.firestore {
           allow delete: if me(u);
         }
       }
+      // Isyarat siaran kamera ke TV (WebRTC) dan tetapan peribadi siaran (kunci strim; pemilik sahaja)
+      match /livesig/{d} { allow read: if true; allow create, update: if request.resource.data.keys().size() <= 8; allow delete: if me(u);
+        match /c/{x} { allow read, create: if request.resource.data.keys().size() <= 4; allow delete: if true; } }
+      match /private/{d} { allow read, write: if me(u); }
       match /slideimg/{i} {
         allow read: if true;
         allow create, update: if me(u) && request.resource.data.data is string && request.resource.data.data.size() < 900000;

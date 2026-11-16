@@ -15,6 +15,7 @@ import Chat from "@/components/Chat";
 import PreviewEditor from "@/components/PreviewEditor";
 import SlideManager from "@/components/SlideManager";
 import Avatar from "@/components/Avatar";
+import LiveStudio from "@/components/LiveStudio";
 import AddressPicker from "@/components/AddressPicker";
 import SlideLibrary from "@/components/SlideLibrary";
 import { useQuickBg } from "@/components/OwnerEditors";
@@ -206,15 +207,6 @@ function Panel({ uidv, user }: { uidv: string; user: User }) {
             <button key={id} type="button" className="card !p-4 text-left transition hover:shadow-lg" onClick={() => setSec(id)}><Ic size={22} className="text-accent" /><b className="mt-2 block">{a}</b><span className="text-xs text-sub">{b}</span></button>))}</div>
         </>)}
 
-        {sec === "live" && (<>
-          <section className="card"><h2 className="text-lg font-bold">Maklumat Penceramah & Paparan Bawah (Lower-Third)</h2><p className="text-sm text-sub">Maklumat ini dipaparkan di bahagian bawah skrin semasa mod Kuliah (Live).</p>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {([["speaker", "Nama penceramah / ustaz", "Ustaz Dr. Ahmad Firdaus"], ["role", "Gelaran / jawatan", "Penceramah Bertauliah JAKIM"], ["topic", "Tajuk ceramah / kitab pengajian", "Syarah Kitab Riyadhus Salihin"], ["session", "Nama sesi / majlis", "Kuliah Maghrib Perdana"]] as [string, string, string][]).map(([k, lb, ph]) => (
-                <div key={k}><L id={"lv" + k}>{lb}</L><input id={"lv" + k} className="inp" maxLength={120} placeholder={ph} defaultValue={draft.live?.[k as "speaker"] ?? ""} onBlur={(e) => live({ live: { ...(draft.live ?? {}), [k]: e.target.value.trim() } })} /></div>))}</div>
-            <L id="lvmsg">Teks hebahan berjalan (di bawah skrin)</L><textarea id="lvmsg" rows={2} maxLength={300} className="inp" placeholder="Sila rapatkan saf dan matikan telefon bimbit." defaultValue={draft.live?.ticker ?? ""} onBlur={(e) => live({ live: { ...(draft.live ?? {}), ticker: e.target.value.trim() } })} /></section>
-          <section className="card"><h2 className="text-lg font-bold">Siaran kamera ke skrin TV</h2><p className="mt-1 text-sm text-sub">Sambungan kamera (kamera web, DSLR melalui kad tangkap, atau kamera telefon petugas) ke skrin TV sedang dibina. Maklumat penceramah di atas akan terus digunakan apabila siaran kamera dibuka.</p></section>
-        </>)}
-
         {sec === "slaid" && (<>
           <section className="card"><h2 className="text-lg font-bold">Kelajuan Slide</h2><p className="text-sm text-sub">Tetapkan berapa lama setiap poster atau hadis dipaparkan sebelum bertukar.</p>
             <L id="ss">Tempoh setiap slide (saat)</L><input id="ss" type="number" min={1} max={300} className="inp max-w-40" value={draft.slideSecs ?? 10} onChange={(e) => up({ slideSecs: Math.max(1, Math.min(300, Math.round(+e.target.value) || 10)) })} />
@@ -329,7 +321,7 @@ function Panel({ uidv, user }: { uidv: string; user: User }) {
                 <button type="button" className="btn mt-3" onClick={() => live({ arabicColor: "" })}>Set semula warna</button></div></div></section>
         </>)}
 
-        {sec === "profil" && (<ProfileSection user={user} managerName={reg.managerName ?? ""} photo={(profile as { photo?: string } | null)?.photo} flash={flash} />)}
+        {sec === "profil" && (<ProfileSection user={user} managerName={reg.managerName ?? ""} photo={(profile as { photo?: string } | null)?.photo} photoSrc={(profile as { photoSrc?: string } | null)?.photoSrc} flash={flash} />)}
 
         {sec === "sumbangan" && (<DonationSection don={don} />)}
         {sec === "notif" && (
@@ -354,6 +346,7 @@ function Panel({ uidv, user }: { uidv: string; user: User }) {
               <li>Paparan tidak akan tidur atau tertutup sendiri. Ia berhenti hanya bila TV dimatikan.</li>
             </ul></section>)}
         </div>
+        <div className={sec === "live" ? "grid grid-cols-[minmax(0,1fr)] gap-5" : "hidden"}><LiveStudio mid={uidv} live={draft.live ?? {}} setLive={(l) => live({ live: l })} flash={flash} /></div>
       </PanelShell>
       <div className="bar-frost fixed inset-x-0 bottom-0 z-40 border-t border-white/60 p-3 md:left-[264px]"><div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-2"><span className="text-sm text-sub">{dirty ? "Ada perubahan belum disimpan" : "Semua perubahan disimpan"}</span><button className="btn btn-primary" disabled={!dirty} onClick={save}><Save size={18} /> Simpan</button></div></div>
       {toast && <div className="toast" role="status">{toast}</div>}
@@ -362,7 +355,7 @@ function Panel({ uidv, user }: { uidv: string; user: User }) {
   );
 }
 
-function ProfileSection({ user, managerName, photo, flash }: { user: User; managerName: string; photo?: string; flash: (m: string) => void }) {
+function ProfileSection({ user, managerName, photo, photoSrc, flash }: { user: User; managerName: string; photo?: string; photoSrc?: string; flash: (m: string) => void }) {
   const [name, setName] = useState(managerName || user.displayName || ""); const [email, setEmail] = useState(user.email ?? "");
   const [cur, setCur] = useState(""); const [p1, setP1] = useState(""); const [p2, setP2] = useState(""); const [msg, setMsg] = useState("");
   useEffect(() => { if (managerName) setName(managerName); }, [managerName]);
@@ -385,7 +378,7 @@ function ProfileSection({ user, managerName, photo, flash }: { user: User; manag
     <div className="grid gap-5 lg:grid-cols-2">
       <section className="card !p-0"><div className="flex items-center gap-3 border-b border-line p-4"><span className="grid size-10 place-items-center rounded-xl bg-muted text-accent"><UserIc size={20} /></span><div><h2 className="font-bold">Maklumat Profil Pentadbir</h2><p className="text-xs text-sub">Kemaskini nama akaun dan alamat emel pentadbir.</p></div></div>
         <div className="p-4">
-          <div className="flex items-center gap-4 rounded-2xl bg-muted p-4"><Avatar photo={photo} initials={(name || user.email || "?").slice(0, 2).toUpperCase()} size={72} onPick={async (d) => { try { await updateDoc(doc(db, "registry", user.uid), { photo: d }); flash("Gambar profil ditukar."); } catch { flash("Gagal menukar gambar."); } }} /><div className="min-w-0"><b className="block truncate">{name || "Pentadbir"}</b><span className="block truncate text-sm text-sub">{user.email}</span>{user.emailVerified ? <span className="chip chip-ok mt-1">Emel disahkan</span> : <span className="chip chip-demo mt-1">Emel belum disahkan</span>}</div></div>
+          <div className="flex items-center gap-4 rounded-2xl bg-muted p-4"><Avatar photo={photo} srcOrig={photoSrc} canEditCrop initials={(name || user.email || "?").slice(0, 2).toUpperCase()} size={72} onSave={async (p) => { try { await updateDoc(doc(db, "registry", user.uid), { photo: p.photo, photoSrc: p.src }); flash("Gambar profil disimpan."); } catch { flash("Gagal menyimpan gambar."); } }} /><div className="min-w-0"><b className="block truncate">{name || "Pentadbir"}</b><span className="block truncate text-sm text-sub">{user.email}</span>{user.emailVerified ? <span className="chip chip-ok mt-1">Emel disahkan</span> : <span className="chip chip-demo mt-1">Emel belum disahkan</span>}</div></div>
           <L id="pn">Nama Penuh</L><input id="pn" className="inp" value={name} onChange={(e) => setName(e.target.value)} />
           <L id="pe">Alamat Emel</L><input id="pe" type="email" className="inp" value={email} onChange={(e) => setEmail(e.target.value)} disabled={social} />
           <p className="mt-1 text-xs text-sub">Jika emel diubah, pautan pengesahan dihantar ke emel baharu. Emel log masuk hanya bertukar selepas anda mengesahkannya.</p>

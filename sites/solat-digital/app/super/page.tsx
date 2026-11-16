@@ -227,8 +227,8 @@ function Dashboard() {
   const [q, setQ] = useState(""); const [toast, setToast] = useState(""); const [now, setNow] = useState(Date.now());
   const [sec, setSec] = useState<Sec>("dash"); const [sub, setSub] = useState("tv"); const [openId, setOpenId] = useState(""); const [nt, setNt] = useState<{ id: string; name: string } | null>(null); const prevUn = useRef(0); const st = useRef({ sec: "dash" as Sec, openId: "" }); const [selSt, setSelSt] = useState(""); const [selZone, setSelZone] = useState(""); const [picked, setPicked] = useState<string[]>([]);
   useEffect(() => { st.current = { sec, openId }; if (sec === "notif" && nt && nt.id === openId) setNt(null); }, [sec, openId]); // eslint-disable-line react-hooks/exhaustive-deps const [selSt, setSelSt] = useState(""); const [selZone, setSelZone] = useState(""); const [picked, setPicked] = useState<string[]>([]);
-  const pwa = usePwaInstall(); const [ownerPhoto, setOwnerPhoto] = useState("");
-  useEffect(() => onSnapshot(doc(db, "config", "ownerProfile"), (s) => setOwnerPhoto((s.data()?.photo as string) ?? ""), () => {}), []);
+  const pwa = usePwaInstall(); const [ownerPhoto, setOwnerPhoto] = useState(""); const [ownerSrc, setOwnerSrc] = useState("");
+  useEffect(() => onSnapshot(doc(db, "config", "ownerProfile"), (s) => { setOwnerPhoto((s.data()?.photo as string) ?? ""); setOwnerSrc((s.data()?.photoSrc as string) ?? ""); }, () => {}), []);
   useEffect(() => {
     const u1 = onSnapshot(query(collection(db, "registry"), orderBy("createdAt", "desc")), (s) => setReg(Object.fromEntries(s.docs.map((d) => [d.id, d.data() as Registry]))));
     const u2 = onSnapshot(collection(db, "tv"), (s) => setTv(Object.fromEntries(s.docs.map((d) => [d.id, d.data() as TvDoc]))));
@@ -284,7 +284,7 @@ function Dashboard() {
               {!shown.length && <li className="text-sm text-sub">Tiada masjid dijumpai.</li>}</ul></section>}
 
           {sec === "profil" && <section className="card"><h2 className="text-lg font-bold">Profil Owner</h2><p className="text-sm text-sub">Gambar profil dipaparkan di bar sisi, di atas butang Log keluar.</p>
-            <div className="mt-4 flex items-center gap-4"><Avatar photo={ownerPhoto} initials="OW" size={96} onPick={async (d) => { try { await setDoc(doc(db, "config", "ownerProfile"), { photo: d }); flash("Gambar profil ditukar."); } catch { flash("Gagal menukar gambar."); } }} /><div><b className="block">Owner Solat Digital</b><span className="text-sm text-sub">{auth.currentUser?.email}</span><p className="mt-1 text-xs text-sub">Tekan ikon kamera untuk tukar gambar. Gambar dipotong segi empat sama.</p></div></div></section>}
+            <div className="mt-4 flex items-center gap-4"><Avatar photo={ownerPhoto} srcOrig={ownerSrc} canEditCrop initials="OW" size={96} onSave={async (p) => { try { await setDoc(doc(db, "config", "ownerProfile"), { photo: p.photo, photoSrc: p.src }); flash("Gambar profil disimpan."); } catch { flash("Gagal menyimpan gambar."); } }} /><div><b className="block">Owner Solat Digital</b><span className="text-sm text-sub">{auth.currentUser?.email}</span><p className="mt-1 text-xs text-sub">Tekan ikon kamera untuk tukar gambar. Gambar dipotong segi empat sama.</p></div></div></section>}
           {sec === "live" && <LiveStatus rows={rows} tv={tv} />}
           {sec === "hadis" && <HadithEditor />}
           {sec === "latar" && <QuickBgEditor />}
