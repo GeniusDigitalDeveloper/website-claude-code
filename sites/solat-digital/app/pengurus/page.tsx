@@ -169,10 +169,10 @@ function Panel({ uidv, user }: { uidv: string; user: User }) {
   return (
     <div>
       <PanelShell groups={groups} active={sec} onSelect={(id) => setSec(id as Sec)} user={{ name: hName, email: user.email ?? "" }} onLogout={() => signOut(auth)} title={titles[sec]} tag="TV OS"
-        right={<><button type="button" className="btn !min-h-10 border-amber-400 bg-amber-50 !px-3 text-amber-900" onClick={() => setSec("sumbangan")}><Heart size={16} /> <span className="hidden sm:inline">Sumbangan</span></button><a className="btn !min-h-10 !px-3" href={tvUrl} target="_blank" rel="noreferrer" aria-label="Buka TV" title="Buka TV"><MonitorPlay size={18} /></a><ModeToggle /></>}>
+        right={<><button type="button" className="btn !min-h-10 !px-3 !border-yellow-500 !bg-yellow-400 !text-black hover:!bg-yellow-300" onClick={() => setSec("sumbangan")}><Heart size={16} /> <span className="hidden sm:inline">Sumbangan</span></button><a className="btn !min-h-10 !px-3" href={tvUrl} target="_blank" rel="noreferrer" aria-label="Buka TV" title="Buka TV"><MonitorPlay size={18} /></a><ModeToggle /></>}>
         <div key={sec} className="grid grid-cols-[minmax(0,1fr)] gap-5">
         {sec === "dash" && (<>
-          {!user.emailVerified && <div className="card flex flex-wrap items-center gap-3 border-amber-400 bg-amber-50 text-amber-900" role="alert"><Mail size={18} /><span className="min-w-0 flex-1">Emel akaun anda belum disahkan. Dapatkan pautan pengesahan melalui emel yang didaftarkan.</span><button type="button" className="btn !min-h-9 border-amber-500" onClick={sendVerify}>Sahkan emel sekarang</button></div>}
+          {!user.emailVerified && <div className="card flex flex-wrap items-center gap-3 border-amber-400 bg-amber-50 text-amber-900" role="alert"><Mail size={18} /><span className="min-w-0 flex-1">Emel akaun anda belum disahkan. Dapatkan pautan pengesahan melalui emel yang didaftarkan.</span><button type="button" className="btn !min-h-9 !border-yellow-500 !bg-yellow-400 !text-black hover:!bg-yellow-300" onClick={sendVerify}>Sahkan emel sekarang</button></div>}
           {eff.panel?.notice && <div className="card border-green-600/40" role="note"><Info size={18} className="mr-2 inline text-accent" />{eff.panel.notice}</div>}
           <section className="rounded-3xl p-6 text-white md:p-8" style={{ background: "linear-gradient(135deg,#166534 0%,#064e3b 55%,#022c22 100%)" }}>
             <div className="flex flex-wrap items-start justify-between gap-4"><div className="min-w-0">
