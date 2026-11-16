@@ -149,7 +149,26 @@ function PanelForm({ v, set }: { v: PanelSettings; set: (v: PanelSettings) => vo
     </div>
   );
 }
+function DonationEditor() {
+  type D = { enabled?: boolean; title?: string; bankName?: string; accName?: string; accNo?: string; method?: string; note?: string; qr?: string };
+  const [d, setD] = useState<D | null>(null); const [msg, setMsg] = useState(""); const f = useRef<HTMLInputElement>(null);
+  useEffect(() => onSnapshot(doc(db, "config", "donation"), (s) => setD((x) => x ?? ((s.data() as D) || { enabled: true })), () => {}), []);
+  if (!d) return <p>Memuatkan…</p>;
+  const set = (p: Partial<D>) => setD({ ...d, ...p });
+  const pick = (file?: File) => { if (!file) return; const img = new Image(), u = URL.createObjectURL(file); img.onload = () => { const k = Math.min(1, 900 / Math.max(img.width, img.height)); const c = document.createElement("canvas"); c.width = img.width * k; c.height = img.height * k; c.getContext("2d")!.drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(u); const q = c.toDataURL("image/png"); if (q.length > 900000) { setMsg("Imej QR terlalu besar. Guna imej lebih kecil."); return; } set({ qr: q }); }; img.src = u; };
+  const save = async () => { try { await setDoc(doc(db, "config", "donation"), { enabled: d.enabled !== false, title: d.title ?? "", bankName: d.bankName ?? "", accName: d.accName ?? "", accNo: d.accNo ?? "", method: d.method ?? "", note: d.note ?? "", qr: d.qr ?? "" }); setMsg("Disimpan. Panel Pengurus Masjid dikemas kini serta-merta."); } catch { setMsg("Gagal simpan."); } };
+  const I = ({ k, label, ph }: { k: keyof D; label: string; ph?: string }) => <div><label className="lbl" htmlFor={"dn" + k}>{label}</label><input id={"dn" + k} className="inp" placeholder={ph} value={(d[k] as string) ?? ""} onChange={(e) => set({ [k]: e.target.value } as Partial<D>)} /></div>;
+  return (<section className="card"><h2 className="text-lg font-bold">Sumbangan (dipaparkan di panel Pengurus Masjid)</h2><p className="text-sm text-sub">Hanya panel pengurus masjid memaparkan bahagian ini. Isi akaun bank dan kod QR anda.</p>
+    <label className="mt-3 flex min-h-11 cursor-pointer items-center gap-3"><input type="checkbox" className="size-5 accent-green-700" checked={d.enabled !== false} onChange={(e) => set({ enabled: e.target.checked })} /> Paparkan halaman Sumbangan</label>
+    <div className="grid gap-3 sm:grid-cols-2"><I k="title" label="Tajuk" ph="Sumbangan Pembangunan Solat Digital" /><I k="bankName" label="Nama bank" /><I k="accName" label="Nama akaun / penerima" /><I k="accNo" label="Nombor akaun" /></div>
+    <label className="lbl" htmlFor="dnmethod">Kaedah sumbangan (pilihan)</label><textarea id="dnmethod" rows={2} className="inp" placeholder="Cth: Imbas QR, pindahan dalam talian atau pindahan bank." value={d.method ?? ""} onChange={(e) => set({ method: e.target.value })} />
+    <label className="lbl" htmlFor="dnnote">Nota tambahan (pilihan)</label><textarea id="dnnote" rows={2} className="inp" value={d.note ?? ""} onChange={(e) => set({ note: e.target.value })} />
+    <span className="lbl">Imej kod QR</span><div className="flex flex-wrap items-center gap-3">{d.qr && <img src={d.qr} alt="QR" className="h-32 w-32 rounded-lg border border-line object-contain" />}<button type="button" className="btn" onClick={() => f.current?.click()}>{d.qr ? "Tukar imej QR" : "Muat naik imej QR"}</button>{d.qr && <button type="button" className="btn" onClick={() => set({ qr: "" })}>Buang</button>}<input ref={f} type="file" accept="image/*" className="hidden" aria-label="Pilih imej QR" onChange={(e) => pick(e.target.files?.[0])} /></div>
+    <button type="button" className="btn btn-primary mt-4" onClick={save}>Simpan sumbangan</button>{msg && <p role="status" className="mt-2 text-sm text-accent">{msg}</p>}</section>);
+}
+
 function Tetapan({ rows, sub }: { rows: Row[]; sub: string }) {
+  if (sub === "sumbangan") return <DonationEditor />;
   const [ed, setEd] = useState<Defaults | null>(null); const [msg, setMsg] = useState(""); const [betaOn, setBetaOn] = useState(false);
   const [nf, setNf] = useState({ name: "", url: "", credit: "" });
   useEffect(() => onSnapshot(doc(db, "config", "defaults"), (s) => setEd((x) => x ?? ((s.data() as Defaults) || {})), () => {}), []);
@@ -226,7 +245,7 @@ function Dashboard() {
     { id: "senarai", label: "Senarai masjid", icon: <Building2 size={20} /> },
     { id: "notif", label: "Notifikasi", icon: <Bell size={20} />, badge: unread },
     { id: "azan", label: "Perpustakaan azan", icon: <Music size={20} /> },
-    { id: "tetapan", label: "Tetapan sistem dan font", icon: <Settings size={20} />, subs: [{ id: "tv", label: "TV" }, { id: "panel", label: "Panel Admin Masjid" }] },
+    { id: "tetapan", label: "Tetapan sistem dan font", icon: <Settings size={20} />, subs: [{ id: "tv", label: "TV" }, { id: "panel", label: "Panel Admin Masjid" }, { id: "sumbangan", label: "Sumbangan" }] },
   ];
   const stRows = (st: string) => rows.filter((r) => r.state === st);
   const zones = ZONES.filter((z) => z[1] === selSt);

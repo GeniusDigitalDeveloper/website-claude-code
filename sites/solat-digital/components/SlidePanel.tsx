@@ -14,7 +14,7 @@ export default function SlidePanel({ slides, anim, secs, T, B, imgs, full = fals
   // setiap slaid ada tempoh sendiri (video: tempoh video, lain-lain: saat lalai)
   useEffect(() => {
     const l = ref.current; if (l.length < 2) return; const cur = l[i % l.length];
-    const ms = (cur.kind === "video" ? Math.min(120, Math.max(5, cur.dur || 15)) : Math.max(4, secs)) * 1000;
+    const ms = (cur.kind === "video" ? Math.min(120, Math.max(5, cur.dur || 15)) : Math.max(1, secs)) * 1000;
     const t = setTimeout(() => setI((x) => (x + 1) % l.length), ms); return () => clearTimeout(t);
   }, [i, key, secs]);
   if (!slides.length) return null;

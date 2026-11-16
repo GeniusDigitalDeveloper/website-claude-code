@@ -4,7 +4,7 @@ import { MicOff, Maximize, Minimize, PhoneOff, Settings, X } from "lucide-react"
 import { computePhase, DEF_SCHED } from "@/lib/phase";
 import Link from "next/link";
 import { usePwaInstall } from "@/lib/usePwa";
-import type { TvDoc } from "@/lib/types";
+import type { SlideItem, TvDoc } from "@/lib/types";
 import { ref, set, serverTimestamp, onDisconnect } from "firebase/database";
 import { rtdb } from "@/lib/firebase";
 import type { AzanItem } from "@/lib/useAzan";
@@ -130,7 +130,8 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
   const hijri = feat.hijri && times ? hijriText(klDay(d), klSec(d), secOf(times.maghrib), defs?.hijriMode ?? "jakim") : "";
   const mmss = (n: number) => `${String(Math.floor(n / 60)).padStart(2, "0")}:${String(n % 60).padStart(2, "0")}`;
   const popDone = (() => { try { return !!popKey && !!localStorage.getItem(popKey); } catch { return false; } })();
-  const pool = [...(m.slideList ?? DEFAULT_SLIDES), ...(defs?.platformSlides ?? [])].filter((x) => x.on && (x.kind === "gambar" ? !!x.imgId : x.kind === "video" ? !!(x.videoUrl || x.vidPath) : !!x.text.trim()));
+  const memoSlides: SlideItem[] = (m.memos ?? []).filter((x) => x.on && x.body.trim()).map((x) => ({ id: "memo-" + x.id, kind: "umum", title: x.title, text: x.body, on: true }));
+  const pool = [...(m.slideList ?? DEFAULT_SLIDES), ...memoSlides, ...(defs?.platformSlides ?? [])].filter((x) => x.on && (x.kind === "gambar" ? !!x.imgId : x.kind === "video" ? !!(x.videoUrl || x.vidPath) : !!x.text.trim()));
   const slides = !feat.slides ? [] : fri ? (pool.some((x) => x.jumaat) ? pool.filter((x) => x.jumaat) : pool) : pool.filter((x) => !x.jumaat);
   const popItem = pop ? items.find((x) => x.k === pop) : null;
   const curKey = cur?.k;
@@ -170,8 +171,8 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
           <p className="mx-auto max-w-4xl text-lg font-semibold leading-snug text-white/95 md:text-3xl">{tx("msg-solat", "Mohon rapatkan dan luruskan saf. Senyapkan telefon bimbit dan tenangkan hati untuk menghadap Allah.")}</p>
           <div className="mt-5 flex flex-wrap items-stretch justify-center gap-5 md:mt-6 md:gap-10">
             {([[PhoneOff, "Senyapkan telefon bimbit"], [MicOff, "Dilarang bercakap"]] as const).map(([Ic, lb]) => (
-              <div key={lb} className="grid h-40 w-40 place-content-center justify-items-center gap-3 rounded-3xl border-4 border-red-600 bg-white p-4 text-center shadow-xl md:h-52 md:w-64 md:gap-3">
-                <Ic className="size-14 text-red-600 md:size-20" strokeWidth={2.25} aria-hidden="true" /><b className="text-sm leading-tight text-slate-900 md:text-xl">{lb}</b>
+              <div key={lb} className="grid h-40 w-40 place-content-center justify-items-center gap-3 glass-tile rounded-3xl !border-4 !border-red-500 p-4 text-center shadow-[0_0_30px_rgba(239,68,68,.45)] md:h-52 md:w-64 md:gap-3">
+                <Ic className="size-14 text-white md:size-20" strokeWidth={2.25} aria-hidden="true" /><b className="text-sm leading-tight text-white md:text-xl">{lb}</b>
               </div>))}
           </div>
         </div>);
