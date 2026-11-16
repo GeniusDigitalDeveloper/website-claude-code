@@ -11,7 +11,9 @@ import { THEMES } from "@/lib/themes";
 import { authMsg, useUser } from "@/lib/useUser";
 import { usePwaInstall } from "@/lib/usePwa";
 import PasswordInput from "@/components/PasswordInput";
-import Shell, { type NavItem } from "@/components/Shell";
+import PanelShell, { type PGroup } from "@/components/PanelShell";
+import { ModeToggle } from "@/components/ModeWrap";
+import { HadithEditor, LiveStatus, QuickBgEditor } from "@/components/OwnerEditors";
 import Chat, { Broadcast } from "@/components/Chat";
 import DateBadge from "@/components/DateBadge";
 import VideoAdder from "@/components/VideoAdder";
@@ -20,7 +22,7 @@ import { chatSfx } from "@/lib/sfx";
 import { useDefaults } from "@/lib/useDefaults";
 
 type Row = Registry & { id: string; plan: "demo" | "full" };
-type Sec = "dash" | "negeri" | "senarai" | "notif" | "azan" | "tetapan";
+type Sec = "dash" | "negeri" | "senarai" | "live" | "notif" | "hadis" | "latar" | "azan" | "sumbangan" | "tetapan";
 const L = ({ id, children }: { id: string; children: React.ReactNode }) => <label htmlFor={id} className="lbl">{children}</label>;
 const Stat = ({ icon, label, v }: { icon: React.ReactNode; label: string; v: number | string }) => <div className="card"><div className="flex items-center gap-2 text-sm text-sub">{icon}{label}</div><div className="mt-2 text-3xl font-extrabold tabular-nums">{v}</div></div>;
 const Switch = ({ on, set, label }: { on: boolean; set: (v: boolean) => void; label: string }) => <div className="flex items-center justify-between gap-3 rounded-xl bg-muted p-3"><span className="font-semibold">{label}</span><button type="button" className="switch" role="switch" aria-checked={on} aria-label={label} onClick={() => set(!on)} /></div>;
@@ -239,24 +241,20 @@ function Dashboard() {
   const flash = (m: string) => { setToast(m); setTimeout(() => setToast(""), 2200); };
   const unread = Object.values(metas).reduce((n, m) => n + (m.unreadOwner || 0), 0);
   const setPlan = async (ids: string[], plan: "demo" | "full") => { try { await Promise.all(ids.map((id) => updateDoc(doc(db, "tv", id), { plan }))); setPicked([]); flash(`${ids.length} masjid dikemas kini.`); } catch { flash("Gagal kemas kini."); } };
-  const items: NavItem[] = [
-    { id: "dash", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
-    { id: "negeri", label: "Mengikut negeri", icon: <MapPin size={20} /> },
-    { id: "senarai", label: "Senarai masjid", icon: <Building2 size={20} /> },
-    { id: "notif", label: "Notifikasi", icon: <Bell size={20} />, badge: unread },
-    { id: "azan", label: "Perpustakaan azan", icon: <Music size={20} /> },
-    { id: "tetapan", label: "Tetapan sistem dan font", icon: <Settings size={20} />, subs: [{ id: "tv", label: "TV" }, { id: "panel", label: "Panel Admin Masjid" }, { id: "sumbangan", label: "Sumbangan" }] },
+  const groups: PGroup[] = [
+    { title: "Utama", items: [{ id: "dash", label: "Dashboard", icon: <LayoutDashboard size={19} /> }] },
+    { title: "Pengurusan masjid", items: [{ id: "negeri", label: "Mengikut negeri", icon: <MapPin size={19} /> }, { id: "senarai", label: "Senarai masjid", icon: <Building2 size={19} /> }, { id: "live", label: "Siaran Kuliah (Live)", icon: <Radio size={19} /> }, { id: "notif", label: "Notifikasi", icon: <Bell size={19} />, badge: unread }] },
+    { title: "Kandungan sistem", items: [{ id: "hadis", label: "Pustaka Hadis & Kategori", icon: <Megaphone size={19} /> }, { id: "latar", label: "Latar Belakang (Pilihan Pantas)", icon: <Radio size={19} /> }, { id: "azan", label: "Perpustakaan azan", icon: <Music size={19} /> }] },
+    { title: "Konfigurasi", items: [{ id: "tetapan", label: "Tetapan sistem dan font", icon: <Settings size={19} /> }, { id: "sumbangan", label: "Sumbangan", icon: <Users size={19} /> }] },
   ];
+  const titles: Record<Sec, string> = { dash: "Dashboard Owner", negeri: "Mengikut negeri dan daerah", senarai: "Senarai masjid", live: "Siaran Kuliah (Live)", notif: "Notifikasi", hadis: "Pustaka Hadis & Kategori", latar: "Latar Belakang (Pilihan Pantas)", azan: "Perpustakaan azan", sumbangan: "Sumbangan", tetapan: "Tetapan sistem dan font" };
   const stRows = (st: string) => rows.filter((r) => r.state === st);
   const zones = ZONES.filter((z) => z[1] === selSt);
   return (
     <div>
-      <header className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-3 pt-4 lg:px-5">
-        <div className="flex items-center gap-3"><img src="/logo.png" alt="Solat Digital" className="h-12 w-auto" /><div><h1 className="text-xl font-extrabold md:text-3xl">{items.find((i) => i.id === sec)?.label}</h1><p className="text-xs font-semibold text-sub md:text-sm">Solat Digital (Admin Owner). Hanya data pendaftaran dipaparkan; tiada akses ke akaun masjid.</p><div className="mt-1"><DateBadge mode={useDefaults("").raw.hijriMode ?? "jakim"} /></div></div></div>
-        <div className="flex gap-2"><a className="btn btn-dl" href="https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/solat-digital-latest/SolatDigital-Admin-Setup.exe"><Download size={18} /> Muat turun (.exe)</a>{pwa.canInstall && <button className="btn" onClick={pwa.install}><Download size={18} /> Pasang aplikasi</button>}<button className="btn btn-danger" onClick={() => signOut(auth)}><LogOut size={18} /> Log keluar</button></div>
-      </header>
-      <Shell brand={<div className="text-sm font-bold text-sub">Menu Owner</div>} items={items} active={sec} sub={sub} onSelect={(id, s) => { setSec(id as Sec); if (s) setSub(s); }}>
-        <div key={sec + sub} className="grid grid-cols-[minmax(0,1fr)] gap-5">
+      <PanelShell groups={groups} active={sec} onSelect={(id) => setSec(id as Sec)} user={{ name: "Owner Solat Digital", email: auth.currentUser?.email ?? "" }} onLogout={() => signOut(auth)} title={titles[sec]} tag="Admin Owner"
+        right={<><a className="btn btn-dl !min-h-10" href="https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/solat-digital-latest/SolatDigital-Admin-Setup.exe"><Download size={16} /> <span className="hidden sm:inline">Muat turun (.exe)</span></a><ModeToggle /></>}>
+        <div key={sec} className="grid grid-cols-[minmax(0,1fr)] gap-5">
           {sec === "dash" && <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
             <Stat icon={<Building2 size={16} />} label="Masjid berdaftar" v={rows.length} /><Stat icon={<Users size={16} />} label="Akaun admin masjid" v={rows.length} />
             <Stat icon={<ShieldCheck size={16} />} label="Akses penuh / demo" v={`${rows.filter((r) => r.plan === "full").length} / ${rows.filter((r) => r.plan !== "full").length}`} /><Stat icon={<Radio size={16} />} label="TV dalam talian" v={rows.filter((r) => online(r.id)).length} /></div>}
@@ -283,11 +281,15 @@ function Dashboard() {
                   <button className={`btn ${r.plan === "full" ? "" : "btn-primary"}`} onClick={() => setPlan([r.id], r.plan === "full" ? "demo" : "full")}>{r.plan === "full" ? "Tukar ke demo" : "Aktifkan akses penuh"}</button></div></div></li>))}
               {!shown.length && <li className="text-sm text-sub">Tiada masjid dijumpai.</li>}</ul></section>}
 
+          {sec === "live" && <LiveStatus rows={rows} tv={tv} />}
+          {sec === "hadis" && <HadithEditor />}
+          {sec === "latar" && <QuickBgEditor />}
+          {sec === "sumbangan" && <DonationEditor />}
           {sec === "notif" && <Notif rows={rows} sel={openId} setSel={setOpenId} />}
           {sec === "azan" && <AzanManager />}
-          {sec === "tetapan" && <Tetapan rows={rows} sub={sub} />}
+          {sec === "tetapan" && (<><div className="flex gap-1 rounded-full bg-muted p-1 w-fit" role="tablist">{([["tv", "TV"], ["panel", "Panel Admin Masjid"]] as const).map(([k, lb]) => <button key={k} type="button" role="tab" aria-selected={sub === k} className={`rounded-full px-4 py-1.5 text-sm font-bold ${sub === k ? "bg-card shadow" : "text-sub"}`} onClick={() => setSub(k)}>{lb}</button>)}</div><Tetapan rows={rows} sub={sub} /></>)}
         </div>
-      </Shell>
+      </PanelShell>
       {toast && <div className="toast" role="status">{toast}</div>}
       {nt && <button type="button" className="notif-toast" onClick={() => { setSec("notif"); setOpenId(nt.id); setNt(null); }}><Bell size={22} className="shrink-0 text-accent" /><span><b className="block">Mesej baharu</b><span className="text-sm text-sub">daripada {nt.name}. Tekan untuk buka.</span></span></button>}
     </div>

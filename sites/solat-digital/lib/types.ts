@@ -1,4 +1,4 @@
-export type SlideItem = { id: string; kind: "hadis" | "ayat" | "hikmah" | "ulama" | "jumaat" | "umum" | "gambar" | "video"; title?: string; text: string; source?: string; on: boolean; jumaat?: boolean; bg?: string; imgId?: string; videoUrl?: string; vidPath?: string; mime?: string; dur?: number; ar?: string; arFont?: string; arSz?: number; font?: string; sz?: number };
+export type SlideItem = { id: string; kind: "hadis" | "ayat" | "hikmah" | "ulama" | "jumaat" | "umum" | "gambar" | "video"; title?: string; text: string; source?: string; on: boolean; jumaat?: boolean; bg?: string; imgId?: string; videoUrl?: string; vidPath?: string; mime?: string; dur?: number; ar?: string; arFont?: string; arSz?: number; font?: string; sz?: number; lib?: string };
 import type { Sched } from "./phase";
 export type Announcement = { id: string; text: string; on: boolean };
 export type ElStyle = { font?: string; color?: string; border?: string };
@@ -8,7 +8,7 @@ export type TvDoc = {
   plan: "demo" | "full"; ownerUid: string; updatedAt?: number;
   preMin?: number; font?: string; arabicFont?: string; azanMute?: boolean; jumaatTime?: string; slideList?: SlideItem[]; slideAnim?: "fade" | "slide" | "up" | "zoom" | "flip"; slideSecs?: number;
   ringtone?: "chime" | "bell" | "beep" | "off"; ringRepeat?: number; azanDelayMin?: number; volume?: number;
-  popupMin?: number; theme?: string; styles?: Record<string, ElStyle>; texts?: Record<string, string>; arabicColor?: string; azanByPrayer?: Record<string, string>; sched?: Partial<Sched>; memos?: { id: string; title: string; body: string; on: boolean }[]; live?: { speaker?: string; role?: string; topic?: string; session?: string; ticker?: string };
+  popupMin?: number; theme?: string; styles?: Record<string, ElStyle>; texts?: Record<string, string>; arabicColor?: string; azanByPrayer?: Record<string, string>; sched?: Partial<Sched>; bgVideo?: { url: string; label?: string }; memos?: { id: string; title: string; body: string; on: boolean }[]; live?: { speaker?: string; role?: string; topic?: string; session?: string; ticker?: string };
 };
 export type Registry = { name: string; address: string; city: string; postcode: string; state: string; zone: string; country: string; managerName: string; email: string; createdAt: number };
 export type AzanDoc = { name: string; credit: string; url: string; fajrUrl?: string; active: boolean; prayers?: string[] };

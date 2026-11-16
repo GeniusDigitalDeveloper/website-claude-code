@@ -13,6 +13,7 @@ import { hijriText } from "@/lib/hijri";
 import { themeVars } from "@/lib/themes";
 import SlidePanel from "@/components/SlidePanel";
 import { DEFAULT_SLIDES } from "@/lib/defaultSlides";
+import { youtubeId, ytEmbed } from "@/lib/media";
 import { ensureArabicFont } from "@/lib/arabicFont";
 import type { Defaults, ElStyle } from "@/lib/types";
 import { zInfo } from "@/lib/zones";
@@ -197,7 +198,7 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
 
   return (
     <main className={`relative min-h-dvh overflow-hidden ${preview ? "pv" : ""} ${ctl || preview ? "" : "cursor-none"}`} style={tvars} onClickCapture={onPick}>
-      <Slides imgs={[...extra, ...m.slides]} anim={m.anim} secs={m.secs} />
+      {(() => { const yid = m.bgVideo?.url ? youtubeId(m.bgVideo.url) : null; return yid && !preview ? (<div className="pointer-events-none absolute inset-0 -z-0 overflow-hidden bg-black" aria-hidden="true"><iframe title="Latar video" src={ytEmbed(yid)} allow="autoplay; encrypted-media" tabIndex={-1} className="absolute left-1/2 top-1/2 h-[56.25vw] min-h-full w-[177.78vh] min-w-full -translate-x-1/2 -translate-y-1/2 border-0" /><div className="absolute inset-0 bg-slate-950/35" /></div>) : <Slides imgs={[...extra, ...m.slides]} anim={m.anim} secs={m.secs} />; })()}
       {entered && <div className="glow-now" aria-hidden="true" />}
       {ph.view === "slides" && <SlidePanel full slides={slides} anim={m.slideAnim ?? "fade"} secs={m.slideSecs ?? 10} T={T} B={B} imgs={slideImgs} />}
       {ph.view !== "slides" && <div className="relative z-10 flex min-h-dvh flex-col gap-4 p-4 md:p-8">

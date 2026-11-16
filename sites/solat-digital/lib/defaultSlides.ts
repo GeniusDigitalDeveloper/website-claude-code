@@ -24,4 +24,11 @@ const KEEP = new Set(["d1", "d2", "d3", "d5", "d7", "d8", "d11", "j1", "j2"]);
 const BASE = ALL.filter((x) => KEEP.has(x.id));
 const PICK: Record<string, string[]> = { hadis: ["nabawi", "vakil", "putra"], ayat: ["quran-1", "quran-2"], ulama: ["quran-2"], hikmah: ["putra"], jumaat: ["vakil", "nabawi", "putra"], umum: ["putra"], gambar: [] };
 const cnt: Record<string, number> = {};
-export const DEFAULT_SLIDES: SlideItem[] = BASE.map((x) => { const l = PICK[x.kind] ?? []; const i = (cnt[x.kind] = (cnt[x.kind] ?? -1) + 1); return l.length ? { ...x, bg: l[i % l.length] } : x; });
+const AR: Record<string, string> = {
+  d1: "إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى", d2: "خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ",
+  d3: "الصَّلَوَاتُ الْخَمْسُ وَالْجُمُعَةُ إِلَى الْجُمُعَةِ وَرَمَضَانُ إِلَى رَمَضَانَ مُكَفِّرَاتٌ مَا بَيْنَهُنَّ إِذَا اجْتَنَبَ الْكَبَائِرَ",
+  d5: "لَا تَحْقِرَنَّ مِنَ الْمَعْرُوفِ شَيْئًا وَلَوْ أَنْ تَلْقَى أَخَاكَ بِوَجْهٍ طَلْقٍ", d7: "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ",
+  d8: "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا ۝ إِنَّ مَعَ الْعُسْرِ يُسْرًا", j1: "خَيْرُ يَوْمٍ طَلَعَتْ عَلَيْهِ الشَّمْسُ يَوْمُ الْجُمُعَةِ",
+  j2: "يَا أَيُّهَا الَّذِينَ آمَنُوا إِذَا نُودِيَ لِلصَّلَاةِ مِن يَوْمِ الْجُمُعَةِ فَاسْعَوْا إِلَىٰ ذِكْرِ اللَّهِ وَذَرُوا الْبَيْعَ",
+};
+export const DEFAULT_SLIDES: SlideItem[] = BASE.map((x0) => { const x = AR[x0.id] ? { ...x0, ar: AR[x0.id], arFont: "amiri" } : x0; const l = PICK[x.kind] ?? []; const i = (cnt[x.kind] = (cnt[x.kind] ?? -1) + 1); return l.length ? { ...x, bg: l[i % l.length] } : x; });

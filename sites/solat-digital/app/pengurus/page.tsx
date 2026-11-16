@@ -14,6 +14,9 @@ import { detectZone, loadTimes, to12, type Times, PRAYERS } from "@/lib/prayer";
 import Chat from "@/components/Chat";
 import PreviewEditor from "@/components/PreviewEditor";
 import SlideManager from "@/components/SlideManager";
+import SlideLibrary from "@/components/SlideLibrary";
+import { useQuickBg } from "@/components/OwnerEditors";
+import { youtubeId } from "@/lib/media";
 import { ARABIC_FONTS, DEMO_TV, FONTS, KIND_LABEL, PRAYER_OPTS, SLIDE_ANIMS, type SlideItem, type TvDoc, uid } from "@/lib/types";
 import { THEMES } from "@/lib/themes";
 import { DEFAULT_SLIDES } from "@/lib/defaultSlides";
@@ -108,6 +111,7 @@ function Panel({ uidv, user }: { uidv: string; user: User }) {
   const [toast, setToast] = useState(""); const [txt, setTxt] = useState(""); const [dirty, setDirty] = useState(false);
   const [noDoc, setNoDoc] = useState(false); const [sec, setSec] = useState<Sec>("dash"); const [unread, setUnread] = useState(0); const [ntoast, setNtoast] = useState(false); const prevUnread = useRef(0); const secRef = useRef<Sec>("dash");
   useEffect(() => { if (noDoc) createMosqueDocs(user, user.displayName || user.email || "Pentadbir").catch(() => {}); }, [noDoc]); // eslint-disable-line react-hooks/exhaustive-deps
+  const quick = useQuickBg(); const [yt, setYt] = useState("");
   const [memoT, setMemoT] = useState(""); const [memoB, setMemoB] = useState("");
   const [online, setOnline] = useState(false); const [times, setTimes] = useState<Times | null>(null); const [profile, setProfile] = useState<{ managerName?: string } | null>(null); const [don, setDon] = useState<Don | null>(null);
   useEffect(() => onValue(dbRef(rtdb, `presence/${uidv}/t`), (s) => { const t = Number(s.val() || 0); setOnline(!!t && Date.now() - t < 180000); }, () => {}), [uidv]);
@@ -213,6 +217,7 @@ function Panel({ uidv, user }: { uidv: string; user: User }) {
           <section className="card"><h2 className="text-lg font-bold">Kelajuan Slide</h2><p className="text-sm text-sub">Tetapkan berapa lama setiap poster atau hadis dipaparkan sebelum bertukar.</p>
             <L id="ss">Tempoh setiap slide (saat)</L><input id="ss" type="number" min={1} max={300} className="inp max-w-40" value={draft.slideSecs ?? 10} onChange={(e) => up({ slideSecs: Math.max(1, Math.min(300, Math.round(+e.target.value) || 10)) })} />
             <p className="mt-2 text-xs text-sub">1 hingga 300 saat. Peralihan antara slide sentiasa lancar. Tekan Simpan selepas mengubah.</p></section>
+          {pf.slides && <SlideLibrary list={draft.slideList ?? DEFAULT_SLIDES} onAdd={(it) => { const cur = draft.slideList ?? DEFAULT_SLIDES; if (cur.length >= 15) { flash("Maksimum 15 slaid. Padam satu slaid dahulu."); return; } live({ slideList: [...cur, { ...it, id: uid() }] }); flash("Ditambah ke slaid TV."); }} />}
           {pf.slides && <section className="card"><h2 className="text-lg font-bold">Poster, Gambar dan Slaid TV</h2><p className="mb-3 text-sm text-sub">Slaid ditayangkan skrin penuh mengikut kitaran di Tetapan Waktu Solat.</p>
             <SlideManager mid={uidv} slides={draft.slideList} onLive={(l) => live({ slideList: l })} flash={flash} /></section>}
         </>)}
@@ -237,6 +242,11 @@ function Panel({ uidv, user }: { uidv: string; user: User }) {
         </>)}
 
         {sec === "latar" && (<>
+          <section className="card"><h2 className="flex items-center gap-2 text-lg font-bold">Video YouTube latar (senyap)</h2><p className="text-sm text-sub">Contoh: Makkah Live atau Madinah Live. Video dimainkan penuh skrin, 100% senyap. Perubahan terus ke TV tanpa lengah.</p>
+            {draft.bgVideo?.url && <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl bg-muted p-3 text-sm"><span className="chip chip-ok">Aktif</span><span className="min-w-0 flex-1 truncate">{draft.bgVideo.label || draft.bgVideo.url}</span><button type="button" className="btn" onClick={() => live({ bgVideo: { url: "" } })}>Matikan video latar</button></div>}
+            <L id="yt">Pautan video YouTube atau kod embed</L><div className="flex gap-2"><input id="yt" className="inp" placeholder="https://www.youtube.com/watch?v=… atau https://www.youtube.com/embed/…" value={yt} onChange={(e) => setYt(e.target.value)} />
+              <button type="button" className="btn btn-primary" onClick={() => { const m = yt.match(/(?:src=["'])?(https?:\/\/[^"'\s>]+)/); const u = m ? m[1] : yt.trim(); if (!youtubeId(u)) return flash("Pautan YouTube tidak sah."); live({ bgVideo: { url: u } }); setYt(""); flash("Video latar dihidupkan."); }}>Terapkan</button></div>
+            {quick.length > 0 && <><span className="lbl">Pilihan pantas</span><div className="flex flex-wrap gap-2">{quick.map((q) => (<button key={q.id} type="button" className="btn" onClick={() => { if (q.kind === "youtube") { live({ bgVideo: { url: q.url, label: q.label } }); flash(`${q.label} dihidupkan sebagai latar.`); } else { up({ slides: [...draft.slides, q.url].slice(0, 10), }); live({ bgVideo: { url: "" } }); flash("Imej ditambah. Tekan Simpan."); } }}>{q.label}</button>))}</div></>}</section>
           {pf.images && <section className="card"><h2 className="text-lg font-bold">Gambar latar</h2><p className="text-sm text-sub">Muat naik gambar masjid anda (maksimum 5) atau letak URL gambar. Kosong = gambar lalai.</p>
             <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">{imgs.map((im) => (<div key={im.id} className="relative overflow-hidden rounded-xl border border-line"><img src={im.data} alt="Gambar latar" className="aspect-video w-full object-cover" /><button className="btn absolute right-1 top-1 !min-h-9 !px-2" aria-label="Padam gambar" onClick={() => deleteDoc(doc(db, "tv", uidv, "img", im.id))}><Trash2 size={16} /></button></div>))}
               {imgs.length < 5 && <button className="grid aspect-video place-items-center rounded-xl border border-dashed border-line text-sub hover:bg-muted" onClick={() => file.current?.click()} aria-label="Muat naik gambar"><span className="grid place-items-center gap-1"><ImagePlus /> Muat naik</span></button>}</div>
