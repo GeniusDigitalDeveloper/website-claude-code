@@ -20,8 +20,8 @@ export default function SlidePanel({ slides, anim, secs, T, B, imgs, full = fals
   if (!slides.length) return null;
   const s = slides[i % slides.length];
   const len = s.text.length, hasAr = !!s.ar?.trim(), alen = s.ar?.length ?? 0;
-  const size = (hasAr ? (len > 170 ? 2.4 : len > 110 ? 2.8 : 3.3) : (len > 170 ? 3.6 : len > 110 ? 4.3 : 5.2)) * (s.sz ?? 1);
-  const arSize = (alen > 140 ? 2.9 : alen > 80 ? 3.5 : 4.3) * (s.arSz ?? 1);
+  const size = (hasAr ? (len > 170 ? 1.7 : len > 110 ? 1.9 : 2.2) : (len > 170 ? 2.8 : len > 110 ? 3.3 : 4)) * (s.sz ?? 1);
+  const arSize = (alen > 140 ? 2.2 : alen > 80 ? 2.6 : 3.1) * (s.arSz ?? 1);
   const bg = bgOf(s.bg);
   const photo = s.kind === "gambar" ? imgs[s.imgId ?? ""] : undefined;
   const tphoto = s.kind !== "gambar" && s.kind !== "video" && s.imgId ? imgs[s.imgId] : undefined;
@@ -36,7 +36,7 @@ export default function SlidePanel({ slides, anim, secs, T, B, imgs, full = fals
         ) : s.kind === "gambar" ? (
           <div key={s.id + i} className={`sl-card sl-${anim} h-full w-full`}>{photo ? <img src={photo} alt="Slaid" className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center text-white/70" style={{ fontSize: "3cqw" }}>Memuatkan gambar…</div>}</div>
         ) : (
-          <div key={s.id + i} className={`sl-card sl-${anim} flex h-full flex-col justify-between`} style={{ padding: "3cqw 5cqw 1.1cqw" }}>
+          <div key={s.id + i} className={`sl-card sl-${anim} flex h-full flex-col justify-between`} style={{ padding: "3cqw 8cqw 1.1cqw" }}>
             <div className="sl-head" style={{ fontSize: "3cqw" }}>
               <span className="sl-label">{s.title || KIND_LABEL[s.kind]}{s.kind === "hadis" && <span className="ar sl-saw" lang="ar">ﷺ</span>}</span>
               <span className="sl-count tabular-nums">{(i % slides.length) + 1} / {slides.length}</span>
