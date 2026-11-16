@@ -6,7 +6,7 @@ import { bgOf } from "@/lib/slideBackgrounds";
 import { arCss, loadSlideFonts } from "@/lib/slideFonts";
 
 /** Panel slaid 16:9 (nisbah 1920x1080) bersaiz kecil. Slaid teks (latar foto sebenar) dan slaid gambar (kekal seperti dimuat naik). */
-export default function SlidePanel({ slides, anim, secs, T, B, imgs }: { slides: SlideItem[]; anim: NonNullable<TvDoc["slideAnim"]>; secs: number; T: (k: string) => CSSProperties; B: (k: string) => CSSProperties; imgs: Record<string, string> }) {
+export default function SlidePanel({ slides, anim, secs, T, B, imgs, full = false }: { full?: boolean; slides: SlideItem[]; anim: NonNullable<TvDoc["slideAnim"]>; secs: number; T: (k: string) => CSSProperties; B: (k: string) => CSSProperties; imgs: Record<string, string> }) {
   const [i, setI] = useState(0);
   useEffect(() => { loadSlideFonts(slides); }, [slides]);
   const ref = useRef(slides); ref.current = slides; const key = slides.map((x) => x.id).join(",");
@@ -27,8 +27,8 @@ export default function SlidePanel({ slides, anim, secs, T, B, imgs }: { slides:
   const tphoto = s.kind !== "gambar" && s.kind !== "video" && s.imgId ? imgs[s.imgId] : undefined;
   const yt = s.kind === "video" && s.videoUrl ? youtubeId(s.videoUrl) : null;
   return (
-    <div className="sl-wrap glass overflow-hidden rounded-3xl" style={B("slide-frame")} data-el="slide-frame" data-kind="slide" data-slide={s.id} data-label="Slaid" role="region" aria-label="Slaid" aria-live="off">
-      <div className="sl-box" style={{ aspectRatio: "16 / 9", ...(tphoto ? { backgroundImage: `linear-gradient(180deg, rgba(2,6,23,.45), rgba(2,6,23,.75)), url(${tphoto})`, backgroundSize: "cover", backgroundPosition: "center" } : bg ? { backgroundImage: `linear-gradient(180deg, rgba(2,6,23,.50), rgba(2,6,23,.78)), url(${bg.url})`, backgroundSize: "cover", backgroundPosition: "center" } : {}) }}>
+    <div className={full ? "sl-wrap fixed inset-0 z-20 overflow-hidden" : "sl-wrap glass overflow-hidden rounded-3xl"} style={B("slide-frame")} data-el="slide-frame" data-kind="slide" data-slide={s.id} data-label="Slaid" role="region" aria-label="Slaid" aria-live="off">
+      <div className="sl-box" style={{ ...(full ? { height: "100%" } : { aspectRatio: "16 / 9" }), ...(tphoto ? { backgroundImage: `linear-gradient(180deg, rgba(2,6,23,.45), rgba(2,6,23,.75)), url(${tphoto})`, backgroundSize: "cover", backgroundPosition: "center" } : bg ? { backgroundImage: `linear-gradient(180deg, rgba(2,6,23,.50), rgba(2,6,23,.78)), url(${bg.url})`, backgroundSize: "cover", backgroundPosition: "center" } : {}) }}>
         {s.kind === "video" ? (
           <div key={s.id + i} className={`sl-card sl-${anim} h-full w-full bg-black`}>
             {yt ? <iframe title="Video slaid" src={ytEmbed(yt)} allow="autoplay; encrypted-media" className="h-full w-full border-0" /> : <VideoEl s={s} />}
