@@ -250,13 +250,13 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
                   </li>))}
               </ul>
             </>) : <p className="py-8 text-center text-lg" role={err ? "alert" : undefined}>{err || "Memuatkan waktu solat…"}</p>}
-            <p className="mt-3 text-xs text-white/80 md:text-sm">Sumber: JAKIM (e-solat.gov.my) · {m.zone ? "zon pilihan" : "zon dikesan automatik"} · Latar: Muhammad Faqih, CC BY-SA 4.0 · Azan: {azanCredit(cur?.k ?? "dhuhr")}</p>
           </section>
         </div>) : null}
         {feat.ticker && ann.length > 0 && !["solat", "raya"].includes(ph.view) && (
           <div className="glass overflow-hidden rounded-2xl py-3 text-lg font-semibold text-white md:text-2xl" style={B("ticker")} {...el("ticker", "border", "Bingkai teks bergerak")} role="marquee" aria-label="Pengumuman">
             <div className="marquee px-4" style={{ ["--dur" as string]: `${Math.max(20, ann.map((a) => a.text).join("   •   ").length * 0.35)}s`, ...T("tickert") }} {...el("tickert", "text", "Teks bergerak")}>{ann.map((a) => a.text).join("   •   ")}</div>
           </div>)}
+        <p className="pt-1 text-center text-[10px] leading-tight text-white/70 md:text-xs">Sumber: JAKIM (e-solat.gov.my) · {m.zone ? "zon pilihan" : "zon dikesan automatik"} · Latar: Muhammad Faqih, CC BY-SA 4.0 · Azan: {azanCredit(cur?.k ?? "dhuhr")}</p>
       </div>}
 
       {live && !liveOn && <div className={`fixed right-0 top-0 z-30 flex items-center tv-ctl transition-opacity duration-500`}>
