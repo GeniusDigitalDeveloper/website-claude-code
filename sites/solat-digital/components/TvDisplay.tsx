@@ -163,13 +163,16 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
         <div className="my-auto"><p lang="ar" dir="rtl" className="ar mb-3 text-center text-5xl text-white md:text-8xl" style={arSty}>{ph.label === "Aidilfitri" ? "صَلَاةُ سُنَّةِ عِيدِ الْفِطْرِ" : "صَلَاةُ سُنَّةِ عِيدِ الْأَضْحَى"}</p>{panel("Hari Raya", `Solat Sunat ${ph.label}`, "Sedang berlangsung", t, tx("msg-raya", "Sila matikan atau senyapkan telefon bimbit. Rapatkan dan luruskan saf."))}</div>);
       case "rkhutbah": return panel("Hari Raya", `Khutbah ${ph.label}`, "Sedang berlangsung", t, tx("msg-rkhutbah", "Dengarkan khutbah dengan penuh perhatian dan khusyuk."));
       case "solat": return (
-        <div className="my-auto text-center text-white">
-          <h2 className="tv-shadow text-6xl font-extrabold uppercase tracking-wide md:text-[9rem]">Solat</h2>
-          <p className="mt-1 text-xl font-semibold md:text-4xl">{ph.label === "Jumaat" ? "Solat Jumaat sedang berlangsung" : `Solat ${ph.label} sedang berlangsung`}</p>
-          <p className="mx-auto mt-6 max-w-5xl text-lg font-semibold md:text-4xl">{tx("msg-solat", "Sila rapatkan saf, luruskan saf. Tumit belakang sama rata, bahu bertemu bahu.")}</p>
-          <div className="mt-8 flex flex-wrap items-start justify-center gap-6 md:gap-14">
-            <div className="glass-tile grid w-44 place-items-center gap-2 p-5 md:w-72 md:p-8"><PhoneOff className="size-16 md:size-28" strokeWidth={1.75} aria-hidden="true" /><b className="text-base md:text-2xl">Matikan telefon bimbit</b></div>
-            <div className="glass-tile grid w-44 place-items-center gap-2 p-5 md:w-72 md:p-8"><MicOff className="size-16 md:size-28" strokeWidth={1.75} aria-hidden="true" /><b className="text-base md:text-2xl">Dilarang bercakap</b></div>
+        <div className="glass mx-auto my-auto w-full max-w-5xl rounded-[2rem] p-5 text-center text-white md:p-8">
+          <p className="text-sm font-bold uppercase tracking-[.35em] md:text-2xl" style={{ color: "var(--acc, #fcd34d)" }}>{ph.label === "Jumaat" ? "Solat Jumaat" : `Solat ${ph.label}`}</p>
+          <h2 className="tv-shadow mt-1 text-4xl font-extrabold uppercase tracking-wide md:text-6xl">Sedang Berlangsung</h2>
+          <div className="mx-auto my-4 h-1 w-24 rounded-full md:my-5 md:w-40" style={{ background: "var(--acc, #fcd34d)" }} aria-hidden="true" />
+          <p className="mx-auto max-w-4xl text-lg font-semibold leading-snug text-white/95 md:text-3xl">{tx("msg-solat", "Mohon rapatkan dan luruskan saf. Senyapkan telefon bimbit dan tenangkan hati untuk menghadap Allah.")}</p>
+          <div className="mt-5 flex flex-wrap items-stretch justify-center gap-5 md:mt-6 md:gap-10">
+            {([[PhoneOff, "Senyapkan telefon bimbit"], [MicOff, "Dilarang bercakap"]] as const).map(([Ic, lb]) => (
+              <div key={lb} className="grid h-40 w-40 place-content-center justify-items-center gap-3 rounded-3xl border-4 border-red-600 bg-white p-4 text-center shadow-xl md:h-52 md:w-64 md:gap-3">
+                <Ic className="size-14 text-red-600 md:size-20" strokeWidth={2.25} aria-hidden="true" /><b className="text-sm leading-tight text-slate-900 md:text-xl">{lb}</b>
+              </div>))}
           </div>
         </div>);
       default: return null;
