@@ -202,7 +202,7 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
 
         {middle}
 
-        {ph.view === "full" ? (<div className="mt-auto grid gap-4">
+        {!["solat", "raya"].includes(ph.view) ? (<div className="mt-auto grid gap-4">
           <section className={`glass rounded-3xl p-4 md:p-6 ${alert ? "tv-alert" : ""}`} style={B("frame")} {...el("frame", "border", "Bingkai waktu solat")} aria-live="off">
             {times && idx ? (<>
               <div className="mb-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-2 text-white">
@@ -221,14 +221,7 @@ export default function TvDisplay({ m, mid, azanLib, extra, slideImgs = {}, defs
             </>) : <p className="py-8 text-center text-lg" role={err ? "alert" : undefined}>{err || "Memuatkan waktu solat…"}</p>}
             <p className="mt-3 text-xs text-white/80 md:text-sm">Sumber: JAKIM (e-solat.gov.my) · {m.zone ? "zon pilihan" : "zon dikesan automatik"} · Latar: Muhammad Faqih, CC BY-SA 4.0 · Azan: {azanCredit(cur?.k ?? "dhuhr")}</p>
           </section>
-        </div>) : ["final", "iqamah", "jwait", "jlead", "khutbah", "rkhutbah"].includes(ph.view) && items.length > 0 ? (
-          <section className="glass mt-auto rounded-3xl p-3 md:p-4" aria-label="Waktu solat">
-            <ul className={`grid grid-cols-5 gap-2 md:gap-3 ${fri ? "grid-cols-6" : ""}`}>
-              {items.map((p) => (<li key={p.k} className={`glass-tile px-1 py-2 text-center md:p-3 ${p.k === (curKey ?? "isha") && !p.silent ? "card-now" : ""} ${p.silent ? "opacity-60" : ""}`}>
-                <b className="block text-xs text-white md:text-xl">{tx("ct-" + p.k, p.n)}</b>
-                <span className="mt-1 block whitespace-nowrap text-xs font-bold tabular-nums text-white md:text-3xl">{to12(p.time)}</span></li>))}
-            </ul>
-          </section>) : null}
+        </div>) : null}
         {feat.ticker && ann.length > 0 && !["solat", "raya"].includes(ph.view) && (
           <div className="glass overflow-hidden rounded-2xl py-3 text-lg font-semibold text-white md:text-2xl" style={B("ticker")} {...el("ticker", "border", "Bingkai teks bergerak")} role="marquee" aria-label="Pengumuman">
             <div className="marquee px-4" style={{ ["--dur" as string]: `${Math.max(20, ann.map((a) => a.text).join("   •   ").length * 0.35)}s`, ...T("tickert") }} {...el("tickert", "text", "Teks bergerak")}>{ann.map((a) => a.text).join("   •   ")}</div>
