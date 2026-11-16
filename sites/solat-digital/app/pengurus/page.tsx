@@ -354,7 +354,7 @@ function Panel({ uidv, user }: { uidv: string; user: User }) {
             </ul></section>)}
         </div>
       </PanelShell>
-      <div className="bar-frost fixed inset-x-0 bottom-0 z-40 border-t border-white/60 p-3 lg:left-[264px]"><div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-2"><span className="text-sm text-sub">{dirty ? "Ada perubahan belum disimpan" : "Semua perubahan disimpan"}</span><button className="btn btn-primary" disabled={!dirty} onClick={save}><Save size={18} /> Simpan</button></div></div>
+      <div className="bar-frost fixed inset-x-0 bottom-0 z-40 border-t border-white/60 p-3 md:left-[264px]"><div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-2"><span className="text-sm text-sub">{dirty ? "Ada perubahan belum disimpan" : "Semua perubahan disimpan"}</span><button className="btn btn-primary" disabled={!dirty} onClick={save}><Save size={18} /> Simpan</button></div></div>
       {toast && <div className="toast" role="status">{toast}</div>}
       {ntoast && <button type="button" className="notif-toast" onClick={() => { setSec("notif"); setNtoast(false); }}><Bell size={22} className="shrink-0 text-accent" /><span><b className="block">Mesej baharu</b><span className="text-sm text-sub">daripada Owner Solat Digital. Tekan untuk buka.</span></span></button>}
     </div>

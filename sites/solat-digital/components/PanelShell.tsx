@@ -1,6 +1,6 @@
 "use client";
 import { useState, type ReactNode } from "react";
-import { LogOut, Menu, X } from "lucide-react";
+import { LogOut, X } from "lucide-react";
 export type PItem = { id: string; label: string; icon: ReactNode; badge?: number };
 export type PGroup = { title: string; items: PItem[] };
 /** Susun atur panel: bar sisi berkumpulan (UTAMA / KANDUNGAN PAPARAN / KONFIGURASI / PENTADBIRAN), bar atas dan kandungan. */
@@ -21,16 +21,15 @@ export default function PanelShell({ groups, active, onSelect, user, onLogout, r
       </div>
     </div>);
   return (
-    <div className="min-h-dvh lg:grid lg:grid-cols-[264px_minmax(0,1fr)]">
-      <aside className="sticky top-0 hidden h-dvh border-r border-line bg-card lg:block">{side}</aside>
-      {open && <div className="fixed inset-0 z-50 lg:hidden"><button className="absolute inset-0 bg-black/50" aria-label="Tutup menu" onClick={() => setOpen(false)} /><aside className="absolute inset-y-0 left-0 w-72 max-w-[85vw] bg-card shadow-2xl">{side}</aside></div>}
+    <div className="min-h-dvh md:grid md:grid-cols-[264px_minmax(0,1fr)]">
+      <aside className="sticky top-0 hidden h-dvh border-r border-line bg-card md:block">{side}</aside>
+      <div className={`fixed inset-0 z-50 md:hidden ${open ? "" : "pointer-events-none"}`} aria-hidden={!open}><button type="button" tabIndex={open ? 0 : -1} className={`ios-fade absolute inset-0 bg-black/45 ${open ? "opacity-100" : "opacity-0"}`} aria-label="Tutup menu" onClick={() => setOpen(false)} /><aside className={`ios-sheet absolute inset-y-0 left-0 w-72 max-w-[85vw] bg-card shadow-2xl ${open ? "translate-x-0" : "-translate-x-full"}`}>{side}</aside></div>
       <div className="min-w-0">
         <div className="sticky top-0 z-30 flex items-center gap-2 border-b border-line bg-card/90 px-3 py-2 backdrop-blur lg:px-6">
-          <button type="button" className="btn !min-h-10 !px-3 lg:hidden" aria-label="Buka menu" onClick={() => setOpen(true)}><Menu size={20} /></button>
-          <b className="min-w-0 flex-1 truncate text-base lg:text-lg">{title}</b>
+          <button type="button" key={title} className="ios-title min-w-0 flex-1 truncate text-left text-base font-bold md:cursor-default md:text-lg" onClick={() => setOpen(true)} aria-label={`${title}. Tekan untuk buka menu`}>{title}</button>
           <div className="flex shrink-0 items-center gap-2">{right}</div>
         </div>
-        <main className="mx-auto w-full max-w-6xl px-3 pb-28 pt-5 lg:px-6">{children}</main>
+        <main key={active} className="ios-page mx-auto w-full max-w-6xl px-3 pb-28 pt-5 lg:px-6">{children}</main>
       </div>
     </div>);
 }

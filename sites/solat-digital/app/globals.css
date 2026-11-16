@@ -235,3 +235,25 @@ main > section.card:nth-of-type(6) { animation-delay: .24s; } main > section.car
   --color-accent:#4ade80; --color-on-accent:#052e16; --color-danger:#f87171; --color-inp:#0f1727; --btn-hover:#1d2a44; --primary-hover:#22c55e;
   --chip-ok-bg:rgba(34,197,94,.18); --chip-ok:#86efac; --chip-demo-bg:rgba(250,204,21,.16); --chip-demo:#fde68a; color-scheme: dark; background: #0b1220; }
 .mode-dark .card { box-shadow: none; }
+
+/* ===== Pergerakan gaya iOS (spring lembut) ===== */
+:root { --ios: cubic-bezier(.32, .72, 0, 1); }
+.ios-page { animation: iosPage .5s var(--ios) both; }
+@keyframes iosPage { from { opacity: 0; transform: translateY(14px) scale(.992); } to { opacity: 1; transform: none; } }
+.ios-title { animation: iosTitle .45s var(--ios) both; }
+@keyframes iosTitle { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.ios-sheet { transition: transform .5s var(--ios); will-change: transform; }
+.ios-fade { transition: opacity .4s var(--ios); }
+.btn, .nav-item, .switch, .swatch, .sw-theme { transition: background-color .25s var(--ios), box-shadow .35s var(--ios), transform .3s var(--ios), color .25s var(--ios), border-color .25s var(--ios); }
+.btn:active, .sw-theme:active, .swatch:active { transform: scale(.96); }
+.card { transition: box-shadow .4s var(--ios), transform .4s var(--ios); }
+[role="dialog"] > .card, [role="dialog"] > div { animation: iosSheetIn .5s var(--ios) both; }
+@keyframes iosSheetIn { from { opacity: 0; transform: translateY(28px) scale(.97); } to { opacity: 1; transform: none; } }
+[role="dialog"] { animation: iosFadeIn .35s var(--ios) both; }
+@keyframes iosFadeIn { from { opacity: 0; } to { opacity: 1; } }
+.toast, .notif-toast { animation: iosToast .55s var(--ios) both; }
+@keyframes iosToast { from { opacity: 0; transform: translate(-50%, 18px) scale(.96); } to { opacity: 1; transform: translate(-50%, 0); } }
+.notif-toast { animation-name: iosToastR; }
+@keyframes iosToastR { from { opacity: 0; transform: translateY(-14px) scale(.96); } to { opacity: 1; transform: none; } }
+select, input, textarea { transition: border-color .25s var(--ios), box-shadow .3s var(--ios); }
+@media (prefers-reduced-motion: reduce) { .ios-page, .ios-title, [role="dialog"], [role="dialog"] > * { animation: none !important; } .ios-sheet, .ios-fade { transition: none; } }
