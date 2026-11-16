@@ -11,6 +11,7 @@ import { THEMES } from "@/lib/themes";
 import { authMsg, useUser } from "@/lib/useUser";
 import { usePwaInstall } from "@/lib/usePwa";
 import PasswordInput from "@/components/PasswordInput";
+import Avatar from "@/components/Avatar";
 import PanelShell, { type PGroup } from "@/components/PanelShell";
 import { ModeToggle } from "@/components/ModeWrap";
 import { HadithEditor, LiveStatus, QuickBgEditor } from "@/components/OwnerEditors";
@@ -22,7 +23,7 @@ import { chatSfx } from "@/lib/sfx";
 import { useDefaults } from "@/lib/useDefaults";
 
 type Row = Registry & { id: string; plan: "demo" | "full" };
-type Sec = "dash" | "negeri" | "senarai" | "live" | "notif" | "hadis" | "latar" | "azan" | "sumbangan" | "tetapan";
+type Sec = "dash" | "negeri" | "senarai" | "live" | "notif" | "hadis" | "latar" | "azan" | "sumbangan" | "tetapan" | "profil";
 const L = ({ id, children }: { id: string; children: React.ReactNode }) => <label htmlFor={id} className="lbl">{children}</label>;
 const Stat = ({ icon, label, v }: { icon: React.ReactNode; label: string; v: number | string }) => <div className="card"><div className="flex items-center gap-2 text-sm text-sub">{icon}{label}</div><div className="mt-2 text-3xl font-extrabold tabular-nums">{v}</div></div>;
 const Switch = ({ on, set, label }: { on: boolean; set: (v: boolean) => void; label: string }) => <div className="flex items-center justify-between gap-3 rounded-xl bg-muted p-3"><span className="font-semibold">{label}</span><button type="button" className="switch" role="switch" aria-checked={on} aria-label={label} onClick={() => set(!on)} /></div>;
@@ -226,7 +227,8 @@ function Dashboard() {
   const [q, setQ] = useState(""); const [toast, setToast] = useState(""); const [now, setNow] = useState(Date.now());
   const [sec, setSec] = useState<Sec>("dash"); const [sub, setSub] = useState("tv"); const [openId, setOpenId] = useState(""); const [nt, setNt] = useState<{ id: string; name: string } | null>(null); const prevUn = useRef(0); const st = useRef({ sec: "dash" as Sec, openId: "" }); const [selSt, setSelSt] = useState(""); const [selZone, setSelZone] = useState(""); const [picked, setPicked] = useState<string[]>([]);
   useEffect(() => { st.current = { sec, openId }; if (sec === "notif" && nt && nt.id === openId) setNt(null); }, [sec, openId]); // eslint-disable-line react-hooks/exhaustive-deps const [selSt, setSelSt] = useState(""); const [selZone, setSelZone] = useState(""); const [picked, setPicked] = useState<string[]>([]);
-  const pwa = usePwaInstall();
+  const pwa = usePwaInstall(); const [ownerPhoto, setOwnerPhoto] = useState("");
+  useEffect(() => onSnapshot(doc(db, "config", "ownerProfile"), (s) => setOwnerPhoto((s.data()?.photo as string) ?? ""), () => {}), []);
   useEffect(() => {
     const u1 = onSnapshot(query(collection(db, "registry"), orderBy("createdAt", "desc")), (s) => setReg(Object.fromEntries(s.docs.map((d) => [d.id, d.data() as Registry]))));
     const u2 = onSnapshot(collection(db, "tv"), (s) => setTv(Object.fromEntries(s.docs.map((d) => [d.id, d.data() as TvDoc]))));
@@ -245,14 +247,14 @@ function Dashboard() {
     { title: "Utama", items: [{ id: "dash", label: "Dashboard", icon: <LayoutDashboard size={19} /> }] },
     { title: "Pengurusan masjid", items: [{ id: "negeri", label: "Mengikut negeri", icon: <MapPin size={19} /> }, { id: "senarai", label: "Senarai masjid", icon: <Building2 size={19} /> }, { id: "live", label: "Siaran Kuliah (Live)", icon: <Radio size={19} /> }, { id: "notif", label: "Notifikasi", icon: <Bell size={19} />, badge: unread }] },
     { title: "Kandungan sistem", items: [{ id: "hadis", label: "Pustaka Hadis & Kategori", icon: <Megaphone size={19} /> }, { id: "latar", label: "Latar Belakang (Pilihan Pantas)", icon: <Radio size={19} /> }, { id: "azan", label: "Perpustakaan azan", icon: <Music size={19} /> }] },
-    { title: "Konfigurasi", items: [{ id: "tetapan", label: "Tetapan sistem dan font", icon: <Settings size={19} /> }, { id: "sumbangan", label: "Sumbangan", icon: <Users size={19} /> }] },
+    { title: "Konfigurasi", items: [{ id: "tetapan", label: "Tetapan sistem dan font", icon: <Settings size={19} /> }, { id: "sumbangan", label: "Sumbangan", icon: <Users size={19} /> }, { id: "profil", label: "Profil Owner", icon: <ShieldCheck size={19} /> }] },
   ];
-  const titles: Record<Sec, string> = { dash: "Dashboard Owner", negeri: "Mengikut negeri dan daerah", senarai: "Senarai masjid", live: "Siaran Kuliah (Live)", notif: "Notifikasi", hadis: "Pustaka Hadis & Kategori", latar: "Latar Belakang (Pilihan Pantas)", azan: "Perpustakaan azan", sumbangan: "Sumbangan", tetapan: "Tetapan sistem dan font" };
+  const titles: Record<Sec, string> = { dash: "Dashboard Owner", negeri: "Mengikut negeri dan daerah", senarai: "Senarai masjid", live: "Siaran Kuliah (Live)", notif: "Notifikasi", hadis: "Pustaka Hadis & Kategori", latar: "Latar Belakang (Pilihan Pantas)", azan: "Perpustakaan azan", sumbangan: "Sumbangan", tetapan: "Tetapan sistem dan font", profil: "Profil Owner" };
   const stRows = (st: string) => rows.filter((r) => r.state === st);
   const zones = ZONES.filter((z) => z[1] === selSt);
   return (
     <div>
-      <PanelShell groups={groups} active={sec} onSelect={(id) => setSec(id as Sec)} user={{ name: "Owner Solat Digital", email: auth.currentUser?.email ?? "" }} onLogout={() => signOut(auth)} title={titles[sec]} tag="Admin Owner"
+      <PanelShell groups={groups} active={sec} onSelect={(id) => setSec(id as Sec)} user={{ name: "Owner Solat Digital", email: auth.currentUser?.email ?? "", photo: ownerPhoto }} onLogout={() => signOut(auth)} title={titles[sec]} tag="Admin Owner"
         right={<><a className="btn btn-dl !min-h-10" href="https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/solat-digital-latest/SolatDigital-Admin-Setup.exe"><Download size={16} /> <span className="hidden sm:inline">Muat turun (.exe)</span></a><ModeToggle /></>}>
         <div key={sec} className="grid grid-cols-[minmax(0,1fr)] gap-5">
           {sec === "dash" && <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
@@ -281,6 +283,8 @@ function Dashboard() {
                   <button className={`btn ${r.plan === "full" ? "" : "btn-primary"}`} onClick={() => setPlan([r.id], r.plan === "full" ? "demo" : "full")}>{r.plan === "full" ? "Tukar ke demo" : "Aktifkan akses penuh"}</button></div></div></li>))}
               {!shown.length && <li className="text-sm text-sub">Tiada masjid dijumpai.</li>}</ul></section>}
 
+          {sec === "profil" && <section className="card"><h2 className="text-lg font-bold">Profil Owner</h2><p className="text-sm text-sub">Gambar profil dipaparkan di bar sisi, di atas butang Log keluar.</p>
+            <div className="mt-4 flex items-center gap-4"><Avatar photo={ownerPhoto} initials="OW" size={96} onPick={async (d) => { try { await setDoc(doc(db, "config", "ownerProfile"), { photo: d }); flash("Gambar profil ditukar."); } catch { flash("Gagal menukar gambar."); } }} /><div><b className="block">Owner Solat Digital</b><span className="text-sm text-sub">{auth.currentUser?.email}</span><p className="mt-1 text-xs text-sub">Tekan ikon kamera untuk tukar gambar. Gambar dipotong segi empat sama.</p></div></div></section>}
           {sec === "live" && <LiveStatus rows={rows} tv={tv} />}
           {sec === "hadis" && <HadithEditor />}
           {sec === "latar" && <QuickBgEditor />}

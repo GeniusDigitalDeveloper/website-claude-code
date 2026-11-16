@@ -257,3 +257,10 @@ main > section.card:nth-of-type(6) { animation-delay: .24s; } main > section.car
 @keyframes iosToastR { from { opacity: 0; transform: translateY(-14px) scale(.96); } to { opacity: 1; transform: none; } }
 select, input, textarea { transition: border-color .25s var(--ios), box-shadow .3s var(--ios); }
 @media (prefers-reduced-motion: reduce) { .ios-page, .ios-title, [role="dialog"], [role="dialog"] > * { animation: none !important; } .ios-sheet, .ios-fade { transition: none; } }
+
+/* Butang berwarna padat (tanpa garis): merah untuk Log keluar, kuning untuk Sumbangan dan Sahkan emel */
+.btn.btn-red { background: linear-gradient(180deg, #ff5a52, #f0332b) !important; color: #fff !important; border: 0 !important; box-shadow: inset 0 1px 0 rgba(255,255,255,.45), 0 6px 16px rgba(240,51,43,.3) !important; }
+.btn.btn-red:hover { background: linear-gradient(180deg, #ff6a62, #f5443c) !important; }
+.btn.btn-yellow { background: linear-gradient(180deg, #ffe25a, #facc15) !important; color: #000 !important; border: 0 !important; box-shadow: inset 0 1px 0 rgba(255,255,255,.6), 0 6px 16px rgba(250,204,21,.32) !important; }
+.btn.btn-yellow:hover { background: linear-gradient(180deg, #ffe970, #fcd535) !important; }
+.btn.btn-red svg, .btn.btn-yellow svg { stroke: currentColor; }

@@ -1,10 +1,11 @@
 "use client";
 import { useState, type ReactNode } from "react";
 import { LogOut, X } from "lucide-react";
+import Avatar from "@/components/Avatar";
 export type PItem = { id: string; label: string; icon: ReactNode; badge?: number };
 export type PGroup = { title: string; items: PItem[] };
 /** Susun atur panel: bar sisi berkumpulan (UTAMA / KANDUNGAN PAPARAN / KONFIGURASI / PENTADBIRAN), bar atas dan kandungan. */
-export default function PanelShell({ groups, active, onSelect, user, onLogout, right, title, children, tag }: { groups: PGroup[]; active: string; onSelect: (id: string) => void; user: { name: string; email: string }; onLogout: () => void; right?: ReactNode; title: string; children: ReactNode; tag?: string }) {
+export default function PanelShell({ groups, active, onSelect, user, onLogout, right, title, children, tag }: { groups: PGroup[]; active: string; onSelect: (id: string) => void; user: { name: string; email: string; photo?: string }; onLogout: () => void; right?: ReactNode; title: string; children: ReactNode; tag?: string }) {
   const [open, setOpen] = useState(false);
   const ini = (user.name || user.email || "?").trim().slice(0, 2).toUpperCase();
   const side = (
@@ -16,8 +17,8 @@ export default function PanelShell({ groups, active, onSelect, user, onLogout, r
             <span className="nav-ico">{it.icon}</span><span className="text-left">{it.label}</span>{!!it.badge && <span className="nav-badge" aria-label={`${it.badge} belum dibaca`}>{it.badge > 99 ? "99+" : it.badge}</span>}</button>))}</div>))}
       </nav>
       <div className="border-t border-line p-3">
-        <div className="flex items-center gap-3 rounded-xl p-2"><span className="grid size-10 shrink-0 place-items-center rounded-full bg-muted text-sm font-extrabold text-accent" aria-hidden="true">{ini}</span><div className="min-w-0"><b className="block truncate text-sm">{user.name || "Pentadbir"}</b><span className="block truncate text-xs text-sub">{user.email}</span></div></div>
-        <button type="button" className="btn mt-2 w-full justify-center" onClick={onLogout}><LogOut size={16} /> Log keluar</button>
+        <div className="flex items-center gap-3 rounded-xl p-2"><Avatar photo={user.photo} initials={ini} size={40} /><div className="min-w-0"><b className="block truncate text-sm">{user.name || "Pentadbir"}</b><span className="block truncate text-xs text-sub">{user.email}</span></div></div>
+        <button type="button" className="btn btn-red mt-2 w-full justify-center" onClick={onLogout}><LogOut size={16} /> Log keluar</button>
       </div>
     </div>);
   return (
