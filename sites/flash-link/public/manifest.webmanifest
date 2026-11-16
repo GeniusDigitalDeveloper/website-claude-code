@@ -1,0 +1,39 @@
+{
+  "id": "/",
+  "name": "Genius Digital Flash Link",
+  "short_name": "Flash Link",
+  "description": "Pembina halaman link-in-bio: satu pautan untuk semua jualan anda.",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#07070A",
+  "theme_color": "#07070A",
+  "lang": "ms",
+  "icons": [
+    {
+      "src": "/assets/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icon-2x.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "url": "/dashboard"
+    }
+  ]
+}
