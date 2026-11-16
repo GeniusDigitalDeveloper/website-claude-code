@@ -21,7 +21,7 @@ export default function SlidePanel({ slides, anim, secs, T, B, imgs, full = fals
   const s = slides[i % slides.length];
   const len = s.text.length, hasAr = !!s.ar?.trim(), alen = s.ar?.length ?? 0;
   const size = (hasAr ? (len > 170 ? 2.4 : len > 110 ? 2.8 : 3.3) : (len > 170 ? 3.6 : len > 110 ? 4.3 : 5.2)) * (s.sz ?? 1);
-  const arSize = (alen > 140 ? 4.4 : alen > 80 ? 5.4 : 6.8) * (s.arSz ?? 1);
+  const arSize = (alen > 140 ? 2.9 : alen > 80 ? 3.5 : 4.3) * (s.arSz ?? 1);
   const bg = bgOf(s.bg);
   const photo = s.kind === "gambar" ? imgs[s.imgId ?? ""] : undefined;
   const tphoto = s.kind !== "gambar" && s.kind !== "video" && s.imgId ? imgs[s.imgId] : undefined;
@@ -36,7 +36,7 @@ export default function SlidePanel({ slides, anim, secs, T, B, imgs, full = fals
         ) : s.kind === "gambar" ? (
           <div key={s.id + i} className={`sl-card sl-${anim} h-full w-full`}>{photo ? <img src={photo} alt="Slaid" className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center text-white/70" style={{ fontSize: "3cqw" }}>Memuatkan gambar…</div>}</div>
         ) : (
-          <div key={s.id + i} className={`sl-card sl-${anim} flex h-full flex-col justify-between`} style={{ padding: "4cqw 5cqw" }}>
+          <div key={s.id + i} className={`sl-card sl-${anim} flex h-full flex-col justify-between`} style={{ padding: "3cqw 5cqw 1.1cqw" }}>
             <div className="sl-head" style={{ fontSize: "3cqw" }}>
               <span className="sl-label">{s.title || KIND_LABEL[s.kind]}{s.kind === "hadis" && <span className="ar sl-saw" lang="ar">ﷺ</span>}</span>
               <span className="sl-count tabular-nums">{(i % slides.length) + 1} / {slides.length}</span>
@@ -44,10 +44,10 @@ export default function SlidePanel({ slides, anim, secs, T, B, imgs, full = fals
             <div className="flex min-h-0 flex-col justify-center" style={{ gap: "1.6cqw" }}>
               {hasAr && <p lang="ar" dir="rtl" className="text-center font-bold text-white" style={{ fontFamily: arCss(s.arFont), fontSize: `${arSize}cqw`, lineHeight: 1.75, textShadow: "0 2px 12px rgba(0,0,0,.55)" }}>{s.ar}</p>}
               {s.text.trim() && <p className={`font-bold leading-snug text-white sl-text ${hasAr ? "text-center" : ""}`} style={{ fontSize: `${size}cqw`, ...(s.font ? { fontFamily: `"${s.font}", var(--font-sans, sans-serif)` } : {}) }}>{s.text}</p>}
+              {s.source && <p className={`font-semibold ${hasAr ? "text-center" : ""}`} style={{ fontSize: `${size}cqw`, marginTop: "1.2cqw", color: "var(--acc, #fde68a)" }}>{s.source}</p>}
             </div>
-            <div className="flex items-end justify-between gap-2">
-              {s.source ? <p className="font-semibold" style={{ fontSize: "2.8cqw", color: "var(--acc, #fde68a)" }}>{s.source}</p> : <span />}
-              {bg && !tphoto && <span className="text-right text-white/70" style={{ fontSize: "1.5cqw", maxWidth: "46%" }}>{bg.credit}</span>}
+            <div className="flex items-end justify-end gap-2">
+              {bg && !tphoto ? <span className="text-right text-white/70" style={{ fontSize: "1.5cqw", maxWidth: "60%" }}>{bg.credit}</span> : <span />}
             </div>
           </div>)}
       </div>
