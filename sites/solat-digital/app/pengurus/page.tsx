@@ -32,6 +32,10 @@ import { RINGS, playRing, type Ring } from "@/lib/ringtone";
 import DateBadge from "@/components/DateBadge";
 import { chatSfx } from "@/lib/sfx";
 
+/** Kod pembelian daripada pautan ?langgan=… disimpan sementara sehingga pengguna log masuk. */
+function purchaseCode(): string {
+  try { const q = new URLSearchParams(location.search).get("langgan"); if (q) { localStorage.setItem("sd_buy", q.slice(0, 60)); history.replaceState(null, "", location.pathname); } return localStorage.getItem("sd_buy") ?? ""; } catch { return ""; }
+}
 const L = ({ id, children }: { id: string; children: React.ReactNode }) => <label htmlFor={id} className="lbl">{children}</label>;
 
 function resize(file: File): Promise<string> {
@@ -46,7 +50,8 @@ type Don = { enabled?: boolean; title?: string; bankName?: string; accName?: str
 function AuthForm() {
   const [mode, setMode] = useState<"in" | "up">("in");
   const [f, setF] = useState({ name: "", email: "", pw: "", pw2: "" });
-  const [err, setErr] = useState(""); const [busy, setBusy] = useState(false); const [info, setInfo] = useState("");
+  const [err, setErr] = useState(""); const [busy, setBusy] = useState(false); const [info, setInfo] = useState(""); const [buy, setBuy] = useState("");
+  useEffect(() => { const c = purchaseCode(); setBuy(c); if (c) setMode("up"); }, []);
   useEffect(() => {
     (async () => {
       try { const e = localStorage.getItem("sd_email_m"); if (e) setF((x) => ({ ...x, email: e })); } catch {}
@@ -81,6 +86,7 @@ function AuthForm() {
       <div className="text-center"><img src="/logo.png" alt="Solat Digital" className="mx-auto mb-2 h-24 w-auto" /><h1 className="text-3xl font-extrabold">Solat Digital</h1><p className="mx-auto mt-1 max-w-xs text-sm text-sub">Sistem Paparan Waktu Solat dan Hebahan Digital Pintar</p></div>
       <form className="card mt-5 !p-6" onSubmit={submit}>
         <h2 className="text-center text-2xl font-extrabold text-accent">{mode === "in" ? "Selamat Kembali" : "Daftar Akaun Baharu"}</h2>
+        {buy && <p role="status" className="mt-3 rounded-xl border border-green-600 bg-green-50 p-3 text-center text-sm font-semibold text-green-900">Pembelian dikesan. Daftar akaun (atau log masuk jika sudah ada) dan akses penuh diaktifkan secara automatik.</p>}
         <p className="mt-1 text-center text-sm text-sub">{mode === "in" ? "Sila masukkan emel dan kata laluan akaun pentadbir masjid anda." : "Cipta akaun pentadbir masjid / surau anda."}</p>
         {mode === "up" && <Fld id="nm" label="Nama Penuh Pentadbir" icon={<UserIc size={18} />}><input id="nm" className="inp !pl-10" placeholder="Contoh: Ustaz Ahmad bin Abdullah" value={f.name} onChange={(e) => set({ name: e.target.value })} required /></Fld>}
         <Fld id="em" label="Alamat Emel" icon={<Mail size={18} />}><input id="em" type="email" autoComplete="off" name="mosque-email" className="inp !pl-10" placeholder="nama@emel.com" value={f.email} onChange={(e) => set({ email: e.target.value })} required /></Fld>
@@ -113,6 +119,11 @@ function Panel({ uidv, user }: { uidv: string; user: User }) {
   const [imgs, setImgs] = useState<{ id: string; data: string }[]>([]);
   const [toast, setToast] = useState(""); const [txt, setTxt] = useState(""); const [dirty, setDirty] = useState(false);
   const [noDoc, setNoDoc] = useState(false); const [sec, setSec] = useState<Sec>("dash"); const [unread, setUnread] = useState(0); const [ntoast, setNtoast] = useState(false); const prevUnread = useRef(0); const secRef = useRef<Sec>("dash");
+  useEffect(() => {
+    if (!tv || tv.plan === "full") { if (tv?.plan === "full") try { localStorage.removeItem("sd_buy"); } catch {} return; }
+    const c = purchaseCode(); if (!c) return;
+    (async () => { try { await setDoc(doc(db, "activations", uidv), { code: c, at: Date.now() }).catch(() => {}); await updateDoc(doc(db, "tv", uidv), { plan: "full", updatedAt: Date.now() }); localStorage.removeItem("sd_buy"); flash("Akses penuh diaktifkan. Terima kasih atas pembelian anda."); } catch { flash("Kod pembelian tidak sah atau telah ditukar. Hubungi penjual."); try { localStorage.removeItem("sd_buy"); } catch {} } })();
+  }, [tv?.plan, uidv]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (noDoc) createMosqueDocs(user, user.displayName || user.email || "Pentadbir").catch(() => {}); }, [noDoc]); // eslint-disable-line react-hooks/exhaustive-deps
   const quick = useQuickBg(); const [yt, setYt] = useState("");
   const [memoT, setMemoT] = useState(""); const [memoB, setMemoB] = useState("");

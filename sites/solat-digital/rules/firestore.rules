@@ -33,6 +33,14 @@ service cloud.firestore {
     }
 
     // Penanda admin besar: hanya boleh disemak oleh tuan akaun; tiada tulis dari klien.
+    // Kod pengaktifan pembelian (rahsia, Owner sahaja). Pelanggan aktifkan akaun dengan kod daripada pautan selepas bayar.
+    match /secret/{d} { allow read, write: if isSuper(); }
+    match /activations/{u} {
+      allow read: if me(u) || isSuper();
+      allow create: if me(u) && request.resource.data.keys().hasOnly(['code', 'at'])
+        && request.resource.data.code is string && request.resource.data.code == get(/databases/$(database)/documents/secret/activation).data.code;
+      allow update, delete: if false;
+    }
     match /admins/{u} { allow get: if me(u); allow list, write: if false; }
 
     // Rekod pendaftaran: admin besar baca sahaja; masjid urus rekod sendiri.
@@ -61,6 +69,7 @@ service cloud.firestore {
       allow read: if true;
       allow create: if me(u) && validTv(request.resource.data) && request.resource.data.plan == 'demo' && request.resource.data.ownerUid == u;
       allow update: if (me(u) && validTv(request.resource.data) && request.resource.data.plan == resource.data.plan && request.resource.data.ownerUid == resource.data.ownerUid)
+        || (me(u) && validTv(request.resource.data) && request.resource.data.plan == 'full' && exists(/databases/$(database)/documents/activations/$(u)) && request.resource.data.ownerUid == resource.data.ownerUid)
         || (isSuper() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['plan']) && request.resource.data.plan in ['demo', 'full']);
       allow delete: if false;
       // Video animasi (kepingan kecil): metadata + kepingan dalam sub-koleksi c

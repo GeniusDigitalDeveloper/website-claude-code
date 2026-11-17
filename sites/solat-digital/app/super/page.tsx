@@ -23,7 +23,7 @@ import { chatSfx } from "@/lib/sfx";
 import { useDefaults } from "@/lib/useDefaults";
 
 type Row = Registry & { id: string; plan: "demo" | "full" };
-type Sec = "dash" | "negeri" | "senarai" | "live" | "notif" | "hadis" | "latar" | "azan" | "sumbangan" | "tetapan" | "profil";
+type Sec = "dash" | "negeri" | "senarai" | "live" | "notif" | "hadis" | "latar" | "azan" | "sumbangan" | "jualan" | "tetapan" | "profil";
 const L = ({ id, children }: { id: string; children: React.ReactNode }) => <label htmlFor={id} className="lbl">{children}</label>;
 const Stat = ({ icon, label, v }: { icon: React.ReactNode; label: string; v: number | string }) => <div className="card"><div className="flex items-center gap-2 text-sm text-sub">{icon}{label}</div><div className="mt-2 text-3xl font-extrabold tabular-nums">{v}</div></div>;
 const Switch = ({ on, set, label }: { on: boolean; set: (v: boolean) => void; label: string }) => <div className="flex items-center justify-between gap-3 rounded-xl bg-muted p-3"><span className="font-semibold">{label}</span><button type="button" className="switch" role="switch" aria-checked={on} aria-label={label} onClick={() => set(!on)} /></div>;
@@ -152,6 +152,21 @@ function PanelForm({ v, set }: { v: PanelSettings; set: (v: PanelSettings) => vo
     </div>
   );
 }
+function SalesLink() {
+  const [code, setCode] = useState<string | null>(null); const [msg, setMsg] = useState("");
+  useEffect(() => onSnapshot(doc(db, "secret", "activation"), (s) => setCode((s.data()?.code as string) ?? ""), () => setCode("")), []);
+  const gen = () => Array.from(crypto.getRandomValues(new Uint8Array(18)), (b) => "abcdefghjkmnpqrstuvwxyz23456789"[b % 31]).join("");
+  const make = async () => { if (code && !confirm("Tukar kod? Pautan lama berhenti berfungsi untuk pelanggan baharu. Akaun yang sudah aktif tidak terjejas.")) return; const c = gen(); try { await setDoc(doc(db, "secret", "activation"), { code: c, at: Date.now() }); setMsg("Kod baharu dijana."); } catch { setMsg("Gagal."); } };
+  const link = code ? `${location.origin}/pengurus/?langgan=${code}` : "";
+  if (code === null) return <p>Memuatkan…</p>;
+  return (<section className="card"><h2 className="text-lg font-bold">Pautan jualan (aktif automatik selepas bayar)</h2>
+    <p className="text-sm text-sub">Letakkan pautan ini sebagai pautan penghantaran produk dalam BCL.my. Pelanggan yang bayar akan dapat pautan ini, daftar atau log masuk, dan akaun masjid mereka terus bertukar kepada akses penuh tanpa tindakan anda.</p>
+    {link ? (<><div className="mt-3 flex gap-2"><input readOnly className="inp" aria-label="Pautan jualan" value={link} /><button type="button" className="btn" onClick={() => { navigator.clipboard?.writeText(link); setMsg("Pautan disalin."); }}><Copy size={16} /> Salin</button></div>
+      <button type="button" className="btn mt-3" onClick={make}>Tukar kod (jana baharu)</button></>) : <button type="button" className="btn btn-primary mt-3" onClick={make}>Jana pautan jualan</button>}
+    {msg && <p role="status" className="mt-2 text-sm text-accent">{msg}</p>}
+    <p className="mt-4 rounded-xl bg-muted p-3 text-xs text-sub">Pautan ini rahsia: sesiapa yang memilikinya boleh mengaktifkan akaun. Jangan siarkan di halaman awam. Jika ia bocor, tekan Tukar kod dan kemas kini pautan dalam BCL.my. Akaun yang sudah diaktifkan kekal aktif.</p></section>);
+}
+
 function DonationEditor() {
   type D = { enabled?: boolean; title?: string; bankName?: string; accName?: string; accNo?: string; method?: string; note?: string; qr?: string };
   const [d, setD] = useState<D | null>(null); const [msg, setMsg] = useState(""); const f = useRef<HTMLInputElement>(null);
@@ -247,9 +262,9 @@ function Dashboard() {
     { title: "Utama", items: [{ id: "dash", label: "Dashboard", icon: <LayoutDashboard size={19} /> }] },
     { title: "Pengurusan masjid", items: [{ id: "negeri", label: "Mengikut negeri", icon: <MapPin size={19} /> }, { id: "senarai", label: "Senarai masjid", icon: <Building2 size={19} /> }, { id: "live", label: "Siaran Kuliah (Live)", icon: <Radio size={19} /> }, { id: "notif", label: "Notifikasi", icon: <Bell size={19} />, badge: unread }] },
     { title: "Kandungan sistem", items: [{ id: "hadis", label: "Pustaka Hadis & Kategori", icon: <Megaphone size={19} /> }, { id: "latar", label: "Latar Belakang (Pilihan Pantas)", icon: <Radio size={19} /> }, { id: "azan", label: "Perpustakaan azan", icon: <Music size={19} /> }] },
-    { title: "Konfigurasi", items: [{ id: "tetapan", label: "Tetapan sistem dan font", icon: <Settings size={19} /> }, { id: "sumbangan", label: "Sumbangan", icon: <Users size={19} /> }, { id: "profil", label: "Profil Owner", icon: <ShieldCheck size={19} /> }] },
+    { title: "Konfigurasi", items: [{ id: "tetapan", label: "Tetapan sistem dan font", icon: <Settings size={19} /> }, { id: "jualan", label: "Pautan Jualan (Auto Aktif)", icon: <Copy size={19} /> }, { id: "sumbangan", label: "Sumbangan", icon: <Users size={19} /> }, { id: "profil", label: "Profil Owner", icon: <ShieldCheck size={19} /> }] },
   ];
-  const titles: Record<Sec, string> = { dash: "Dashboard Owner", negeri: "Mengikut negeri dan daerah", senarai: "Senarai masjid", live: "Siaran Kuliah (Live)", notif: "Notifikasi", hadis: "Pustaka Hadis & Kategori", latar: "Latar Belakang (Pilihan Pantas)", azan: "Perpustakaan azan", sumbangan: "Sumbangan", tetapan: "Tetapan sistem dan font", profil: "Profil Owner" };
+  const titles: Record<Sec, string> = { dash: "Dashboard Owner", negeri: "Mengikut negeri dan daerah", senarai: "Senarai masjid", live: "Siaran Kuliah (Live)", notif: "Notifikasi", hadis: "Pustaka Hadis & Kategori", latar: "Latar Belakang (Pilihan Pantas)", azan: "Perpustakaan azan", sumbangan: "Sumbangan", jualan: "Pautan Jualan (Auto Aktif)", tetapan: "Tetapan sistem dan font", profil: "Profil Owner" };
   const stRows = (st: string) => rows.filter((r) => r.state === st);
   const zones = ZONES.filter((z) => z[1] === selSt);
   return (
@@ -289,6 +304,7 @@ function Dashboard() {
           {sec === "hadis" && <HadithEditor />}
           {sec === "latar" && <QuickBgEditor />}
           {sec === "sumbangan" && <DonationEditor />}
+          {sec === "jualan" && <SalesLink />}
           {sec === "notif" && <Notif rows={rows} sel={openId} setSel={setOpenId} />}
           {sec === "azan" && <AzanManager />}
           {sec === "tetapan" && (<><div className="flex gap-1 rounded-full bg-muted p-1 w-fit" role="tablist">{([["tv", "TV"], ["panel", "Panel Admin Masjid"]] as const).map(([k, lb]) => <button key={k} type="button" role="tab" aria-selected={sub === k} className={`rounded-full px-4 py-1.5 text-sm font-bold ${sub === k ? "bg-card shadow" : "text-sub"}`} onClick={() => setSub(k)}>{lb}</button>)}</div><Tetapan rows={rows} sub={sub} /></>)}
