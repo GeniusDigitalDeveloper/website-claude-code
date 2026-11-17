@@ -1152,6 +1152,11 @@ body.pray-off #pray,body.pray-off #nxp,body.pray-off #praypop,body.pray-off sect
 .fl-bnfov{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent 0%,transparent 30%,color-mix(in srgb,var(--bgs,#000) 10%,transparent) 44%,color-mix(in srgb,var(--bgs,#000) 28%,transparent) 58%,color-mix(in srgb,var(--bgs,#000) 52%,transparent) 71%,color-mix(in srgb,var(--bgs,#000) 76%,transparent) 83%,color-mix(in srgb,var(--bgs,#000) 92%,transparent) 93%,var(--bgs,#000) 100%)}
 .fl-bnfav{margin-top:-48px;position:relative;z-index:1;display:flex;justify-content:center}.fl-bnfav .fl-avatar{margin:0}
 .sty-bnfull{background:linear-gradient(180deg,#7C8594,#1b1e2b 42%)}.sty-bnfull i{top:34px}
+
+/* ===== V-116: pratonton kecil ringan: tiada animasi / kabur dalam kad template ===== */
+.mini{contain:layout paint style}
+.mini *,.mini *::before,.mini *::after{animation:none!important;transition:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.mini[data-lz]{background:linear-gradient(180deg,#1b1e2d,#11131d)}
 </style>
 </head>
 <body>
@@ -2818,15 +2823,37 @@ function deleteDesign(id) {
   if (wasActive) activateDesign(p.designs[0].id, true); else saveProfile();
 }
 let LZ = null;
+const MINI_CACHE = new Map(); let MINI_SIG = "";
+const miniSig = () => { const p = S.profile; return JSON.stringify([p.displayName, p.bio, p.avatarUrl, p.bannerUrl, p.socialIcons, S.links, IMG_CACHE.size, IMG_TH.size]); };
+function renderMini(m) {
+  const key = m.dataset.lz; if (!key) return; const [k, id] = key.split(":"); let pr = null, ck = key;
+  if (k === "d") { const d = S.profile.designs.find(x => x.id === id); if (d) { pr = withDesign(d); ck = key + JSON.stringify([d.template, d.profileStyle, d.theme]); } }
+  else { const d = DESIGNS.find(x => x.id === id); if (d) pr = { ...S.profile, template: d.tpl, profileStyle: d.sty || "classic", theme: designTheme(d) }; }
+  if (!pr) return; let html = MINI_CACHE.get(ck); if (html === undefined) { html = miniHtml(pr); if (MINI_CACHE.size > 120) MINI_CACHE.clear(); MINI_CACHE.set(ck, html); }
+  m.innerHTML = html; m.removeAttribute("data-lz"); fitMini(m);
+}
+const MQ = { q: [], on: false };
+let LAST_SCROLL = 0; addEventListener("scroll", () => { LAST_SCROLL = performance.now(); }, { passive: true, capture: true });
+const nextFrame = f => requestAnimationFrame(() => setTimeout(f, 0));
+const idleDo = f => (window.requestIdleCallback ? requestIdleCallback(f, { timeout: 900 }) : setTimeout(f, 60));
+function mqRun() {
+  if (MQ.on) return; MQ.on = true;
+  const step = () => { let m = MQ.q.shift(); while (m && !(document.body.contains(m) && m.dataset.lz)) m = MQ.q.shift(); if (!m) { MQ.on = false; return; } try { LZ.unobserve(m); } catch {} renderMini(m); nextFrame(step); };
+  nextFrame(step);
+}
 function lazyMinis(scope) {
-  if (!LZ) LZ = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; const m = e.target; LZ.unobserve(m); const [k, id] = (m.dataset.lz || "").split(":"); let pr = null; if (k === "d") { const d = S.profile.designs.find(x => x.id === id); if (d) pr = withDesign(d); } else { const d = DESIGNS.find(x => x.id === id); if (d) pr = { ...S.profile, template: d.tpl, profileStyle: d.sty || "classic", theme: designTheme(d) }; } if (pr) { m.innerHTML = miniHtml(pr); m.removeAttribute("data-lz"); fitMini(m); } }), { rootMargin: "240px" });
-  $$(".mini[data-lz]", scope).forEach(m => LZ.observe(m));
+  const sg = miniSig(); if (sg !== MINI_SIG) { MINI_SIG = sg; MINI_CACHE.clear(); }
+  if (!LZ) LZ = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && e.target.dataset.lz && !MQ.q.includes(e.target)) { MQ.q.push(e.target); mqRun(); } }), { rootMargin: "240px" });
+  const all = $$(".mini[data-lz]", scope); all.forEach(m => LZ.observe(m));
+  // selepas yang kelihatan siap, lukis selebihnya ketika pelayar senggang supaya skrol tidak tersangkut
+  const pre = () => { const m = all.find(x => x.dataset.lz && document.body.contains(x) && !MQ.q.includes(x)); if (!m) return; if (MQ.on || MQ.q.length || performance.now() - LAST_SCROLL < 300) return setTimeout(() => idleDo(pre), 150); renderMini(m); try { LZ.unobserve(m); } catch {} idleDo(pre); };
+  idleDo(pre);
 }
 const withDesign = d => ({ ...S.profile, template: d.template, profileStyle: d.profileStyle || "classic", theme: d.theme });
-const miniHtml = pr => { IMGMODE.thumb = true; try { return `<div class="mini-in">${renderProfile(pr, S.links, { preview: true, anim: false })}</div>`; } finally { IMGMODE.thumb = false; } };
+const miniHtml = (pr, full) => { IMGMODE.thumb = true; try { return `<div class="mini-in">${renderProfile(pr, full ? S.links : S.links.slice(0, 5), { preview: true, anim: false })}</div>`; } finally { IMGMODE.thumb = false; } }; // pratonton kecil hanya 5 pautan teratas (kurang DOM dan imej)
 function viewModal(pr, title, sub, btns) {
   const m = modal(`<h2 class="font-display" style="font-size:20px;font-weight:700;margin:0 0 2px">${esc(title)}</h2><p class="hint" style="margin:0 0 10px">${sub}</p><div class="vwwrap"><div class="mini vw"></div></div><div style="display:flex;gap:10px;margin-top:14px">${btns.map(b => `<button class="btn ${b.cls || "btn-red"}" id="${b.id}" style="flex:1;min-height:48px">${b.t}</button>`).join("")}</div>`, bg => {
-    const mn = $(".mini.vw", bg); mn.innerHTML = miniHtml(pr); fitMinis(); requestAnimationFrame(fitMinis); setTimeout(fitMinis, 450); hydrateImages && 0;
+    const mn = $(".mini.vw", bg); mn.innerHTML = miniHtml(pr, true); fitMinis(); requestAnimationFrame(fitMinis); setTimeout(fitMinis, 450); hydrateImages && 0;
     btns.forEach(b => ($("#" + b.id, bg).onclick = () => { bg.close(); b.go(); }));
   }, { cls: "ctr" });
   return m;
@@ -2879,7 +2906,7 @@ async function designTab() {
   $$(".gal-card", gal).forEach(c => (c.onclick = () => { const d = DESIGNS.find(x => x.id === c.dataset.p); viewModal({ ...S.profile, template: d.tpl, profileStyle: d.sty || "classic", theme: designTheme(d) }, d.n, "Pratonton template. Ia hanya masuk Design saya selepas anda tekan Edit template, kemudian Simpan.", [{ id: "vw-edit", t: `${ic("pencil", "w-4 h-4")} Edit template`, go: () => createFromPreset(d) }]); }));
   fitMinis(); lazyMinis(pane);
   if (imgMissing(S.profile, S.links)) hydrateImages(S.profile, S.links).then(() => designTab());
-  const fitGal = () => { const g = $("#galw"), c = g && $(".gal-card", g); if (c) g.style.maxHeight = c.offsetHeight + 8 + "px"; const m = $("#minew"), mc = m && $(".gal-card", m); if (mc) m.style.maxHeight = mc.offsetHeight + 8 + "px"; };
+  const fitGal = () => { const g = $("#galw"), c = g && $(".gal-card", g); if (c) g.style.maxHeight = (innerWidth >= 1000 ? c.offsetHeight * 2 + 10 + 8 : c.offsetHeight + 8) + "px"; const m = $("#minew"), mc = m && $(".gal-card", m); if (mc) m.style.maxHeight = mc.offsetHeight + 8 + "px"; };
   requestAnimationFrame(() => { fitGal(); const c = $("#gal .gal-card"); if (c) new ResizeObserver(fitGal).observe(c); requestAnimationFrame(() => { const g = $("#galw"), m = $("#minew"); if (g) g.scrollTop = keep.g; if (m) m.scrollTop = keep.m; window.scrollTo(0, keep.y); [180, 500].forEach(ms => setTimeout(() => { const g2 = $("#galw"), m2 = $("#minew"); if (g2 && Math.abs(g2.scrollTop - keep.g) > 2) g2.scrollTop = keep.g; if (m2 && Math.abs(m2.scrollTop - keep.m) > 2) m2.scrollTop = keep.m; if (Math.abs(window.scrollY - keep.y) > 2) window.scrollTo(0, keep.y); }, ms)); }); });
 }
 
@@ -3588,7 +3615,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-115";
+const APP_VERSION = "V-116";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
