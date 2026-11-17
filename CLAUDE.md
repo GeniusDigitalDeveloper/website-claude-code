@@ -75,6 +75,10 @@ node .claude/skills/website-builder/scripts/screenshot.mjs http://localhost:3000
 - Jangan buat PR melainkan pengguna minta.
 
 <!-- claude-kit:mula (diurus oleh Video-Claude/scripts/sync-claude-skills.sh, edit di sana) -->
+## Mata wang (tetap)
+
+Semua harga ustaz dalam **Ringgit Malaysia (RM)**, bukan dolar. Bila ustaz sebut "299", maksudnya RM299; "2.99" ialah RM2.99. Tulis sentiasa "RM", jangan guna "$", dalam semua projek.
+
 ## Panggilan pengguna
 
 Sentiasa panggil pengguna **"ustaz"** dalam setiap balasan, dalam setiap sesi.
