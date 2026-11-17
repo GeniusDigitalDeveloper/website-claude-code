@@ -209,7 +209,7 @@ function Panel({ uidv, user }: { uidv: string; user: User }) {
                 : (<div className="mt-4 rounded-xl bg-muted p-6 text-center text-sm text-sub"><Info className="mx-auto mb-2" />Data waktu solat belum dimuatkan. Pastikan zon solat telah dipilih di Tetapan.<div className="mt-3"><button type="button" className="btn" onClick={() => setSec("tetapan")}>Pergi ke Tetapan</button></div></div>)}</section>
             <section className="card"><h2 className="flex items-center gap-2 text-lg font-bold"><MonitorPlay size={20} className="text-accent" /> Pautan Paparan TV</h2><p className="mt-1 text-sm text-sub">Buka URL ini pada Smart TV, Android Box atau pelayar web skrin masjid.</p>
               <div className="mt-3 flex gap-2"><input readOnly className="inp" aria-label="Pautan TV" value={tvUrl} /><button className="btn" aria-label="Salin pautan" onClick={() => { navigator.clipboard?.writeText(tvUrl); flash("Pautan disalin."); }}><Copy size={18} /></button></div>
-              <div className="mt-3 flex flex-wrap gap-2"><a className="btn btn-primary" href={tvUrl} target="_blank" rel="noreferrer"><MonitorPlay size={18} /> Buka TV</a><a className="btn btn-dl" href={REL + "SolatDigital-TV.zip"}><Download size={18} /> Muat turun aplikasi TV</a></div>
+              <div className="mt-3 flex flex-wrap gap-2"><a className="btn btn-primary" href={tvUrl} target="_blank" rel="noreferrer"><MonitorPlay size={18} /> Buka TV</a><a className="btn btn-dl" href={REL + "SolatDigital-TV-Setup.exe"}><Download size={18} /> Muat turun aplikasi TV</a></div>
               <p className="mt-3 flex items-center gap-2 border-t border-line pt-3 text-xs text-sub"><CheckCircle2 size={14} className="text-accent" /> Paparan menyokong mod skrin penuh dan tidak tidur.</p></section>
           </div>
           {tv.plan !== "full" && <div className="card border-yellow-500/50" role="note"><b>Akaun anda masih mod demo.</b> Pop-up dan azan waktu solat belum aktif. Langgan sekali sahaja (bayaran sekali, akses penuh seumur hidup) dan Owner Solat Digital akan aktifkan akaun anda.</div>}
@@ -341,7 +341,6 @@ function Panel({ uidv, user }: { uidv: string; user: User }) {
         {sec === "muat" && (
           <section className="card"><h2 className="text-lg font-bold">Muat turun aplikasi</h2>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
-              <a className="btn btn-dl justify-center" href={REL + "SolatDigital-TV.zip"}><Download size={18} /> Solat Digital (TV) .zip</a>
               <a className="btn btn-dl justify-center" href={REL + "SolatDigital-TV-Setup.exe"}><Download size={18} /> Solat Digital (TV) .exe</a>
               <a className="btn btn-dl justify-center" href={REL + "SolatDigital-Pengurus-Setup.exe"}><Download size={18} /> Solat Digital (Pengurus Masjid) .exe</a>
             </div>
