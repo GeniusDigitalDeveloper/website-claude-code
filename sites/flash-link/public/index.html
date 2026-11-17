@@ -1618,8 +1618,6 @@ const DESIGNS = [
   { id: "f-pasir", n: "Pasir Hangat", d: "Gambar di kiri, warna pasir", tpl: "minimal", sty: "side", theme: {bgType: "gradient", bg1: "#F7EFE5", bg2: "#EBD9C3", text: "#3A2B1D", btn: "#A47148", font: "Lora", shape: "pill", bs: "outline", bc: false} },
   { id: "bn-cerah", n: "Banner Penuh Cerah", d: "Banner rapat ke tepi, pudar licin ke latar krim", tpl: "minimal", sty: "bnfull", ov: 88, theme: { bgType: "solid", bg1: "#F6F3EE", bg2: "#F6F3EE", text: "#1C1C1F", btn: "#26282D", font: "DM Sans", shape: "round", bs: "solid", bc: false } },
   { id: "bn-gelap", n: "Banner Penuh Gelap", d: "Banner rapat ke tepi, pudar licin ke latar gelap", tpl: "dark", sty: "bnfull", ov: 90, theme: { bgType: "solid", bg1: "#0B0C10", bg2: "#0B0C10", text: "#F4F5F7", btn: "#E5E7EB", font: "Space Grotesk", shape: "round", bs: "glass", bc: false } },
-  { id: "x-aurora", n: "Bento Aurora", d: "Petak bento berbeza saiz, aurora ungu dan teal", tpl: "bento", theme: { bgType: "gradient", bg1: "#0B1026", bg2: "#1B0F3A", text: "#EAF0FF", btn: "#7C5CFF", font: "Sora", shape: "round", fx: "aurora", bc: false } },
-  { id: "x-senja", n: "Karusel Senja", d: "Kad meluncur ke tepi, gradien senja dan orbit kaca", tpl: "carousel", theme: { bgType: "gradient", bg1: "#2A0B3D", bg2: "#7A2A5B", text: "#FFF1E6", btn: "#FFB26B", font: "Bricolage Grotesque", shape: "pill", fx: "orbs", bc: false } },
   { id: "x-pastel", n: "Ikon Pastel", d: "Ikon bulat gaya skrin telefon, warna pastel lembut", tpl: "icons", theme: { bgType: "gradient", bg1: "#FDE7F3", bg2: "#DDEBFF", text: "#2B2A4C", btn: "#FFFFFF", font: "Nunito", shape: "round", bc: false } },
   { id: "x-midnight", n: "Poster Midnight", d: "Poster hero, biru malam dan perak, fon Cormorant", tpl: "poster", ov: 86, theme: { bgType: "gradient", bg1: "#0A1A33", bg2: "#050B16", text: "#FFFFFF", btn: "#C9D3E6", font: "Cormorant Garamond", shape: "round", bc: false } },
   { id: "x-neon", n: "Neon Retro", d: "Garisan neon berputar, fon Orbitron, bintang", tpl: "dark", theme: { bgType: "solid", bg1: "#07040F", bg2: "#07040F", text: "#EDE7FF", btn: "#FF2BD6", font: "Orbitron", shape: "square", bs: "conic", fx: "stars", bc: false } },
@@ -3583,7 +3581,7 @@ document.addEventListener("pointerout", e => { if (SFX.last && !SFX.last.contain
 document.addEventListener("visibilitychange", () => { if (!SFX.ctx || !SFX.scope) return; document.hidden ? SFX.ctx.suspend() : SFX.ctx.resume(); });
 
 /* ---------- Kemas kini automatik: semak versi baharu, butang untuk muat semula ---------- */
-const APP_VERSION = "V-112";
+const APP_VERSION = "V-113";
 const CENTRAL = "https://genius-digital-flashlink-40bc9-5effc.web.app", ZIP_URL = "https://github.com/GeniusDigitalDeveloper/website-claude-code/releases/download/flashlink-latest/Flash-Link-Web.zip";
 const IS_CENTRAL = ["genius-digital-flashlink-40bc9-5effc.web.app", "localhost", "127.0.0.1"].includes(location.hostname);
 async function fetchLatest() { const r = await fetch((IS_CENTRAL ? "" : CENTRAL) + "/version.json?t=" + Date.now(), { cache: "no-store" }); return r.json(); }
