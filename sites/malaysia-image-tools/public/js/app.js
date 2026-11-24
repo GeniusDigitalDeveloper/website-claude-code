@@ -5,6 +5,8 @@ const STATE = { disabled: new Set(), featured: new Set(), announcement: null, sc
 const toolById = id => TOOLS.find(t => t.id === id);
 const visibleTools = () => TOOLS.filter(t => !STATE.disabled.has(t.id));
 const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+/* Lencana NEW hijau: hanya aktif sebelum t.newUntil (waktu Malaysia); selepas itu hilang sendiri. */
+const isNewTool = t => !!t.newUntil && Date.now() < Date.parse(t.newUntil + 'T00:00:00+08:00');
 const matches = (t, q) => !q || norm(`${t.name} ${t.desc} ${CATS[t.cat].bm} ${t.id}`).includes(norm(q));
 
 $$('[data-logo]').forEach(el => { el.innerHTML = LOGO(el.dataset.logo); });
@@ -15,13 +17,14 @@ function renderNav(q = '') {
   for (const [k, c] of Object.entries(CATS)) {
     const list = visibleTools().filter(t => t.cat === k && matches(t, q));
     if (!list.length) continue;
-    html += `<h4>${c.name}<span>${list.length}</span></h4>` + list.map(t => `<a href="#${t.id}" class="${cur === t.id ? 'on' : ''}">${icon(t.icon)}${esc(t.name)}</a>`).join('');
+    html += `<h4>${c.name}<span>${list.length}</span></h4>` + list.map(t => `<a href="#${t.id}" class="${cur === t.id ? 'on' : ''}">${icon(t.icon)}${esc(t.name)}${isNewTool(t) ? '<span class="nbadge">NEW</span>' : ''}</a>`).join('');
   }
   $('#nav').innerHTML = html || '<div class="empty" style="margin:8px">Tiada alat ditemui.</div>';
 }
 function card(t) {
-  const tag = STATE.featured.has(t.id) ? 'Pilihan' : t.popular ? 'Popular' : t.isNew ? 'Baharu' : '';
-  return `<a class="tcard ${CATS[t.cat].cls}" href="#${t.id}"><span class="ticon">${icon(t.icon)}</span>${tag ? `<span class="tag">${tag}</span>` : ''}<h3>${esc(t.name)}</h3><p>${esc(t.desc)}</p><span class="arrow">Buka alat ${icon('arrow')}</span></a>`;
+  const isNew = isNewTool(t);
+  const tag = isNew ? '' : STATE.featured.has(t.id) ? 'Pilihan' : t.popular ? 'Popular' : t.isNew ? 'Baharu' : '';
+  return `<a class="tcard ${CATS[t.cat].cls}${isNew ? ' is-new' : ''}" href="#${t.id}"><span class="ticon">${icon(t.icon)}</span>${isNew ? '<span class="tag new">NEW</span>' : tag ? `<span class="tag">${tag}</span>` : ''}<h3>${esc(t.name)}</h3><p>${esc(t.desc)}</p><span class="arrow">Buka alat ${icon('arrow')}</span></a>`;
 }
 function bannerHTML() {
   const a = STATE.announcement; if (!a) return '';
@@ -41,7 +44,7 @@ function renderHome() {
       <div class="quick"><a class="hot" href="#remove-background">Buang latar (AI)</a><a href="#image-compressor">Mampat gambar</a><a href="#image-resizer">Ubah saiz</a><a href="#png-to-jpg">PNG → JPG</a><a href="#image-to-pdf">Gambar → PDF</a><a href="#passport-photo">Foto pasport</a></div>
       <div class="hero-mini">
         <div class="mini t1"><span class="si">${icon('image')}</span><div><b>${n} alat</b><small>sedia guna</small></div></div>
-        <div class="mini t2"><span class="si">${icon('shield')}</span><div><b>0 muat naik</b><small>gambar kekal di peranti</small></div></div>
+        <div class="mini t2"><span class="si">${icon('shield')}</span><div><b>Setempat</b><small>diproses di peranti anda</small></div></div>
         <div class="mini t3"><span class="si">${icon('star')}</span><div><b>RM0</b><small>tiada langganan</small></div></div>
         <div class="mini t4"><span class="si">${icon('upload')}</span><div><b>${CONFIG.maxImageMB} MB</b><small>had setiap gambar</small></div></div>
       </div>
@@ -74,7 +77,7 @@ function footer() {
     <p class="vnote" id="vnote"></p>
     <div class="foot-brand">
       <div><span class="foot-id">${LOGO('ft')}<b class="foot-name">MALAYSIA IMAGE TOOLS</b></span><blockquote class="slogan">“Memacu Inovasi Digital Melalui Sistem Pintar, Kreatif dan Efisien.”</blockquote></div>
-      <span class="foot-priv">${icon('shield')}Semua fail diproses dalam browser anda. Tiada muat naik, tiada simpanan.</span>
+      <span class="foot-priv">${icon('shield')}Fail diproses dalam browser anda. Tiada muat naik, kecuali jika anda guna alat Image to Link.</span>
     </div>
     <div class="foot-bottom"><span>© Hak Cipta Terpelihara Genius Digital 2026</span><span>Alat Gambar Percuma untuk Semua</span></div>
   </footer>`;
@@ -127,8 +130,8 @@ function mountTool(id) {
   const related = visibleTools().filter(x => x.cat === t.cat && x.id !== t.id).slice(0, 4);
   view.innerHTML = `${bannerHTML()}${previewNote()}
     <nav class="crumbs" aria-label="Laluan"><a href="#">Utama</a><span>/</span><span>${c.name}</span><span>/</span><span style="color:var(--ink)">${esc(t.name)}</span></nav>
-    <div class="tool-head ${c.cls}"><span class="ticon">${icon(t.icon)}</span><div><h1>${esc(t.name)}</h1><p>${esc(t.desc)}</p>
-      <div class="chips"><span class="chip ok">${icon('shield')}Diproses dalam browser anda</span><span class="chip">${icon('check')}Percuma</span><span class="chip">Had ${t.id === 'pdf-to-image' ? CONFIG.maxPdfMB : CONFIG.maxImageMB} MB / fail</span></div></div></div>
+    <div class="tool-head ${c.cls}"><span class="ticon">${icon(t.icon)}</span><div><h1>${esc(t.name)}${isNewTool(t) ? ' <span class="nbadge big">NEW</span>' : ''}</h1><p>${esc(t.desc)}</p>
+      <div class="chips">${t.uploads ? `<span class="chip warn">${icon('alert')}Gambar dimuat naik ke ImgBB</span>` : `<span class="chip ok">${icon('shield')}Diproses dalam browser anda</span>`}<span class="chip">${icon('check')}Percuma</span><span class="chip">Had ${t.id === 'pdf-to-image' ? CONFIG.maxPdfMB : CONFIG.maxImageMB} MB / fail</span></div></div></div>
     <div id="toolRoot"></div>
     ${related.length ? `<section class="sec"><div class="sec-head"><div><h2>Alat berkaitan</h2><p>${c.bm}</p></div></div><div class="grid">${related.map(card).join('')}</div></section>` : ''}
     ${footer()}`;
@@ -173,8 +176,9 @@ async function initFirebase() {
 function track(id) {
   if (!FB.rtdb) return;
   try {
-    const day = mytKeys().day, inc = v => (typeof v === 'number' ? v : 0) + 1;
-    rt('stats/tools/' + id + '/count').transaction(inc); rt('stats/total/count').transaction(inc); rt(`stats/daily/${day}/count`).transaction(inc);
+    /* increment sebelah pelayan: hanya perlu kebenaran tulis (stats hanya admin boleh baca, jadi transaction akan ditolak) */
+    const day = mytKeys().day, inc = () => firebase.database.ServerValue.increment(1);
+    [`stats/tools/${id}/count`, 'stats/total/count', `stats/daily/${day}/count`].forEach(p => rt(p).set(inc()).catch(e => console.warn('stat:', e.message)));
   } catch (e) { console.warn(e); }
 }
 function feedback() {

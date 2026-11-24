@@ -105,6 +105,8 @@ const ICONS = {
   shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>',
   lr: '<path d="m9 7-5 5 5 5M15 7l5 5-5 5"/>',
   magic: '<path d="m15 4 1.5-1.5M20 9l1.5-1.5M14 10 3 21"/><path d="m18 6 .5 2.5L21 9l-2.5.5L18 12l-.5-2.5L15 9l2.5-.5z"/><path d="M8 3v3M6.5 4.5h3"/>',
+  link: '<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>',
+  code: '<path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/>',
   megaphone: '<path d="M3 11v2a1 1 0 0 0 1 1h3l5 4V6L7 10H4a1 1 0 0 0-1 1z"/><path d="M16 9a3 3 0 0 1 0 6M19 6a7 7 0 0 1 0 12"/>'
 };
 const LOGO = () => `<img src="/icons/logo.png" alt="Logo Malaysia Image Tools" width="256" height="256" decoding="async">`;

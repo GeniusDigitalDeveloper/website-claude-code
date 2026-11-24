@@ -335,3 +335,17 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13px}
 .foot-bottom span:first-child{color:var(--ink);font-weight:650}
 .mono{font-family:var(--mono)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* Lencana NEW (hijau) & alat baharu */
+.tag.new{background:#0b7f4f;color:#fff;box-shadow:0 4px 12px -4px rgba(11,127,79,.6)}
+.tcard.is-new{border-color:#8fd9b8}
+.tcard.is-new:hover{border-color:#0b7f4f}
+.nbadge{margin-left:auto;font-size:9.5px;font-weight:800;letter-spacing:.06em;line-height:1;padding:3px 6px;border-radius:999px;background:#0b7f4f;color:#fff}
+.nbadge.big{margin-left:8px;font-size:11px;padding:4px 9px;vertical-align:middle}
+.linkrows{display:grid;gap:6px;margin-top:8px}
+.linkrow{display:grid;grid-template-columns:130px minmax(0,1fr) auto;gap:8px;align-items:center;font-size:12px}
+.linkrow span{color:var(--muted);font-weight:600}
+.linkrow .inp{height:32px;font-size:12px}
+@media (max-width:620px){.linkrow{grid-template-columns:minmax(0,1fr) auto}.linkrow span{grid-column:1/-1}}
+.outbox{display:grid;gap:6px}
+.outbox textarea{font-size:12px;resize:vertical;min-height:52px}

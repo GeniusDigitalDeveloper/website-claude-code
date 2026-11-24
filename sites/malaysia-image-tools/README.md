@@ -15,3 +15,8 @@ Sebelum deploy, WAJIB ambil rules semasa (app lain kerap mengemas kini fail yang
 firebase deploy --only firestore:rules,database --project genius-digital-40bc9
 firebase deploy --only hosting   # site: malaysia-image-tools (https://malaysia-image-tools.web.app)
 ```
+
+## Alat baharu (lencana NEW hijau sehingga 24 Dis 2026)
+- `image-to-embed`: jana kod HTML/Markdown/BBCode/CSS/React (sepenuhnya di peranti).
+- `image-to-link`: muat naik ke ImgBB. Isi `public/imgbb-config.js` (`window.MIT_IMGBB_KEY`) untuk mengaktifkan; selagi kosong alat ini disembunyikan.
+- Tarikh tamat lencana: `NEW_UNTIL` dalam `public/js/tools-4.js`.
