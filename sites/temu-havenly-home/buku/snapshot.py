@@ -60,6 +60,8 @@ def main():
             v = json.load(r)
         if v is None:
             continue
+        if p == "cms_texts" and isinstance(v, dict):  # Kemudahan Sekitar dah dibuang dari website
+            v.pop("facilities", None)
         if p == "feedbacks":  # hanya yang diluluskan, tanpa nombor telefon
             items = v.values() if isinstance(v, dict) else v
             v = {x["id"]: {k: x[k] for k in x if k != "contact"} for x in items if x and x.get("approved")}

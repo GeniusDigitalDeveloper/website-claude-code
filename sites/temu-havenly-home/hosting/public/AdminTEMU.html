@@ -919,157 +919,6 @@
             </div>
           </div>
 
-          <!-- 4. PENGURUSAN 6 KEMUDAHAN SEKITAR (AUTOSYNC) -->
-          <div class="glass-card p-5 sm:p-6 rounded-2xl space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h4 class="text-sm font-bold text-amber-800 uppercase tracking-wider flex items-center gap-2">
-                <i data-lucide="map-pin" class="w-4 h-4 text-amber-600"></i>
-                <span>Kemudahan Sekitar: Tajuk, Gambar, Masa, Jarak, Keterangan & Pautan Google Maps (Autosync)</span>
-              </h4>
-              <span class="text-[11px] text-emerald-700 font-bold">Autosync aktif</span>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              <!-- 1. Ana Ikan Bakar Petai -->
-              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
-                <span class="text-xs font-bold text-slate-900 uppercase block">Kemudahan 1</span>
-                <div>
-                  <label class="block text-[10.5px] text-slate-600 mb-0.5 font-semibold">Nama / Tajuk Kemudahan:</label>
-                  <input type="text" id="inputFacTitle1" onchange="autoSyncFacilities()" value="ANA IKAN BAKAR PETAI" placeholder="Tajuk Kemudahan" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800 uppercase font-bold">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                  <input type="text" id="inputFacMasa1" onchange="autoSyncFacilities()" value="17 minit" placeholder="Masa" class="bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
-                  <input type="text" id="inputFacJarak1" onchange="autoSyncFacilities()" value="15 km" placeholder="Jarak" class="bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
-                </div>
-                <input type="text" id="inputFacDesc1" onchange="autoSyncFacilities()" value="Destinasi santapan makanan laut bakar terkenal di Tanjung Lumpur." placeholder="Penerangan Ringkas" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
-                <div class="flex items-center gap-2">
-                  <input type="text" id="inputFacImg1" onchange="autoSyncFacilities()" value="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=700&q=80" placeholder="Pautan Gambar" class="flex-1 bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
-                  <input type="file" id="fileFacImg1" accept="image/jpeg,image/jpg" onchange="handleFileUploadGeneric(event, 'inputFacImg1', false, autoSyncFacilities)" class="hidden">
-                  <button type="button" onclick="document.getElementById('fileFacImg1').click()" class="px-2.5 py-2 bg-amber-600 hover:bg-amber-500 rounded-lg text-[11px] font-bold text-white flex items-center gap-1 shrink-0 transition active:scale-95 shadow-sm">
-                    <i data-lucide="upload" class="w-3 h-3"></i>
-                    <span>Device</span>
-                  </button>
-                </div>
-                <input type="url" id="inputFacMap1" onchange="autoSyncFacilities()" value="https://maps.google.com/?q=Ana+Ikan+Bakar+Petai+Tanjung+Lumpur+Kuantan" placeholder="Pautan Google Maps" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-emerald-700 font-mono">
-              </div>
-
-              <!-- 2. Pantai Teluk Cempedak -->
-              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
-                <span class="text-xs font-bold text-slate-900 uppercase block">Kemudahan 2</span>
-                <div>
-                  <label class="block text-[10.5px] text-slate-600 mb-0.5 font-semibold">Nama / Tajuk Kemudahan:</label>
-                  <input type="text" id="inputFacTitle2" onchange="autoSyncFacilities()" value="PANTAI TELUK CEMPEDAK" placeholder="Tajuk Kemudahan" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800 uppercase font-bold">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                  <input type="text" id="inputFacMasa2" onchange="autoSyncFacilities()" value="28 minit" placeholder="Masa" class="bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
-                  <input type="text" id="inputFacJarak2" onchange="autoSyncFacilities()" value="17 km" placeholder="Jarak" class="bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
-                </div>
-                <input type="text" id="inputFacDesc2" onchange="autoSyncFacilities()" value="Pantai ikonik Kuantan dengan laluan pejalan kaki berkayu dan kafe santai." placeholder="Penerangan Ringkas" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
-                <div class="flex items-center gap-2">
-                  <input type="text" id="inputFacImg2" onchange="autoSyncFacilities()" value="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=700&q=80" placeholder="Pautan Gambar" class="flex-1 bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
-                  <input type="file" id="fileFacImg2" accept="image/jpeg,image/jpg" onchange="handleFileUploadGeneric(event, 'inputFacImg2', false, autoSyncFacilities)" class="hidden">
-                  <button type="button" onclick="document.getElementById('fileFacImg2').click()" class="px-2.5 py-2 bg-amber-600 hover:bg-amber-500 rounded-lg text-[11px] font-bold text-white flex items-center gap-1 shrink-0 transition active:scale-95 shadow-sm">
-                    <i data-lucide="upload" class="w-3 h-3"></i>
-                    <span>Device</span>
-                  </button>
-                </div>
-                <input type="url" id="inputFacMap2" onchange="autoSyncFacilities()" value="https://maps.google.com/?q=Pantai+Teluk+Cempedak+Kuantan" placeholder="Pautan Google Maps" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-emerald-700 font-mono">
-              </div>
-
-              <!-- 3. Pantai Sepat -->
-              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
-                <span class="text-xs font-bold text-slate-900 uppercase block">Kemudahan 3</span>
-                <div>
-                  <label class="block text-[10.5px] text-slate-600 mb-0.5 font-semibold">Nama / Tajuk Kemudahan:</label>
-                  <input type="text" id="inputFacTitle3" onchange="autoSyncFacilities()" value="PANTAI SEPAT" placeholder="Tajuk Kemudahan" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800 uppercase font-bold">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                  <input type="text" id="inputFacMasa3" onchange="autoSyncFacilities()" value="6 minit" placeholder="Masa" class="bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
-                  <input type="text" id="inputFacJarak3" onchange="autoSyncFacilities()" value="5 km" placeholder="Jarak" class="bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
-                </div>
-                <input type="text" id="inputFacDesc3" onchange="autoSyncFacilities()" value="Pantai pasir landai yang tenang dan sangat dekat dengan homestay." placeholder="Penerangan Ringkas" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
-                <div class="flex items-center gap-2">
-                  <input type="text" id="inputFacImg3" onchange="autoSyncFacilities()" value="https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=700&q=80" placeholder="Pautan Gambar" class="flex-1 bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
-                  <input type="file" id="fileFacImg3" accept="image/jpeg,image/jpg" onchange="handleFileUploadGeneric(event, 'inputFacImg3', false, autoSyncFacilities)" class="hidden">
-                  <button type="button" onclick="document.getElementById('fileFacImg3').click()" class="px-2.5 py-2 bg-amber-600 hover:bg-amber-500 rounded-lg text-[11px] font-bold text-white flex items-center gap-1 shrink-0 transition active:scale-95 shadow-sm">
-                    <i data-lucide="upload" class="w-3 h-3"></i>
-                    <span>Device</span>
-                  </button>
-                </div>
-                <input type="url" id="inputFacMap3" onchange="autoSyncFacilities()" value="https://maps.google.com/?q=Pantai+Sepat+Kuantan" placeholder="Pautan Google Maps" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-emerald-700 font-mono">
-              </div>
-
-              <!-- 4. Menara 188 Kuantan -->
-              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
-                <span class="text-xs font-bold text-slate-900 uppercase block">Kemudahan 4</span>
-                <div>
-                  <label class="block text-[10.5px] text-slate-600 mb-0.5 font-semibold">Nama / Tajuk Kemudahan:</label>
-                  <input type="text" id="inputFacTitle4" onchange="autoSyncFacilities()" value="MENARA 188 KUANTAN" placeholder="Tajuk Kemudahan" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800 uppercase font-bold">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                  <input type="text" id="inputFacMasa4" onchange="autoSyncFacilities()" value="20 minit" placeholder="Masa" class="bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
-                  <input type="text" id="inputFacJarak4" onchange="autoSyncFacilities()" value="13 km" placeholder="Jarak" class="bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
-                </div>
-                <input type="text" id="inputFacDesc4" onchange="autoSyncFacilities()" value="Menara tinjau moden kedua tertinggi di Malaysia dengan pemandangan 360 darjah." placeholder="Penerangan Ringkas" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
-                <div class="flex items-center gap-2">
-                  <input type="text" id="inputFacImg4" onchange="autoSyncFacilities()" value="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=700&q=80" placeholder="Pautan Gambar" class="flex-1 bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
-                  <input type="file" id="fileFacImg4" accept="image/jpeg,image/jpg" onchange="handleFileUploadGeneric(event, 'inputFacImg4', false, autoSyncFacilities)" class="hidden">
-                  <button type="button" onclick="document.getElementById('fileFacImg4').click()" class="px-2.5 py-2 bg-amber-600 hover:bg-amber-500 rounded-lg text-[11px] font-bold text-white flex items-center gap-1 shrink-0 transition active:scale-95 shadow-sm">
-                    <i data-lucide="upload" class="w-3 h-3"></i>
-                    <span>Device</span>
-                  </button>
-                </div>
-                <input type="url" id="inputFacMap4" onchange="autoSyncFacilities()" value="https://maps.google.com/?q=Menara+188+Kuantan" placeholder="Pautan Google Maps" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-emerald-700 font-mono">
-              </div>
-
-              <!-- 5. Bandar Kuantan & East Coast Mall -->
-              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
-                <span class="text-xs font-bold text-slate-900 uppercase block">Kemudahan 5</span>
-                <div>
-                  <label class="block text-[10.5px] text-slate-600 mb-0.5 font-semibold">Nama / Tajuk Kemudahan:</label>
-                  <input type="text" id="inputFacTitle5" onchange="autoSyncFacilities()" value="BANDAR KUANTAN & EAST COAST MALL" placeholder="Tajuk Kemudahan" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800 uppercase font-bold">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                  <input type="text" id="inputFacMasa5" onchange="autoSyncFacilities()" value="22 minit" placeholder="Masa" class="bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
-                  <input type="text" id="inputFacJarak5" onchange="autoSyncFacilities()" value="13 km" placeholder="Jarak" class="bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
-                </div>
-                <input type="text" id="inputFacDesc5" onchange="autoSyncFacilities()" value="Pusat membeli-belah terkemuka serta hab perniagaan dan santapan utama di Kuantan." placeholder="Penerangan Ringkas" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
-                <div class="flex items-center gap-2">
-                  <input type="text" id="inputFacImg5" onchange="autoSyncFacilities()" value="https://images.unsplash.com/photo-1567449303078-57ad995bd301?auto=format&fit=crop&w=700&q=80" placeholder="Pautan Gambar" class="flex-1 bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
-                  <input type="file" id="fileFacImg5" accept="image/jpeg,image/jpg" onchange="handleFileUploadGeneric(event, 'inputFacImg5', false, autoSyncFacilities)" class="hidden">
-                  <button type="button" onclick="document.getElementById('fileFacImg5').click()" class="px-2.5 py-2 bg-amber-600 hover:bg-amber-500 rounded-lg text-[11px] font-bold text-white flex items-center gap-1 shrink-0 transition active:scale-95 shadow-sm">
-                    <i data-lucide="upload" class="w-3 h-3"></i>
-                    <span>Device</span>
-                  </button>
-                </div>
-                <input type="url" id="inputFacMap5" onchange="autoSyncFacilities()" value="https://maps.google.com/?q=East+Coast+Mall+Kuantan" placeholder="Pautan Google Maps" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-emerald-700 font-mono">
-              </div>
-
-              <!-- 6. Lapangan Terbang Kuantan -->
-              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
-                <span class="text-xs font-bold text-slate-900 uppercase block">Kemudahan 6</span>
-                <div>
-                  <label class="block text-[10.5px] text-slate-600 mb-0.5 font-semibold">Nama / Tajuk Kemudahan:</label>
-                  <input type="text" id="inputFacTitle6" onchange="autoSyncFacilities()" value="LAPANGAN TERBANG KUANTAN" placeholder="Tajuk Kemudahan" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800 uppercase font-bold">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                  <input type="text" id="inputFacMasa6" onchange="autoSyncFacilities()" value="29 minit" placeholder="Masa" class="bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
-                  <input type="text" id="inputFacJarak6" onchange="autoSyncFacilities()" value="24 km" placeholder="Jarak" class="bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
-                </div>
-                <input type="text" id="inputFacDesc6" onchange="autoSyncFacilities()" value="Lapangan Terbang Sultan Haji Ahmad Shah yang menghubungkan laluan penerbangan utama." placeholder="Penerangan Ringkas" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
-                <div class="flex items-center gap-2">
-                  <input type="text" id="inputFacImg6" onchange="autoSyncFacilities()" value="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=700&q=80" placeholder="Pautan Gambar" class="flex-1 bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-800">
-                  <input type="file" id="fileFacImg6" accept="image/jpeg,image/jpg" onchange="handleFileUploadGeneric(event, 'inputFacImg6', false, autoSyncFacilities)" class="hidden">
-                  <button type="button" onclick="document.getElementById('fileFacImg6').click()" class="px-2.5 py-2 bg-amber-600 hover:bg-amber-500 rounded-lg text-[11px] font-bold text-white flex items-center gap-1 shrink-0 transition active:scale-95 shadow-sm">
-                    <i data-lucide="upload" class="w-3 h-3"></i>
-                    <span>Device</span>
-                  </button>
-                </div>
-                <input type="url" id="inputFacMap6" onchange="autoSyncFacilities()" value="https://maps.google.com/?q=Sultan+Haji+Ahmad+Shah+Airport+Kuantan" placeholder="Pautan Google Maps" class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-emerald-700 font-mono">
-              </div>
-            </div>
-          </div>
-
           <!-- 5. TEKS HERO & MAKLUMAT HUBUNGAN (AUTOSYNC) -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="glass-card p-5 sm:p-6 rounded-2xl space-y-3.5">
@@ -1713,6 +1562,7 @@
         if (gate) gate.classList.add('hidden');
         if (dash) dash.classList.remove('hidden');
         initAdminDataRender();
+        switchTab('tabLocks');
         showToast("Log masuk berjaya! Selamat datang ke Portal Admin.", "success");
       } else {
         showToast("Kata laluan salah! Sila cuba lagi.", "error");
@@ -2365,6 +2215,7 @@
 
     // AUTOSYNC: 6 KEMUDAHAN SEKITAR
     function autoSyncFacilities() {
+      return; // Kemudahan Sekitar dibuang dari website; jangan tulis ke database
       const facData = {
         item1: {
           title: document.getElementById('inputFacTitle1')?.value.trim() || 'ANA IKAN BAKAR PETAI',
@@ -3576,6 +3427,7 @@
 
       if (AdminState.isLoggedIn) {
         initAdminDataRender();
+        switchTab('tabLocks');
       }
       if (window.lucide) lucide.createIcons();
     };
