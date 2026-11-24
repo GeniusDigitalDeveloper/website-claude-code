@@ -28,7 +28,7 @@ function card(t) {
 }
 function bannerHTML() {
   const a = STATE.announcement; if (!a) return '';
-  return `<div class="banner ${['info', 'warning', 'success'].includes(a.type) ? a.type : 'info'}">${icon('megaphone')}<div>${esc(a.text)}</div></div>`;
+  return `<div class="banner site-banner ${['info', 'warning', 'success'].includes(a.type) ? a.type : 'info'}">${icon('megaphone')}<div>${esc(a.text)}</div></div>`;
 }
 const previewNote = () => IN_FRAME ? `<div class="banner info preview-flag">${icon('info')}<div>Anda sedang melihat <b>pratonton</b>. Semua alat berfungsi, tetapi sesetengah paparan pratonton menyekat muat turun fail. Buka laman ini terus di pelayar untuk muat turun penuh.</div></div>` : '';
 
@@ -153,6 +153,14 @@ function route() {
    Firestore: mit_settings/site, mit_tools/{id}, mit_feedback/{id}
    Realtime DB (skema kongsi): apps/image-tools/visits/*, apps/image-tools/stats/*  */
 const FB = { ready: false, db: null, rtdb: null };
+/* Selepas tetapan Firebase tiba: jangan pasang semula alat yang sedang digunakan (gambar pengguna akan hilang). */
+function refreshAfterSettings() {
+  const id = decodeURIComponent(location.hash.slice(1)), t = id && toolById(id);
+  if (!t || STATE.disabled.has(id)) return route();
+  renderNav($('#navSearch').value);
+  $$('#view > .site-banner').forEach(el => el.remove());
+  if (STATE.announcement) $('#view').insertAdjacentHTML('afterbegin', bannerHTML());
+}
 async function initFirebase() {
   if (!FIREBASE_CONFIG.apiKey || !FIREBASE_CONFIG.projectId) return;
   try {
@@ -170,7 +178,7 @@ async function initFirebase() {
       const tools = await FB.db.collection('mit_tools').get();
       tools.forEach(d => { const x = d.data(); if (x.enabled === false) STATE.disabled.add(d.id); if (x.featured) STATE.featured.add(d.id); });
     } catch (e) { console.warn('Tetapan alat:', e.message); }
-    route();
+    refreshAfterSettings();
   } catch (e) { console.warn('Firebase tidak aktif:', e.message); }
 }
 function track(id) {

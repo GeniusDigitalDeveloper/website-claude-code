@@ -1,6 +1,6 @@
 /* Service worker Malaysia Image Tools — membolehkan pemasangan (PWA) dan cangkerang luar talian.
    Strategi: rangkaian dahulu, jatuh balik ke cache. Hanya fail dari domain sendiri; Firebase & CDN tidak disentuh. */
-const VERSION = 'mit-v5';
+const VERSION = 'mit-v6';
 const SHELL = ['/', '/index.html', '/css/style.css', '/js/core.js', '/js/tools-1.js', '/js/tools-2.js', '/js/tools-3.js', '/js/tools-4.js', '/imgbb-config.js', '/js/app.js',
   '/firebase-config.js', '/favicon.ico', '/icons/logo.png', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png', '/hero-bg.jpg'];
 
