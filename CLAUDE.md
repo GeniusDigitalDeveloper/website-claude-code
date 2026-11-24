@@ -114,3 +114,10 @@ Cara hantar buku preview: **terbitkan dengan tool `Artifact`** (publish fail `in
 dan beri link-nya dalam chat. Ustaz nak tengok terus dalam chat Claude Code, bukan download. Temu Havenly Home:
 https://claude.ai/artifact/Mpxkd1KthcvMg1UCrpbLTA
 Ustaz tak nak scroll cari preview lama.
+
+## Temu Havenly Home: 3 link WAJIB selepas setiap update
+
+Setiap kali siap update apa-apa (kod, design, SEO, domain), akhiri balasan dengan 3 link ini dalam bentuk link boleh tekan:
+1. Website rasmi: https://temuhomestay.com/home
+2. Website www: https://www.temuhomestay.com/home (redirect 301 ke alamat rasmi)
+3. Buku preview: https://claude.ai/artifact/Mpxkd1KthcvMg1UCrpbLTA (terbitkan semula dulu jika kod berubah)
