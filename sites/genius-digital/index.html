@@ -623,7 +623,7 @@
   </style>
 </head>
 <body>
-  <a class="skip-link" href="#home" data-i18n="ui.skip">Terus ke kandungan</a>
+  <a class="skip-link" href="/home" data-i18n="ui.skip">Terus ke kandungan</a>
 
   <!-- SVG icon sprite -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
@@ -654,17 +654,17 @@
   <!-- ====================== HEADER ====================== -->
   <header class="site-header" id="siteHeader">
     <div class="container nav-wrap">
-      <a href="#home" class="brand" data-i18n-attr="aria-label:ui.homeAria" aria-label="Genius Digital">
+      <a href="/home" class="brand" data-i18n-attr="aria-label:ui.homeAria" aria-label="Genius Digital">
         <svg class="brand-mark" aria-hidden="true"><use href="#i-logo"/></svg>
         <img class="brand-logo" alt="" hidden>
         <span class="brand-name keep-ls">GENIUS <b>DIGITAL</b></span>
       </a>
       <div class="header-end">
         <nav class="nav-menu" id="navMenu" data-i18n-attr="aria-label:ui.navMain" aria-label="Menu utama">
-          <a class="nav-link active" href="#home" data-i18n="nav.home">Utama</a>
-          <a class="nav-link" href="#about" data-i18n="nav.about">Tentang Kami</a>
-          <a class="nav-link" href="#products" data-i18n="nav.products">Produk</a>
-          <a class="nav-link" href="#contact" data-i18n="nav.contact">Hubungi Kami</a>
+          <a class="nav-link active" href="/home" data-i18n="nav.home">Utama</a>
+          <a class="nav-link" href="/about" data-i18n="nav.about">Tentang Kami</a>
+          <a class="nav-link" href="/products" data-i18n="nav.products">Produk</a>
+          <a class="nav-link" href="/contact" data-i18n="nav.contact">Hubungi Kami</a>
           <button class="install-btn" id="installBtn" type="button" hidden><svg aria-hidden="true"><use href="#i-download"/></svg><span data-i18n="install.btn">Pasang Apps</span></button>
         </nav>
         <div class="lang-menu" id="langMenu">
@@ -698,8 +698,8 @@
           <p class="hero-quote reveal" style="--d:.22s" data-i18n="hero.quote">“Memacu Inovasi Digital Melalui Sistem Pintar, Kreatif dan Efisien.”</p>
           <p class="hero-intro reveal" style="--d:.28s" data-i18n="hero.intro">Genius Digital ialah sebuah syarikat yang membangunkan dan menawarkan pelbagai penyelesaian sistem digital untuk membantu individu, organisasi dan perniagaan mengurus tugasan dengan lebih mudah, sistematik dan efisien.</p>
           <div class="hero-actions reveal" style="--d:.34s">
-            <a class="btn btn-primary" href="#products"><span data-i18n="hero.btnProducts">Terokai Produk Kami</span> <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
-            <a class="btn btn-ghost" href="#about" data-i18n="hero.btnAbout">Tentang Genius Digital</a>
+            <a class="btn btn-primary" href="/products"><span data-i18n="hero.btnProducts">Terokai Produk Kami</span> <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            <a class="btn btn-ghost" href="/about" data-i18n="hero.btnAbout">Tentang Genius Digital</a>
           </div>
           <ul class="hero-points reveal" style="--d:.4s" data-i18n-attr="aria-label:hero.pointsAria" aria-label="Ciri utama">
             <li data-i18n="hero.p1">Berasaskan web</li><li data-i18n="hero.p2">Mesra mudah alih</li><li data-i18n="hero.p3">Sentiasa dipertingkatkan</li>
@@ -779,7 +779,7 @@
         <div class="fc-list" id="contactList"></div>
       </div>
       <div class="footer-center">
-        <a href="#home" class="brand" data-i18n-attr="aria-label:ui.backTop" aria-label="Kembali ke atas">
+        <a href="/home" class="brand" data-i18n-attr="aria-label:ui.backTop" aria-label="Kembali ke atas">
           <svg class="brand-mark" aria-hidden="true"><use href="#i-logo"/></svg>
           <img class="brand-logo" alt="" hidden>
           <span class="brand-name keep-ls">GENIUS DIGITAL</span>
@@ -787,7 +787,7 @@
         <p class="tag keep-ls">Digital Innovation. Intelligent Systems.</p>
       </div>
       <nav class="footer-links" data-i18n-attr="aria-label:ui.footerNav" aria-label="Pautan hujung halaman">
-        <a href="#home" data-i18n="nav.home">Utama</a><a href="#about" data-i18n="nav.about">Tentang Kami</a><a href="#products" data-i18n="nav.products">Produk</a><a href="#contact" data-i18n="nav.contact">Hubungi Kami</a>
+        <a href="/home" data-i18n="nav.home">Utama</a><a href="/about" data-i18n="nav.about">Tentang Kami</a><a href="/products" data-i18n="nav.products">Produk</a><a href="/contact" data-i18n="nav.contact">Hubungi Kami</a>
       </nav>
     </div>
     <div class="container"><p class="copy" data-i18n="footer.copy">© 2026 Genius Digital. Hak Cipta Terpelihara.</p></div>
@@ -1121,6 +1121,7 @@
         if (productsRendered) cards.forEach(c => c.classList.add("in"));   // tanpa fade 0.7s
         grid.replaceChildren(...cards); productsRendered = true;
         observeReveals(grid);
+        if (pendingInitial) { const id = pendingInitial; pendingInitial = null; requestAnimationFrame(() => goTo(id, false)); }
       }
     }
     const showLoading = () => { view = { kind: "loading", error: null, retry: null, products: [] }; renderView(); };
@@ -1326,13 +1327,44 @@
     document.addEventListener("click", (e) => { if (menu.classList.contains("open") && !e.target.closest("#siteHeader")) setMenu(false); });
     window.matchMedia("(min-width: 900px)").addEventListener("change", (e) => { if (e.matches) setMenu(false); });
 
-    const onScroll = () => header.classList.toggle("scrolled", window.scrollY > 8);
+    const onScroll = () => {
+      header.classList.toggle("scrolled", window.scrollY > 8);
+      // Hubungi Kami berada di footer: bila sampai hujung halaman, tandakan menu itu
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4)
+        document.querySelectorAll("#navMenu a.nav-link").forEach(a => a.classList.toggle("active", a.getAttribute("href") === "/contact"));
+    };
     window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
+
+    // Laluan bersih: /home  /about  /products  /contact  (tanpa #; / juga = home). Halaman tetap satu; menu skrol ke bahagian.
+    const ROUTES = { "/": "home", "/home": "home", "/about": "about", "/products": "products", "/contact": "contact" };
+    const PATH_OF = { home: "/home", about: "/about", products: "/products", contact: "/contact" };
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function goTo(id, smooth = true) {
+      const target = document.getElementById(id); if (!target) return;
+      const behavior = smooth && !reduceMotion ? "smooth" : "auto";
+      if (id === "home") window.scrollTo({ top: 0, behavior }); else target.scrollIntoView({ behavior, block: "start" });
+    }
+    document.addEventListener("click", (e) => {
+      const a = e.target.closest("a[href]");
+      if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || a.target === "_blank") return;
+      const url = new URL(a.href, location.href);
+      if (url.origin !== location.origin || url.hash || !ROUTES[url.pathname]) return;
+      const id = ROUTES[url.pathname];
+      e.preventDefault(); goTo(id);
+      if (location.pathname !== url.pathname || location.hash) history.pushState({ id }, "", url.pathname);
+      if (a.classList.contains("skip-link")) { const s = document.getElementById(id); s.setAttribute("tabindex", "-1"); s.focus({ preventScroll: true }); }
+    });
+    window.addEventListener("popstate", () => { const id = ROUTES[location.pathname]; if (id) goTo(id, false); });
+    // Pautan lama (/#about) ditukar kepada /about; buka terus /contact dsb. skrol ke bahagian itu.
+    const hashId = location.hash.slice(1);
+    if (PATH_OF[hashId]) history.replaceState(null, "", PATH_OF[hashId]);
+    let pendingInitial = (() => { const id = PATH_OF[hashId] ? hashId : ROUTES[location.pathname]; return id && id !== "home" ? id : null; })();
+    if (pendingInitial) requestAnimationFrame(() => pendingInitial && goTo(pendingInitial, false));
 
     // Scroll-spy
     const navLinks = [...menu.querySelectorAll("a.nav-link")];
     const spy = new IntersectionObserver((entries) => {
-      for (const en of entries) if (en.isIntersecting) navLinks.forEach(a => a.classList.toggle("active", a.getAttribute("href") === "#" + en.target.id));
+      for (const en of entries) if (en.isIntersecting) navLinks.forEach(a => a.classList.toggle("active", a.getAttribute("href") === PATH_OF[en.target.id]));
     }, { rootMargin: "-45% 0px -50% 0px" });
     ["home", "about", "products", "contact"].forEach(id => spy.observe(document.getElementById(id)));
 
