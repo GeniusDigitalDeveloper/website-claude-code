@@ -248,6 +248,26 @@
             margin-bottom: 20px;
         }
 
+        .pass-wrap { position: relative; }
+        .pass-toggle {
+            position: absolute;
+            top: 50%;
+            right: 8px;
+            transform: translateY(-50%);
+            width: 34px;
+            height: 34px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: #5b6b63;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            font-size: 1rem;
+        }
+        .pass-toggle:hover { color: var(--emerald-dark); background: #e8f3ee; }
+        .pass-toggle:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+
         .toast-container {
             position: fixed;
             bottom: 30px;
@@ -300,7 +320,10 @@
                     <input type="email" id="adminAuthEmail" class="admin-input" placeholder="Emel Admin" autocomplete="username" required style="text-align: center; font-size: 1rem;" />
                 </div>
                 <div class="admin-form-group">
-                    <input type="password" id="adminAuthPass" class="admin-input" placeholder="Kata Laluan Admin" autocomplete="current-password" required style="text-align: center; font-size: 1rem; letter-spacing: 0.1em;" />
+                    <div class="pass-wrap">
+                        <input type="password" id="adminAuthPass" class="admin-input" placeholder="Kata Laluan Admin" autocomplete="current-password" required style="text-align: center; font-size: 1rem; letter-spacing: 0.1em; padding-left: 46px; padding-right: 46px;" />
+                        <button type="button" class="pass-toggle" id="btnTogglePass" aria-label="Tunjuk kata laluan" aria-pressed="false"><i class="fas fa-eye"></i></button>
+                    </div>
                 </div>
                 <button type="submit" class="admin-btn" id="btnAuthSubmit" style="width: 100%; justify-content: center;"><i class="fas fa-key"></i> Log Masuk Admin</button>
             </form>
@@ -669,6 +692,16 @@
                 reader.readAsDataURL(file);
             }
         };
+
+        document.getElementById('btnTogglePass').addEventListener('click', function() {
+            const input = document.getElementById('adminAuthPass');
+            const show = input.type === 'password';
+            input.type = show ? 'text' : 'password';
+            this.innerHTML = show ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
+            this.setAttribute('aria-label', show ? 'Sembunyi kata laluan' : 'Tunjuk kata laluan');
+            this.setAttribute('aria-pressed', String(show));
+            input.focus();
+        });
 
         onAuthStateChanged(auth, (user) => {
             document.getElementById('authOverlay').style.display = user ? 'none' : 'flex';
