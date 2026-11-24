@@ -387,6 +387,56 @@
         .news-save-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
         .news-check { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 600; color: var(--text-light); cursor: pointer; margin-top: 30px; }
         .news-check input { width: 18px; height: 18px; accent-color: var(--emerald); }
+        /* Editor dua lajur: teks (kiri) + Gambar Dipilih (kanan) */
+        .news-compose { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 18px; align-items: start; }
+        .news-compose-main { min-width: 0; }
+        .news-compose-side { position: sticky; top: 84px; background: #f6f8f7; border: 1px solid var(--border-dark); border-radius: 12px; padding: 14px; max-height: calc(100vh - 110px); overflow-y: auto; }
+        .news-side-head { font-weight: 700; color: var(--emerald-dark); font-size: 0.9rem; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .news-side-hint { font-size: 0.74rem; color: #5b6b63; line-height: 1.55; margin-bottom: 10px; }
+        .news-compose-side .news-imgs { grid-template-columns: minmax(0, 1fr); margin-top: 0; }
+        .news-imgs-empty { font-size: 0.8rem; color: #5b6b63; text-align: center; padding: 18px 8px; border: 1px dashed var(--border-dark); border-radius: 10px; }
+        .news-img { cursor: grab; }
+        .news-img.dragging { opacity: 0.45; }
+        .news-img .rm {
+            position: absolute; top: 6px; right: 6px; z-index: 2; width: 28px; height: 28px; border-radius: 50%;
+            background: #dc2626; color: #fff; border: 2px solid #fff; display: grid; place-items: center; font-size: 0.85rem; padding: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        .news-img .rm:hover { background: #b91c1c; }
+        .news-img .badge.used { left: auto; right: 40px; background: var(--emerald); }
+        .news-img .ins { border: 1px solid var(--emerald); background: #fff; color: var(--emerald-dark); border-radius: 6px; padding: 3px 7px; font-family: var(--font); font-size: 0.7rem; font-weight: 600; cursor: pointer; }
+        .news-img .ins:hover { background: #e8f3ee; }
+        /* Gambar di dalam teks (editor) */
+        .news-body-wrap { position: relative; }
+        .news-editor figure.nimg { display: block; position: relative; cursor: pointer; border-radius: 8px; outline: 2px dashed transparent; outline-offset: 3px; transition: outline-color 0.2s; user-select: none; }
+        .news-editor figure.nimg:hover { outline-color: rgba(201, 168, 76, 0.6); }
+        .news-editor figure.nimg.sel { outline: 3px solid var(--gold); }
+        .news-editor figure.nimg img { width: 100%; display: block; border-radius: 8px; pointer-events: none; }
+        .news-drop-line { position: absolute; left: 10px; right: 10px; height: 4px; border-radius: 4px; background: var(--emerald); box-shadow: 0 0 0 3px rgba(11, 122, 92, 0.18); pointer-events: none; z-index: 4; }
+        .fig-ctrl {
+            position: absolute; left: 8px; right: 8px; z-index: 6; display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+            background: #fff; border: 1px solid var(--gold); border-radius: 10px; padding: 7px 8px; box-shadow: 0 8px 24px rgba(15, 60, 40, 0.15);
+        }
+        .fig-ctrl-group { display: inline-flex; align-items: center; gap: 4px; }
+        .fig-ctrl label { font-size: 0.74rem; font-weight: 700; color: var(--emerald-dark); }
+        .fig-ctrl input[type=range] { width: 110px; accent-color: var(--emerald); }
+        .fig-ctrl output { font-size: 0.74rem; font-weight: 700; min-width: 34px; color: var(--emerald-dark); font-variant-numeric: tabular-nums; }
+        .fig-ctrl select { font-family: var(--font); font-size: 0.76rem; padding: 5px 6px; border: 1px solid var(--border-dark); border-radius: 7px; background: #f6f8f7; color: var(--text-light); }
+        .fig-ctrl select:disabled { opacity: 0.5; }
+        .fig-ctrl button { width: 30px; height: 30px; border: 1px solid var(--border-dark); background: #f6f8f7; border-radius: 7px; cursor: pointer; color: var(--text-light); display: grid; place-items: center; font-size: 0.8rem; }
+        .fig-ctrl button:hover, .fig-ctrl button.on { background: #e8f3ee; border-color: var(--emerald); color: var(--emerald-dark); }
+        .fig-ctrl .fig-x { margin-left: auto; background: #dc2626; border-color: #dc2626; color: #fff; }
+        .fig-ctrl .fig-x:hover { background: #b91c1c; color: #fff; }
+        /* Pratonton */
+        .news-preview-panel { margin-top: 18px; border: 1px solid var(--border-dark); border-radius: 12px; overflow: hidden; background: #f3f6f4; }
+        .news-preview-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; background: #fff; border-bottom: 1px solid var(--border-dark); font-size: 0.82rem; font-weight: 600; color: var(--emerald-dark); }
+        .news-preview-head a { text-decoration: none; }
+        #newsPreviewFrame { width: 100%; height: 760px; border: 0; display: block; background: #f3f6f4; }
+        @media (max-width: 1100px) {
+            .news-compose { grid-template-columns: minmax(0, 1fr); }
+            .news-compose-side { position: static; max-height: none; order: -1; }
+            .news-compose-side .news-imgs { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+        }
         @media (max-width: 640px) {
             .news-admin-item { grid-template-columns: minmax(0, 1fr); }
             .news-toolbar { top: 0; }
@@ -459,7 +509,11 @@
                             <h2 style="font-size: 1.8rem; color: var(--gold-text); margin-top: 4px;" id="adminStatToday">0</h2>
                         </div>
                         <div style="background: #f6f8f7; padding: 20px; border-radius: 12px; border: 1px solid #dfe6e2;">
-                            <span style="font-size: 0.75rem; color: #5b6b63; font-weight: 700; text-transform: uppercase;">Jumlah Pelawat</span>
+                            <span style="font-size: 0.75rem; color: #5b6b63; font-weight: 700; text-transform: uppercase;">Pelawat Bulan Ini</span>
+                            <h2 style="font-size: 1.8rem; color: var(--emerald-dark); margin-top: 4px;" id="adminStatMonth">0</h2>
+                        </div>
+                        <div style="background: #f6f8f7; padding: 20px; border-radius: 12px; border: 1px solid #dfe6e2;">
+                            <span style="font-size: 0.75rem; color: #5b6b63; font-weight: 700; text-transform: uppercase;">Pelawat Keseluruhan</span>
                             <h2 style="font-size: 1.8rem; color: #047857; margin-top: 4px;" id="adminStatTotal">0</h2>
                         </div>
                         <div style="background: #f6f8f7; padding: 20px; border-radius: 12px; border: 1px solid #dfe6e2;">
@@ -581,14 +635,13 @@
                     </div>
 
                     <div class="admin-form-group">
-                        <label>Gambar Berita (boleh pilih banyak gambar sekali gus, maksimum 8). Semua gambar dipaparkan di sebelah kanan berita dan disimpan dalam Firebase.</label>
+                        <label>Gambar Berita (boleh pilih banyak gambar sekali gus, maksimum 8). Gambar disimpan dalam Firebase dan muncul di panel <b>Gambar Dipilih</b> di sebelah kanan editor.</label>
                         <div class="news-upload">
                             <input type="file" id="newsImgFile" accept="image/*" multiple hidden />
                             <button class="admin-btn" type="button" id="btnNewsPickImg"><i class="fas fa-upload"></i> Pilih Gambar Dari Peranti</button>
                             <input type="url" class="admin-input" id="newsImgUrl" placeholder="atau tampal URL gambar (https://...)" />
                             <button class="news-icon-btn" type="button" id="btnNewsAddUrl"><i class="fas fa-link"></i> Tambah URL</button>
                         </div>
-                        <div class="news-imgs" id="newsImgs"></div>
                     </div>
 
                     <div class="admin-form-group">
@@ -621,6 +674,8 @@
                         <div class="news-header-preview" id="newsHdrPreview"><div class="empty">Pilih gambar dan tandakan sebagai header</div></div>
                     </div>
 
+                    <div class="news-compose">
+                        <div class="news-compose-main">
                     <div class="news-toolbar" id="newsToolbar" role="toolbar" aria-label="Format teks berita">
                         <select id="newsFont" aria-label="Jenis font">
                             <option value="">Font</option>
@@ -665,14 +720,63 @@
                     </div>
                     <div class="admin-form-group">
                         <label>Keterangan Berita</label>
-                        <div class="news-editor body" id="newsBodyEd" contenteditable="true" data-placeholder="Tulis isi berita di sini…" role="textbox" aria-multiline="true" aria-label="Keterangan berita"></div>
+                        <div class="news-body-wrap" id="newsBodyWrap">
+                            <div class="news-editor body" id="newsBodyEd" contenteditable="true" data-placeholder="Tulis isi berita di sini… Seret gambar dari panel kanan ke mana-mana tempat dalam teks." role="textbox" aria-multiline="true" aria-label="Keterangan berita"></div>
+                            <div class="news-drop-line" id="newsDropLine" hidden></div>
+                            <div class="fig-ctrl" id="figCtrl" hidden role="toolbar" aria-label="Tetapan gambar dalam teks">
+                                <span class="fig-ctrl-group">
+                                    <label for="figW">Saiz</label>
+                                    <input type="range" id="figW" min="15" max="100" step="5" value="60" />
+                                    <output id="figWOut">60%</output>
+                                </span>
+                                <select id="figRatio" aria-label="Crop gambar">
+                                    <option value="">Asal (tanpa crop)</option>
+                                    <option value="16/9">Crop 16:9 (lebar)</option>
+                                    <option value="4/3">Crop 4:3</option>
+                                    <option value="1/1">Crop 1:1 (petak)</option>
+                                    <option value="3/4">Crop 3:4 (tegak)</option>
+                                </select>
+                                <select id="figPos" aria-label="Bahagian gambar yang ditunjuk bila crop">
+                                    <option value="top">Fokus atas</option>
+                                    <option value="center">Fokus tengah</option>
+                                    <option value="bottom">Fokus bawah</option>
+                                </select>
+                                <span class="fig-ctrl-group">
+                                    <button type="button" data-fig="left" aria-label="Letak gambar di kiri" title="Kiri"><i class="fas fa-align-left"></i></button>
+                                    <button type="button" data-fig="center" aria-label="Letak gambar di tengah" title="Tengah"><i class="fas fa-align-center"></i></button>
+                                    <button type="button" data-fig="right" aria-label="Letak gambar di kanan" title="Kanan"><i class="fas fa-align-right"></i></button>
+                                </span>
+                                <span class="fig-ctrl-group">
+                                    <button type="button" data-fig="up" aria-label="Alih gambar ke atas" title="Alih ke atas"><i class="fas fa-arrow-up"></i></button>
+                                    <button type="button" data-fig="down" aria-label="Alih gambar ke bawah" title="Alih ke bawah"><i class="fas fa-arrow-down"></i></button>
+                                </span>
+                                <button type="button" data-fig="del" class="fig-x" aria-label="Buang gambar dari teks" title="Buang dari teks"><i class="fas fa-xmark"></i></button>
+                            </div>
+                        </div>
                         <div class="news-stats"><span id="newsWords">0 patah perkataan</span><span id="newsLenHint"></span></div>
+                    </div>
+
+                        </div>
+                        <aside class="news-compose-side" aria-label="Gambar dipilih">
+                            <div class="news-side-head"><i class="fas fa-images"></i> Gambar Dipilih</div>
+                            <p class="news-side-hint">Seret gambar ke dalam <b>Keterangan Berita</b>, atau tekan <i class="fas fa-arrow-left"></i> untuk masukkan di kedudukan kursor. Klik gambar dalam teks untuk ubah saiz, crop, alih atau buang. Butang <i class="fas fa-xmark"></i> memadam gambar terus dari database.</p>
+                            <div class="news-imgs" id="newsImgs"></div>
+                        </aside>
                     </div>
 
                     <div class="news-save-row">
                         <button class="admin-btn" type="button" id="btnNewsSave"><i class="fas fa-save"></i> Simpan Berita Ke Database</button>
+                        <button class="news-icon-btn" type="button" id="btnNewsPreview" aria-expanded="false"><i class="fas fa-eye"></i> Pratonton Berita</button>
                         <button class="news-icon-btn" type="button" id="btnNewsView" hidden><i class="fas fa-up-right-from-square"></i> Lihat di Portal</button>
                         <button class="news-icon-btn" type="button" id="btnNewsCancel"><i class="fas fa-rotate-left"></i> Kosongkan Borang</button>
+                    </div>
+
+                    <div class="news-preview-panel" id="newsPreviewPanel" hidden>
+                        <div class="news-preview-head">
+                            <span><i class="fas fa-eye"></i> Pratonton berita (dikemas kini secara langsung semasa menaip)</span>
+                            <a href="/news/__preview" target="_blank" rel="noopener" class="news-icon-btn"><i class="fas fa-up-right-from-square"></i> Buka tab baru</a>
+                        </div>
+                        <iframe id="newsPreviewFrame" title="Pratonton berita" loading="lazy"></iframe>
                     </div>
                 </div>
             </div>
@@ -730,7 +834,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getDatabase, ref, onValue, set, update, remove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        import { getDatabase, ref, onValue, set, update, remove, query, orderByKey, startAt, endAt } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -1044,7 +1148,14 @@
             renderAdminCommentsTable();
         });
 
-        const todayStr = new Date().toISOString().split('T')[0];
+        // Tarikh ikut waktu Malaysia (sama seperti portal awam)
+        const todayStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kuala_Lumpur', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+        const monthStr = todayStr.slice(0, 7);
+        onValue(query(ref(db, 'visitors/daily'), orderByKey(), startAt(`${monthStr}-01`), endAt(`${monthStr}-31`)), (snap) => {
+            let sum = 0;
+            snap.forEach(ch => { sum += +ch.val() || 0; });
+            document.getElementById('adminStatMonth').textContent = sum.toLocaleString();
+        });
         onValue(ref(db, 'visitors/total'), (snap) => {
             document.getElementById('adminStatTotal').textContent = (snap.val() || 0).toLocaleString();
         });
@@ -1514,19 +1625,26 @@
     <script type="module">
         // ================= BERITA (Admin) =================
         // Simpan ke Firebase Realtime Database nod `news/{id}`.
+        // Gambar: senarai `images` (data URL / https) + `imageIds` (rujukan tetap untuk gambar dalam teks).
+        // Gambar dalam teks disimpan sebagai <figure data-ref data-w data-ratio data-pos data-align> tanpa data gambar (elak duplikasi).
         import { getApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getDatabase, ref, onValue, set, remove, push } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        import { getDatabase, ref, onValue, set, update, remove, push } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
         const db = getDatabase(getApp());
         const $ = (id) => document.getElementById(id);
         const MAX_IMGS = 8;
         const MONTHS = ['Jan', 'Feb', 'Mac', 'Apr', 'Mei', 'Jun', 'Jul', 'Ogo', 'Sep', 'Okt', 'Nov', 'Dis'];
+        const PREVIEW_KEY = 'nadwahNewsPreview';
+        const DRAG_TYPE = 'application/x-nadwah-img';
+        const FIG_RATIOS = { '16/9': '16 / 9', '4/3': '4 / 3', '1/1': '1 / 1', '3/4': '3 / 4' };
         let newsAll = [];
         let editingId = null;
         let images = [];
+        let imageIds = [];
         let headerIndex = 0;
         let activeEd = null;
         let savedRange = null;
+        let selFig = null;
 
         function toast(message, type = 'info') {
             const container = $('toastContainer'); if (!container) return;
@@ -1540,7 +1658,8 @@
             setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 400); }, 3500);
         }
         const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-        const plain = (html) => { const d = document.createElement('div'); d.innerHTML = html || ''; return (d.textContent || '').replace(/\s+/g, ' ').trim(); };
+        const plain = (html) => { const d = document.createElement('div'); d.innerHTML = html || ''; d.querySelectorAll('figure').forEach(f => f.remove()); return (d.textContent || '').replace(/\s+/g, ' ').trim(); };
+        const newImgId = () => 'g' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
         function todayStr() {
             const d = new Date();
             return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -1587,16 +1706,31 @@
                 reader.readAsDataURL(file);
             });
         }
+        async function addFiles(files) {
+            const added = [];
+            for (const f of files) {
+                if (!/^image\//.test(f.type)) continue;
+                if (images.length >= MAX_IMGS) { toast(`Maksimum ${MAX_IMGS} gambar setiap berita.`, 'warning'); break; }
+                try { const src = await compress(f); const id = newImgId(); images.push(src); imageIds.push(id); added.push(id); }
+                catch (err) { toast('Gambar tidak dapat dibaca: ' + f.name, 'warning'); }
+            }
+            renderImgs(); queuePreview();
+            return added;
+        }
         function renderImgs() {
             const box = $('newsImgs');
             if (headerIndex >= images.length) headerIndex = 0;
+            if (!images.length) { box.innerHTML = '<p class="news-imgs-empty">Belum ada gambar. Tekan <b>Pilih Gambar Dari Peranti</b> di atas.</p>'; renderHeaderPreview(); return; }
+            const used = new Set([...$('newsBodyEd').querySelectorAll('figure[data-ref]')].map(f => f.dataset.ref));
             box.innerHTML = images.map((src, i) => `
-                <div class="news-img ${i === headerIndex ? 'is-header' : ''}">
+                <div class="news-img ${i === headerIndex ? 'is-header' : ''}" draggable="true" data-idx="${i}" title="Seret ke dalam teks berita">
                     ${i === headerIndex ? '<span class="badge">HEADER</span>' : ''}
-                    <img src="${esc(src)}" alt="Gambar ${i + 1}" />
+                    ${used.has(imageIds[i]) ? '<span class="badge used">DALAM TEKS</span>' : ''}
+                    <button type="button" class="rm" data-rm="${i}" aria-label="Padam gambar ${i + 1} dari database" title="Padam dari database"><i class="fas fa-xmark"></i></button>
+                    <img src="${esc(src)}" alt="Gambar ${i + 1}" draggable="false" />
                     <div class="bar">
-                        <label><input type="radio" name="newsHeader" value="${i}" ${i === headerIndex ? 'checked' : ''} /> Jadikan header</label>
-                        <button type="button" class="rm" data-rm="${i}" aria-label="Buang gambar ${i + 1}"><i class="fas fa-trash"></i></button>
+                        <label><input type="radio" name="newsHeader" value="${i}" ${i === headerIndex ? 'checked' : ''} /> Header</label>
+                        <button type="button" class="ins" data-ins="${i}" aria-label="Masukkan gambar ${i + 1} ke dalam teks" title="Masukkan ke dalam teks"><i class="fas fa-arrow-left"></i> Masuk teks</button>
                     </div>
                 </div>`).join('');
             renderHeaderPreview();
@@ -1611,6 +1745,137 @@
             pv.innerHTML = src
                 ? `<img src="${esc(src)}" alt="Pratonton header" style="object-fit:${$('newsHdrFit').value};object-position:center ${$('newsHdrPos').value};" />`
                 : '<div class="empty">Pilih gambar dan tandakan sebagai header</div>';
+        }
+        // Padam gambar terus dari database (jimat ruang storan)
+        async function deleteImage(i) {
+            const id = imageIds[i];
+            if (!confirm('Padam gambar ini secara kekal dari database? Gambar juga akan dibuang dari teks berita.')) return;
+            images.splice(i, 1); imageIds.splice(i, 1);
+            if (headerIndex === i) headerIndex = 0; else if (headerIndex > i) headerIndex--;
+            $('newsBodyEd').querySelectorAll(`figure[data-ref="${id}"]`).forEach(f => { if (f === selFig) deselectFig(); f.remove(); });
+            renderImgs(); queuePreview();
+            const saved = editingId && newsAll.find(x => x.id === editingId);
+            if (saved) {
+                try {
+                    // Hanya kemas kini senarai gambar; teks yang belum disimpan tidak ditulis
+                    await update(ref(db, 'news/' + editingId), { images, imageIds, headerIndex, updatedAt: Date.now() });
+                    toast('Gambar telah dipadam dari database.', 'success');
+                } catch (err) { console.error(err); toast('Gagal memadam gambar dari database.', 'warning'); }
+            } else toast('Gambar dibuang.', 'info');
+        }
+
+        // ---------- Gambar di dalam teks ----------
+        function applyFig(fig) {
+            const w = Math.min(Math.max(+fig.dataset.w || 60, 15), 100);
+            const al = ['left', 'right'].includes(fig.dataset.align) ? fig.dataset.align : 'center';
+            fig.style.width = w + '%';
+            fig.style.margin = al === 'left' ? '0.7em auto 0.7em 0' : al === 'right' ? '0.7em 0 0.7em auto' : '0.7em auto';
+            const img = fig.querySelector('img'); if (!img) return;
+            const ratio = FIG_RATIOS[fig.dataset.ratio];
+            const pos = ['top', 'bottom'].includes(fig.dataset.pos) ? fig.dataset.pos : 'center';
+            img.style.aspectRatio = ratio || '';
+            img.style.objectFit = ratio ? 'cover' : '';
+            img.style.objectPosition = ratio ? `center ${pos}` : '';
+        }
+        function hydrateFig(fig) {
+            const i = imageIds.indexOf(fig.dataset.ref);
+            if (i < 0) { fig.remove(); return; }
+            fig.className = 'nimg';
+            fig.setAttribute('contenteditable', 'false');
+            fig.replaceChildren();
+            const img = document.createElement('img'); img.src = images[i]; img.alt = ''; img.draggable = false;
+            fig.appendChild(img);
+            applyFig(fig);
+        }
+        function makeFig(id) {
+            const fig = document.createElement('figure');
+            fig.dataset.ref = id; fig.dataset.w = '60'; fig.dataset.align = 'center'; fig.dataset.pos = 'center';
+            hydrateFig(fig);
+            return fig;
+        }
+        function topBlock(node) {
+            const ed = $('newsBodyEd');
+            while (node && node.parentNode !== ed) node = node.parentNode;
+            return node;
+        }
+        function ensureTypingSpace(fig) {
+            const ed = $('newsBodyEd');
+            const blank = () => { const d = document.createElement('div'); d.appendChild(document.createElement('br')); return d; };
+            if (!fig.nextSibling) ed.appendChild(blank());
+            if (!fig.previousSibling) ed.insertBefore(blank(), fig);
+        }
+        function insertFigAt(fig, block, before) {
+            const ed = $('newsBodyEd');
+            if (!block) ed.appendChild(fig);
+            else if (before) ed.insertBefore(fig, block);
+            else ed.insertBefore(fig, block.nextSibling);
+            ensureTypingSpace(fig);
+            selectFig(fig); renderImgs(); queuePreview(); updateStats();
+        }
+        function dropTarget(e) {
+            const ed = $('newsBodyEd');
+            const blocks = [...ed.childNodes].filter(n => n.nodeType === 1 || (n.nodeType === 3 && n.textContent.trim()));
+            if (!blocks.length) return { block: null, before: false };
+            for (const b of blocks) {
+                const r = b.nodeType === 1 ? b.getBoundingClientRect() : (() => { const rg = document.createRange(); rg.selectNode(b); return rg.getBoundingClientRect(); })();
+                if (e.clientY < r.top + r.height / 2) return { block: b, before: true, rect: r };
+            }
+            const last = blocks[blocks.length - 1];
+            const r = last.nodeType === 1 ? last.getBoundingClientRect() : (() => { const rg = document.createRange(); rg.selectNode(last); return rg.getBoundingClientRect(); })();
+            return { block: last, before: false, rect: r };
+        }
+        function showDropLine(t) {
+            const line = $('newsDropLine'), wrap = $('newsBodyWrap');
+            const wr = wrap.getBoundingClientRect();
+            const ed = $('newsBodyEd').getBoundingClientRect();
+            const y = !t.rect ? ed.top + 14 : (t.before ? t.rect.top - 3 : t.rect.bottom + 3);
+            line.style.top = (y - wr.top) + 'px';
+            line.hidden = false;
+        }
+        function selectFig(fig) {
+            document.querySelectorAll('#newsBodyEd figure.sel').forEach(f => f.classList.remove('sel'));
+            selFig = fig; fig.classList.add('sel');
+            $('figW').value = fig.dataset.w || 60; $('figWOut').textContent = ($('figW').value) + '%';
+            $('figRatio').value = fig.dataset.ratio || '';
+            $('figPos').value = fig.dataset.pos || 'center';
+            $('figPos').disabled = !fig.dataset.ratio;
+            document.querySelectorAll('#figCtrl [data-fig=left],#figCtrl [data-fig=center],#figCtrl [data-fig=right]').forEach(b => b.classList.toggle('on', (fig.dataset.align || 'center') === b.dataset.fig));
+            placeCtrl();
+        }
+        function deselectFig() {
+            if (selFig) selFig.classList.remove('sel');
+            selFig = null; $('figCtrl').hidden = true;
+        }
+        function placeCtrl() {
+            if (!selFig || !selFig.isConnected) { deselectFig(); return; }
+            const c = $('figCtrl'), wrap = $('newsBodyWrap');
+            c.hidden = false;
+            const wr = wrap.getBoundingClientRect(), fr = selFig.getBoundingClientRect();
+            let top = fr.top - wr.top - c.offsetHeight - 8;
+            if (top < 0) top = fr.bottom - wr.top + 8;
+            c.style.top = top + 'px';
+        }
+        function figAction(act) {
+            const fig = selFig; if (!fig) return;
+            const ed = $('newsBodyEd');
+            const sib = (n, dir) => { let x = n[dir]; while (x && x.nodeType === 3 && !x.textContent.trim()) x = x[dir]; return x; };
+            if (act === 'del') { deselectFig(); fig.remove(); renderImgs(); queuePreview(); return; }
+            if (['left', 'center', 'right'].includes(act)) fig.dataset.align = act;
+            if (act === 'up') { const p = sib(fig, 'previousSibling'); if (p) ed.insertBefore(fig, p); }
+            if (act === 'down') { const n = sib(fig, 'nextSibling'); if (n) ed.insertBefore(fig, n.nextSibling); ensureTypingSpace(fig); }
+            applyFig(fig); selectFig(fig); queuePreview();
+            fig.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+        function serializeBody() {
+            const c = $('newsBodyEd').cloneNode(true);
+            c.querySelectorAll('figure').forEach(f => {
+                const keep = {};
+                ['ref', 'w', 'ratio', 'pos', 'align'].forEach(k => { if (f.dataset[k]) keep[k] = f.dataset[k]; });
+                const n = document.createElement('figure');
+                Object.entries(keep).forEach(([k, v]) => n.dataset[k] = v);
+                f.replaceWith(n);
+            });
+            return c.innerHTML.trim();
         }
 
         // ---------- Editor teks ----------
@@ -1634,7 +1899,6 @@
             }
             return ed;
         }
-        // Tukar <font size=7 / face> kepada <span style> supaya kemas
         function convertFonts(ed, sizePx, face) {
             const made = [];
             ed.querySelectorAll('font').forEach(f => {
@@ -1648,7 +1912,6 @@
                 f.replaceWith(span);
                 made.push(span);
             });
-            // Kekalkan teks yang sama terpilih supaya boleh terus tukar font/saiz/bold
             if (made.length) {
                 const r = document.createRange();
                 r.setStartBefore(made[0]); r.setEndAfter(made[made.length - 1]);
@@ -1657,16 +1920,16 @@
             }
         }
         function needSelection() {
-            const ed = restoreSel();
+            restoreSel();
             const sel = window.getSelection();
             if (!sel.rangeCount || sel.getRangeAt(0).collapsed) { toast('Pilih (highlight) teks dahulu sebelum tukar font atau saiz.', 'info'); return false; }
-            return ed;
+            return true;
         }
         function exec(cmd, val) {
             const ed = restoreSel();
             document.execCommand('styleWithCSS', false, false);
             document.execCommand(cmd, false, val ?? null);
-            saveSel(); updateToolbar(); updateStats();
+            saveSel(); updateToolbar(); updateStats(); queuePreview();
             return ed;
         }
         function updateToolbar() {
@@ -1677,18 +1940,55 @@
         function applyLineHeight() {
             const lh = $('newsLineH').value;
             eds().forEach(e => e.style.lineHeight = lh);
+            queuePreview();
         }
         function updateStats() {
             const words = plain($('newsBodyEd').innerHTML).split(' ').filter(Boolean).length;
-            $('newsWords').textContent = `${words} patah perkataan`;
+            const figs = $('newsBodyEd').querySelectorAll('figure').length;
+            $('newsWords').textContent = `${words} patah perkataan${figs ? ` · ${figs} gambar dalam teks` : ''}`;
             const hint = $('newsLenHint');
-            if (words > 350) { hint.textContent = 'Berita agak panjang. Ringkaskan supaya muat satu muka cetak.'; hint.className = 'warn'; }
+            if (words > 350 || figs > 3) { hint.textContent = 'Berita agak panjang. Ringkaskan supaya muat satu muka cetak.'; hint.className = 'warn'; }
             else { hint.textContent = words ? 'Panjang sesuai untuk satu muka cetak.' : ''; hint.className = ''; }
+        }
+
+        // ---------- Pratonton langsung ----------
+        let pvTimer = 0;
+        function draftData() {
+            return {
+                title: $('newsTitleEd').innerHTML.trim(), body: serializeBody(),
+                date: $('newsDate').value || todayStr(), images, imageIds,
+                headerIndex: Math.min(headerIndex, Math.max(images.length - 1, 0)),
+                headerHeight: +$('newsHdrH').value, headerWidth: +$('newsHdrW').value,
+                headerFit: $('newsHdrFit').value, headerPos: $('newsHdrPos').value,
+                lineHeight: +$('newsLineH').value
+            };
+        }
+        function writePreview() {
+            try { localStorage.setItem(PREVIEW_KEY, JSON.stringify(draftData())); }
+            catch (e) { toast('Pratonton tidak dapat dikemas kini (gambar terlalu besar untuk storan pelayar).', 'warning'); }
+        }
+        function queuePreview() {
+            if ($('newsPreviewPanel').hidden) return;
+            clearTimeout(pvTimer); pvTimer = setTimeout(writePreview, 350);
+        }
+        function togglePreview(show) {
+            const panel = $('newsPreviewPanel');
+            const on = show ?? panel.hidden;
+            panel.hidden = !on;
+            $('btnNewsPreview').setAttribute('aria-expanded', String(on));
+            $('btnNewsPreview').innerHTML = on ? '<i class="fas fa-eye-slash"></i> Tutup Pratonton' : '<i class="fas fa-eye"></i> Pratonton Berita';
+            if (on) {
+                writePreview();
+                const fr = $('newsPreviewFrame');
+                if (!fr.getAttribute('src')) fr.src = '/news/__preview';
+                panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
 
         // ---------- Borang ----------
         function resetForm() {
-            editingId = null; images = []; headerIndex = 0;
+            editingId = null; images = []; imageIds = []; headerIndex = 0;
+            deselectFig();
             $('newsEditorHeading').textContent = 'Tulis Berita Baru';
             $('newsDate').value = todayStr();
             $('newsPublished').checked = true;
@@ -1696,12 +1996,14 @@
             $('newsLineH').value = '1.15';
             $('newsTitleEd').innerHTML = ''; $('newsBodyEd').innerHTML = '';
             $('btnNewsView').hidden = true;
-            applyLineHeight(); renderImgs(); updateStats(); renderList();
+            applyLineHeight(); renderImgs(); updateStats(); renderList(); queuePreview();
         }
         function loadForm(n) {
             editingId = n.id;
             images = Array.isArray(n.images) ? [...n.images] : [];
+            imageIds = Array.isArray(n.imageIds) && n.imageIds.length === images.length ? [...n.imageIds] : images.map(() => newImgId());
             headerIndex = +n.headerIndex || 0;
+            deselectFig();
             $('newsEditorHeading').textContent = 'Kemaskini Berita';
             $('newsDate').value = n.date || todayStr();
             $('newsPublished').checked = n.published !== false;
@@ -1711,30 +2013,23 @@
             $('newsLineH').value = String(n.lineHeight || 1.15);
             if (!$('newsLineH').value) $('newsLineH').value = '1.15';
             $('newsTitleEd').innerHTML = n.title || ''; $('newsBodyEd').innerHTML = n.body || '';
+            $('newsBodyEd').querySelectorAll('figure').forEach(hydrateFig);
             $('btnNewsView').hidden = false;
-            applyLineHeight(); renderImgs(); updateStats(); renderList();
+            applyLineHeight(); renderImgs(); updateStats(); renderList(); queuePreview();
             $('newsEditorCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         async function save() {
             const title = $('newsTitleEd').innerHTML.trim();
-            const body = $('newsBodyEd').innerHTML.trim();
+            const body = serializeBody();
             if (!plain(title)) { toast('Sila tulis tajuk berita.', 'warning'); $('newsTitleEd').focus(); return; }
-            if (!plain(body)) { toast('Sila tulis keterangan berita.', 'warning'); $('newsBodyEd').focus(); return; }
+            if (!plain(body) && !$('newsBodyEd').querySelector('figure')) { toast('Sila tulis keterangan berita.', 'warning'); $('newsBodyEd').focus(); return; }
             if (!$('newsDate').value) { toast('Sila pilih tarikh berita.', 'warning'); return; }
             const old = newsAll.find(x => x.id === editingId);
             const id = editingId || push(ref(db, 'news')).key;
             const data = {
-                title, body,
-                date: $('newsDate').value,
+                ...draftData(), title, body,
                 published: $('newsPublished').checked,
-                images,
-                headerIndex: Math.min(headerIndex, Math.max(images.length - 1, 0)),
-                headerHeight: +$('newsHdrH').value,
-                headerWidth: +$('newsHdrW').value,
-                headerFit: $('newsHdrFit').value,
-                headerPos: $('newsHdrPos').value,
-                lineHeight: +$('newsLineH').value,
                 createdAt: old?.createdAt || Date.now(),
                 updatedAt: Date.now()
             };
@@ -1752,21 +2047,71 @@
         }
 
         function boot() {
-            // Toolbar: kekalkan pilihan teks semasa klik butang
+            const body = $('newsBodyEd');
             document.addEventListener('selectionchange', saveSel);
             eds().forEach(ed => {
                 ed.addEventListener('focus', () => setActive(ed));
-                ed.addEventListener('input', updateStats);
+                ed.addEventListener('input', () => { updateStats(); queuePreview(); if (selFig) placeCtrl(); });
                 ed.addEventListener('keyup', updateToolbar);
                 ed.addEventListener('mouseup', updateToolbar);
-                // Tampal sebagai teks biasa (elak format bersepah dari Word/WhatsApp)
                 ed.addEventListener('paste', (e) => {
                     e.preventDefault();
                     const text = (e.clipboardData || window.clipboardData).getData('text/plain');
                     document.execCommand('insertText', false, text);
                 });
             });
-            activeEd = $('newsBodyEd');
+            activeEd = body;
+
+            // Klik gambar dalam teks untuk pilih
+            body.addEventListener('click', (e) => {
+                const fig = e.target.closest('figure');
+                if (fig && body.contains(fig)) { e.preventDefault(); selectFig(fig); } else deselectFig();
+            });
+            document.addEventListener('click', (e) => {
+                if (selFig && e.target.isConnected && !e.target.closest('#newsBodyEd figure') && !e.target.closest('#figCtrl') && !e.target.closest('#newsImgs')) deselectFig();
+            });
+            body.addEventListener('keydown', (e) => {
+                if (selFig && (e.key === 'Delete' || e.key === 'Backspace') && document.activeElement === body && window.getSelection().isCollapsed === false) return;
+            });
+            window.addEventListener('resize', () => selFig && placeCtrl());
+            window.addEventListener('scroll', () => selFig && placeCtrl(), { passive: true });
+
+            // Kawalan gambar dalam teks
+            $('figW').addEventListener('input', (e) => { if (!selFig) return; selFig.dataset.w = e.target.value; $('figWOut').textContent = e.target.value + '%'; applyFig(selFig); placeCtrl(); queuePreview(); });
+            $('figRatio').addEventListener('change', (e) => { if (!selFig) return; if (e.target.value) selFig.dataset.ratio = e.target.value; else delete selFig.dataset.ratio; applyFig(selFig); selectFig(selFig); queuePreview(); });
+            $('figPos').addEventListener('change', (e) => { if (!selFig) return; selFig.dataset.pos = e.target.value; applyFig(selFig); queuePreview(); });
+            document.querySelectorAll('#figCtrl [data-fig]').forEach(b => {
+                b.addEventListener('mousedown', e => e.preventDefault());
+                b.addEventListener('click', () => figAction(b.dataset.fig));
+            });
+
+            // Seret gambar dari panel kanan ke dalam teks (atau fail dari komputer)
+            $('newsImgs').addEventListener('dragstart', (e) => {
+                const card = e.target.closest('.news-img'); if (!card) return;
+                e.dataTransfer.setData(DRAG_TYPE, imageIds[+card.dataset.idx]);
+                e.dataTransfer.effectAllowed = 'copy';
+                card.classList.add('dragging');
+            });
+            $('newsImgs').addEventListener('dragend', (e) => { const c = e.target.closest('.news-img'); if (c) c.classList.remove('dragging'); $('newsDropLine').hidden = true; });
+            const isImgDrag = (e) => [...e.dataTransfer.types].some(t => t === DRAG_TYPE || t === 'Files');
+            body.addEventListener('dragover', (e) => { if (!isImgDrag(e)) return; e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; showDropLine(dropTarget(e)); });
+            body.addEventListener('dragleave', (e) => { if (!body.contains(e.relatedTarget)) $('newsDropLine').hidden = true; });
+            body.addEventListener('drop', async (e) => {
+                if (!isImgDrag(e)) return;
+                e.preventDefault();
+                $('newsDropLine').hidden = true;
+                const t = dropTarget(e);
+                const id = e.dataTransfer.getData(DRAG_TYPE);
+                if (id) { insertFigAt(makeFig(id), t.block, t.before); return; }
+                const files = [...(e.dataTransfer.files || [])];
+                if (files.length) {
+                    const ids = await addFiles(files);
+                    let anchor = t.block, before = t.before;
+                    ids.forEach(gid => { const f = makeFig(gid); insertFigAt(f, anchor, before); anchor = f; before = false; });
+                }
+            });
+
+            // Toolbar teks
             document.querySelectorAll('#newsToolbar [data-cmd]').forEach(b => {
                 b.addEventListener('mousedown', e => e.preventDefault());
                 b.addEventListener('click', () => {
@@ -1775,38 +2120,41 @@
                     exec(cmd);
                 });
             });
-            $('newsFont').onchange = (e) => { const v = e.target.value; e.target.value = ''; if (!v || !needSelection()) return; const ed = exec('fontName', v); convertFonts(ed, null, v); };
-            $('newsSize').onchange = (e) => { const v = +e.target.value; e.target.value = ''; if (!v || !needSelection()) return; const ed = exec('fontSize', '7'); convertFonts(ed, v, null); };
+            $('newsFont').onchange = (e) => { const v = e.target.value; e.target.value = ''; if (!v || !needSelection()) return; const ed = exec('fontName', v); convertFonts(ed, null, v); queuePreview(); };
+            $('newsSize').onchange = (e) => { const v = +e.target.value; e.target.value = ''; if (!v || !needSelection()) return; const ed = exec('fontSize', '7'); convertFonts(ed, v, null); queuePreview(); };
             $('newsLineH').onchange = applyLineHeight;
 
+            // Gambar
             $('btnNewsPickImg').onclick = () => $('newsImgFile').click();
-            $('newsImgFile').onchange = async (e) => {
-                const files = [...e.target.files];
-                e.target.value = '';
-                for (const f of files) {
-                    if (images.length >= MAX_IMGS) { toast(`Maksimum ${MAX_IMGS} gambar setiap berita.`, 'warning'); break; }
-                    try { images.push(await compress(f)); } catch (err) { toast('Gambar tidak dapat dibaca: ' + f.name, 'warning'); }
-                }
-                renderImgs();
-            };
+            $('newsImgFile').onchange = async (e) => { const files = [...e.target.files]; e.target.value = ''; await addFiles(files); };
             $('btnNewsAddUrl').onclick = () => {
                 const u = $('newsImgUrl').value.trim();
                 if (!/^https:\/\//i.test(u)) { toast('Masukkan URL gambar yang bermula dengan https://', 'warning'); return; }
                 if (images.length >= MAX_IMGS) { toast(`Maksimum ${MAX_IMGS} gambar setiap berita.`, 'warning'); return; }
-                images.push(u); $('newsImgUrl').value = ''; renderImgs();
+                images.push(u); imageIds.push(newImgId()); $('newsImgUrl').value = ''; renderImgs(); queuePreview();
             };
-            $('newsImgs').addEventListener('change', (e) => { if (e.target.name === 'newsHeader') { headerIndex = +e.target.value; renderImgs(); } });
+            $('newsImgs').addEventListener('change', (e) => { if (e.target.name === 'newsHeader') { headerIndex = +e.target.value; renderImgs(); queuePreview(); } });
             $('newsImgs').addEventListener('click', (e) => {
-                const b = e.target.closest('[data-rm]'); if (!b) return;
-                const i = +b.dataset.rm; images.splice(i, 1);
-                if (headerIndex === i) headerIndex = 0; else if (headerIndex > i) headerIndex--;
-                renderImgs();
+                const rm = e.target.closest('[data-rm]');
+                if (rm) { deleteImage(+rm.dataset.rm); return; }
+                const ins = e.target.closest('[data-ins]');
+                if (ins) {
+                    // Masukkan di kedudukan kursor terakhir dalam Keterangan (atau di hujung)
+                    const id = imageIds[+ins.dataset.ins];
+                    let block = null;
+                    if (savedRange && body.contains(savedRange.commonAncestorContainer)) block = topBlock(savedRange.endContainer);
+                    insertFigAt(makeFig(id), block, false);
+                    selFig && selFig.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                }
             });
-            ['newsHdrH', 'newsHdrW', 'newsHdrFit', 'newsHdrPos'].forEach(id => $(id).addEventListener('input', renderHeaderPreview));
+            ['newsHdrH', 'newsHdrW', 'newsHdrFit', 'newsHdrPos'].forEach(id => $(id).addEventListener('input', () => { renderHeaderPreview(); queuePreview(); }));
+            ['newsDate'].forEach(id => $(id).addEventListener('input', queuePreview));
 
+            // Butang borang
             $('btnNewsNew').onclick = () => { resetForm(); $('newsEditorCard').scrollIntoView({ behavior: 'smooth', block: 'start' }); $('newsTitleEd').focus(); };
             $('btnNewsCancel').onclick = resetForm;
             $('btnNewsSave').onclick = save;
+            $('btnNewsPreview').onclick = () => togglePreview();
             $('btnNewsView').onclick = () => { if (editingId) window.open('/news/' + encodeURIComponent(editingId), '_blank', 'noopener'); };
             $('newsAdminList').addEventListener('click', async (e) => {
                 const ed = e.target.closest('[data-edit]');

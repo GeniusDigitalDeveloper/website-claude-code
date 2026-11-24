@@ -1060,6 +1060,15 @@
             gap: 16px;
         }
 
+        .gallery-masonry { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--emerald-light) transparent; padding-right: 2px; }
+        .gallery-masonry.is-scroll { padding-right: 8px; }
+        .gallery-scroll-hint { text-align: center; font-size: 0.8rem; color: var(--gray-600); margin-top: 12px; }
+        .gallery-scroll-hint i { color: var(--gold-dark); margin-right: 6px; }
+        .gallery-empty { grid-column: 1 / -1; text-align: center; padding: 36px 16px; color: var(--gray-600); background: var(--white); border: 1px dashed var(--gray-300); border-radius: var(--radius-sm); }
+        .gallery-empty i { display: block; font-size: 1.8rem; color: var(--gold); margin-bottom: 8px; }
+        .gallery-masonry::-webkit-scrollbar { width: 6px; }
+        .gallery-masonry::-webkit-scrollbar-thumb { background: var(--emerald-light); border-radius: 6px; }
+
         .gallery-item {
             border-radius: var(--radius-xs);
             overflow: hidden;
@@ -1636,6 +1645,18 @@
             padding: 9px 18px; border-radius: 30px;
         }
 
+
+        /* Gambar di dalam teks berita */
+        .news-body .news-fig { display: block; }
+        .news-body .news-fig img { width: 100%; display: block; border-radius: var(--radius-xs); box-shadow: var(--shadow-sm); }
+        /* Mod pratonton (dibuka dari Panel Admin) */
+        body.news-preview-mode > *:not(#newsPreviewRoot):not(#newsLightbox):not(script) { display: none !important; }
+        body.news-preview-mode { background: var(--gray-100); padding: 16px; }
+        #newsPreviewRoot { max-width: 1080px; margin: 0 auto; }
+        .news-preview-flag { background: var(--gold); color: #1f2d27; font-weight: 700; font-size: 0.78rem; letter-spacing: 0.04em; padding: 8px 14px; border-radius: 10px 10px 0 0; }
+        .news-preview-card { background: var(--white); border-radius: 0 0 var(--radius) var(--radius); box-shadow: var(--shadow-md); overflow: hidden; }
+        .news-preview-empty { text-align: center; padding: 40px 16px; color: var(--gray-600); }
+
         /* Paparan baca berita (dalam modal) */
         .modal-box.modal-news { max-width: 1080px; width: 96%; padding: 0; }
         .modal-box.modal-news .close { z-index: 5; }
@@ -1938,11 +1959,11 @@
                 <p class="section-subtitle" data-i18n="subtitle_galeri">Momen-momen terbaik program dan kegiatan NADWAH sepanjang tahun.</p>
             </div>
             <div class="gallery-categories" id="galleryCats" data-aos="fade-up" data-aos-delay="50">
-                <button class="active" data-cat="all" data-i18n="cat_all">Semua</button>
-                <button data-cat="pendidikan" data-i18n="cat_pendidikan">Pendidikan</button>
+                <button class="active" data-cat="pendidikan" data-i18n="cat_pendidikan">Pendidikan</button>
                 <button data-cat="dakwah" data-i18n="cat_dakwah">Dakwah</button>
                 <button data-cat="komuniti" data-i18n="cat_komuniti">Komuniti</button>
                 <button data-cat="sukan" data-i18n="cat_sukan">Sukan</button>
+                <button data-cat="all" data-i18n="cat_all">Semua</button>
             </div>
             <div class="gallery-masonry" id="galleryMasonry" data-aos="fade-up" data-aos-delay="100"></div>
         </div>
@@ -2043,6 +2064,13 @@
                             </div>
                         </div>
                         <div class="visitor-card">
+                            <i class="fas fa-calendar-days"></i>
+                            <div class="v-info">
+                                <span class="v-label">Bulan Ini</span>
+                                <span class="v-count" id="visitorMonth">0</span>
+                            </div>
+                        </div>
+                        <div class="visitor-card">
                             <i class="fas fa-users"></i>
                             <div class="v-info">
                                 <span class="v-label" data-i18n="visitor_total">Keseluruhan</span>
@@ -2070,7 +2098,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        import { getDatabase, ref, push, onValue, runTransaction, query, orderByKey, startAt, endAt } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAwh-SZr1lyC1iuxxMFACiCuQtIFo7LdvE",
@@ -2441,7 +2469,7 @@
                 }
 
                 renderPrograms();
-                renderGallery('all');
+                renderGallery((document.querySelector('.gallery-categories button.active') || {}).dataset?.cat || 'pendidikan');
                 renderComments();
                 renderCommittee();
                 renderAboutTimeline();
@@ -2480,11 +2508,17 @@
                 });
             }
 
-            function renderGallery(filter = 'all') {
+            function renderGallery(filter = 'pendidikan') {
                 const masonry = document.getElementById('galleryMasonry');
                 if (!masonry) return;
                 const itemsList = state.gallery || defaultData.gallery;
                 const items = filter === 'all' ? itemsList : itemsList.filter(g => g.cat === filter);
+                if (!items.length) {
+                    masonry.innerHTML = `<div class="gallery-empty"><i class="fas fa-images"></i>${currentLang === 'en' ? 'No photos in this category yet.' : 'Belum ada gambar untuk kategori ini.'}</div>`;
+                    masonry.style.maxHeight = ''; masonry.classList.remove('is-scroll');
+                    const hn = document.getElementById('galleryScrollHint'); if (hn) hn.hidden = true;
+                    return;
+                }
                 masonry.innerHTML = items.map(g => `
                     <div class="gallery-item">
                         <img src="${g.img}" alt="${g.alt}" loading="lazy" />
@@ -2492,6 +2526,8 @@
                     </div>
                 `).join('');
 
+                fitGalleryRows();
+                masonry.querySelectorAll('.gallery-item img').forEach(im => im.addEventListener('load', fitGalleryRows, { once: true }));
                 masonry.querySelectorAll('.gallery-item').forEach(item => {
                     item.addEventListener('click', function() {
                         const img = this.querySelector('img');
@@ -2505,6 +2541,28 @@
                     });
                 });
             }
+
+            // Galeri: papar 3 baris sahaja, selebihnya skrol di dalam kotak galeri
+            function fitGalleryRows() {
+                const masonry = document.getElementById('galleryMasonry');
+                if (!masonry) return;
+                const first = masonry.querySelector('.gallery-item');
+                if (!first) { masonry.style.maxHeight = ''; masonry.classList.remove('is-scroll'); return; }
+                const gap = parseFloat(getComputedStyle(masonry).rowGap) || 16;
+                const h = first.getBoundingClientRect().height;
+                const max = Math.ceil(h * 3 + gap * 2) + 2;
+                masonry.style.maxHeight = max + 'px';
+                const scroll = masonry.scrollHeight > max + 4;
+                masonry.classList.toggle('is-scroll', scroll);
+                let hint = document.getElementById('galleryScrollHint');
+                if (!hint) {
+                    hint = document.createElement('p'); hint.id = 'galleryScrollHint'; hint.className = 'gallery-scroll-hint';
+                    masonry.insertAdjacentElement('afterend', hint);
+                }
+                hint.innerHTML = `<i class="fas fa-angles-down"></i> ${currentLang === 'en' ? 'Scroll inside the gallery to see more photos' : 'Skrol di dalam galeri untuk lihat lebih banyak gambar'}`;
+                hint.hidden = !scroll;
+            }
+            window.addEventListener('resize', fitGalleryRows);
 
             function renderComments() {
                 const container = document.getElementById('commentsDisplayList');
@@ -2667,7 +2725,9 @@
                 });
             }
 
-            const todayStr = new Date().toISOString().split('T')[0];
+            // Tarikh ikut waktu Malaysia (reset tepat 12 tengah malam MYT)
+            const todayStr = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kuala_Lumpur', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
+            const monthStr = todayStr.slice(0, 7);
             if (!sessionStorage.getItem('counted_visit')) {
                 sessionStorage.setItem('counted_visit', 'true');
                 runTransaction(ref(db, 'visitors/total'), (curr) => (curr || 0) + 1);
@@ -2682,6 +2742,14 @@
             onValue(ref(db, `visitors/daily/${todayStr}`), (snap) => {
                 const today = snap.val() || 0;
                 document.getElementById('visitorToday').textContent = today.toLocaleString();
+            });
+
+            // Bulan Ini = jumlah semua hari dalam bulan semasa (auto reset setiap bulan baru)
+            onValue(query(ref(db, 'visitors/daily'), orderByKey(), startAt(`${monthStr}-01`), endAt(`${monthStr}-31`)), (snap) => {
+                let sum = 0;
+                snap.forEach(ch => { sum += +ch.val() || 0; });
+                const el = document.getElementById('visitorMonth');
+                if (el) el.textContent = sum.toLocaleString();
             });
 
             window.openAjkModal = function(type) {
@@ -3002,7 +3070,8 @@
         let selMonth = now.getMonth() + 1; // 1-12, 0 = semua
 
         // ---- Sanitizer: hanya format teks yang dibenarkan ----
-        const ALLOWED_TAGS = new Set(['B', 'STRONG', 'I', 'EM', 'U', 'S', 'BR', 'P', 'DIV', 'SPAN', 'FONT', 'UL', 'OL', 'LI', 'BLOCKQUOTE', 'H3', 'H4']);
+        const ALLOWED_TAGS = new Set(['B', 'STRONG', 'I', 'EM', 'U', 'S', 'BR', 'P', 'DIV', 'SPAN', 'FONT', 'UL', 'OL', 'LI', 'BLOCKQUOTE', 'H3', 'H4', 'FIGURE']);
+        const FIG_ATTRS = ['data-ref', 'data-w', 'data-ratio', 'data-pos', 'data-align'];
         const ALLOWED_CSS = ['text-align', 'font-size', 'font-family', 'font-weight', 'font-style', 'text-decoration', 'line-height', 'color'];
         function sanitize(html) {
             const doc = new DOMParser().parseFromString(`<div>${html || ''}</div>`, 'text/html');
@@ -3013,6 +3082,14 @@
                         if (ch.nodeType === 1 && !['SCRIPT', 'STYLE', 'IFRAME', 'OBJECT', 'EMBED'].includes(ch.tagName)) {
                             walk(ch); ch.replaceWith(...ch.childNodes);
                         } else ch.remove();
+                        return;
+                    }
+                    if (ch.tagName === 'FIGURE') {
+                        // Gambar dalam teks: simpan rujukan & tetapan sahaja, gambar sebenar dari senarai images
+                        const keep = FIG_ATTRS.map(a => [a, (ch.getAttribute(a) || '').replace(/[^\w\/.-]/g, '')]);
+                        [...ch.attributes].forEach(a => ch.removeAttribute(a.name));
+                        keep.forEach(([a, v]) => { if (v) ch.setAttribute(a, v); });
+                        ch.replaceChildren();
                         return;
                     }
                     const style = ch.getAttribute('style') || '';
@@ -3035,6 +3112,31 @@
         const plain = (html) => { const d = document.createElement('div'); d.innerHTML = sanitize(html); return (d.textContent || '').replace(/\s+/g, ' ').trim(); };
         const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         const safeImg = (src) => (typeof src === 'string' && /^(data:image\/(png|jpe?g|webp|gif);base64,|https:\/\/|\/)/i.test(src)) ? src : '';
+
+        // ---- Gambar di dalam teks berita ----
+        const FIG_RATIOS = { '16/9': '16 / 9', '4/3': '4 / 3', '1/1': '1 / 1', '3/4': '3 / 4' };
+        function figHtml(fig, src) {
+            const w = Math.min(Math.max(+fig.dataset.w || 60, 15), 100);
+            const al = ['left', 'right'].includes(fig.dataset.align) ? fig.dataset.align : 'center';
+            const m = al === 'left' ? '0.7em auto 0.7em 0' : al === 'right' ? '0.7em 0 0.7em auto' : '0.7em auto';
+            const ratio = FIG_RATIOS[fig.dataset.ratio];
+            const pos = ['top', 'bottom'].includes(fig.dataset.pos) ? fig.dataset.pos : 'center';
+            const imgStyle = ratio ? `aspect-ratio:${ratio};object-fit:cover;object-position:center ${pos};` : '';
+            return `<figure class="news-fig" style="width:${w}%;margin:${m};"><img src="${src}" alt="" style="${imgStyle}"></figure>`;
+        }
+        function bodyHtml(n) {
+            const ids = Array.isArray(n.imageIds) ? n.imageIds : [];
+            const imgs = Array.isArray(n.images) ? n.images : [];
+            const d = document.createElement('div');
+            d.innerHTML = sanitize(n.body);
+            d.querySelectorAll('figure').forEach(f => {
+                const i = ids.indexOf(f.dataset.ref);
+                const src = i >= 0 ? safeImg(imgs[i]) : '';
+                if (!src) { f.remove(); return; }
+                f.outerHTML = figHtml(f, src);
+            });
+            return d.innerHTML;
+        }
 
         function parseDate(d) {
             const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(d || '');
@@ -3134,7 +3236,7 @@
                     ${head ? `<div class="news-header-img" style="${hs.box}"><img src="${head}" alt="" style="${hs.img}" /></div>` : ''}
                     <div class="news-meta"><span class="tag">${t.news}</span><span><i class="far fa-calendar"></i> ${fmtDate(n.date)}</span></div>
                     <div class="news-title" style="line-height:${lh};">${sanitize(n.title)}</div>
-                    <div class="news-body" style="line-height:${lh};">${sanitize(n.body)}</div>
+                    <div class="news-body" style="line-height:${lh};">${bodyHtml(n)}</div>
                 </div>
                 <aside class="news-side">
                     <div class="news-side-brand"><img src="${LOGO}" alt="Logo NADWAH" /><div><b>BADAN NADWAH</b><span>ISLAMIAH PAHANG</span></div></div>
@@ -3153,7 +3255,28 @@
             </div>`;
         }
 
+        // ---- Pratonton dari Panel Admin: /news/__preview (data draf dari localStorage) ----
+        const PREVIEW_KEY = 'nadwahNewsPreview';
+        function readPreview() { try { return JSON.parse(localStorage.getItem(PREVIEW_KEY) || 'null'); } catch (e) { return null; } }
+        function renderPreview() {
+            document.body.classList.add('news-preview-mode');
+            let root = document.getElementById('newsPreviewRoot');
+            if (!root) { root = document.createElement('div'); root.id = 'newsPreviewRoot'; document.body.appendChild(root); }
+            const n = readPreview();
+            if (!n) { root.innerHTML = '<p class="news-preview-empty">Tiada draf untuk dipratonton. Tulis berita di Panel Admin dahulu.</p>'; return; }
+            root.innerHTML = `<div class="news-preview-flag"><i class="fas fa-eye"></i> PRATONTON: paparan berita sebelum disimpan</div><div class="news-preview-card">${articleHtml(n)}</div>`;
+            const back = document.getElementById('newsBackBtn'); if (back) back.remove();
+            const pb = document.getElementById('newsPrintBtn'); if (pb) pb.onclick = () => printNews(n);
+            const imgs = (Array.isArray(n.images) ? n.images : []).map(safeImg).filter(Boolean);
+            root.querySelectorAll('.news-thumbs [data-zoom]').forEach(b => b.onclick = () => {
+                const lb = document.getElementById('newsLightbox');
+                lb.querySelector('img').src = imgs[+b.dataset.zoom]; lb.classList.add('open');
+            });
+        }
+        window.addEventListener('storage', (e) => { if (e.key === PREVIEW_KEY && document.body.classList.contains('news-preview-mode')) renderPreview(); });
+
         function openArticle(id, fromRoute) {
+            if (id === '__preview') { renderPreview(); return; }
             if (!loaded) { pendingOpen = id; return; }
             const n = newsArr.find(x => x.id === id);
             if (!n) { if (fromRoute && window.openModal) window.openModal(`<p style="text-align:center;padding:30px;">${T[lang].notfound}</p>`); return; }
@@ -3211,11 +3334,12 @@
                     .body { font-size: 11pt; text-align: justify; }
                     .body p, .body div { margin: 0 0 0.55em; }
                     .title, .body { overflow-wrap: anywhere; }
+                    .news-fig img { width: 100%; display: block; border-radius: 6px; }
                 </style></head><body><div id="page">
                 ${head ? `<div class="hdr" style="${hs.box}"><img src="${head}" alt="" style="${hs.img}"></div>` : ''}
                 <div class="date">${fmtDate(n.date)}</div>
                 <div class="title" style="line-height:${lh};">${sanitize(n.title)}</div>
-                <div class="body" style="line-height:${lh};">${sanitize(n.body)}</div>
+                <div class="body" style="line-height:${lh};">${bodyHtml(n)}</div>
                 </div></body></html>`);
             d.close();
             const go = () => {

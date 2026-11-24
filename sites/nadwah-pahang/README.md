@@ -44,9 +44,19 @@ Pautan lama (`/#korporat`, `/korporat`, `/admin/korporat`, ...) auto ditukar ke 
 ## Berita
 
 - Data dalam Realtime Database nod `news/{id}`: `title` & `body` (HTML berformat), `date` (YYYY-MM-DD),
-  `published`, `images` (data URL dimampatkan atau URL https), `headerIndex`, `headerHeight`, `headerWidth`,
+  `published`, `images` (data URL dimampatkan atau URL https) + `imageIds` (rujukan tetap), `headerIndex`, `headerHeight`, `headerWidth`,
   `headerFit`, `headerPos`, `lineHeight` (default 1.15), `createdAt`, `updatedAt`.
 - Portal: penapis Tahun + Bulan (default bulan semasa), susunan terkini di atas, butang anak panah buka berita,
   butang **Cetak Berita** (berita sahaja, satu muka A4, auto kecil jika panjang).
 - Admin: tab **Berita** (`/admin/news`) untuk tulis/edit/padam, muat naik gambar, pilih header & saiz,
   toolbar font/saiz/bold/italic/underline/jajaran (default justify), jarak baris.
+- Gambar dalam teks: `<figure data-ref data-w data-ratio data-pos data-align>` dalam `body` (tiada data gambar,
+  dirujuk melalui `imageIds`). Admin seret gambar dari panel **Gambar Dipilih** ke dalam teks; klik gambar untuk
+  saiz, crop, fokus, kiri/tengah/kanan, alih atas/bawah, buang. Butang × pada panel memadam gambar terus dari database.
+- Pratonton langsung: admin tulis draf ke `localStorage` (`nadwahNewsPreview`), dipaparkan di `/news/__preview`.
+
+## Galeri & Pelawat
+
+- Galeri: default kategori Pendidikan, "Semua" di hujung; papar 3 baris, selebihnya skrol dalam kotak galeri.
+- Pelawat: Hari Ini (`visitors/daily/<YYYY-MM-DD>` waktu Malaysia), Bulan Ini (jumlah hari dalam bulan semasa),
+  Keseluruhan (`visitors/total`).
