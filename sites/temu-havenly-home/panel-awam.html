@@ -1,0 +1,2849 @@
+<!DOCTYPE html>
+<html lang="ms" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <title>TEMU HAVENLY HOME | HOMESTAY KG CEMPAKA KUANTAN</title>
+  <meta name="description" content="Nikmati penginapan selesa di Kuantan dengan pengalaman tempahan moden, kalendar dinamik dan perkhidmatan terbaik.">
+
+  <!-- Open Graph / WhatsApp / Facebook Sharing Preview (Format JPEG Rasmi) -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="TEMU HAVENLY HOME | HOMESTAY KG CEMPAKA KUANTAN">
+  <meta property="og:description" content="Nikmati penginapan selesa di Kuantan dengan pengalaman tempahan moden, kalendar dinamik dan perkhidmatan terbaik.">
+  <meta id="ogImageTag" property="og:image" content="https://arleta.site/interactivelink/5719/750936997.jpg">
+  <meta id="ogImageSecureTag" property="og:image:secure_url" content="https://arleta.site/interactivelink/5719/750936997.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Twitter / X Card Preview -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="TEMU HAVENLY HOME | HOMESTAY KG CEMPAKA KUANTAN">
+  <meta name="twitter:description" content="Nikmati penginapan selesa di Kuantan dengan pengalaman tempahan moden, kalendar dinamik dan perkhidmatan terbaik.">
+  <meta id="twitterImageTag" name="twitter:image" content="https://arleta.site/interactivelink/5719/750936997.jpg">
+
+  <!-- Generic Link Preview Thumbnail & Dynamic Favicon -->
+  <link id="linkSrcTag" rel="image_src" href="https://arleta.site/interactivelink/5719/750936997.jpg">
+  <link id="dynamicFavicon" rel="shortcut icon" type="image/jpeg" href="https://arleta.site/interactivelink/5719/750936997.jpg">
+
+  <!-- Google Fonts Termasuk Poppins Bold -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          screens: {
+            'xs': '420px',
+            'ipad': '768px',
+            'laptop': '1024px',
+            'desktop': '1280px'
+          },
+          colors: {
+            brand: {
+              charcoal: '#0b0f19',
+              slate: '#1e293b',
+              emerald: '#064e3b',
+              emeraldLight: '#059669',
+              emeraldBright: '#047857',
+              teal: '#0d9488',
+              tealDark: '#0f766e',
+              gold: '#c59b27',
+              softGray: '#f8fafc',
+              border: '#e2e8f0'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Playfair Display', 'serif'],
+            display: ['Cinzel', 'serif'],
+            poppins: ['Poppins', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Lucide Icons Library -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Firebase App & Realtime Database SDK (Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+  <style>
+    html, body {
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    .parallax-layer-2d {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      will-change: transform;
+      transition: transform 0.05s linear;
+    }
+
+    .luxury-glass {
+      background: rgba(11, 15, 25, 0.90);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .font-times {
+      font-family: 'Times New Roman', Times, serif;
+    }
+
+    .font-poppins-bold {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+    }
+
+    .nav-menu-btn {
+      position: relative;
+      transition: color 0.25s ease, transform 0.2s ease;
+      white-space: nowrap;
+    }
+    .nav-menu-btn::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: #059669;
+      transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      border-radius: 9999px;
+    }
+    .nav-menu-btn:hover::after, .nav-menu-btn.active-nav::after {
+      width: 100%;
+    }
+    .touch-scroll {
+      -webkit-overflow-scrolling: touch;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #e2e8f0;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #10b981;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #059669;
+    }
+  </style>
+</head>
+
+<body class="bg-brand-softGray text-slate-800 font-sans antialiased selection:bg-emerald-600 selection:text-white">
+
+  <!-- Navigasi Bar Menu (Panjang & 1 Baris Teks) -->
+  <nav id="customerNav" class="fixed top-2 sm:top-4 w-full z-40 transition-all duration-300 px-2 sm:px-4 md:px-8 py-2 pointer-events-none">
+    <div class="max-w-[96rem] mx-auto flex items-center justify-between px-3.5 sm:px-6 py-2.5 sm:py-3.5 rounded-xl sm:rounded-2xl pointer-events-auto transition-all duration-300 luxury-glass text-white shadow-2xl" id="navContainer">
+
+      <!-- Logo Branding (JPEG Sahaja) -->
+      <a href="#hero" onclick="handleLogoClick(event)" class="flex items-center gap-2.5 sm:gap-3.5 group shrink-0 select-none">
+        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden bg-slate-900 flex items-center justify-center shadow-lg border-2 border-teal-400/50 group-hover:scale-105 transition transform shrink-0">
+          <img id="publicHeaderLogoImg" src="https://arleta.site/interactivelink/5719/750936997.jpg" alt="TEMU HAVENLY HOME Logo" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://arleta.site/interactivelink/5719/750936997.jpg';">
+        </div>
+        <div class="flex flex-col">
+          <span id="publicBrandTitle" class="font-display font-bold tracking-wider sm:tracking-widest text-base sm:text-lg md:text-xl text-white hover:text-teal-300 transition leading-tight">
+            TEMU HAVENLY HOME
+          </span>
+          <span id="publicBrandSubtitle" class="text-[9px] sm:text-[10px] tracking-[0.18em] sm:tracking-[0.25em] text-teal-400 uppercase font-semibold">
+            HOMESTAY KG CEMPAKA KUANTAN
+          </span>
+        </div>
+      </a>
+
+      <!-- Desktop Links Satu Baris Penuh Tanpa Delay -->
+      <div class="hidden xl:flex items-center space-x-3 2xl:space-x-5 text-xs xl:text-[12.5px] 2xl:text-[13px] font-semibold text-slate-200 flex-nowrap whitespace-nowrap">
+        <a href="#hero" onclick="navigateToSection(event, '#hero')" class="nav-menu-btn hover:text-teal-300 transition py-1">Utama</a>
+        <a href="#properties" onclick="navigateToSection(event, '#properties')" class="nav-menu-btn hover:text-teal-300 transition py-1">Bilik Penginapan</a>
+        <a href="#bookingSection" onclick="navigateToSection(event, '#bookingSection')" class="nav-menu-btn hover:text-teal-300 transition py-1">Kalendar & Tempahan</a>
+        <a href="#gallerySection" onclick="navigateToSection(event, '#gallerySection')" class="nav-menu-btn hover:text-teal-300 transition py-1">Koleksi Gambar</a>
+        <a href="#faqSection" onclick="navigateToSection(event, '#faqSection')" class="nav-menu-btn hover:text-teal-300 transition py-1">Soalan Lazim</a>
+        <a href="#feedbackSection" onclick="navigateToSection(event, '#feedbackSection')" class="nav-menu-btn hover:text-teal-300 transition py-1">Maklum Balas</a>
+        <a href="#contactSection" onclick="navigateToSection(event, '#contactSection')" class="nav-menu-btn hover:text-teal-300 transition py-1">Hubungi</a>
+      </div>
+
+      <!-- Action Button & Mobile Drawer Trigger -->
+      <div class="flex items-center space-x-2 sm:space-x-3 shrink-0">
+        <a href="#bookingSection" onclick="navigateToSection(event, '#bookingSection')" class="hidden sm:inline-flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-medium text-xs px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl shadow-lg shadow-teal-950/40 hover:shadow-teal-900/60 transition hover:scale-105 active:scale-95 whitespace-nowrap">
+          <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+          <span>Tempah Sekarang</span>
+        </a>
+        <button onclick="toggleMobileMenu()" class="xl:hidden text-white p-2 rounded-lg hover:bg-white/10 active:bg-white/20 transition" aria-label="Buka menu navigasi">
+          <i data-lucide="menu" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Drawer Navigation -->
+    <div id="mobileMenu" class="hidden xl:hidden mt-2 p-4 sm:p-5 rounded-xl sm:rounded-2xl luxury-glass pointer-events-auto border border-slate-700/60 text-white flex-col space-y-2 max-w-[96rem] mx-auto shadow-2xl text-xs sm:text-sm">
+      <a href="#hero" onclick="navigateToSection(event, '#hero'); toggleMobileMenu()" class="py-2.5 px-3 rounded-lg hover:bg-white/5 hover:text-teal-300 border-b border-slate-800 flex items-center justify-between">
+        <span>Utama</span>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i>
+      </a>
+      <a href="#properties" onclick="navigateToSection(event, '#properties'); toggleMobileMenu()" class="py-2.5 px-3 rounded-lg hover:bg-white/5 hover:text-teal-300 border-b border-slate-800 flex items-center justify-between">
+        <span>Bilik Penginapan</span>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i>
+      </a>
+      <a href="#bookingSection" onclick="navigateToSection(event, '#bookingSection'); toggleMobileMenu()" class="py-2.5 px-3 rounded-lg hover:bg-white/5 hover:text-teal-300 border-b border-slate-800 flex items-center justify-between">
+        <span>Kalendar & Tempahan</span>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i>
+      </a>
+      <a href="#gallerySection" onclick="navigateToSection(event, '#gallerySection'); toggleMobileMenu()" class="py-2.5 px-3 rounded-lg hover:bg-white/5 hover:text-teal-300 border-b border-slate-800 flex items-center justify-between">
+        <span>Koleksi Gambar</span>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i>
+      </a>
+      <a href="#faqSection" onclick="navigateToSection(event, '#faqSection'); toggleMobileMenu()" class="py-2.5 px-3 rounded-lg hover:bg-white/5 hover:text-teal-300 border-b border-slate-800 flex items-center justify-between">
+        <span>Soalan Lazim</span>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i>
+      </a>
+      <a href="#feedbackSection" onclick="navigateToSection(event, '#feedbackSection'); toggleMobileMenu()" class="py-2.5 px-3 rounded-lg hover:bg-white/5 hover:text-teal-300 border-b border-slate-800 flex items-center justify-between">
+        <span>Maklum Balas</span>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i>
+      </a>
+      <a href="#contactSection" onclick="navigateToSection(event, '#contactSection'); toggleMobileMenu()" class="py-2.5 px-3 rounded-lg hover:bg-white/5 hover:text-teal-300 border-b border-slate-800 flex items-center justify-between">
+        <span>Hubungi</span>
+        <i data-lucide="chevron-right" class="w-4 h-4 text-slate-500"></i>
+      </a>
+    </div>
+  </nav>
+
+  <div id="viewCustomer" class="block w-full overflow-hidden">
+
+    <!-- HERO SECTION -->
+    <section id="hero" class="relative min-h-[680px] sm:min-h-[750px] lg:min-h-[820px] h-[100svh] w-full overflow-hidden flex items-center justify-center">
+      <div id="heroLayerSky" class="parallax-layer-2d scale-105" style="background-image: linear-gradient(to bottom, rgba(11, 15, 25, 0.45), rgba(11, 15, 25, 0.8)), url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=80');"></div>
+      <div id="heroLayerBuilding" class="parallax-layer-2d scale-100 opacity-90" style="background-image: linear-gradient(to top, rgba(11, 15, 25, 0.9) 15%, transparent 60%), url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80');"></div>
+      <div id="heroLayerForeground" class="parallax-layer-2d pointer-events-none" style="background: radial-gradient(circle at 50% 90%, rgba(13, 148, 136, 0.15), transparent 70%);"></div>
+
+      <div id="heroContent" class="relative z-10 text-center text-white px-3 sm:px-6 max-w-5xl mx-auto flex flex-col items-center pt-20 sm:pt-24 pb-24 sm:pb-32 transition-transform duration-75">
+        <h1 class="text-center tracking-tight text-white mb-3 sm:mb-4 drop-shadow-md w-full">
+          <span id="heroWelcomeText" class="block font-sans font-bold text-2xl xs:text-3xl sm:text-5xl md:text-6xl text-white mb-1.5 sm:mb-2">
+            SELAMAT DATANG
+          </span>
+          <span id="heroSubtitleText" class="block font-sans font-normal text-base xs:text-lg sm:text-2xl md:text-3xl lg:text-4xl text-white mb-2 sm:mb-3">
+            Percutian Impian di
+          </span>
+          <span id="heroBrandNameText" class="block font-times font-bold italic text-emerald-400 text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl py-1 drop-shadow-lg tracking-normal sm:tracking-wide w-full leading-tight whitespace-normal break-words text-center">
+            TEMU HAVENLY HOME
+          </span>
+        </h1>
+
+        <p id="heroDescriptionText" class="text-xs xs:text-sm sm:text-base text-slate-300 max-w-2xl font-light mb-6 sm:mb-8 leading-relaxed px-2">
+          Nikmati keselesaan homestay di Cempaka, Kuantan yang serba lengkap .
+        </p>
+
+        <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 mb-6 sm:mb-8 w-full px-2">
+          <a href="#bookingSection" onclick="navigateToSection(event, '#bookingSection')" class="w-full xs:w-auto px-6 sm:px-8 py-3 sm:py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl font-medium text-xs sm:text-sm shadow-xl shadow-teal-950/50 hover:scale-105 active:scale-95 transition transform text-center">
+            Tempah Sekarang
+          </a>
+          <a href="#story" onclick="navigateToSection(event, '#story')" class="w-full xs:w-auto px-6 sm:px-8 py-3 sm:py-3.5 bg-white/10 hover:bg-white/20 text-white rounded-xl font-medium text-xs sm:text-sm backdrop-blur-md border border-white/20 hover:scale-105 active:scale-95 transition transform flex items-center justify-center gap-2">
+            <span>Terokai Homestay</span>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION CINEMATIC SLIDES -->
+    <section id="story" class="py-14 sm:py-20 bg-brand-charcoal text-white relative overflow-hidden">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="text-center max-w-3xl mx-auto mb-6 sm:mb-10">
+          <p id="cinemaSectionSub" class="text-teal-400 uppercase tracking-widest text-[11px] sm:text-xs font-semibold mb-1.5">TEMU HAVENLY HOME</p>
+          <h2 id="cinemaSectionTitle" class="font-serif text-2xl sm:text-4xl md:text-5xl font-bold text-white mb-2 sm:mb-3 leading-tight px-2">
+            Cipta Kenangan Anda Bersama Ahli Keluarga Bersama Kami
+          </h2>
+        </div>
+
+        <div class="relative w-full h-[260px] xs:h-[320px] sm:h-[440px] md:h-[540px] lg:h-[600px] rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-800 shadow-2xl bg-slate-950" id="cinemaBannerContainer">
+          <div id="cinemaSlide1" class="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out transform scale-100 opacity-100 will-change-transform will-change-opacity">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-slate-950/30"></div>
+          </div>
+          <div id="cinemaSlide2" class="absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out transform scale-100 opacity-0 will-change-transform will-change-opacity">
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-slate-950/30"></div>
+          </div>
+          <div class="absolute bottom-4 sm:bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-10 w-full max-w-2xl px-4 pointer-events-none text-center">
+            <span id="cinemaSlideCaption" class="inline-block px-4 sm:px-6 py-2 sm:py-3 rounded-xl sm:rounded-2xl bg-slate-950/80 border border-white/15 backdrop-blur-md text-xs sm:text-sm md:text-base font-medium tracking-wide text-white shadow-2xl transition-all duration-300">
+              Suasana Mewah & Damai Tropika • TEMU HAVENLY HOME
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION PETA LOKASI (4:3 5.5in x 4.125in) -->
+    <section id="location" class="py-14 sm:py-20 bg-white border-b border-slate-200">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="flex flex-col items-center justify-center text-center">
+          <span class="text-brand-teal uppercase tracking-widest text-[11px] sm:text-xs font-semibold">Peta Panduan Rasmi</span>
+          <h2 class="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mt-1 mb-2 uppercase">LOKASI TEMU HAVENLY HOME</h2>
+          <p id="locationDescText" class="text-slate-600 text-xs sm:text-sm max-w-2xl leading-relaxed mb-6">
+            TEMU HAVENLY HOME terletak di Lot 5795, Lorong Cempaka, Pantai Kg Sri Cempaka, 26060 Kuantan, Pahang.
+          </p>
+
+          <div class="rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border-2 border-emerald-500/30 relative bg-slate-100 mx-auto" style="width: 5.5in; height: 4.125in; max-width: 100%; aspect-ratio: 4/3;">
+            <iframe 
+              title="Peta Lokasi Homestay Kuantan - TEMU HAVENLY HOME"
+              class="w-full h-full border-0" 
+              src="https://maps.google.com/maps?q=Lot%205795,%20Lorong%20Cempaka,%20Kampung%20Sri%20Cempaka,%2026060%20Kuantan,%20Pahang&t=&z=15&ie=UTF8&iwloc=&output=embed"
+              allowfullscreen="" 
+              loading="lazy" 
+              referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+            <a href="https://maps.app.goo.gl/VvuEmTkJsxTkPEpQ6" target="_blank" rel="noopener noreferrer" class="absolute bottom-3 right-3 bg-slate-900/90 hover:bg-slate-900 text-white text-[10px] sm:text-[11px] font-medium px-2.5 sm:px-3 py-1.5 rounded-lg shadow-lg backdrop-blur-md flex items-center gap-1.5 transition border border-slate-700">
+              <i data-lucide="external-link" class="w-3.5 h-3.5 text-teal-400"></i>
+              <span>Buka Aplikasi Maps</span>
+            </a>
+          </div>
+
+          <div class="mt-6">
+            <a href="https://maps.app.goo.gl/VvuEmTkJsxTkPEpQ6" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-semibold text-xs shadow-md transition transform hover:scale-105 active:scale-95">
+              <i data-lucide="map-pin" class="w-4 h-4"></i>
+              <span>Buka Lokasi Di Google Maps</span>
+              <i data-lucide="external-link" class="w-3.5 h-3.5 ml-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION BILIK DI TEMU HAVENLY HOME -->
+    <section id="properties" class="py-16 sm:py-24 bg-brand-softGray">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
+          <p class="text-brand-teal uppercase tracking-widest text-[11px] sm:text-xs font-semibold mb-1.5">Pilihan Penginapan Eksklusif</p>
+          <h2 class="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 tracking-wide uppercase">BILIK DI TEMU HAVENLY HOME</h2>
+          <p class="text-slate-600 text-xs sm:text-sm mt-2 leading-relaxed">
+            Terokai unit bilik kami: unit CAMELIA dan unit studio DAHLIA. Pilihan bilik dibuat di sebelah kalendar di bawah.
+          </p>
+        </div>
+
+        <!-- Bahagian 1: CAMELIA 1, 2, 3, 4 -->
+        <div class="mb-12">
+          <div class="mb-6 p-5 sm:p-7 bg-white border-2 border-emerald-300 rounded-2xl sm:rounded-3xl shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-emerald-100 pb-3.5 mb-4">
+              <div class="flex items-center gap-2.5">
+                <span class="w-3.5 h-3.5 rounded-full bg-emerald-500 ring-4 ring-emerald-200"></span>
+                <h3 class="font-serif text-xl sm:text-2xl font-bold text-slate-900 tracking-wide uppercase">CAMELIA 1, 2, 3, 4</h3>
+              </div>
+              <div class="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-3.5 py-1.5 rounded-full self-start sm:self-auto shadow-xs">
+                <span class="text-xs font-bold text-emerald-950 font-poppins-bold">Kadar Sewa:</span>
+                <span id="displayCameliaWkndTop" class="text-xs font-poppins-bold text-emerald-800">RM350 (Hari Minggu)</span>
+                <span class="text-emerald-400 font-bold">/</span>
+                <span id="displayCameliaBaseTop" class="text-xs font-poppins-bold text-slate-700">RM300 (Hari Biasa)</span>
+              </div>
+            </div>
+
+            <div class="space-y-3 text-xs sm:text-sm text-slate-700 leading-relaxed">
+              <div class="pt-1">
+                <span class="text-xs font-bold text-emerald-950 uppercase tracking-wider block mb-2">Perincian Spesifik Unit Camelia:</span>
+                <ul class="grid grid-cols-1 md:grid-cols-3 gap-2.5 sm:gap-3 text-xs">
+                  <li class="p-3 rounded-xl bg-slate-50 border border-emerald-100 flex items-start gap-2">
+                    <i data-lucide="check" class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5"></i>
+                    <div>
+                      <span id="specCameliaDesc1" class="text-slate-600">Bilik tidur utama berhawa dingin dengan katil selesa dan pencahayaan moden tropika.</span>
+                    </div>
+                  </li>
+                  <li class="p-3 rounded-xl bg-slate-50 border border-emerald-100 flex items-start gap-2">
+                    <i data-lucide="check" class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5"></i>
+                    <div>
+                      <span id="specCameliaDesc2" class="text-slate-600">Bilik kedua yang selesa, berhawa dingin serta privasi sepenuhnya untuk seisi keluarga.</span>
+                    </div>
+                  </li>
+                  <li class="p-3 rounded-xl bg-slate-50 border border-emerald-100 flex items-start gap-2">
+                    <i data-lucide="check" class="w-4 h-4 text-emerald-600 shrink-0 mt-0.5"></i>
+                    <div>
+                      <span id="specCameliaDesc3" class="text-slate-600">Ruang santai dilengkapi sofa, TV pintar dengan Netflix, serta suasana luas dan nyaman.</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Kad Gambar Camelia (3 Gambar Lengkap) -->
+          <div id="cameliaCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+          </div>
+        </div>
+
+        <!-- Bahagian 2: DAHLIA STUDIO 1, STUDIO 2 -->
+        <div class="mb-14">
+          <div class="mb-6 p-5 sm:p-7 bg-white border-2 border-pink-300 rounded-2xl sm:rounded-3xl shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-pink-100 pb-3.5 mb-4">
+              <div class="flex items-center gap-2.5">
+                <span class="w-3.5 h-3.5 rounded-full bg-pink-500 ring-4 ring-pink-200"></span>
+                <h3 class="font-serif text-xl sm:text-2xl font-bold text-slate-900 tracking-wide uppercase">DAHLIA STUDIO 1, STUDIO 2</h3>
+              </div>
+              <div class="inline-flex items-center gap-2 bg-pink-50 border border-pink-200 px-3.5 py-1.5 rounded-full self-start sm:self-auto shadow-xs">
+                <span class="text-xs font-bold text-pink-950 font-poppins-bold">Kadar Sewa:</span>
+                <span id="displayDahliaWkndTop" class="text-xs font-poppins-bold text-pink-800">RM200 (Hari Minggu)</span>
+                <span class="text-pink-400 font-bold">/</span>
+                <span id="displayDahliaBaseTop" class="text-xs font-poppins-bold text-slate-700">RM150 (Hari Biasa)</span>
+              </div>
+            </div>
+
+            <div class="space-y-3 text-xs sm:text-sm text-slate-700 leading-relaxed">
+              <div class="pt-1">
+                <span class="text-xs font-bold text-pink-950 uppercase tracking-wider block mb-2">Perincian Spesifik Unit Dahlia Studio:</span>
+                <ul class="grid grid-cols-1 md:grid-cols-3 gap-2.5 sm:gap-3 text-xs">
+                  <li class="p-3 rounded-xl bg-slate-50 border border-pink-100 flex items-start gap-2">
+                    <i data-lucide="check" class="w-4 h-4 text-pink-600 shrink-0 mt-0.5"></i>
+                    <div>
+                      <span id="specDahliaDesc1" class="text-slate-600">Susun atur studio praktikal dengan katil queen empuk, hawa dingin dan kipas siling.</span>
+                    </div>
+                  </li>
+                  <li class="p-3 rounded-xl bg-slate-50 border border-pink-100 flex items-start gap-2">
+                    <i data-lucide="check" class="w-4 h-4 text-pink-600 shrink-0 mt-0.5"></i>
+                    <div>
+                      <span id="specDahliaDesc2" class="text-slate-600">Ruang katil bujang tambahan yang selesa untuk anak-anak atau rakan pengembara.</span>
+                    </div>
+                  </li>
+                  <li class="p-3 rounded-xl bg-slate-50 border border-pink-100 flex items-start gap-2">
+                    <i data-lucide="check" class="w-4 h-4 text-pink-600 shrink-0 mt-0.5"></i>
+                    <div>
+                      <span id="specDahliaDesc3" class="text-slate-600">Dilengkapi peti sejuk mini, microwave, cerek elektrik, seterika dan bilik air peribadi.</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Kad Gambar Dahlia (3 Gambar Lengkap) -->
+          <div id="dahliaCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+          </div>
+        </div>
+
+        <!-- 5 Frame Program & Aktiviti -->
+        <div class="mt-8 mb-14 bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-5 sm:p-6 md:p-8 shadow-sm">
+          <div class="border-b border-slate-100 pb-4 mb-6">
+            <span class="text-brand-teal uppercase tracking-widest text-[11px] sm:text-xs font-semibold">Pakej & Pengalaman Menarik</span>
+            <h3 class="font-serif text-xl sm:text-2xl font-bold text-slate-900 mt-1 uppercase">PROGRAM & AKTIVITI DI TEMU HAVENLY HOME</h3>
+            <p class="text-slate-500 text-xs mt-1">Pelbagai aktiviti dan pakej penginapan menarik yang disediakan untuk anda sekeluarga mahupun berkumpulan.</p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 sm:gap-5">
+            <!-- 1. HARI KELUARGA -->
+            <div class="rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200 overflow-hidden shadow-xs hover:shadow-md transition flex flex-col justify-between">
+              <div>
+                <div class="h-40 sm:h-44 w-full overflow-hidden relative">
+                  <img id="pubActImg1" src="https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=800&q=80" alt="Hari Keluarga" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" loading="lazy">
+                </div>
+                <div class="p-4">
+                  <h4 id="pubActTitle1" class="font-bold text-slate-900 text-xs sm:text-sm uppercase tracking-wide">HARI KELUARGA</h4>
+                  <p id="pubActDesc1" class="text-[11px] text-slate-600 mt-1.5 leading-relaxed">
+                    Sesuai untuk perhimpunan santai seisi keluarga dengan ruang laman luas, barbeku, dan suasana mesra.
+                  </p>
+                </div>
+              </div>
+              <div class="p-4 pt-0">
+                <a href="#bookingSection" onclick="navigateToSection(event, '#bookingSection')" class="w-full py-2 rounded-xl text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 text-emerald-800 transition flex items-center justify-center gap-1 border border-emerald-200 shadow-xs">
+                  <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-600"></i>
+                  <span>Tempah Pakej</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- 2. PERCUTIAN KELUARGA -->
+            <div class="rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200 overflow-hidden shadow-xs hover:shadow-md transition flex flex-col justify-between">
+              <div>
+                <div class="h-40 sm:h-44 w-full overflow-hidden relative">
+                  <img id="pubActImg2" src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=800&q=80" alt="Percutian Keluarga" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" loading="lazy">
+                </div>
+                <div class="p-4">
+                  <h4 id="pubActTitle2" class="font-bold text-slate-900 text-xs sm:text-sm uppercase tracking-wide">PERCUTIAN KELUARGA</h4>
+                  <p id="pubActDesc2" class="text-[11px] text-slate-600 mt-1.5 leading-relaxed">
+                    Penginapan tenang dan privasi berhampiran pantai untuk merehatkan minda bersama insan tersayang.
+                  </p>
+                </div>
+              </div>
+              <div class="p-4 pt-0">
+                <a href="#bookingSection" onclick="navigateToSection(event, '#bookingSection')" class="w-full py-2 rounded-xl text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 text-emerald-800 transition flex items-center justify-center gap-1 border border-emerald-200 shadow-xs">
+                  <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-600"></i>
+                  <span>Tempah Pakej</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- 3. KURSUS DAN TEAM BUILDING -->
+            <div class="rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200 overflow-hidden shadow-xs hover:shadow-md transition flex flex-col justify-between">
+              <div>
+                <div class="h-40 sm:h-44 w-full overflow-hidden relative">
+                  <img id="pubActImg3" src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80" alt="Kursus dan Team Building" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" loading="lazy">
+                </div>
+                <div class="p-4">
+                  <h4 id="pubActTitle3" class="font-bold text-slate-900 text-xs sm:text-sm uppercase tracking-wide">KURSUS DAN TEAM BUILDING</h4>
+                  <p id="pubActDesc3" class="text-[11px] text-slate-600 mt-1.5 leading-relaxed">
+                    Kemudahan bilik perbincangan santai, ruang wacana, dan persekitaran kondusif untuk kumpulan kerja.
+                  </p>
+                </div>
+              </div>
+              <div class="p-4 pt-0">
+                <a href="#bookingSection" onclick="navigateToSection(event, '#bookingSection')" class="w-full py-2 rounded-xl text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 text-emerald-800 transition flex items-center justify-center gap-1 border border-emerald-200 shadow-xs">
+                  <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-600"></i>
+                  <span>Tempah Pakej</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- 4. REHLAH TAHFIZ -->
+            <div class="rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200 overflow-hidden shadow-xs hover:shadow-md transition flex flex-col justify-between">
+              <div>
+                <div class="h-40 sm:h-44 w-full overflow-hidden relative">
+                  <img id="pubActImg4" src="https://images.unsplash.com/photo-1609599006353-e629aaabfeae?auto=format&fit=crop&w=800&q=80" alt="Rehlah Tahfiz" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" loading="lazy">
+                </div>
+                <div class="p-4">
+                  <h4 id="pubActTitle4" class="font-bold text-slate-900 text-xs sm:text-sm uppercase tracking-wide">REHLAH TAHFIZ</h4>
+                  <p id="pubActDesc4" class="text-[11px] text-slate-600 mt-1.5 leading-relaxed">
+                    Program pengisian rohani dan hafazan santai dalam suasana alam semulajadi yang damai dan selesa.
+                  </p>
+                </div>
+              </div>
+              <div class="p-4 pt-0">
+                <a href="#bookingSection" onclick="navigateToSection(event, '#bookingSection')" class="w-full py-2 rounded-xl text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 text-emerald-800 transition flex items-center justify-center gap-1 border border-emerald-200 shadow-xs">
+                  <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-600"></i>
+                  <span>Tempah Pakej</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- 5. PROGRAM KECEMELANGAN PELAJAR -->
+            <div class="rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200 overflow-hidden shadow-xs hover:shadow-md transition flex flex-col justify-between">
+              <div>
+                <div class="h-40 sm:h-44 w-full overflow-hidden relative">
+                  <img id="pubActImg5" src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80" alt="Program Kecemerlangan Pelajar" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" loading="lazy">
+                </div>
+                <div class="p-4">
+                  <h4 id="pubActTitle5" class="font-bold text-slate-900 text-xs sm:text-sm uppercase tracking-wide">PROGRAM KECEMELANGAN PELAJAR</h4>
+                  <p id="pubActDesc5" class="text-[11px] text-slate-600 mt-1.5 leading-relaxed">
+                    Bengkel motivasi, persediaan peperiksaan, dan kepimpinan belia berhampiran destinasi tarikan Kuantan.
+                  </p>
+                </div>
+              </div>
+              <div class="p-4 pt-0">
+                <a href="#bookingSection" onclick="navigateToSection(event, '#bookingSection')" class="w-full py-2 rounded-xl text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 text-emerald-800 transition flex items-center justify-center gap-1 border border-emerald-200 shadow-xs">
+                  <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-600"></i>
+                  <span>Tempah Pakej</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6 Kemudahan Sekitar (Realtime Autosync Admin) -->
+        <div class="mt-8 bg-white border border-slate-200 rounded-2xl sm:rounded-3xl p-5 sm:p-6 md:p-8 shadow-sm">
+          <div class="border-b border-slate-100 pb-4 mb-6">
+            <span class="text-brand-teal uppercase tracking-widest text-[11px] sm:text-xs font-semibold">Tarikan & Fasiliti Berdekatan</span>
+            <h3 id="facSectionTitle" class="font-serif text-xl sm:text-2xl font-bold text-slate-900 mt-1 uppercase">KEMUDAHAN SEKITAR</h3>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <!-- 1. ANA IKAN BAKAR PETAI -->
+            <div class="rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-md transition">
+              <div class="h-36 sm:h-40 w-full overflow-hidden relative">
+                <img id="pubFacImg1" src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=700&q=80" alt="Ana Ikan Bakar Petai Tanjung Lumpur" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" loading="lazy">
+              </div>
+              <div class="p-4 flex-1 flex flex-col justify-between">
+                <div>
+                  <h4 id="pubFacTitle1" class="font-bold text-slate-900 text-xs sm:text-sm mt-0.5 uppercase">ANA IKAN BAKAR PETAI</h4>
+                  <p id="pubFacDesc1" class="text-[11px] text-slate-500 mt-1">Destinasi santapan makanan laut bakar terkenal di Tanjung Lumpur.</p>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-slate-200/60 flex items-center justify-between gap-2">
+                  <div class="text-xs font-semibold text-slate-600">
+                    <span id="pubFacMasa1">17 minit</span> <span id="pubFacJarak1" class="font-mono text-emerald-700 font-bold">(15 km)</span>
+                  </div>
+                  <a id="btnLocAnaIkanBakar" href="https://maps.google.com/?q=Ana+Ikan+Bakar+Petai+Tanjung+Lumpur+Kuantan" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] flex items-center gap-1.5 shadow-sm transition active:scale-95 shrink-0" title="Buka Lokasi Google Maps">
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                    <span>Location</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. PANTAI TELUK CEMPEDAK -->
+            <div class="rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-md transition">
+              <div class="h-36 sm:h-40 w-full overflow-hidden relative">
+                <img id="pubFacImg2" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=700&q=80" alt="Pantai Teluk Cempedak Kuantan" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" loading="lazy">
+              </div>
+              <div class="p-4 flex-1 flex flex-col justify-between">
+                <div>
+                  <h4 id="pubFacTitle2" class="font-bold text-slate-900 text-xs sm:text-sm mt-0.5 uppercase">PANTAI TELUK CEMPEDAK</h4>
+                  <p id="pubFacDesc2" class="text-[11px] text-slate-500 mt-1">Pantai ikonik Kuantan dengan laluan pejalan kaki berkayu dan kafe santai.</p>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-slate-200/60 flex items-center justify-between gap-2">
+                  <div class="text-xs font-semibold text-slate-600">
+                    <span id="pubFacMasa2">28 minit</span> <span id="pubFacJarak2" class="font-mono text-emerald-700 font-bold">(17 km)</span>
+                  </div>
+                  <a id="btnLocTelukCempedak" href="https://maps.google.com/?q=Pantai+Teluk+Cempedak+Kuantan" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] flex items-center gap-1.5 shadow-sm transition active:scale-95 shrink-0" title="Buka Lokasi Google Maps">
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                    <span>Location</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. PANTAI SEPAT -->
+            <div class="rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-md transition">
+              <div class="h-36 sm:h-40 w-full overflow-hidden relative">
+                <img id="pubFacImg3" src="https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=700&q=80" alt="Pantai Sepat Kuantan" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" loading="lazy">
+              </div>
+              <div class="p-4 flex-1 flex flex-col justify-between">
+                <div>
+                  <h4 id="pubFacTitle3" class="font-bold text-slate-900 text-xs sm:text-sm mt-0.5 uppercase">PANTAI SEPAT</h4>
+                  <p id="pubFacDesc3" class="text-[11px] text-slate-500 mt-1">Pantai pasir landai yang tenang dan sangat dekat dengan homestay.</p>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-slate-200/60 flex items-center justify-between gap-2">
+                  <div class="text-xs font-semibold text-slate-600">
+                    <span id="pubFacMasa3">6 minit</span> <span id="pubFacJarak3" class="font-mono text-emerald-700 font-bold">(5 km)</span>
+                  </div>
+                  <a id="btnLocPantaiSepat" href="https://maps.google.com/?q=Pantai+Sepat+Kuantan" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] flex items-center gap-1.5 shadow-sm transition active:scale-95 shrink-0" title="Buka Lokasi Google Maps">
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                    <span>Location</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. MENARA 188 KUANTAN -->
+            <div class="rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-md transition">
+              <div class="h-36 sm:h-40 w-full overflow-hidden relative">
+                <img id="pubFacImg4" src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=700&q=80" alt="Menara 188 Kuantan" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" loading="lazy">
+              </div>
+              <div class="p-4 flex-1 flex flex-col justify-between">
+                <div>
+                  <h4 id="pubFacTitle4" class="font-bold text-slate-900 text-xs sm:text-sm mt-0.5 uppercase">MENARA 188 KUANTAN</h4>
+                  <p id="pubFacDesc4" class="text-[11px] text-slate-500 mt-1">Menara tinjau moden kedua tertinggi di Malaysia dengan pemandangan 360 darjah.</p>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-slate-200/60 flex items-center justify-between gap-2">
+                  <div class="text-xs font-semibold text-slate-600">
+                    <span id="pubFacMasa4">20 minit</span> <span id="pubFacJarak4" class="font-mono text-emerald-700 font-bold">(13 km)</span>
+                  </div>
+                  <a id="btnLocMenara188" href="https://maps.google.com/?q=Menara+188+Kuantan" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] flex items-center gap-1.5 shadow-sm transition active:scale-95 shrink-0" title="Buka Lokasi Google Maps">
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                    <span>Location</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- 5. BANDAR KUANTAN & EAST COAST MALL -->
+            <div class="rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-md transition">
+              <div class="h-36 sm:h-40 w-full overflow-hidden relative">
+                <img id="pubFacImg5" src="https://images.unsplash.com/photo-1567449303078-57ad995bd301?auto=format&fit=crop&w=700&q=80" alt="Bandar Kuantan & East Coast Mall" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" loading="lazy">
+              </div>
+              <div class="p-4 flex-1 flex flex-col justify-between">
+                <div>
+                  <h4 id="pubFacTitle5" class="font-bold text-slate-900 text-xs sm:text-sm mt-0.5 uppercase">BANDAR KUANTAN & EAST COAST MALL</h4>
+                  <p id="pubFacDesc5" class="text-[11px] text-slate-500 mt-1">Pusat membeli-belah terkemuka serta hab perniagaan dan santapan utama di Kuantan.</p>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-slate-200/60 flex items-center justify-between gap-2">
+                  <div class="text-xs font-semibold text-slate-600">
+                    <span id="pubFacMasa5">22 minit</span> <span id="pubFacJarak5" class="font-mono text-emerald-700 font-bold">(13 km)</span>
+                  </div>
+                  <a id="btnLocEastCoastMall" href="https://maps.google.com/?q=East+Coast+Mall+Kuantan" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] flex items-center gap-1.5 shadow-sm transition active:scale-95 shrink-0" title="Buka Lokasi Google Maps">
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                    <span>Location</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- 6. LAPANGAN TERBANG KUANTAN -->
+            <div class="rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between overflow-hidden shadow-xs hover:shadow-md transition">
+              <div class="h-36 sm:h-40 w-full overflow-hidden relative">
+                <img id="pubFacImg6" src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=700&q=80" alt="Lapangan Terbang Kuantan" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" loading="lazy">
+              </div>
+              <div class="p-4 flex-1 flex flex-col justify-between">
+                <div>
+                  <h4 id="pubFacTitle6" class="font-bold text-slate-900 text-xs sm:text-sm mt-0.5 uppercase">LAPANGAN TERBANG KUANTAN</h4>
+                  <p id="pubFacDesc6" class="text-[11px] text-slate-500 mt-1">Lapangan Terbang Sultan Haji Ahmad Shah yang menghubungkan laluan penerbangan utama.</p>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-slate-200/60 flex items-center justify-between gap-2">
+                  <div class="text-xs font-semibold text-slate-600">
+                    <span id="pubFacMasa6">29 minit</span> <span id="pubFacJarak6" class="font-mono text-emerald-700 font-bold">(24 km)</span>
+                  </div>
+                  <a id="btnLocAirport" href="https://maps.google.com/?q=Sultan+Haji+Ahmad+Shah+Airport+Kuantan" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] flex items-center gap-1.5 shadow-sm transition active:scale-95 shrink-0" title="Buka Lokasi Google Maps">
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                    <span>Location</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECTION KALENDAR & TEMPAHAN INTERAKTIF -->
+    <section id="bookingSection" class="py-16 sm:py-24 bg-gradient-to-b from-emerald-50/60 via-slate-50 to-emerald-50/40 text-slate-800 relative border-t border-emerald-200/70">
+      <div class="max-w-7xl mx-auto px-3 sm:px-6">
+
+        <div class="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-100/90 text-emerald-900 text-[11px] sm:text-xs font-bold uppercase tracking-widest border border-emerald-300/80 shadow-sm">
+            <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+            <span>Takwim Masihi Malaysia & Khas Negeri Pahang (Kumpulan B KPM)</span>
+          </div>
+          <h2 class="font-serif text-2xl sm:text-4xl md:text-5xl font-extrabold mt-3 text-slate-900 tracking-tight">
+            Kalendar & Pilihan Bilik Penginapan
+          </h2>
+          <p class="text-slate-600 text-xs sm:text-sm mt-2 sm:mt-3 leading-relaxed px-2 max-w-2xl mx-auto">
+            Pilih unit bilik yang diinginkan di sebelah kanan, kemudian tetapkan tarikh daftar masuk dan daftar keluar secara interaktif di atas kalendar.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch mb-8 sm:mb-12">
+
+          <!-- LEFT COLUMN: Calendar Main Card -->
+          <div class="lg:col-span-7 flex flex-col">
+            <div class="h-full bg-white/95 backdrop-blur-md border-2 border-emerald-300 rounded-3xl p-4 sm:p-6 md:p-7 shadow-xl shadow-emerald-950/5 relative overflow-hidden transition-all duration-300 flex flex-col justify-between">
+
+              <div class="absolute -top-16 -right-16 w-44 h-44 bg-gradient-to-br from-emerald-200/50 to-teal-200/30 rounded-full blur-2xl pointer-events-none"></div>
+
+              <div>
+                <!-- Calendar Top Toolbar -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 sm:mb-5 pb-3.5 border-b border-emerald-100 relative z-10">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <div class="flex items-center gap-1.5 p-1 rounded-2xl bg-emerald-50/90 border border-emerald-200/80 shadow-inner">
+                      <select id="calendarSelectMonth" onchange="handleMonthYearSelectChange()" class="bg-white border border-emerald-300/80 rounded-xl px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-bold text-emerald-950 focus:outline-none focus:ring-2 focus:ring-emerald-400 cursor-pointer shadow-sm">
+                      </select>
+                      <select id="calendarSelectYear" onchange="handleMonthYearSelectChange()" class="bg-white border border-emerald-300/80 rounded-xl px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm font-bold text-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-400 cursor-pointer shadow-sm">
+                      </select>
+                    </div>
+                    <span class="text-[11px] font-mono font-bold text-emerald-700 bg-emerald-100/70 px-2.5 py-1 rounded-xl hidden xs:inline-block">
+                      Takwim Rasmi Pahang
+                    </span>
+                  </div>
+
+                  <!-- Navigation Prev/Next Buttons -->
+                  <div class="flex items-center gap-1.5 self-end sm:self-auto">
+                    <button type="button" id="btnPrevMonth" onclick="changeCalendarMonth(-1)" class="p-2 sm:p-2.5 rounded-xl bg-white hover:bg-emerald-50 active:bg-emerald-100 text-emerald-900 transition shadow-sm border border-emerald-200 hover:border-emerald-300 flex items-center justify-center" aria-label="Bulan Lepas">
+                      <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                    </button>
+                    <button type="button" id="btnNextMonth" onclick="changeCalendarMonth(1)" class="p-2 sm:p-2.5 rounded-xl bg-white hover:bg-emerald-50 active:bg-emerald-100 text-emerald-900 transition shadow-sm border border-emerald-200 hover:border-emerald-300 flex items-center justify-center" aria-label="Bulan Seterusnya">
+                      <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Day Name Headers (Bermula Hari Isnin) -->
+                <div class="grid grid-cols-7 gap-1 text-center text-[10px] sm:text-[11px] font-extrabold tracking-wider uppercase text-emerald-950 mb-2 py-1.5 bg-emerald-50/60 rounded-xl border border-emerald-100">
+                  <span>Isn</span>
+                  <span>Sel</span>
+                  <span>Rab</span>
+                  <span>Kha</span>
+                  <span>Jum</span>
+                  <span class="text-blue-700 font-black">Sab</span>
+                  <span class="text-blue-700 font-black">Ahd</span>
+                </div>
+
+                <div id="calendarDaysGrid" class="grid grid-cols-7 gap-1 sm:gap-1.5 text-xs relative z-10">
+                </div>
+              </div>
+
+              <!-- Active Selection Date Bar & Reset Button -->
+              <div class="mt-4 pt-3.5 border-t border-emerald-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                <div class="flex items-center gap-4 sm:gap-6 flex-wrap">
+                  <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs shrink-0">
+                      <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
+                    </div>
+                    <div>
+                      <span class="text-[9px] sm:text-[10px] text-slate-500 uppercase block font-bold leading-none mb-0.5">Daftar Masuk:</span>
+                      <strong id="displayCheckInText" class="text-emerald-950 font-mono text-xs sm:text-sm font-extrabold">-</strong>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-lg bg-teal-100 text-teal-800 flex items-center justify-center font-bold text-xs shrink-0">
+                      <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                    </div>
+                    <div>
+                      <span class="text-[9px] sm:text-[10px] text-slate-500 uppercase block font-bold leading-none mb-0.5">Daftar Keluar:</span>
+                      <strong id="displayCheckOutText" class="text-emerald-950 font-mono text-xs sm:text-sm font-extrabold">-</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <button type="button" onclick="clearSelectedDates()" class="text-xs text-rose-700 hover:text-rose-800 font-bold flex items-center gap-1.5 py-1.5 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 transition active:scale-95 shadow-sm">
+                  <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                  <span>Set Semula Tarikh</span>
+                </button>
+              </div>
+
+              <input type="hidden" id="bookingCheckIn">
+              <input type="hidden" id="bookingCheckOut">
+            </div>
+          </div>
+
+          <!-- RIGHT COLUMN: Room Selection Panel -->
+          <div class="lg:col-span-5 flex flex-col">
+            <div class="h-full bg-white/95 backdrop-blur-md border-2 border-emerald-300/90 p-4 sm:p-6 md:p-7 rounded-3xl shadow-xl shadow-emerald-950/5 flex flex-col justify-between relative overflow-hidden">
+
+              <div class="flex-1 flex flex-col">
+                <div class="flex items-start justify-between border-b border-emerald-100 pb-3.5 mb-4 gap-2">
+                  <div>
+                    <h3 class="font-serif text-lg sm:text-xl font-extrabold text-slate-900 flex items-center gap-2">
+                      <span class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                        <i data-lucide="bed-double" class="w-4 h-4"></i>
+                      </span>
+                      <span>Pilihan Bilik Untuk Tempahan</span>
+                    </h3>
+                    <p class="text-xs text-slate-500 mt-1 leading-normal">
+                      Pilih mana-mana bilik yang aktif. Hanya bilik berstatus hijau cerah sedia untuk ditempah.
+                    </p>
+                  </div>
+                  <span id="selectedRoomsSummaryCount" class="text-xs font-mono px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 font-extrabold shrink-0 shadow-sm">
+                    0 Bilik Aktif
+                  </span>
+                </div>
+
+                <div class="flex items-center gap-2 mb-4">
+                  <button type="button" onclick="selectAllRooms(true)" class="flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-700 to-teal-700 hover:from-emerald-600 hover:to-teal-600 active:scale-98 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition shadow-sm">
+                    <i data-lucide="check-square" class="w-3.5 h-3.5 text-emerald-200"></i>
+                    <span class="truncate">Pilih Semua (6 Bilik)</span>
+                  </button>
+                  <button type="button" onclick="selectAllRooms(false)" class="flex-1 py-2.5 px-3 rounded-xl bg-slate-50 hover:bg-slate-100 active:scale-98 text-slate-700 text-xs font-bold flex items-center justify-center gap-1.5 transition border border-slate-200 shadow-sm">
+                    <i data-lucide="square" class="w-3.5 h-3.5 text-slate-400"></i>
+                    <span class="truncate">Kosongkan Pilihan</span>
+                  </button>
+                </div>
+
+                <div id="selectedRoomsChips" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3 flex-1 content-start">
+                </div>
+              </div>
+
+              <!-- Rates Note -->
+              <div class="mt-5 pt-3.5 border-t border-emerald-100 bg-gradient-to-r from-emerald-50/80 to-teal-50/80 p-3.5 rounded-2xl border border-emerald-200/80 shrink-0">
+                <div class="flex items-center gap-2 text-xs text-emerald-950 font-bold font-poppins-bold">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>Kadar Harga Rasmi Homestay</span>
+                </div>
+                <p class="text-[11px] text-slate-600 mt-1 leading-relaxed font-medium">
+                  Unit CAMELIA: <strong id="rateNoteCameliaWknd" class="font-poppins-bold text-emerald-900">RM350</strong> (Hujung Minggu: Sab & Ahd) / <strong id="rateNoteCameliaBase" class="font-poppins-bold text-slate-800">RM300</strong> (Hari Biasa: Isn - Jum)<br>
+                  Unit DAHLIA: <strong id="rateNoteDahliaWknd" class="font-poppins-bold text-pink-900">RM200</strong> (Hujung Minggu: Sab & Ahd) / <strong id="rateNoteDahliaBase" class="font-poppins-bold text-slate-800">RM150</strong> (Hari Biasa: Isn - Jum)
+                </p>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- DEDICATED NOTE & COLOR CODE TRAY -->
+          <div class="lg:col-span-12 bg-white/95 backdrop-blur-md border-2 border-emerald-200/90 p-4 sm:p-5 rounded-2xl sm:rounded-3xl shadow-sm space-y-3.5 text-xs text-slate-700">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-emerald-100">
+              <div class="flex items-center gap-2 font-bold text-emerald-950 text-xs sm:text-sm">
+                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600 shrink-0"></i>
+                <span>Status 6 Kotak Bilik (Pada Setiap Hari):</span>
+              </div>
+              <div class="flex items-center gap-4 flex-wrap text-xs">
+                <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-xl bg-emerald-50 border border-emerald-200">
+                  <span class="w-3 h-3 rounded-md bg-emerald-400 ring-2 ring-emerald-300 shadow-sm shrink-0"></span>
+                  <span class="text-emerald-900 font-bold">Kotak Hijau Cerah = Belum Ditempah</span>
+                </div>
+                <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-xl bg-rose-50 border border-rose-200">
+                  <span class="w-3 h-3 rounded-md bg-rose-400 ring-2 ring-rose-300 shadow-sm shrink-0"></span>
+                  <span class="text-rose-900 font-bold">Kotak Merah Pudar = Bilik Telah Ditempah</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 flex-wrap text-[11px]">
+              <span class="font-bold text-slate-800 text-xs shrink-0 flex items-center gap-1.5">
+                <i data-lucide="palette" class="w-3.5 h-3.5 text-teal-600"></i>
+                <span>Kod Warna Kalendar:</span>
+              </span>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 text-blue-900 border border-blue-200 font-semibold shadow-xs">
+                  <span class="w-2 h-2 rounded-full bg-blue-600"></span> Hujung Minggu
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-900 border border-amber-200 font-semibold shadow-xs">
+                  <span class="w-2 h-2 rounded-full bg-amber-500"></span> Cuti Sekolah KPM (Pahang)
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-50 text-purple-900 border border-purple-200 font-semibold shadow-xs">
+                  <span class="w-2 h-2 rounded-full bg-purple-600"></span> Cuti Negeri Pahang
+                </span>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-50 text-rose-900 border border-rose-200 font-semibold shadow-xs">
+                  <span class="w-2 h-2 rounded-full bg-rose-600"></span> Cuti Kebangsaan Malaysia
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Perincian Tempahan & Pengesahan -->
+        <div class="bg-white border-2 border-emerald-200 p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl shadow-xl">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b-2 border-emerald-100 pb-3 sm:pb-4 mb-5 sm:mb-6 gap-2">
+            <div>
+              <h3 class="font-serif text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
+                <i data-lucide="receipt" class="w-5 h-5 sm:w-6 sm:h-6 text-teal-600 shrink-0"></i>
+                <span>Perincian Tempahan & Pengesahan</span>
+              </h3>
+              <p class="text-xs text-slate-500 mt-0.5">
+                Lengkapkan butiran tetamu dan hantar tempahan terus ke aplikasi WhatsApp rasmi pengurusan.
+              </p>
+            </div>
+            <span id="priceBadgeNights" class="text-xs font-poppins-bold px-3 py-1.5 rounded-xl bg-emerald-100 text-emerald-900 border-2 border-emerald-300 self-start sm:self-auto shrink-0">
+              0 Malam Penginapan
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+            <div class="lg:col-span-7 space-y-4 sm:space-y-5">
+              <h4 class="text-xs sm:text-sm font-bold text-slate-800 flex items-center gap-2">
+                <i data-lucide="user-check" class="w-4 h-4 text-emerald-600"></i>
+                <span>Maklumat Peribadi Tetamu</span>
+              </h4>
+
+              <div class="space-y-3 sm:space-y-4">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">
+                    Nama Penuh <span class="text-rose-500">*</span>
+                  </label>
+                  <input type="text" id="guestFullName" placeholder="Cth: Ahmad Razlan bin Daud" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3 text-base md:text-sm text-slate-800 focus:outline-none focus:border-emerald-500 focus:bg-white transition">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">
+                    Nombor Telefon <span class="text-rose-500">*</span>
+                  </label>
+                  <input type="tel" id="guestPhone" placeholder="Cth: 0199333757 atau 0123456789" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3 text-base md:text-sm text-slate-800 focus:outline-none focus:border-emerald-500 focus:bg-white transition">
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">
+                    Alamat / Bandar <span class="text-slate-400 font-normal">(Pilihan)</span>
+                  </label>
+                  <input type="text" id="guestAddressCity" placeholder="Cth: Kuantan, Pahang / Cheras, Kuala Lumpur" class="w-full bg-slate-50 border-2 border-slate-200 rounded-xl p-3 text-base md:text-sm text-slate-800 focus:outline-none focus:border-emerald-500 focus:bg-white transition">
+                </div>
+              </div>
+            </div>
+
+            <!-- Perincian Bil & Butang Terus Ke WhatsApp Admin -->
+            <div class="lg:col-span-5 bg-emerald-50/80 border-2 border-emerald-400 p-4 sm:p-6 rounded-xl sm:rounded-2xl space-y-3.5 sm:space-y-4 text-emerald-950 shadow-sm">
+              <h4 class="text-xs uppercase tracking-wider font-extrabold text-emerald-950 border-b-2 border-emerald-300 pb-2">
+                Perincian Bil Penginapan
+              </h4>
+
+              <div class="space-y-2.5 sm:space-y-3 text-xs text-emerald-900 border-b-2 border-emerald-300 pb-3 sm:pb-4 font-semibold">
+                <div class="flex justify-between">
+                  <span>Bilik Aktif Dipilih</span>
+                  <span id="valRoomsCountSummary" class="font-poppins-bold text-emerald-950">0 Bilik</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span id="labelWeekdayRate">Kadar Hari Biasa</span>
+                  <span id="valWeekdayTotal" class="font-poppins-bold text-emerald-950">RM 0.00</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span id="labelWeekendRate">Kadar Hujung Minggu</span>
+                  <span id="valWeekendTotal" class="font-poppins-bold text-emerald-950">RM 0.00</span>
+                </div>
+              </div>
+
+              <div class="pt-1 flex items-baseline justify-between">
+                <div>
+                  <span class="text-xs uppercase tracking-wider text-emerald-950 block font-extrabold">Jumlah Keseluruhan</span>
+                  <p class="text-[10px] text-emerald-800 font-medium">Hanya harga bilik penginapan</p>
+                </div>
+                <span id="valGrandTotal" class="font-poppins-bold text-2xl sm:text-3xl text-emerald-800">
+                  RM 0.00
+                </span>
+              </div>
+
+              <button onclick="handleDirectBookingToWhatsApp()" id="btnSubmitBooking" class="w-full py-3.5 sm:py-4 mt-2 bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 hover:from-emerald-500 hover:to-teal-500 active:scale-95 text-white rounded-xl font-bold text-xs sm:text-sm tracking-wide shadow-xl flex items-center justify-center gap-2 transition transform">
+                <i data-lucide="message-circle" class="w-4 h-4 text-white"></i>
+                <span class="truncate">HANTAR TEMPAHAN KE WHATSAPP ADMIN</span>
+              </button>
+              <p class="text-[10px] text-emerald-800 font-semibold text-center leading-normal">
+                Maklumat tempahan akan dihantar terus ke WhatsApp admin rasmi untuk semakan dan pembayaran.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECTION GALERI GAMBAR -->
+    <section id="gallerySection" class="py-16 sm:py-20 bg-emerald-50/80 text-slate-900 border-t border-emerald-100">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
+          <p class="text-emerald-700 uppercase tracking-widest text-[11px] sm:text-xs font-semibold mb-1">Visual Penginapan</p>
+          <h2 class="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900">KOLEKSI GAMBAR TEMU</h2>
+          <p class="text-slate-600 text-xs sm:text-sm mt-1 sm:mt-2">
+            Terokai gambar suasana bilik, kolam santai, dan pelbagai kemudahan menarik yang disediakan. Tatal ke bawah untuk melihat koleksi penuh atau klik gambar untuk paparan besar.
+          </p>
+
+          <div id="galleryAlbumFilterButtons" class="flex items-center justify-center gap-2 mt-4 sm:mt-6 flex-wrap">
+          </div>
+        </div>
+
+        <div class="max-h-[580px] sm:max-h-[680px] overflow-y-auto touch-scroll pr-1 sm:pr-2 rounded-2xl bg-white/40 p-2 sm:p-3 border border-emerald-200/80 shadow-inner">
+          <div id="galleryGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-4">
+          </div>
+        </div>
+        <p class="text-[11px] text-slate-500 text-center mt-3 font-medium flex items-center justify-center gap-1.5">
+          <i data-lucide="chevrons-down" class="w-3.5 h-3.5 text-emerald-600 animate-bounce"></i>
+          <span>Tatal ke bawah dalam kotak di atas untuk melihat gambar-gambar seterusnya • Klik pada mana-mana gambar untuk melihat paparan penuh</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- SECTION SOALAN LAZIM (FAQ) -->
+    <section id="faqSection" class="py-16 sm:py-20 bg-brand-softGray border-b border-slate-200">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6">
+        <div class="text-center mb-8 sm:mb-10">
+          <p class="text-brand-teal uppercase tracking-widest text-[11px] sm:text-xs font-semibold mb-1">Pertanyaan Biasa</p>
+          <h2 class="font-serif text-2xl sm:text-3xl font-bold text-slate-900">SOALAN LAZIM (FAQ)</h2>
+          <p class="text-slate-600 text-xs sm:text-sm mt-1">Jawapan pantas bagi soalan yang sering diajukan tetamu.</p>
+        </div>
+
+        <div id="faqItemsContainer" class="space-y-3.5 sm:space-y-4">
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION MAKLUM BALAS TETAMU -->
+    <section id="feedbackSection" class="py-16 sm:py-20 bg-emerald-50/70 text-slate-900 border-t border-emerald-100">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
+          <p class="text-emerald-700 uppercase tracking-widest text-[11px] sm:text-xs font-semibold mb-1">Suara Tetamu</p>
+          <h2 class="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900">RUANG MAKLUM BALAS</h2>
+          <p class="text-slate-600 text-xs sm:text-sm mt-1">Kongsi komen, cadangan serta pengalaman penginapan anda bersama kami.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+          <div class="lg:col-span-5 bg-white border border-emerald-200 p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl shadow-xl">
+            <div class="p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-red-50 border border-red-200 shadow-inner mb-5 sm:mb-6">
+              <div class="flex items-center gap-2 text-red-600 font-bold text-xs uppercase tracking-wider mb-2">
+                <i data-lucide="alert-circle" class="w-4 h-4 text-red-600 shrink-0"></i>
+                <span>PERHATIAN & PANDUAN MAKLUM BALAS</span>
+              </div>
+              <ol class="space-y-1.5 text-xs font-bold text-red-600 leading-relaxed list-decimal list-inside">
+                <li>THH mengalu-alukan pandangan serta komen ANDA.</li>
+                <li>THH mengalu-alukan ANDA berkongsi gambar Momen Indah di homestay kami.</li>
+                <li>Setiap komen dan gambar akan disiarkan setelah disahkan oleh admin.</li>
+                <li>Pihak Admin THH berhak memadam mana-mana komen atau gambar yang tidak sesuai.</li>
+              </ol>
+            </div>
+
+            <h3 class="font-serif text-lg sm:text-xl font-bold text-slate-900 mb-1 sm:mb-2 flex items-center gap-2">
+              <i data-lucide="edit-3" class="w-5 h-5 text-emerald-600"></i>
+              <span>Hantar Komen & Cadangan</span>
+            </h3>
+            <p class="text-xs text-slate-500 mb-4 sm:mb-5">
+              Isi maklumat anda dan muat naik hingga 2 keping gambar dari peranti atau kamera roll.
+            </p>
+
+            <form id="feedbackForm" onsubmit="handleFeedbackSubmit(event)" class="space-y-3.5 sm:space-y-4 text-xs">
+              <div>
+                <label class="block text-slate-700 font-medium mb-1">Nama Penuh :</label>
+                <input type="text" id="fbFullName" required placeholder="Cth: Siti Zulaikha" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-base md:text-xs text-slate-800 focus:outline-none focus:border-teal-500 focus:bg-white">
+              </div>
+
+              <div>
+                <label class="block text-slate-700 font-medium mb-1">Nombor Telefon / Email :</label>
+                <input type="text" id="fbContact" required placeholder="Cth: 019-8765432 atau email@domain.com" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-base md:text-xs text-slate-800 focus:outline-none focus:border-teal-500 focus:bg-white">
+              </div>
+
+              <div>
+                <label class="block text-slate-700 font-medium mb-1">Komen & Cadangan Anda :</label>
+                <textarea id="fbComment" rows="4" required placeholder="Kongsi pengalaman menginap anda atau cadangan penambahbaikan..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-base md:text-xs text-slate-800 focus:outline-none focus:border-teal-500 focus:bg-white leading-relaxed"></textarea>
+              </div>
+
+              <div>
+                <label class="block text-slate-700 font-medium mb-1">
+                  Pilihan Gambar (Device / Kamera Roll - Limit 2 Gambar Sahaja) :
+                </label>
+                <input type="file" id="fbImages" accept="image/*" multiple onchange="handleFeedbackImageUpload(event)" class="w-full text-slate-600 text-xs file:mr-3 file:py-2 file:px-3 sm:file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-teal-700 hover:file:bg-slate-200 cursor-pointer">
+                <p class="text-[10px] text-slate-500 mt-1" id="imageUploadCountText">Maksimum 2 gambar sahaja boleh dimuat naik.</p>
+
+                <div id="fbImagePreviewContainer" class="flex items-center gap-2 mt-2 flex-wrap">
+                </div>
+              </div>
+
+              <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition transform active:scale-95">
+                <i data-lucide="send" class="w-4 h-4"></i>
+                <span>Kirim Sekarang</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Comment Feed -->
+          <div class="lg:col-span-7 bg-white border border-emerald-200 p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl shadow-xl flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+                <h3 class="font-serif text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
+                  <i data-lucide="message-square" class="w-5 h-5 text-teal-600"></i>
+                  <span>Komen & Maklum Balas Tetamu</span>
+                </h3>
+                <span id="commentFeedCount" class="text-xs font-mono px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold border border-emerald-200">
+                  0 Komen
+                </span>
+              </div>
+
+              <div id="commentFeedContainer" class="space-y-3.5 sm:space-y-4 max-h-[460px] sm:max-h-[520px] overflow-y-auto pr-1.5 touch-scroll">
+              </div>
+
+              <p class="text-[10px] text-slate-400 text-center mt-3 font-medium flex items-center justify-center gap-1">
+                <i data-lucide="chevrons-down" class="w-3.5 h-3.5 text-slate-400"></i>
+                <span>Tatal ke bawah untuk membaca komen-komen lain</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION HUBUNGI KAMI -->
+    <section id="contactSection" class="py-16 sm:py-20 bg-emerald-50/80 text-slate-900 border-t border-emerald-100">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
+          <p class="text-emerald-700 uppercase tracking-widest text-[11px] sm:text-xs font-semibold mb-1">Saluran Perhubungan</p>
+          <h2 class="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900">HUBUNGI KAMI</h2>
+          <p class="text-slate-600 text-xs sm:text-sm mt-1">Kami sedia membantu sebarang urusan tempahan, pertanyaan lanjut atau kerjasama penginapan.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-stretch">
+          <div class="bg-white border border-emerald-200 p-5 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl flex flex-col justify-between">
+            <div>
+              <span class="px-3 py-1 rounded bg-teal-100 text-teal-800 text-[10px] font-mono font-bold uppercase tracking-wider">
+                Pengurusan Rasmi
+              </span>
+              <h3 class="font-serif text-xl sm:text-2xl font-bold text-slate-900 mt-2 sm:mt-3 mb-3 sm:mb-4">
+                HUBUNGI PENGURUSAN TEMU
+              </h3>
+              <p class="text-xs text-slate-600 leading-relaxed mb-5 sm:mb-6">
+                Untuk pertanyaan pantas, pengesahan tempahan, atau urusan kecemasan, anda boleh berhubung terus dengan kami melalui maklumat di bawah:
+              </p>
+
+              <div class="space-y-3 sm:space-y-4 text-xs sm:text-sm">
+                <div class="flex items-center gap-3 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200">
+                  <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                    <i data-lucide="phone-call" class="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <span class="text-[9px] sm:text-[10px] text-slate-500 uppercase block font-semibold">Talian Telefon / WhatsApp</span>
+                    <a id="publicContactPhoneLink" href="https://wa.me/60199333757" target="_blank" class="font-mono text-emerald-700 font-bold hover:underline">
+                      019 933 3757
+                    </a>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-teal-100 text-teal-700 flex items-center justify-center shrink-0">
+                  <div class="w-10 h-10 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center shrink-0">
+                    <i data-lucide="mail" class="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <span class="text-[9px] sm:text-[10px] text-slate-500 uppercase block font-semibold">EMAIL Rasmi</span>
+                    <a id="publicContactEmailLink" href="https://mail.google.com/mail/?view=cm&fs=1&to=temuhavenly@gmail.com&su=Pertanyaan%20Penginapan%20TEMU%20HAVENLY%20HOME" target="_blank" rel="noopener noreferrer" class="text-teal-700 font-medium hover:underline break-all">
+                      temuhavenly@gmail.com
+                    </a>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl bg-pink-100 text-pink-700 flex items-center justify-center shrink-0">
+                  <div class="w-10 h-10 rounded-xl bg-pink-100 text-pink-700 flex items-center justify-center shrink-0">
+                    <i data-lucide="video" class="w-5 h-5"></i>
+                  </div>
+                  <div>
+                    <span class="text-[9px] sm:text-[10px] text-slate-500 uppercase block font-semibold">Media Sosial</span>
+                    <span id="publicContactSocialText" class="text-pink-600 font-bold">
+                      #TikTok : TemuHavenly Home
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 sm:mt-8 pt-4 border-t border-slate-100 text-[10px] sm:text-[11px] text-slate-500 flex items-center gap-2">
+              <i data-lucide="map-pin" class="w-4 h-4 text-teal-600 shrink-0"></i>
+              <span id="publicFooterAddressMini">Lokasi Utama: Kg Cempaka, Kuantan, Pahang Darul Makmur</span>
+            </div>
+          </div>
+
+          <div class="bg-white border border-emerald-200 p-5 sm:p-8 rounded-2xl sm:rounded-3xl shadow-xl flex flex-col justify-between">
+            <div>
+              <span class="px-3 py-1 rounded bg-emerald-100 text-emerald-800 text-[10px] font-mono font-bold uppercase tracking-wider">
+                Mesej Terus
+              </span>
+              <h3 class="font-serif text-xl sm:text-2xl font-bold text-slate-900 mt-2 sm:mt-3 mb-2">
+                BORANG PERTANYAAN AM
+              </h3>
+              <p class="text-xs text-slate-600 mb-5 sm:mb-6">
+                Isi borang ringkas ini untuk terus menghantar pertanyaan anda kepada kami melalui WhatsApp rasmi.
+              </p>
+
+              <form id="generalInquiryForm" onsubmit="handleGeneralInquirySubmit(event)" class="space-y-3.5 sm:space-y-4 text-xs">
+                <div>
+                  <label class="block text-slate-700 font-medium mb-1">NAMA PENUH</label>
+                  <input type="text" id="inqFullName" required placeholder="Cth: Muhammad Daniel" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-base md:text-xs text-slate-800 focus:outline-none focus:border-emerald-500 focus:bg-white">
+                </div>
+
+                <div>
+                  <label class="block text-slate-700 font-medium mb-1">NO TELEFON</label>
+                  <input type="tel" id="inqPhone" required placeholder="Cth: 0123456789" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-base md:text-xs text-slate-800 focus:outline-none focus:border-emerald-500 focus:bg-white">
+                </div>
+
+                <div>
+                  <label class="block text-slate-700 font-medium mb-1">MESEJ PERTANYAAN</label>
+                  <textarea id="inqMessage" rows="4" required placeholder="Tuliskan pertanyaan anda mengenai bilik, tempahan berkumpulan, fasiliti atau tarikh penginapan..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-base md:text-xs text-slate-800 focus:outline-none focus:border-emerald-500 focus:bg-white leading-relaxed"></textarea>
+                </div>
+
+                <button type="submit" class="w-full py-3.5 sm:py-4 mt-2 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl shadow-emerald-950/20 transition transform active:scale-95">
+                  <i data-lucide="message-circle" class="w-4 h-4 text-white"></i>
+                  <span>HANTAR PERTANYAAN KE WHATSAPP</span>
+                </button>
+              </form>
+            </div>
+            <p class="text-[10px] text-slate-500 mt-4 text-center">
+              Mesej anda akan dibuka secara automatik di aplikasi WhatsApp pada nombor <span id="publicInquiryPhoneNum">019 933 3757</span>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER & KAUNTER PELAWAT AUTOSYNC REALTIME -->
+    <footer class="bg-slate-950 text-slate-200 py-10 sm:py-12 md:py-16 border-t border-slate-800 text-xs sm:text-sm md:text-base">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 space-y-6 sm:space-y-8">
+        <div class="flex items-center justify-center gap-2 sm:gap-3 text-center text-xs sm:text-sm md:text-lg px-2">
+          <i data-lucide="map-pin" class="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-emerald-400 shrink-0"></i>
+          <span>
+            <strong class="text-white font-bold">Alamat TEMU:</strong>
+            <a id="publicFooterAddressText" href="https://maps.app.goo.gl/VvuEmTkJsxTkPEpQ6" target="_blank" rel="noopener noreferrer" class="hover:text-emerald-300 font-semibold underline decoration-slate-600 hover:decoration-emerald-400 transition ml-1 text-slate-100">
+              Lot 5795, Lorong Cempaka, Kampung Sri Cempaka, 26060 Kuantan, Pahang
+            </a>
+          </span>
+        </div>
+
+        <div class="pt-6 sm:pt-8 border-t border-slate-800 flex flex-col lg:flex-row items-center justify-between gap-4 sm:gap-6">
+          <div id="publicFooterCopyright" class="text-slate-300 text-xs sm:text-sm text-center lg:text-left font-medium select-none">
+            © 2026 TEMU HAVENLY HOME (HOMESTAY KG CEMPAKA KUANTAN). Hak Cipta Terpelihara.
+          </div>
+
+          <!-- Realtime Autosync Visitor Badges -->
+          <div class="flex items-center gap-2.5 sm:gap-4 text-xs sm:text-sm flex-wrap justify-center lg:justify-end">
+            <div class="inline-flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-slate-900 border border-slate-700/80 text-slate-100 shadow-md">
+              <span class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span class="font-medium text-slate-300 text-[11px] sm:text-xs">Pelawat Hari Ini:</span>
+              <strong id="counterVisitorsToday" class="font-mono text-emerald-400 font-bold text-xs sm:text-sm md:text-base">0</strong>
+            </div>
+            <div class="inline-flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-slate-900 border border-slate-700/80 text-slate-100 shadow-md">
+              <i data-lucide="users" class="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-teal-400"></i>
+              <span class="font-medium text-slate-300 text-[11px] sm:text-xs">Jumlah Pelawat:</span>
+              <strong id="counterVisitorsTotal" class="font-mono text-teal-300 font-bold text-xs sm:text-sm md:text-base">0</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Modal Paparan Besar Galeri Gambar -->
+  <div id="galleryImageModal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4" onclick="closeGalleryModal()">
+    <div class="relative max-w-4xl w-full max-h-[90vh] flex flex-col items-center justify-center" onclick="event.stopPropagation()">
+      <button onclick="closeGalleryModal()" class="absolute -top-12 right-0 text-white hover:text-emerald-400 p-2 text-sm font-bold flex items-center gap-1.5 transition">
+        <span>Tutup</span>
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+      <img id="galleryModalImg" src="" alt="Paparan Foto Penuh" class="max-w-full max-h-[75vh] rounded-2xl shadow-2xl object-contain border border-slate-700">
+      <div class="mt-3 text-center">
+        <h4 id="galleryModalTitle" class="text-white font-serif text-lg font-bold"></h4>
+        <span id="galleryModalCategory" class="text-emerald-400 text-xs font-mono font-bold uppercase"></span>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="fixed bottom-4 sm:bottom-6 right-3 sm:right-6 left-3 sm:left-auto z-50 flex flex-col gap-2 pointer-events-none max-w-sm"></div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAlzYLbP9W2p97Tmz-X3oDVy-8oCzWhgg8",
+      authDomain: "temu-havenly-home-4443a.firebaseapp.com",
+      projectId: "temu-havenly-home-4443a",
+      storageBucket: "temu-havenly-home-4443a.firebasestorage.app",
+      messagingSenderId: "866528976515",
+      appId: "1:866528976515:web:7ae06ce06a456973f845b6",
+      measurementId: "G-M4L27ZEJHK",
+      databaseURL: "https://temu-havenly-home-4443a-default-rtdb.asia-southeast1.firebasedatabase.app/"
+    };
+
+    let rtdb = null;
+    try {
+      if (typeof firebase !== 'undefined') {
+        const app = firebase.apps && firebase.apps.length ? firebase.app() : firebase.initializeApp(firebaseConfig);
+        rtdb = firebase.database();
+      }
+    } catch (err) {
+      console.warn("Firebase initialization note:", err);
+    }
+
+    const CURRENT_ORG_ID = "org_temu_havenly_01";
+    const malaysiaMonthNames = [
+      "Januari", "Februari", "Mac", "April", "Mei", "Jun",
+      "Julai", "Ogos", "September", "Oktober", "November", "Disember"
+    ];
+
+    function getTodayDateStr() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    // TAKWIM RASMI REALTIME MALAYSIA & KHAS NEGERI PAHANG (KUMPULAN B KPM)
+    function getPahangMasihiHolidays(year) {
+      const holidays = { national: {}, pahang: {}, school: [] };
+
+      // CUTI KEBANGSAAN MALAYSIA RASMI
+      holidays.national[`${year}-01-01`] = "Tahun Baru";
+      holidays.national[`${year}-05-01`] = "Hari Pekerja";
+      holidays.national[`${year}-08-31`] = "Hari Kebangsaan";
+      holidays.national[`${year}-09-16`] = "Hari Malaysia";
+      holidays.national[`${year}-12-25`] = "Hari Krismas";
+
+      // CUTI KHAS NEGERI PAHANG
+      holidays.pahang[`${year}-05-22`] = "Hari Hol Pahang";
+      holidays.pahang[`${year}-07-30`] = "Hari Keputeraan Sultan Pahang";
+
+      if (year === 2026) {
+        // Cuti Kebangsaan 2026
+        holidays.national[`2026-02-17`] = "Tahun Baharu Cina";
+        holidays.national[`2026-02-18`] = "Tahun Baharu Cina Hari Ke-2";
+        holidays.national[`2026-03-21`] = "Hari Raya Aidilfitri";
+        holidays.national[`2026-03-22`] = "Hari Raya Aidilfitri Hari Ke-2";
+        holidays.national[`2026-05-27`] = "Hari Raya Qurban (Haji)";
+        holidays.national[`2026-05-31`] = "Hari Wesak";
+        holidays.national[`2026-06-01`] = "Keputeraan YDPA";
+        holidays.national[`2026-06-17`] = "Awal Muharram";
+        holidays.national[`2026-08-25`] = "Maulidur Rasul";
+        holidays.national[`2026-11-08`] = "Hari Deepavali";
+
+        // Cuti Negeri Pahang 2026
+        holidays.pahang[`2026-03-07`] = "Hari Nuzul Al-Quran";
+        holidays.pahang[`2026-05-22`] = "Hari Hol Pahang";
+        holidays.pahang[`2026-07-30`] = "Keputeraan Sultan Pahang";
+
+        // TAKWIM RASMI CUTI PERSEKOLAHAN KPM 2026 (KUMPULAN B - NEGERI PAHANG)
+        holidays.school = [
+          { start: "2026-03-21", end: "2026-03-29", name: "Cuti Penggal 1 KPM" },
+          { start: "2026-05-23", end: "2026-06-07", name: "Cuti Pertengahan Tahun KPM" },
+          { start: "2026-08-29", end: "2026-09-06", name: "Cuti Penggal 2 KPM" },
+          // BERMULA 5 DISEMBER HINGGA 31 DISEMBER
+          { start: "2026-12-05", end: "2026-12-31", name: "Cuti Akhir Tahun KPM" }
+        ];
+      } else if (year === 2025) {
+        holidays.national[`2025-01-29`] = "Tahun Baharu Cina";
+        holidays.national[`2025-01-30`] = "Tahun Baharu Cina Hari Ke-2";
+        holidays.national[`2025-03-31`] = "Hari Raya Aidilfitri";
+        holidays.national[`2025-04-01`] = "Hari Raya Aidilfitri Hari Ke-2";
+        holidays.national[`2025-05-12`] = "Hari Wesak";
+        holidays.national[`2025-06-02`] = "Keputeraan YDPA";
+        holidays.national[`2025-06-07`] = "Hari Raya Haji";
+        holidays.national[`2025-06-27`] = "Awal Muharram";
+        holidays.national[`2025-09-05`] = "Maulidur Rasul";
+        holidays.national[`2025-10-20`] = "Hari Deepavali";
+
+        holidays.pahang[`2025-03-18`] = "Hari Nuzul Al-Quran";
+        holidays.pahang[`2025-05-22`] = "Hari Hol Pahang";
+        holidays.pahang[`2025-07-30`] = "Keputeraan Sultan Pahang";
+
+        holidays.school = [
+          { start: "2025-05-24", end: "2025-06-08", name: "Cuti Penggal 1 KPM" },
+          { start: "2025-09-13", end: "2025-09-21", name: "Cuti Penggal 2 KPM" },
+          { start: "2025-12-20", end: "2026-01-11", name: "Cuti Akhir Persekolahan KPM" }
+        ];
+      } else {
+        // Anggaran Kalendar Rasmi Tahun-tahun Lain
+        const firstDayJun = new Date(year, 5, 1).getDay();
+        const firstMondayJunDate = 1 + ((8 - firstDayJun) % 7);
+        holidays.national[`${year}-06-${String(firstMondayJunDate).padStart(2, '0')}`] = "Keputeraan YDP Agong";
+
+        holidays.school = [
+          { start: `${year}-03-21`, end: `${year}-03-29`, name: "Cuti Penggal 1 KPM" },
+          { start: `${year}-05-23`, end: `${year}-06-07`, name: "Cuti Pertengahan Tahun KPM" },
+          { start: `${year}-08-29`, end: `${year}-09-06`, name: "Cuti Penggal 2 KPM" },
+          { start: `${year}-12-05`, end: `${year}-12-31`, name: "Cuti Akhir Tahun KPM" }
+        ];
+      }
+
+      return holidays;
+    }
+
+    function checkHolidayType(dateStr) {
+      const parts = dateStr.split('-');
+      const year = parseInt(parts[0], 10);
+      const d = new Date(year, parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+      const dayOfWeek = d.getDay();
+      const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+      const holidayMeta = getPahangMasihiHolidays(year);
+
+      return {
+        isWeekend,
+        national: holidayMeta.national[dateStr] || null,
+        pahang: holidayMeta.pahang[dateStr] || null,
+        school: holidayMeta.school.find(r => dateStr >= r.start && dateStr <= r.end)?.name || null
+      };
+    }
+
+    const realNow = new Date();
+    const AppState = {
+      selectedRoomIds: ["camelia_1"],
+      MIN_CALENDAR_YEAR: 2006,
+      calendarYear: realNow.getFullYear(),
+      calendarMonth: realNow.getMonth(),
+      selectedCheckInDate: null,
+      selectedCheckOutDate: null,
+
+      visitorsToday: 0,
+      visitorsTotal: 0,
+
+      branding: {
+        logoUrl: "https://arleta.site/interactivelink/5719/750936997.jpg",
+        brandTitle: "TEMU HAVENLY HOME",
+        brandSubtitle: "HOMESTAY KG CEMPAKA KUANTAN",
+        heroSkyBg: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2000&q=80",
+        heroBuildingBg: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80"
+      },
+
+      cinemaSlides: [
+        { image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2560&q=95", caption: "Seni Bina Moden Tropika & Rekabentuk Mewah • TEMU HAVENLY HOME" },
+        { image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=2560&q=95", caption: "Ruang Tamu Selesa & Suasana Tenang Bersama Keluarga" },
+        { image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=2560&q=95", caption: "Kamar Tidur Camelia Mewah & Privasi Terpelihara" },
+        { image: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=2560&q=95", caption: "Dapur Moden & Kemudahan Penapis Air Coway" },
+        { image: "https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&w=2560&q=95", caption: "Kolam Santai Peribadi & Patio Rekreasi Keluarga" }
+      ],
+
+      texts: {
+        heroWelcome: "SELAMAT DATANG",
+        heroSubtitle: "Percutian Impian di",
+        heroBrandName: "TEMU HAVENLY HOME",
+        heroDescription: "Nikmati keselesaan homestay di Cempaka, Kuantan yang serba lengkap .",
+        phone: "019 933 3757",
+        phoneRaw: "60199333757",
+        email: "temuhavenly@gmail.com",
+        address: "Lot 5795, Lorong Cempaka, Kampung Sri Cempaka, 26060 Kuantan, Pahang Darul Makmur",
+        social: "#TikTok : TemuHavenly Home"
+      },
+
+      rooms: [
+        { id: "camelia_1", type: "CAMELIA", category: "Bilik Normal", name: "CAMELIA 1", base_price: 300.00, weekend_price: 350.00 },
+        { id: "camelia_2", type: "CAMELIA", category: "Bilik Normal", name: "CAMELIA 2", base_price: 300.00, weekend_price: 350.00 },
+        { id: "camelia_3", type: "CAMELIA", category: "Bilik Normal", name: "CAMELIA 3", base_price: 300.00, weekend_price: 350.00 },
+        { id: "camelia_4", type: "CAMELIA", category: "Bilik Normal", name: "CAMELIA 4", base_price: 300.00, weekend_price: 350.00 },
+        { id: "dahlia_1", type: "DAHLIA", category: "Bilik Studio", name: "DAHLIA 1", base_price: 150.00, weekend_price: 200.00 },
+        { id: "dahlia_2", type: "DAHLIA", category: "Bilik Studio", name: "DAHLIA 2", base_price: 150.00, weekend_price: 200.00 }
+      ],
+
+      displayRoomImages: {
+        camelia: [
+          "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=800&q=80",
+          "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80",
+          "https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=800&q=80"
+        ],
+        dahlia: [
+          "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80",
+          "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=800&q=80",
+          "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80"
+        ]
+      },
+
+      galleryItems: [
+        { id: "g1", category: "BILIK", title: "Kamar Tidur Utama Camelia", image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=800&q=80" },
+        { id: "g2", category: "BILIK", title: "Studio Dahlia Nyaman", image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80" },
+        { id: "g3", category: "BILIK", title: "Bilik Normal Katil Berkembar", image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80" },
+        { id: "g4", category: "KOLAM", title: "Kolam Renang Privasi & Patio", image: "https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&w=800&q=80" },
+        { id: "g5", category: "KOLAM", title: "Suasana Kolam Waktu Malam", image: "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&w=800&q=80" },
+        { id: "g6", category: "DAPUR", title: "Dapur Lengkap & Coway", image: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=800&q=80" },
+        { id: "g7", category: "PADANG", title: "Halaman Padang & Landskap Hijau", image: "https://images.unsplash.com/photo-1588880331179-bc9b93a8cb5e?auto=format&fit=crop&w=800&q=80" },
+        { id: "g8", category: "SEKITAR", title: "Suasana Santai Sekitar Homestay", image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80" },
+        { id: "g9", category: "RUANG WACANA", title: "Ruang Wacana & Perbincangan Santai", image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=800&q=80" }
+      ],
+
+      faqItems: [
+        {
+          id: "faq_1",
+          question: "Apakah kemudahan yang ada di dalam unit Camelia ?",
+          answer: "Dalam unit Camelia, ada dua bilik tidur berhawa dingin, dua bilik air beserta water heater, ruang tamu dengan sofa, ada TV dan Netflix, ada Iron dan iron board, ada microwave, ada water heater dan freezer."
+        },
+        {
+          id: "faq_2",
+          question: "Apa kemudahan di dalam bilik studio Dahlia 1 & 2 ?",
+          answer: "Bilik studio berhawa dingin ada satu katil queen, satu katil bujang, TV dan Netflix, bilik air dengan water heater, freezer, microwave, iron dan iron board dan sejadah."
+        }
+      ],
+
+      feedbackList: [
+        {
+          id: "fb_1",
+          name: "Nurul Aini binti Ishak",
+          contact: "019-3321144",
+          comment: "Homestay paling kemas dan wangi di Kuantan! Sistem kod PIN digital sangat memudahkan, sampai lewat malam pun senang nak masuk tanpa perlu tunggu kunci. Kolam pun bersih!",
+          images: ["https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?auto=format&fit=crop&w=400&q=80"],
+          date: "3 Oktober",
+          approved: true
+        }
+      ],
+
+      uploadedFeedbackImages: [],
+      adminLocks: [],
+      bookings: []
+    };
+
+    // Pemuatan Segera Tanpa Delay dari Cache Tempatan (Zero Delay Initial Render)
+    function loadLocalCachedData() {
+      try {
+        const cachedLogo = localStorage.getItem('thh_saved_logo_jpeg');
+        if (cachedLogo) {
+          AppState.branding.logoUrl = cachedLogo;
+          updatePublicLogoRealtime(cachedLogo);
+        }
+
+        const cachedRoomImgs = localStorage.getItem('thh_room_images');
+        if (cachedRoomImgs) {
+          const parsed = JSON.parse(cachedRoomImgs);
+          if (parsed.camelia) AppState.displayRoomImages.camelia = parsed.camelia;
+          if (parsed.dahlia) AppState.displayRoomImages.dahlia = parsed.dahlia;
+        }
+
+        const cachedFacs = localStorage.getItem('thh_facilities');
+        if (cachedFacs) {
+          applyFacilitiesData(JSON.parse(cachedFacs));
+        }
+
+        const cachedActs = localStorage.getItem('thh_activities');
+        if (cachedActs) {
+          applyActivitiesData(JSON.parse(cachedActs));
+        }
+      } catch (e) {
+        console.warn("Cache load note:", e);
+      }
+    }
+
+    function updatePublicLogoRealtime(logoUrl) {
+      if (!logoUrl) return;
+      localStorage.setItem('thh_saved_logo_jpeg', logoUrl);
+      const logoImg = document.getElementById('publicHeaderLogoImg');
+      if (logoImg) logoImg.src = logoUrl;
+
+      const fav = document.getElementById('dynamicFavicon');
+      if (fav) fav.href = logoUrl;
+
+      const ogImg = document.getElementById('ogImageTag');
+      const ogSec = document.getElementById('ogImageSecureTag');
+      const twImg = document.getElementById('twitterImageTag');
+      const linkSrc = document.getElementById('linkSrcTag');
+
+      if (ogImg) ogImg.setAttribute('content', logoUrl);
+      if (ogSec) ogSec.setAttribute('content', logoUrl);
+      if (twImg) twImg.setAttribute('content', logoUrl);
+      if (linkSrc) linkSrc.setAttribute('href', logoUrl);
+    }
+
+    // Navigasi Pantas Tanpa Sebarang Delay
+    function navigateToSection(e, targetSelector) {
+      if (e) e.preventDefault();
+      const targetElem = document.querySelector(targetSelector);
+      if (!targetElem) return;
+
+      const navbarHeight = window.innerWidth < 640 ? 76 : 95;
+      const targetRect = targetElem.getBoundingClientRect();
+      const targetTop = targetRect.top + window.pageYOffset;
+
+      window.scrollTo({
+        top: Math.max(0, targetTop - navbarHeight),
+        behavior: 'smooth'
+      });
+
+      document.querySelectorAll('.nav-menu-btn').forEach(btn => {
+        btn.classList.remove('active-nav', 'text-teal-300');
+        if (btn.getAttribute('href') === targetSelector) {
+          btn.classList.add('active-nav', 'text-teal-300');
+        }
+      });
+    }
+
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobileMenu');
+      if (menu) menu.classList.toggle('hidden');
+    }
+
+    function handleLogoClick(e) {
+      navigateToSection(e, '#hero');
+    }
+
+    // Animasi Parallax Latar Belakang Hero
+    function initHero2DScrollAnimation() {
+      const sky = document.getElementById('heroLayerSky');
+      const bldg = document.getElementById('heroLayerBuilding');
+      const content = document.getElementById('heroContent');
+
+      window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset || document.documentElement.scrollTop;
+        if (scrolled > 900) return;
+
+        if (sky) sky.style.transform = `translateY(${scrolled * 0.28}px) scale(1.05)`;
+        if (bldg) bldg.style.transform = `translateY(${scrolled * 0.12}px)`;
+        if (content) {
+          content.style.transform = `translateY(${scrolled * 0.22}px)`;
+          content.style.opacity = Math.max(0, 1 - (scrolled / 520));
+        }
+      }, { passive: true });
+    }
+
+    let currentCinemaIndex = 0;
+    let activeCinemaLayer = 1;
+    let cinemaIntervalTimer = null;
+
+    function init8kCinemaAutoSlide() {
+      const slide1 = document.getElementById('cinemaSlide1');
+      const slide2 = document.getElementById('cinemaSlide2');
+      const captionElem = document.getElementById('cinemaSlideCaption');
+      if (!slide1 || !slide2 || AppState.cinemaSlides.length === 0) return;
+
+      if (slide1 && AppState.cinemaSlides[0]) {
+        slide1.style.backgroundImage = `url('${AppState.cinemaSlides[0].image}')`;
+        if (captionElem) captionElem.innerText = AppState.cinemaSlides[0].caption;
+      }
+
+      if (cinemaIntervalTimer) clearInterval(cinemaIntervalTimer);
+
+      cinemaIntervalTimer = setInterval(() => {
+        if (AppState.cinemaSlides.length === 0) return;
+        currentCinemaIndex = (currentCinemaIndex + 1) % AppState.cinemaSlides.length;
+        const currentData = AppState.cinemaSlides[currentCinemaIndex];
+
+        if (activeCinemaLayer === 1) {
+          slide2.style.backgroundImage = `url('${currentData.image}')`;
+          slide2.style.opacity = '1';
+          slide2.style.transform = 'scale(1.03)';
+          slide1.style.opacity = '0';
+          slide1.style.transform = 'scale(1.0)';
+          activeCinemaLayer = 2;
+        } else {
+          slide1.style.backgroundImage = `url('${currentData.image}')`;
+          slide1.style.opacity = '1';
+          slide1.style.transform = 'scale(1.03)';
+          slide2.style.opacity = '0';
+          slide2.style.transform = 'scale(1.0)';
+          activeCinemaLayer = 1;
+        }
+
+        if (captionElem) {
+          captionElem.style.opacity = '0';
+          setTimeout(() => {
+            captionElem.innerText = currentData.caption;
+            captionElem.style.opacity = '1';
+          }, 300);
+        }
+      }, 4200);
+    }
+
+    function renderRoomCards() {
+      const cameliaContainer = document.getElementById('cameliaCardsContainer');
+      const dahliaContainer = document.getElementById('dahliaCardsContainer');
+      if (!cameliaContainer || !dahliaContainer) return;
+
+      cameliaContainer.innerHTML = '';
+      dahliaContainer.innerHTML = '';
+
+      AppState.displayRoomImages.camelia.forEach(imgUrl => {
+        const card = document.createElement('div');
+        card.className = "rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition duration-300 border border-slate-200 bg-white flex flex-col";
+        card.innerHTML = `
+          <div class="h-48 sm:h-56 relative overflow-hidden bg-slate-100">
+            <img src="${imgUrl}" alt="BILIK CAMELIA" class="w-full h-full object-cover transition-transform duration-700 hover:scale-105" loading="lazy">
+          </div>
+          <div class="p-4 sm:p-5 flex-1 flex items-center justify-between gap-3 bg-white">
+            <h4 class="font-serif text-sm sm:text-base font-bold text-slate-900 tracking-wider truncate uppercase">BILIK CAMELIA</h4>
+            <a href="#bookingSection" onclick="navigateToSection(event, '#bookingSection')" class="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 text-emerald-800 transition flex items-center gap-1 shrink-0 border border-emerald-200 shadow-xs">
+              <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-600"></i>
+              <span>Pilih Bilik</span>
+            </a>
+          </div>
+        `;
+        cameliaContainer.appendChild(card);
+      });
+
+      AppState.displayRoomImages.dahlia.forEach(imgUrl => {
+        const card = document.createElement('div');
+        card.className = "rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition duration-300 border border-slate-200 bg-white flex flex-col";
+        card.innerHTML = `
+          <div class="h-48 sm:h-56 relative overflow-hidden bg-slate-100">
+            <img src="${imgUrl}" alt="STUDIO DAHLIA" class="w-full h-full object-cover transition-transform duration-700 hover:scale-105" loading="lazy">
+          </div>
+          <div class="p-4 sm:p-5 flex-1 flex items-center justify-between gap-3 bg-white">
+            <h4 class="font-serif text-sm sm:text-base font-bold text-slate-900 tracking-wider truncate uppercase">STUDIO DAHLIA</h4>
+            <a href="#bookingSection" onclick="navigateToSection(event, '#bookingSection')" class="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-semibold bg-pink-50 hover:bg-pink-100 active:bg-pink-200 text-pink-800 transition flex items-center gap-1 shrink-0 border border-pink-200 shadow-xs">
+              <i data-lucide="calendar" class="w-3.5 h-3.5 text-pink-600"></i>
+              <span>Pilih Bilik</span>
+            </a>
+          </div>
+        `;
+        dahliaContainer.appendChild(card);
+      });
+
+      updateSelectedRoomsUI();
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function toggleRoomSelection(roomId) {
+      if (AppState.selectedRoomIds.includes(roomId)) {
+        if (AppState.selectedRoomIds.length > 1) {
+          AppState.selectedRoomIds = AppState.selectedRoomIds.filter(id => id !== roomId);
+        } else {
+          showToast("Sekurang-kurangnya satu bilik perlu dipilih.", "info");
+          return;
+        }
+      } else {
+        AppState.selectedRoomIds.push(roomId);
+      }
+      updateSelectedRoomsUI();
+      renderInteractiveCalendar();
+      calculateLivePricing();
+    }
+
+    function selectAllRooms(shouldSelectAll) {
+      if (shouldSelectAll) {
+        AppState.selectedRoomIds = AppState.rooms.map(r => r.id);
+        showToast("Semua 6 bilik telah dipilih.", "success");
+      } else {
+        AppState.selectedRoomIds = [AppState.rooms[0].id];
+        showToast("Pilihan dikosongkan. Hanya CAMELIA 1 dipilih sebagai lalai.", "info");
+      }
+      updateSelectedRoomsUI();
+      renderInteractiveCalendar();
+      calculateLivePricing();
+    }
+
+    function isRoomLockedOnSingleDate(dateStr, roomId) {
+      for (const l of AppState.adminLocks) {
+        if (!l.is_released) {
+          const isMatch = l.room_id === 'ALL' || 
+                          l.room_id === roomId || 
+                          (Array.isArray(l.room_ids) && l.room_ids.includes(roomId));
+          if (isMatch) {
+            if (l.start_date === l.end_date) {
+              if (dateStr === l.start_date) return true;
+            } else {
+              if (dateStr >= l.start_date && dateStr < l.end_date) {
+                return true;
+              }
+            }
+          }
+        }
+      }
+      return false;
+    }
+
+    function isRoomUnavailableOnDates(roomId, checkInStr, checkOutStr) {
+      if (!checkInStr) return false;
+      const [yIn, mIn, dIn] = checkInStr.split('-').map(Number);
+      let cur = new Date(yIn, mIn - 1, dIn);
+      let cOut;
+      if (checkOutStr) {
+        const [yOut, mOut, dOut] = checkOutStr.split('-').map(Number);
+        cOut = new Date(yOut, mOut - 1, dOut);
+      } else {
+        cOut = new Date(yIn, mIn - 1, dIn + 1);
+      }
+
+      while (cur < cOut) {
+        const dStr = `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, '0')}-${String(cur.getDate()).padStart(2, '0')}`;
+        if (isRoomLockedOnSingleDate(dStr, roomId)) {
+          return true;
+        }
+        cur.setDate(cur.getDate() + 1);
+      }
+      return false;
+    }
+
+    function updateSelectedRoomsUI() {
+      const count = AppState.selectedRoomIds.length;
+      const summary = document.getElementById('selectedRoomsSummaryCount');
+      if (summary) summary.innerText = `${count} Bilik Aktif`;
+
+      const valCount = document.getElementById('valRoomsCountSummary');
+      if (valCount) valCount.innerText = `${count} Bilik`;
+
+      const chipsContainer = document.getElementById('selectedRoomsChips');
+      if (chipsContainer) {
+        chipsContainer.innerHTML = '';
+        AppState.rooms.forEach(r => {
+          const isSel = AppState.selectedRoomIds.includes(r.id);
+          const isLocked = isRoomUnavailableOnDates(r.id, AppState.selectedCheckInDate, AppState.selectedCheckOutDate);
+
+          const card = document.createElement('div');
+          let cardStyle = 'bg-white/90 border border-emerald-200/90 text-slate-800 hover:border-emerald-400 hover:shadow-md cursor-pointer';
+          if (isSel) {
+            cardStyle = 'bg-gradient-to-br from-emerald-50 via-teal-50/50 to-emerald-100/60 border-2 border-emerald-500 ring-2 ring-emerald-400/40 text-emerald-950 shadow-md scale-[1.01]';
+          } else if (isLocked) {
+            cardStyle = 'bg-rose-50/70 border border-rose-200 text-slate-500 opacity-60 cursor-not-allowed';
+          }
+
+          card.className = `p-3 rounded-2xl transition-all duration-200 flex items-center justify-between gap-3 ${cardStyle}`;
+          card.onclick = () => {
+            if (!isLocked) toggleRoomSelection(r.id);
+          };
+
+          card.innerHTML = `
+            <div class="flex items-center gap-2.5 min-w-0">
+              <span class="w-3 h-3 rounded-full ${isLocked ? 'bg-rose-400 ring-2 ring-rose-300' : (isSel ? 'bg-emerald-500 ring-2 ring-emerald-300 animate-pulse' : 'bg-slate-300')} shrink-0"></span>
+              <div class="min-w-0">
+                <h4 class="font-serif font-bold text-xs sm:text-sm text-slate-900 truncate">${r.name}</h4>
+                <p class="text-[10px] text-slate-500">${r.category}</p>
+              </div>
+            </div>
+            <div class="text-right shrink-0">
+              <span class="font-poppins-bold text-xs sm:text-sm text-emerald-900 block leading-tight">RM ${r.weekend_price.toFixed(0)}</span>
+              <span class="text-[9px] text-slate-500 block font-poppins-bold mt-0.5">H.Biasa: RM${r.base_price.toFixed(0)}</span>
+            </div>
+          `;
+          chipsContainer.appendChild(card);
+        });
+      }
+    }
+
+    let currentGalleryAlbum = 'BILIK';
+    const ALBUM_ORDER_LIST = ['BILIK', 'KOLAM', 'DAPUR', 'PADANG', 'SEKITAR', 'RUANG WACANA', 'SEMUA'];
+
+    function renderGalleryAlbumsAndItems() {
+      const btnContainer = document.getElementById('galleryAlbumFilterButtons');
+      const grid = document.getElementById('galleryGrid');
+      if (!btnContainer || !grid) return;
+
+      btnContainer.innerHTML = '';
+      ALBUM_ORDER_LIST.forEach(cat => {
+        const btn = document.createElement('button');
+        const isActive = (cat === currentGalleryAlbum);
+        btn.className = `px-3.5 sm:px-4 py-1.5 rounded-full text-xs font-semibold transition shadow active:scale-95 ${isActive ? 'bg-emerald-700 text-white' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'}`;
+        btn.innerText = cat;
+        btn.onclick = () => {
+          currentGalleryAlbum = cat;
+          renderGalleryAlbumsAndItems();
+        };
+        btnContainer.appendChild(btn);
+      });
+
+      grid.innerHTML = '';
+      const filtered = (currentGalleryAlbum === 'SEMUA')
+        ? AppState.galleryItems
+        : AppState.galleryItems.filter(item => (item.category || '').toUpperCase() === currentGalleryAlbum);
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 text-xs italic">Tiada gambar dalam album ${currentGalleryAlbum} pada masa ini.</div>`;
+      } else {
+        filtered.forEach(item => {
+          const div = document.createElement('div');
+          div.className = "group relative h-48 sm:h-52 rounded-2xl overflow-hidden shadow-sm border border-slate-200 bg-slate-100 cursor-pointer transform hover:-translate-y-1 transition duration-300";
+          div.onclick = () => openGalleryModal(item.image, item.title, item.category);
+
+          div.innerHTML = `
+            <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" loading="lazy">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex flex-col justify-end p-3.5 text-white">
+              <span class="text-[9px] uppercase tracking-wider font-mono text-emerald-300 font-bold">${item.category}</span>
+              <h4 class="font-serif text-xs sm:text-sm font-bold mt-0.5 truncate">${item.title}</h4>
+              <span class="text-[10px] text-emerald-200 mt-1 flex items-center gap-1"><i data-lucide="zoom-in" class="w-3 h-3"></i> Klik lihat besar</span>
+            </div>
+          `;
+          grid.appendChild(div);
+        });
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function populateMonthYearDropdowns() {
+      const monthSelect = document.getElementById('calendarSelectMonth');
+      const yearSelect = document.getElementById('calendarSelectYear');
+      if (!monthSelect || !yearSelect) return;
+
+      if (monthSelect.children.length === 0) {
+        malaysiaMonthNames.forEach((name, idx) => {
+          const opt = document.createElement('option');
+          opt.value = idx;
+          opt.innerText = name;
+          monthSelect.appendChild(opt);
+        });
+      }
+
+      if (yearSelect.children.length === 0) {
+        const curY = new Date().getFullYear();
+        const maxCalYear = Math.max(curY + 15, 2040);
+        for (let y = AppState.MIN_CALENDAR_YEAR; y <= maxCalYear; y++) {
+          const opt = document.createElement('option');
+          opt.value = y;
+          opt.innerText = y;
+          yearSelect.appendChild(opt);
+        }
+      }
+
+      monthSelect.value = AppState.calendarMonth;
+      yearSelect.value = AppState.calendarYear;
+    }
+
+    function handleMonthYearSelectChange() {
+      const monthSelect = document.getElementById('calendarSelectMonth');
+      const yearSelect = document.getElementById('calendarSelectYear');
+      if (!monthSelect || !yearSelect) return;
+
+      AppState.calendarMonth = parseInt(monthSelect.value, 10);
+      AppState.calendarYear = parseInt(yearSelect.value, 10);
+      renderInteractiveCalendar();
+    }
+
+    function changeCalendarMonth(delta) {
+      let m = AppState.calendarMonth + delta;
+      let y = AppState.calendarYear;
+
+      if (m > 11) {
+        m = 0;
+        y++;
+      } else if (m < 0) {
+        if (y <= AppState.MIN_CALENDAR_YEAR) return;
+        m = 11;
+        y--;
+      }
+
+      AppState.calendarMonth = m;
+      AppState.calendarYear = y;
+      renderInteractiveCalendar();
+    }
+
+    function renderInteractiveCalendar() {
+      const year = AppState.calendarYear;
+      const month = AppState.calendarMonth;
+
+      populateMonthYearDropdowns();
+
+      const btnPrev = document.getElementById('btnPrevMonth');
+      if (btnPrev) {
+        if (year === AppState.MIN_CALENDAR_YEAR && month === 0) {
+          btnPrev.disabled = true;
+          btnPrev.classList.add('opacity-30', 'cursor-not-allowed');
+        } else {
+          btnPrev.disabled = false;
+          btnPrev.classList.remove('opacity-30', 'cursor-not-allowed');
+        }
+      }
+
+      const grid = document.getElementById('calendarDaysGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      const firstDayRaw = new Date(year, month, 1).getDay();
+      const firstDayIndex = (firstDayRaw === 0) ? 6 : firstDayRaw - 1;
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+      for (let i = firstDayIndex - 1; i >= 0; i--) {
+        const prevDayCell = document.createElement('div');
+        prevDayCell.className = "min-h-[58px] sm:min-h-[70px] md:min-h-[78px] p-1 sm:p-1.5 rounded-xl bg-slate-50/60 text-slate-300 flex flex-col justify-between opacity-40 cursor-not-allowed border border-dashed border-slate-200";
+        prevDayCell.innerHTML = `<span class="text-[9px] sm:text-[10px] font-mono">${daysInPrevMonth - i}</span>`;
+        grid.appendChild(prevDayCell);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dayCell = document.createElement('div');
+
+        const hInfo = checkHolidayType(dateStr);
+        const isCheckIn = AppState.selectedCheckInDate === dateStr;
+        const isCheckOut = AppState.selectedCheckOutDate === dateStr;
+        const isInRange = AppState.selectedCheckInDate && AppState.selectedCheckOutDate && (dateStr > AppState.selectedCheckInDate && dateStr < AppState.selectedCheckOutDate);
+
+        let cellTheme = "bg-white text-slate-800 border border-emerald-200/90 hover:border-emerald-400 hover:shadow-md";
+
+        if (hInfo.isWeekend) cellTheme = "bg-blue-50/70 text-blue-950 border border-blue-300/80 hover:border-blue-500 hover:shadow-md";
+        if (hInfo.school) cellTheme = "bg-amber-50/70 text-amber-950 border border-amber-300/80 hover:border-amber-500 hover:shadow-md";
+        if (hInfo.pahang) cellTheme = "bg-purple-50/70 text-purple-950 border border-purple-300/80 hover:border-purple-500 hover:shadow-md";
+        if (hInfo.national) cellTheme = "bg-rose-50/70 text-rose-950 border border-rose-300/80 hover:border-rose-500 hover:shadow-md";
+
+        if (isCheckIn || isCheckOut) {
+          cellTheme = "bg-gradient-to-br from-emerald-600 to-teal-700 text-white border-2 border-emerald-800 font-bold ring-4 ring-emerald-400/30 shadow-lg scale-[1.03] z-20";
+        } else if (isInRange) {
+          cellTheme = "bg-emerald-100 text-emerald-950 border-2 border-emerald-400 font-bold shadow-xs";
+        }
+
+        let roomIndicatorBoxes = '';
+        let availableCountOnDay = 0;
+
+        AppState.rooms.forEach((r) => {
+          const isLocked = isRoomLockedOnSingleDate(dateStr, r.id);
+          const boxColor = isLocked ? 'bg-rose-400 ring-1 ring-rose-300' : 'bg-emerald-400 ring-1 ring-emerald-300';
+          const tooltip = isLocked ? `${r.name}: Bilik Telah Ditempah` : `${r.name}: Belum Ditempah`;
+
+          if (!isLocked) availableCountOnDay++;
+
+          roomIndicatorBoxes += `
+            <span title="${tooltip}" class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-sm ${boxColor} inline-block transition-transform hover:scale-125 shadow-xs"></span>
+          `;
+        });
+
+        let holidayTag = '';
+        if (hInfo.national) {
+          holidayTag = `<span class="truncate block text-[7px] sm:text-[8px] px-1 py-0.2 rounded bg-rose-200/90 text-rose-950 font-extrabold border border-rose-400" title="${hInfo.national}">${hInfo.national}</span>`;
+        } else if (hInfo.pahang) {
+          holidayTag = `<span class="truncate block text-[7px] sm:text-[8px] px-1 py-0.2 rounded bg-purple-200/90 text-purple-950 font-extrabold border border-purple-400" title="${hInfo.pahang}">${hInfo.pahang}</span>`;
+        } else if (hInfo.school) {
+          holidayTag = `<span class="truncate block text-[7px] sm:text-[8px] px-1 py-0.2 rounded bg-amber-200/90 text-amber-950 font-extrabold border border-amber-400" title="${hInfo.school}">Cuti Sek</span>`;
+        } else if (hInfo.isWeekend) {
+          holidayTag = `<span class="block text-[7px] sm:text-[8px] px-1 py-0.2 rounded bg-blue-200/90 text-blue-950 font-extrabold border border-blue-400">H.Minggu</span>`;
+        }
+
+        dayCell.className = `min-h-[58px] sm:min-h-[70px] md:min-h-[78px] p-1 sm:p-1.5 rounded-xl border flex flex-col justify-between cursor-pointer transition select-none ${cellTheme}`;
+        dayCell.onclick = () => handleCalendarDateClick(dateStr, availableCountOnDay);
+
+        let badgeLabel = '';
+        if (isCheckIn) badgeLabel = '<span class="text-[7px] sm:text-[8px] bg-emerald-950 text-emerald-200 px-1 py-0.5 rounded font-mono font-bold uppercase shadow-xs">Masuk</span>';
+        if (isCheckOut) badgeLabel = '<span class="text-[7px] sm:text-[8px] bg-teal-950 text-teal-200 px-1 py-0.5 rounded font-mono font-bold uppercase shadow-xs">Keluar</span>';
+
+        dayCell.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] sm:text-[12px] font-mono font-extrabold ${hInfo.isWeekend && !isCheckIn && !isCheckOut ? 'text-blue-900' : ''}">${day}</span>
+              ${badgeLabel}
+            </div>
+            <div class="mt-0.5">
+              ${holidayTag}
+            </div>
+          </div>
+          <div class="pt-1 mt-auto">
+            <div class="grid grid-cols-3 gap-0.5 sm:gap-1 ${isCheckIn || isCheckOut ? 'bg-emerald-950/70 border border-emerald-400/80' : 'bg-emerald-100/70 border border-emerald-200/80'} p-0.5 sm:p-1 rounded-md justify-items-center">
+              ${roomIndicatorBoxes}
+            </div>
+          </div>
+        `;
+
+        grid.appendChild(dayCell);
+      }
+
+      updateCalendarDateDisplays();
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function handleCalendarDateClick(dateStr, availableCountOnDay) {
+      if (AppState.selectedCheckInDate && !AppState.selectedCheckOutDate) {
+        if (dateStr > AppState.selectedCheckInDate) {
+          const hasConflict = AppState.selectedRoomIds.some(rId => isRoomUnavailableOnDates(rId, AppState.selectedCheckInDate, dateStr));
+          if (hasConflict) {
+            showToast(`Bilik yang dipilih tidak tersedia untuk malam penginapan antara ${formatDateDisplay(AppState.selectedCheckInDate)} dan ${formatDateDisplay(dateStr)}.`, "error");
+            return;
+          }
+          AppState.selectedCheckOutDate = dateStr;
+          document.getElementById('bookingCheckIn').value = AppState.selectedCheckInDate || '';
+          document.getElementById('bookingCheckOut').value = AppState.selectedCheckOutDate || '';
+          showToast(`Tarikh Keluar dipilih: ${formatDateDisplay(dateStr)}.`, "success");
+          ensureSelectedRoomsAreValid();
+          renderInteractiveCalendar();
+          updateSelectedRoomsUI();
+          calculateLivePricing();
+          return;
+        } else if (dateStr === AppState.selectedCheckInDate) {
+          AppState.selectedCheckInDate = null;
+          document.getElementById('bookingCheckIn').value = '';
+          showToast("Pilihan tarikh daftar masuk dibatalkan.", "info");
+          renderInteractiveCalendar();
+          updateSelectedRoomsUI();
+          calculateLivePricing();
+          return;
+        } else {
+          if (availableCountOnDay === 0) {
+            showToast(`Maaf! Tiada bilik sedia untuk daftar masuk pada ${formatDateDisplay(dateStr)}.`, "error");
+            return;
+          }
+          AppState.selectedCheckInDate = dateStr;
+          document.getElementById('bookingCheckIn').value = dateStr;
+          showToast(`Tarikh Masuk dikemaskini: ${formatDateDisplay(dateStr)}.`, "info");
+          renderInteractiveCalendar();
+          updateSelectedRoomsUI();
+          calculateLivePricing();
+          return;
+        }
+      }
+
+      if (availableCountOnDay === 0) {
+        showToast(`Maaf! Tiada bilik sedia pada ${formatDateDisplay(dateStr)}. Semua bilik telah ditempah.`, "error");
+        return;
+      }
+
+      if (AppState.selectedCheckOutDate === dateStr) {
+        AppState.selectedCheckOutDate = null;
+        showToast("Pilihan tarikh daftar keluar dibatalkan.", "info");
+      } else {
+        AppState.selectedCheckInDate = dateStr;
+        AppState.selectedCheckOutDate = null;
+        showToast(`Tarikh Masuk dipilih: ${formatDateDisplay(dateStr)}. Sila klik tarikh seterusnya untuk Daftar Keluar.`, "info");
+      }
+
+      document.getElementById('bookingCheckIn').value = AppState.selectedCheckInDate || '';
+      document.getElementById('bookingCheckOut').value = AppState.selectedCheckOutDate || '';
+
+      ensureSelectedRoomsAreValid();
+      renderInteractiveCalendar();
+      updateSelectedRoomsUI();
+      calculateLivePricing();
+    }
+
+    function ensureSelectedRoomsAreValid() {
+      if (!AppState.selectedCheckInDate) return;
+
+      const validRooms = AppState.selectedRoomIds.filter(id => 
+        !isRoomUnavailableOnDates(id, AppState.selectedCheckInDate, AppState.selectedCheckOutDate)
+      );
+
+      if (validRooms.length > 0) {
+        AppState.selectedRoomIds = validRooms;
+      } else {
+        const anyAvail = AppState.rooms.find(r => 
+          !isRoomUnavailableOnDates(r.id, AppState.selectedCheckInDate, AppState.selectedCheckOutDate)
+        );
+        if (anyAvail) {
+          AppState.selectedRoomIds = [anyAvail.id];
+          showToast(`Pilihan bilik diselaraskan ke ${anyAvail.name}.`, "info");
+        }
+      }
+    }
+
+    function clearSelectedDates() {
+      AppState.selectedCheckInDate = null;
+      AppState.selectedCheckOutDate = null;
+      document.getElementById('bookingCheckIn').value = '';
+      document.getElementById('bookingCheckOut').value = '';
+      renderInteractiveCalendar();
+      updateSelectedRoomsUI();
+      calculateLivePricing();
+      showToast("Pilihan tarikh telah dikosongkan.", "info");
+    }
+
+    function formatDateDisplay(dateStr) {
+      if (!dateStr) return "-";
+      const parts = dateStr.split('-');
+      if (parts.length !== 3) return dateStr;
+      const mIdx = parseInt(parts[1], 10) - 1;
+      return `${parseInt(parts[2], 10)} ${malaysiaMonthNames[mIdx]} ${parts[0]}`;
+    }
+
+    function updateCalendarDateDisplays() {
+      const inText = document.getElementById('displayCheckInText');
+      const outText = document.getElementById('displayCheckOutText');
+      if (inText) inText.innerText = formatDateDisplay(AppState.selectedCheckInDate);
+      if (outText) outText.innerText = formatDateDisplay(AppState.selectedCheckOutDate);
+    }
+
+    function calculateLivePricing() {
+      const checkInVal = AppState.selectedCheckInDate;
+      const checkOutVal = AppState.selectedCheckOutDate;
+
+      const activeAvailableRooms = AppState.rooms.filter(r => 
+        AppState.selectedRoomIds.includes(r.id) &&
+        !isRoomUnavailableOnDates(r.id, checkInVal, checkOutVal)
+      );
+
+      if (!checkInVal || !checkOutVal || activeAvailableRooms.length === 0) {
+        resetPricingDisplay(activeAvailableRooms);
+        return;
+      }
+
+      const [yIn, mIn, dInNum] = checkInVal.split('-').map(Number);
+      const [yOut, mOut, dOutNum] = checkOutVal.split('-').map(Number);
+
+      let cur = new Date(yIn, mIn - 1, dInNum);
+      const end = new Date(yOut, mOut - 1, dOutNum);
+
+      if (end <= cur) {
+        resetPricingDisplay(activeAvailableRooms);
+        return;
+      }
+
+      let totalNights = 0;
+      let weekdayNights = 0;
+      let weekendNights = 0;
+
+      while (cur < end) {
+        totalNights++;
+        const day = cur.getDay();
+        if (day === 6 || day === 0) {
+          weekendNights++;
+        } else {
+          weekdayNights++;
+        }
+        cur.setDate(cur.getDate() + 1);
+      }
+
+      let totalWeekdayAmount = 0;
+      let totalWeekendAmount = 0;
+
+      activeAvailableRooms.forEach(room => {
+        totalWeekdayAmount += (weekdayNights * room.base_price);
+        totalWeekendAmount += (weekendNights * room.weekend_price);
+      });
+
+      const grandTotal = totalWeekdayAmount + totalWeekendAmount;
+
+      document.getElementById('priceBadgeNights').innerText = `${totalNights} Malam`;
+      document.getElementById('valRoomsCountSummary').innerText = `${activeAvailableRooms.length} Bilik`;
+      document.getElementById('labelWeekdayRate').innerText = `Kadar Hari Biasa (${weekdayNights} mlm × ${activeAvailableRooms.length} bilik)`;
+      document.getElementById('valWeekdayTotal').innerText = `RM ${totalWeekdayAmount.toFixed(2)}`;
+      document.getElementById('labelWeekendRate').innerText = `Kadar Hujung Minggu (${weekendNights} mlm × ${activeAvailableRooms.length} bilik)`;
+      document.getElementById('valWeekendTotal').innerText = `RM ${totalWeekendAmount.toFixed(2)}`;
+      document.getElementById('valGrandTotal').innerText = `RM ${grandTotal.toFixed(2)}`;
+    }
+
+    function resetPricingDisplay(rooms = []) {
+      const count = rooms.length || AppState.selectedRoomIds.length;
+      document.getElementById('priceBadgeNights').innerText = `0 Malam`;
+      document.getElementById('valRoomsCountSummary').innerText = `${count} Bilik`;
+      document.getElementById('valWeekdayTotal').innerText = `RM 0.00`;
+      document.getElementById('valWeekendTotal').innerText = `RM 0.00`;
+      document.getElementById('valGrandTotal').innerText = `RM 0.00`;
+    }
+
+    function handleDirectBookingToWhatsApp() {
+      const checkIn = AppState.selectedCheckInDate;
+      const checkOut = AppState.selectedCheckOutDate;
+      const guestName = document.getElementById('guestFullName').value.trim();
+      const guestPhone = document.getElementById('guestPhone').value.trim();
+      const guestAddressCity = document.getElementById('guestAddressCity').value.trim();
+
+      if (AppState.selectedRoomIds.length === 0) {
+        showToast("Sila pilih sekurang-kurangnya satu bilik yang sedia (berwarna hijau).", "warning");
+        return;
+      }
+      if (!checkIn || !checkOut) {
+        showToast("Sila pilih tarikh daftar masuk dan daftar keluar pada kalendar.", "warning");
+        return;
+      }
+      if (!guestName || !guestPhone) {
+        showToast("Sila lengkapkan Nama Penuh dan Nombor Telefon anda.", "warning");
+        return;
+      }
+
+      const unavail = AppState.selectedRoomIds.filter(id => isRoomUnavailableOnDates(id, checkIn, checkOut));
+      if (unavail.length > 0) {
+        const names = unavail.map(id => AppState.rooms.find(r => r.id === id)?.name).join(', ');
+        showToast(`Bilik ${names} telah ditempah bagi tarikh ini. Sila pilih bilik lain.`, "error");
+        return;
+      }
+
+      const selectedRooms = AppState.rooms.filter(r => AppState.selectedRoomIds.includes(r.id));
+      const bookingNo = `THH-${new Date().getFullYear()}${(new Date().getMonth()+1).toString().padStart(2,'0')}${new Date().getDate().toString().padStart(2,'0')}-${Math.floor(1000 + Math.random() * 9000)}`;
+      const accessPin = Math.floor(100000 + Math.random() * 900000).toString();
+      const grandTotal = parseFloat(document.getElementById('valGrandTotal').innerText.replace('RM ', ''));
+      const nightsCount = Math.ceil((new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24));
+
+      const bookingRecord = {
+        id: `b_${Date.now()}`,
+        organization_id: CURRENT_ORG_ID,
+        room_ids: [...AppState.selectedRoomIds],
+        property_id: AppState.selectedRoomIds[0],
+        room_names: selectedRooms.map(r => r.name).join(', '),
+        booking_number: bookingNo,
+        guest_name: guestName,
+        guest_phone: guestPhone,
+        guest_address_city: guestAddressCity || "-",
+        guest_email: AppState.texts.email,
+        check_in: checkIn,
+        check_out: checkOut,
+        nights: nightsCount,
+        grand_total: grandTotal,
+        pin_code: accessPin,
+        payment_status: "PENDING_CONFIRMATION",
+        booking_status: "SUBMITTED",
+        created_at: new Date().toISOString()
+      };
+
+      if (rtdb) {
+        try {
+          rtdb.ref('bookings/' + bookingRecord.id).set(bookingRecord);
+        } catch (e) {
+          console.error("Firebase booking record save error:", e);
+        }
+      }
+
+      const waPhone = AppState.texts.phoneRaw || "60199333757";
+      const addressDisplay = guestAddressCity || "-";
+      const waLines = [
+        "*TEMPAHAN HOMESTAY TEMU HAVENLY HOME*",
+        "",
+        `*No. Tempahan:* ${bookingNo}`,
+        `*Nama Tetamu:* ${guestName}`,
+        `*No. Telefon:* ${guestPhone}`,
+        `*Bandar/Alamat:* ${addressDisplay}`,
+        `*Bilik Dipilih:* ${bookingRecord.room_names}`,
+        `*Tarikh Masuk:* ${checkIn}`,
+        `*Tarikh Keluar:* ${checkOut} (${nightsCount} Malam)`,
+        `*Jumlah Sewa:* RM ${grandTotal.toFixed(2)}`,
+        `*PIN Akses:* ${accessPin}`,
+        "",
+        "Salam admin, saya ingin mengesahkan tempahan ini dan membuat pembayaran. Terima kasih."
+      ];
+
+      const waMsg = encodeURIComponent(waLines.join("\n"));
+      const waUrl = `https://wa.me/${waPhone}?text=${waMsg}`;
+      window.open(waUrl, '_blank');
+      showToast("Tempahan dihantar terus ke WhatsApp admin rasmi!", "success");
+    }
+
+    function openGalleryModal(imageUrl, title, category) {
+      const modal = document.getElementById('galleryImageModal');
+      const imgElem = document.getElementById('galleryModalImg');
+      const titleElem = document.getElementById('galleryModalTitle');
+      const catElem = document.getElementById('galleryModalCategory');
+      if (!modal || !imgElem) return;
+
+      imgElem.src = imageUrl;
+      if (titleElem) titleElem.innerText = title || "Koleksi Gambar";
+      if (catElem) catElem.innerText = category || "Galeri";
+
+      modal.classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeGalleryModal() {
+      const modal = document.getElementById('galleryImageModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function renderFaqItems() {
+      const container = document.getElementById('faqItemsContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      AppState.faqItems.forEach((faq) => {
+        const item = document.createElement('div');
+        item.className = "bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-xs transition hover:border-emerald-300";
+        item.innerHTML = `
+          <h4 class="font-serif font-bold text-slate-900 text-sm sm:text-base flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span>${faq.question}</span>
+          </h4>
+          <p class="text-xs sm:text-sm text-slate-600 mt-2 pl-4 leading-relaxed border-l-2 border-emerald-200">
+            ${faq.answer}
+          </p>
+        `;
+        container.appendChild(item);
+      });
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function renderFeedbackList() {
+      const container = document.getElementById('commentFeedContainer');
+      const countBadge = document.getElementById('commentFeedCount');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const approvedItems = AppState.feedbackList.filter(f => f.approved !== false);
+      if (countBadge) countBadge.innerText = `${approvedItems.length} Komen`;
+
+      if (approvedItems.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-6">Belum ada komen yang disahkan.</p>`;
+        return;
+      }
+
+      approvedItems.forEach(fb => {
+        const card = document.createElement('div');
+        card.className = "p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-xs";
+        let imagesHtml = '';
+        if (fb.images && Array.isArray(fb.images) && fb.images.length > 0) {
+          imagesHtml = `<div class="flex items-center gap-2 mt-2 pt-2 border-t border-slate-200/60 flex-wrap">`;
+          fb.images.forEach(imgUrl => {
+            imagesHtml += `<img src="${imgUrl}" alt="Foto Komen" class="w-16 h-14 rounded-lg object-cover border border-slate-300 cursor-pointer" onclick="openGalleryModal('${imgUrl}', '${fb.name}', 'Maklum Balas')">`;
+          });
+          imagesHtml += `</div>`;
+        }
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between border-b border-slate-200/80 pb-1.5">
+            <span class="font-bold text-slate-900 flex items-center gap-1.5">
+              <i data-lucide="user" class="w-3.5 h-3.5 text-emerald-600"></i>
+              <span>${fb.name}</span>
+            </span>
+            <span class="text-[10px] text-slate-400 font-mono">${fb.date || 'Baru'}</span>
+          </div>
+          <p class="text-slate-700 leading-relaxed">${fb.comment}</p>
+          ${imagesHtml}
+        `;
+        container.appendChild(card);
+      });
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function handleFeedbackImageUpload(event) {
+      const files = event.target.files;
+      if (!files) return;
+
+      if (files.length > 2) {
+        showToast("Maksimum 2 gambar sahaja dibenarkan.", "warning");
+        event.target.value = "";
+        return;
+      }
+
+      AppState.uploadedFeedbackImages = [];
+      const previewContainer = document.getElementById('fbImagePreviewContainer');
+      if (previewContainer) previewContainer.innerHTML = '';
+
+      Array.from(files).slice(0, 2).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          AppState.uploadedFeedbackImages.push(e.target.result);
+          if (previewContainer) {
+            const thumb = document.createElement('img');
+            thumb.src = e.target.result;
+            thumb.className = "w-12 h-12 rounded-lg object-cover border border-emerald-400";
+            previewContainer.appendChild(thumb);
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function handleFeedbackSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('fbFullName').value.trim();
+      const contact = document.getElementById('fbContact').value.trim();
+      const comment = document.getElementById('fbComment').value.trim();
+
+      if (!name || !contact || !comment) {
+        showToast("Sila lengkapkan semua maklumat maklum balas.", "warning");
+        return;
+      }
+
+      const newFeedback = {
+        id: `fb_${Date.now()}`,
+        name: name,
+        contact: contact,
+        comment: comment,
+        images: [...AppState.uploadedFeedbackImages],
+        date: new Date().toLocaleDateString('ms-MY', { day: 'numeric', month: 'long' }),
+        approved: false
+      };
+
+      if (rtdb) {
+        try {
+          rtdb.ref('feedbacks/' + newFeedback.id).set(newFeedback);
+        } catch (err) {
+          console.warn("Firebase Feedback Note:", err);
+        }
+      }
+
+      showToast("Komen anda telah dihantar dan akan disiarkan selepas disahkan admin. Terima kasih!", "success");
+      document.getElementById('feedbackForm').reset();
+      AppState.uploadedFeedbackImages = [];
+      const previewContainer = document.getElementById('fbImagePreviewContainer');
+      if (previewContainer) previewContainer.innerHTML = '';
+    }
+
+    function handleGeneralInquirySubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('inqFullName').value.trim();
+      const phone = document.getElementById('inqPhone').value.trim();
+      const msg = document.getElementById('inqMessage').value.trim();
+
+      if (!name || !phone || !msg) {
+        showToast("Sila lengkapkan semua ruangan mesej.", "warning");
+        return;
+      }
+
+      const waPhone = AppState.texts.phoneRaw || "60199333757";
+      const waInquiryLines = [
+        "*PERTANYAAN AM TEMU HAVENLY HOME*",
+        "",
+        `*Nama:* ${name}`,
+        `*No. Telefon:* ${phone}`,
+        `*Mesej Pertanyaan:* ${msg}`,
+        "",
+        "Salam admin, saya ingin bertanyakan maklumat di atas. Terima kasih."
+      ];
+
+      const fullMsg = encodeURIComponent(waInquiryLines.join("\n"));
+      window.open(`https://wa.me/${waPhone}?text=${fullMsg}`, '_blank');
+      showToast("Membuka WhatsApp admin...", "info");
+      document.getElementById('generalInquiryForm').reset();
+    }
+
+    // Fungsi Mengisi Kemudahan Sekitar (Realtime & Cache)
+    function applyFacilitiesData(f) {
+      if (!f) return;
+      try {
+        localStorage.setItem('thh_facilities', JSON.stringify(f));
+      } catch (e) {}
+
+      const setFac = (idx, titleId, masaId, jarakId, descId, imgId, mapBtnId, defaultTitle) => {
+        const item = f[`item${idx}`] || {};
+        const tEl = document.getElementById(titleId);
+        const mEl = document.getElementById(masaId);
+        const jEl = document.getElementById(jarakId);
+        const dEl = document.getElementById(descId);
+        const iEl = document.getElementById(imgId);
+        const bEl = document.getElementById(mapBtnId);
+
+        if (tEl && item.title !== undefined) tEl.innerText = item.title || defaultTitle;
+        if (mEl && item.masa !== undefined) mEl.innerText = item.masa;
+        if (jEl && item.jarak !== undefined) jEl.innerText = `(${item.jarak})`;
+        if (dEl && item.desc !== undefined) dEl.innerText = item.desc;
+        if (iEl && item.img) iEl.src = item.img;
+        if (bEl && item.map) bEl.href = item.map;
+      };
+
+      setFac(1, 'pubFacTitle1', 'pubFacMasa1', 'pubFacJarak1', 'pubFacDesc1', 'pubFacImg1', 'btnLocAnaIkanBakar', 'ANA IKAN BAKAR PETAI');
+      setFac(2, 'pubFacTitle2', 'pubFacMasa2', 'pubFacJarak2', 'pubFacDesc2', 'pubFacImg2', 'btnLocTelukCempedak', 'PANTAI TELUK CEMPEDAK');
+      setFac(3, 'pubFacTitle3', 'pubFacMasa3', 'pubFacJarak3', 'pubFacDesc3', 'pubFacImg3', 'btnLocPantaiSepat', 'PANTAI SEPAT');
+      setFac(4, 'pubFacTitle4', 'pubFacMasa4', 'pubFacJarak4', 'pubFacDesc4', 'pubFacImg4', 'btnLocMenara188', 'MENARA 188 KUANTAN');
+      setFac(5, 'pubFacTitle5', 'pubFacMasa5', 'pubFacJarak5', 'pubFacDesc5', 'pubFacImg5', 'btnLocEastCoastMall', 'BANDAR KUANTAN & EAST COAST MALL');
+      setFac(6, 'pubFacTitle6', 'pubFacMasa6', 'pubFacJarak6', 'pubFacDesc6', 'pubFacImg6', 'btnLocAirport', 'LAPANGAN TERBANG KUANTAN');
+    }
+
+    // Fungsi Mengisi 5 Frame Aktiviti (Realtime & Cache)
+    function applyActivitiesData(a) {
+      if (!a) return;
+      try {
+        localStorage.setItem('thh_activities', JSON.stringify(a));
+      } catch (e) {}
+
+      const setAct = (idx, titleId, imgId, descId, defaultTitle, defaultDesc) => {
+        const item = a[`act${idx}`] || {};
+        const tEl = document.getElementById(titleId);
+        const iEl = document.getElementById(imgId);
+        const dEl = document.getElementById(descId);
+        if (tEl) tEl.innerText = item.title || defaultTitle;
+        if (iEl && item.img) iEl.src = item.img;
+        if (dEl && item.desc) dEl.innerText = item.desc;
+      };
+
+      setAct(1, 'pubActTitle1', 'pubActImg1', 'pubActDesc1', 'HARI KELUARGA', 'Sesuai untuk perhimpunan santai seisi keluarga dengan ruang laman luas, barbeku, dan suasana mesra.');
+      setAct(2, 'pubActTitle2', 'pubActImg2', 'pubActDesc2', 'PERCUTIAN KELUARGA', 'Penginapan tenang dan privasi berhampiran pantai untuk merehatkan minda bersama insan tersayang.');
+      setAct(3, 'pubActTitle3', 'pubActImg3', 'pubActDesc3', 'KURSUS DAN TEAM BUILDING', 'Kemudahan bilik perbincangan santai, ruang wacana, dan persekitaran kondusif untuk kumpulan kerja.');
+      setAct(4, 'pubActTitle4', 'pubActImg4', 'pubActDesc4', 'REHLAH TAHFIZ', 'Program pengisian rohani dan hafazan santai dalam suasana alam semulajadi yang damai dan selesa.');
+      setAct(5, 'pubActTitle5', 'pubActImg5', 'pubActDesc5', 'PROGRAM KECEMELANGAN PELAJAR', 'Bengkel motivasi, persediaan peperiksaan, dan kepimpinan belia berhampiran destinasi tarikan Kuantan.');
+    }
+
+    // PENGURUSAN KAUNTER PELAWAT AUTOSYNC REALTIME HARIAN & KESELURUHAN
+    function registerRealtimeVisitorTraffic() {
+      if (!rtdb) return;
+
+      const todayStr = getTodayDateStr();
+
+      rtdb.ref('stats').transaction((currentData) => {
+        const data = currentData || {};
+        const lastRecordedDate = data.lastDate || todayStr;
+        let todayCount = Number(data.visitorsToday || 0);
+        let totalCount = Number(data.visitorsTotal || 0);
+
+        if (lastRecordedDate !== todayStr) {
+          todayCount = 1;
+          totalCount += 1;
+        } else {
+          todayCount += 1;
+          totalCount += 1;
+        }
+
+        return {
+          visitorsToday: todayCount,
+          visitorsTotal: totalCount,
+          lastDate: todayStr
+        };
+      }, (error, committed, snapshot) => {
+        if (committed && snapshot) {
+          const val = snapshot.val();
+          if (val) {
+            AppState.visitorsToday = val.visitorsToday || 0;
+            AppState.visitorsTotal = val.visitorsTotal || 0;
+            const elToday = document.getElementById('counterVisitorsToday');
+            const elTotal = document.getElementById('counterVisitorsTotal');
+            if (elToday) elToday.innerText = Number(val.visitorsToday).toLocaleString();
+            if (elTotal) elTotal.innerText = Number(val.visitorsTotal).toLocaleString();
+          }
+        }
+      });
+    }
+
+    function initFirebaseListeners() {
+      if (!rtdb) return;
+
+      try {
+        // Pemantau Logo JPEG
+        rtdb.ref('branding/logoUrl').on('value', (snap) => {
+          const url = snap.val();
+          if (url) {
+            AppState.branding.logoUrl = url;
+            updatePublicLogoRealtime(url);
+          }
+        });
+
+        rtdb.ref('branding').on('value', (snap) => {
+          const data = snap.val();
+          if (data) {
+            Object.assign(AppState.branding, data);
+            if (data.logoUrl) updatePublicLogoRealtime(data.logoUrl);
+            if (data.brandTitle) {
+              const el = document.getElementById('publicBrandTitle');
+              if (el) el.innerText = data.brandTitle;
+            }
+            if (data.brandSubtitle) {
+              const el = document.getElementById('publicBrandSubtitle');
+              if (el) el.innerText = data.brandSubtitle;
+            }
+            if (data.heroSkyBg) {
+              const sky = document.getElementById('heroLayerSky');
+              if (sky) sky.style.backgroundImage = `linear-gradient(to bottom, rgba(11, 15, 25, 0.45), rgba(11, 15, 25, 0.8)), url('${data.heroSkyBg}')`;
+            }
+            if (data.heroBuildingBg) {
+              const bldg = document.getElementById('heroLayerBuilding');
+              if (bldg) bldg.style.backgroundImage = `linear-gradient(to top, rgba(11, 15, 25, 0.9) 15%, transparent 60%), url('${data.heroBuildingBg}')`;
+            }
+          }
+        });
+
+        // Pemantau Kunci Bilik
+        rtdb.ref('admin_locks').on('value', (snap) => {
+          const data = snap.val();
+          AppState.adminLocks = data ? (Array.isArray(data) ? data.filter(Boolean) : Object.values(data)) : [];
+          renderInteractiveCalendar();
+          updateSelectedRoomsUI();
+        });
+
+        // Pemantau Slaid 8K
+        rtdb.ref('cinema_slides').on('value', (snap) => {
+          const data = snap.val();
+          if (data && Array.isArray(data) && data.length > 0) {
+            AppState.cinemaSlides = data;
+            init8kCinemaAutoSlide();
+          }
+        });
+
+        // Pemantau Galeri
+        rtdb.ref('gallery').on('value', (snap) => {
+          const data = snap.val();
+          if (data) {
+            AppState.galleryItems = Array.isArray(data) ? data.filter(Boolean) : Object.values(data);
+            renderGalleryAlbumsAndItems();
+          }
+        });
+
+        // Pemantau FAQ
+        rtdb.ref('faq').on('value', (snap) => {
+          const data = snap.val();
+          if (data) {
+            AppState.faqItems = Array.isArray(data) ? data.filter(Boolean) : Object.values(data);
+            renderFaqItems();
+          }
+        });
+
+        // Pemantau Maklum Balas
+        rtdb.ref('feedbacks').on('value', (snap) => {
+          const data = snap.val();
+          if (data) {
+            AppState.feedbackList = Array.isArray(data) ? data.filter(Boolean) : Object.values(data);
+            renderFeedbackList();
+          }
+        });
+
+        // Pemantau Statistik Realtime Autosync
+        rtdb.ref('stats').on('value', (snap) => {
+          const val = snap.val();
+          if (val) {
+            const todayStr = getTodayDateStr();
+            const lastDate = val.lastDate || todayStr;
+
+            const todayVisitors = (lastDate === todayStr) ? Number(val.visitorsToday || 0) : 0;
+            const totalVisitors = Number(val.visitorsTotal || 0);
+
+            AppState.visitorsToday = todayVisitors;
+            AppState.visitorsTotal = totalVisitors;
+
+            const elToday = document.getElementById('counterVisitorsToday');
+            const elTotal = document.getElementById('counterVisitorsTotal');
+            if (elToday) elToday.innerText = todayVisitors.toLocaleString();
+            if (elTotal) elTotal.innerText = totalVisitors.toLocaleString();
+          }
+        });
+
+        // Pemantau Teks Hero
+        rtdb.ref('cms_texts/hero').on('value', (snap) => {
+          const data = snap.val();
+          if (data) {
+            if (data.heroWelcome) document.getElementById('heroWelcomeText').innerText = data.heroWelcome;
+            if (data.heroSubtitle) document.getElementById('heroSubtitleText').innerText = data.heroSubtitle;
+            if (data.heroBrandName) document.getElementById('heroBrandNameText').innerText = data.heroBrandName;
+            if (data.heroDescription) document.getElementById('heroDescriptionText').innerText = data.heroDescription;
+          }
+        });
+
+        // Pemantau Hubungi
+        rtdb.ref('cms_texts/contact').on('value', (snap) => {
+          const data = snap.val();
+          if (data) {
+            if (data.phone) {
+              const phoneLink = document.getElementById('publicContactPhoneLink');
+              if (phoneLink) {
+                phoneLink.innerText = data.phone;
+                phoneLink.href = `https://wa.me/${data.phoneRaw || data.phone.replace(/[^0-9]/g, '')}`;
+              }
+              const inqNum = document.getElementById('publicInquiryPhoneNum');
+              if (inqNum) inqNum.innerText = data.phone;
+            }
+            if (data.email) {
+              const emailLink = document.getElementById('publicContactEmailLink');
+              if (emailLink) {
+                emailLink.innerText = data.email;
+                emailLink.href = `mailto:${data.email}`;
+              }
+            }
+            if (data.address) {
+              const addr = document.getElementById('publicFooterAddressText');
+              if (addr) addr.innerText = data.address;
+            }
+          }
+        });
+
+        // Pemantau 5 Frame Aktiviti Realtime
+        rtdb.ref('cms_texts/activities').on('value', (snap) => {
+          const a = snap.val();
+          if (a) applyActivitiesData(a);
+        });
+
+        // Pemantau 6 Kemudahan Sekitar Realtime
+        rtdb.ref('cms_texts/facilities').on('value', (snap) => {
+          const f = snap.val();
+          if (f) applyFacilitiesData(f);
+        });
+
+        // Pemantau Gambar Bilik Camelia & Dahlia Realtime
+        rtdb.ref('cms_texts/room_images').on('value', (snap) => {
+          const data = snap.val();
+          if (data) {
+            if (Array.isArray(data.camelia) && data.camelia.length > 0) {
+              data.camelia.forEach((imgUrl, i) => {
+                if (imgUrl) AppState.displayRoomImages.camelia[i] = imgUrl;
+              });
+            }
+            if (Array.isArray(data.dahlia) && data.dahlia.length > 0) {
+              data.dahlia.forEach((imgUrl, i) => {
+                if (imgUrl) AppState.displayRoomImages.dahlia[i] = imgUrl;
+              });
+            }
+            try {
+              localStorage.setItem('thh_room_images', JSON.stringify(AppState.displayRoomImages));
+            } catch (e) {}
+            renderRoomCards();
+          }
+        });
+
+        // Pemantau Spesifikasi & Harga Bilik
+        rtdb.ref('cms_texts/sections').on('value', (snap) => {
+          const data = snap.val();
+          if (data) {
+            if (data.specCamelia1 && document.getElementById('specCameliaDesc1')) document.getElementById('specCameliaDesc1').innerText = data.specCamelia1;
+            if (data.specCamelia2 && document.getElementById('specCameliaDesc2')) document.getElementById('specCameliaDesc2').innerText = data.specCamelia2;
+            if (data.specCamelia3 && document.getElementById('specCameliaDesc3')) document.getElementById('specCameliaDesc3').innerText = data.specCamelia3;
+            if (data.specDahlia1 && document.getElementById('specDahliaDesc1')) document.getElementById('specDahliaDesc1').innerText = data.specDahlia1;
+            if (data.specDahlia2 && document.getElementById('specDahliaDesc2')) document.getElementById('specDahliaDesc2').innerText = data.specDahlia2;
+            if (data.specDahlia3 && document.getElementById('specDahliaDesc3')) document.getElementById('specDahliaDesc3').innerText = data.specDahlia3;
+
+            if (data.priceCameliaWknd) {
+              const el = document.getElementById('displayCameliaWkndTop');
+              if (el) el.innerText = `RM${data.priceCameliaWknd} (Hari Minggu)`;
+              const nEl = document.getElementById('rateNoteCameliaWknd');
+              if (nEl) nEl.innerText = `RM${data.priceCameliaWknd}`;
+            }
+            if (data.priceCameliaBase) {
+              const el = document.getElementById('displayCameliaBaseTop');
+              if (el) el.innerText = `RM${data.priceCameliaBase} (Hari Biasa)`;
+              const nEl = document.getElementById('rateNoteCameliaBase');
+              if (nEl) nEl.innerText = `RM${data.priceCameliaBase}`;
+            }
+
+            if (data.priceDahliaWknd) {
+              const el = document.getElementById('displayDahliaWkndTop');
+              if (el) el.innerText = `RM${data.priceDahliaWknd} (Hari Minggu)`;
+              const nEl = document.getElementById('rateNoteDahliaWknd');
+              if (nEl) nEl.innerText = `RM${data.priceDahliaWknd}`;
+            }
+            if (data.priceDahliaBase) {
+              const el = document.getElementById('displayDahliaBaseTop');
+              if (el) el.innerText = `RM${data.priceDahliaBase} (Hari Biasa)`;
+              const nEl = document.getElementById('rateNoteDahliaBase');
+              if (nEl) nEl.innerText = `RM${data.priceDahliaBase}`;
+            }
+
+            AppState.rooms.forEach(r => {
+              if (r.type === 'CAMELIA') {
+                if (data.priceCameliaBase) r.base_price = Number(data.priceCameliaBase);
+                if (data.priceCameliaWknd) r.weekend_price = Number(data.priceCameliaWknd);
+              } else if (r.type === 'DAHLIA') {
+                if (data.priceDahliaBase) r.base_price = Number(data.priceDahliaBase);
+                if (data.priceDahliaWknd) r.weekend_price = Number(data.priceDahliaWknd);
+              }
+            });
+            updateSelectedRoomsUI();
+            calculateLivePricing();
+          }
+        });
+
+      } catch (err) {
+        console.warn("Firebase Listener Warning:", err);
+      }
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+      const styles = {
+        success: 'bg-emerald-900/95 border-emerald-500 text-white',
+        error: 'bg-rose-900/95 border-rose-500 text-white',
+        warning: 'bg-amber-900/95 border-amber-500 text-white',
+        info: 'bg-slate-900/95 border-teal-500 text-white'
+      };
+
+      toast.className = `p-3.5 rounded-2xl border backdrop-blur-md shadow-2xl text-xs font-semibold flex items-center gap-2 pointer-events-auto transform transition duration-300 translate-y-2 ${styles[type] || styles.info}`;
+      toast.innerHTML = `<i data-lucide="${type === 'success' ? 'check-circle' : (type === 'error' ? 'alert-triangle' : 'info')}" class="w-4 h-4 text-emerald-300 shrink-0"></i> <span>${message}</span>`;
+      
+      container.appendChild(toast);
+      if (window.lucide) lucide.createIcons();
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3600);
+    }
+
+    window.onload = function() {
+      loadLocalCachedData();
+      renderRoomCards();
+      renderGalleryAlbumsAndItems();
+      renderFaqItems();
+      renderFeedbackList();
+      populateMonthYearDropdowns();
+      renderInteractiveCalendar();
+      init8kCinemaAutoSlide();
+      initHero2DScrollAnimation();
+
+      initFirebaseListeners();
+      registerRealtimeVisitorTraffic();
+
+      if (window.lucide) {
+        try { lucide.createIcons(); } catch (e) { console.warn(e); }
+      }
+    };
+  </script>
+</body>
+</html>
