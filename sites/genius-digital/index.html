@@ -243,6 +243,32 @@
 
     /* Hero visual — subtle 3D glass dashboard */
     .hero-visual { position: relative; perspective: 1400px; min-height: 340px; display: grid; place-items: center; }
+    /* Orbit produk (masa nyata): logo di tengah, bulatan produk berputar dalam 2 orbit */
+    .orbit { position: relative; width: min(100%, 520px); aspect-ratio: 1; container-type: inline-size; }
+    .orbit-track { position: absolute; left: 50%; top: 50%; border-radius: 50%; transform: translate(-50%, -50%); border: 1.5px dashed rgba(10, 102, 255, .22); pointer-events: none; }
+    .orbit-track.t1 { width: 60%; height: 60%; }
+    .orbit-track.t2 { width: 92%; height: 92%; border-color: rgba(0, 200, 245, .25); }
+    .orbit-ring { position: absolute; inset: 0; animation: orbitSpin var(--dur, 40s) linear infinite; }
+    .orbit-ring.r1 { --dur: 38s; --r: 30cqw; }
+    .orbit-ring.r2 { --dur: 60s; --r: 46cqw; animation-direction: reverse; }
+    .orbit:hover .orbit-ring, .orbit:hover .ob-in { animation-play-state: paused; }
+    .ob { position: absolute; left: 50%; top: 50%; width: var(--s, 16cqw); height: var(--s, 16cqw); margin: calc(var(--s, 16cqw) / -2) 0 0 calc(var(--s, 16cqw) / -2);
+      transform: rotate(var(--a)) translateX(var(--r)) rotate(calc(-1 * var(--a))); }
+    .ob-in { width: 100%; height: 100%; animation: orbitSpin var(--dur) linear infinite reverse; }
+    .orbit-ring.r2 .ob-in { animation-direction: normal; }
+    .ob-btn { display: block; width: 100%; height: 100%; padding: 0; border: 3px solid #fff; border-radius: 50%; overflow: hidden; background: #fff; cursor: pointer;
+      box-shadow: 0 8px 22px rgba(10, 31, 68, .22), 0 0 0 4px rgba(10, 102, 255, .12); animation: orbitBob 4.5s ease-in-out infinite; animation-delay: var(--bd, 0s); transition: box-shadow .2s ease, scale .2s ease; }
+    .ob-btn:hover { scale: 1.12; box-shadow: 0 12px 28px rgba(10, 31, 68, .3), 0 0 0 5px rgba(0, 200, 245, .45); }
+    .ob-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .orbit-core { position: absolute; left: 50%; top: 50%; width: 26cqw; height: 26cqw; transform: translate(-50%, -50%); border-radius: 50%; padding: 2.2cqw; background: #fff;
+      box-shadow: 0 14px 40px rgba(10, 102, 255, .28), 0 0 0 7px rgba(10, 102, 255, .08), 0 0 0 16px rgba(0, 200, 245, .06); animation: corePulse 4s ease-in-out infinite; }
+    .orbit-core img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    :root[data-theme="dark"] .orbit-core, :root[data-theme="dark"] .ob-btn { background: #112042; border-color: #1E3A6E; }
+    .product-card.flash { animation: cardFlash 1.6s ease; }
+    @keyframes orbitSpin { to { transform: rotate(360deg); } }
+    @keyframes orbitBob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -6%; } }
+    @keyframes corePulse { 0%, 100% { scale: 1; } 50% { scale: 1.04; } }
+    @keyframes cardFlash { 0%, 100% { box-shadow: var(--shadow-sm); } 30%, 70% { box-shadow: 0 0 0 4px var(--cyan-400), var(--shadow-md); } }
     .scene { position: relative; width: min(100%, 520px); aspect-ratio: 1 / .86; transform-style: preserve-3d; transform: rotateX(var(--rx, 8deg)) rotateY(var(--ry, -14deg)); transition: transform .25s ease-out; }
     .plate { position: absolute; inset: 0; border-radius: 26px; }
     .plate.p3 { transform: translateZ(-70px) translate(26px, 26px); background: linear-gradient(135deg, rgba(10, 102, 255, .22), rgba(0, 200, 245, .22)); border: 1px solid rgba(10, 102, 255, .25); }
@@ -707,26 +733,12 @@
         </div>
 
         <div class="hero-visual reveal" style="--d:.2s" aria-hidden="true">
-          <div class="scene keep-ls" id="heroScene">
-            <div class="plate p3"></div>
-            <div class="plate p2"></div>
-            <div class="plate p1">
-              <div class="win-bar"><i></i><i></i><i></i><span>GENIUS · SYSTEMS</span></div>
-              <div class="win-body">
-                <div class="win-col">
-                  <div class="tile qr"><svg><use href="#i-qr"/></svg><div><b>QR ME</b><small data-i18n="hero.tileQr">Alatan Digital</small></div></div>
-                  <div class="tile pdf"><svg><use href="#i-pdf"/></svg><div><b>PDF TOOLS</b><small data-i18n="hero.tilePdf">Produktiviti</small></div></div>
-                </div>
-                <div class="chart">
-                  <small data-i18n="hero.efficiency">Kecekapan</small>
-                  <div class="bars"><i style="--h:35%"></i><i style="--h:55%"></i><i style="--h:42%"></i><i style="--h:72%"></i><i style="--h:60%"></i><i style="--h:92%"></i></div>
-                  <div class="line"></div>
-                </div>
-              </div>
-            </div>
-            <span class="chip c1"><svg><use href="#i-chip"/></svg><span data-i18n="hero.chip1">Sistem Pintar</span></span>
-            <span class="chip c2"><svg><use href="#i-shield"/></svg><span data-i18n="hero.chip2">Awan Selamat</span></span>
-            <span class="chip c3"><svg><use href="#i-bulb"/></svg><span data-i18n="hero.chip3">Inovasi</span></span>
+          <div class="orbit" id="heroOrbit">
+            <div class="orbit-track t1"></div>
+            <div class="orbit-track t2"></div>
+            <div class="orbit-ring r1" id="orbitRing1"></div>
+            <div class="orbit-ring r2" id="orbitRing2"></div>
+            <div class="orbit-core"><img src="/icons/logo-192.png" alt="" width="192" height="192"></div>
           </div>
         </div>
       </div>
@@ -1210,6 +1222,28 @@
       ]);
     }
 
+    // Orbit hero: satu bulatan untuk setiap produk yang dipaparkan (masa nyata). Klik -> skrol ke kad produk.
+    let orbitSig = "";
+    function renderOrbit(list) {
+      const sig = list.map(p => p.slug + ":" + (p.thumbnailURL || "").length + ":" + p.name).join("|");
+      if (sig === orbitSig) return; orbitSig = sig;
+      const r1 = $("#orbitRing1"), r2 = $("#orbitRing2"); if (!r1 || !r2) return;
+      const inner = list.slice(0, Math.min(5, Math.ceil(list.length / 2.2))), outer = list.slice(inner.length);
+      const bubble = (p, i, n, size, ring) => {
+        const img = el("img", { alt: "", width: "120", height: "120", decoding: "async" });
+        const fb = placeholderThumbURL(p);
+        img.addEventListener("error", () => { if (img.src !== fb) img.src = fb; }, { once: true });
+        img.src = safeImage(p.thumbnailURL) || fb;
+        const btn = el("button", { class: "ob-btn", type: "button", tabindex: "-1", title: p.name, style: `--bd:${(-(i * 0.7)).toFixed(1)}s`,
+          onclick: () => { const c = document.querySelector(`.product-card[data-slug="${CSS.escape(p.slug)}"]`); if (!c) return;
+            c.scrollIntoView({ behavior: "smooth", block: "center" }); c.classList.remove("flash"); void c.offsetWidth; c.classList.add("flash"); } }, img);
+        return el("div", { class: "ob", style: `--a:${(360 / n * i + (ring === 2 ? 360 / n / 2 : 0)).toFixed(2)}deg; --s:${size}cqw` }, el("div", { class: "ob-in" }, btn));
+      };
+      const sizeIn = inner.length <= 3 ? 18 : 16, sizeOut = outer.length <= 6 ? 15 : outer.length <= 9 ? 13 : 11;
+      r1.replaceChildren(...inner.map((p, i) => bubble(p, i, inner.length, sizeIn, 1)));
+      r2.replaceChildren(...outer.map((p, i) => bubble(p, i, outer.length, sizeOut, 2)));
+    }
+
     function renderProducts(products) {
       const str = (v) => (typeof v === "string" ? v : "");
       const visible = products
@@ -1221,6 +1255,7 @@
         }))
         .sort((a, b) => a.displayOrder - b.displayOrder || a.name.localeCompare(b.name));
       view = { kind: visible.length ? "list" : "empty", error: null, retry: null, products: visible };
+      renderOrbit(visible);
       renderView();
     }
 
@@ -1381,17 +1416,6 @@
     }
 
     // Subtle 3D tilt (hanya pada peranti pointer halus & tanpa reduced-motion). Arah dicerminkan untuk RTL.
-    const scene = $("#heroScene");
-    if (window.matchMedia("(hover: hover) and (pointer: fine)").matches && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      const visual = scene.parentElement;
-      visual.addEventListener("pointermove", (e) => {
-        const r = visual.getBoundingClientRect(), dir = LANGS[lang].dir === "rtl" ? -1 : 1;
-        const px = (e.clientX - r.left) / r.width - .5, py = (e.clientY - r.top) / r.height - .5;
-        scene.style.setProperty("--ry", (dir * (-14 + px * 14)).toFixed(2) + "deg");
-        scene.style.setProperty("--rx", (8 - py * 12).toFixed(2) + "deg");
-      });
-      visual.addEventListener("pointerleave", () => { scene.style.removeProperty("--ry"); scene.style.removeProperty("--rx"); });
-    }
 
     /* =====================================================================
        Bahagian 8: Bahasa (BM / BI / BA) dan tema (cerah / gelap)
