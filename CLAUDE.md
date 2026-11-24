@@ -118,8 +118,8 @@ Ustaz tak nak scroll cari preview lama.
 ## Temu Havenly Home: 4 link WAJIB selepas setiap update
 
 Setiap kali siap update apa-apa (kod, design, SEO, domain), akhiri balasan dengan 4 link ini dalam bentuk link boleh tekan:
-1. Website (https): https://temuhomestay.com/
-2. Website (www): https://www.temuhomestay.com/
+1. Website (https): https://temuhomestay.com
+2. Website (www): https://www.temuhomestay.com
 3. Portal Admin: https://temuhomestay.com/AdminTEMU
 4. Buku preview: https://claude.ai/artifact/Mpxkd1KthcvMg1UCrpbLTA (terbitkan semula dulu jika kod berubah)
 
