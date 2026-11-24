@@ -97,7 +97,7 @@
 <header>
   <div class="eyebrow">Homestay Kg Cempaka, Kuantan</div>
   <h1>Temu Havenly Home</h1>
-  <p>Satu buku, dua sistem. Setiap bab ada preview web di kiri dan kod HTML penuh di kanan untuk copy atau muat turun.</p>
+  <p>Satu buku, dua sistem. Setiap bab ada preview web di kiri dan kod HTML penuh di kanan dengan butang Copy kod.</p>
   <nav class="tabs" role="tablist" aria-label="Bab buku">
     <button role="tab" id="tab-awam" aria-controls="bab-awam" aria-selected="true">Bab I · Panel Awam</button>
     <button role="tab" id="tab-admin" aria-controls="bab-admin" aria-selected="false">Bab II · Portal Admin</button>
@@ -122,7 +122,6 @@
         <h3>Kod Panel Awam</h3>
         <div class="btns">
           <button class="btn primary" data-act="copy"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy kod</span></button>
-          <button class="btn ghost" data-act="download"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>Muat turun .html</button>
         </div>
         <div class="codebox"><div class="head"><span>panel-awam.html</span><span class="meta" data-meta></span></div><pre><code data-code></code></pre></div>
       </div>
@@ -145,7 +144,6 @@
         <h3>Kod Portal Admin</h3>
         <div class="btns">
           <button class="btn primary" data-act="copy"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span>Copy kod</span></button>
-          <button class="btn ghost" data-act="download"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>Muat turun .html</button>
         </div>
         <div class="codebox"><div class="head"><span>portal-admin.html</span><span class="meta" data-meta></span></div><pre><code data-code></code></pre></div>
       </div>
@@ -214,7 +212,7 @@
         copy(text(k)).then(function(){
           var s = b.querySelector('span'); s.textContent = 'Dah copy!'; b.classList.add('done'); toast('Kod ' + sec.dataset.file + ' disalin');
           setTimeout(function(){ s.textContent = 'Copy kod'; b.classList.remove('done'); }, 1800);
-        }, function(){ toast('Tak dapat copy. Guna butang muat turun.'); });
+        }, function(){ toast('Tak dapat copy. Pilih kod dalam kotak dan salin manual.'); });
       }
     });
   });
