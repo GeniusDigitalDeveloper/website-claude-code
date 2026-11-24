@@ -53,7 +53,8 @@ Pautan lama (`/#korporat`, `/korporat`, `/admin/korporat`, ...) auto ditukar ke 
 - Gambar dalam teks: `<figure data-ref data-w data-ratio data-pos data-align>` dalam `body` (tiada data gambar,
   dirujuk melalui `imageIds`). Admin seret gambar dari panel **Gambar Dipilih** ke dalam teks; klik gambar untuk
   saiz, crop, fokus, kiri/tengah/kanan, alih atas/bawah, buang. Butang × pada panel memadam gambar terus dari database.
-- Pratonton langsung: admin tulis draf ke `localStorage` (`nadwahNewsPreview`), dipaparkan di `/news/__preview`.
+- Pratonton sentiasa terbuka di bawah editor: draf ditulis ke `localStorage` (`nadwahNewsPreview`), dipaparkan di `/news/__preview`.
+- Simpan automatik 2.5 saat selepas perubahan terakhir (juga bila tukar tab/tutup halaman); butang Simpan Berita untuk simpan segera.
 
 ## Galeri & Pelawat
 

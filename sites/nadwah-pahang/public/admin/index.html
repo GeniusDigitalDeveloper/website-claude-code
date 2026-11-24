@@ -338,6 +338,7 @@
         }
     </style>
     <style>
+        [hidden] { display: none !important; }
         /* ================= BERITA (Admin) ================= */
         .news-note { background: #dc2626; border: 1px solid #b91c1c; color: #ffffff; border-radius: 10px; padding: 12px 14px; font-size: 0.84rem; line-height: 1.6; margin-bottom: 18px; display: flex; gap: 10px; }
         .news-note i { margin-top: 3px; color: #ffffff; }
@@ -384,7 +385,14 @@
         .news-editor p, .news-editor div { margin: 0 0 0.6em; }
         .news-stats { font-size: 0.76rem; color: #5b6b63; margin-top: 6px; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
         .news-stats .warn { color: #b45309; font-weight: 700; }
-        .news-save-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+        .news-save-row { display: flex; flex-wrap: nowrap; align-items: center; gap: 10px; margin-top: 12px; }
+        .news-save-row > button { white-space: nowrap; flex-shrink: 0; }
+        .news-auto-status { margin-left: auto; font-size: 0.78rem; color: #5b6b63; font-weight: 600; text-align: right; }
+        .news-auto-status.pending { color: #b45309; }
+        .news-auto-status.ok { color: #047857; }
+        .news-save-note { margin-top: 18px; display: flex; gap: 8px; align-items: flex-start; font-size: 0.8rem; color: #1e3a8a; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 9px 12px; line-height: 1.5; }
+        .news-save-note i { margin-top: 3px; }
+        @media (max-width: 640px) { .news-save-row { flex-wrap: wrap; } .news-auto-status { width: 100%; text-align: left; margin-left: 0; } }
         .news-check { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 600; color: var(--text-light); cursor: pointer; margin-top: 30px; }
         .news-check input { width: 18px; height: 18px; accent-color: var(--emerald); }
         /* Editor dua lajur: teks (kiri) + Gambar Dipilih (kanan) */
@@ -764,16 +772,19 @@
                         </aside>
                     </div>
 
+                    <div class="news-save-note"><i class="fas fa-circle-info"></i>
+                        <span>Sila tekan <b>Simpan Berita</b> selepas edit. Jika terlupa, berita tetap disimpan secara automatik dan terus dikemas kini di Portal Awam.</span>
+                    </div>
                     <div class="news-save-row">
-                        <button class="admin-btn" type="button" id="btnNewsSave"><i class="fas fa-save"></i> Simpan Berita Ke Database</button>
-                        <button class="news-icon-btn" type="button" id="btnNewsPreview" aria-expanded="false"><i class="fas fa-eye"></i> Pratonton Berita</button>
-                        <button class="news-icon-btn" type="button" id="btnNewsView" hidden><i class="fas fa-up-right-from-square"></i> Lihat di Portal</button>
+                        <button class="admin-btn" type="button" id="btnNewsSave"><i class="fas fa-save"></i> Simpan Berita</button>
+                        <button class="news-icon-btn" type="button" id="btnNewsView"><i class="fas fa-up-right-from-square"></i> Lihat di Portal</button>
                         <button class="news-icon-btn" type="button" id="btnNewsCancel"><i class="fas fa-rotate-left"></i> Kosongkan Borang</button>
+                        <span class="news-auto-status" id="newsAutoStatus" aria-live="polite"></span>
                     </div>
 
-                    <div class="news-preview-panel" id="newsPreviewPanel" hidden>
+                    <div class="news-preview-panel" id="newsPreviewPanel">
                         <div class="news-preview-head">
-                            <span><i class="fas fa-eye"></i> Pratonton berita (dikemas kini secara langsung semasa menaip)</span>
+                            <span><i class="fas fa-eye"></i> Pratonton berita (dikemas kini secara automatik semasa menaip)</span>
                             <a href="/news/__preview" target="_blank" rel="noopener" class="news-icon-btn"><i class="fas fa-up-right-from-square"></i> Buka tab baru</a>
                         </div>
                         <iframe id="newsPreviewFrame" title="Pratonton berita" loading="lazy"></iframe>
@@ -1967,26 +1978,31 @@
             try { localStorage.setItem(PREVIEW_KEY, JSON.stringify(draftData())); }
             catch (e) { toast('Pratonton tidak dapat dikemas kini (gambar terlalu besar untuk storan pelayar).', 'warning'); }
         }
+        // Setiap perubahan: kemas kini pratonton + jadualkan simpan automatik
         function queuePreview() {
-            if ($('newsPreviewPanel').hidden) return;
             clearTimeout(pvTimer); pvTimer = setTimeout(writePreview, 350);
-        }
-        function togglePreview(show) {
-            const panel = $('newsPreviewPanel');
-            const on = show ?? panel.hidden;
-            panel.hidden = !on;
-            $('btnNewsPreview').setAttribute('aria-expanded', String(on));
-            $('btnNewsPreview').innerHTML = on ? '<i class="fas fa-eye-slash"></i> Tutup Pratonton' : '<i class="fas fa-eye"></i> Pratonton Berita';
-            if (on) {
-                writePreview();
-                const fr = $('newsPreviewFrame');
-                if (!fr.getAttribute('src')) fr.src = '/news/__preview';
-                panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
+            queueAutosave();
         }
 
+        // ---------- Simpan automatik ----------
+        const AUTOSAVE_MS = 2500;
+        let suspend = false, asTimer = 0, saving = false, pendingSave = false;
+        const hhmm = () => new Date().toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
+        function setAutoStatus(text, cls = '') { const el = $('newsAutoStatus'); if (!el) return; el.textContent = text; el.className = 'news-auto-status ' + cls; }
+        function queueAutosave() {
+            if (suspend) return;
+            clearTimeout(asTimer);
+            setAutoStatus('Perubahan belum disimpan… (simpan automatik sebentar lagi)', 'pending');
+            asTimer = setTimeout(() => { asTimer = 0; save({ auto: true }); }, AUTOSAVE_MS);
+        }
+        async function flushAutosave() {
+            if (asTimer) { clearTimeout(asTimer); asTimer = 0; await save({ auto: true }); }
+        }
+        function quiet(fn) { suspend = true; try { fn(); } finally { clearTimeout(asTimer); asTimer = 0; suspend = false; writePreview(); } }
+
         // ---------- Borang ----------
-        function resetForm() {
+        function resetForm() { quiet(resetFormInner); setAutoStatus(''); }
+        function resetFormInner() {
             editingId = null; images = []; imageIds = []; headerIndex = 0;
             deselectFig();
             $('newsEditorHeading').textContent = 'Tulis Berita Baru';
@@ -1995,10 +2011,10 @@
             $('newsHdrH').value = 320; $('newsHdrW').value = 100; $('newsHdrFit').value = 'cover'; $('newsHdrPos').value = 'center';
             $('newsLineH').value = '1.15';
             $('newsTitleEd').innerHTML = ''; $('newsBodyEd').innerHTML = '';
-            $('btnNewsView').hidden = true;
-            applyLineHeight(); renderImgs(); updateStats(); renderList(); queuePreview();
+            applyLineHeight(); renderImgs(); updateStats(); renderList();
         }
-        function loadForm(n) {
+        function loadForm(n) { quiet(() => loadFormInner(n)); setAutoStatus('Berita dimuatkan untuk diedit.', 'ok'); $('newsEditorCard').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        function loadFormInner(n) {
             editingId = n.id;
             images = Array.isArray(n.images) ? [...n.images] : [];
             imageIds = Array.isArray(n.imageIds) && n.imageIds.length === images.length ? [...n.imageIds] : images.map(() => newImgId());
@@ -2014,17 +2030,22 @@
             if (!$('newsLineH').value) $('newsLineH').value = '1.15';
             $('newsTitleEd').innerHTML = n.title || ''; $('newsBodyEd').innerHTML = n.body || '';
             $('newsBodyEd').querySelectorAll('figure').forEach(hydrateFig);
-            $('btnNewsView').hidden = false;
-            applyLineHeight(); renderImgs(); updateStats(); renderList(); queuePreview();
-            $('newsEditorCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            applyLineHeight(); renderImgs(); updateStats(); renderList();
         }
 
-        async function save() {
+        async function save(opts = {}) {
+            const auto = !!opts.auto;
+            if (!auto) { clearTimeout(asTimer); asTimer = 0; }
+            if (saving) { pendingSave = true; return; }
             const title = $('newsTitleEd').innerHTML.trim();
             const body = serializeBody();
-            if (!plain(title)) { toast('Sila tulis tajuk berita.', 'warning'); $('newsTitleEd').focus(); return; }
-            if (!plain(body) && !$('newsBodyEd').querySelector('figure')) { toast('Sila tulis keterangan berita.', 'warning'); $('newsBodyEd').focus(); return; }
-            if (!$('newsDate').value) { toast('Sila pilih tarikh berita.', 'warning'); return; }
+            const hasBody = !!plain(body) || !!$('newsBodyEd').querySelector('figure');
+            if (!plain(title) || !hasBody || !$('newsDate').value) {
+                if (auto) { setAutoStatus('Simpan automatik menunggu tajuk dan keterangan berita.', 'pending'); return; }
+                if (!plain(title)) { toast('Sila tulis tajuk berita.', 'warning'); $('newsTitleEd').focus(); return; }
+                if (!hasBody) { toast('Sila tulis keterangan berita.', 'warning'); $('newsBodyEd').focus(); return; }
+                toast('Sila pilih tarikh berita.', 'warning'); return;
+            }
             const old = newsAll.find(x => x.id === editingId);
             const id = editingId || push(ref(db, 'news')).key;
             const data = {
@@ -2033,17 +2054,23 @@
                 createdAt: old?.createdAt || Date.now(),
                 updatedAt: Date.now()
             };
-            const btn = $('btnNewsSave'); btn.disabled = true;
+            const btn = $('btnNewsSave'); btn.disabled = true; saving = true;
+            setAutoStatus(auto ? 'Menyimpan automatik…' : 'Menyimpan…', 'pending');
             try {
                 await set(ref(db, 'news/' + id), data);
                 editingId = id;
                 $('newsEditorHeading').textContent = 'Kemaskini Berita';
-                $('btnNewsView').hidden = false;
-                toast('Berita berjaya disimpan ke Firebase Realtime Database!', 'success');
+                renderList();
+                setAutoStatus(`${auto ? 'Disimpan automatik' : 'Disimpan'} ${hhmm()} · dikemas kini di Portal Awam`, 'ok');
+                if (!auto) toast('Berita berjaya disimpan!', 'success');
             } catch (err) {
                 console.error('Firebase write error:', err);
+                setAutoStatus('Gagal menyimpan. Sila tekan Simpan Berita.', 'pending');
                 toast('Gagal menyimpan berita. Sila cuba lagi.', 'warning');
-            } finally { btn.disabled = false; }
+            } finally {
+                btn.disabled = false; saving = false;
+                if (pendingSave) { pendingSave = false; queueAutosave(); }
+            }
         }
 
         function boot() {
@@ -2151,19 +2178,28 @@
             ['newsDate'].forEach(id => $(id).addEventListener('input', queuePreview));
 
             // Butang borang
-            $('btnNewsNew').onclick = () => { resetForm(); $('newsEditorCard').scrollIntoView({ behavior: 'smooth', block: 'start' }); $('newsTitleEd').focus(); };
-            $('btnNewsCancel').onclick = resetForm;
-            $('btnNewsSave').onclick = save;
-            $('btnNewsPreview').onclick = () => togglePreview();
-            $('btnNewsView').onclick = () => { if (editingId) window.open('/news/' + encodeURIComponent(editingId), '_blank', 'noopener'); };
+            $('btnNewsNew').onclick = async () => { await flushAutosave(); resetForm(); $('newsEditorCard').scrollIntoView({ behavior: 'smooth', block: 'start' }); $('newsTitleEd').focus(); };
+            $('btnNewsCancel').onclick = async () => { await flushAutosave(); resetForm(); };
+            $('btnNewsSave').onclick = () => save();
+            $('btnNewsView').onclick = async () => {
+                await flushAutosave();
+                if (!editingId) { toast('Simpan berita dahulu sebelum lihat di portal.', 'info'); return; }
+                window.open('/news/' + encodeURIComponent(editingId), '_blank', 'noopener');
+            };
+            $('newsPublished').addEventListener('change', queuePreview);
+            // Simpan jika admin tukar tab / tutup halaman sebelum simpan automatik berjalan
+            document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushAutosave(); });
+            window.addEventListener('beforeunload', () => { if (asTimer) flushAutosave(); });
+            $('newsPreviewFrame').src = '/news/__preview';
             $('newsAdminList').addEventListener('click', async (e) => {
                 const ed = e.target.closest('[data-edit]');
-                if (ed) { const n = newsAll.find(x => x.id === ed.dataset.edit); if (n) loadForm(n); return; }
+                if (ed) { await flushAutosave(); const n = newsAll.find(x => x.id === ed.dataset.edit); if (n) loadForm(n); return; }
                 const del = e.target.closest('[data-del]');
                 if (del) {
                     const n = newsAll.find(x => x.id === del.dataset.del);
                     if (!n) return;
                     if (!confirm(`Padam berita "${plain(n.title)}" secara kekal dari database?`)) return;
+                    if (editingId === n.id) { clearTimeout(asTimer); asTimer = 0; }
                     try {
                         await remove(ref(db, 'news/' + n.id));
                         if (editingId === n.id) resetForm();
