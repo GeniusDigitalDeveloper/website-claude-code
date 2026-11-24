@@ -110,4 +110,7 @@ berserta **satu fail buku preview sahaja** (`sites/<slug>/index.html`, display `
 berasingan. Buku preview = satu fail yang gabungkan preview web + kod HTML setiap sistem dengan butang Copy kod
 (ustaz host di Interactive Link dan copy-paste kod dari buku). Untuk Temu Havenly Home: edit `panel-awam.html` /
 `portal-admin.html`, kemudian jana semula buku dengan `python3 sites/temu-havenly-home/buku/build.py`.
+Cara hantar buku preview: **terbitkan dengan tool `Artifact`** (publish fail `index.html` yang sama supaya URL kekal)
+dan beri link-nya dalam chat. Ustaz nak tengok terus dalam chat Claude Code, bukan download. Temu Havenly Home:
+https://claude.ai/artifact/Mpxkd1KthcvMg1UCrpbLTA
 Ustaz tak nak scroll cari preview lama.
