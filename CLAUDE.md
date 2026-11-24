@@ -117,7 +117,8 @@ Masih WAJIB berhenti dan tanya jika rules hidup berbeza daripada backup, ada rul
 
 **Selepas SETIAP kemas kini Flash Link (arahan tetap ustaz), JANGAN tulis 3 pautan sebagai teks.** Sebaliknya jana semula
 "Buku Pautan" dan hantar fail itu untuk dipapar dalam chat:
-`cd sites/flash-link && node scripts/buku-pautan.mjs`, kemudian SendUserFile `sites/flash-link/buku-pautan.html` dengan `display: "render"`.
+`cd sites/flash-link && node scripts/buku-pautan.mjs`, kemudian terbitkan semula dengan tool **Artifact** (publish) pada `sites/flash-link/buku-pautan.html`
+ke URL sedia ada `https://claude.ai/artifact/NER5gWSjUHvvn97Qdqpeyx` (beri `url` ini jika dari sesi lain), supaya ia terbuka terus dalam chat tanpa muat turun. JANGAN guna SendUserFile untuk buku ini.
 Buku itu mengandungi pratonton panel hidup, versi semasa, dan pautan Awam, Admin dan EXE Windows (setiap satu ada butang Buka dan Salin).
 Pautan disimpan dalam skrip itu: EXE `releases/download/flashlink-latest/Flash-Link-Setup.exe`, Awam `genius-digital-flashlink-40bc9-5effc.web.app`, Admin `/admin`.
 

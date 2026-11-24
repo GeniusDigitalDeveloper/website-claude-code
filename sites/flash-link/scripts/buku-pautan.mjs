@@ -37,12 +37,11 @@ const svg = (n, s = 18) => `<svg viewBox="0 0 24 24" width="${s}" height="${s}" 
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const now = new Intl.DateTimeFormat("ms-MY", { timeZone: "Asia/Kuala_Lumpur", dateStyle: "medium", timeStyle: "short" }).format(new Date());
 
-const html = `<!doctype html>
-<html lang="ms"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Buku Pautan Flash Link</title>
+const html = `<title>Buku Pautan Flash Link</title>
+<meta name="claude:viewport-fit-sides" content="cover">
 <style>
-:root{--bg:#07080d;--card:#11131c;--line:rgba(255,255,255,.12);--text:#F4F4F5;--mute:#A1A1AA;--red:#E11D2A;--blue:#38BDF8}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(60% 50% at 15% 0%,rgba(225,29,42,.28),transparent 70%),radial-gradient(60% 50% at 100% 30%,rgba(56,189,248,.2),transparent 70%),var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh;padding:24px 16px 40px}
+:root{color-scheme:dark;--bg:#07080d;--card:#11131c;--line:rgba(255,255,255,.12);--text:#F4F4F5;--mute:#A1A1AA;--red:#E11D2A;--blue:#38BDF8}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(60% 50% at 15% 0%,rgba(225,29,42,.28),transparent 70%),radial-gradient(60% 50% at 100% 30%,rgba(56,189,248,.2),transparent 70%),var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100%;padding-block:24px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .wrap{max-width:860px;margin:0 auto}
 h1{font-size:26px;margin:0}.sub{color:var(--mute);margin:4px 0 18px;font-size:13.5px}
 .ver{display:inline-block;margin-left:8px;padding:2px 10px;border-radius:99px;background:rgba(56,189,248,.15);border:1px solid rgba(56,189,248,.45);color:#BAE6FD;font-size:12.5px;font-weight:700;vertical-align:middle}
@@ -63,7 +62,7 @@ h1{font-size:26px;margin:0}.sub{color:var(--mute);margin:4px 0 18px;font-size:13
 .foot{margin-top:18px;color:var(--mute);font-size:12.5px;text-align:center}
 #toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,20px);opacity:0;padding:10px 16px;border-radius:12px;background:#0f2a1d;border:1px solid #34D399;color:#D1FAE5;font-weight:600;transition:.25s}
 #toast.on{opacity:1;transform:translate(-50%,0)}
-</style></head><body><div class="wrap">
+</style><div class="wrap">
 <h1>Buku Pautan Flash Link <span class="ver">${esc(version)}</span></h1>
 <p class="sub">Dikemas kini ${esc(now)}. Tekan Buka untuk pergi ke pautan, atau Salin untuk menyalinnya.</p>
 <div class="panel"><div class="bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span style="margin-left:6px">Pratonton panel: ${esc(AWAM.replace("https://", ""))}</span></div>
@@ -83,6 +82,6 @@ document.addEventListener("click", async ev => {
   try { if (document.execCommand("copy")) { toast("Pautan disalin ✓"); return; } } catch {}
   toast("Pautan dipilih. Tekan Ctrl+C (atau Cmd+C) untuk salin.");
 });
-</script></body></html>`;
+</script>`;
 fs.writeFileSync(OUT, html);
 console.log("Buku pautan:", OUT, Math.round(html.length / 1024) + " KB", shot ? "(dengan pratonton)" : "(tanpa pratonton)");
