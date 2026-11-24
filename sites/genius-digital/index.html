@@ -248,24 +248,30 @@
     .orbit-track { position: absolute; left: 50%; top: 50%; border-radius: 50%; transform: translate(-50%, -50%); border: 1.5px dashed rgba(10, 102, 255, .22); pointer-events: none; }
     .orbit-track.t1 { width: 60%; height: 60%; }
     .orbit-track.t2 { width: 92%; height: 92%; border-color: rgba(0, 200, 245, .25); }
-    .orbit-ring { position: absolute; inset: 0; animation: orbitSpin var(--dur, 40s) linear infinite; }
-    .orbit-ring.r1 { --dur: 38s; --r: 30cqw; }
-    .orbit-ring.r2 { --dur: 60s; --r: 46cqw; animation-direction: reverse; }
-    .orbit:hover .orbit-ring, .orbit:hover .ob-in { animation-play-state: paused; }
+    .orbit-ring { position: absolute; inset: 0; z-index: 1; transform: rotate(calc(var(--rot, 0) * var(--k, 1) * 1deg)); }
+    .orbit-ring.r1 { --k: 1; --r: 30cqw; }
+    .orbit-ring.r2 { --k: -1.35; --r: 46cqw; }
     .ob { position: absolute; left: 50%; top: 50%; width: var(--s, 16cqw); height: var(--s, 16cqw); margin: calc(var(--s, 16cqw) / -2) 0 0 calc(var(--s, 16cqw) / -2);
       transform: rotate(var(--a)) translateX(var(--r)) rotate(calc(-1 * var(--a))); }
-    .ob-in { width: 100%; height: 100%; animation: orbitSpin var(--dur) linear infinite reverse; }
-    .orbit-ring.r2 .ob-in { animation-direction: normal; }
+    .ob-in { width: 100%; height: 100%; transform: rotate(calc(var(--rot, 0) * var(--k, 1) * -1deg)); }   /* gambar kekal tegak */
     .ob-btn { display: block; width: 100%; height: 100%; padding: 0; border: 3px solid #fff; border-radius: 50%; overflow: hidden; background: #fff; cursor: pointer;
       box-shadow: 0 8px 22px rgba(10, 31, 68, .22), 0 0 0 4px rgba(10, 102, 255, .12); animation: orbitBob 4.5s ease-in-out infinite; animation-delay: var(--bd, 0s); transition: box-shadow .2s ease, scale .2s ease; }
     .ob-btn:hover { scale: 1.12; box-shadow: 0 12px 28px rgba(10, 31, 68, .3), 0 0 0 5px rgba(0, 200, 245, .45); }
     .ob-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .orbit-core { position: absolute; left: 50%; top: 50%; width: 26cqw; height: 26cqw; transform: translate(-50%, -50%); border-radius: 50%; padding: 2.2cqw; background: #fff;
-      box-shadow: 0 14px 40px rgba(10, 102, 255, .28), 0 0 0 7px rgba(10, 102, 255, .08), 0 0 0 16px rgba(0, 200, 245, .06); animation: corePulse 4s ease-in-out infinite; }
+      box-shadow: 0 14px 40px rgba(10, 102, 255, .28), 0 0 0 7px rgba(10, 102, 255, .08), 0 0 0 16px rgba(0, 200, 245, .06); z-index: 2;
+      animation: coreIntro 1.3s cubic-bezier(.2, .8, .2, 1) both, corePulse 4s ease-in-out 1.3s infinite; }
     .orbit-core img { width: 100%; height: 100%; object-fit: contain; display: block; }
     :root[data-theme="dark"] .orbit-core, :root[data-theme="dark"] .ob-btn { background: #112042; border-color: #1E3A6E; }
     .product-card.flash { animation: cardFlash 1.6s ease; }
-    @keyframes orbitSpin { to { transform: rotate(360deg); } }
+    /* Intro: logo G berputar masuk; produk keluar dari belakang logo dan berpusing ke orbit */
+    .orbit.intro .ob { animation: obEmerge 1.6s cubic-bezier(.16, .84, .3, 1) both; animation-delay: var(--id, 0s); }
+    @keyframes obEmerge {
+      from { transform: rotate(calc(var(--a) - 300deg)) translateX(0) rotate(calc(-1 * var(--a) + 300deg)); scale: .15; opacity: 0; }
+      12% { opacity: 1; }
+      to { transform: rotate(var(--a)) translateX(var(--r)) rotate(calc(-1 * var(--a))); scale: 1; opacity: 1; }
+    }
+    @keyframes coreIntro { from { rotate: -540deg; scale: .35; opacity: 0; } to { rotate: 0deg; scale: 1; opacity: 1; } }
     @keyframes orbitBob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -6%; } }
     @keyframes corePulse { 0%, 100% { scale: 1; } 50% { scale: 1.04; } }
     @keyframes cardFlash { 0%, 100% { box-shadow: var(--shadow-sm); } 30%, 70% { box-shadow: 0 0 0 4px var(--cyan-400), var(--shadow-md); } }
@@ -1223,7 +1229,7 @@
     }
 
     // Orbit hero: satu bulatan untuk setiap produk yang dipaparkan (masa nyata). Klik -> skrol ke kad produk.
-    let orbitSig = "";
+    let orbitSig = "", orbitIntroDone = false;
     function renderOrbit(list) {
       const sig = list.map(p => p.slug + ":" + (p.thumbnailURL || "").length + ":" + p.name).join("|");
       if (sig === orbitSig) return; orbitSig = sig;
@@ -1237,12 +1243,47 @@
         const btn = el("button", { class: "ob-btn", type: "button", tabindex: "-1", title: p.name, style: `--bd:${(-(i * 0.7)).toFixed(1)}s`,
           onclick: () => { const c = document.querySelector(`.product-card[data-slug="${CSS.escape(p.slug)}"]`); if (!c) return;
             c.scrollIntoView({ behavior: "smooth", block: "center" }); c.classList.remove("flash"); void c.offsetWidth; c.classList.add("flash"); } }, img);
-        return el("div", { class: "ob", style: `--a:${(360 / n * i + (ring === 2 ? 360 / n / 2 : 0)).toFixed(2)}deg; --s:${size}cqw` }, el("div", { class: "ob-in" }, btn));
+        return el("div", { class: "ob", style: `--a:${(360 / n * i + (ring === 2 ? 360 / n / 2 : 0)).toFixed(2)}deg; --s:${size}cqw; --id:${((ring === 2 ? 0.35 : 0) + i * 0.09).toFixed(2)}s` }, el("div", { class: "ob-in" }, btn));
       };
       const sizeIn = inner.length <= 3 ? 18 : 16, sizeOut = outer.length <= 6 ? 15 : outer.length <= 9 ? 13 : 11;
       r1.replaceChildren(...inner.map((p, i) => bubble(p, i, inner.length, sizeIn, 1)));
       r2.replaceChildren(...outer.map((p, i) => bubble(p, i, outer.length, sizeOut, 2)));
+      if (!orbitIntroDone && list.length) {   // intro hanya sekali (kali pertama produk dimuatkan)
+        orbitIntroDone = true; const orb = $("#heroOrbit"); orb.classList.add("intro");
+        playIntroPops([...inner.map((_, i) => i * 0.09), ...outer.map((_, i) => 0.35 + i * 0.09)]);
+        setTimeout(() => orb.classList.remove("intro"), 1600 + (0.35 + list.length * 0.09) * 1000 + 200);
+      }
     }
+
+    // Bunyi "pop" semasa intro (dijana dengan Web Audio, tiada fail). Pelayar mungkin menyekat bunyi
+    // sebelum pengunjung berinteraksi; jika disekat, intro berjalan senyap (tiada bunyi lewat).
+    function playIntroPops(delays) {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+      let ctx; try { ctx = new AC(); } catch (e) { return; }
+      const started = performance.now();
+      const pop = (t, f) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = "sine"; o.frequency.setValueAtTime(f * 1.7, t); o.frequency.exponentialRampToValueAtTime(f * .45, t + .09);
+        g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.2, t + .008); g.gain.exponentialRampToValueAtTime(.0001, t + .13);
+        o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + .15);
+      };
+      const go = () => { const t0 = ctx.currentTime + .03; delays.forEach((d, k) => pop(t0 + d + .45, 480 + (k * 137) % 420)); setTimeout(() => ctx.close().catch(() => {}), (Math.max(...delays) + 1.2) * 1000); };
+      if (ctx.state === "running") go();
+      else ctx.resume().then(() => { if (ctx.state === "running" && performance.now() - started < 1500) go(); else ctx.close().catch(() => {}); }).catch(() => {});
+    }
+
+    // Orbit berputar ikut skrol: skrol ke bawah = satu arah, skrol ke atas = arah sebaliknya (dilicinkan)
+    (() => {
+      const orb = $("#heroOrbit"); if (!orb || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const DEG_PER_PX = 0.18; let cur = window.scrollY * DEG_PER_PX, target = cur, raf = 0;
+      const tick = () => {
+        cur += (target - cur) * 0.12; if (Math.abs(target - cur) < 0.05) cur = target;
+        orb.style.setProperty("--rot", cur.toFixed(2)); raf = cur !== target ? requestAnimationFrame(tick) : 0;
+      };
+      orb.style.setProperty("--rot", cur.toFixed(2));
+      window.addEventListener("scroll", () => { target = window.scrollY * DEG_PER_PX; if (!raf) raf = requestAnimationFrame(tick); }, { passive: true });
+    })();
 
     function renderProducts(products) {
       const str = (v) => (typeof v === "string" ? v : "");
