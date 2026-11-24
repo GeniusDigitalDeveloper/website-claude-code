@@ -32,11 +32,21 @@ tambah user di situ sahaja. Untuk buang akses, padam atau disable user tersebut.
 
 Bahasa kandungan website default Bahasa Melayu; hanya path URL dalam BI.
 
-Portal: `/corporate`, `/about`, `/complex-plan`, `/programs`, `/gallery`, `/comments`, `/contact`,
+Portal: `/news` (Berita), `/news/<id>` (baca berita), `/corporate`, `/about`, `/complex-plan`, `/programs`, `/gallery`, `/comments`, `/contact`,
 `/committee`, `/main-committee`, `/general-committee`, `/introduction`.
 
 Admin: `/admin`, `/admin/banner`, `/admin/cta`, `/admin/programs`, `/admin/committee`, `/admin/history`,
-`/admin/complex-plan`, `/admin/gallery`, `/admin/corporate`, `/admin/comments`.
+`/admin/complex-plan`, `/admin/news`, `/admin/gallery`, `/admin/corporate`, `/admin/comments`.
 
 Pautan lama (`/#korporat`, `/korporat`, `/admin/korporat`, ...) auto ditukar ke path BI.
 `firebase.json` ada `rewrites` supaya semua path ini buka `index.html` yang betul.
+
+## Berita
+
+- Data dalam Realtime Database nod `news/{id}`: `title` & `body` (HTML berformat), `date` (YYYY-MM-DD),
+  `published`, `images` (data URL dimampatkan atau URL https), `headerIndex`, `headerHeight`, `headerWidth`,
+  `headerFit`, `headerPos`, `lineHeight` (default 1.15), `createdAt`, `updatedAt`.
+- Portal: penapis Tahun + Bulan (default bulan semasa), susunan terkini di atas, butang anak panah buka berita,
+  butang **Cetak Berita** (berita sahaja, satu muka A4, auto kecil jika panjang).
+- Admin: tab **Berita** (`/admin/news`) untuk tulis/edit/padam, muat naik gambar, pilih header & saiz,
+  toolbar font/saiz/bold/italic/underline/jajaran (default justify), jarak baris.

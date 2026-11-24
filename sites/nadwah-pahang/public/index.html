@@ -1580,6 +1580,204 @@
         .header-logo .logo-icon, .footer-brand .logo .icon { background: none; border-radius: 0; box-shadow: none; overflow: hidden; }
         .footer-brand .logo .icon { width: 44px; height: 44px; }
     </style>
+    <style>
+        /* ================= BERITA (News) ================= */
+        .news-filters {
+            display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-end; gap: 12px;
+            margin: 0 auto 28px; max-width: 760px;
+        }
+        .news-filter { display: flex; flex-direction: column; gap: 6px; min-width: 150px; flex: 1 1 150px; }
+        .news-filter label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--emerald-dark); }
+        .news-filter select {
+            font-family: var(--font); font-size: 0.92rem; font-weight: 600; color: var(--gray-800);
+            padding: 11px 14px; border-radius: var(--radius-xs); border: 1px solid var(--gray-300); background: var(--white);
+            cursor: pointer;
+        }
+        .news-filter select:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+        .news-count { font-size: 0.82rem; color: var(--gray-600); text-align: center; margin: -12px 0 20px; }
+        .news-list { display: flex; flex-direction: column; gap: 16px; max-width: 900px; margin: 0 auto; }
+        .news-card {
+            display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 18px; align-items: center;
+            background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-sm);
+            padding: 18px 20px; box-shadow: var(--shadow-sm); transition: var(--transition);
+        }
+        .news-card:hover { border-color: var(--emerald-light); box-shadow: var(--shadow-md); }
+        .news-date {
+            width: 64px; text-align: center; border-radius: var(--radius-xs); overflow: hidden;
+            border: 1px solid var(--gray-200); background: var(--off-white); flex-shrink: 0;
+        }
+        .news-date .d { display: block; font-size: 1.5rem; font-weight: 800; color: var(--emerald-dark); line-height: 1.2; padding-top: 6px; }
+        .news-date .m { display: block; font-size: 0.68rem; font-weight: 700; color: var(--white); background: var(--emerald); padding: 3px 0; letter-spacing: 0.06em; text-transform: uppercase; }
+        .news-date .y { display: block; font-size: 0.68rem; color: var(--gray-600); padding-bottom: 4px; }
+        .news-card-body { min-width: 0; }
+        .news-card-body h3 {
+            font-size: 1.05rem; font-weight: 700; color: var(--gray-900); line-height: 1.35; margin-bottom: 6px;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .news-card-body p {
+            font-size: 0.88rem; color: var(--gray-600); line-height: 1.6;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .news-open {
+            width: 48px; height: 48px; border-radius: 50%; border: none; cursor: pointer; flex-shrink: 0;
+            background: var(--emerald-gradient); color: var(--white); font-size: 1.05rem;
+            display: grid; place-items: center; transition: var(--transition);
+        }
+        .news-open:hover { transform: translateX(3px); box-shadow: 0 6px 18px rgba(11, 122, 92, 0.3); }
+        .news-open:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+        .news-empty {
+            text-align: center; padding: 36px 20px; background: var(--white); border: 1px dashed var(--gray-300);
+            border-radius: var(--radius-sm); color: var(--gray-600); max-width: 900px; margin: 0 auto;
+        }
+        .news-empty i { font-size: 2rem; color: var(--gold); margin-bottom: 10px; display: block; }
+        .news-empty button {
+            margin-top: 14px; font-family: var(--font); font-weight: 600; font-size: 0.85rem; cursor: pointer;
+            border: 1px solid var(--emerald); color: var(--emerald-dark); background: var(--emerald-pale);
+            padding: 9px 18px; border-radius: 30px;
+        }
+
+        /* Paparan baca berita (dalam modal) */
+        .modal-box.modal-news { max-width: 1080px; width: 96%; padding: 0; }
+        .modal-box.modal-news .close { z-index: 5; }
+        .news-article { display: grid; grid-template-columns: minmax(0, 1fr) 280px; }
+        .news-main { padding: 28px 30px 32px; min-width: 0; }
+        .news-header-img { margin: 0 auto 22px; border-radius: var(--radius-sm); overflow: hidden; background: var(--gray-100); }
+        .news-header-img img { width: 100%; height: 100%; display: block; }
+        .news-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 0.8rem; color: var(--gray-600); }
+        .news-meta .tag { background: var(--emerald-pale); color: var(--emerald-dark); font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.7rem; }
+        .news-title { font-size: 1.6rem; font-weight: 800; color: var(--gray-900); margin-bottom: 16px; text-align: justify; }
+        .news-body { font-size: 0.98rem; color: var(--gray-800); text-align: justify; }
+        .news-title, .news-body { overflow-wrap: anywhere; }
+        .news-body p, .news-body div { margin: 0 0 0.6em; }
+        .news-body img { max-width: 100%; }
+        .news-side { background: var(--off-white); border-left: 1px solid var(--gray-200); padding: 28px 22px; display: flex; flex-direction: column; gap: 18px; }
+        .news-side-brand { display: flex; align-items: center; gap: 12px; padding-right: 34px; }
+        .news-side-brand img { width: 54px; height: 54px; object-fit: contain; }
+        .news-side-brand b { display: block; font-size: 0.95rem; color: var(--emerald-dark); line-height: 1.2; }
+        .news-side-brand span { font-size: 0.72rem; font-weight: 700; color: var(--gold-dark); letter-spacing: 0.05em; }
+        .news-side-block h4 { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--emerald-dark); margin-bottom: 8px; }
+        .news-side-contact { display: flex; flex-direction: column; gap: 8px; font-size: 0.8rem; color: var(--gray-600); line-height: 1.5; }
+        .news-side-contact div { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 8px; overflow-wrap: anywhere; }
+        .news-side-contact i { color: var(--gold-dark); margin-top: 3px; }
+        .news-thumbs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+        .news-thumbs button { padding: 0; border: 2px solid transparent; border-radius: var(--radius-xs); overflow: hidden; cursor: zoom-in; background: var(--gray-100); aspect-ratio: 4 / 3; }
+        .news-thumbs button:hover, .news-thumbs button:focus-visible { border-color: var(--gold); outline: none; }
+        .news-thumbs img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .news-actions { display: flex; flex-direction: column; gap: 8px; margin-top: auto; }
+        .news-actions button {
+            font-family: var(--font); font-weight: 600; font-size: 0.85rem; cursor: pointer; padding: 11px 14px; border-radius: 30px;
+            display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--emerald);
+        }
+        .news-actions .btn-print { background: var(--emerald-gradient); color: var(--white); border-color: transparent; }
+        .news-actions .btn-back { background: var(--white); color: var(--emerald-dark); }
+        .news-lightbox { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9); z-index: 1000001; display: none; align-items: center; justify-content: center; padding: 20px; cursor: zoom-out; }
+        .news-lightbox.open { display: flex; }
+        .news-lightbox img { max-width: 100%; max-height: 90vh; border-radius: 8px; }
+
+        @media (max-width: 860px) {
+            .news-article { grid-template-columns: minmax(0, 1fr); }
+            .news-side { border-left: none; border-top: 1px solid var(--gray-200); }
+            .news-main { padding: 22px 18px 24px; }
+            .news-title { font-size: 1.3rem; }
+        }
+        @media (max-width: 560px) {
+            .news-card { grid-template-columns: auto minmax(0, 1fr); padding: 14px; gap: 12px; }
+            .news-open { grid-column: 2; justify-self: end; width: 42px; height: 42px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .news-card, .news-open { transition: none; }
+            .news-open:hover { transform: none; }
+        }
+    </style>
+    <style>
+        /* ================= MENU (gaya baharu) =================
+           Tulisan kecil & padat, tiada pil bulat menyala.
+           Hover: garisan emas kecil slide dari kiri ke kanan.
+           Klik/aktif: kotak nipis muncul dan BERGERAK (animasi) ke menu yang dipilih. */
+        .nav-list { position: relative; gap: 2px; }
+        .nav-list > li { position: relative; z-index: 1; }
+        .nav-list > li.nav-indicator {
+            position: absolute; top: 0; left: 0; z-index: 0; pointer-events: none;
+            border-radius: 7px; border: 1px solid rgba(11, 122, 92, 0.28);
+            background: linear-gradient(180deg, rgba(230, 244, 240, 0.9), rgba(230, 244, 240, 0.55));
+            opacity: 0;
+            transition: transform 0.55s cubic-bezier(0.22, 1.15, 0.36, 1), width 0.55s cubic-bezier(0.22, 1.15, 0.36, 1), height 0.3s ease, opacity 0.3s ease;
+        }
+        .nav-list a {
+            position: relative;
+            padding: 6px 9px;
+            font-size: 0.69rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            color: var(--gray-800);
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 7px;
+            box-shadow: none;
+            gap: 4px;
+            transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+        }
+        .nav-list a::after {
+            content: "";
+            position: absolute; left: 9px; right: 9px; bottom: 2px; height: 2px; border-radius: 2px;
+            background: var(--gold-gradient);
+            transform: scaleX(0); transform-origin: left center;
+            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .nav-list a:hover,
+        .nav-list a.active {
+            background: transparent;
+            color: var(--emerald-dark);
+            border-color: transparent;
+            box-shadow: none;
+        }
+        .nav-list a:hover::after,
+        .nav-list a.active::after,
+        .nav-list a:focus-visible::after { transform: scaleX(1); }
+        .nav-list a:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+        .nav-list a .fa-chevron-down { font-size: 0.58rem; transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+        .dropdown:hover > a .fa-chevron-down,
+        .dropdown.open > a .fa-chevron-down { transform: rotate(180deg); }
+
+        /* Sub menu */
+        .dropdown-menu { padding: 6px; min-width: 210px; border-radius: 10px; }
+        .dropdown-menu li { position: relative; }
+        .dropdown-menu a {
+            padding: 8px 12px 9px;
+            font-size: 0.7rem;
+            border-radius: 7px;
+            border: 1px solid transparent;
+            transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease, padding-left 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .dropdown-menu a::after { left: 12px; right: 12px; bottom: 3px; }
+        .dropdown-menu a:hover {
+            background: transparent;
+            color: var(--emerald-dark);
+            padding-left: 16px;
+        }
+        .dropdown-menu a.active {
+            background: rgba(230, 244, 240, 0.8);
+            border-color: rgba(11, 122, 92, 0.28);
+            color: var(--emerald-dark);
+        }
+
+        @media (max-width: 1250px) {
+            .nav-list a { padding: 6px 7px; font-size: 0.66rem; }
+        }
+        @media (max-width: 992px) {
+            .nav-list > li.nav-indicator { display: none; }
+            .header-nav { background: var(--white); }
+            .nav-list { gap: 4px; }
+            .nav-list > li { width: 100%; }
+            .nav-list a { font-size: 0.84rem; padding: 10px 14px; background: transparent; }
+            .nav-list a.active { background: rgba(230, 244, 240, 0.8); border-color: rgba(11, 122, 92, 0.28); }
+            .dropdown-menu { padding: 4px 0 4px 10px; }
+            .dropdown-menu a { font-size: 0.8rem; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .nav-list > li.nav-indicator, .nav-list a, .nav-list a::after, .nav-list a .fa-chevron-down, .dropdown-menu a { transition: none; }
+        }
+    </style>
 </head>
 
 <body>
@@ -1613,6 +1811,7 @@
                         </ul>
                     </li>
                     <li><a href="#program" data-i18n="nav_program">PROGRAM NADWAH</a></li>
+                    <li><a href="#berita" data-news-nav>BERITA</a></li>
                     <li><a href="#galeri" data-i18n="nav_galeri">GALERI</a></li>
                     <li><a href="#hubungi" data-i18n="nav_komen">KOMEN</a></li>
                     <li><a href="#footer" data-i18n="nav_hubungi">HUBUNGI KAMI</a></li>
@@ -1706,6 +1905,31 @@
         </div>
     </section>
 
+    <section class="section-padding" id="berita" style="background: var(--white);">
+        <div class="container">
+            <div class="text-center" data-aos="fade-up">
+                <h2 class="section-title" id="newsTitle">Berita Terkini</h2>
+                <p class="section-subtitle" id="newsSubtitle">Berita dan perkembangan terkini aktiviti BADAN NADWAH Islamiah Pahang.</p>
+            </div>
+            <div class="news-filters">
+                <div class="news-filter">
+                    <label for="newsYear" id="newsYearLabel">Tahun</label>
+                    <select id="newsYear"></select>
+                </div>
+                <div class="news-filter">
+                    <label for="newsMonth" id="newsMonthLabel">Bulan</label>
+                    <select id="newsMonth"></select>
+                </div>
+            </div>
+            <p class="news-count" id="newsCount" aria-live="polite"></p>
+            <div class="news-list" id="newsList">
+                <div class="news-empty"><i class="fas fa-newspaper"></i>Memuatkan berita…</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="news-lightbox" id="newsLightbox" role="dialog" aria-label="Gambar berita"><img alt="" /></div>
+
     <section class="section-padding" id="galeri" style="background: var(--emerald-pale);">
         <div class="container">
             <div class="text-center" data-aos="fade-up">
@@ -1783,6 +2007,7 @@
                         <a href="javascript:void(0)" onclick="openTentangModal()" data-i18n="fl_about">Mengenai NADWAH</a>
                         <a href="#program" data-i18n="fl_program">Program</a>
                         <a href="#pelan-kompleks" data-i18n="fl_pelan">Pelan Kompleks</a>
+                        <a href="#berita" data-news-nav>Berita</a>
                         <a href="#galeri" data-i18n="fl_galeri">Galeri Aktiviti</a>
                         <a href="#footer" data-i18n="fl_hubungi">Hubungi Kami</a>
                     </div>
@@ -2606,13 +2831,14 @@
         // Seksyen -> path. Firebase Hosting rewrite semua path ke index.html.
         const SECTION_TO_PATH = {
             'banner': '/', 'korporat': '/corporate', 'tentang': '/about', 'pelan-kompleks': '/complex-plan',
-            'program': '/programs', 'galeri': '/gallery', 'hubungi': '/comments', 'footer': '/contact'
+            'program': '/programs', 'galeri': '/gallery', 'hubungi': '/comments', 'footer': '/contact', 'berita': '/news'
         };
         // Path lama (BM) auto ditukar ke path BI
         const PATH_ALIASES = {
             '/korporat': '/corporate', '/tentang': '/about', '/pelan-kompleks': '/complex-plan', '/program': '/programs',
             '/galeri': '/gallery', '/komen': '/comments', '/hubungi-kami': '/contact', '/hubungi': '/contact',
-            '/ajk': '/committee', '/ajk-utama': '/main-committee', '/ajk-biasa': '/general-committee', '/pengenalan': '/introduction'
+            '/ajk': '/committee', '/ajk-utama': '/main-committee', '/ajk-biasa': '/general-committee', '/pengenalan': '/introduction',
+            '/berita': '/news'
         };
         const PATH_TO_SECTION = Object.fromEntries(Object.entries(SECTION_TO_PATH).map(([k, v]) => [v, k]));
         const MODAL_PATHS = {
@@ -2625,7 +2851,15 @@
         let lastSectionPath = '/';
         let routing = false;
 
-        function cleanPath(p) { p = (p || '/').replace(/\/+$/, '').toLowerCase(); p = p === '' ? '/' : p; return PATH_ALIASES[p] || p; }
+        function cleanPath(p) {
+            p = (p || '/').replace(/\/+$/, '');
+            const low = p.toLowerCase();
+            // /news/<id>: id berita sensitif huruf besar/kecil
+            if (low.startsWith('/news/') || low.startsWith('/berita/')) return '/news/' + p.split('/').slice(2).join('/');
+            p = low === '' ? '/' : low;
+            return PATH_ALIASES[p] || p;
+        }
+        function isModalPath(p) { return !!MODAL_PATHS[p] || p.startsWith('/news/'); }
         function hashToPath(href) {
             const id = href.slice(1);
             if (!id) return '/';
@@ -2643,15 +2877,17 @@
             return true;
         }
         function markActive(path) {
-            document.querySelectorAll('.nav-menu > li > a, #mainNav > ul > li > a').forEach(a => {
-                const h = a.getAttribute('href') || '';
-                if (h.startsWith('/')) a.classList.toggle('active', cleanPath(h) === path);
-            });
+            const links = [...document.querySelectorAll('#mainNav a')];
+            const match = links.find(a => { const h = a.getAttribute('href') || ''; return h.startsWith('/') && cleanPath(h) === path; });
+            if (!match) return;
+            links.forEach(a => a.classList.remove('active'));
+            match.classList.add('active');
         }
         function route(path, smooth) {
             path = cleanPath(path);
             routing = true;
             if (MODAL_PATHS[path]) { MODAL_PATHS[path](); }
+            else if (path.startsWith('/news/')) { if (window.openNewsArticle) window.openNewsArticle(decodeURIComponent(path.slice(6)), true); }
             else {
                 const overlay = document.querySelector('.modal-overlay.open');
                 if (overlay && window.closeModal) window.closeModal();
@@ -2692,6 +2928,7 @@
         });
 
         window.addEventListener('popstate', () => route(location.pathname, true));
+        window.nadwahRouter = { setPath: (p) => setPath(p), setReturn: (p) => { lastSectionPath = cleanPath(p); } };
 
         function boot() {
             // Bungkus modal supaya URL ikut: /ajk, /ajk-utama, /ajk-biasa, /pengenalan
@@ -2707,13 +2944,13 @@
             }
             if (window.closeModal && !window.closeModal.__routed) {
                 const orig = window.closeModal;
-                window.closeModal = function() { orig.apply(this, arguments); if (!routing && MODAL_PATHS[cleanPath(location.pathname)]) setPath(lastSectionPath); };
+                window.closeModal = function() { orig.apply(this, arguments); if (!routing && isModalPath(cleanPath(location.pathname))) setPath(lastSectionPath); };
                 window.closeModal.__routed = true;
                 const mc = document.getElementById('modalClose');
-                if (mc) mc.addEventListener('click', () => { if (MODAL_PATHS[cleanPath(location.pathname)]) setPath(lastSectionPath); });
-                document.addEventListener('keydown', e => { if (e.key === 'Escape' && MODAL_PATHS[cleanPath(location.pathname)]) setPath(lastSectionPath); });
+                if (mc) mc.addEventListener('click', () => { if (isModalPath(cleanPath(location.pathname))) setPath(lastSectionPath); });
+                document.addEventListener('keydown', e => { if (e.key === 'Escape' && isModalPath(cleanPath(location.pathname))) setPath(lastSectionPath); });
                 const mo = document.querySelector('.modal-overlay');
-                if (mo) mo.addEventListener('click', function(e) { if (e.target === this && MODAL_PATHS[cleanPath(location.pathname)]) setPath(lastSectionPath); });
+                if (mo) mo.addEventListener('click', function(e) { if (e.target === this && isModalPath(cleanPath(location.pathname))) setPath(lastSectionPath); });
             }
             rewriteLinks();
             new MutationObserver(muts => muts.forEach(m => m.addedNodes.forEach(n => { if (n.nodeType === 1) rewriteLinks(n.parentNode || n); }))).observe(document.body, { childList: true, subtree: true });
@@ -2722,14 +2959,359 @@
             let start = cleanPath(location.pathname);
             if (start !== location.pathname && start !== '/') history.replaceState({ path: start }, '', start);
             if (location.hash && location.hash.length > 1) { start = hashToPath(location.hash); history.replaceState({ path: start }, '', start); }
+            if (start.startsWith('/news/')) lastSectionPath = '/news';
             if (start !== '/') {
                 route(start, false);
                 // Ulang selepas kandungan Firebase dimuatkan supaya kedudukan skrol tepat
-                setTimeout(() => route(start, false), 900);
-                setTimeout(() => route(start, false), 2200);
+                if (!isModalPath(start)) {
+                    setTimeout(() => route(start, false), 900);
+                    setTimeout(() => route(start, false), 2200);
+                }
             }
         }
         if (document.readyState !== 'complete') document.addEventListener('DOMContentLoaded', boot); else boot();
+    </script>
+    <script type="module">
+        // ================= BERITA (News) — Portal Awam =================
+        // Data: Firebase Realtime Database nod `news/{id}`; dikemas kini dari Panel Admin.
+        import { getApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+        const db = getDatabase(getApp());
+        const LOGO = '/logo-nadwah.png';
+        const MONTHS = {
+            ms: ['Januari', 'Februari', 'Mac', 'April', 'Mei', 'Jun', 'Julai', 'Ogos', 'September', 'Oktober', 'November', 'Disember'],
+            en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+        };
+        const T = {
+            ms: { title: 'Berita Terkini', sub: 'Berita dan perkembangan terkini aktiviti BADAN NADWAH Islamiah Pahang.', year: 'Tahun', month: 'Bulan', all: 'Semua Bulan',
+                  count: n => `${n} berita`, none: (m, y) => `Tiada berita untuk ${m} ${y}.`, latest: 'Lihat berita terkini', read: 'Baca berita',
+                  print: 'Cetak Berita', back: 'Kembali', news: 'Berita', contact: 'Hubungi Kami', photos: 'Gambar Berita', loading: 'Memuatkan berita…', notfound: 'Berita tidak dijumpai.' },
+            en: { title: 'Latest News', sub: 'News and latest updates on BADAN NADWAH Islamiah Pahang activities.', year: 'Year', month: 'Month', all: 'All Months',
+                  count: n => `${n} news`, none: (m, y) => `No news for ${m} ${y}.`, latest: 'View latest news', read: 'Read news',
+                  print: 'Print News', back: 'Back', news: 'News', contact: 'Contact Us', photos: 'News Photos', loading: 'Loading news…', notfound: 'News not found.' }
+        };
+        let lang = 'ms';
+        let newsArr = [];
+        let loaded = false;
+        let pendingOpen = null;
+        let corporate = {};
+        const now = new Date();
+        let selYear = now.getFullYear();
+        let selMonth = now.getMonth() + 1; // 1-12, 0 = semua
+
+        // ---- Sanitizer: hanya format teks yang dibenarkan ----
+        const ALLOWED_TAGS = new Set(['B', 'STRONG', 'I', 'EM', 'U', 'S', 'BR', 'P', 'DIV', 'SPAN', 'FONT', 'UL', 'OL', 'LI', 'BLOCKQUOTE', 'H3', 'H4']);
+        const ALLOWED_CSS = ['text-align', 'font-size', 'font-family', 'font-weight', 'font-style', 'text-decoration', 'line-height', 'color'];
+        function sanitize(html) {
+            const doc = new DOMParser().parseFromString(`<div>${html || ''}</div>`, 'text/html');
+            const walk = (node) => {
+                [...node.childNodes].forEach(ch => {
+                    if (ch.nodeType === 3) return;
+                    if (ch.nodeType !== 1 || !ALLOWED_TAGS.has(ch.tagName)) {
+                        if (ch.nodeType === 1 && !['SCRIPT', 'STYLE', 'IFRAME', 'OBJECT', 'EMBED'].includes(ch.tagName)) {
+                            walk(ch); ch.replaceWith(...ch.childNodes);
+                        } else ch.remove();
+                        return;
+                    }
+                    const style = ch.getAttribute('style') || '';
+                    const face = ch.getAttribute('face');
+                    const align = ch.getAttribute('align');
+                    [...ch.attributes].forEach(a => ch.removeAttribute(a.name));
+                    const kept = style.split(';').map(s => s.trim()).filter(s => {
+                        const k = s.split(':')[0].trim().toLowerCase();
+                        return ALLOWED_CSS.includes(k) && !/url\(|expression/i.test(s);
+                    });
+                    if (kept.length) ch.setAttribute('style', kept.join('; '));
+                    if (face && ch.tagName === 'FONT') ch.setAttribute('face', face.replace(/[^\w\s,'-]/g, ''));
+                    if (align && /^(left|right|center|justify)$/i.test(align)) ch.setAttribute('align', align);
+                    walk(ch);
+                });
+            };
+            walk(doc.body.firstChild);
+            return doc.body.firstChild.innerHTML;
+        }
+        const plain = (html) => { const d = document.createElement('div'); d.innerHTML = sanitize(html); return (d.textContent || '').replace(/\s+/g, ' ').trim(); };
+        const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const safeImg = (src) => (typeof src === 'string' && /^(data:image\/(png|jpe?g|webp|gif);base64,|https:\/\/|\/)/i.test(src)) ? src : '';
+
+        function parseDate(d) {
+            const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(d || '');
+            return m ? { y: +m[1], m: +m[2], d: +m[3] } : null;
+        }
+        function fmtDate(d) {
+            const p = parseDate(d); if (!p) return '';
+            return `${p.d} ${MONTHS[lang][p.m - 1]} ${p.y}`;
+        }
+        function sortKey(n) { return `${n.date || ''}|${String(n.createdAt || 0).padStart(15, '0')}`; }
+
+        // ---- Penapis Tahun / Bulan ----
+        function fillFilters() {
+            const yearSel = document.getElementById('newsYear');
+            const monthSel = document.getElementById('newsMonth');
+            if (!yearSel || !monthSel) return;
+            const years = new Set([now.getFullYear()]);
+            newsArr.forEach(n => { const p = parseDate(n.date); if (p) years.add(p.y); });
+            const ys = [...years].sort((a, b) => b - a);
+            if (!ys.includes(selYear)) selYear = ys[0];
+            yearSel.innerHTML = ys.map(y => `<option value="${y}" ${y === selYear ? 'selected' : ''}>${y}</option>`).join('');
+            monthSel.innerHTML = `<option value="0" ${selMonth === 0 ? 'selected' : ''}>${T[lang].all}</option>` +
+                MONTHS[lang].map((m, i) => `<option value="${i + 1}" ${i + 1 === selMonth ? 'selected' : ''}>${m}</option>`).join('');
+        }
+
+        function renderList() {
+            const list = document.getElementById('newsList');
+            const count = document.getElementById('newsCount');
+            if (!list) return;
+            const t = T[lang];
+            if (!loaded) { list.innerHTML = `<div class="news-empty"><i class="fas fa-newspaper"></i>${t.loading}</div>`; return; }
+            const items = newsArr.filter(n => {
+                const p = parseDate(n.date); if (!p) return false;
+                return p.y === selYear && (selMonth === 0 || p.m === selMonth);
+            });
+            count.textContent = items.length ? t.count(items.length) : '';
+            if (!items.length) {
+                const label = selMonth === 0 ? '' : MONTHS[lang][selMonth - 1];
+                const hasAny = newsArr.some(n => parseDate(n.date));
+                list.innerHTML = `<div class="news-empty"><i class="fas fa-newspaper"></i>${esc(t.none(label, selYear)).replace('  ', ' ')}
+                    ${hasAny ? `<div><button type="button" id="newsJumpLatest">${t.latest}</button></div>` : ''}</div>`;
+                const jb = document.getElementById('newsJumpLatest');
+                if (jb) jb.onclick = () => {
+                    const p = parseDate(newsArr.find(n => parseDate(n.date)).date);
+                    selYear = p.y; selMonth = p.m; fillFilters(); renderList();
+                };
+                return;
+            }
+            list.innerHTML = items.map(n => {
+                const p = parseDate(n.date);
+                const title = plain(n.title) || '(Tanpa tajuk)';
+                const excerpt = plain(n.body).slice(0, 260);
+                return `
+                <article class="news-card">
+                    <div class="news-date" aria-hidden="true"><span class="d">${p.d}</span><span class="m">${MONTHS[lang][p.m - 1].slice(0, 3)}</span><span class="y">${p.y}</span></div>
+                    <div class="news-card-body">
+                        <h3>${esc(title)}</h3>
+                        <p>${esc(excerpt)}</p>
+                    </div>
+                    <button type="button" class="news-open" data-news="${esc(n.id)}" aria-label="${t.read}: ${esc(title)}" title="${t.read}"><i class="fas fa-arrow-right"></i></button>
+                </article>`;
+            }).join('');
+        }
+
+        function applyLabels() {
+            const t = T[lang];
+            const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+            set('newsTitle', t.title); set('newsSubtitle', t.sub); set('newsYearLabel', t.year); set('newsMonthLabel', t.month);
+            const navA = document.querySelector('#mainNav a[data-news-nav]');
+            if (navA) navA.textContent = lang === 'en' ? 'NEWS' : 'BERITA';
+            const fl = document.querySelector('footer a[data-news-nav]');
+            if (fl) fl.textContent = lang === 'en' ? 'News' : 'Berita';
+        }
+
+        // ---- Paparan artikel (format berita) ----
+        function headerStyle(n) {
+            const h = Math.min(Math.max(+n.headerHeight || 320, 120), 700);
+            const w = Math.min(Math.max(+n.headerWidth || 100, 30), 100);
+            return { box: `height:${h}px; width:${w}%;`, img: `object-fit:${n.headerFit === 'contain' ? 'contain' : 'cover'}; object-position:center ${['top', 'bottom'].includes(n.headerPos) ? n.headerPos : 'center'};` };
+        }
+        function articleHtml(n) {
+            const t = T[lang];
+            const imgs = (Array.isArray(n.images) ? n.images : []).map(safeImg).filter(Boolean);
+            const head = imgs[Math.min(+n.headerIndex || 0, imgs.length - 1)] || '';
+            const hs = headerStyle(n);
+            const lh = +n.lineHeight || 1.15;
+            const c = corporate || {};
+            return `
+            <div class="news-article">
+                <div class="news-main">
+                    ${head ? `<div class="news-header-img" style="${hs.box}"><img src="${head}" alt="" style="${hs.img}" /></div>` : ''}
+                    <div class="news-meta"><span class="tag">${t.news}</span><span><i class="far fa-calendar"></i> ${fmtDate(n.date)}</span></div>
+                    <div class="news-title" style="line-height:${lh};">${sanitize(n.title)}</div>
+                    <div class="news-body" style="line-height:${lh};">${sanitize(n.body)}</div>
+                </div>
+                <aside class="news-side">
+                    <div class="news-side-brand"><img src="${LOGO}" alt="Logo NADWAH" /><div><b>BADAN NADWAH</b><span>ISLAMIAH PAHANG</span></div></div>
+                    <div class="news-side-block">
+                        <h4>${t.contact}</h4>
+                        <div class="news-side-contact">
+                            ${c.address ? `<div><i class="fas fa-map-marker-alt"></i><span>${esc(c.address)}</span></div>` : ''}
+                            ${c.phone ? `<div><i class="fas fa-phone-alt"></i><span>${esc(c.phone)}</span></div>` : ''}
+                            ${c.email ? `<div><i class="fas fa-envelope"></i><span>${esc(c.email)}</span></div>` : ''}
+                            <div><i class="fas fa-globe"></i><span>nadwahpahang.org</span></div>
+                        </div>
+                    </div>
+                    ${imgs.length ? `<div class="news-side-block"><h4>${t.photos}</h4><div class="news-thumbs">
+                        ${imgs.map((src, i) => `<button type="button" data-zoom="${i}" aria-label="Besarkan gambar ${i + 1}"><img src="${src}" alt="" loading="lazy" /></button>`).join('')}
+                    </div></div>` : ''}
+                    <div class="news-actions">
+                        <button type="button" class="btn-print" id="newsPrintBtn"><i class="fas fa-print"></i> ${t.print}</button>
+                        <button type="button" class="btn-back" id="newsBackBtn"><i class="fas fa-arrow-left"></i> ${t.back}</button>
+                    </div>
+                </aside>
+            </div>`;
+        }
+
+        function openArticle(id, fromRoute) {
+            if (!loaded) { pendingOpen = id; return; }
+            const n = newsArr.find(x => x.id === id);
+            if (!n) { if (fromRoute && window.openModal) window.openModal(`<p style="text-align:center;padding:30px;">${T[lang].notfound}</p>`); return; }
+            if (!window.openModal) return;
+            window.openModal(articleHtml(n), true);
+            const box = document.querySelector('.modal-box');
+            if (box) { box.classList.add('modal-news'); box.scrollTop = 0; }
+            const imgs = (Array.isArray(n.images) ? n.images : []).map(safeImg).filter(Boolean);
+            document.querySelectorAll('.news-thumbs [data-zoom]').forEach(b => b.onclick = () => {
+                const lb = document.getElementById('newsLightbox');
+                lb.querySelector('img').src = imgs[+b.dataset.zoom]; lb.classList.add('open');
+            });
+            document.getElementById('newsPrintBtn').onclick = () => printNews(n);
+            document.getElementById('newsBackBtn').onclick = () => window.closeModal && window.closeModal();
+            if (!fromRoute) {
+                const R = window.nadwahRouter;
+                if (R) { R.setReturn(location.pathname === '/' ? '/news' : location.pathname); R.setPath('/news/' + id); }
+            }
+        }
+        window.openNewsArticle = openArticle;
+
+        // Buang kelas modal-news bila modal ditutup / kandungan lain dibuka
+        const mo = document.getElementById('modalOverlay');
+        if (mo) new MutationObserver(() => {
+            const box = document.querySelector('.modal-box');
+            if (box && box.classList.contains('modal-news') && (!mo.classList.contains('open') || !box.querySelector('.news-article'))) box.classList.remove('modal-news');
+        }).observe(mo, { attributes: true, subtree: true, childList: true, attributeFilter: ['class'] });
+        document.getElementById('newsLightbox').onclick = function() { this.classList.remove('open'); };
+
+        // ---- Cetak: berita sahaja, satu muka A4 ----
+        function printNews(n) {
+            const imgs = (Array.isArray(n.images) ? n.images : []).map(safeImg).filter(Boolean);
+            const head = imgs[Math.min(+n.headerIndex || 0, imgs.length - 1)] || '';
+            const hs = headerStyle(n);
+            const lh = +n.lineHeight || 1.15;
+            const old = document.getElementById('newsPrintFrame'); if (old) old.remove();
+            const fr = document.createElement('iframe');
+            fr.id = 'newsPrintFrame';
+            fr.setAttribute('aria-hidden', 'true');
+            fr.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden;';
+            document.body.appendChild(fr);
+            const d = fr.contentDocument;
+            d.open();
+            d.write(`<!doctype html><html><head><meta charset="utf-8"><title>${esc(plain(n.title))}</title>
+                <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+                <style>
+                    @page { size: A4 portrait; margin: 12mm; }
+                    html, body { margin: 0; padding: 0; background: #fff; }
+                    body { font-family: 'Poppins', Arial, sans-serif; color: #1e293b; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                    #page { width: 186mm; }
+                    .hdr { margin: 0 auto 6mm; overflow: hidden; border-radius: 6px; }
+                    .hdr img { width: 100%; height: 100%; display: block; }
+                    .date { font-size: 10pt; color: #64748b; margin-bottom: 3mm; }
+                    .title { font-size: 18pt; font-weight: 800; color: #0f172a; margin-bottom: 4mm; text-align: justify; }
+                    .body { font-size: 11pt; text-align: justify; }
+                    .body p, .body div { margin: 0 0 0.55em; }
+                    .title, .body { overflow-wrap: anywhere; }
+                </style></head><body><div id="page">
+                ${head ? `<div class="hdr" style="${hs.box}"><img src="${head}" alt="" style="${hs.img}"></div>` : ''}
+                <div class="date">${fmtDate(n.date)}</div>
+                <div class="title" style="line-height:${lh};">${sanitize(n.title)}</div>
+                <div class="body" style="line-height:${lh};">${sanitize(n.body)}</div>
+                </div></body></html>`);
+            d.close();
+            const go = () => {
+                const page = d.getElementById('page');
+                // Muatkan dalam satu muka A4 (273mm tinggi boleh guna ≈ 1031px pada 96dpi)
+                const maxH = 1025;
+                const h = page.scrollHeight;
+                if (h > maxH) page.style.zoom = (maxH / h).toFixed(3);
+                fr.contentWindow.focus();
+                fr.contentWindow.print();
+            };
+            const imgsEl = [...d.images];
+            Promise.all([d.fonts ? d.fonts.ready : Promise.resolve(), ...imgsEl.map(im => im.complete ? 0 : new Promise(r => { im.onload = im.onerror = r; }))])
+                .then(() => setTimeout(go, 150));
+        }
+
+        // ---- Bahasa: ikut butang MY / ENG ----
+        function hookLang() {
+            if (window.setLanguage && !window.setLanguage.__news) {
+                const orig = window.setLanguage;
+                window.setLanguage = function(l) { orig.apply(this, arguments); lang = l === 'en' ? 'en' : 'ms'; applyLabels(); fillFilters(); renderList(); };
+                window.setLanguage.__news = true;
+            }
+        }
+
+        function boot() {
+            hookLang();
+            applyLabels();
+            fillFilters();
+            renderList();
+            document.getElementById('newsYear').onchange = (e) => { selYear = +e.target.value; renderList(); };
+            document.getElementById('newsMonth').onchange = (e) => { selMonth = +e.target.value; renderList(); };
+            document.getElementById('newsList').addEventListener('click', (e) => {
+                const b = e.target.closest('[data-news]'); if (b) openArticle(b.dataset.news, false);
+            });
+        }
+        if (document.readyState !== 'complete') document.addEventListener('DOMContentLoaded', boot); else boot();
+
+        onValue(ref(db, 'site_content/corporate'), (snap) => { corporate = snap.val() || {}; });
+        onValue(ref(db, 'news'), (snap) => {
+            const val = snap.val() || {};
+            newsArr = Object.entries(val).map(([id, n]) => ({ id, ...n }))
+                .filter(n => n && n.published !== false && parseDate(n.date))
+                .sort((a, b) => sortKey(b).localeCompare(sortKey(a)));   // terkini di atas
+            loaded = true;
+            fillFilters();
+            renderList();
+            if (pendingOpen) { const id = pendingOpen; pendingOpen = null; openArticle(id, true); }
+        }, () => { loaded = true; renderList(); });
+    </script>
+    <script>
+        // ================= MENU: kotak bergerak ke menu aktif =================
+        (function() {
+            function init() {
+                const list = document.querySelector('#mainNav .nav-list');
+                if (!list) return;
+                const ind = document.createElement('li');
+                ind.className = 'nav-indicator';
+                ind.setAttribute('aria-hidden', 'true');
+                list.prepend(ind);
+                const topLinks = () => [...list.querySelectorAll(':scope > li > a')];
+                function topOf(a) { const li = a.closest('.nav-list > li'); return li ? li.querySelector(':scope > a') : a; }
+                function current() { return topLinks().find(a => a.classList.contains('active')); }
+                function moveTo(a) {
+                    if (!a || window.innerWidth <= 992) { ind.style.opacity = 0; return; }
+                    const lr = list.getBoundingClientRect(), r = a.getBoundingClientRect();
+                    ind.style.width = r.width + 'px';
+                    ind.style.height = r.height + 'px';
+                    ind.style.transform = `translate(${r.left - lr.left}px, ${r.top - lr.top}px)`;
+                    ind.style.opacity = 1;
+                }
+                function setActive(a) {
+                    list.querySelectorAll('a.active').forEach(x => x.classList.remove('active'));
+                    const top = topOf(a);
+                    top.classList.add('active');
+                    if (top !== a) a.classList.add('active');
+                    moveTo(top);
+                }
+                list.addEventListener('click', (e) => {
+                    const a = e.target.closest('a');
+                    if (!a || !list.contains(a)) return;
+                    setActive(a);
+                }, true);
+                // Ikut perubahan .active dari router (contoh: buka terus /gallery)
+                let raf = 0;
+                new MutationObserver(() => {
+                    cancelAnimationFrame(raf);
+                    raf = requestAnimationFrame(() => {
+                        moveTo(current());
+                    });
+                }).observe(list, { attributes: true, attributeFilter: ['class'], subtree: true });
+                window.addEventListener('resize', () => moveTo(current()));
+                if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => moveTo(current()));
+                setTimeout(() => moveTo(current()), 300);
+                moveTo(current());
+            }
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+        })();
     </script>
 </body>
 </html>
