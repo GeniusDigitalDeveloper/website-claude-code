@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "nadwah-c5d27",
     "public": "public",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "cleanUrls": true,
