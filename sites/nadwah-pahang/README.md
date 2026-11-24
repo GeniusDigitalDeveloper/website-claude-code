@@ -21,3 +21,9 @@ npx firebase-tools deploy --only hosting --project nadwah-c5d27
 
 Firebase Console → Hosting → Add custom domain → `nadwahpahang.org` (dan `www.nadwahpahang.org` redirect ke apex),
 kemudian masukkan rekod DNS (TXT + A) yang Firebase beri di panel DNS pendaftar domain. SSL keluar sendiri dalam beberapa jam.
+
+## Log masuk Panel Admin
+
+Panel Admin guna **Firebase Authentication (Email/Password)**. Sesiapa yang ada akaun dalam
+Firebase Console → Authentication → Users boleh log masuk terus (tiada senarai UID). Untuk tambah admin baru,
+tambah user di situ sahaja. Untuk buang akses, padam atau disable user tersebut.

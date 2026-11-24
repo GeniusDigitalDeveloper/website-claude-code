@@ -24,10 +24,11 @@
             --gold: #c9a84c;
             --gold-light: #e8d48b;
             --gold-dark: #a8892e;
-            --bg-dark: #0f172a;
-            --card-dark: #1e293b;
-            --border-dark: #334155;
-            --text-light: #f8fafc;
+            --bg-dark: #f3f6f4;
+            --card-dark: #ffffff;
+            --border-dark: #dfe6e2;
+            --text-light: #1f2d27;
+            --gold-text: #8a6a14;
             --font: 'Poppins', sans-serif;
             --transition: 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             --gold-gradient: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark));
@@ -61,10 +62,10 @@
             gap: 12px;
             font-weight: 800;
             font-size: 1.1rem;
-            color: #ffffff;
+            color: var(--emerald-dark);
         }
 
-        .admin-brand span { color: var(--gold-light); }
+        .admin-brand span { color: var(--gold-text); }
 
         .admin-body {
             display: flex;
@@ -84,7 +85,7 @@
 
         .admin-menu-item {
             padding: 12px 24px;
-            color: #94a3b8;
+            color: #475569;
             display: flex;
             align-items: center;
             gap: 12px;
@@ -97,8 +98,8 @@
 
         .admin-menu-item:hover,
         .admin-menu-item.active {
-            background: #334155;
-            color: #ffffff;
+            background: #e8f3ee;
+            color: var(--emerald-dark);
             border-left-color: var(--gold);
         }
 
@@ -115,13 +116,13 @@
             padding: 24px;
             border: 1px solid var(--border-dark);
             margin-bottom: 24px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            box-shadow: 0 6px 18px rgba(15,60,40,0.06);
         }
 
         .admin-card-title {
             font-size: 1.1rem;
             font-weight: 700;
-            color: var(--gold-light);
+            color: var(--gold-text);
             margin-bottom: 18px;
             display: flex;
             align-items: center;
@@ -138,7 +139,7 @@
             display: block;
             font-size: 0.8rem;
             font-weight: 600;
-            color: #cbd5e1;
+            color: #475569;
             margin-bottom: 6px;
         }
 
@@ -146,9 +147,9 @@
             width: 100%;
             padding: 10px 14px;
             background: var(--bg-dark);
-            border: 1px solid #475569;
+            border: 1px solid #cbd5e1;
             border-radius: 8px;
-            color: #f8fafc;
+            color: #1f2d27;
             font-family: var(--font);
             font-size: 0.88rem;
         }
@@ -202,14 +203,14 @@
 
         .admin-table th {
             background: var(--bg-dark);
-            color: var(--gold-light);
+            color: var(--gold-text);
             font-weight: 700;
         }
 
         #authOverlay {
             position: fixed;
             inset: 0;
-            background: rgba(15, 23, 42, 0.96);
+            background: rgba(243, 246, 244, 0.97);
             backdrop-filter: blur(12px);
             z-index: 999999;
             display: flex;
@@ -226,24 +227,24 @@
             max-width: 420px;
             width: 100%;
             text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 50px rgba(15,60,40,0.12);
         }
 
         .auth-card i.lock-icon {
             font-size: 3rem;
-            color: var(--gold-light);
+            color: var(--gold-text);
             margin-bottom: 14px;
         }
 
         .auth-card h2 {
             font-size: 1.3rem;
-            color: #ffffff;
+            color: #1f2d27;
             margin-bottom: 6px;
         }
 
         .auth-card p {
             font-size: 0.82rem;
-            color: #94a3b8;
+            color: #5b6b63;
             margin-bottom: 20px;
         }
 
@@ -259,11 +260,11 @@
         }
 
         .toast {
-            background: #1e293b;
-            color: #ffffff;
+            background: #ffffff;
+            color: #1f2d27;
             padding: 14px 22px;
             border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            box-shadow: 0 10px 30px rgba(15,60,40,0.15);
             display: flex;
             align-items: center;
             gap: 12px;
@@ -281,7 +282,7 @@
 
         @media (max-width: 992px) {
             .admin-body { flex-direction: column; }
-            .admin-sidebar { width: 100%; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid #334155; }
+            .admin-sidebar { width: 100%; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--border-dark); }
             .admin-menu-item { white-space: nowrap; }
         }
     </style>
@@ -293,12 +294,15 @@
         <div class="auth-card">
             <i class="fas fa-user-shield lock-icon"></i>
             <h2>Kawasan Larangan Pentadbir</h2>
-            <p>Sila masukkan kata laluan keselamatan untuk mengakses Dashboard Admin BADAN NADWAH Pahang.</p>
+            <p>Sila log masuk dengan akaun pentadbir (emel &amp; kata laluan Firebase) untuk mengakses Dashboard Admin BADAN NADWAH Pahang.</p>
             <form id="authForm">
                 <div class="admin-form-group">
-                    <input type="password" id="adminAuthPass" class="admin-input" placeholder="Kata Laluan Admin" required style="text-align: center; font-size: 1rem; letter-spacing: 0.1em;" />
+                    <input type="email" id="adminAuthEmail" class="admin-input" placeholder="Emel Admin" autocomplete="username" required style="text-align: center; font-size: 1rem;" />
                 </div>
-                <button type="submit" class="admin-btn" style="width: 100%; justify-content: center;"><i class="fas fa-key"></i> Log Masuk Admin</button>
+                <div class="admin-form-group">
+                    <input type="password" id="adminAuthPass" class="admin-input" placeholder="Kata Laluan Admin" autocomplete="current-password" required style="text-align: center; font-size: 1rem; letter-spacing: 0.1em;" />
+                </div>
+                <button type="submit" class="admin-btn" id="btnAuthSubmit" style="width: 100%; justify-content: center;"><i class="fas fa-key"></i> Log Masuk Admin</button>
             </form>
         </div>
     </div>
@@ -308,7 +312,7 @@
             <i class="fas fa-user-shield text-gold"></i> PANEL ADMIN <span>BADAN NADWAH</span>
         </div>
         <div style="display: flex; align-items: center; gap: 14px;">
-            <span style="font-size: 0.78rem; background: rgba(16, 185, 129, 0.2); color: #10b981; padding: 4px 12px; border-radius: 20px; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.4);">
+            <span style="font-size: 0.78rem; background: rgba(16, 185, 129, 0.12); color: #047857; padding: 4px 12px; border-radius: 20px; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.4);">
                 <i class="fas fa-wifi"></i> REALTIME CONNECTED
             </span>
             <button class="admin-btn admin-btn-danger" id="btnAdminLogout"><i class="fas fa-sign-out-alt"></i> Keluar</button>
@@ -334,19 +338,19 @@
             <div class="admin-tab-content" id="tab-overview">
                 <div class="admin-card">
                     <div class="admin-card-title"><i class="fas fa-tachometer-alt"></i> Panel Kawalan Admin BADAN NADWAH</div>
-                    <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 20px;">Selamat datang ke Dashboard Pentadbir. Segala perubahan yang disimpan di sini akan dikemas kini secara **Realtime Fast Update** terus kepada paparan portal awam.</p>
+                    <p style="color: #5b6b63; font-size: 0.9rem; margin-bottom: 20px;">Selamat datang ke Dashboard Pentadbir. Segala perubahan yang disimpan di sini akan dikemas kini secara **Realtime Fast Update** terus kepada paparan portal awam.</p>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-                        <div style="background: #0f172a; padding: 20px; border-radius: 12px; border: 1px solid #334155;">
-                            <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Pelawat Hari Ini</span>
-                            <h2 style="font-size: 1.8rem; color: var(--gold-light); margin-top: 4px;" id="adminStatToday">0</h2>
+                        <div style="background: #f6f8f7; padding: 20px; border-radius: 12px; border: 1px solid #dfe6e2;">
+                            <span style="font-size: 0.75rem; color: #5b6b63; font-weight: 700; text-transform: uppercase;">Pelawat Hari Ini</span>
+                            <h2 style="font-size: 1.8rem; color: var(--gold-text); margin-top: 4px;" id="adminStatToday">0</h2>
                         </div>
-                        <div style="background: #0f172a; padding: 20px; border-radius: 12px; border: 1px solid #334155;">
-                            <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Jumlah Pelawat</span>
-                            <h2 style="font-size: 1.8rem; color: #10b981; margin-top: 4px;" id="adminStatTotal">0</h2>
+                        <div style="background: #f6f8f7; padding: 20px; border-radius: 12px; border: 1px solid #dfe6e2;">
+                            <span style="font-size: 0.75rem; color: #5b6b63; font-weight: 700; text-transform: uppercase;">Jumlah Pelawat</span>
+                            <h2 style="font-size: 1.8rem; color: #047857; margin-top: 4px;" id="adminStatTotal">0</h2>
                         </div>
-                        <div style="background: #0f172a; padding: 20px; border-radius: 12px; border: 1px solid #334155;">
-                            <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Jumlah Komen Awam</span>
-                            <h2 style="font-size: 1.8rem; color: #3b82f6; margin-top: 4px;" id="adminStatComments">0</h2>
+                        <div style="background: #f6f8f7; padding: 20px; border-radius: 12px; border: 1px solid #dfe6e2;">
+                            <span style="font-size: 0.75rem; color: #5b6b63; font-weight: 700; text-transform: uppercase;">Jumlah Komen Awam</span>
+                            <h2 style="font-size: 1.8rem; color: #1d4ed8; margin-top: 4px;" id="adminStatComments">0</h2>
                         </div>
                     </div>
                 </div>
@@ -357,7 +361,7 @@
                 <div class="admin-card">
                     <div class="admin-card-title"><i class="fas fa-images"></i> Pengurusan Banner Slaid Hero</div>
                     <div id="adminBannerList"></div>
-                    <button class="admin-btn" id="btnAddBannerRow" style="margin-top: 10px; background: #334155;"><i class="fas fa-plus"></i> Tambah Banner Baru</button>
+                    <button class="admin-btn" id="btnAddBannerRow" style="margin-top: 10px; background: var(--emerald);"><i class="fas fa-plus"></i> Tambah Banner Baru</button>
                     <br/><br/>
                     <button class="admin-btn" id="btnAdminSaveBanners"><i class="fas fa-save"></i> Simpan Slaid Banner Ke Database</button>
                 </div>
@@ -367,7 +371,7 @@
             <div class="admin-tab-content" id="tab-cta" style="display: none;">
                 <div class="admin-card">
                     <div class="admin-card-title"><i class="fas fa-circle-nodes"></i> Pengurusan 5 CTA Button LOGO &amp; Link Pautan</div>
-                    <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 16px;">Masukkan Label, Gambar/Logo (URL atau Device), dan **URL Link Luaran** untuk dibuka apabila butang logo diklik oleh pelawat.</p>
+                    <p style="color: #5b6b63; font-size: 0.85rem; margin-bottom: 16px;">Masukkan Label, Gambar/Logo (URL atau Device), dan **URL Link Luaran** untuk dibuka apabila butang logo diklik oleh pelawat.</p>
                     <div id="adminCtaButtonsList"></div>
                     <button class="admin-btn" id="btnAdminSaveCta" style="margin-top: 16px;"><i class="fas fa-save"></i> Simpan CTA Buttons Ke Database</button>
                 </div>
@@ -387,12 +391,12 @@
                 <div class="admin-card">
                     <div class="admin-card-title"><i class="fas fa-user-shield"></i> Ahli Jawatankuasa Utama</div>
                     <div id="adminAjkUtamaList"></div>
-                    <button class="admin-btn" id="btnAddAjkUtamaRow" style="margin-top: 10px; background: #334155;"><i class="fas fa-plus"></i> Tambah AJK Utama</button>
+                    <button class="admin-btn" id="btnAddAjkUtamaRow" style="margin-top: 10px; background: var(--emerald);"><i class="fas fa-plus"></i> Tambah AJK Utama</button>
                 </div>
                 <div class="admin-card">
                     <div class="admin-card-title"><i class="fas fa-users"></i> Ahli Jawatankuasa Biasa</div>
                     <div id="adminAjkBiasaList"></div>
-                    <button class="admin-btn" id="btnAddAjkBiasaRow" style="margin-top: 10px; background: #334155;"><i class="fas fa-plus"></i> Tambah AJK Biasa</button>
+                    <button class="admin-btn" id="btnAddAjkBiasaRow" style="margin-top: 10px; background: var(--emerald);"><i class="fas fa-plus"></i> Tambah AJK Biasa</button>
                     <br/><br/>
                     <button class="admin-btn" id="btnAdminSaveAjk"><i class="fas fa-save"></i> Simpan Keseluruhan AJK Ke Database</button>
                 </div>
@@ -422,7 +426,7 @@
                 <div class="admin-card">
                     <div class="admin-card-title"><i class="fas fa-history"></i> Garisan Masa Kronologi Sejarah</div>
                     <div id="adminTimelineList"></div>
-                    <button class="admin-btn" id="btnAddTimelineRow" style="margin-top: 10px; background: #334155;"><i class="fas fa-plus"></i> Tambah Tahun Sejarah</button>
+                    <button class="admin-btn" id="btnAddTimelineRow" style="margin-top: 10px; background: var(--emerald);"><i class="fas fa-plus"></i> Tambah Tahun Sejarah</button>
                     <br/><br/>
                     <button class="admin-btn" id="btnAdminSaveAboutTimeline"><i class="fas fa-save"></i> Simpan Pengenalan &amp; Sejarah Ke Database</button>
                 </div>
@@ -442,7 +446,7 @@
                 <div class="admin-card">
                     <div class="admin-card-title"><i class="fas fa-photo-film"></i> Pengurusan Galeri Aktiviti</div>
                     <div id="adminGalleryList"></div>
-                    <button class="admin-btn" id="btnAddGalleryRow" style="margin-top: 10px; background: #334155;"><i class="fas fa-plus"></i> Tambah Foto Galeri</button>
+                    <button class="admin-btn" id="btnAddGalleryRow" style="margin-top: 10px; background: var(--emerald);"><i class="fas fa-plus"></i> Tambah Foto Galeri</button>
                     <br/><br/>
                     <button class="admin-btn" id="btnAdminSaveGallery"><i class="fas fa-save"></i> Simpan Galeri Ke Database</button>
                 </div>
@@ -480,7 +484,7 @@
             <div class="admin-tab-content" id="tab-comments" style="display: none;">
                 <div class="admin-card">
                     <div class="admin-card-title"><i class="fas fa-comments"></i> Modul Pengurusan Komen Awam</div>
-                    <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 16px;">Admin berhak mengedit kandungan kekal atau memadam mana-mana komen awam secara mutlak dari database.</p>
+                    <p style="color: #5b6b63; font-size: 0.85rem; margin-bottom: 16px;">Admin berhak mengedit kandungan kekal atau memadam mana-mana komen awam secara mutlak dari database.</p>
                     <div id="adminCommentsTableContainer"></div>
                 </div>
             </div>
@@ -492,6 +496,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getDatabase, ref, onValue, set, update, remove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAwh-SZr1lyC1iuxxMFACiCuQtIFo7LdvE",
@@ -507,7 +512,9 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        const ADMIN_PASSWORD = "NADWAHPAHANG";
+        // Log masuk admin guna Firebase Authentication (Email/Password).
+        // Mana-mana akaun dalam Firebase Console > Authentication > Users boleh log masuk terus, tiada senarai UID.
+        const auth = getAuth(app);
 
         const defaultData = {
             siteInfo: {
@@ -663,19 +670,35 @@
             }
         };
 
-        document.getElementById('authForm').addEventListener('submit', function(e) {
+        onAuthStateChanged(auth, (user) => {
+            document.getElementById('authOverlay').style.display = user ? 'none' : 'flex';
+        });
+
+        document.getElementById('authForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const inputPass = document.getElementById('adminAuthPass').value;
-            if (inputPass === ADMIN_PASSWORD) {
-                document.getElementById('authOverlay').style.display = 'none';
-                showToast("Selamat datang ke Dashboard Admin!", "success");
-            } else {
-                showToast("Kata laluan Admin salah!", "warning");
+            const email = document.getElementById('adminAuthEmail').value.trim();
+            const pass = document.getElementById('adminAuthPass').value;
+            const btn = document.getElementById('btnAuthSubmit');
+            btn.disabled = true;
+            try {
+                const cred = await signInWithEmailAndPassword(auth, email, pass);
+                document.getElementById('adminAuthPass').value = '';
+                showToast(`Selamat datang ke Dashboard Admin, ${cred.user.email}!`, "success");
+            } catch (err) {
+                const code = err && err.code ? err.code : '';
+                let msg = "Log masuk gagal. Sila cuba lagi.";
+                if (['auth/invalid-credential', 'auth/wrong-password', 'auth/user-not-found', 'auth/invalid-email'].includes(code)) msg = "Emel atau kata laluan Admin salah!";
+                else if (code === 'auth/too-many-requests') msg = "Terlalu banyak cubaan. Sila tunggu sebentar.";
+                else if (code === 'auth/user-disabled') msg = "Akaun ini telah dinyahaktifkan.";
+                else if (code === 'auth/network-request-failed') msg = "Tiada sambungan internet.";
+                showToast(msg, "warning");
+            } finally {
+                btn.disabled = false;
             }
         });
 
-        document.getElementById('btnAdminLogout').onclick = () => {
-            document.getElementById('authOverlay').style.display = 'flex';
+        document.getElementById('btnAdminLogout').onclick = async () => {
+            await signOut(auth);
             document.getElementById('adminAuthPass').value = '';
             showToast("Telah keluar dari Dashboard Admin.", "info");
         };
@@ -729,9 +752,9 @@
             // Banners Form
             const banners = state.banners || [];
             document.getElementById('adminBannerList').innerHTML = banners.map((b, i) => `
-                <div style="border: 1px solid #334155; padding: 14px; border-radius: 8px; margin-bottom: 12px; background: #0f172a;">
+                <div style="border: 1px solid #dfe6e2; padding: 14px; border-radius: 8px; margin-bottom: 12px; background: #f6f8f7;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <h4 style="color: var(--gold-light);">Slaid #${i+1}</h4>
+                        <h4 style="color: var(--gold-text);">Slaid #${i+1}</h4>
                         <button class="admin-btn admin-btn-danger" type="button" onclick="deleteBannerRow(${i})" style="padding: 4px 10px; font-size: 0.75rem;"><i class="fas fa-trash"></i> Padam Banner</button>
                     </div>
                     <div class="admin-form-group"><label>Lencana (Badge)</label><input type="text" class="admin-input adm-b-badge" value="${b.badge || ''}" /></div>
@@ -751,8 +774,8 @@
             // CTA Buttons Form with Link Input
             const ctas = state.ctaButtons || [];
             document.getElementById('adminCtaButtonsList').innerHTML = ctas.map((c, i) => `
-                <div style="border: 1px solid #334155; padding: 14px; border-radius: 8px; margin-bottom: 12px; background: #0f172a;">
-                    <h4 style="color: var(--gold-light); margin-bottom: 8px;">CTA Button #${i+1}</h4>
+                <div style="border: 1px solid #dfe6e2; padding: 14px; border-radius: 8px; margin-bottom: 12px; background: #f6f8f7;">
+                    <h4 style="color: var(--gold-text); margin-bottom: 8px;">CTA Button #${i+1}</h4>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                         <div class="admin-form-group"><label>Label Program / CTA</label><input type="text" class="admin-input adm-c-label" value="${c.label || ''}" placeholder="Cth: PHIM" /></div>
                         <div class="admin-form-group"><label>Pautan URL Link Luaran (PENTING)</label><input type="text" class="admin-input adm-c-link" value="${c.linkUrl || '#'}" placeholder="Cth: https://example.com" /></div>
@@ -772,8 +795,8 @@
             // Programs Form
             const progs = state.programs || [];
             document.getElementById('adminProgramsList').innerHTML = progs.map((p, i) => `
-                <div style="border: 1px solid #334155; padding: 14px; border-radius: 8px; margin-bottom: 12px; background: #0f172a;">
-                    <h4 style="color: var(--gold-light); margin-bottom: 8px;">Program: ${p.title}</h4>
+                <div style="border: 1px solid #dfe6e2; padding: 14px; border-radius: 8px; margin-bottom: 12px; background: #f6f8f7;">
+                    <h4 style="color: var(--gold-text); margin-bottom: 8px;">Program: ${p.title}</h4>
                     <div class="admin-form-group"><label>Tajuk Program</label><input type="text" class="admin-input adm-p-title" value="${p.title || ''}" /></div>
                     <div class="admin-form-group"><label>Tag Kategori (MY)</label><input type="text" class="admin-input adm-p-tag" value="${p.tag_ms || ''}" /></div>
                     <div class="admin-form-group"><label>Penerangan Ringkas Kad</label><textarea class="admin-textarea adm-p-desc" rows="2">${p.desc_ms || ''}</textarea></div>
@@ -802,9 +825,9 @@
             // Pelan Frames Form
             const frames = state.pelanFrames || [];
             document.getElementById('adminPelanFramesList').innerHTML = frames.map((f, i) => `
-                <div style="border: 1px solid #334155; padding: 12px; border-radius: 8px; margin-bottom: 10px; background: #0f172a; display: flex; flex-direction: column; gap: 8px;">
+                <div style="border: 1px solid #dfe6e2; padding: 12px; border-radius: 8px; margin-bottom: 10px; background: #f6f8f7; display: flex; flex-direction: column; gap: 8px;">
                     <div style="display: flex; gap: 10px; align-items: center;">
-                        <strong style="color: var(--gold-light); width: 80px;">Frame #${i+1}</strong>
+                        <strong style="color: var(--gold-text); width: 80px;">Frame #${i+1}</strong>
                         <input type="text" class="admin-input adm-pf-title" value="${f.title || ''}" style="width: 200px;" placeholder="Tajuk Frame" />
                     </div>
                     <div style="display: flex; gap: 8px; align-items: center;">
@@ -855,7 +878,7 @@
             const listBiasa = state.jawatankuasaBiasa || [];
 
             document.getElementById('adminAjkUtamaList').innerHTML = listUtama.map((m, i) => `
-                <div style="border: 1px solid #334155; padding: 10px; border-radius: 6px; margin-bottom: 8px; background: #0f172a; display: flex; flex-direction: column; gap: 8px;">
+                <div style="border: 1px solid #dfe6e2; padding: 10px; border-radius: 6px; margin-bottom: 8px; background: #f6f8f7; display: flex; flex-direction: column; gap: 8px;">
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <input type="text" class="admin-input adm-ajku-name" value="${m.name || ''}" placeholder="Nama Ahli" />
                         <select class="admin-select adm-ajku-pos" style="width: 180px;">
@@ -876,7 +899,7 @@
             `).join('');
 
             document.getElementById('adminAjkBiasaList').innerHTML = listBiasa.map((m, i) => `
-                <div style="border: 1px solid #334155; padding: 10px; border-radius: 6px; margin-bottom: 8px; background: #0f172a; display: flex; flex-direction: column; gap: 8px;">
+                <div style="border: 1px solid #dfe6e2; padding: 10px; border-radius: 6px; margin-bottom: 8px; background: #f6f8f7; display: flex; flex-direction: column; gap: 8px;">
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <input type="text" class="admin-input adm-ajkb-name" value="${m.name || ''}" placeholder="Nama Ahli" />
                         <button class="admin-btn admin-btn-danger" onclick="deleteAjkRow('biasa', ${i})"><i class="fas fa-trash"></i></button>
@@ -911,7 +934,7 @@
         function renderAdminTimelineForm() {
             const tl = state.timeline || [];
             document.getElementById('adminTimelineList').innerHTML = tl.map((t, i) => `
-                <div style="border: 1px solid #334155; padding: 10px; border-radius: 6px; margin-bottom: 8px; background: #0f172a; display: flex; gap: 10px; align-items: center;">
+                <div style="border: 1px solid #dfe6e2; padding: 10px; border-radius: 6px; margin-bottom: 8px; background: #f6f8f7; display: flex; gap: 10px; align-items: center;">
                     <input type="text" class="admin-input adm-tl-year" value="${t.year || ''}" style="width: 90px;" placeholder="Tahun" />
                     <input type="text" class="admin-input adm-tl-title" value="${t.title || ''}" style="width: 180px;" placeholder="Tajuk Sejarah" />
                     <input type="text" class="admin-input adm-tl-desc" value="${t.desc || ''}" placeholder="Penerangan Ringkas" />
@@ -934,7 +957,7 @@
         function renderAdminGalleryForm() {
             const g = state.gallery || [];
             document.getElementById('adminGalleryList').innerHTML = g.map((item, i) => `
-                <div style="border: 1px solid #334155; padding: 10px; border-radius: 6px; margin-bottom: 8px; background: #0f172a; display: flex; flex-direction: column; gap: 8px;">
+                <div style="border: 1px solid #dfe6e2; padding: 10px; border-radius: 6px; margin-bottom: 8px; background: #f6f8f7; display: flex; flex-direction: column; gap: 8px;">
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <select class="admin-select adm-gal-cat" style="width: 140px;">
                             <option value="pendidikan" ${item.cat === 'pendidikan' ? 'selected' : ''}>Pendidikan</option>
@@ -971,7 +994,7 @@
             const comments = state.comments || [];
 
             if (comments.length === 0) {
-                container.innerHTML = `<p style="color: #94a3b8; font-style: italic;">Tiada komen awam lagi.</p>`;
+                container.innerHTML = `<p style="color: #5b6b63; font-style: italic;">Tiada komen awam lagi.</p>`;
                 return;
             }
 
