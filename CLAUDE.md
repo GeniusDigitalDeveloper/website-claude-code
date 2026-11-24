@@ -106,4 +106,8 @@ ini kerananya, kecuali ustaz minta.
 
 Setiap kali siap buat update pada website ustaz, **terus hantar preview terkini** tanpa perlu diminta:
 tangkap skrin baru (desktop 1440px + telefon 375px) dan hantar dengan `SendUserFile` (display `render`),
-berserta fail HTML yang diubah (display `attach`). Ustaz tak nak scroll cari preview lama.
+berserta **satu fail buku preview sahaja** (`sites/<slug>/index.html`, display `attach`). Jangan hantar fail HTML
+berasingan. Buku preview = satu fail yang gabungkan preview web + kod HTML setiap sistem dengan butang Copy kod
+(ustaz host di Interactive Link dan copy-paste kod dari buku). Untuk Temu Havenly Home: edit `panel-awam.html` /
+`portal-admin.html`, kemudian jana semula buku dengan `python3 sites/temu-havenly-home/buku/build.py`.
+Ustaz tak nak scroll cari preview lama.
