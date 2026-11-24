@@ -1,0 +1,16 @@
+{
+  "hosting": {
+    "public": "public",
+    "cleanUrls": true,
+    "trailingSlash": false,
+    "ignore": ["firebase.json", "**/.*"],
+    "redirects": [
+      { "source": "/home", "destination": "/", "type": 301 },
+      { "source": "/index", "destination": "/", "type": 301 }
+    ],
+    "headers": [
+      { "source": "**/*.html", "headers": [{ "key": "Cache-Control", "value": "public, max-age=300" }] },
+      { "source": "/AdminTEMU", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] }
+    ]
+  }
+}
