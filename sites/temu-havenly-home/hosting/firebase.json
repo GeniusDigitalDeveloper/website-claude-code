@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "temu-havenly-home-4443a",
     "public": "public",
     "cleanUrls": true,
     "trailingSlash": false,
