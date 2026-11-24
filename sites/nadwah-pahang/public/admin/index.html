@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0"/>
+    <link rel="icon" type="image/png" href="/logo-nadwah.png" />
     <title>PANEL ADMIN - BADAN NADWAH ISLAMIAH PAHANG</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -271,7 +272,9 @@
             flex-shrink: 0;
             overflow: hidden;
         }
-        .auth-logo-icon img { width: 100%; height: 100%; object-fit: cover; }
+        .auth-logo-icon img { width: 100%; height: 100%; object-fit: contain; display: block; }
+        /* Logo NADWAH: petak, plain, tanpa border/bulatan */
+        .auth-logo-icon { background: none; border-radius: 0; box-shadow: none; }
         .auth-logo-title { font-size: 1.15rem; font-weight: 800; color: var(--emerald-dark); line-height: 1.2; }
         .auth-logo-subtitle { font-size: 0.78rem; font-weight: 700; color: var(--gold-text); letter-spacing: 0.05em; }
 
@@ -340,7 +343,7 @@
     <div id="authOverlay">
         <div class="auth-card">
             <div class="auth-logo">
-                <div class="auth-logo-icon" id="authLogoIcon">N</div>
+                <div class="auth-logo-icon" id="authLogoIcon"><img src="/logo-nadwah.png" alt="Logo NADWAH" /></div>
                 <div class="auth-logo-text">
                     <div class="auth-logo-title" id="authLogoTitle">BADAN NADWAH</div>
                     <div class="auth-logo-subtitle" id="authLogoSubtitle">ISLAMIAH PAHANG</div>
@@ -747,7 +750,7 @@
                 img.alt = 'Logo NADWAH';
                 icon.appendChild(img);
             } else {
-                icon.textContent = info.logoIconText || 'N';
+                icon.innerHTML = '<img src="/logo-nadwah.png" alt="Logo NADWAH" />';
             }
             if (info.logoTitle) document.getElementById('authLogoTitle').textContent = info.logoTitle;
             if (info.logoSubtitle) document.getElementById('authLogoSubtitle').textContent = info.logoSubtitle;
