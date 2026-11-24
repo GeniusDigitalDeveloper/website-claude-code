@@ -27,3 +27,13 @@ kemudian masukkan rekod DNS (TXT + A) yang Firebase beri di panel DNS pendaftar 
 Panel Admin guna **Firebase Authentication (Email/Password)**. Sesiapa yang ada akaun dalam
 Firebase Console → Authentication → Users boleh log masuk terus (tiada senarai UID). Untuk tambah admin baru,
 tambah user di situ sahaja. Untuk buang akses, padam atau disable user tersebut.
+
+## Pautan bersih (tanpa #)
+
+Portal: `/korporat`, `/tentang`, `/pelan-kompleks`, `/program`, `/galeri`, `/komen`, `/hubungi-kami`,
+`/ajk`, `/ajk-utama`, `/ajk-biasa`, `/pengenalan`. Pautan lama `/#korporat` auto ditukar ke `/korporat`.
+
+Admin: `/admin`, `/admin/banner`, `/admin/cta`, `/admin/program`, `/admin/ajk`, `/admin/sejarah`,
+`/admin/pelan-kompleks`, `/admin/galeri`, `/admin/korporat`, `/admin/komen`.
+
+`firebase.json` ada `rewrites` supaya semua path ini buka `index.html` yang betul.

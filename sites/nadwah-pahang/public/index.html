@@ -2579,5 +2579,128 @@
             }
         });
     </script>
+    <script type="module">
+        // ===== Pautan bersih: nadwahpahang.org/korporat (tanpa #) =====
+        // Seksyen -> path. Firebase Hosting rewrite semua path ke index.html.
+        const SECTION_TO_PATH = {
+            'banner': '/', 'korporat': '/korporat', 'tentang': '/tentang', 'pelan-kompleks': '/pelan-kompleks',
+            'program': '/program', 'galeri': '/galeri', 'hubungi': '/komen', 'footer': '/hubungi-kami'
+        };
+        const PATH_TO_SECTION = Object.fromEntries(Object.entries(SECTION_TO_PATH).map(([k, v]) => [v, k]));
+        const MODAL_PATHS = {
+            '/ajk': () => window.openAjkModal && window.openAjkModal('semua'),
+            '/ajk-utama': () => window.openAjkModal && window.openAjkModal('utama'),
+            '/ajk-biasa': () => window.openAjkModal && window.openAjkModal('biasa'),
+            '/pengenalan': () => window.openTentangModal && window.openTentangModal()
+        };
+        const AJK_PATH = { semua: '/ajk', utama: '/ajk-utama', biasa: '/ajk-biasa' };
+        let lastSectionPath = '/';
+        let routing = false;
+
+        function cleanPath(p) { p = (p || '/').replace(/\/+$/, ''); return p === '' ? '/' : p.toLowerCase(); }
+        function hashToPath(href) {
+            const id = href.slice(1);
+            if (!id) return '/';
+            return SECTION_TO_PATH[id] || ('/' + id);
+        }
+        function setPath(path, replace) {
+            if (cleanPath(location.pathname) === path && !location.hash) return;
+            history[replace ? 'replaceState' : 'pushState']({ path }, '', path);
+        }
+        function scrollToSection(id, smooth) {
+            if (id === 'banner') { window.scrollTo({ top: 0, behavior: smooth ? 'smooth' : 'auto' }); return true; }
+            const el = document.getElementById(id);
+            if (!el) return false;
+            el.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
+            return true;
+        }
+        function markActive(path) {
+            document.querySelectorAll('.nav-menu > li > a, #mainNav > ul > li > a').forEach(a => {
+                const h = a.getAttribute('href') || '';
+                if (h.startsWith('/')) a.classList.toggle('active', cleanPath(h) === path);
+            });
+        }
+        function route(path, smooth) {
+            path = cleanPath(path);
+            routing = true;
+            if (MODAL_PATHS[path]) { MODAL_PATHS[path](); }
+            else {
+                const overlay = document.querySelector('.modal-overlay.open');
+                if (overlay && window.closeModal) window.closeModal();
+                const id = PATH_TO_SECTION[path] || path.slice(1);
+                if (scrollToSection(id, smooth)) lastSectionPath = path;
+                markActive(path);
+            }
+            routing = false;
+        }
+
+        // Tukar semua href="#xxx" kepada "/xxx" (termasuk yang dijana dari database)
+        function rewriteLinks(root) {
+            (root || document).querySelectorAll('a[href^="#"]').forEach(a => {
+                const h = a.getAttribute('href');
+                const isPlaceholder = h === '#' && a.id !== 'siteHeaderLogoLink';
+                if (isPlaceholder) return;
+                a.setAttribute('href', hashToPath(h));
+                a.dataset.spa = '1';
+            });
+        }
+
+        document.addEventListener('click', function(e) {
+            const a = e.target.closest('a');
+            if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || a.target === '_blank') return;
+            const h = a.getAttribute('href') || '';
+            if (h === '#') { e.preventDefault(); return; }
+            let path = null;
+            if (h.startsWith('#')) path = hashToPath(h);
+            else if (a.dataset.spa === '1' && h.startsWith('/')) path = cleanPath(h);
+            if (path === null) return;
+            e.preventDefault();
+            setPath(path);
+            route(path, true);
+            const mainNav = document.getElementById('mainNav');
+            const hb = document.getElementById('hamburger');
+            if (mainNav) mainNav.classList.remove('open');
+            if (hb) hb.classList.remove('active');
+        });
+
+        window.addEventListener('popstate', () => route(location.pathname, true));
+
+        function boot() {
+            // Bungkus modal supaya URL ikut: /ajk, /ajk-utama, /ajk-biasa, /pengenalan
+            if (window.openAjkModal && !window.openAjkModal.__routed) {
+                const orig = window.openAjkModal;
+                window.openAjkModal = function(type) { orig.apply(this, arguments); if (!routing) setPath(AJK_PATH[type] || '/ajk'); };
+                window.openAjkModal.__routed = true;
+            }
+            if (window.openTentangModal && !window.openTentangModal.__routed) {
+                const orig = window.openTentangModal;
+                window.openTentangModal = function() { orig.apply(this, arguments); if (!routing) setPath('/pengenalan'); };
+                window.openTentangModal.__routed = true;
+            }
+            if (window.closeModal && !window.closeModal.__routed) {
+                const orig = window.closeModal;
+                window.closeModal = function() { orig.apply(this, arguments); if (!routing && MODAL_PATHS[cleanPath(location.pathname)]) setPath(lastSectionPath); };
+                window.closeModal.__routed = true;
+                const mc = document.getElementById('modalClose');
+                if (mc) mc.addEventListener('click', () => { if (MODAL_PATHS[cleanPath(location.pathname)]) setPath(lastSectionPath); });
+                document.addEventListener('keydown', e => { if (e.key === 'Escape' && MODAL_PATHS[cleanPath(location.pathname)]) setPath(lastSectionPath); });
+                const mo = document.querySelector('.modal-overlay');
+                if (mo) mo.addEventListener('click', function(e) { if (e.target === this && MODAL_PATHS[cleanPath(location.pathname)]) setPath(lastSectionPath); });
+            }
+            rewriteLinks();
+            new MutationObserver(muts => muts.forEach(m => m.addedNodes.forEach(n => { if (n.nodeType === 1) rewriteLinks(n.parentNode || n); }))).observe(document.body, { childList: true, subtree: true });
+
+            // Sokong pautan lama bertanda # (contoh: /#korporat -> /korporat)
+            let start = cleanPath(location.pathname);
+            if (location.hash && location.hash.length > 1) { start = hashToPath(location.hash); history.replaceState({ path: start }, '', start); }
+            if (start !== '/') {
+                route(start, false);
+                // Ulang selepas kandungan Firebase dimuatkan supaya kedudukan skrol tepat
+                setTimeout(() => route(start, false), 900);
+                setTimeout(() => route(start, false), 2200);
+            }
+        }
+        if (document.readyState !== 'complete') document.addEventListener('DOMContentLoaded', boot); else boot();
+    </script>
 </body>
 </html>
