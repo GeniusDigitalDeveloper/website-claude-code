@@ -2580,24 +2580,30 @@
         });
     </script>
     <script type="module">
-        // ===== Pautan bersih: nadwahpahang.org/korporat (tanpa #) =====
+        // ===== Pautan bersih: nadwahpahang.org/corporate (tanpa #, path dalam BI) =====
         // Seksyen -> path. Firebase Hosting rewrite semua path ke index.html.
         const SECTION_TO_PATH = {
-            'banner': '/', 'korporat': '/korporat', 'tentang': '/tentang', 'pelan-kompleks': '/pelan-kompleks',
-            'program': '/program', 'galeri': '/galeri', 'hubungi': '/komen', 'footer': '/hubungi-kami'
+            'banner': '/', 'korporat': '/corporate', 'tentang': '/about', 'pelan-kompleks': '/complex-plan',
+            'program': '/programs', 'galeri': '/gallery', 'hubungi': '/comments', 'footer': '/contact'
+        };
+        // Path lama (BM) auto ditukar ke path BI
+        const PATH_ALIASES = {
+            '/korporat': '/corporate', '/tentang': '/about', '/pelan-kompleks': '/complex-plan', '/program': '/programs',
+            '/galeri': '/gallery', '/komen': '/comments', '/hubungi-kami': '/contact', '/hubungi': '/contact',
+            '/ajk': '/committee', '/ajk-utama': '/main-committee', '/ajk-biasa': '/general-committee', '/pengenalan': '/introduction'
         };
         const PATH_TO_SECTION = Object.fromEntries(Object.entries(SECTION_TO_PATH).map(([k, v]) => [v, k]));
         const MODAL_PATHS = {
-            '/ajk': () => window.openAjkModal && window.openAjkModal('semua'),
-            '/ajk-utama': () => window.openAjkModal && window.openAjkModal('utama'),
-            '/ajk-biasa': () => window.openAjkModal && window.openAjkModal('biasa'),
-            '/pengenalan': () => window.openTentangModal && window.openTentangModal()
+            '/committee': () => window.openAjkModal && window.openAjkModal('semua'),
+            '/main-committee': () => window.openAjkModal && window.openAjkModal('utama'),
+            '/general-committee': () => window.openAjkModal && window.openAjkModal('biasa'),
+            '/introduction': () => window.openTentangModal && window.openTentangModal()
         };
-        const AJK_PATH = { semua: '/ajk', utama: '/ajk-utama', biasa: '/ajk-biasa' };
+        const AJK_PATH = { semua: '/committee', utama: '/main-committee', biasa: '/general-committee' };
         let lastSectionPath = '/';
         let routing = false;
 
-        function cleanPath(p) { p = (p || '/').replace(/\/+$/, ''); return p === '' ? '/' : p.toLowerCase(); }
+        function cleanPath(p) { p = (p || '/').replace(/\/+$/, '').toLowerCase(); p = p === '' ? '/' : p; return PATH_ALIASES[p] || p; }
         function hashToPath(href) {
             const id = href.slice(1);
             if (!id) return '/';
@@ -2669,12 +2675,12 @@
             // Bungkus modal supaya URL ikut: /ajk, /ajk-utama, /ajk-biasa, /pengenalan
             if (window.openAjkModal && !window.openAjkModal.__routed) {
                 const orig = window.openAjkModal;
-                window.openAjkModal = function(type) { orig.apply(this, arguments); if (!routing) setPath(AJK_PATH[type] || '/ajk'); };
+                window.openAjkModal = function(type) { orig.apply(this, arguments); if (!routing) setPath(AJK_PATH[type] || '/committee'); };
                 window.openAjkModal.__routed = true;
             }
             if (window.openTentangModal && !window.openTentangModal.__routed) {
                 const orig = window.openTentangModal;
-                window.openTentangModal = function() { orig.apply(this, arguments); if (!routing) setPath('/pengenalan'); };
+                window.openTentangModal = function() { orig.apply(this, arguments); if (!routing) setPath('/introduction'); };
                 window.openTentangModal.__routed = true;
             }
             if (window.closeModal && !window.closeModal.__routed) {
@@ -2690,8 +2696,9 @@
             rewriteLinks();
             new MutationObserver(muts => muts.forEach(m => m.addedNodes.forEach(n => { if (n.nodeType === 1) rewriteLinks(n.parentNode || n); }))).observe(document.body, { childList: true, subtree: true });
 
-            // Sokong pautan lama bertanda # (contoh: /#korporat -> /korporat)
+            // Sokong pautan lama bertanda # dan path BM (contoh: /#korporat atau /korporat -> /corporate)
             let start = cleanPath(location.pathname);
+            if (start !== location.pathname && start !== '/') history.replaceState({ path: start }, '', start);
             if (location.hash && location.hash.length > 1) { start = hashToPath(location.hash); history.replaceState({ path: start }, '', start); }
             if (start !== '/') {
                 route(start, false);

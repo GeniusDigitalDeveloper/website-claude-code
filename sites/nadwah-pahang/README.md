@@ -28,12 +28,15 @@ Panel Admin guna **Firebase Authentication (Email/Password)**. Sesiapa yang ada 
 Firebase Console → Authentication → Users boleh log masuk terus (tiada senarai UID). Untuk tambah admin baru,
 tambah user di situ sahaja. Untuk buang akses, padam atau disable user tersebut.
 
-## Pautan bersih (tanpa #)
+## Pautan bersih (tanpa #, path dalam Bahasa Inggeris)
 
-Portal: `/korporat`, `/tentang`, `/pelan-kompleks`, `/program`, `/galeri`, `/komen`, `/hubungi-kami`,
-`/ajk`, `/ajk-utama`, `/ajk-biasa`, `/pengenalan`. Pautan lama `/#korporat` auto ditukar ke `/korporat`.
+Bahasa kandungan website default Bahasa Melayu; hanya path URL dalam BI.
 
-Admin: `/admin`, `/admin/banner`, `/admin/cta`, `/admin/program`, `/admin/ajk`, `/admin/sejarah`,
-`/admin/pelan-kompleks`, `/admin/galeri`, `/admin/korporat`, `/admin/komen`.
+Portal: `/corporate`, `/about`, `/complex-plan`, `/programs`, `/gallery`, `/comments`, `/contact`,
+`/committee`, `/main-committee`, `/general-committee`, `/introduction`.
 
+Admin: `/admin`, `/admin/banner`, `/admin/cta`, `/admin/programs`, `/admin/committee`, `/admin/history`,
+`/admin/complex-plan`, `/admin/gallery`, `/admin/corporate`, `/admin/comments`.
+
+Pautan lama (`/#korporat`, `/korporat`, `/admin/korporat`, ...) auto ditukar ke path BI.
 `firebase.json` ada `rewrites` supaya semua path ini buka `index.html` yang betul.

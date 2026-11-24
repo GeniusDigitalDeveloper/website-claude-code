@@ -789,12 +789,18 @@
         // Sidebar Navigation + pautan bersih: /admin/banner, /admin/korporat, ... (tanpa #)
         const ADMIN_TAB_PATHS = {
             'tab-overview': '/admin', 'tab-banner': '/admin/banner', 'tab-cta': '/admin/cta',
-            'tab-programs': '/admin/program', 'tab-ajk': '/admin/ajk', 'tab-about': '/admin/sejarah',
-            'tab-pelan': '/admin/pelan-kompleks', 'tab-gallery': '/admin/galeri',
-            'tab-corporate': '/admin/korporat', 'tab-comments': '/admin/komen'
+            'tab-programs': '/admin/programs', 'tab-ajk': '/admin/committee', 'tab-about': '/admin/history',
+            'tab-pelan': '/admin/complex-plan', 'tab-gallery': '/admin/gallery',
+            'tab-corporate': '/admin/corporate', 'tab-comments': '/admin/comments'
+        };
+        // Path lama (BM) auto ditukar ke path BI
+        const ADMIN_PATH_ALIASES = {
+            '/admin/program': '/admin/programs', '/admin/ajk': '/admin/committee', '/admin/sejarah': '/admin/history',
+            '/admin/pelan-kompleks': '/admin/complex-plan', '/admin/galeri': '/admin/gallery',
+            '/admin/korporat': '/admin/corporate', '/admin/komen': '/admin/comments', '/admin/overview': '/admin'
         };
         const ADMIN_PATH_TABS = Object.fromEntries(Object.entries(ADMIN_TAB_PATHS).map(([k, v]) => [v, k]));
-        function adminCleanPath(p) { p = (p || '/admin').replace(/\/+$/, '').toLowerCase(); return p || '/admin'; }
+        function adminCleanPath(p) { p = (p || '/admin').replace(/\/+$/, '').toLowerCase() || '/admin'; return ADMIN_PATH_ALIASES[p] || p; }
 
         function showAdminTab(tabId) {
             const item = document.querySelector(`.admin-menu-item[data-tab="${tabId}"]`);
@@ -824,7 +830,7 @@
             let path = adminCleanPath(location.pathname);
             // Sokong pautan lama bertanda # (contoh: /admin#banner)
             if (location.hash.length > 1) {
-                const h = '/admin/' + location.hash.slice(1).replace(/^tab-/, '');
+                const h = adminCleanPath('/admin/' + location.hash.slice(1).replace(/^tab-/, ''));
                 if (ADMIN_PATH_TABS[h]) path = h;
             }
             const tabId = ADMIN_PATH_TABS[path] || 'tab-overview';
