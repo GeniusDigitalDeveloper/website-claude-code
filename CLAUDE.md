@@ -101,3 +101,9 @@ HyperFrames ikut dokumen itu.
 
 Ini tambahan sahaja. Jangan ubah skill, framework atau tools yang sedia ada dalam repo
 ini kerananya, kecuali ustaz minta.
+
+## Preview automatik selepas setiap update (wajib)
+
+Setiap kali siap buat update pada website ustaz, **terus hantar preview terkini** tanpa perlu diminta:
+tangkap skrin baru (desktop 1440px + telefon 375px) dan hantar dengan `SendUserFile` (display `render`),
+berserta fail HTML yang diubah (display `attach`). Ustaz tak nak scroll cari preview lama.
