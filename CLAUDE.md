@@ -118,8 +118,8 @@ Ustaz tak nak scroll cari preview lama.
 ## Temu Havenly Home: 3 link WAJIB selepas setiap update
 
 Setiap kali siap update apa-apa (kod, design, SEO, domain), akhiri balasan dengan 3 link ini dalam bentuk link boleh tekan:
-1. Website rasmi: https://temuhomestay.com/
-2. Website www: https://www.temuhomestay.com/
+1. Panel Awam: https://temuhomestay.com/
+2. Portal Admin: https://temuhomestay.com/AdminTEMU
 3. Buku preview: https://claude.ai/artifact/Mpxkd1KthcvMg1UCrpbLTA (terbitkan semula dulu jika kod berubah)
 
 ## Temu Havenly Home: hosting (Firebase)
