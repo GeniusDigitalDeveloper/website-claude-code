@@ -50,14 +50,15 @@
   h3{font-family:Cinzel,serif;font-size:19px;color:#0f2e26}
   .lead{color:var(--muted);font-size:14.5px;line-height:1.6}
 
-  .screen{position:relative;width:100%;aspect-ratio:16/10;border-radius:10px;overflow:hidden;background:#e2e8f0;
+  .screen{position:relative;width:100%;aspect-ratio:4/3;border-radius:10px;overflow:hidden;background:#e2e8f0;
     border:1px solid #d6cfbd;box-shadow:0 12px 30px -14px rgba(15,46,38,.45)}
   .screen .bar{position:absolute;inset:0 0 auto 0;height:28px;background:#f1f5f9;border-bottom:1px solid #e2e8f0;
     display:flex;align-items:center;gap:6px;padding:0 10px;z-index:1}
   .screen .bar i{width:9px;height:9px;border-radius:50%;background:#cbd5e1;display:block}
   .screen .bar span{margin-left:8px;font-size:11px;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .screen .vp{position:absolute;top:28px;left:0;right:0;bottom:0;overflow:hidden}
-  .screen iframe{position:absolute;top:0;left:0;width:1440px;height:900px;border:0;transform-origin:0 0;background:#fff}
+  .screen .vp{overflow-y:auto;overscroll-behavior:contain;background:#fff}
+  .screen .vp img{display:block;width:100%;height:auto}
 
   .btns{display:flex;gap:8px;flex-wrap:wrap}
   .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;font:600 14px "Plus Jakarta Sans",sans-serif;
@@ -97,7 +98,7 @@
 <header>
   <div class="eyebrow">Homestay Kg Cempaka, Kuantan</div>
   <h1>Temu Havenly Home</h1>
-  <p>Satu buku, dua sistem. Setiap bab ada preview web di kiri dan kod HTML penuh di kanan dengan butang Copy kod.</p>
+  <p>Satu buku, dua sistem. Setiap bab ada paparan sebenar web (gambar &amp; data dari database) di kiri dan kod HTML penuh di kanan dengan butang Copy kod.</p>
   <nav class="tabs" role="tablist" aria-label="Bab buku">
     <button role="tab" id="tab-awam" aria-controls="bab-awam" aria-selected="true">Bab I · Panel Awam</button>
     <button role="tab" id="tab-admin" aria-controls="bab-admin" aria-selected="false">Bab II · Portal Admin</button>
@@ -112,10 +113,7 @@
         <div class="chapter"><small>Bab I · Tetamu</small><span class="pg">i</span></div>
         <h2>Panel Awam</h2>
         <p class="lead">Laman tetamu: hero, bilik, kalendar kekosongan, galeri dan tempahan WhatsApp. Data dibaca terus dari Firebase.</p>
-        <div class="screen"><div class="bar"><i></i><i></i><i></i><span>panel-awam.html · preview live</span></div><div class="vp"><iframe title="Preview Panel Awam" tabindex="-1"></iframe></div></div>
-        <div class="btns">
-          <button class="btn primary" data-act="open"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>Buka skrin penuh</button>
-        </div>
+        <div class="screen"><div class="bar"><i></i><i></i><i></i><span>panel-awam.html · paparan sebenar (scroll)</span></div><div class="vp" tabindex="0" aria-label="Preview Panel Awam, scroll untuk lihat"><img data-shot alt="Paparan sebenar Panel Awam dengan data dari database"></div></div>
       </div>
       <div class="page r">
         <div class="chapter"><small>Kod HTML</small><span class="pg">ii</span></div>
@@ -133,11 +131,8 @@
         <div class="chapter"><small>Bab II · Pengurusan</small><span class="pg">iii</span></div>
         <h2>Portal Pengurusan Admin</h2>
         <p class="lead">Papan kawalan pemilik: tempahan, kunci tarikh, kandungan, slaid, maklum balas dan eksport Excel. Setiap simpan terus ke Firebase.</p>
-        <div class="screen"><div class="bar"><i></i><i></i><i></i><span>portal-admin.html · preview live</span></div><div class="vp"><iframe title="Preview Portal Admin" tabindex="-1"></iframe></div></div>
-        <div class="btns">
-          <button class="btn primary" data-act="open"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>Buka skrin penuh</button>
-        </div>
-        <p class="note"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>Preview sambung ke database sebenar. Simpan dalam admin = ubah data live.</p>
+        <div class="screen"><div class="bar"><i></i><i></i><i></i><span>portal-admin.html · paparan sebenar (scroll)</span></div><div class="vp" tabindex="0" aria-label="Preview Portal Admin, scroll untuk lihat"><img data-shot alt="Paparan sebenar Portal Admin dengan data dari database"></div></div>
+        <p class="note"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg>Portal admin dilindungi kata laluan, jadi paparan ini skrin log masuk. Data admin kekal dalam Firebase.</p>
       </div>
       <div class="page r">
         <div class="chapter"><small>Kod HTML</small><span class="pg">iv</span></div>
@@ -164,30 +159,20 @@
     for (var i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
     return new TextDecoder('utf-8').decode(bytes);
   }
-  var cache = {}, urls = {};
+  var cache = {};
   function text(k){ return cache[k] || (cache[k] = decode(SRC[k])); }
-  function url(k){ return urls[k] || (urls[k] = URL.createObjectURL(new Blob([text(k)], {type:'text/html'}))); }
 
   var toastEl = document.querySelector('.toast'), tt;
   function toast(m){ toastEl.textContent = m; toastEl.classList.add('show'); clearTimeout(tt); tt = setTimeout(function(){ toastEl.classList.remove('show'); }, 1800); }
 
-  function fit(screen){
-    var vp = screen.querySelector('.vp'), f = screen.querySelector('iframe');
-    if (!vp.clientWidth) return;
-    var s = vp.clientWidth / 1440;
-    f.style.transform = 'scale(' + s + ')';
-    f.style.height = (vp.clientHeight / s) + 'px';
-  }
-  var ro = new ResizeObserver(function(es){ es.forEach(function(e){ fit(e.target); }); });
 
   function load(sec){
     if (sec.dataset.loaded) return;
     sec.dataset.loaded = '1';
     var k = sec.dataset.key, t = text(k);
-    sec.querySelector('iframe').src = url(k);
+    sec.querySelector('[data-shot]').src = 'data:image/jpeg;base64,' + SRC['shot_' + k];
     sec.querySelector('[data-code]').textContent = t;
     sec.querySelector('[data-meta]').textContent = t.split('\n').length.toLocaleString('ms-MY') + ' baris';
-    var sc = sec.querySelector('.screen'); ro.observe(sc); fit(sc);
   }
 
   function copy(t){
@@ -204,10 +189,6 @@
     sec.addEventListener('click', function(e){
       var b = e.target.closest('[data-act]'); if (!b) return;
       var act = b.dataset.act;
-      if (act === 'open') window.open(url(k), '_blank');
-      if (act === 'download'){
-        var a = document.createElement('a'); a.href = url(k); a.download = sec.dataset.file; document.body.appendChild(a); a.click(); a.remove();
-      }
       if (act === 'copy'){
         copy(text(k)).then(function(){
           var s = b.querySelector('span'); s.textContent = 'Dah copy!'; b.classList.add('done'); toast('Kod ' + sec.dataset.file + ' disalin');
