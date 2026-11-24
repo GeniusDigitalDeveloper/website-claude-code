@@ -128,5 +128,6 @@ Setiap kali siap update apa-apa (kod, design, SEO, domain), akhiri balasan denga
 - Hosting: projek Firebase **`temuhavenlyhome`** (site `temuhavenlyhome`, domain temuhomestay.com). Sejak 24 Nov 2026, bukan lagi Interactive Link.
 - Database: projek **`temu-havenly-home-4443a`** (RTDB). JANGAN deploy `database`/rules; deploy `hosting` SAHAJA.
 - Selepas ubah `panel-awam.html`/`portal-admin.html`: `python3 sites/temu-havenly-home/hosting/build.py`, kemudian
-  deploy hosting (firebase_deploy only=hosting, project dir `sites/temu-havenly-home/hosting`). Minta izin ustaz sebelum deploy.
+  deploy hosting (firebase_deploy only=hosting, project dir `sites/temu-havenly-home/hosting`, project `temuhavenlyhome`).
+  **Ustaz beri izin tetap (24 Nov 2026): setiap kali siap update, TERUS deploy hosting tanpa tanya.** Tetap hosting SAHAJA, jangan sentuh database/rules.
 - Laluan: `/` panel awam, `/AdminTEMU` admin (noindex), `/home` -> `/` (301).
