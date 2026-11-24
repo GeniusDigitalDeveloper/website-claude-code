@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0"/>
+    <title>PANEL ADMIN - BADAN NADWAH ISLAMIAH PAHANG</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --emerald: #0b7a5c;
+            --emerald-dark: #065a44;
+            --gold: #c9a84c;
+            --gold-light: #e8d48b;
+            --gold-dark: #a8892e;
+            --bg-dark: #0f172a;
+            --card-dark: #1e293b;
+            --border-dark: #334155;
+            --text-light: #f8fafc;
+            --font: 'Poppins', sans-serif;
+            --transition: 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --gold-gradient: linear-gradient(135deg, var(--gold-light), var(--gold), var(--gold-dark));
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+        }
+
+        .admin-header {
+            background: var(--card-dark);
+            padding: 16px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 2px solid var(--gold);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .admin-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: #ffffff;
+        }
+
+        .admin-brand span { color: var(--gold-light); }
+
+        .admin-body {
+            display: flex;
+            flex: 1;
+            min-height: calc(100vh - 70px);
+        }
+
+        .admin-sidebar {
+            width: 260px;
+            background: var(--card-dark);
+            border-right: 1px solid var(--border-dark);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .admin-menu-item {
+            padding: 12px 24px;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+
+        .admin-menu-item:hover,
+        .admin-menu-item.active {
+            background: #334155;
+            color: #ffffff;
+            border-left-color: var(--gold);
+        }
+
+        .admin-content {
+            flex: 1;
+            padding: 28px;
+            background: var(--bg-dark);
+            max-width: 1200px;
+        }
+
+        .admin-card {
+            background: var(--card-dark);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-dark);
+            margin-bottom: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .admin-card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--gold-light);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-dark);
+            padding-bottom: 10px;
+        }
+
+        .admin-form-group {
+            margin-bottom: 16px;
+        }
+
+        .admin-form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            margin-bottom: 6px;
+        }
+
+        .admin-input, .admin-textarea, .admin-select {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-dark);
+            border: 1px solid #475569;
+            border-radius: 8px;
+            color: #f8fafc;
+            font-family: var(--font);
+            font-size: 0.88rem;
+        }
+
+        .admin-input:focus, .admin-textarea:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+
+        .admin-btn {
+            background: var(--gold-gradient);
+            color: #ffffff;
+            font-weight: 700;
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        .admin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(201, 168, 76, 0.4);
+        }
+
+        .admin-btn-danger {
+            background: #ef4444;
+            color: #ffffff;
+        }
+        .admin-btn-danger:hover {
+            background: #dc2626;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            font-size: 0.85rem;
+        }
+
+        .admin-table th, .admin-table td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-dark);
+        }
+
+        .admin-table th {
+            background: var(--bg-dark);
+            color: var(--gold-light);
+            font-weight: 700;
+        }
+
+        #authOverlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.96);
+            backdrop-filter: blur(12px);
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: var(--card-dark);
+            border: 1px solid var(--gold);
+            padding: 36px 28px;
+            border-radius: 16px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .auth-card i.lock-icon {
+            font-size: 3rem;
+            color: var(--gold-light);
+            margin-bottom: 14px;
+        }
+
+        .auth-card h2 {
+            font-size: 1.3rem;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+
+        .auth-card p {
+            font-size: 0.82rem;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 999999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: #1e293b;
+            color: #ffffff;
+            padding: 14px 22px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            pointer-events: auto;
+            transform: translateX(120%);
+            transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-left: 4px solid var(--gold);
+        }
+
+        .toast.show { transform: translateX(0); }
+        .toast.toast-success { border-left-color: #10b981; }
+        .toast.toast-warning { border-left-color: #f59e0b; }
+
+        @media (max-width: 992px) {
+            .admin-body { flex-direction: column; }
+            .admin-sidebar { width: 100%; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid #334155; }
+            .admin-menu-item { white-space: nowrap; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="authOverlay">
+        <div class="auth-card">
+            <i class="fas fa-user-shield lock-icon"></i>
+            <h2>Kawasan Larangan Pentadbir</h2>
+            <p>Sila masukkan kata laluan keselamatan untuk mengakses Dashboard Admin BADAN NADWAH Pahang.</p>
+            <form id="authForm">
+                <div class="admin-form-group">
+                    <input type="password" id="adminAuthPass" class="admin-input" placeholder="Kata Laluan Admin" required style="text-align: center; font-size: 1rem; letter-spacing: 0.1em;" />
+                </div>
+                <button type="submit" class="admin-btn" style="width: 100%; justify-content: center;"><i class="fas fa-key"></i> Log Masuk Admin</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="admin-header">
+        <div class="admin-brand">
+            <i class="fas fa-user-shield text-gold"></i> PANEL ADMIN <span>BADAN NADWAH</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 14px;">
+            <span style="font-size: 0.78rem; background: rgba(16, 185, 129, 0.2); color: #10b981; padding: 4px 12px; border-radius: 20px; font-weight: 700; border: 1px solid rgba(16, 185, 129, 0.4);">
+                <i class="fas fa-wifi"></i> REALTIME CONNECTED
+            </span>
+            <button class="admin-btn admin-btn-danger" id="btnAdminLogout"><i class="fas fa-sign-out-alt"></i> Keluar</button>
+        </div>
+    </div>
+
+    <div class="admin-body">
+        <div class="admin-sidebar">
+            <div class="admin-menu-item active" data-tab="tab-overview"><i class="fas fa-chart-line"></i> Ringkasan &amp; Statistik</div>
+            <div class="admin-menu-item" data-tab="tab-banner"><i class="fas fa-images"></i> Banner Slaid Hero</div>
+            <div class="admin-menu-item" data-tab="tab-cta"><i class="fas fa-circle-nodes"></i> CTA Button LOGO &amp; Link</div>
+            <div class="admin-menu-item" data-tab="tab-programs"><i class="fas fa-list-check"></i> Program NADWAH</div>
+            <div class="admin-menu-item" data-tab="tab-ajk"><i class="fas fa-users-gear"></i> Ahli Jawatankuasa</div>
+            <div class="admin-menu-item" data-tab="tab-about"><i class="fas fa-book-bookmark"></i> Pengenalan &amp; Sejarah</div>
+            <div class="admin-menu-item" data-tab="tab-pelan"><i class="fas fa-drafting-compass"></i> Pelan Kompleks (10 Frame)</div>
+            <div class="admin-menu-item" data-tab="tab-gallery"><i class="fas fa-photo-film"></i> Galeri Aktiviti</div>
+            <div class="admin-menu-item" data-tab="tab-corporate"><i class="fas fa-building"></i> Maklumat Korporat</div>
+            <div class="admin-menu-item" data-tab="tab-comments"><i class="fas fa-comments"></i> Pengurusan Komen Awam</div>
+        </div>
+
+        <div class="admin-content">
+            <!-- TAB: Overview -->
+            <div class="admin-tab-content" id="tab-overview">
+                <div class="admin-card">
+                    <div class="admin-card-title"><i class="fas fa-tachometer-alt"></i> Panel Kawalan Admin BADAN NADWAH</div>
+                    <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 20px;">Selamat datang ke Dashboard Pentadbir. Segala perubahan yang disimpan di sini akan dikemas kini secara **Realtime Fast Update** terus kepada paparan portal awam.</p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                        <div style="background: #0f172a; padding: 20px; border-radius: 12px; border: 1px solid #334155;">
+                            <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Pelawat Hari Ini</span>
+                            <h2 style="font-size: 1.8rem; color: var(--gold-light); margin-top: 4px;" id="adminStatToday">0</h2>
+                        </div>
+                        <div style="background: #0f172a; padding: 20px; border-radius: 12px; border: 1px solid #334155;">
+                            <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Jumlah Pelawat</span>
+                            <h2 style="font-size: 1.8rem; color: #10b981; margin-top: 4px;" id="adminStatTotal">0</h2>
+                        </div>
+                        <div style="background: #0f172a; padding: 20px; border-radius: 12px; border: 1px solid #334155;">
+                            <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Jumlah Komen Awam</span>
+                            <h2 style="font-size: 1.8rem; color: #3b82f6; margin-top: 4px;" id="adminStatComments">0</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: Banner Slaid -->
+            <div class="admin-tab-content" id="tab-banner" style="display: none;">
+                <div class="admin-card">
+                    <div class="admin-card-title"><i class="fas fa-images"></i> Pengurusan Banner Slaid Hero</div>
+                    <div id="adminBannerList"></div>
+                    <button class="admin-btn" id="btnAddBannerRow" style="margin-top: 10px; background: #334155;"><i class="fas fa-plus"></i> Tambah Banner Baru</button>
+                    <br/><br/>
+                    <button class="admin-btn" id="btnAdminSaveBanners"><i class="fas fa-save"></i> Simpan Slaid Banner Ke Database</button>
+                </div>
+            </div>
+
+            <!-- TAB: CTA Buttons -->
+            <div class="admin-tab-content" id="tab-cta" style="display: none;">
+                <div class="admin-card">
+                    <div class="admin-card-title"><i class="fas fa-circle-nodes"></i> Pengurusan 5 CTA Button LOGO &amp; Link Pautan</div>
+                    <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 16px;">Masukkan Label, Gambar/Logo (URL atau Device), dan **URL Link Luaran** untuk dibuka apabila butang logo diklik oleh pelawat.</p>
+                    <div id="adminCtaButtonsList"></div>
+                    <button class="admin-btn" id="btnAdminSaveCta" style="margin-top: 16px;"><i class="fas fa-save"></i> Simpan CTA Buttons Ke Database</button>
+                </div>
+            </div>
+
+            <!-- TAB: Programs -->
+            <div class="admin-tab-content" id="tab-programs" style="display: none;">
+                <div class="admin-card">
+                    <div class="admin-card-title"><i class="fas fa-list-check"></i> Pengurusan Program NADWAH</div>
+                    <div id="adminProgramsList"></div>
+                    <button class="admin-btn" id="btnAdminSavePrograms" style="margin-top: 16px;"><i class="fas fa-save"></i> Simpan Program NADWAH Ke Database</button>
+                </div>
+            </div>
+
+            <!-- TAB: AJK -->
+            <div class="admin-tab-content" id="tab-ajk" style="display: none;">
+                <div class="admin-card">
+                    <div class="admin-card-title"><i class="fas fa-user-shield"></i> Ahli Jawatankuasa Utama</div>
+                    <div id="adminAjkUtamaList"></div>
+                    <button class="admin-btn" id="btnAddAjkUtamaRow" style="margin-top: 10px; background: #334155;"><i class="fas fa-plus"></i> Tambah AJK Utama</button>
+                </div>
+                <div class="admin-card">
+                    <div class="admin-card-title"><i class="fas fa-users"></i> Ahli Jawatankuasa Biasa</div>
+                    <div id="adminAjkBiasaList"></div>
+                    <button class="admin-btn" id="btnAddAjkBiasaRow" style="margin-top: 10px; background: #334155;"><i class="fas fa-plus"></i> Tambah AJK Biasa</button>
+                    <br/><br/>
+                    <button class="admin-btn" id="btnAdminSaveAjk"><i class="fas fa-save"></i> Simpan Keseluruhan AJK Ke Database</button>
+                </div>
+            </div>
+
+            <!-- TAB: About & Timeline -->
+            <div class="admin-tab-content" id="tab-about" style="display: none;">
+                <div class="admin-card">
+                    <div class="admin-card-title"><i class="fas fa-book"></i> Teks Pengenalan &amp; Sejarah</div>
+                    <div class="admin-form-group">
+                        <label>Perenggan 1</label>
+                        <textarea class="admin-textarea" id="adminAboutP1" rows="3"></textarea>
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Perenggan 2</label>
+                        <textarea class="admin-textarea" id="adminAboutP2" rows="3"></textarea>
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Perenggan 3</label>
+                        <textarea class="admin-textarea" id="adminAboutP3" rows="3"></textarea>
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Perenggan 4</label>
+                        <textarea class="admin-textarea" id="adminAboutP4" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="admin-card">
+                    <div class="admin-card-title"><i class="fas fa-history"></i> Garisan Masa Kronologi Sejarah</div>
+                    <div id="adminTimelineList"></div>
+                    <button class="admin-btn" id="btnAddTimelineRow" style="margin-top: 10px; background: #334155;"><i class="fas fa-plus"></i> Tambah Tahun Sejarah</button>
+                    <br/><br/>
+                    <button class="admin-btn" id="btnAdminSaveAboutTimeline"><i class="fas fa-save"></i> Simpan Pengenalan &amp; Sejarah Ke Database</button>
+                </div>
+            </div>
+
+            <!-- TAB: Pelan Kompleks -->
+            <div class="admin-tab-content" id="tab-pelan" style="display: none;">
+                <div class="admin-card">
+                    <div class="admin-card-title"><i class="fas fa-drafting-compass"></i> Kemaskini Gambar 10 Frame Pelan Induk Kompleks</div>
+                    <div id="adminPelanFramesList"></div>
+                    <button class="admin-btn" id="btnAdminSavePelan" style="margin-top: 16px;"><i class="fas fa-save"></i> Simpan Pelan Kompleks Ke Database</button>
+                </div>
+            </div>
+
+            <!-- TAB: Gallery -->
+            <div class="admin-tab-content" id="tab-gallery" style="display: none;">
+                <div class="admin-card">
+                    <div class="admin-card-title"><i class="fas fa-photo-film"></i> Pengurusan Galeri Aktiviti</div>
+                    <div id="adminGalleryList"></div>
+                    <button class="admin-btn" id="btnAddGalleryRow" style="margin-top: 10px; background: #334155;"><i class="fas fa-plus"></i> Tambah Foto Galeri</button>
+                    <br/><br/>
+                    <button class="admin-btn" id="btnAdminSaveGallery"><i class="fas fa-save"></i> Simpan Galeri Ke Database</button>
+                </div>
+            </div>
+
+            <!-- TAB: Corporate -->
+            <div class="admin-tab-content" id="tab-corporate" style="display: none;">
+                <div class="admin-card">
+                    <div class="admin-card-title"><i class="fas fa-building"></i> Maklumat Korporat &amp; Hubungan</div>
+                    <div class="admin-form-group">
+                        <label>Nombor Pendaftaran</label>
+                        <input type="text" class="admin-input" id="adminCorpReg" />
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Tarikh Daftar</label>
+                        <input type="text" class="admin-input" id="adminCorpDate" />
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Alamat Rasmi</label>
+                        <textarea class="admin-textarea" id="adminCorpAddress" rows="2"></textarea>
+                    </div>
+                    <div class="admin-form-group">
+                        <label>Nombor Telefon</label>
+                        <input type="text" class="admin-input" id="adminCorpPhone" />
+                    </div>
+                    <div class="admin-form-group">
+                        <label>E-mel Rasmi</label>
+                        <input type="text" class="admin-input" id="adminCorpEmail" />
+                    </div>
+                    <button class="admin-btn" id="btnAdminSaveCorporate" style="margin-top: 10px;"><i class="fas fa-save"></i> Simpan Maklumat Korporat Ke Database</button>
+                </div>
+            </div>
+
+            <!-- TAB: Comments -->
+            <div class="admin-tab-content" id="tab-comments" style="display: none;">
+                <div class="admin-card">
+                    <div class="admin-card-title"><i class="fas fa-comments"></i> Modul Pengurusan Komen Awam</div>
+                    <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 16px;">Admin berhak mengedit kandungan kekal atau memadam mana-mana komen awam secara mutlak dari database.</p>
+                    <div id="adminCommentsTableContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getDatabase, ref, onValue, set, update, remove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAwh-SZr1lyC1iuxxMFACiCuQtIFo7LdvE",
+            authDomain: "nadwah-c5d27.firebaseapp.com",
+            databaseURL: "https://nadwah-c5d27-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "nadwah-c5d27",
+            storageBucket: "nadwah-c5d27.firebasestorage.app",
+            messagingSenderId: "406689805628",
+            appId: "1:406689805628:web:db3abde041d1cb6fea5a39",
+            measurementId: "G-178K35HDR3"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const ADMIN_PASSWORD = "NADWAHPAHANG";
+
+        const defaultData = {
+            siteInfo: {
+                logoTitle: 'BADAN NADWAH',
+                logoSubtitle: 'ISLAMIAH PAHANG',
+                logoIconText: 'N',
+                logoIconImg: ''
+            },
+            banners: [
+                {
+                    badge: "Organisasi Induk",
+                    titleHtml: "BADAN NADWAH <span>ISLAMIAH</span> PAHANG",
+                    desc: "Memartabatkan Islam melalui pendidikan, dakwah & pembangunan komuniti berteraskan al-Quran dan as-Sunnah.",
+                    img: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1400&q=80"
+                },
+                {
+                    badge: "Kebajikan Kesihatan",
+                    titleHtml: "PUSAT <span>HEMODIALISIS</span> ISLAM MAKMUR",
+                    desc: "Menyediakan perkhidmatan hemodialisis dan sokongan kebajikan kesihatan untuk komuniti Islam.",
+                    img: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1400&q=80"
+                },
+                {
+                    badge: "Pembangunan Ummah",
+                    titleHtml: "<span>KOMPLEKS KOMUNITI</span>",
+                    desc: "Pembangunan kompleks komuniti bersepadu yang merangkumi Pusat Hemodialisis, Pusat Jagaan Harian & Pendidikan Warga Emas dan Pusat Rehabilitasi di Sungai Soi, Kuantan.",
+                    img: "https://images.unsplash.com/photo-1523050854058-8df90110c7f1?w=1400&q=80"
+                },
+                {
+                    badge: "Rumah Anak Yatim",
+                    titleHtml: "PERMATA <span>CAMAR</span>",
+                    desc: "Membentuk jati diri generasi muda melalui aktiviti keagamaan, kemahiran hidup dan pembangunan sosial.",
+                    img: "https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=1400&q=80"
+                },
+                {
+                    badge: "Dakwah Bergerak",
+                    titleHtml: "MOBIL <span>MUSOLLA</span>",
+                    desc: "Memperluas dakwah dan pendidikan Islam ke seluruh Pahang melalui khidmat bergerak dan program luar.",
+                    img: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1400&q=80"
+                }
+            ],
+            ctaButtons: [
+                { id: "phim", label: "PHIM", iconClass: "fas fa-heartbeat", imgUrl: "", linkUrl: "https://phim.nadwahpahang.org" },
+                { id: "kompleks", label: "KOMPLEKS KOMUNITI", iconClass: "fas fa-building", imgUrl: "", linkUrl: "https://kompleks.nadwahpahang.org" },
+                { id: "permata", label: "PERMATA CAMAR", iconClass: "fas fa-child", imgUrl: "", linkUrl: "https://permatacamar.nadwahpahang.org" },
+                { id: "mobil", label: "MOBIL MUSOLLA", iconClass: "fas fa-mosque", imgUrl: "", linkUrl: "https://musolla.nadwahpahang.org" },
+                { id: "dewan-permata", label: "DEWAN PERMATA CAMAR", iconClass: "fas fa-landmark", imgUrl: "", linkUrl: "https://dewan.nadwahpahang.org" }
+            ],
+            corporate: {
+                reg: "PPM-010-06-11101997",
+                date: "10 November 1997",
+                address: "D/A Lot 9015, Lorong Cempaka 1, Kampung Sri Cempaka, 26060 Kuantan, Pahang",
+                phone: "09-534 1320",
+                email: "nadwahislamiahpahang@gmail.com"
+            },
+            about: {
+                p1: "Badan Nadwah Islamiah Pahang atau lebih dikenali NADWAH pada awal penubuhan di tahun 80'an merupakan Sekretariat Dakwah Pejabat Agama Islam Daerah Kuantan yang dipengerusikan oleh Al Fadhil Qadhi Daerah Kuantan.",
+                p2: "Aktiviti dan program yang dilaksanakan adalah dalam bentuk 'dakwah bil lisan' yang mana menganjurkan ceramah, forum dan seminar. Dan pada 1997, NADWAH didaftarkan sebagai sebuah Badan Bukan Kerajaan (NGO) yang berdaftar di bawah Akta Pertubuhan 1966.",
+                p3: "NADWAH juga sedang merancang untuk membangunkan sebuah kompleks komuniti di atas tapak 3 ekar bertempat di Sungai Soi, Kuantan yang telah diluluskan oleh Kerajaan Negeri Pahang. Kompleks tersebut merangkumi Pusat Hemodialisis, Pusat Jagaan Harian & Pendidikan Warga Emas dan Pusat Rehabilitasi.",
+                p4: "Tahun 1998, NADWAH telah mengubah bentuk dakwah dengan melaksanakan kerja-kerja kebajikan bagi membantu umat Islam yang memerlukan pertolongan. Diantara program yang dilaksanakan adalah seperti berikut :"
+            },
+            timeline: [
+                { year: "1985", title: "Penubuhan Awal", desc: "Sekretariat Dakwah Pejabat Agama Islam Daerah Kuantan." },
+                { year: "1997", title: "Pendaftaran NGO", desc: "Didaftarkan secara rasmi di bawah Akta Pertubuhan 1966." },
+                { year: "2001", title: "PHIM", desc: "Pusat Hemodialisis Islam Makmur." },
+                { year: "2003", title: "QUDWAH", desc: "Kelab Remaja & Akademi Kepimpinan Qudwah." },
+                { year: "2004", title: "PERMATA CAMAR", desc: "Penempatan Anak-Anak Yatim & Miskin Nadwah Permata Camar." },
+                { year: "2015", title: "MOBIL MUSOLLA", desc: "Khidmat Surau Bergerak Mobil Musolla." },
+                { year: "2024", title: "Kompleks Komuniti", desc: "Pusat sehenti pembangunan ummah Sungai Soi." }
+            ],
+            jawatankuasaUtama: [
+                { name: 'Ustaz Khairul Anuar Bin Kamar', posKey: 'ajk_presiden', avatarText: 'K', avatarImg: '' },
+                { name: 'Encik Abdul Rahman Bin Abdullah', posKey: 'ajk_timbalan', avatarText: 'A', avatarImg: '' },
+                { name: 'Cik Nurul Shifa Binti Bahaderul Hisham', posKey: 'ajk_setiausaha', avatarText: 'N', avatarImg: '' },
+                { name: 'Encik Mohd Rozaidin Bin Mat Said', posKey: 'ajk_pen_setiausaha', avatarText: 'M', avatarImg: '' },
+                { name: 'Encik Nazri Bin Ibrahim', posKey: 'ajk_bendahari', avatarText: 'N', avatarImg: '' }
+            ],
+            jawatankuasaBiasa: [
+                { name: 'Tuan Syed Mohd Anis Bin Syed Hisain', posKey: 'ajk_biasa', avatarText: 'S', avatarImg: '' },
+                { name: 'Tuan Haji Mokhtar Bin Jusoh', posKey: 'ajk_biasa', avatarText: 'M', avatarImg: '' },
+                { name: 'YM. Tengku Ahmad Bin Tengku Abdul Rahman', posKey: 'ajk_biasa', avatarText: 'T', avatarImg: '' },
+                { name: 'Puan Che Hazina Binti Che Wil', posKey: 'ajk_biasa', avatarText: 'C', avatarImg: '' },
+                { name: 'Puan Hajah Katipah Binti Haji Awang', posKey: 'ajk_biasa', avatarText: 'K', avatarImg: '' },
+                { name: 'Puan Norhidayah Bin Mohd Ibrahim', posKey: 'ajk_biasa', avatarText: 'N', avatarImg: '' }
+            ],
+            pelanFrames: Array.from({ length: 10 }, (_, i) => ({
+                num: i + 1,
+                title: `Pelan Induk ${i + 1}`,
+                iconClass: "fas fa-drafting-compass",
+                imgUrl: "",
+                desc: "Dokumen reka bentuk teknikal dan pelan susun atur ruang bagi zon Pembangunan Kompleks Komuniti NADWAH Pahang."
+            })),
+            programs: [
+                {
+                    id: 'phim', title: 'PHIM', tag_ms: 'Kebajikan & Kesihatan', tag_en: 'Welfare & Healthcare',
+                    desc_ms: 'Pusat Hemodialisis Islam Makmur — perkhidmatan hemodialisis & kebajikan kesihatan.',
+                    desc_en: 'Makmur Islamic Hemodialysis Centre — hemodialysis services & healthcare welfare.',
+                    img: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=600&q=80',
+                    full_ms: `<p style="margin-bottom: 12px;">Yayasan Pusat Hemodialisis Islam Makmur adalah merupakan organisasi pertama yang ditubuhkan oleh NADWAH yang mengendalikan sebuah pusat dialisis berlesen yang diberi nama Pusat Dialisis Yayasan PHIM yang memberikan perkhidmatan kepada pesakit-pesakit kegagalan fungsi buah pinggang.</p><p style="margin-bottom: 12px;">Pusat Dialisis ini telah memulakan operasi semenjak 5 Februari 2001 di premis terdahulu terletak di No 119 &amp; 121, Bangunan MUIP, Jalan Mahkota, 25000 Kuantan. Bagaimanapun, operasi dialisis ini telah dipindahkan ke premis baru terletak di No. 168, Tingkat Bawah, Bangunan BOSB, Jalan Besar, 25000 Kuantan. Premis baru ini mampu menempatkan seramai 88 orang pesakit.</p><p>Semenjak mula beroperasi pada 05 Februari 2001 hingga ke 31 Mei 2023, jumlah pesakit (tetap) yang telah menjalani rawatan adalah seramai 287 orang.</p>`,
+                    full_en: `<p style="margin-bottom: 12px;">Makmur Islamic Hemodialysis Centre Foundation is the first organization established by NADWAH operating a licensed dialysis centre named PHIM Foundation Dialysis Centre providing critical kidney care services.</p>`
+                },
+                {
+                    id: 'kompleks', title: 'KOMPLEKS KOMUNITI', tag_ms: 'Pembangunan Ummah', tag_en: 'Ummah Development',
+                    desc_ms: 'Membantu warga-warga yang susah dan yang memerlukan bantuan seperti tenaga, makanan, pakaian, dan kelengkapan rumah.',
+                    desc_en: 'Assisting those in hardship needing support such as manpower, food, clothing, and household necessities.',
+                    img: 'https://images.unsplash.com/photo-1523050854058-8df90110c7f1?w=600&q=80',
+                    full_ms: `<p>Membantu warga-warga yang susah dan yang memerlukan bantuan seperti tenaga, makanan, pakaian, dan kelengkapan rumah bagi melangsungkan kehidupan seperti biasa,</p>`,
+                    full_en: `<p>Assisting those in hardship needing support such as manpower, food, clothing, and household necessities to maintain normal daily life.</p>`
+                },
+                {
+                    id: 'permata', title: 'PERMATA CAMAR', tag_ms: 'Rumah Anak Yatim', tag_en: 'Orphanage Welfare',
+                    desc_ms: 'Penempatan Anak-Anak Yatim & Miskin Nadwah Permata Camar.', desc_en: 'Nadwah Permata Camar Orphan & Needy Children Welfare Home.',
+                    img: 'https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=600&q=80',
+                    full_ms: `<p style="margin-bottom: 12px;">Penubuhan Rumah Anak Yatim dan Miskin Permata Camar telah di ilhamkan oleh Badan Nadwah Islamiah Pahang (NADWAH) pada tahun 2002 dan mula beroperasi pada 28 Februari 2004 dengan menyewa 3 unit rumah berkembar di Taman Berjaya Permai, Kuantan.</p><p style="margin-bottom: 12px;">Pada tahun 2006, Permata Camar telah menerima wakaf tanah seluas 2.1 ekar (0.8 Hektar) beserta sebuah rumah banglo dan pada tahun 2008, sebidang tanah berkeluasan 2.21 ekar telah dibeli dengan sumbangan derma orang ramai menjadikan jumlah tanah keseluruhan 4.36 ekar (1.7 Hektar).</p><p style="margin-bottom: 12px;">Pada 24 Oktober 2014, Permata Camar telah berdaftar dengan Jabatan Pendaftaran Pertubuhan dengan mengguna pakai nama Badan Kebajikan Anak-Anak Yatim dan Miskin Nadwah Permata Camar dan bersedia bergerak secara berasingan dengan badan induk dalam urusan pentadbiran dan kawangan.</p><p>Daripada 5 orang pada 2004 dan kini (2022) penghuni semasa berjumlah 33 orang sehingga Julai 2022 Permata Camar telah pun melahirkan 150 orang alumni atau yang anak-anak yang pernah menetap di Permata Camar balik ke pangkuan keluarga atau berbakti kepada masyarakat.</p>`,
+                    full_en: `<p>Permata Camar Orphan and Needy Children Home was initiated by NADWAH in 2002 and officially commenced operations on February 28, 2004.</p>`
+                },
+                {
+                    id: 'mobil', title: 'MOBIL MUSOLLA', tag_ms: 'Dakwah Bergerak', tag_en: 'Mobile Dawah',
+                    desc_ms: 'Khidmat Surau Bergerak Mobil Musolla ke seluruh daerah Pahang.', desc_en: 'Mobil Musolla mobile surau service operating across Pahang.',
+                    img: 'https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=600&q=80',
+                    full_ms: `<p style="margin-bottom: 14px;">Khidmat Surau Bergerak Badan Nadwah Islamiah Pahang yang dinamakan Mobil Musolla adalah satu perkhidmatan menyediakan kemudahan tempat untuk bersolat kepada orang ramai dengan menggunakan kenderaan iaitu lori yang diubahsuai. Kenderaan ini dilengkapi dengan ruang solat untuk lelaki dan wanita serta tempat untuk berwuduk. Lokasi yang dipilih untuk menempatkan Mobil Musolla ini adalah di pasar-pasar malam, di tempat-tempat keramaian, di perkarangan stadium darul makmur ketika perlawanan bolasepak serta lain-lain lagi. Mobil Musolla juga bersedia menerima tempahan dari mana-mana pihak yang memerlukan perkhidmatan ini. Mobil Musolla satu lagi usaha dakwah bil hal yang dipelopori oleh Badan Nadwah Islamiah Pahang. Marilah menunaikan solat, Marilah menuju kejayaan.</p><div style="background: var(--emerald-pale); padding: 16px; border-radius: var(--radius-xs); border-left: 4px solid var(--gold-dark); margin-top: 14px;"><strong style="color: var(--emerald-dark); display: block; margin-bottom: 8px;"><i class="fas fa-bullseye text-gold"></i> OBJEKTIF UTAMA :</strong><ul style="list-style: disc; padding-left: 20px; font-size: 0.88rem; color: var(--gray-800);"><li style="margin-bottom: 6px;">Menyediakan tempat solat berdekatan atau bersebelahan pasar malam.</li><li style="margin-bottom: 6px;">Menggalakkan dan memudahkan para peniaga dan pengunjung menunaikan solat setiap waktu.</li><li>Menarik golongan yang tidak melazimi menunaikan solat supaya tidak meninggalkan ibadah yang wajib ini.</li></ul></div>`,
+                    full_en: `<p>Mobil Musolla is a mobile surau service by Badan Nadwah Islamiah Pahang providing prayer facilities using modified trucks.</p>`
+                },
+                {
+                    id: 'dewan-permata', title: 'DEWAN PERMATA CAMAR', tag_ms: 'Infrastruktur', tag_en: 'Infrastructure',
+                    desc_ms: 'Dewan serbaguna moden untuk aktiviti kemasyarakatan & majlis ilmu.', desc_en: 'Modern multipurpose hall for community events & educational gatherings.',
+                    img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&q=80',
+                    full_ms: `<p style="margin-bottom: 14px;">Dewan Permata Camar merupakan sebuah dewan serbaguna yang dibangunkan sebagai inisiatif di bawah Kompleks Anak Yatim Permata Camar, Kuantan, Pahang.</p><p>Setiap tempahan secara tidak langsung akan menjadi sebahagian daripada usaha membina masa depan yang lebih baik untuk generasi anak-anak yang dibimbing di kompleks ini.</p>`,
+                    full_en: `<p>Dewan Permata Camar is a modern multipurpose hall developed as an initiative under the Permata Camar Orphanage Complex in Kuantan, Pahang.</p>`
+                }
+            ],
+            gallery: [
+                { img: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=500&q=80', cat: 'pendidikan', alt: 'Program Pendidikan & Kuliah' },
+                { img: 'https://images.unsplash.com/photo-1523050854058-8df90110c7f1?w=500&q=80', cat: 'dakwah', alt: 'Sesi Ceramah Dakwah' },
+                { img: 'https://images.unsplash.com/photo-1571260899304-425eee4c7efc?w=500&q=80', cat: 'komuniti', alt: 'Aktiviti Kemasyarakatan' },
+                { img: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?w=500&q=80', cat: 'sukan', alt: 'Aktiviti Sukan Komuniti' }
+            ]
+        };
+
+        let state = JSON.parse(JSON.stringify(defaultData));
+
+        window.handleFileToInput = function(fileInput, targetInput) {
+            if (fileInput.files && fileInput.files[0]) {
+                const file = fileInput.files[0];
+                if (file.size > 3 * 1024 * 1024) {
+                    showToast("Saiz gambar agak besar (>3MB). Pertimbangkan saiz lebih kecil.", "warning");
+                }
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    targetInput.value = e.target.result;
+                    showToast("Gambar peranti berjaya dimuat naik!", "success");
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        document.getElementById('authForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const inputPass = document.getElementById('adminAuthPass').value;
+            if (inputPass === ADMIN_PASSWORD) {
+                document.getElementById('authOverlay').style.display = 'none';
+                showToast("Selamat datang ke Dashboard Admin!", "success");
+            } else {
+                showToast("Kata laluan Admin salah!", "warning");
+            }
+        });
+
+        document.getElementById('btnAdminLogout').onclick = () => {
+            document.getElementById('authOverlay').style.display = 'flex';
+            document.getElementById('adminAuthPass').value = '';
+            showToast("Telah keluar dari Dashboard Admin.", "info");
+        };
+
+        // Sidebar Navigation
+        document.querySelectorAll('.admin-menu-item').forEach(item => {
+            item.onclick = function() {
+                document.querySelectorAll('.admin-menu-item').forEach(m => m.classList.remove('active'));
+                document.querySelectorAll('.admin-tab-content').forEach(c => c.style.display = 'none');
+                this.classList.add('active');
+                const tabId = this.dataset.tab;
+                document.getElementById(tabId).style.display = 'block';
+            };
+        });
+
+        renderAdminForms();
+
+        onValue(ref(db, 'site_content'), (snapshot) => {
+            const val = snapshot.val();
+            if (val) {
+                state = { ...defaultData, ...val };
+            } else {
+                state = JSON.parse(JSON.stringify(defaultData));
+                set(ref(db, 'site_content'), state);
+            }
+            renderAdminForms();
+        });
+
+        onValue(ref(db, 'comments'), (snapshot) => {
+            const val = snapshot.val();
+            if (val) {
+                const list = Object.keys(val).map(k => ({ id: k, ...val[k] }));
+                list.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+                state.comments = list;
+            } else {
+                state.comments = [];
+            }
+            document.getElementById('adminStatComments').textContent = (state.comments || []).length;
+            renderAdminCommentsTable();
+        });
+
+        const todayStr = new Date().toISOString().split('T')[0];
+        onValue(ref(db, 'visitors/total'), (snap) => {
+            document.getElementById('adminStatTotal').textContent = (snap.val() || 0).toLocaleString();
+        });
+        onValue(ref(db, `visitors/daily/${todayStr}`), (snap) => {
+            document.getElementById('adminStatToday').textContent = (snap.val() || 0).toLocaleString();
+        });
+
+        function renderAdminForms() {
+            // Banners Form
+            const banners = state.banners || [];
+            document.getElementById('adminBannerList').innerHTML = banners.map((b, i) => `
+                <div style="border: 1px solid #334155; padding: 14px; border-radius: 8px; margin-bottom: 12px; background: #0f172a;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <h4 style="color: var(--gold-light);">Slaid #${i+1}</h4>
+                        <button class="admin-btn admin-btn-danger" type="button" onclick="deleteBannerRow(${i})" style="padding: 4px 10px; font-size: 0.75rem;"><i class="fas fa-trash"></i> Padam Banner</button>
+                    </div>
+                    <div class="admin-form-group"><label>Lencana (Badge)</label><input type="text" class="admin-input adm-b-badge" value="${b.badge || ''}" /></div>
+                    <div class="admin-form-group"><label>Tajuk HTML</label><input type="text" class="admin-input adm-b-title" value="${b.titleHtml || ''}" /></div>
+                    <div class="admin-form-group"><label>Penerangan Ringkas</label><textarea class="admin-textarea adm-b-desc" rows="2">${b.desc || ''}</textarea></div>
+                    <div class="admin-form-group">
+                        <label>Gambar Banner (URL ATAU Muat Naik Dari Peranti)</label>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <input type="text" class="admin-input adm-b-img" value="${b.img || ''}" placeholder="URL Gambar..." />
+                            <input type="file" accept="image/*" style="display:none;" id="file-b-${i}" onchange="handleFileToInput(this, this.previousElementSibling)" />
+                            <button class="admin-btn" type="button" onclick="document.getElementById('file-b-${i}').click()" style="padding: 8px 12px; font-size: 0.78rem; white-space: nowrap;"><i class="fas fa-upload"></i> Pilih Peranti</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // CTA Buttons Form with Link Input
+            const ctas = state.ctaButtons || [];
+            document.getElementById('adminCtaButtonsList').innerHTML = ctas.map((c, i) => `
+                <div style="border: 1px solid #334155; padding: 14px; border-radius: 8px; margin-bottom: 12px; background: #0f172a;">
+                    <h4 style="color: var(--gold-light); margin-bottom: 8px;">CTA Button #${i+1}</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="admin-form-group"><label>Label Program / CTA</label><input type="text" class="admin-input adm-c-label" value="${c.label || ''}" placeholder="Cth: PHIM" /></div>
+                        <div class="admin-form-group"><label>Pautan URL Link Luaran (PENTING)</label><input type="text" class="admin-input adm-c-link" value="${c.linkUrl || '#'}" placeholder="Cth: https://example.com" /></div>
+                        <div class="admin-form-group" style="grid-column: span 2;">
+                            <label>Gambar Logo (URL ATAU Muat Naik Dari Peranti Admin)</label>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <input type="text" class="admin-input adm-c-img" value="${c.imgUrl || ''}" placeholder="URL Gambar Logo..." />
+                                <input type="file" accept="image/*" style="display:none;" id="file-c-${i}" onchange="handleFileToInput(this, this.previousElementSibling)" />
+                                <button class="admin-btn" type="button" onclick="document.getElementById('file-c-${i}').click()" style="padding: 8px 12px; font-size: 0.78rem; white-space: nowrap;"><i class="fas fa-folder-open"></i> Pilih Peranti</button>
+                            </div>
+                        </div>
+                        <div class="admin-form-group" style="grid-column: span 2;"><label>Atau Class Icon FontAwesome (Jika tiada gambar logo)</label><input type="text" class="admin-input adm-c-icon" value="${c.iconClass || 'fas fa-star'}" placeholder="Cth: fas fa-heartbeat" /></div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Programs Form
+            const progs = state.programs || [];
+            document.getElementById('adminProgramsList').innerHTML = progs.map((p, i) => `
+                <div style="border: 1px solid #334155; padding: 14px; border-radius: 8px; margin-bottom: 12px; background: #0f172a;">
+                    <h4 style="color: var(--gold-light); margin-bottom: 8px;">Program: ${p.title}</h4>
+                    <div class="admin-form-group"><label>Tajuk Program</label><input type="text" class="admin-input adm-p-title" value="${p.title || ''}" /></div>
+                    <div class="admin-form-group"><label>Tag Kategori (MY)</label><input type="text" class="admin-input adm-p-tag" value="${p.tag_ms || ''}" /></div>
+                    <div class="admin-form-group"><label>Penerangan Ringkas Kad</label><textarea class="admin-textarea adm-p-desc" rows="2">${p.desc_ms || ''}</textarea></div>
+                    <div class="admin-form-group">
+                        <label>Gambar Program (URL ATAU Muat Naik Dari Peranti)</label>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <input type="text" class="admin-input adm-p-img" value="${p.img || ''}" placeholder="URL Gambar Program..." />
+                            <input type="file" accept="image/*" style="display:none;" id="file-p-${i}" onchange="handleFileToInput(this, this.previousElementSibling)" />
+                            <button class="admin-btn" type="button" onclick="document.getElementById('file-p-${i}').click()" style="padding: 8px 12px; font-size: 0.78rem; white-space: nowrap;"><i class="fas fa-upload"></i> Pilih Peranti</button>
+                        </div>
+                    </div>
+                    <div class="admin-form-group"><label>Kandungan Penuh Maklumat Lanjut HTML</label><textarea class="admin-textarea adm-p-full" rows="5">${p.full_ms || ''}</textarea></div>
+                </div>
+            `).join('');
+
+            renderAdminAjkForm();
+
+            // About & Timeline Form
+            const ab = state.about || {};
+            document.getElementById('adminAboutP1').value = ab.p1 || '';
+            document.getElementById('adminAboutP2').value = ab.p2 || '';
+            document.getElementById('adminAboutP3').value = ab.p3 || '';
+            document.getElementById('adminAboutP4').value = ab.p4 || '';
+            renderAdminTimelineForm();
+
+            // Pelan Frames Form
+            const frames = state.pelanFrames || [];
+            document.getElementById('adminPelanFramesList').innerHTML = frames.map((f, i) => `
+                <div style="border: 1px solid #334155; padding: 12px; border-radius: 8px; margin-bottom: 10px; background: #0f172a; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <strong style="color: var(--gold-light); width: 80px;">Frame #${i+1}</strong>
+                        <input type="text" class="admin-input adm-pf-title" value="${f.title || ''}" style="width: 200px;" placeholder="Tajuk Frame" />
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="text" class="admin-input adm-pf-img" value="${f.imgUrl || ''}" placeholder="URL Gambar Blueprint Pelan..." />
+                        <input type="file" accept="image/*" style="display:none;" id="file-pf-${i}" onchange="handleFileToInput(this, this.previousElementSibling)" />
+                        <button class="admin-btn" type="button" onclick="document.getElementById('file-pf-${i}').click()" style="padding: 8px 12px; font-size: 0.78rem; white-space: nowrap;"><i class="fas fa-upload"></i> Pilih Peranti</button>
+                    </div>
+                </div>
+            `).join('');
+
+            renderAdminGalleryForm();
+
+            // Corporate Form
+            const c = state.corporate || {};
+            document.getElementById('adminCorpReg').value = c.reg || '';
+            document.getElementById('adminCorpDate').value = c.date || '';
+            document.getElementById('adminCorpAddress').value = c.address || '';
+            document.getElementById('adminCorpPhone').value = c.phone || '';
+            document.getElementById('adminCorpEmail').value = c.email || '';
+
+            renderAdminCommentsTable();
+        }
+
+        window.deleteBannerRow = function(idx) {
+            if (confirm("Adakah anda pasti mahu memadam slaid banner ini?")) {
+                state.banners.splice(idx, 1);
+                renderAdminForms();
+                showToast("Slaid banner telah dipadam. Sila klik 'Simpan Slaid Banner' untuk kemaskini database.", "info");
+            }
+        };
+
+        document.getElementById('btnAddBannerRow').onclick = () => {
+            state.banners = state.banners || [];
+            state.banners.push({
+                badge: "Program Baharu",
+                titleHtml: "TAJUK <span>BANNER</span> BAHARU",
+                desc: "Penerangan ringkas untuk slaid banner baharu.",
+                img: "https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1400&q=80",
+                btnPrimaryText: "Ketahui Lebih Lanjut",
+                btnPrimaryLink: "#program"
+            });
+            renderAdminForms();
+            showToast("Banner baru telah ditambah. Sila isi maklumat dan simpan.", "success");
+        };
+
+        function renderAdminAjkForm() {
+            const listUtama = state.jawatankuasaUtama || [];
+            const listBiasa = state.jawatankuasaBiasa || [];
+
+            document.getElementById('adminAjkUtamaList').innerHTML = listUtama.map((m, i) => `
+                <div style="border: 1px solid #334155; padding: 10px; border-radius: 6px; margin-bottom: 8px; background: #0f172a; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="text" class="admin-input adm-ajku-name" value="${m.name || ''}" placeholder="Nama Ahli" />
+                        <select class="admin-select adm-ajku-pos" style="width: 180px;">
+                            <option value="ajk_presiden" ${m.posKey === 'ajk_presiden' ? 'selected' : ''}>Presiden</option>
+                            <option value="ajk_timbalan" ${m.posKey === 'ajk_timbalan' ? 'selected' : ''}>Timbalan Presiden</option>
+                            <option value="ajk_setiausaha" ${m.posKey === 'ajk_setiausaha' ? 'selected' : ''}>Setiausaha</option>
+                            <option value="ajk_pen_setiausaha" ${m.posKey === 'ajk_pen_setiausaha' ? 'selected' : ''}>Penolong Setiausaha</option>
+                            <option value="ajk_bendahari" ${m.posKey === 'ajk_bendahari' ? 'selected' : ''}>Bendahari</option>
+                        </select>
+                        <button class="admin-btn admin-btn-danger" onclick="deleteAjkRow('utama', ${i})"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="text" class="admin-input adm-ajku-img" value="${m.avatarImg || ''}" placeholder="URL Gambar Foto AJK..." />
+                        <input type="file" accept="image/*" style="display:none;" id="file-ajku-${i}" onchange="handleFileToInput(this, this.previousElementSibling)" />
+                        <button class="admin-btn" type="button" onclick="document.getElementById('file-ajku-${i}').click()" style="padding: 8px 12px; font-size: 0.78rem; white-space: nowrap;"><i class="fas fa-camera"></i> Gambar Peranti</button>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('adminAjkBiasaList').innerHTML = listBiasa.map((m, i) => `
+                <div style="border: 1px solid #334155; padding: 10px; border-radius: 6px; margin-bottom: 8px; background: #0f172a; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="text" class="admin-input adm-ajkb-name" value="${m.name || ''}" placeholder="Nama Ahli" />
+                        <button class="admin-btn admin-btn-danger" onclick="deleteAjkRow('biasa', ${i})"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="text" class="admin-input adm-ajkb-img" value="${m.avatarImg || ''}" placeholder="URL Gambar Foto AJK..." />
+                        <input type="file" accept="image/*" style="display:none;" id="file-ajkb-${i}" onchange="handleFileToInput(this, this.previousElementSibling)" />
+                        <button class="admin-btn" type="button" onclick="document.getElementById('file-ajkb-${i}').click()" style="padding: 8px 12px; font-size: 0.78rem; white-space: nowrap;"><i class="fas fa-camera"></i> Gambar Peranti</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.deleteAjkRow = function(type, idx) {
+            if (type === 'utama') state.jawatankuasaUtama.splice(idx, 1);
+            else state.jawatankuasaBiasa.splice(idx, 1);
+            renderAdminAjkForm();
+        };
+
+        document.getElementById('btnAddAjkUtamaRow').onclick = () => {
+            state.jawatankuasaUtama = state.jawatankuasaUtama || [];
+            state.jawatankuasaUtama.push({ name: '', posKey: 'ajk_setiausaha', avatarText: 'A', avatarImg: '' });
+            renderAdminAjkForm();
+        };
+
+        document.getElementById('btnAddAjkBiasaRow').onclick = () => {
+            state.jawatankuasaBiasa = state.jawatankuasaBiasa || [];
+            state.jawatankuasaBiasa.push({ name: '', posKey: 'ajk_biasa', avatarText: 'A', avatarImg: '' });
+            renderAdminAjkForm();
+        };
+
+        function renderAdminTimelineForm() {
+            const tl = state.timeline || [];
+            document.getElementById('adminTimelineList').innerHTML = tl.map((t, i) => `
+                <div style="border: 1px solid #334155; padding: 10px; border-radius: 6px; margin-bottom: 8px; background: #0f172a; display: flex; gap: 10px; align-items: center;">
+                    <input type="text" class="admin-input adm-tl-year" value="${t.year || ''}" style="width: 90px;" placeholder="Tahun" />
+                    <input type="text" class="admin-input adm-tl-title" value="${t.title || ''}" style="width: 180px;" placeholder="Tajuk Sejarah" />
+                    <input type="text" class="admin-input adm-tl-desc" value="${t.desc || ''}" placeholder="Penerangan Ringkas" />
+                    <button class="admin-btn admin-btn-danger" onclick="deleteTimelineRow(${i})"><i class="fas fa-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        window.deleteTimelineRow = function(idx) {
+            state.timeline.splice(idx, 1);
+            renderAdminTimelineForm();
+        };
+
+        document.getElementById('btnAddTimelineRow').onclick = () => {
+            state.timeline = state.timeline || [];
+            state.timeline.push({ year: '2026', title: 'Peristiwa Baharu', desc: 'Penerangan peritiwa.' });
+            renderAdminTimelineForm();
+        };
+
+        function renderAdminGalleryForm() {
+            const g = state.gallery || [];
+            document.getElementById('adminGalleryList').innerHTML = g.map((item, i) => `
+                <div style="border: 1px solid #334155; padding: 10px; border-radius: 6px; margin-bottom: 8px; background: #0f172a; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <select class="admin-select adm-gal-cat" style="width: 140px;">
+                            <option value="pendidikan" ${item.cat === 'pendidikan' ? 'selected' : ''}>Pendidikan</option>
+                            <option value="dakwah" ${item.cat === 'dakwah' ? 'selected' : ''}>Dakwah</option>
+                            <option value="komuniti" ${item.cat === 'komuniti' ? 'selected' : ''}>Komuniti</option>
+                            <option value="sukan" ${item.cat === 'sukan' ? 'selected' : ''}>Sukan</option>
+                        </select>
+                        <input type="text" class="admin-input adm-gal-alt" value="${item.alt || ''}" placeholder="Keterangan Gambar" />
+                        <button class="admin-btn admin-btn-danger" onclick="deleteGalleryRow(${i})"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="text" class="admin-input adm-gal-img" value="${item.img || ''}" placeholder="URL Gambar Galeri..." />
+                        <input type="file" accept="image/*" style="display:none;" id="file-gal-${i}" onchange="handleFileToInput(this, this.previousElementSibling)" />
+                        <button class="admin-btn" type="button" onclick="document.getElementById('file-gal-${i}').click()" style="padding: 8px 12px; font-size: 0.78rem; white-space: nowrap;"><i class="fas fa-image"></i> Pilih Peranti</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.deleteGalleryRow = function(idx) {
+            state.gallery.splice(idx, 1);
+            renderAdminGalleryForm();
+        };
+
+        document.getElementById('btnAddGalleryRow').onclick = () => {
+            state.gallery = state.gallery || [];
+            state.gallery.push({ img: '', cat: 'komuniti', alt: 'Aktiviti Komuniti' });
+            renderAdminGalleryForm();
+        };
+
+        function renderAdminCommentsTable() {
+            const container = document.getElementById('adminCommentsTableContainer');
+            if (!container) return;
+            const comments = state.comments || [];
+
+            if (comments.length === 0) {
+                container.innerHTML = `<p style="color: #94a3b8; font-style: italic;">Tiada komen awam lagi.</p>`;
+                return;
+            }
+
+            container.innerHTML = `
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Nama</th>
+                            <th>Rating</th>
+                            <th>Komen / Mesej</th>
+                            <th>Tindakan Admin</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${comments.map(c => `
+                            <tr>
+                                <td><input type="text" class="admin-input" id="adm-c-name-${c.id}" value="${c.nama || ''}" /></td>
+                                <td><input type="text" class="admin-input" id="adm-c-rate-${c.id}" value="${c.rating || ''}" style="width: 110px;" /></td>
+                                <td><textarea class="admin-textarea" id="adm-c-msg-${c.id}" rows="2">${c.mesej || ''}</textarea></td>
+                                <td>
+                                    <button class="admin-btn" onclick="saveCommentAdmin('${c.id}')" style="padding: 6px 12px; margin-bottom: 4px;"><i class="fas fa-save"></i> Kemaskini</button>
+                                    <button class="admin-btn admin-btn-danger" onclick="deleteCommentAdmin('${c.id}')" style="padding: 6px 12px;"><i class="fas fa-trash"></i> Padam</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        window.saveCommentAdmin = function(cid) {
+            const nama = document.getElementById(`adm-c-name-${cid}`).value.trim();
+            const rating = document.getElementById(`adm-c-rate-${cid}`).value.trim();
+            const mesej = document.getElementById(`adm-c-msg-${cid}`).value.trim();
+
+            update(ref(db, `comments/${cid}`), { nama, rating, mesej })
+                .then(() => showToast("Komen berjaya dikemaskini kekal!", "success"));
+        };
+
+        window.deleteCommentAdmin = function(cid) {
+            if (confirm("Adakah anda pasti mahu memadam komen ini secara kekal?")) {
+                remove(ref(db, `comments/${cid}`))
+                    .then(() => showToast("Komen telah dipadamkan kekal!", "info"));
+            }
+        };
+
+        function saveStateToFirebase(message = "Perubahan berjaya disimpan kekal ke Firebase Realtime Database!") {
+            set(ref(db, 'site_content'), state)
+                .then(() => showToast(message, "success"))
+                .catch((err) => {
+                    console.error("Firebase write error:", err);
+                    showToast("Ralat menyimpan ke database!", "warning");
+                });
+        }
+
+        document.getElementById('btnAdminSaveBanners').onclick = () => {
+            const badges = document.querySelectorAll('.adm-b-badge');
+            const titles = document.querySelectorAll('.adm-b-title');
+            const descs = document.querySelectorAll('.adm-b-desc');
+            const imgs = document.querySelectorAll('.adm-b-img');
+
+            state.banners = Array.from(badges).map((el, i) => ({
+                badge: el.value,
+                titleHtml: titles[i].value,
+                desc: descs[i].value,
+                img: imgs[i].value,
+                btnPrimaryText: (state.banners[i] && state.banners[i].btnPrimaryText) || "Ketahui Lebih Lanjut",
+                btnPrimaryLink: (state.banners[i] && state.banners[i].btnPrimaryLink) || "#program"
+            }));
+
+            saveStateToFirebase("Slaid Banner Hero berjaya dikemaskini!");
+        };
+
+        document.getElementById('btnAdminSaveCta').onclick = () => {
+            const labels = document.querySelectorAll('.adm-c-label');
+            const links = document.querySelectorAll('.adm-c-link');
+            const imgs = document.querySelectorAll('.adm-c-img');
+            const icons = document.querySelectorAll('.adm-c-icon');
+
+            state.ctaButtons = state.ctaButtons || [];
+            labels.forEach((el, i) => {
+                if (!state.ctaButtons[i]) state.ctaButtons[i] = {};
+                state.ctaButtons[i].label = el.value;
+                state.ctaButtons[i].linkUrl = links[i].value;
+                state.ctaButtons[i].imgUrl = imgs[i].value;
+                state.ctaButtons[i].iconClass = icons[i].value;
+            });
+            saveStateToFirebase("5 CTA Button LOGO & Link Pautan berjaya dikemaskini!");
+        };
+
+        document.getElementById('btnAdminSavePrograms').onclick = () => {
+            const titles = document.querySelectorAll('.adm-p-title');
+            const tags = document.querySelectorAll('.adm-p-tag');
+            const descs = document.querySelectorAll('.adm-p-desc');
+            const imgs = document.querySelectorAll('.adm-p-img');
+            const fulls = document.querySelectorAll('.adm-p-full');
+
+            state.programs = state.programs || [];
+            titles.forEach((el, i) => {
+                if (state.programs[i]) {
+                    state.programs[i].title = el.value;
+                    state.programs[i].tag_ms = tags[i].value;
+                    state.programs[i].desc_ms = descs[i].value;
+                    state.programs[i].img = imgs[i].value;
+                    state.programs[i].full_ms = fulls[i].value;
+                }
+            });
+            saveStateToFirebase("Program NADWAH berjaya dikemaskini!");
+        };
+
+        document.getElementById('btnAdminSaveAjk').onclick = () => {
+            const uNames = document.querySelectorAll('.adm-ajku-name');
+            const uPos = document.querySelectorAll('.adm-ajku-pos');
+            const uImgs = document.querySelectorAll('.adm-ajku-img');
+
+            state.jawatankuasaUtama = Array.from(uNames).map((el, i) => ({
+                name: el.value,
+                posKey: uPos[i].value,
+                avatarText: el.value ? el.value.charAt(0).toUpperCase() : 'A',
+                avatarImg: uImgs[i].value
+            }));
+
+            const bNames = document.querySelectorAll('.adm-ajkb-name');
+            const bImgs = document.querySelectorAll('.adm-ajkb-img');
+
+            state.jawatankuasaBiasa = Array.from(bNames).map((el, i) => ({
+                name: el.value,
+                posKey: 'ajk_biasa',
+                avatarText: el.value ? el.value.charAt(0).toUpperCase() : 'A',
+                avatarImg: bImgs[i].value
+            }));
+
+            saveStateToFirebase("Ahli Jawatankuasa Utama & Biasa berjaya dikemaskini!");
+        };
+
+        document.getElementById('btnAdminSaveAboutTimeline').onclick = () => {
+            state.about = {
+                p1: document.getElementById('adminAboutP1').value,
+                p2: document.getElementById('adminAboutP2').value,
+                p3: document.getElementById('adminAboutP3').value,
+                p4: document.getElementById('adminAboutP4').value
+            };
+
+            const years = document.querySelectorAll('.adm-tl-year');
+            const titles = document.querySelectorAll('.adm-tl-title');
+            const descs = document.querySelectorAll('.adm-tl-desc');
+
+            state.timeline = Array.from(years).map((el, i) => ({
+                year: el.value,
+                title: titles[i].value,
+                desc: descs[i].value
+            }));
+
+            saveStateToFirebase("Pengenalan, Sejarah & Kronologi Sejarah berjaya dikemaskini!");
+        };
+
+        document.getElementById('btnAdminSavePelan').onclick = () => {
+            const titles = document.querySelectorAll('.adm-pf-title');
+            const imgs = document.querySelectorAll('.adm-pf-img');
+
+            state.pelanFrames = state.pelanFrames || [];
+            titles.forEach((el, i) => {
+                if (state.pelanFrames[i]) {
+                    state.pelanFrames[i].title = el.value;
+                    state.pelanFrames[i].imgUrl = imgs[i].value;
+                }
+            });
+            saveStateToFirebase("Gambar Pelan Kompleks Komuniti berjaya dikemaskini!");
+        };
+
+        document.getElementById('btnAdminSaveGallery').onclick = () => {
+            const imgs = document.querySelectorAll('.adm-gal-img');
+            const cats = document.querySelectorAll('.adm-gal-cat');
+            const alts = document.querySelectorAll('.adm-gal-alt');
+
+            state.gallery = Array.from(imgs).map((el, i) => ({
+                img: el.value,
+                cat: cats[i].value,
+                alt: alts[i].value
+            }));
+
+            saveStateToFirebase("Galeri Aktiviti berjaya dikemaskini!");
+        };
+
+        document.getElementById('btnAdminSaveCorporate').onclick = () => {
+            state.corporate = {
+                reg: document.getElementById('adminCorpReg').value,
+                date: document.getElementById('adminCorpDate').value,
+                address: document.getElementById('adminCorpAddress').value,
+                phone: document.getElementById('adminCorpPhone').value,
+                email: document.getElementById('adminCorpEmail').value
+            };
+            saveStateToFirebase("Maklumat Korporat berjaya dikemaskini!");
+        };
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            let iconClass = 'fa-circle-info';
+            if (type === 'success') iconClass = 'fa-circle-check';
+            if (type === 'warning') iconClass = 'fa-triangle-exclamation';
+
+            toast.innerHTML = `<i class="fas ${iconClass}"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 50);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 400);
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
