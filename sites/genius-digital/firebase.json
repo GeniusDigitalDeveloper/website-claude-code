@@ -9,7 +9,7 @@
       "**/.*",
       "**/node_modules/**"
     ],
-    "cleanUrls": true,
+    "cleanUrls": false,
     "headers": [
       {
         "source": "**/*.html",
@@ -63,6 +63,12 @@
             "value": "application/manifest+json"
           }
         ]
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "/admin",
+        "destination": "/admin.html"
       }
     ]
   },
