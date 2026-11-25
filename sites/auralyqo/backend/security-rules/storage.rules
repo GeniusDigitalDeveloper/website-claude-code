@@ -1,0 +1,16 @@
+rules_version = '2';
+
+// Profile images only. Audio files are NEVER uploaded (local music stays on device).
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /users/{uid}/avatar/{file} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == uid
+        && file in ['avatar.jpg', 'original.jpg']
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+      allow delete: if request.auth != null && request.auth.uid == uid;
+    }
+    match /{allPaths=**} { allow read, write: if false; }
+  }
+}

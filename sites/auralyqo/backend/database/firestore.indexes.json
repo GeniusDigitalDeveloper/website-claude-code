@@ -1,0 +1,7 @@
+{
+  "indexes": [],
+  "fieldOverrides": [
+    { "collectionGroup": "error_logs", "fieldPath": "at", "indexes": [{ "order": "DESCENDING", "queryScope": "COLLECTION" }] },
+    { "collectionGroup": "users", "fieldPath": "createdAt", "indexes": [{ "order": "DESCENDING", "queryScope": "COLLECTION" }] }
+  ]
+}
