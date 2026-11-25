@@ -1,5 +1,5 @@
 "use client";
-import { Clock3, Heart, HardDrive, Play, Shuffle, Sparkles } from "lucide-react";
+import { Heart, HardDrive, Pause, Play, Shuffle, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
@@ -110,39 +110,55 @@ function Greeting() {
   );
 }
 
-function Continue({ kind }: { kind: SectionConfig["kind"] }) {
-  const resume = useLibrary((s) => s.resume);
-  const recent = useLibrary((s) => s.recent);
-  if (!resume) return <p className="text-sm text-muted">Lagu yang anda jeda akan muncul di sini supaya anda boleh sambung dari saat yang sama.</p>;
-  const t = resume.track;
-  const go = async () => {
-    const p = usePlayer.getState();
-    const at = p.queue.findIndex((q) => q.id === t.id);
-    if (at >= 0 && at === p.index) return p.play();
-    usePlayer.setState({ queue: [t, ...recent.filter((r) => r.id !== t.id).slice(0, 20)], index: 0 });
-    usePlayer.getState().play();
-  };
-  const pct = t.playableSeconds || t.duration ? (resume.position / (t.playableSeconds || t.duration)) * 100 : 0;
+/**
+ * Continue Listening: unfinished songs (up to 4 in view, the rest scroll sideways). Each resumes from where
+ * it stopped. A song disappears once finished, or if it is not resumed within a week.
+ */
+const WEEK = 7 * 86_400_000;
+function ContinueCard({ t, pos, dur, list, i }: { t: Track; pos: number; dur: number; list: Track[]; i: number }) {
+  const isCur = usePlayer((s) => s.queue[s.index]?.id === t.id);
+  const playing = usePlayer((s) => s.playing);
+  const live = usePlayer((s) => (s.queue[s.index]?.id === t.id ? s.position : -1));
+  const at = live >= 0 ? live : pos;
+  const total = dur || t.duration || 0;
+  const go = () => (isCur ? usePlayer.getState().toggle() : usePlayer.getState().playList(list, i, { shuffle: false }));
   return (
-    <div className={cx("flex gap-3", kind === "list" ? "flex-col" : "")}>
-      <button onClick={go} className="chip-glass group flex w-full max-w-md cursor-pointer items-center gap-4 rounded-[var(--radius)] p-3 text-left transition hover:bg-card-hover">
-        <Artwork src={t.artwork} alt="" className="h-16 w-16" rounded="rounded-xl" />
-        <div className="min-w-0 flex-1">
-          <p translate="no" className="truncate font-semibold">{t.title}</p>
-          <p className="truncate text-xs text-muted">{t.artist}</p>
-          <div className="mt-2 flex items-center gap-2 text-[11px] text-muted">
-            <div className="h-1 flex-1 overflow-hidden rounded-full bg-line">
-              <div className="grad-bg h-full" style={{ width: `${Math.min(100, pct)}%` }} />
-            </div>
-            <Clock3 className="h-3 w-3" /> {fmt(resume.position)}
+    <button
+      onClick={go}
+      className="chip-glass group flex w-[min(320px,82vw)] shrink-0 snap-start cursor-pointer items-center gap-3 rounded-[var(--radius)] p-3 text-left transition hover:bg-card-hover md:w-[calc((100%-48px)/4)] md:min-w-[230px]"
+      aria-label={isCur && playing ? `Jeda ${t.title}` : `Main ${t.title}`}
+    >
+      <Artwork src={t.artwork} alt="" className="h-14 w-14" rounded="rounded-xl" />
+      <div className="min-w-0 flex-1">
+        <p translate="no" className={cx("truncate text-sm font-semibold", isCur && "text-acc")}>
+          {t.title}
+        </p>
+        <p translate="no" className="truncate text-xs text-muted">
+          {t.artist}
+        </p>
+        <div className="mt-2 flex items-center gap-2 text-[11px] font-semibold text-acc">
+          <div className="h-1 flex-1 overflow-hidden rounded-full bg-line">
+            <div className="grad-bg h-full" style={{ width: `${total ? Math.min(100, (at / total) * 100) : 0}%` }} />
           </div>
+          <span className="tabular-nums">{fmt(at)}</span>
         </div>
-        <span className="btn-luxe grid h-10 w-10 place-items-center rounded-full">
-          <Play className="ml-0.5 h-4 w-4 fill-current" />
-        </span>
-      </button>
-    </div>
+      </div>
+      <span className="btn-luxe grid h-9 w-9 shrink-0 place-items-center rounded-full">{isCur && playing ? <Pause className="h-4 w-4 fill-current" /> : <Play className="ml-0.5 h-4 w-4 fill-current" />}</span>
+    </button>
   );
+}
+
+function Continue({ kind }: { kind: SectionConfig["kind"] }) {
+  const progress = useLibrary((s) => s.progress);
+  const [now, setNow] = useState(0);
+  useEffect(() => setNow(Date.now()), []);
+  const items = Object.values(progress)
+    .filter((e) => e.track && e.pos > 5 && now - e.at < WEEK && (!e.dur || e.pos < e.dur - 15))
+    .sort((a, b) => b.at - a.at);
+  if (!items.length) return <p className="text-sm text-muted">Lagu yang anda jeda akan muncul di sini supaya anda boleh sambung dari saat yang sama.</p>;
+  const list = items.map((e) => e.track!) as Track[];
+  const cards = items.map((e, i) => <ContinueCard key={e.track!.id} t={e.track!} pos={e.pos} dur={e.dur} list={list} i={i} />);
+  return kind === "list" ? <div className="flex flex-col gap-2">{cards}</div> : <HScroll>{cards}</HScroll>;
 }
 
 function topArtists(limit: number): { id: string; name: string }[] {

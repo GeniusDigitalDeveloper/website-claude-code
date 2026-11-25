@@ -15,7 +15,7 @@ import { useSettings, type SettingsState } from "@/store/settings";
 import { useLayout, type LayoutState } from "@/store/layout";
 import type { UserPlaylist } from "./types";
 
-const LIB_KEYS = ["favourites", "playlists", "recent", "searchHistory", "savedAlbums", "artistPlays", "resume"] as const;
+const LIB_KEYS = ["favourites", "playlists", "recent", "searchHistory", "savedAlbums", "artistPlays", "resume", "progress"] as const;
 type LibKey = (typeof LIB_KEYS)[number];
 
 const strip = <T,>(o: T) => JSON.parse(JSON.stringify(o)) as T; // drop functions/undefined for Firestore

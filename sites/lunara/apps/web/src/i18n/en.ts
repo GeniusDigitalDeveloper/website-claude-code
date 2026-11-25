@@ -232,6 +232,11 @@ export const EN: Record<string, string> = {
   "Lagu penuh distrim melalui YouTube. Fail peranti dimainkan pada kualiti asal (termasuk FLAC lossless).": "Full songs stream through YouTube. Device files play at original quality (including lossless FLAC).",
   "Status lagu penuh (YouTube)": "Full-song status (YouTube)", "Uji sambungan lagu penuh dari peranti ini.": "Test the full-song connection from this device.",
   "Uji": "Test", "Menguji…": "Testing…", "Ralat, uji semula": "Error, test again", "Tiada kunci YouTube dalam binaan ini.": "No YouTube key in this build.",
+  "Seret untuk alih": "Drag to move", "Saiz kecil": "Small size", "Saiz sederhana": "Medium size", "Saiz besar": "Large size",
+  "Lekat di atas bar pemain": "Dock above the player bar",
+  "Sambung dari sini": "Continue from here",
+  "Muat turun": "Download", "Fail tidak dijumpai.": "File not found.",
+  "Kembali": "Back",
   "Seksyen tidak dikenali": "Unknown section", "Bukan fail layout LUNARA MUSIC": "Not a LUNARA MUSIC layout file",
 };
 
@@ -294,6 +299,7 @@ export const EN_PATTERNS: [RegExp, string][] = [
   [/^Mengimbas (\d+)\/(\d+)$/, "Scanning $1/$2"],
   [/^Diguna oleh app: (.+) daripada (.+)$/, "Used by the app: $1 of $2"],
   [/^Fail: (.+)$/, "File: $1"],
+  [/^Dimuat turun: (.+)$/, "Downloaded: $1"],
   [/^Tambah ke "(.+)"$/, "Add to \"$1\""],
   [/^Main album (.+)$/, "Play album $1"],
   [/^Main playlist (.+)$/, "Play playlist $1"],

@@ -23,6 +23,8 @@ export function TrackRow({ t, i, list, onRemove, removeLabel, showAlbum = true, 
   const playing = usePlayer((s) => s.playing);
   const fav = useLibrary((s) => s.favourites.some((f) => f.id === t.id));
   const compact = useLayout((s) => s.density === "compact");
+  const pr = useLibrary((s) => s.progress[t.id]);
+  const livePos = usePlayer((s) => (s.queue[s.index]?.id === t.id ? s.position : -1));
   const click = () => {
     if (isCur) usePlayer.getState().toggle();
     else void usePlayer.getState().playList(list, i, { shuffle: false });
@@ -74,7 +76,17 @@ export function TrackRow({ t, i, list, onRemove, removeLabel, showAlbum = true, 
         <button type="button" aria-label={fav ? `Buang ${t.title} dari kegemaran` : `Suka ${t.title}`} aria-pressed={fav} onClick={() => useLibrary.getState().toggleFav(t)} className={cx("hidden h-8 w-8 cursor-pointer place-items-center rounded-full transition hover:bg-card sm:grid", fav ? "text-rose-500" : "text-muted opacity-0 group-hover:opacity-100 focus:opacity-100")}>
           <Heart className={cx("h-4 w-4", fav && "fill-current")} />
         </button>
-        <span className="w-10 text-right text-xs tabular-nums text-muted">{fmt(t.duration)}</span>
+        {/* where the song got to (resumes from there), not the full length */}
+        {livePos >= 0 ? (
+          <span className="w-12 text-right text-xs font-semibold tabular-nums text-acc">{fmt(livePos)}</span>
+        ) : pr && pr.pos > 5 ? (
+          <span className="flex w-12 items-center justify-end gap-0.5 text-xs font-semibold tabular-nums text-acc" title="Sambung dari sini">
+            <Play className="h-2.5 w-2.5 fill-current" aria-hidden />
+            {fmt(pr.pos)}
+          </span>
+        ) : (
+          <span className="w-12 text-right text-xs tabular-nums text-muted">{fmt(t.duration)}</span>
+        )}
         <TrackMenu track={t} onRemove={onRemove} removeLabel={removeLabel} />
       </div>
     </div>

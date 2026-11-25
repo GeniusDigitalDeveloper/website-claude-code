@@ -10,7 +10,7 @@ const log = (...a) => console.log(...a);
   const page = await ctx.newPage();
   const errors = [];
   page.on('pageerror', e => errors.push('pageerror@' + page.url() + ': ' + e.message.split('\n').filter(l => /^\s*[+-]|^\s*<[A-Z]/.test(l)).slice(-14).join('\n')));
-  page.on('console', m => { if (m.type() === 'error') errors.push('console@' + page.url() + ': ' + m.text().split('\n').filter(l => /^\s*[+-]|@|<|tree/.test(l)).slice(0,25).join('\n')); });
+  page.on('console', m => { if (m.type() === 'error') errors.push('console@' + page.url() + ': ' + m.text().slice(0,160) + ' || ' + m.text().split('\n').filter(l => /^\s*[+-]|@|<|tree/.test(l)).slice(0,25).join('\n')); });
   await page.goto(URL, { waitUntil: 'load' });
   await page.evaluate(() => { localStorage.setItem('lunara-settings', JSON.stringify({ state: { language: 'ms', languageChosen: true, theme: 'light', colorTheme: 'lunara', fade: { enabled: true, fadeIn: true, fadeOut: true, fadeInSec: 2, fadeOutSec: 2, crossfade: false, crossfadeSec: 6 }, quality: 'high', autoplay: true, normalize: false, playbackRate: 1, notifications: true, keepHistory: true, privatePlaylistsByDefault: true, updatedAt: 1 }, version: 3 })); }); await page.reload({ waitUntil: 'load' });
   await page.waitForSelector('text=Nasyid Pilihan');
@@ -117,7 +117,8 @@ const log = (...a) => console.log(...a);
   await page.screenshot({ path: `${OUT}/10-home-compact-light.png` });
   log('theme attr:', await page.evaluate(() => document.documentElement.dataset.theme));
   // in-place edit mode
-  await page.locator('button:has-text("Edit layout")').click(); await sleep(600);
+  await page.goto(`${URL}/settings#layout`, { waitUntil: 'load' }); await sleep(1500);
+  await page.locator('section#layout button:has-text("Edit layout")').first().click(); await sleep(2500);
   await page.screenshot({ path: `${OUT}/11-edit-layout.png` });
   await page.locator('button:has-text("Siap")').click();
 

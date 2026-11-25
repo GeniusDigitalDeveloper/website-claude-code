@@ -9,7 +9,7 @@ import { useLibrary, syncSafe } from "./library";
 import { useSettings } from "./settings";
 import { toast } from "./toast";
 import { logPlaybackError } from "@/lib/log";
-import { findVideo, getYouTube, youtubeEnabled } from "@/lib/youtube";
+import { findVideo, findVideos, getYouTube, markBadVideo, youtubeEnabled } from "@/lib/youtube";
 import type { EngineEvent } from "@/lib/audio-engine";
 
 /** Which player is producing sound: the audio engine (device files, previews) or YouTube (full songs). */
@@ -91,6 +91,11 @@ export const usePlayer = create<PlayerState>()(
       async function loadCurrent(autoplay: boolean, startAt?: number) {
         const t = get().current();
         if (!t) return;
+        // Resume a partly-heard song from where the listener stopped (anywhere it is started from)
+        if (startAt === undefined) {
+          const pr = useLibrary.getState().progress[t.id];
+          if (pr && pr.pos > 5 && (!pr.dur || pr.pos < pr.dur - 15)) startAt = pr.pos;
+        }
         const my = ++loadSeq;
         xfadeFor = null;
         set({ position: startAt ?? 0, duration: t.playableSeconds || t.duration || 0, buffering: autoplay });
@@ -351,7 +356,7 @@ export function wirePlayer() {
       const t = s.current();
       if (t && Date.now() - lastResumeSave > 5000 && ev.position > 1) {
         lastResumeSave = Date.now();
-        useLibrary.getState().setResume(t, ev.position);
+        useLibrary.getState().setResume(t, ev.position, ev.duration);
       }
       if ("mediaSession" in navigator && ev.duration && Number.isFinite(ev.duration)) {
         try {
@@ -384,18 +389,23 @@ export function wirePlayer() {
     } else if (ev.type === "state") usePlayer.setState({ playing: ev.playing });
     else if (ev.type === "buffering") usePlayer.setState({ buffering: ev.buffering });
     else if (ev.type === "ended") {
+      const done = usePlayer.getState().current();
+      if (done) useLibrary.getState().clearProgress(done.id); // finished: next time starts from the beginning
       void usePlayer.getState().next(true);
     }
     else if (ev.type === "error" && from === "yt") {
-      // YouTube video unavailable/blocked: remember it and fall back to normal audio silently
+      // This video can't be embedded (owner blocked it): try the next candidate, then fall back silently
       const cur = usePlayer.getState().current();
-      if (cur) {
-        try {
-          localStorage.setItem("lunara-yt:" + cur.id.replace(/^dz:/, ""), "-");
-        } catch {
-          /* ignore */
+      const yt = getYouTube();
+      if (cur && yt.videoId) {
+        const bad = yt.videoId;
+        markBadVideo(cur, bad);
+        const next = (await findVideos(cur)).find((v) => v !== bad);
+        if (next && yt.active) {
+          void yt.load(next, { autoplay: true, startAt: 0 });
+          return;
         }
-        getYouTube().stop();
+        yt.stop();
         backend = "audio";
         void usePlayer.getState().jumpTo(usePlayer.getState().index);
       }
@@ -406,6 +416,19 @@ export function wirePlayer() {
     }
     if (ev.type === "state" && "mediaSession" in navigator) navigator.mediaSession.playbackState = ev.playing ? "playing" : "paused";
   };
+  // Safety net: keep every Play/Pause button in sync with what is really audible.
+  // A mismatch must last 6 s (longer than the longest fade) before it is corrected.
+  let mismatch = 0;
+  setInterval(() => {
+    const st = usePlayer.getState();
+    if (!st.queue.length) return;
+    const real = backend === "yt" ? yt.busy : e.playing;
+    mismatch = real !== st.playing ? mismatch + 1 : 0;
+    if (mismatch >= 6) {
+      mismatch = 0;
+      usePlayer.setState({ playing: real });
+    }
+  }, 1000);
   e.on((ev) => void handle(ev, "audio"));
   yt.on((ev) => void handle(ev, "yt"));
 

@@ -5,7 +5,8 @@ import { motion } from "motion/react";
 import type { Album, Artist, PlaylistSummary, Track } from "@/lib/types";
 import { useLayout } from "@/store/layout";
 import { usePlayer } from "@/store/player";
-import { Artwork, cx, SourceBadge } from "../ui";
+import { Artwork, cx, fmt, SourceBadge } from "../ui";
+import { useLibrary } from "@/store/library";
 
 export const cardWidth = (s: "s" | "m" | "l") => (s === "s" ? "w-32 md:w-36" : s === "l" ? "w-44 md:w-56" : "w-36 md:w-44");
 
@@ -49,16 +50,30 @@ export function TrackCard({ t, list, i, grid }: { t: Track; list: Track[]; i: nu
   const isCur = usePlayer((s) => s.queue[s.index]?.id === t.id);
   const playing = usePlayer((s) => s.playing);
   const go = () => (isCur ? usePlayer.getState().toggle() : usePlayer.getState().playList(list, i, { shuffle: false }));
+  const pr = useLibrary((s) => s.progress[t.id]);
   return (
     <Shell grid={grid} href={t.albumId ? `/album?id=${t.albumId}` : undefined}>
       <div className="relative">
         <Artwork src={t.artwork} alt={`${t.title} oleh ${t.artist}`} className="aspect-square w-full shadow-[var(--shadow)]" />
+        {pr && pr.pos > 5 && pr.dur > 0 && <ResumeBar pos={pr.pos} dur={pr.dur} />}
         {t.playable && <PlayFab onClick={go} label={isCur && playing ? `Jeda ${t.title}` : `Main ${t.title}`} active={isCur && playing} />}
       </div>
       <p translate="no" className={cx("mt-2.5 truncate text-sm font-semibold", isCur && "text-acc")}>{t.title}</p>
       <p translate="no" className="mt-0.5 truncate text-xs text-muted">{t.artist}</p>
       <SourceBadge t={t} className="mt-1.5" />
     </Shell>
+  );
+}
+
+/** Thin bar on a cover showing how far a song was heard, plus the resume time. */
+export function ResumeBar({ pos, dur }: { pos: number; dur: number }) {
+  return (
+    <div className="absolute inset-x-2 bottom-2 flex items-center gap-1.5 rounded-full bg-black/55 px-2 py-1 text-[10px] font-semibold text-white backdrop-blur" title="Sambung dari sini">
+      <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/30">
+        <div className="h-full rounded-full bg-white" style={{ width: `${Math.min(100, (pos / dur) * 100)}%` }} />
+      </div>
+      <span className="tabular-nums">{fmt(pos)}</span>
+    </div>
   );
 }
 

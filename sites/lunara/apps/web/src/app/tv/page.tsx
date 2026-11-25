@@ -9,6 +9,8 @@ import type { Track } from "@/lib/types";
 import { useLibrary } from "@/store/library";
 import { usePlayer } from "@/store/player";
 import { Artwork, cx, fmt, HScroll } from "@/components/ui";
+import { ResumeBar } from "@/components/music/Cards";
+import { goBack } from "@/components/shell/BackButton";
 import { Mark, Wordmark } from "@/components/shell/Logo";
 
 /**
@@ -63,6 +65,12 @@ function useSpatialNav(root: React.RefObject<HTMLElement | null>, onBack: () => 
   }, [root, onBack]);
 }
 
+function TvProgress({ id }: { id: string }) {
+  const pr = useLibrary((s) => s.progress[id]);
+  if (!pr || pr.pos <= 5 || !pr.dur) return null;
+  return <ResumeBar pos={pr.pos} dur={pr.dur} />;
+}
+
 function Row({ title, tracks }: { title: string; tracks: Track[] }) {
   if (!tracks.length) return null;
   return (
@@ -71,7 +79,10 @@ function Row({ title, tracks }: { title: string; tracks: Track[] }) {
       <HScroll tv className="gap-6 p-3 md:gap-6">
         {tracks.map((t, i) => (
           <button key={`${t.id}-${i}`} data-tv onClick={() => usePlayer.getState().playList(tracks, i, { shuffle: false })} className="group w-52 shrink-0 snap-start cursor-pointer rounded-2xl p-2 text-left transition focus:scale-105 focus:bg-card">
-            <Artwork src={t.artwork} alt="" className="aspect-square w-full shadow-xl" rounded="rounded-xl" />
+            <span className="relative block">
+              <Artwork src={t.artwork} alt="" className="aspect-square w-full shadow-xl" rounded="rounded-xl" />
+              <TvProgress id={t.id} />
+            </span>
             <p translate="no" className="mt-3 truncate text-lg font-semibold">{t.title}</p>
             <p translate="no" className="truncate text-base text-muted">{t.artist}</p>
           </button>
@@ -97,7 +108,7 @@ export default function TV() {
   const playing = usePlayer((s) => s.playing);
   const pos = usePlayer((s) => s.position);
   const dur = usePlayer((s) => s.duration);
-  useSpatialNav(root, () => (tab !== "discover" ? setTab("discover") : router.push("/")));
+  useSpatialNav(root, () => (tab !== "discover" ? setTab("discover") : goBack(router)));
   useEffect(() => {
     document.documentElement.dataset.tv = "1";
     root.current?.querySelector<HTMLElement>("[data-tv]")?.focus();
@@ -107,7 +118,7 @@ export default function TV() {
   return (
     <div ref={root} className="min-h-dvh px-[5vw] py-[4vh] text-lg">
       <header className="flex items-center gap-6">
-        <button data-tv onClick={() => router.push("/")} aria-label="Keluar mod TV" className="grid h-12 w-12 cursor-pointer place-items-center rounded-full ring-1 ring-line focus:bg-card">
+        <button data-tv onClick={() => goBack(router)} aria-label="Keluar mod TV" className="grid h-12 w-12 cursor-pointer place-items-center rounded-full ring-1 ring-line focus:bg-card">
           <ArrowLeft className="h-6 w-6" />
         </button>
         <Mark size={48} />

@@ -25,6 +25,9 @@ export interface LibraryState {
   localTracks: LocalTrack[];
   artistPlays: Record<string, { name: string; count: number }>;
   resume: { track: Track; position: number; at: number } | null;
+  /** how far each partly-heard song got (seconds), so every list can show it and resume from there */
+  progress: Record<string, { pos: number; dur: number; at: number; track?: Track }>;
+  clearProgress: (id: string) => void;
   updatedAt: Record<string, number>;
   hydrated: boolean;
 
@@ -32,7 +35,7 @@ export interface LibraryState {
   toggleFav: (t: Track) => void;
   addRecent: (t: Track) => void;
   clearRecent: () => void;
-  setResume: (t: Track, position: number) => void;
+  setResume: (t: Track, position: number, duration?: number) => void;
   addSearch: (q: string) => void;
   removeSearch: (q: string) => void;
   clearSearch: () => void;
@@ -65,6 +68,7 @@ export const useLibrary = create<LibraryState>()(
         localTracks: [],
         artistPlays: {},
         resume: null,
+        progress: {},
         updatedAt: {},
         hydrated: false,
 
@@ -81,7 +85,21 @@ export const useLibrary = create<LibraryState>()(
             return { recent: [syncSafe(t), ...s.recent.filter((x) => x.id !== t.id)].slice(0, 50), artistPlays: plays, ...touch("recent", "artistPlays") };
           }),
         clearRecent: () => set({ recent: [], resume: null, ...touch("recent") }),
-        setResume: (t, position) => set({ resume: { track: syncSafe(t), position, at: now() }, ...touch("resume") }),
+        setResume: (t, position, duration = 0) =>
+          set((s) => {
+            const progress = { ...s.progress, [t.id]: { pos: Math.round(position), dur: Math.round(duration || t.duration || 0), at: now(), track: syncSafe(t) } };
+            // keep the 120 most recent, and drop anything not resumed for a week
+            const week = now() - 7 * 86_400_000;
+            const keep = Object.entries(progress).filter(([, v]) => v.at > week).sort((a, b) => b[1].at - a[1].at).slice(0, 120);
+            return { resume: { track: syncSafe(t), position, at: now() }, progress: Object.fromEntries(keep), ...touch("resume", "progress") };
+          }),
+        clearProgress: (id) =>
+          set((s) => {
+            if (!s.progress[id]) return {};
+            const progress = { ...s.progress };
+            delete progress[id];
+            return { progress, ...touch("progress") };
+          }),
         addSearch: (q) =>
           set((s) => ({ searchHistory: [q, ...s.searchHistory.filter((x) => x.toLowerCase() !== q.toLowerCase())].slice(0, 15), ...touch("searchHistory") })),
         removeSearch: (q) => set((s) => ({ searchHistory: s.searchHistory.filter((x) => x !== q), ...touch("searchHistory") })),

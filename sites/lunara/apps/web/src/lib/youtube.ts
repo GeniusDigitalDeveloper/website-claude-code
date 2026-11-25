@@ -49,6 +49,30 @@ function norm(s: string) {
     .trim();
 }
 
+/** Best playable YouTube video candidates for a catalogue track (best first). Empty when unavailable. */
+export async function findVideos(t: Track): Promise<string[]> {
+  const v = await findVideo(t);
+  if (!v) return [];
+  try {
+    const extra = JSON.parse(localStorage.getItem(LS + "c:" + dzId(t)) ?? "[]") as string[];
+    return [v, ...extra.filter((x) => x !== v)];
+  } catch {
+    return [v];
+  }
+}
+
+/** Remember that a video can't be embedded, so it is skipped next time. */
+export function markBadVideo(t: Track, videoId: string) {
+  const id = dzId(t);
+  try {
+    const extra = (JSON.parse(localStorage.getItem(LS + "c:" + id) ?? "[]") as string[]).filter((x) => x !== videoId);
+    localStorage.setItem(LS + "c:" + id, JSON.stringify(extra));
+    localStorage.setItem(LS + id, extra[0] ?? "-");
+  } catch {
+    /* ignore */
+  }
+}
+
 /** Find (and cache) the YouTube video for a catalogue track. Returns null when unavailable. */
 export async function findVideo(t: Track): Promise<string | null> {
   if (t.provider !== "deezer") return null;
@@ -71,7 +95,7 @@ export async function findVideo(t: Track): Promise<string | null> {
   }
   if (!youtubeEnabled()) return null;
   const q = `${t.artist} ${t.title}`;
-  const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoEmbeddable=true&maxResults=5&q=${encodeURIComponent(q)}&key=${KEY}`;
+  const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoEmbeddable=true&videoSyndicated=true&maxResults=8&q=${encodeURIComponent(q)}&key=${KEY}`;
   let data: { items?: { id: { videoId: string }; snippet: { title: string; channelTitle: string } }[]; error?: { code: number } };
   try {
     data = await (await fetch(url)).json();
@@ -95,9 +119,14 @@ export async function findVideo(t: Track): Promise<string | null> {
     if (/official|audio|topic|music video|lirik/.test(s)) p += 1;
     return p;
   };
-  const best = [...items].sort((a, b) => score(b) - score(a))[0];
-  const vid = best && score(best) >= 3 ? best.id.videoId : null;
+  const ranked = [...items].filter((it) => score(it) >= 3).sort((a, b) => score(b) - score(a)).map((it) => it.id.videoId);
+  const vid = ranked[0] ?? null;
   remember(id, vid ?? "-");
+  try {
+    localStorage.setItem(LS + "c:" + id, JSON.stringify(ranked.slice(1)));
+  } catch {
+    /* ignore */
+  }
   if (vid && d && auth()?.currentUser) void setDoc(doc(d, "lunara_yt", id), { v: vid, at: serverTimestamp() }).catch(() => {});
   return vid;
 }
@@ -176,7 +205,7 @@ class YouTubeDeck {
               resolve();
             },
             onStateChange: (e: { data: number }) => this.onState(e.data),
-            onError: () => this.emit({ type: "error", message: "Video lagu ini tidak boleh dimainkan." }),
+            onError: (e: { data: number }) => this.emit({ type: "error", message: `yt:${e.data}` }),
           },
         });
       };
@@ -235,6 +264,12 @@ class YouTubeDeck {
     }, 250);
   }
 
+  /** playing or buffering */
+  get busy() {
+    if (!this.player) return false;
+    const st = this.player.getPlayerState();
+    return st === 1 || st === 3;
+  }
   get playing() {
     return this.player ? this.player.getPlayerState() === 1 : false;
   }

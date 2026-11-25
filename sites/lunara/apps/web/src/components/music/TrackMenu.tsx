@@ -1,5 +1,5 @@
 "use client";
-import { Disc3, Heart, ListEnd, ListPlus, ListStart, MoreHorizontal, Plus, Trash2, User } from "lucide-react";
+import { Disc3, Download, Heart, ListEnd, ListPlus, ListStart, MoreHorizontal, Plus, Trash2, User } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -7,6 +7,7 @@ import type { Track } from "@/lib/types";
 import { useLibrary } from "@/store/library";
 import { usePlayer } from "@/store/player";
 import { toast } from "@/store/toast";
+import { localUrl } from "@/lib/local-music";
 import { cx } from "../ui";
 
 export function TrackMenu({ track, onRemove, removeLabel = "Buang dari senarai ini", className }: { track: Track; onRemove?: () => void; removeLabel?: string; className?: string }) {
@@ -76,6 +77,30 @@ export function TrackMenu({ track, onRemove, removeLabel = "Buang dari senarai i
                   <button role="menuitem" className={item} onClick={act(() => useLibrary.getState().toggleFav(track))}>
                     <Heart className={cx("h-4 w-4", fav && "fill-current text-rose-500")} /> {fav ? "Buang dari kegemaran" : "Suka lagu ini"}
                   </button>
+                  {track.provider === "device" && (
+                    <button
+                      role="menuitem"
+                      className={item}
+                      onClick={act(async () => {
+                        // the user's own file (device/imported music): save a copy
+                        try {
+                          const lt = useLibrary.getState().localTracks.find((x) => x.id === track.id);
+                          if (!lt) throw new Error("Fail tidak dijumpai.");
+                          const a = document.createElement("a");
+                          a.href = await localUrl(lt);
+                          a.download = lt.local.fileName;
+                          document.body.appendChild(a);
+                          a.click();
+                          a.remove();
+                          toast(`Dimuat turun: ${lt.local.fileName}`);
+                        } catch (e) {
+                          toast((e as Error).message);
+                        }
+                      })}
+                    >
+                      <Download className="h-4 w-4" /> Muat turun
+                    </button>
+                  )}
                   {track.albumId && (
                     <Link role="menuitem" href={`/album?id=${track.albumId}`} className={item} onClick={() => setOpen(false)}>
                       <Disc3 className="h-4 w-4" /> Pergi ke album
