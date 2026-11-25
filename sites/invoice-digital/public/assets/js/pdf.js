@@ -121,7 +121,7 @@ export async function buildPdf(type, doc, company = {}, opts = {}) {
   if (company.regNo) rawLines.push({ s: `${t("pdf_regno")}: ${company.regNo}`, bold: true }); // tepat di bawah nama syarikat, ditulis penuh, hitam tebal
   if (company.address) rawLines.push({ s: company.address });
   // Hubungan: "Tel: nombor" dan garis "|" TEBAL hitam (sama seperti No. Pendaftaran); e-mel teks biasa. Jika tak muat sebaris, e-mel turun baris baharu.
-  const contactSegs = []; if (company.phone) contactSegs.push({ s: `${t("pdf_tel")} ${company.phone}`, bold: true }); if (company.phone && company.email) contactSegs.push({ s: "   |   ", bold: true }); if (company.email) contactSegs.push({ s: company.email, bold: false });
+  const contactSegs = []; if (company.phone) contactSegs.push({ s: `${t("pdf_tel")} ${company.phone}`, bold: false }); if (company.phone && company.email) contactSegs.push({ s: "   |   ", bold: false }); if (company.email) contactSegs.push({ s: company.email, bold: false });
   if (contactSegs.length) rawLines.push({ segs: contactSegs });
   if (company.website) rawLines.push({ s: company.website });
   const detail = []; pdf.setFontSize(8.5);
@@ -271,12 +271,44 @@ export async function buildPdf(type, doc, company = {}, opts = {}) {
 
 export const pdfBlob = (pdf) => pdf.output("blob");
 const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-export function printPdf(pdf) {
+// Cetak: halaman PDF dilukis sebagai imej A4 tepat (@page size A4, margin 0) supaya hasil cetakan SAMA sebiji dengan pratonton.
+// (Mencetak PDF terus melalui pemapar pelayar sering lalai ke saiz kertas Letter dan memotong bahagian bawah/footer.)
+let pdfjsP;
+const loadPdfjs = () => (pdfjsP ||= (async () => {
+  if (!window.pdfjsLib) await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js");
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  return window.pdfjsLib;
+})().catch((e) => { pdfjsP = null; throw e; }));
+export async function pdfToImages(pdf, scale = 3) {
+  const lib = await loadPdfjs();
+  const doc = await lib.getDocument({ data: pdf.output("arraybuffer") }).promise; const out = [];
+  for (let i = 1; i <= doc.numPages; i++) {
+    const page = await doc.getPage(i), vp = page.getViewport({ scale });
+    const c = document.createElement("canvas"); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+    const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height);
+    await page.render({ canvasContext: g, viewport: vp }).promise; out.push(c.toDataURL("image/png")); c.width = c.height = 0;
+  }
+  doc.destroy(); return out;
+}
+function printPdfViewer(pdf) {
   const url = URL.createObjectURL(pdf.output("blob"));
-  if (isIOS()) { window.open(url, "_blank"); return; } // iOS tidak membenarkan print() daripada iframe; pengguna cetak dari pemapar PDF
+  if (isIOS()) { window.open(url, "_blank"); return; }
   const f = document.createElement("iframe"); f.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0"; f.src = url;
   f.onload = () => { try { f.contentWindow.focus(); f.contentWindow.print(); } catch { window.open(url, "_blank"); } setTimeout(() => { f.remove(); URL.revokeObjectURL(url); }, 60000); };
   document.body.append(f);
+}
+export async function printPdf(pdf) {
+  if (isIOS()) return printPdfViewer(pdf); // iOS tidak membenarkan print() daripada iframe
+  let imgs;
+  try { imgs = await pdfToImages(pdf); } catch (e) { console.warn("pdfjs", e); return printPdfViewer(pdf); }
+  const html = `<!doctype html><html><head><meta charset="utf-8"><title>Cetak</title><style>@page{size:A4 portrait;margin:0}html,body{margin:0;padding:0;background:#fff}img{display:block;width:210mm;height:297mm;page-break-after:always;break-after:page}img:last-child{page-break-after:auto;break-after:auto}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}</style></head><body>${imgs.map((src) => `<img src="${src}" alt="">`).join("")}</body></html>`;
+  const f = document.createElement("iframe"); f.setAttribute("aria-hidden", "true"); f.style.cssText = "position:fixed;left:-10000px;top:0;width:210mm;height:297mm;border:0;visibility:hidden";
+  document.body.append(f);
+  const d = f.contentDocument; d.open(); d.write(html); d.close();
+  const go = () => { try { f.contentWindow.focus(); f.contentWindow.print(); } catch { printPdfViewer(pdf); } setTimeout(() => f.remove(), 60000); };
+  const ims = [...d.images]; let left = ims.length;
+  if (!left) return go();
+  ims.forEach((im) => { if (im.complete) { if (--left === 0) go(); } else im.onload = im.onerror = () => { if (--left === 0) go(); }; });
 }
 export async function sharePdf(pdf, filename, text) {
   const blob = pdf.output("blob"); const file = new File([blob], filename, { type: "application/pdf" });
