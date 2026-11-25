@@ -1,5 +1,5 @@
 "use client";
-import { Disc3, Heart, ListEnd, ListPlus, ListStart, MoreHorizontal, Plus, Trash2, User } from "lucide-react";
+import { Disc3, ExternalLink, Heart, ListEnd, ListPlus, ListStart, MoreHorizontal, Plus, Trash2, User } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -76,6 +76,11 @@ export function TrackMenu({ track, onRemove, removeLabel = "Buang dari senarai i
                   <button role="menuitem" className={item} onClick={act(() => useLibrary.getState().toggleFav(track))}>
                     <Heart className={cx("h-4 w-4", fav && "fill-current text-rose-500")} /> {fav ? "Buang dari kegemaran" : "Suka lagu ini"}
                   </button>
+                  {track.provider === "deezer" && (
+                    <a role="menuitem" href={`https://www.deezer.com/track/${track.id.replace(/^dz:/, "")}`} target="_blank" rel="noopener noreferrer" className={item} onClick={() => setOpen(false)}>
+                      <ExternalLink className="h-4 w-4" /> Dengar lagu penuh (Deezer)
+                    </a>
+                  )}
                   {track.albumId && (
                     <Link role="menuitem" href={`/album?id=${track.albumId}`} className={item} onClick={() => setOpen(false)}>
                       <Disc3 className="h-4 w-4" /> Pergi ke album

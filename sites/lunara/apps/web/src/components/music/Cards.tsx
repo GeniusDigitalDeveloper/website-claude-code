@@ -20,7 +20,7 @@ function PlayFab({ onClick, label, active }: { onClick: () => void; label: strin
         onClick();
       }}
       className={cx(
-        "grad-bg absolute right-2 bottom-2 grid h-11 w-11 cursor-pointer place-items-center rounded-full text-white shadow-xl transition duration-300",
+        "btn-luxe absolute right-2 bottom-2 grid h-11 w-11 cursor-pointer place-items-center rounded-full shadow-xl transition duration-300",
         active ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100",
       )}
     >
@@ -55,8 +55,8 @@ export function TrackCard({ t, list, i, grid }: { t: Track; list: Track[]; i: nu
         <Artwork src={t.artwork} alt={`${t.title} oleh ${t.artist}`} className="aspect-square w-full shadow-[var(--shadow)]" />
         {t.playable && <PlayFab onClick={go} label={isCur && playing ? `Jeda ${t.title}` : `Main ${t.title}`} active={isCur && playing} />}
       </div>
-      <p className={cx("mt-2.5 truncate text-sm font-semibold", isCur && "text-acc")}>{t.title}</p>
-      <p className="mt-0.5 truncate text-xs text-muted">{t.artist}</p>
+      <p translate="no" className={cx("mt-2.5 truncate text-sm font-semibold", isCur && "text-acc")}>{t.title}</p>
+      <p translate="no" className="mt-0.5 truncate text-xs text-muted">{t.artist}</p>
       <SourceBadge t={t} className="mt-1.5" />
     </Shell>
   );
@@ -69,7 +69,7 @@ export function AlbumCard({ a, grid, onPlay }: { a: Album; grid?: boolean; onPla
         <Artwork src={a.cover} alt={`Album ${a.title}`} className="aspect-square w-full shadow-[var(--shadow)]" />
         {onPlay && <PlayFab onClick={onPlay} label={`Main album ${a.title}`} />}
       </div>
-      <p className="mt-2.5 truncate text-sm font-semibold">{a.title}</p>
+      <p translate="no" className="mt-2.5 truncate text-sm font-semibold">{a.title}</p>
       <p className="mt-0.5 truncate text-xs text-muted">
         {a.artist}
         {a.releaseDate ? ` · ${a.releaseDate.slice(0, 4)}` : ""}
@@ -85,7 +85,7 @@ export function PlaylistCard({ p, href, onPlay, grid }: { p: PlaylistSummary; hr
         <Artwork src={p.cover} alt={`Playlist ${p.title}`} className="aspect-square w-full shadow-[var(--shadow)]" />
         {onPlay && <PlayFab onClick={onPlay} label={`Main playlist ${p.title}`} />}
       </div>
-      <p className="mt-2.5 truncate text-sm font-semibold">{p.title}</p>
+      <p translate="no" className="mt-2.5 truncate text-sm font-semibold">{p.title}</p>
       <p className="mt-0.5 truncate text-xs text-muted">{p.creator ?? (p.nbTracks ? `${p.nbTracks} lagu` : "Playlist")}</p>
     </Shell>
   );
@@ -96,7 +96,7 @@ export function ArtistCircle({ a, grid }: { a: Artist; grid?: boolean }) {
   return (
     <Link href={`/artist?id=${a.id}`} className={cx("group block shrink-0 snap-start cursor-pointer rounded-[var(--radius)] p-2.5 text-center transition hover:bg-card-hover", !grid && cardWidth(size))}>
       <Artwork src={a.picture} alt={a.name} className="aspect-square w-full shadow-[var(--shadow)] transition-transform duration-300 group-hover:scale-[1.03]" rounded="rounded-full" />
-      <p className="mt-2.5 truncate text-sm font-semibold">{a.name}</p>
+      <p translate="no" className="mt-2.5 truncate text-sm font-semibold">{a.name}</p>
       <p className="mt-0.5 text-xs text-muted">{a.fans ? `${Intl.NumberFormat("ms", { notation: "compact" }).format(a.fans)} peminat` : "Artis"}</p>
     </Link>
   );

@@ -45,22 +45,22 @@ export function TrackRow({ t, i, list, onRemove, removeLabel, showAlbum = true, 
       <div className="min-w-0">
         <div className="flex items-center gap-2">
           {isCur && <NowEq paused={!playing} />}
-          <span className={cx("truncate text-sm font-semibold", isCur && "text-acc")}>{t.title}</span>
+          <span translate="no" className={cx("truncate text-sm font-semibold", isCur && "text-acc")}>{t.title}</span>
           {t.explicit && <span className="rounded bg-card-hover px-1 text-[9px] font-bold text-muted">E</span>}
         </div>
         <div className="mt-0.5 flex min-w-0 items-center gap-2 text-xs text-muted">
           {t.artistId ? (
-            <Link href={`/artist?id=${t.artistId}`} className="truncate hover:text-fg hover:underline">
+            <Link translate="no" href={`/artist?id=${t.artistId}`} className="truncate hover:text-fg hover:underline">
               {t.artist}
             </Link>
           ) : (
-            <span className="truncate">{t.artist}</span>
+            <span translate="no" className="truncate">{t.artist}</span>
           )}
           <SourceBadge t={t} className="shrink-0" />
         </div>
       </div>
       {showAlbum && (
-        <div className="hidden min-w-0 text-xs text-muted md:block">
+        <div translate="no" className="hidden min-w-0 text-xs text-muted md:block">
           {t.albumId ? (
             <Link href={`/album?id=${t.albumId}`} className="truncate hover:text-fg hover:underline">
               {t.album}

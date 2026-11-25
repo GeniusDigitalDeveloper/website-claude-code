@@ -1,11 +1,10 @@
-import { Compass, HardDrive, Heart, Home, LayoutDashboard, Library, Search, Settings, Shield, Tv, UserRound } from "lucide-react";
+import { Compass, HardDrive, Heart, Home, LayoutDashboard, Library, Settings, Shield, Tv, UserRound } from "lucide-react";
 
 export const NAV = [
   { href: "/", label: "Utama", icon: Home, mobile: true },
-  { href: "/search", label: "Cari", icon: Search, mobile: true },
   { href: "/explore", label: "Teroka", icon: Compass },
   { href: "/library", label: "Pustaka", icon: Library, mobile: true },
-  { href: "/favourites", label: "Kegemaran", icon: Heart },
+  { href: "/favourites", label: "Kegemaran", icon: Heart, mobile: true },
   { href: "/local", label: "Muzik Peranti", icon: HardDrive, mobile: true },
 ];
 export const NAV_2 = [

@@ -3,6 +3,7 @@ import { ArrowLeft, Compass, Heart, Library, Pause, Play, Search, SkipBack, Skip
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { catalog } from "@/lib/catalog";
+import { albumsFrom, MALAY, mixFrom } from "@/lib/malay";
 import { useAsync } from "@/lib/useAsync";
 import type { Track } from "@/lib/types";
 import { useLibrary } from "@/store/library";
@@ -71,8 +72,8 @@ function Row({ title, tracks }: { title: string; tracks: Track[] }) {
         {tracks.map((t, i) => (
           <button key={`${t.id}-${i}`} data-tv onClick={() => usePlayer.getState().playList(tracks, i, { shuffle: false })} className="group w-52 shrink-0 cursor-pointer rounded-2xl p-2 text-left transition focus:scale-105 focus:bg-card">
             <Artwork src={t.artwork} alt="" className="aspect-square w-full shadow-xl" rounded="rounded-xl" />
-            <p className="mt-3 truncate text-lg font-semibold">{t.title}</p>
-            <p className="truncate text-base text-muted">{t.artist}</p>
+            <p translate="no" className="mt-3 truncate text-lg font-semibold">{t.title}</p>
+            <p translate="no" className="truncate text-base text-muted">{t.artist}</p>
           </button>
         ))}
       </div>
@@ -86,8 +87,9 @@ export default function TV() {
   const [tab, setTab] = useState<"discover" | "library" | "search">("discover");
   const [q, setQ] = useState("");
   const [term, setTerm] = useState("");
-  const chart = useAsync("chart", () => catalog.chart());
-  const rel = useAsync("releases", () => catalog.newReleases());
+  const nasyid = useAsync("my:nasyid", () => mixFrom(MALAY.nasyid, 4));
+  const jiwang = useAsync("my:jiwang", () => mixFrom(MALAY.jiwang, 3));
+  const rel = useAsync("my:rockAlbums", () => albumsFrom(MALAY.rock, 2));
   const res = useAsync(term ? `search:${term}` : null, () => catalog.searchAll(term));
   const favs = useLibrary((s) => s.favourites);
   const recent = useLibrary((s) => s.recent);
@@ -127,7 +129,7 @@ export default function TV() {
           <div className="ml-auto flex items-center gap-3 rounded-2xl bg-card p-2 pr-3 ring-1 ring-line">
             <Artwork src={cur.artwork} alt="" className="h-14 w-14" rounded="rounded-lg" />
             <div className="w-56 min-w-0">
-              <p className="truncate font-semibold">{cur.title}</p>
+              <p translate="no" className="truncate font-semibold">{cur.title}</p>
               <p className="truncate text-sm text-muted">
                 {cur.artist} · {fmt(pos)}/{fmt(dur)}
               </p>
@@ -153,7 +155,7 @@ export default function TV() {
               <img src={hero.cover} alt="" aria-hidden className="absolute inset-0 -z-10 h-full w-full object-cover opacity-50 blur-2xl" />
               <Artwork src={hero.cover} alt="" className="h-64 w-64 shadow-2xl" rounded="rounded-2xl" />
               <div>
-                <p className="text-base font-semibold text-muted uppercase">Keluaran pilihan</p>
+                <p className="text-base font-semibold text-muted uppercase">Album pilihan</p>
                 <h1 className="mt-2 font-display text-6xl font-extrabold">{hero.title}</h1>
                 <p className="mt-2 text-2xl text-muted">{hero.artist}</p>
                 <button
@@ -162,14 +164,15 @@ export default function TV() {
                     const a = await catalog.album(hero.id);
                     if (a.tracks) void usePlayer.getState().playList(a.tracks, 0, { shuffle: false });
                   }}
-                  className="grad-bg mt-6 flex cursor-pointer items-center gap-3 rounded-full px-8 py-4 text-xl font-bold text-white focus:scale-105"
+                  className="btn-luxe mt-6 flex cursor-pointer items-center gap-3 rounded-full px-8 py-4 text-xl font-bold focus:scale-105"
                 >
                   <Play className="h-6 w-6 fill-current" /> Main sekarang
                 </button>
               </div>
             </div>
           )}
-          <Row title="Trending Seluruh Dunia" tracks={chart.data?.tracks ?? []} />
+          <Row title="Nasyid Pilihan" tracks={nasyid.data ?? []} />
+          <Row title="Rock Jiwang & Balada Melayu" tracks={jiwang.data ?? []} />
           {recent.length > 0 && <Row title="Baru Dimainkan" tracks={recent} />}
         </>
       )}

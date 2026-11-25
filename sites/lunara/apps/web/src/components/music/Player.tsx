@@ -7,7 +7,7 @@ import { useLayout } from "@/store/layout";
 import { useLibrary } from "@/store/library";
 import { usePlayer } from "@/store/player";
 import { useSettings } from "@/store/settings";
-import { Artwork, cx, fmt, IconBtn, SourceBadge } from "../ui";
+import { Artwork, cx, fmt, FullSongLink, IconBtn, SourceBadge } from "../ui";
 import { QueueList } from "./Queue";
 
 function Seek({ big }: { big?: boolean }) {
@@ -129,12 +129,13 @@ export function PlayerBar() {
         <button type="button" onClick={() => usePlayer.getState().setUi({ fullOpen: true })} className="flex min-w-0 flex-1 cursor-pointer items-center gap-3 text-left md:w-[30%] md:flex-none" aria-label="Buka pemain skrin penuh">
           <Artwork src={t.artwork} alt="" className="h-11 w-11 md:h-14 md:w-14" rounded="rounded-xl" />
           <span className="min-w-0">
-            <span className="block truncate text-sm font-semibold">{t.title}</span>
+            <span translate="no" className="block truncate text-sm font-semibold">{t.title}</span>
             <span className="flex items-center gap-2 truncate text-xs text-muted">
-              {t.artist} <SourceBadge t={t} className="hidden sm:inline-flex" />
+              <span translate="no">{t.artist}</span> <SourceBadge t={t} className="hidden sm:inline-flex" />
             </span>
           </span>
         </button>
+        <FullSongLink t={t} className="hidden lg:inline-flex" />
         <IconBtn label={fav ? "Buang dari kegemaran" : "Suka lagu ini"} active={fav} onClick={() => useLibrary.getState().toggleFav(t)} size="sm" className="hidden md:grid">
           <Heart className={cx("h-4 w-4", fav && "fill-current text-rose-500")} />
         </IconBtn>
@@ -198,7 +199,7 @@ export function FullPlayer() {
               </IconBtn>
               <div className="flex gap-1 rounded-full bg-card/70 p-1 ring-1 ring-line lg:hidden">
                 {(["art", "queue"] as const).map((k) => (
-                  <button key={k} onClick={() => setTab(k)} className={cx("cursor-pointer rounded-full px-3 py-1 text-xs font-semibold", tab === k ? "grad-bg text-white" : "text-muted")}>
+                  <button key={k} onClick={() => setTab(k)} className={cx("cursor-pointer rounded-full px-3 py-1 text-xs font-semibold", tab === k ? "btn-luxe font-bold" : "text-muted")}>
                     {k === "art" ? "Sedang dimainkan" : "Giliran"}
                   </button>
                 ))}
@@ -213,8 +214,8 @@ export function FullPlayer() {
                 <div className="w-full max-w-xl">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <h2 className="truncate font-display text-2xl font-bold md:text-3xl">{t.title}</h2>
-                      <p className="mt-1 truncate text-muted">
+                      <h2 translate="no" className="truncate font-display text-2xl font-bold md:text-3xl">{t.title}</h2>
+                      <p translate="no" className="mt-1 truncate text-muted">
                         {t.artistId ? (
                           <Link href={`/artist?id=${t.artistId}`} onClick={() => usePlayer.getState().setUi({ fullOpen: false })} className="hover:underline">
                             {t.artist}
@@ -224,7 +225,10 @@ export function FullPlayer() {
                         )}
                         {t.album && ` · ${t.album}`}
                       </p>
-                      <SourceBadge t={t} className="mt-2" />
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <SourceBadge t={t} />
+                        <FullSongLink t={t} label="Dengar lagu penuh di Deezer" />
+                      </div>
                     </div>
                     <IconBtn label={fav ? "Buang dari kegemaran" : "Suka lagu ini"} active={fav} onClick={() => useLibrary.getState().toggleFav(t)}>
                       <Heart className={cx("h-6 w-6", fav && "fill-current text-rose-500")} />
@@ -240,7 +244,7 @@ export function FullPlayer() {
                     <FadeChip />
                     <Volume className="ml-auto" />
                   </div>
-                  {t.source === "stream" && <p className="mt-4 text-center text-[11px] text-faint">Main balik dibenarkan oleh Deezer sebagai pratonton 30 saat. Lagu penuh memerlukan pembekal berlesen (lihat docs/licensing).</p>}
+                  {t.source === "stream" && <p className="mt-4 text-center text-[11px] text-faint">Lagu katalog dimainkan sebagai pratonton 30 saat, iaitu had lesen Deezer untuk app luar. Lagu penuh: tekan &quot;Dengar lagu penuh di Deezer&quot;. Lagu dari peranti anda dimainkan penuh.</p>}
                 </div>
               </div>
               <div className={cx("panel glass min-h-0 flex-col overflow-hidden p-3", tab === "queue" ? "flex" : "hidden lg:flex")}>

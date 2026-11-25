@@ -6,6 +6,8 @@ import { deleteDoc, doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth, authMessage } from "@/store/auth";
 import { useLibrary } from "@/store/library";
+import { tr } from "@/i18n";
+import { LanguagePicker } from "@/components/LanguagePicker";
 import { useLocalProfile } from "@/store/profile";
 import { toast } from "@/store/toast";
 import { ImageCropper, normalizeImage } from "@/components/media/ImageCropper";
@@ -95,7 +97,7 @@ export default function ProfilePage() {
   };
 
   const remove = async () => {
-    if (!confirm("Buang gambar profil?")) return;
+    if (!confirm(tr("Buang gambar profil?"))) return;
     const d = db();
     if (user && d) {
       await deleteDoc(doc(d, "lunara_users", user.uid, "data", "avatar")).catch(() => {});
@@ -135,13 +137,13 @@ export default function ProfilePage() {
               <span className="grid h-full w-full place-items-center rounded-full bg-panel font-display text-5xl font-extrabold">{displayName[0]?.toUpperCase()}</span>
             )}
           </div>
-          <button aria-label="Tukar gambar profil" onClick={() => fileRef.current?.click()} className="grad-bg absolute right-1 bottom-1 grid h-11 w-11 cursor-pointer place-items-center rounded-full text-white shadow-lg ring-4 ring-[color:var(--bg)]">
+          <button aria-label="Tukar gambar profil" onClick={() => fileRef.current?.click()} className="btn-luxe absolute right-1 bottom-1 grid h-11 w-11 cursor-pointer place-items-center rounded-full shadow-lg ring-4 ring-[color:var(--bg)]">
             <Camera className="h-5 w-5" />
           </button>
         </div>
         <div className="min-w-0">
           <p className="text-xs font-semibold tracking-wider text-muted uppercase">Profil</p>
-          <h1 className="font-display text-3xl font-extrabold md:text-5xl">{displayName}</h1>
+          <h1 translate="no" className="font-display text-3xl font-extrabold md:text-5xl">{displayName}</h1>
           <div className="mt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm text-muted md:justify-start">
             {profile ? (
               <>
@@ -213,6 +215,10 @@ export default function ProfilePage() {
           Artis paling kerap didengar: <b className="text-fg">{topArtist.name}</b> ({topArtist.count} kali)
         </p>
       )}
+
+      <section className="panel mt-8 p-5">
+        <LanguagePicker />
+      </section>
 
       <section className="mt-10">
         <SectionHead title="Baru dimainkan" href="/library?tab=recent" />

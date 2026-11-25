@@ -2,8 +2,8 @@
 import { Download, Eye, EyeOff, PencilRuler, RotateCcw, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef } from "react";
-import { ACCENTS, SECTION_KINDS, SECTION_LABEL, useLayout, type AccentId, type LayoutPreset, type LayoutState } from "@/store/layout";
-import { useSettings } from "@/store/settings";
+import { SECTION_KINDS, SECTION_LABEL, useLayout, type LayoutPreset, type LayoutState } from "@/store/layout";
+import { ThemePicker } from "@/components/ThemePicker";
 import { toast } from "@/store/toast";
 import { SortableItem, SortableList } from "@/components/music/Sortable";
 import { Btn, cx, inputCls, Segmented, Switch } from "@/components/ui";
@@ -71,7 +71,6 @@ export default function Studio() {
   const L = useLayout();
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
-  const theme = useSettings((s) => s.theme);
 
   const exportLayout = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -136,18 +135,7 @@ export default function Studio() {
         <section className="panel p-5">
           <h2 className="font-display text-lg font-bold">Gaya</h2>
           <div className="mt-3 space-y-4">
-            <div>
-              <p className="mb-2 text-sm font-medium">Warna aksen</p>
-              <div className="flex flex-wrap gap-3">
-                {(Object.keys(ACCENTS) as AccentId[]).map((k) => (
-                  <button key={k} onClick={() => L.set({ accent: k })} aria-label={ACCENTS[k].name} aria-pressed={L.accent === k} title={ACCENTS[k].name} className={cx("h-10 w-10 cursor-pointer rounded-full ring-offset-2 ring-offset-[color:var(--panel)] transition", L.accent === k ? "ring-2 ring-fg" : "")} style={{ background: `linear-gradient(120deg, ${ACCENTS[k].from}, ${ACCENTS[k].via}, ${ACCENTS[k].to})` }} />
-                ))}
-              </div>
-            </div>
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="text-sm font-medium">Tema</span>
-              <Segmented label="Tema" value={theme} onChange={(v) => useSettings.getState().set({ theme: v })} options={[{ value: "light", label: "Cerah" }, { value: "dark", label: "Gelap" }, { value: "system", label: "Sistem" }]} />
-            </div>
+            <ThemePicker />
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="text-sm font-medium">Saiz kad</span>
               <Segmented label="Saiz kad" value={L.cardSize} onChange={(v) => L.set({ cardSize: v })} options={[{ value: "s", label: "Kecil" }, { value: "m", label: "Sederhana" }, { value: "l", label: "Besar" }]} />

@@ -1,5 +1,5 @@
 "use client";
-import { Download, Info, KeyRound, LogOut, Mail, Monitor, Moon, ShieldCheck, Sun, Trash2, UserRound, Waves } from "lucide-react";
+import { Download, Info, KeyRound, LogOut, Mail, Monitor, ShieldCheck, Sun, Trash2, UserRound, Waves } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { firebaseEnabled } from "@/lib/firebase";
@@ -12,6 +12,8 @@ import { toast } from "@/store/toast";
 import { Btn, cx, Field, inputCls, Modal, Segmented, Switch } from "@/components/ui";
 import { PasswordInput, StrengthMeter } from "@/components/auth/PasswordInput";
 import { BRAND, Mark } from "@/components/shell/Logo";
+import { ThemePicker } from "@/components/ThemePicker";
+import { LanguagePicker } from "@/components/LanguagePicker";
 
 function Card({ id, title, icon, children }: { id: string; title: string; icon: ReactNode; children: ReactNode }) {
   return (
@@ -271,21 +273,11 @@ export default function SettingsPage() {
       </Card>
 
       <Card id="appearance" title="Paparan" icon={<Sun className="h-4 w-4" />}>
-        <Row label="Tema" desc="Disimpan dan disegerak ke peranti lain bila log masuk.">
-          <div role="radiogroup" aria-label="Tema" className="flex gap-2">
-            {(
-              [
-                ["light", "Cerah", Sun],
-                ["dark", "Gelap", Moon],
-                ["system", "Sistem", Monitor],
-              ] as const
-            ).map(([v, l, I]) => (
-              <button key={v} role="radio" aria-checked={s.theme === v} onClick={() => s.set({ theme: v })} className={cx("flex cursor-pointer flex-col items-center gap-1 rounded-xl px-4 py-2.5 text-xs font-semibold ring-1 transition", s.theme === v ? "grad-bg text-white ring-transparent" : "ring-line hover:bg-card")}>
-                <I className="h-4 w-4" /> {l}
-              </button>
-            ))}
-          </div>
-        </Row>
+        <div className="py-3">
+          <p className="mb-1 text-sm font-medium">Tema & warna</p>
+          <p className="mb-3 text-xs text-muted">Semua tema warna adalah cerah dengan teks hitam. Night mode gelap dengan teks putih. Disegerak ke peranti lain bila log masuk.</p>
+          <ThemePicker />
+        </div>
         <Row label="Layout & warna" desc="Susun seksyen, pilih preset, warna aksen, saiz kad dan banyak lagi.">
           <Btn variant="ghost" href="/studio">
             Buka Layout Studio
@@ -347,20 +339,9 @@ export default function SettingsPage() {
       </Card>
 
       <Card id="app" title="Aplikasi" icon={<Monitor className="h-4 w-4" />}>
-        <Row label="Bahasa" desc="Antara muka kini dalam Bahasa Melayu. English sedang diterjemah.">
-          <Segmented
-            label="Bahasa"
-            value={s.language}
-            onChange={(v) => {
-              s.set({ language: v });
-              if (v === "en") toast("Terjemahan English akan datang. Antara muka kekal BM buat masa ini.");
-            }}
-            options={[
-              { value: "ms", label: "Bahasa Melayu" },
-              { value: "en", label: "English" },
-            ]}
-          />
-        </Row>
+        <div className="py-3">
+          <LanguagePicker />
+        </div>
         <Switch
           checked={s.notifications}
           onChange={async (v) => {
@@ -370,6 +351,11 @@ export default function SettingsPage() {
           label="Pemberitahuan"
           desc="Keluaran baharu daripada artis kegemaran (memerlukan Firebase Cloud Messaging)."
         />
+        <Row label="Aplikasi Windows" desc="Pasang LUNARA MUSIC pada PC/laptop Windows. Sentiasa versi terkini secara automatik, tiada butang kemas kini.">
+          <Btn href="https://github.com/GeniusDigitalDeveloper/website-claude-code/raw/claude/auralyqo-music-streaming-5bpqap/sites/lunara/downloads/LUNARA-MUSIC-Setup.exe">
+            <Download className="h-4 w-4" /> Muat turun .exe
+          </Btn>
+        </Row>
         <Row label="Kosongkan cache" desc="Buang cache katalog dan imej. Muzik peranti dan playlist tidak terjejas.">
           <Btn
             variant="ghost"

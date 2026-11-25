@@ -1,13 +1,15 @@
 "use client";
-import { ChevronsLeft, ChevronsRight, Cloud, CloudOff, LogIn, Search } from "lucide-react";
+import { ChevronsLeft, ChevronsRight, Cloud, CloudOff, LogIn } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
-import { ACCENTS, useLayout } from "@/store/layout";
+import { useLayout } from "@/store/layout";
+import { getTheme, themeVars } from "@/lib/themes";
 import { useSettings } from "@/store/settings";
 import { useAuth } from "@/store/auth";
 import { useLocalProfile } from "@/store/profile";
 import { useLibrary } from "@/store/library";
+import { setLang } from "@/i18n";
 import { usePlayer, wirePlayer } from "@/store/player";
 import { useToasts } from "@/store/toast";
 import { onSyncStatus, startSync, stopSync, type SyncStatus } from "@/lib/sync";
@@ -15,29 +17,33 @@ import { FullPlayer, PlayerBar } from "../music/Player";
 import { QueueDrawer } from "../music/Queue";
 import { cx, IconBtn } from "../ui";
 import { Logo } from "./Logo";
+import { TopSearch } from "./TopSearch";
+import { WaterRipple } from "../fx/WaterRipple";
+import { AutoUpdate } from "../fx/AutoUpdate";
 import { ADMIN, NAV, NAV_2 } from "./nav";
 import { RightPanel } from "./RightPanel";
 import { AnimatePresence, motion } from "motion/react";
 
 function useApplyTheme() {
   const theme = useSettings((s) => s.theme);
-  const accent = useLayout((s) => s.accent);
+  const colorTheme = useSettings((s) => s.colorTheme);
   const radius = useLayout((s) => s.radius);
   useEffect(() => {
     const mq = matchMedia("(prefers-color-scheme: dark)");
-    const apply = () => (document.documentElement.dataset.theme = theme === "dark" || (theme === "system" && mq.matches) ? "dark" : "light");
+    const apply = () => {
+      const night = theme === "night" || (theme === "system" && mq.matches);
+      const root = document.documentElement;
+      root.dataset.theme = night ? "dark" : "light";
+      for (const [k, v] of Object.entries(themeVars(getTheme(colorTheme), night))) root.style.setProperty(k, v);
+      document.querySelector('meta[name="theme-color"]')?.setAttribute("content", getComputedStyle(root).getPropertyValue("--bg"));
+    };
     apply();
     mq.addEventListener("change", apply);
     return () => mq.removeEventListener("change", apply);
-  }, [theme]);
+  }, [theme, colorTheme]);
   useEffect(() => {
-    const a = ACCENTS[accent] ?? ACCENTS.aurora;
-    const r = document.documentElement.style;
-    r.setProperty("--acc-from", a.from);
-    r.setProperty("--acc-via", a.via);
-    r.setProperty("--acc-to", a.to);
-    r.setProperty("--radius", `${radius}px`);
-  }, [accent, radius]);
+    document.documentElement.style.setProperty("--radius", `${radius}px`);
+  }, [radius]);
 }
 
 function NavLink({ href, label, Icon, collapsed, active }: { href: string; label: string; Icon: React.ComponentType<{ className?: string }>; collapsed?: boolean; active: boolean }) {
@@ -86,24 +92,6 @@ function Avatar() {
   );
 }
 
-function TopSearch({ className }: { className?: string }) {
-  const router = useRouter();
-  const [q, setQ] = useState("");
-  return (
-    <form
-      role="search"
-      className={cx("relative", className)}
-      onSubmit={(e) => {
-        e.preventDefault();
-        router.push(`/search?q=${encodeURIComponent(q)}`);
-      }}
-    >
-      <Search className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-faint" />
-      <input value={q} onChange={(e) => setQ(e.target.value)} onFocus={() => router.prefetch("/search")} placeholder="Cari artis, lagu atau album" aria-label="Cari muzik" className="w-full rounded-full bg-card py-2.5 pr-4 pl-10 text-sm ring-1 ring-line outline-none placeholder:text-faint focus:ring-2 focus:ring-[color:var(--acc-via)]" />
-    </form>
-  );
-}
-
 function Toaster() {
   const items = useToasts((s) => s.items);
   return (
@@ -129,6 +117,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   const user = useAuth((s) => s.user);
   const isAdmin = useAuth((s) => s.profile?.isAdmin);
   useApplyTheme();
+  const language = useSettings((s) => s.language);
+  useEffect(() => {
+    if (useSettings.persist.hasHydrated()) setLang(language);
+  }, [language]);
 
   useEffect(() => {
     // Restore persisted stores after hydration so server and first client render match.
@@ -137,6 +129,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     void Promise.all([useSettings.persist.rehydrate(), useLayout.persist.rehydrate(), usePlayer.persist.rehydrate()]).then(() => {
       wirePlayer();
       useAuth.getState().init();
+      setLang(useSettings.getState().language);
     });
   }, []);
   useEffect(() => {
@@ -154,6 +147,8 @@ export function AppShell({ children }: { children: ReactNode }) {
         {children}
         <FullPlayer />
         <Toaster />
+        <WaterRipple />
+        <AutoUpdate />
       </>
     );
 
@@ -200,33 +195,42 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className={cx("flex min-h-dvh", preset === "bento" && "gap-3")}>
         {sidebar}
         <div className={cx("flex min-w-0 flex-1 flex-col", preset === "bento" && "md:gap-3")}>
-          {/* top bar */}
-          <header className={cx("glass sticky top-0 z-30 flex items-center gap-3 border-b border-line px-4 py-3 md:px-6", preset === "bento" && "md:static md:border-0 md:bg-transparent md:px-0 md:py-0 md:backdrop-blur-none")}>
-            <div className="md:hidden">
-              <Logo size={26} />
+          {/* top bar: logo/nav left · the ONE search box centred · account right */}
+          <header className={cx("glass sticky top-0 z-30 border-b border-line px-3 py-2.5 md:px-6 md:py-3", preset === "bento" && "md:static md:border-0 md:bg-transparent md:px-0 md:py-0 md:backdrop-blur-none")}>
+            <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 md:grid-cols-[1fr_minmax(0,520px)_1fr] md:gap-4">
+              <div className="flex min-w-0 items-center">
+                <div className="md:hidden">
+                  <Logo size={30} compact />
+                </div>
+                {top && (
+                  <div className="hidden md:block">
+                    <Logo size={30} />
+                  </div>
+                )}
+              </div>
+              <TopSearch className="w-full" />
+              <div className="flex items-center justify-end gap-2">
+                {top && (
+                  <Link href="/studio" className="hidden rounded-full px-3 py-2 text-sm font-semibold whitespace-nowrap text-muted hover:text-fg xl:block">
+                    Layout Studio
+                  </Link>
+                )}
+                <span className="hidden sm:block">
+                  <SyncPill />
+                </span>
+                <Avatar />
+              </div>
             </div>
             {top && (
-              <div className="hidden items-center gap-4 md:flex xl:gap-6">
-                <Logo size={28} />
-                <nav aria-label="Navigasi utama" className="hidden items-center gap-0.5 lg:flex">
-                  {NAV.map((n) => (
-                    <Link key={n.href} href={n.href} aria-current={isActive(n.href) ? "page" : undefined} className={cx("rounded-full px-3 py-2 text-sm font-semibold whitespace-nowrap transition xl:px-3.5", isActive(n.href) ? "bg-fg text-bg" : "text-muted hover:text-fg")}>
-                      {n.label}
-                    </Link>
-                  ))}
-                </nav>
-              </div>
+              <nav aria-label="Navigasi utama" className="no-scrollbar mt-2.5 hidden items-center gap-1 overflow-x-auto md:flex">
+                {NAV.map((n) => (
+                  <Link key={n.href} href={n.href} aria-current={isActive(n.href) ? "page" : undefined} className={cx("flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-semibold whitespace-nowrap transition", isActive(n.href) ? "bg-fg text-bg" : "text-muted hover:bg-card hover:text-fg")}>
+                    <n.icon className="h-4 w-4" />
+                    {n.label}
+                  </Link>
+                ))}
+              </nav>
             )}
-            <TopSearch className={cx("hidden flex-1 md:block", top ? "min-w-[160px] max-w-xs" : "max-w-md")} />
-            <div className="ml-auto flex items-center gap-2">
-              {top && (
-                <Link href="/studio" className="hidden rounded-full px-3 py-2 text-sm font-semibold whitespace-nowrap text-muted hover:text-fg xl:block">
-                  Layout Studio
-                </Link>
-              )}
-              <SyncPill />
-              <Avatar />
-            </div>
           </header>
           <div className="flex min-w-0 flex-1 gap-3">
             <main id="main" className={cx("relative min-w-0 flex-1 overflow-x-clip", preset === "bento" && "md:panel md:overflow-hidden", hasTrack ? "pb-44 md:pb-28" : "pb-24 md:pb-8")}>
@@ -249,6 +253,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       <QueueDrawer />
       <FullPlayer />
       <Toaster />
+      <WaterRipple />
+      <AutoUpdate />
     </div>
   );
 }

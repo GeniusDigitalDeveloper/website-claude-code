@@ -32,8 +32,8 @@ export function RightPanel() {
               <div className="mt-3 flex items-center gap-3">
                 <Artwork src={t.artwork} alt="" className="h-16 w-16" rounded="rounded-xl" />
                 <div className="min-w-0">
-                  <p className="truncate font-display font-bold">{t.title}</p>
-                  <p className="truncate text-sm text-muted">{t.artist}</p>
+                  <p translate="no" className="truncate font-display font-bold">{t.title}</p>
+                  <p translate="no" className="truncate text-sm text-muted">{t.artist}</p>
                 </div>
               </div>
               <div className="mt-3 flex items-center gap-2 text-[11px] tabular-nums text-muted">
@@ -75,7 +75,7 @@ export function RightPanel() {
               ["playlists", "Playlist"],
             ] as const
           ).map(([k, l]) => (
-            <button key={k} onClick={() => setTab(k)} className={cx("cursor-pointer rounded-full px-3 py-1 text-xs font-semibold", tab === k ? "grad-bg text-white" : "bg-card text-muted")}>
+            <button key={k} onClick={() => setTab(k)} className={cx("cursor-pointer rounded-full px-3 py-1 text-xs font-semibold", tab === k ? "btn-luxe font-bold" : "bg-card text-muted")}>
               {l}
             </button>
           ))}
@@ -88,8 +88,8 @@ export function RightPanel() {
                   <button className="flex min-w-0 flex-1 cursor-pointer items-center gap-3 text-left" onClick={() => p().playList(favs, i, { shuffle: false })}>
                     <Artwork src={f.artwork} alt="" className="h-10 w-10" rounded="rounded-lg" />
                     <span className="min-w-0">
-                      <span className="block truncate text-sm font-medium">{f.title}</span>
-                      <span className="block truncate text-xs text-muted">{f.artist}</span>
+                      <span translate="no" className="block truncate text-sm font-medium">{f.title}</span>
+                      <span translate="no" className="block truncate text-xs text-muted">{f.artist}</span>
                     </span>
                   </button>
                   <TrackMenu track={f} />
@@ -104,8 +104,8 @@ export function RightPanel() {
                 <Link key={a.id} href={`/album?id=${a.id}`} className="flex items-center gap-3 rounded-xl p-1.5 hover:bg-card-hover">
                   <Artwork src={a.cover} alt="" className="h-10 w-10" rounded="rounded-lg" />
                   <span className="min-w-0">
-                    <span className="block truncate text-sm font-medium">{a.title}</span>
-                    <span className="block truncate text-xs text-muted">{a.artist}</span>
+                    <span translate="no" className="block truncate text-sm font-medium">{a.title}</span>
+                    <span translate="no" className="block truncate text-xs text-muted">{a.artist}</span>
                   </span>
                 </Link>
               ))
@@ -118,7 +118,7 @@ export function RightPanel() {
                 <Link key={pl.id} href={`/playlist?id=${pl.id}`} className="flex items-center gap-3 rounded-xl p-1.5 hover:bg-card-hover">
                   <Artwork src={pl.cover ?? pl.tracks[0]?.artwork} alt="" className="h-10 w-10" rounded="rounded-lg" />
                   <span className="min-w-0">
-                    <span className="block truncate text-sm font-medium">{pl.name}</span>
+                    <span translate="no" className="block truncate text-sm font-medium">{pl.name}</span>
                     <span className="block truncate text-xs text-muted">{pl.tracks.length} lagu</span>
                   </span>
                 </Link>

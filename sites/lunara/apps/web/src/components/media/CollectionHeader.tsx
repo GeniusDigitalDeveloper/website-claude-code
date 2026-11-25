@@ -17,7 +17,7 @@ export function CollectionHeader({ cover, kicker, title, meta, children, round }
         </motion.div>
         <div className="min-w-0">
           <p className="text-xs font-semibold tracking-wider text-muted uppercase">{kicker}</p>
-          <h1 className="mt-1 font-display text-3xl leading-tight font-extrabold tracking-tight break-words md:text-5xl">{title}</h1>
+          <h1 translate="no" className="mt-1 font-display text-3xl leading-tight font-extrabold tracking-tight break-words md:text-5xl">{title}</h1>
           <div className="mt-3 text-sm text-muted">{meta}</div>
         </div>
       </div>

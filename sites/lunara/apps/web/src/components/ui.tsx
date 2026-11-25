@@ -1,5 +1,5 @@
 "use client";
-import { ChevronLeft, ChevronRight, Disc3, HardDrive, Loader2, Radio, Upload, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Disc3, ExternalLink, HardDrive, Loader2, Radio, Upload, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "motion/react";
@@ -61,6 +61,17 @@ export function SourceBadge({ t, className }: { t: Track; className?: string }) 
   );
 }
 
+/** Link to the full-length song on the licensed provider (shown for 30s previews). */
+export function FullSongLink({ t, className, label = "Dengar penuh" }: { t: Track; className?: string; label?: string }) {
+  if (t.source !== "stream" || t.provider !== "deezer") return null;
+  const href = `https://www.deezer.com/track/${t.id.replace(/^dz:/, "")}`;
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" title="Lagu penuh tersedia di Deezer (had lesen: app luar hanya dibenarkan pratonton 30 saat)" className={cx("inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold whitespace-nowrap text-acc ring-1 ring-[color:var(--acc-via)]/40 hover:bg-card-hover", className)}>
+      {label} <ExternalLink className="h-3 w-3" aria-hidden />
+    </a>
+  );
+}
+
 export function IconBtn({ label, onClick, children, className, active, size = "md", disabled }: { label: string; onClick?: (e: React.MouseEvent) => void; children: ReactNode; className?: string; active?: boolean; size?: "sm" | "md" | "lg"; disabled?: boolean }) {
   const s = size === "sm" ? "h-8 w-8" : size === "lg" ? "h-12 w-12" : "h-10 w-10";
   return (
@@ -80,12 +91,18 @@ export function IconBtn({ label, onClick, children, className, active, size = "m
 
 export function Btn({ children, onClick, variant = "primary", className, type = "button", disabled, href }: { children: ReactNode; onClick?: () => void; variant?: "primary" | "ghost" | "soft" | "danger"; className?: string; type?: "button" | "submit"; disabled?: boolean; href?: string }) {
   const v = {
-    primary: "grad-bg text-white shadow-[0_8px_24px_-10px_var(--acc-via)] hover:brightness-110",
+    primary: "btn-luxe font-bold",
     ghost: "ring-1 ring-line hover:bg-card-hover text-fg",
     soft: "bg-card hover:bg-card-hover text-fg",
     danger: "bg-rose-600 text-white hover:bg-rose-500",
   }[variant];
   const cls = cx("inline-flex cursor-pointer items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition duration-200 disabled:cursor-not-allowed disabled:opacity-50", v, className);
+  if (href && (href.startsWith("http") || href.startsWith("/download/")))
+    return (
+      <a href={href} className={cls} download={href.startsWith("/download/") ? "" : undefined}>
+        {children}
+      </a>
+    );
   if (href)
     return (
       <Link href={href} className={cls}>
@@ -232,7 +249,7 @@ export function Segmented<T extends string | number>({ value, options, onChange,
           role="radio"
           aria-checked={o.value === value}
           onClick={() => onChange(o.value)}
-          className={cx("cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold transition", o.value === value ? "grad-bg text-white shadow" : "text-muted hover:text-fg")}
+          className={cx("cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold transition", o.value === value ? "btn-luxe font-bold" : "text-muted hover:text-fg")}
         >
           {o.label}
         </button>

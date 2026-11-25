@@ -76,6 +76,7 @@ async function resolveUrl(t: Track): Promise<string> {
 let loadSeq = 0;
 let xfadeFor: string | null = null;
 let lastResumeSave = 0;
+let previewNoticeShown = false;
 
 export const usePlayer = create<PlayerState>()(
   persist(
@@ -338,7 +339,14 @@ export function wirePlayer() {
       }
     } else if (ev.type === "state") usePlayer.setState({ playing: ev.playing });
     else if (ev.type === "buffering") usePlayer.setState({ buffering: ev.buffering });
-    else if (ev.type === "ended") void usePlayer.getState().next(true);
+    else if (ev.type === "ended") {
+      const ended = usePlayer.getState().current();
+      if (ended?.source === "stream" && !previewNoticeShown) {
+        previewNoticeShown = true;
+        toast("Pratonton 30 saat tamat. Lagu penuh: tekan \"Dengar penuh\" (Deezer). Had ini ditetapkan oleh lesen Deezer.");
+      }
+      void usePlayer.getState().next(true);
+    }
     else if (ev.type === "error") {
       usePlayer.setState({ buffering: false });
       toast(ev.message);

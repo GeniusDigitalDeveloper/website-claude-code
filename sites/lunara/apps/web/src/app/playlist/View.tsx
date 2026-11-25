@@ -6,6 +6,7 @@ import { catalog } from "@/lib/catalog";
 import { useAsync } from "@/lib/useAsync";
 import type { Track } from "@/lib/types";
 import { useLibrary } from "@/store/library";
+import { tr } from "@/i18n";
 import { usePlayer } from "@/store/player";
 import { toast } from "@/store/toast";
 import { CollectionHeader } from "@/components/media/CollectionHeader";
@@ -231,7 +232,7 @@ function UserPlaylistView({ id }: { id: string }) {
               <Btn
                 variant="danger"
                 onClick={() => {
-                  if (confirm(`Padam playlist "${pl.name}"? Tindakan ini tidak boleh dibatalkan.`)) {
+                  if (confirm(tr(`Padam playlist "${pl.name}"? Tindakan ini tidak boleh dibatalkan.`))) {
                     L().deletePlaylist(pl.id);
                     router.push("/library");
                     toast("Playlist dipadam");

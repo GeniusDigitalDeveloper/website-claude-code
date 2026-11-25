@@ -2,52 +2,30 @@
 import { History, Search, TrendingUp, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { catalog } from "@/lib/catalog";
+import { MALAY_SEARCH_CHIPS } from "@/lib/malay";
 import { useAsync } from "@/lib/useAsync";
 import type { Track } from "@/lib/types";
 import { useLibrary } from "@/store/library";
-import { usePlayer } from "@/store/player";
 import { AlbumCard, ArtistCircle } from "@/components/music/Cards";
 import { TrackList } from "@/components/music/TrackRow";
-import { Artwork, cx, Empty, HScroll, SectionHead, Segmented, Skeleton } from "@/components/ui";
+import { cx, Empty, HScroll, SectionHead, Segmented, Skeleton } from "@/components/ui";
 
 type Tab = "all" | "tracks" | "artists" | "albums" | "device";
 
 export function SearchView() {
   const params = useSearchParams();
   const router = useRouter();
-  const initial = params.get("q") ?? "";
-  const [q, setQ] = useState(initial);
-  const [debounced, setDebounced] = useState(initial);
-  const [submitted, setSubmitted] = useState(initial);
+  const submitted = (params.get("q") ?? "").trim();
   const [tab, setTab] = useState<Tab>("all");
-  const [focus, setFocus] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
   const history = useLibrary((s) => s.searchHistory);
   const local = useLibrary((s) => s.localTracks);
 
-  useEffect(() => {
-    setQ(initial);
-    setSubmitted(initial);
-    if (initial) useLibrary.getState().addSearch(initial);
-  }, [initial]);
-  useEffect(() => {
-    const id = setTimeout(() => setDebounced(q.trim()), 250);
-    return () => clearTimeout(id);
-  }, [q]);
-  useEffect(() => {
-    if (!initial) inputRef.current?.focus();
-  }, [initial]);
+  useEffect(() => setTab("all"), [submitted]);
 
-  const sugg = useAsync(debounced.length >= 2 && debounced !== submitted ? `sugg:${debounced}` : null, () => catalog.suggest(debounced));
   const res = useAsync(submitted ? `search:${submitted}` : null, () => catalog.searchAll(submitted));
-  const chart = useAsync("chart", () => catalog.chart());
-  const trending = useMemo(() => {
-    const c = chart.data;
-    if (!c) return [];
-    return [...c.artists.slice(0, 5).map((a) => a.name), ...c.tracks.slice(0, 5).map((t) => t.title)];
-  }, [chart.data]);
+  const trending = MALAY_SEARCH_CHIPS;
 
   const localHits = useMemo(() => {
     const s = submitted.toLowerCase();
@@ -58,74 +36,17 @@ export function SearchView() {
   const go = (term: string) => {
     const v = term.trim();
     if (!v) return;
-    setQ(v);
-    setFocus(false);
-    router.replace(`/search?q=${encodeURIComponent(v)}`);
+    useLibrary.getState().addSearch(v);
+    router.push(`/search?q=${encodeURIComponent(v)}`);
   };
-
-  const showDrop = focus && q.trim().length >= 2 && debounced !== submitted;
 
   return (
     <div className="px-4 pt-5 md:px-8 md:pt-7">
-      <h1 className="font-display text-3xl font-extrabold tracking-tight">Cari</h1>
-      <form
-        role="search"
-        className="relative mt-4 max-w-2xl"
-        onSubmit={(e) => {
-          e.preventDefault();
-          go(q);
-        }}
-      >
-        <Search className="pointer-events-none absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-faint" />
-        <input
-          ref={inputRef}
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          onFocus={() => setFocus(true)}
-          onBlur={() => setTimeout(() => setFocus(false), 180)}
-          placeholder="Lagu, artis, album: antarabangsa atau tempatan"
-          aria-label="Cari muzik"
-          aria-autocomplete="list"
-          className="w-full rounded-2xl bg-card py-4 pr-12 pl-12 text-base ring-1 ring-line outline-none placeholder:text-faint focus:ring-2 focus:ring-[color:var(--acc-via)]"
-        />
-        {q && (
-          <button type="button" aria-label="Kosongkan carian" onClick={() => (setQ(""), inputRef.current?.focus())} className="absolute top-1/2 right-3 grid h-8 w-8 -translate-y-1/2 cursor-pointer place-items-center rounded-full hover:bg-card-hover">
-            <X className="h-4 w-4" />
-          </button>
-        )}
-        {showDrop && (
-          <div role="listbox" className="panel absolute inset-x-0 top-full z-20 mt-2 overflow-hidden p-1.5 shadow-2xl">
-            {sugg.loading && <p className="px-3 py-2 text-sm text-muted">Mencari…</p>}
-            {sugg.data?.map((t) => (
-              <button
-                key={t.id}
-                role="option"
-                aria-selected={false}
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => {
-                  useLibrary.getState().addSearch(`${t.title} ${t.artist}`);
-                  void usePlayer.getState().playTrack(t);
-                  setFocus(false);
-                }}
-                className="flex w-full cursor-pointer items-center gap-3 rounded-lg p-2 text-left hover:bg-card-hover"
-              >
-                <Artwork src={t.artwork} alt="" className="h-9 w-9" rounded="rounded-md" />
-                <span className="min-w-0">
-                  <span className="block truncate text-sm font-medium">{t.title}</span>
-                  <span className="block truncate text-xs text-muted">Lagu · {t.artist}</span>
-                </span>
-              </button>
-            ))}
-            <button type="submit" onMouseDown={(e) => e.preventDefault()} className="flex w-full cursor-pointer items-center gap-3 rounded-lg p-2 text-left text-sm font-semibold text-acc hover:bg-card-hover">
-              <Search className="h-4 w-4" /> Lihat semua hasil untuk &quot;{q}&quot;
-            </button>
-          </div>
-        )}
-      </form>
+      <h1 className="font-display text-3xl font-extrabold tracking-tight">{submitted ? <>Hasil untuk &quot;{submitted}&quot;</> : "Cari"}</h1>
+      {!submitted && <p className="mt-1 text-sm text-muted">Taip di kotak carian di atas: lagu, artis atau album, antarabangsa atau tempatan.</p>}
 
       {!submitted ? (
-        <div className="mt-8 grid gap-8 lg:grid-cols-2">
+        <div className="mt-6 grid gap-8 lg:grid-cols-2">
           <section>
             <SectionHead
               title="Carian terkini"
@@ -156,7 +77,7 @@ export function SearchView() {
             )}
           </section>
           <section>
-            <SectionHead title="Trending sekarang" sub="Dari carta global Deezer, dikemas kini setiap hari" />
+            <SectionHead title="Carian popular" sub="Nasyid, zikir, rock jiwang & rock kapak" />
             <div className="flex flex-wrap gap-2">
               {trending.length
                 ? trending.map((t) => (
@@ -165,13 +86,6 @@ export function SearchView() {
                     </button>
                   ))
                 : Array.from({ length: 8 }, (_, i) => <Skeleton key={i} className="h-9 w-28 rounded-full" />)}
-            </div>
-            <div className="mt-6 flex flex-wrap gap-2">
-              {["Siti Nurhaliza", "Dato' Sri Siti", "Hindia", "Faizal Tahir", "Nadhif Basalamah", "Yonnyboii", "Aina Abdul", "Dolla"].map((t) => (
-                <button key={t} onClick={() => go(t)} className="cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold text-muted ring-1 ring-line hover:text-fg">
-                  {t}
-                </button>
-              ))}
             </div>
           </section>
         </div>

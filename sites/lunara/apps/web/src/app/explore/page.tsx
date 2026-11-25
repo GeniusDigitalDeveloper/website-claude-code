@@ -1,49 +1,54 @@
 "use client";
-import { catalog } from "@/lib/catalog";
-import { useAsync } from "@/lib/useAsync";
-import { usePlayer } from "@/store/player";
-import { AlbumCard, PlaylistCard } from "@/components/music/Cards";
-import { TrackList } from "@/components/music/TrackRow";
-import { Btn, HScroll, SectionHead, Skeleton } from "@/components/ui";
 import { Play, Shuffle } from "lucide-react";
 import Link from "next/link";
+import { catalog } from "@/lib/catalog";
+import { albumsFrom, MALAY, mixFrom } from "@/lib/malay";
+import { useAsync } from "@/lib/useAsync";
+import type { Track } from "@/lib/types";
+import { usePlayer } from "@/store/player";
+import { AlbumCard } from "@/components/music/Cards";
+import { TrackList } from "@/components/music/TrackRow";
+import { Btn, HScroll, SectionHead, Skeleton } from "@/components/ui";
+
+function PlayAll({ tracks }: { tracks?: Track[] }) {
+  if (!tracks?.length) return null;
+  return (
+    <div className="flex gap-2">
+      <Btn onClick={() => usePlayer.getState().playList(tracks, 0, { shuffle: false })} className="px-4 py-1.5">
+        <Play className="h-3.5 w-3.5 fill-current" /> Main
+      </Btn>
+      <Btn variant="ghost" onClick={() => usePlayer.getState().playList(tracks, 0, { shuffle: true })} className="px-4 py-1.5">
+        <Shuffle className="h-3.5 w-3.5" /> Rawak
+      </Btn>
+    </div>
+  );
+}
+
+function Category({ title, sub, cacheKey, ids, per }: { title: string; sub: string; cacheKey: string; ids: string[]; per: number }) {
+  const { data } = useAsync(cacheKey, () => mixFrom(ids, per));
+  return (
+    <section>
+      <SectionHead title={title} sub={sub} action={<PlayAll tracks={data} />} />
+      {data ? <TrackList tracks={data} numbered limit={12} /> : <Skeleton className="h-72" />}
+    </section>
+  );
+}
 
 export default function Explore() {
-  const chart = useAsync("chart", () => catalog.chart());
-  const rel = useAsync("releases", () => catalog.newReleases());
+  const rock = useAsync("my:rockAlbums", () => albumsFrom(MALAY.rock, 2));
   const genres = useAsync("genres", () => catalog.genres(), 3600_000);
-  const tracks = chart.data?.tracks ?? [];
   return (
     <div className="space-y-10 px-4 pt-5 md:px-8 md:pt-7">
       <div>
         <h1 className="font-display text-3xl font-extrabold tracking-tight">Teroka</h1>
-        <p className="mt-1 text-sm text-muted">Carta dunia, keluaran baharu dan genre, terus dari katalog Deezer.</p>
+        <p className="mt-1 text-sm text-muted">Nasyid, zikir, rock jiwang dan rock kapak Melayu. Gunakan carian di atas untuk lagu dari seluruh dunia.</p>
       </div>
+      <Category title="Nasyid Pilihan" sub="Raihan, Hijjaz, Rabbani, Inteam, Saujana dan lagi" cacheKey="my:nasyid-ex" ids={MALAY.nasyid} per={3} />
+      <Category title="Zikir & Selawat" sub="Hafiz Hamidun, Inteam, Raihan, Hijjaz" cacheKey="my:zikir" ids={MALAY.zikir} per={5} />
+      <Category title="Rock Jiwang & Balada Melayu" sub="Iklim, Slam, Ukays, Exists, Lestari dan lagi" cacheKey="my:jiwang-ex" ids={MALAY.jiwang} per={2} />
       <section>
-        <SectionHead
-          title="Trending Seluruh Dunia: Top 20"
-          action={
-            tracks.length ? (
-              <div className="flex gap-2">
-                <Btn onClick={() => usePlayer.getState().playList(tracks, 0, { shuffle: false })} className="px-4 py-1.5">
-                  <Play className="h-3.5 w-3.5 fill-current" /> Main
-                </Btn>
-                <Btn variant="ghost" onClick={() => usePlayer.getState().playList(tracks, 0, { shuffle: true })} className="px-4 py-1.5">
-                  <Shuffle className="h-3.5 w-3.5" /> Rawak
-                </Btn>
-              </div>
-            ) : null
-          }
-        />
-        {chart.data ? <TrackList tracks={tracks} numbered /> : <Skeleton className="h-96" />}
-      </section>
-      <section>
-        <SectionHead title="Keluaran Baharu" />
-        <HScroll>{rel.data?.map((a) => <AlbumCard key={a.id} a={a} />)}</HScroll>
-      </section>
-      <section>
-        <SectionHead title="Top Global Hits: Playlist" />
-        <HScroll>{chart.data?.playlists.map((p) => <PlaylistCard key={p.id} p={p} href={`/playlist?id=dz-${p.id}`} />)}</HScroll>
+        <SectionHead title="Album Rock Kapak 80an & 90an" sub="Search, Wings, Lefthanded, XPDC, Awie, BPR, Amuk" />
+        <HScroll>{rock.data?.map((a) => <AlbumCard key={a.id} a={a} />)}</HScroll>
       </section>
       <section>
         <SectionHead title="Genre" />

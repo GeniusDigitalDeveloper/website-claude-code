@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { catalog } from "@/lib/catalog";
+import { albumsFrom, artistsFrom, MALAY, MALAY_SEED_ARTISTS, mixFrom } from "@/lib/malay";
 import { useAsync } from "@/lib/useAsync";
 import type { Track } from "@/lib/types";
 import { useAuth } from "@/store/auth";
@@ -55,11 +56,13 @@ function Greeting() {
   const [hello, setHello] = useState("Selamat datang");
   useEffect(() => setHello(greeting()), []);
   const name = useAuth((s) => s.profile?.displayName?.split(" ")[0]);
-  const { data } = useAsync("releases", () => catalog.newReleases());
-  const chart = useChart();
+  const { data } = useAsync("my:rockAlbums", () => albumsFrom(MALAY.rock, 2));
+  const nasyid = useAsync("my:nasyid", () => mixFrom(MALAY.nasyid, 4));
   const recent = useLibrary((s) => s.recent);
-  const hero = data?.[0];
-  const quick = recent.length >= 4 ? recent.slice(0, 6) : (chart.data?.tracks ?? []).slice(0, 6);
+  const [pick, setPick] = useState(0);
+  useEffect(() => setPick(new Date().getDate()), []);
+  const hero = data?.length ? data[pick % data.length] : undefined;
+  const quick = recent.length >= 4 ? recent.slice(0, 6) : (nasyid.data ?? []).slice(0, 6);
   const playHero = async () => {
     if (!hero) return;
     const a = await catalog.album(hero.id);
@@ -69,7 +72,7 @@ function Greeting() {
     <div>
       <motion.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="font-display text-3xl font-extrabold tracking-tight md:text-4xl">
         {hello}
-        {name ? `, ${name}` : ""}
+        {name ? <span translate="no">, {name}</span> : ""}
       </motion.h1>
       <div className="mt-5 grid gap-4 lg:grid-cols-[1.4fr_1fr]">
         {hero ? (
@@ -77,9 +80,9 @@ function Greeting() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={hero.cover} alt="" aria-hidden className="absolute inset-0 -z-10 h-full w-full object-cover" />
             <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black/85 via-black/55 to-black/10" />
-            <p className="text-xs font-semibold tracking-wider text-white/80 uppercase">Keluaran pilihan</p>
-            <h2 className="mt-2 max-w-md font-display text-3xl leading-tight font-extrabold text-white md:text-4xl">{hero.title}</h2>
-            <p className="mt-1 text-sm text-white/80">{hero.artist}</p>
+            <p className="text-xs font-semibold tracking-wider text-white/80 uppercase">Album pilihan hari ini</p>
+            <h2 translate="no" className="mt-2 max-w-md font-display text-3xl leading-tight font-extrabold text-white md:text-4xl">{hero.title}</h2>
+            <p translate="no" className="mt-1 text-sm text-white/80">{hero.artist}</p>
             <div className="mt-6 flex flex-wrap gap-2">
               <Btn onClick={playHero}>
                 <Play className="h-4 w-4 fill-current" /> Main sekarang
@@ -97,7 +100,7 @@ function Greeting() {
             ? quick.map((t, i) => (
                 <button key={t.id} onClick={() => usePlayer.getState().playList(quick, i, { shuffle: false })} className="group flex cursor-pointer items-center gap-3 overflow-hidden rounded-xl bg-card pr-2 text-left ring-1 ring-line transition hover:bg-card-hover">
                   <Artwork src={t.artwork} alt="" className="h-14 w-14" rounded="rounded-none" />
-                  <span className="line-clamp-2 min-w-0 text-xs font-semibold md:text-sm">{t.title}</span>
+                  <span translate="no" className="line-clamp-2 min-w-0 text-xs font-semibold md:text-sm">{t.title}</span>
                 </button>
               ))
             : Array.from({ length: 6 }, (_, i) => <Skeleton key={i} className="h-14" />)}
@@ -125,7 +128,7 @@ function Continue({ kind }: { kind: SectionConfig["kind"] }) {
       <button onClick={go} className="group flex w-full max-w-md cursor-pointer items-center gap-4 rounded-[var(--radius)] bg-card p-3 text-left ring-1 ring-line transition hover:bg-card-hover">
         <Artwork src={t.artwork} alt="" className="h-16 w-16" rounded="rounded-xl" />
         <div className="min-w-0 flex-1">
-          <p className="truncate font-semibold">{t.title}</p>
+          <p translate="no" className="truncate font-semibold">{t.title}</p>
           <p className="truncate text-xs text-muted">{t.artist}</p>
           <div className="mt-2 flex items-center gap-2 text-[11px] text-muted">
             <div className="h-1 flex-1 overflow-hidden rounded-full bg-line">
@@ -134,7 +137,7 @@ function Continue({ kind }: { kind: SectionConfig["kind"] }) {
             <Clock3 className="h-3 w-3" /> {fmt(resume.position)}
           </div>
         </div>
-        <span className="grad-bg grid h-10 w-10 place-items-center rounded-full text-white">
+        <span className="btn-luxe grid h-10 w-10 place-items-center rounded-full">
           <Play className="ml-0.5 h-4 w-4 fill-current" />
         </span>
       </button>
@@ -169,7 +172,7 @@ function MadeForYou({ kind }: { kind: SectionConfig["kind"] }) {
   });
   void plays;
   void favCount;
-  if (!seeds.length) return <p className="text-sm text-muted">Dengar atau suka beberapa lagu dahulu. Cadangan peribadi dibina daripada artis yang anda dengar (radio artis Deezer), bukan data rekaan.</p>;
+  if (!seeds.length) return <StarterMix kind={kind} />;
   if (error) return <ErrorNote msg={error} />;
   if (loading || !data) return <RowSkeleton />;
   return <Tracks tracks={data} kind={kind} />;
@@ -178,8 +181,9 @@ function MadeForYou({ kind }: { kind: SectionConfig["kind"] }) {
 function DailyMix({ kind }: { kind: SectionConfig["kind"] }) {
   const chart = useChart();
   const mine = topArtists(4);
-  const seeds = mine.length >= 2 ? mine : (chart.data?.artists ?? []).slice(0, 4).map((a) => ({ id: a.id, name: a.name, picture: a.picture }));
-  const pics = chart.data?.artists ?? [];
+  const seedInfo = useAsync(mine.length >= 2 ? null : "my:seedArtists", () => artistsFrom(MALAY_SEED_ARTISTS));
+  const seeds = mine.length >= 2 ? mine : (seedInfo.data ?? []).map((a) => ({ id: a.id, name: a.name, picture: a.picture }));
+  const pics = [...(chart.data?.artists ?? []), ...(seedInfo.data ?? [])];
   if (!seeds.length) return <RowSkeleton />;
   const play = async (id: string, name: string) => {
     try {
@@ -312,8 +316,43 @@ function Genres({ kind }: { kind: SectionConfig["kind"] }) {
   return kind === "row" ? <HScroll>{items}</HScroll> : <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">{items}</div>;
 }
 
+/** Before the user has any history: a Malay mix (nasyid + jiwang + rock). Replaced by their own taste as they listen. */
+function StarterMix({ kind }: { kind: SectionConfig["kind"] }) {
+  const { data, loading, error } = useAsync("my:starter", () => mixFrom([...MALAY.nasyid.slice(0, 3), ...MALAY.jiwang.slice(0, 3), ...MALAY.rock.slice(0, 3)], 2));
+  if (error) return <ErrorNote msg={error} />;
+  if (loading || !data) return <RowSkeleton />;
+  return <Tracks tracks={data} kind={kind} />;
+}
+
+function MalayTracks({ cacheKey, ids, per, kind }: { cacheKey: string; ids: string[]; per: number; kind: SectionConfig["kind"] }) {
+  const { data, loading, error } = useAsync(cacheKey, () => mixFrom(ids, per));
+  if (error) return <ErrorNote msg={error} />;
+  if (loading || !data) return <RowSkeleton />;
+  return <Tracks tracks={data} kind={kind} />;
+}
+
+function RockAlbums({ kind }: { kind: SectionConfig["kind"] }) {
+  const { data, loading, error } = useAsync("my:rockAlbums", () => albumsFrom(MALAY.rock, 2));
+  if (error) return <ErrorNote msg={error} />;
+  if (loading || !data) return <RowSkeleton />;
+  const cards = data.map((a) => <AlbumCard key={a.id} a={a} grid={kind === "grid"} onPlay={() => playAlbum(a.id)} />);
+  return kind === "grid" ? <Collection kind="grid">{cards}</Collection> : <HScroll>{cards}</HScroll>;
+}
+
+function MalayArtists() {
+  const { data, loading, error } = useAsync("my:artists", () => artistsFrom([...MALAY.nasyid.slice(0, 4), "5157170", ...MALAY.jiwang.slice(0, 4), ...MALAY.rock.slice(0, 4)]));
+  if (error) return <ErrorNote msg={error} />;
+  if (loading || !data) return <RowSkeleton />;
+  return <HScroll>{data.map((a) => <ArtistCircle key={a.id} a={a} />)}</HScroll>;
+}
+
 export const SECTION_COMPONENT: Record<SectionId, (p: { kind: SectionConfig["kind"] }) => React.ReactNode> = {
   greeting: () => <Greeting />,
+  nasyid: ({ kind }) => <MalayTracks cacheKey="my:nasyid" ids={MALAY.nasyid} per={4} kind={kind} />,
+  zikir: ({ kind }) => <MalayTracks cacheKey="my:zikir" ids={MALAY.zikir} per={5} kind={kind} />,
+  jiwang: ({ kind }) => <MalayTracks cacheKey="my:jiwang" ids={MALAY.jiwang} per={3} kind={kind} />,
+  rockAlbums: RockAlbums,
+  malayArtists: () => <MalayArtists />,
   continue: Continue,
   recent: Recent,
   madeForYou: MadeForYou,
@@ -343,7 +382,7 @@ export function SectionActions({ id }: { id: SectionId }) {
   if (id !== "favourites" || !favs.length) return null;
   return (
     <>
-      <button aria-label="Main semua kegemaran" onClick={() => usePlayer.getState().playList(favs, 0, { shuffle: false })} className="grad-bg grid h-8 w-8 cursor-pointer place-items-center rounded-full text-white">
+      <button aria-label="Main semua kegemaran" onClick={() => usePlayer.getState().playList(favs, 0, { shuffle: false })} className="btn-luxe grid h-8 w-8 cursor-pointer place-items-center rounded-full">
         <Play className="ml-0.5 h-3.5 w-3.5 fill-current" />
       </button>
       <button aria-label="Main rawak kegemaran" onClick={() => usePlayer.getState().playList(favs, 0, { shuffle: true })} className="grid h-8 w-8 cursor-pointer place-items-center rounded-full bg-card ring-1 ring-line">

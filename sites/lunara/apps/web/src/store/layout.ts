@@ -11,6 +11,11 @@ export type SectionKind = "row" | "grid" | "list" | "hero" | "circles";
 
 export type SectionId =
   | "greeting"
+  | "nasyid"
+  | "zikir"
+  | "jiwang"
+  | "rockAlbums"
+  | "malayArtists"
   | "continue"
   | "recent"
   | "madeForYou"
@@ -34,6 +39,11 @@ export interface SectionConfig {
 
 export const SECTION_LABEL: Record<SectionId, string> = {
   greeting: "Ucapan & sorotan",
+  nasyid: "Nasyid Pilihan",
+  zikir: "Zikir & Selawat",
+  jiwang: "Rock Jiwang & Balada Melayu",
+  rockAlbums: "Album Rock Kapak 80an & 90an",
+  malayArtists: "Artis Melayu Pilihan",
   continue: "Sambung Mendengar",
   recent: "Baru Dimainkan",
   madeForYou: "Dibuat Untuk Anda",
@@ -51,6 +61,11 @@ export const SECTION_LABEL: Record<SectionId, string> = {
 
 export const SECTION_KINDS: Record<SectionId, SectionKind[]> = {
   greeting: ["hero"],
+  nasyid: ["row", "grid", "list"],
+  zikir: ["list", "row", "grid"],
+  jiwang: ["row", "list", "grid"],
+  rockAlbums: ["row", "grid"],
+  malayArtists: ["circles", "row"],
   continue: ["row", "list"],
   recent: ["row", "grid", "list"],
   madeForYou: ["row", "grid"],
@@ -66,20 +81,28 @@ export const SECTION_KINDS: Record<SectionId, SectionKind[]> = {
   genres: ["grid", "row"],
 };
 
+// Default for new users: Malay nasyid / zikir / jiwang / rock kapak. Global (western) charts are
+// available but hidden by default; users can switch them on in Layout Studio.
+export const GLOBAL_SECTIONS: SectionId[] = ["trending", "topHits", "newReleases", "artists", "albums", "genres"];
 const DEFAULT_SECTIONS: SectionConfig[] = [
   { id: "greeting", visible: true, kind: "hero" },
   { id: "continue", visible: true, kind: "row" },
-  { id: "recent", visible: true, kind: "row" },
   { id: "madeForYou", visible: true, kind: "row" },
-  { id: "trending", visible: true, kind: "list" },
-  { id: "newReleases", visible: true, kind: "row" },
-  { id: "artists", visible: true, kind: "circles" },
+  { id: "nasyid", visible: true, kind: "row" },
+  { id: "zikir", visible: true, kind: "list" },
+  { id: "jiwang", visible: true, kind: "row" },
+  { id: "rockAlbums", visible: true, kind: "row" },
+  { id: "malayArtists", visible: true, kind: "circles" },
   { id: "dailyMix", visible: true, kind: "row" },
-  { id: "topHits", visible: true, kind: "row" },
-  { id: "albums", visible: true, kind: "row" },
+  { id: "recent", visible: true, kind: "row" },
   { id: "favourites", visible: true, kind: "list" },
   { id: "recentlyAdded", visible: true, kind: "list" },
   { id: "playlists", visible: true, kind: "row" },
+  { id: "trending", visible: false, kind: "list" },
+  { id: "newReleases", visible: false, kind: "row" },
+  { id: "artists", visible: false, kind: "circles" },
+  { id: "topHits", visible: false, kind: "row" },
+  { id: "albums", visible: false, kind: "row" },
   { id: "genres", visible: false, kind: "grid" },
 ];
 
@@ -152,7 +175,13 @@ export const useLayout = create<LayoutState>()(
     }),
     {
       name: "lunara-layout",
-      version: 1,
+      version: 2,
+      migrate: (s, v) => {
+        const st = s as Partial<LayoutState>;
+        // v2: Malay-first home. Put the new Malay sections first and hide global charts.
+        if (v < 2) st.sections = DEFAULT_SECTIONS;
+        return st as LayoutState;
+      },
       skipHydration: true,
       partialize: ({ editing, ...rest }) => (void editing, rest),
       merge: (persisted, current) => {

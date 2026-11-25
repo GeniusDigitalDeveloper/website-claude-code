@@ -3,6 +3,7 @@ import { Inter, Sora } from "next/font/google";
 import "./globals.css";
 import { AppShell } from "@/components/shell/AppShell";
 import { BRAND } from "@/components/shell/Logo";
+import { THEMES, themeVars } from "@/lib/themes";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const sora = Sora({ subsets: ["latin"], variable: "--font-sora", weight: ["600", "700", "800"], display: "swap" });
@@ -17,17 +18,14 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#08062b" },
-    { media: "(prefers-color-scheme: light)", color: "#f5f5fb" },
-  ],
+  themeColor: "#f7f5ff",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
 };
 
-// Applies the saved theme before first paint (no flash). Mirrors store/settings.ts.
-const themeScript = `(()=>{try{var s=JSON.parse(localStorage.getItem('lunara-settings')||'{}').state||{};var t=s.theme||'system';var d=t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.theme=d?'dark':'light'}catch(e){document.documentElement.dataset.theme='dark'}})()`;
+// Applies the saved mode + colour theme before first paint (no flash). Mirrors components/shell/AppShell.tsx.
+const themeScript = `(()=>{var T=${JSON.stringify(THEMES)};var V=${themeVars.toString()};try{var s=JSON.parse(localStorage.getItem('lunara-settings')||'{}').state||{};var m=s.theme||'light';var n=m==='night'||m==='dark'||(m==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);var t=T.find(function(x){return x.id===s.colorTheme})||T[0];var r=document.documentElement;r.dataset.theme=n?'dark':'light';if((s.language||'en')==='en'){r.lang='en';r.classList.add('i18n-wait');setTimeout(function(){r.classList.remove('i18n-wait')},2500)}var v=V(t,n);for(var k in v)r.style.setProperty(k,v[k])}catch(e){document.documentElement.dataset.theme='light'}})()`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

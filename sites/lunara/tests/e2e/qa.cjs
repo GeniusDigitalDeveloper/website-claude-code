@@ -12,12 +12,13 @@ const log = (...a) => console.log(...a);
   page.on('pageerror', e => errors.push('pageerror@' + page.url() + ': ' + e.message.split('\n').filter(l => /^\s*[+-]|^\s*<[A-Z]/.test(l)).slice(-14).join('\n')));
   page.on('console', m => { if (m.type() === 'error') errors.push('console@' + page.url() + ': ' + m.text().split('\n').filter(l => /^\s*[+-]|@|<|tree/.test(l)).slice(0,25).join('\n')); });
   await page.goto(URL, { waitUntil: 'load' });
-  await page.waitForSelector('text=Trending Seluruh Dunia');
+  await page.evaluate(() => { localStorage.setItem('lunara-settings', JSON.stringify({ state: { language: 'ms', languageChosen: true, theme: 'light', colorTheme: 'lunara', fade: { enabled: true, fadeIn: true, fadeOut: true, fadeInSec: 2, fadeOutSec: 2, crossfade: false, crossfadeSec: 6 }, quality: 'high', autoplay: true, normalize: false, playbackRate: 1, notifications: true, keepHistory: true, privatePlaylistsByDefault: true, updatedAt: 1 }, version: 3 })); }); await page.reload({ waitUntil: 'load' });
+  await page.waitForSelector('text=Nasyid Pilihan');
   await sleep(1500);
   await page.screenshot({ path: `${OUT}/01-home-bento-1440-dark.png` });
 
   // ---- play first trending track
-  const playBtn = page.locator('section[aria-label="Trending Seluruh Dunia"] button[aria-label^="Main "]').first();
+  const playBtn = page.locator('section[aria-label="Nasyid Pilihan"] button[aria-label^="Main "]').first();
   await playBtn.click();
   const gains = [];
   const t0 = Date.now();
@@ -69,7 +70,16 @@ const log = (...a) => console.log(...a);
   await page.keyboard.press('Escape'); await sleep(500);
   await page.locator('button[aria-label="Jeda"]:visible').first().click().catch(()=>{});
 
-  // ---- search
+  // ---- single top search box: suggestions + Enter -> results
+  await page.goto(`${URL}/`, { waitUntil: 'load' }); await sleep(1500);
+  const box = page.locator('header input[aria-label="Cari muzik"]');
+  log('search inputs on home:', await page.locator('input[aria-label="Cari muzik"]').count(), '| sidebar "Cari" links:', await page.locator('aside a[href="/search"], nav a[href="/search"]').count());
+  const bb = await box.boundingBox(); log('search box centre x:', Math.round(bb.x + bb.width / 2), 'of', 1440);
+  await box.fill('adnin roslan'); await sleep(2500);
+  log('suggestions:', await page.locator('[role=listbox][aria-label="Cadangan carian"] [role=option]').count());
+  await page.screenshot({ path: `${OUT}/05b-top-search-suggest.png` });
+  await box.press('Enter'); await sleep(3500);
+  log('after Enter url:', page.url().replace(URL, ''), '| inputs on /search:', await page.locator('input[aria-label="Cari muzik"]').count(), '| h1:', await page.locator('main h1').first().textContent());
   await page.goto(`${URL}/search?q=siti%20nurhaliza`, { waitUntil: 'load' });
   await sleep(1500);
   await page.screenshot({ path: `${OUT}/05-search-1440.png` });
@@ -114,16 +124,16 @@ const log = (...a) => console.log(...a);
   // ---- mobile
   const m = await browser.newContext({ ignoreHTTPSErrors: true, viewport: { width: 375, height: 812 }, colorScheme: 'dark', isMobile: true, hasTouch: true, deviceScaleFactor: 1 });
   const mp = await m.newPage(); mp.on('pageerror', e => errors.push('M pageerror@' + mp.url() + ': ' + e.message.slice(0,80)));
-  for (const [path, name] of [['/', 'home'], ['/search?q=hindia', 'search'], ['/local', 'local'], ['/settings', 'settings'], ['/login', 'login'], ['/profile', 'profile'], ['/studio', 'studio'], ['/album/302127', 'album']]) {
+  for (const [path, name] of [['/', 'home'], ['/search?q=hindia', 'search'], ['/local', 'local'], ['/settings', 'settings'], ['/login', 'login'], ['/profile', 'profile'], ['/studio', 'studio'], ['/album?id=302127', 'album']]) {
     await mp.goto(URL + path, { waitUntil: 'load' }); await sleep(1500);
     const sw = await mp.evaluate(() => [document.documentElement.scrollWidth, innerWidth]);
     log(`mobile ${name}: scrollWidth ${sw[0]} / ${sw[1]}`);
     await mp.screenshot({ path: `${OUT}/m-${name}.png` });
   }
   await mp.goto(URL, { waitUntil: 'load' }); await sleep(1500);
-  await mp.locator('section[aria-label="Trending Seluruh Dunia"] button[aria-label^="Main "]').first().click(); await sleep(2500);
+  await mp.locator('section[aria-label="Featured Nasyid"] button[aria-label^="Play "]').first().click(); await sleep(2500);
   await mp.screenshot({ path: `${OUT}/m-home-playing.png` });
-  await mp.locator('button[aria-label="Buka pemain skrin penuh"]').click(); await sleep(900);
+  await mp.locator('button[aria-label="Open full-screen player"]').click(); await sleep(900);
   await mp.screenshot({ path: `${OUT}/m-full-player.png` });
   const t = await browser.newContext({ ignoreHTTPSErrors: true, viewport: { width: 768, height: 1024 }, colorScheme: 'dark' });
   const tp = await t.newPage(); tp.on('pageerror', e => errors.push('T@' + tp.url() + e.message.slice(0,60)));

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ACCEPT, addFolder, folderScanSupported, forgetFolder, importFiles, listFolders, removeFromLibrary, rescanFolders, storageEstimate, SUPPORTED_EXT, type LocalTrack } from "@/lib/local-music";
 import { useLibrary } from "@/store/library";
+import { tr } from "@/i18n";
 import { usePlayer } from "@/store/player";
 import { toast } from "@/store/toast";
 import { ImageCropper, normalizeImage } from "@/components/media/ImageCropper";
@@ -159,7 +160,7 @@ export default function LocalMusic() {
 
   const removeSel = async (ids: string[]) => {
     const tracks = all.filter((t) => ids.includes(t.id));
-    if (!confirm(`Buang ${tracks.length} lagu dari pustaka LUNARA MUSIC?\n\nFail asal pada peranti TIDAK akan dipadam.`)) return;
+    if (!confirm(tr(`Buang ${tracks.length} lagu dari pustaka LUNARA MUSIC?\n\nFail asal pada peranti TIDAK akan dipadam.`))) return;
     for (const t of tracks) await removeFromLibrary(t);
     L().removeLocal(ids);
     setSel(new Set());

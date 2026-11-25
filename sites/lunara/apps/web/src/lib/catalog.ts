@@ -47,17 +47,91 @@ function jsonp<T>(url: string, timeoutMs = 12000): Promise<T> {
   });
 }
 
+// Deezer allows ~50 requests / 5 s per user. Stay under it, de-duplicate identical calls,
+// retry politely on "quota exceeded", and keep slow-changing catalogue data in localStorage.
+const WINDOW_MS = 5000;
+const MAX_PER_WINDOW = 40;
+const sent: number[] = [];
+const inflight = new Map<string, Promise<any>>();
+const LS_PREFIX = "lunara-dz:";
+const LS_TTL = 6 * 3600_000;
+
+async function slot() {
+  for (;;) {
+    const now = Date.now();
+    while (sent.length && now - sent[0] > WINDOW_MS) sent.shift();
+    if (sent.length < MAX_PER_WINDOW) {
+      sent.push(now);
+      return;
+    }
+    await new Promise((r) => setTimeout(r, WINDOW_MS - (now - sent[0]) + 30));
+  }
+}
+
+function lsGet(url: string) {
+  try {
+    const raw = localStorage.getItem(LS_PREFIX + url);
+    if (!raw) return undefined;
+    const { at, data } = JSON.parse(raw);
+    if (Date.now() - at > LS_TTL) return undefined;
+    return data;
+  } catch {
+    return undefined;
+  }
+}
+function lsSet(url: string, data: unknown) {
+  try {
+    localStorage.setItem(LS_PREFIX + url, JSON.stringify({ at: Date.now(), data }));
+  } catch {
+    // storage full: drop our old entries and carry on
+    try {
+      Object.keys(localStorage).filter((k) => k.startsWith(LS_PREFIX)).slice(0, 40).forEach((k) => localStorage.removeItem(k));
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
 async function api<T = any>(path: string, params: Record<string, string | number> = {}): Promise<T> {
   if (!ALLOWED.some((r) => r.test(path))) throw new Error("endpoint_not_allowed");
   const qs = new URLSearchParams(Object.entries(params).map(([k, v]) => [k, String(v).slice(0, 200)]));
   const url = `https://api.deezer.com/${path}${qs.size ? `?${qs}` : ""}`;
   const noCache = path.startsWith("track/"); // preview links are signed and expire
+  const persist = !noCache && !path.startsWith("search");
   const hit = memo.get(url);
   if (!noCache && hit && Date.now() - hit.at < 10 * 60_000) return hit.data as T;
-  const data = await jsonp<any>(url);
-  if (data?.error) throw new Error(data.error.message ?? "upstream_error");
-  if (!noCache) memo.set(url, { at: Date.now(), data });
-  return data as T;
+  if (persist) {
+    const stored = lsGet(url);
+    if (stored !== undefined) {
+      memo.set(url, { at: Date.now(), data: stored });
+      return stored as T;
+    }
+  }
+  const running = inflight.get(url);
+  if (running) return running as Promise<T>;
+  const job = (async () => {
+    for (let attempt = 0; ; attempt++) {
+      await slot();
+      const data = await jsonp<any>(url);
+      if (data?.error) {
+        // code 4 = quota exceeded: wait and retry
+        if (data.error.code === 4 && attempt < 4) {
+          await new Promise((r) => setTimeout(r, 1200 * (attempt + 1)));
+          continue;
+        }
+        throw new Error(data.error.message ?? "upstream_error");
+      }
+      if (!noCache) memo.set(url, { at: Date.now(), data });
+      if (persist) lsSet(url, data);
+      return data as T;
+    }
+  })();
+  inflight.set(url, job);
+  try {
+    return await job;
+  } finally {
+    inflight.delete(url);
+  }
 }
 
 /** Health check used by the admin dashboard. */
@@ -68,6 +142,9 @@ export async function pingCatalog() {
 }
 
 export const PREVIEW_SECONDS = 30;
+
+/** Official Deezer page for the full-length song (opens the Deezer app/site). */
+export const fullSongUrl = (t: { id: string; provider: string }) => (t.provider === "deezer" ? `https://www.deezer.com/track/${t.id.replace(/^dz:/, "")}` : null);
 
 export function mapTrack(t: any, albumFallback?: { title?: string; id?: number; cover?: string }): Track {
   return {
@@ -175,6 +252,19 @@ export const catalog = {
       singles: all.filter((x) => x.recordType === "single"),
       related: (related.data ?? []).map(mapArtist) as Artist[],
     };
+  },
+  async artistTop(id: string, limit = 10) {
+    const r = await api(`artist/${id}/top`, { limit });
+    return (r.data ?? []).map((t: any) => mapTrack(t)) as Track[];
+  },
+  async artistAlbums(id: string) {
+    const r = await api(`artist/${id}/albums`, { limit: 25 });
+    const all = (r.data ?? []).map(mapAlbum) as Album[];
+    const albums = all.filter((a) => a.recordType !== "single");
+    return (albums.length ? albums : all).map((a) => ({ ...a, artistId: a.artistId ?? id }));
+  },
+  async artistInfo(id: string) {
+    return mapArtist(await api(`artist/${id}`));
   },
   async artistRadio(id: string) {
     const r = await api(`artist/${id}/radio`, { limit: 25 });

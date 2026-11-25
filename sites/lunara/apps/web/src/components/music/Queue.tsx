@@ -51,7 +51,7 @@ export function QueueList() {
           }}
         >
           <input autoFocus className={inputCls} placeholder="Nama playlist" value={name} onChange={(e) => setName(e.target.value)} aria-label="Nama playlist" />
-          <button className="grad-bg cursor-pointer rounded-xl px-3 text-sm font-semibold text-white">Simpan</button>
+          <button className="btn-luxe cursor-pointer rounded-xl px-3 text-sm font-bold">Simpan</button>
         </form>
       )}
       <div className="thin-scroll min-h-0 flex-1 overflow-y-auto pr-1">
@@ -63,9 +63,9 @@ export function QueueList() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <NowEq paused={!playing} />
-                  <p className="truncate text-sm font-semibold text-acc">{cur.title}</p>
+                  <p translate="no" className="truncate text-sm font-semibold text-acc">{cur.title}</p>
                 </div>
-                <p className="truncate text-xs text-muted">{cur.artist}</p>
+                <p translate="no" className="truncate text-xs text-muted">{cur.artist}</p>
               </div>
             </div>
           </>
@@ -80,7 +80,7 @@ export function QueueList() {
                   <button type="button" className="flex min-w-0 flex-1 cursor-pointer items-center gap-3 text-left" onClick={() => p().jumpTo(index + 1 + i)} aria-label={`Main ${t.title} dari giliran`}>
                     <Artwork src={t.artwork} alt="" className="h-10 w-10" rounded="rounded-lg" />
                     <span className="min-w-0">
-                      <span className="block truncate text-sm font-medium">{t.title}</span>
+                      <span translate="no" className="block truncate text-sm font-medium">{t.title}</span>
                       <span className="flex items-center gap-1.5 truncate text-xs text-muted">
                         {t.artist} <SourceBadge t={t} />
                       </span>
@@ -101,7 +101,7 @@ export function QueueList() {
             {queue.slice(0, index).map((t, i) => (
               <button key={`${t.id}-p${i}`} onClick={() => p().jumpTo(i)} className="flex w-full cursor-pointer items-center gap-3 rounded-xl p-1.5 text-left opacity-60 hover:bg-card-hover hover:opacity-100">
                 <Artwork src={t.artwork} alt="" className="h-9 w-9" rounded="rounded-lg" />
-                <span className="min-w-0 truncate text-sm">{t.title}</span>
+                <span translate="no" className="min-w-0 truncate text-sm">{t.title}</span>
               </button>
             ))}
           </>

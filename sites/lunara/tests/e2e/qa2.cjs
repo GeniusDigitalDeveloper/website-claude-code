@@ -4,11 +4,11 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   const b = await chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'], proxy: { server: process.env.HTTPS_PROXY, bypass: 'localhost,127.0.0.1' } });
   const p = await (await b.newContext({ ignoreHTTPSErrors: true, viewport: { width: 1440, height: 900 } })).newPage();
   const errs = []; p.on('pageerror', e => errs.push(e.message.slice(0, 120)));
-  await p.goto('http://localhost:3100/', { waitUntil: 'load' }); await sleep(3500);
+  await p.goto('http://localhost:3100/', { waitUntil: 'load' }); await p.evaluate(() => localStorage.setItem('lunara-settings', JSON.stringify({ state: { language: 'ms', languageChosen: true, theme: 'light', colorTheme: 'lunara', fade: { enabled: true, fadeIn: true, fadeOut: true, fadeInSec: 2, fadeOutSec: 2, crossfade: false, crossfadeSec: 6 }, quality: 'high', autoplay: true, keepHistory: true, playbackRate: 1, updatedAt: 1 }, version: 3 }))); await p.reload({ waitUntil: 'load' }); await sleep(4000);
   const A = (fn, ...args) => p.evaluate(fn, ...args);
   // ---- crossfade (independent of pause/resume fade)
   await A(() => window.__lunara.settings.getState().setFade({ crossfade: true, crossfadeSec: 4 }));
-  await p.locator('section[aria-label="Trending Seluruh Dunia"] button[aria-label^="Main "]').first().click();
+  await p.locator('section[aria-label="Nasyid Pilihan"] button[aria-label^="Main "]').first().click();
   await sleep(3000);
   await A(() => window.__lunara.player.getState().seek(23));
   const t0 = await A(() => window.__lunara.player.getState().current().title);
@@ -31,7 +31,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
   console.log('repeat:', await A(() => window.__lunara.player.getState().repeat));
   const plId = await A(() => window.__lunara.player.getState().saveQueueAsPlaylist('Ujian Giliran'));
   // ---- playlist page: rename, reorder via store, duplicate, delete
-  await p.goto('http://localhost:3100/playlist/' + plId, { waitUntil: 'load' }); await sleep(2500);
+  await p.goto('http://localhost:3100/playlist?id=' + plId, { waitUntil: 'load' }); await sleep(2500);
   console.log('playlist page shows:', await p.locator('h1').first().textContent(), '| tracks:', await A(() => window.__lunara.library.getState().playlists[0].tracks.length));
   await p.locator('button:has-text("Edit")').first().click(); await sleep(400);
   await p.locator('input[required]').first().fill('Playlist Ujian Dinamakan');

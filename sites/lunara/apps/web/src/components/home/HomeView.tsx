@@ -41,7 +41,7 @@ export function HomeView() {
               <Link href="/studio" className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold ring-1 ring-line hover:bg-card">
                 <LayoutDashboard className="h-3.5 w-3.5" /> Studio penuh
               </Link>
-              <button onClick={() => L().set({ editing: false })} className="grad-bg flex cursor-pointer items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-semibold text-white">
+              <button onClick={() => L().set({ editing: false })} className="btn-luxe flex cursor-pointer items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-bold">
                 <Check className="h-3.5 w-3.5" /> Siap
               </button>
             </div>

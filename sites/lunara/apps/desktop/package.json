@@ -1,0 +1,53 @@
+{
+  "name": "lunara-music-desktop",
+  "productName": "LUNARA MUSIC",
+  "version": "1.0.0",
+  "description": "LUNARA MUSIC for Windows: always runs the latest live version, no manual updates.",
+  "author": "LUNARA MUSIC",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist:lite": "cd lite && makensis -V2 launcher.nsi && makensis -V2 installer.nsi && cp ../dist/LUNARA-MUSIC-Setup.exe ../../../downloads/",
+    "dist:full": "electron-builder --win dir --x64 --publish never && makensis -V2 installer.nsi"
+  },
+  "build": {
+    "appId": "app.lunara.music",
+    "productName": "LUNARA MUSIC",
+    "artifactName": "LUNARA-MUSIC-Setup.${ext}",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "offline.html",
+      "build/icon.png"
+    ],
+    "afterPack": "./scripts/set-icon.cjs",
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "build/icon.ico",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "runAfterFinish": true,
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "shortcutName": "LUNARA MUSIC",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "deleteAppDataOnUninstall": false
+    }
+  },
+  "devDependencies": {
+    "electron": "45.5.0",
+    "electron-builder": "26.0.12",
+    "resedit": "^2.0.3"
+  }
+}
