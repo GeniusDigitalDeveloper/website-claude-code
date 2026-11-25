@@ -137,7 +137,7 @@ async function renderApp(segs, q) {
       if (!sub) return M.renderList(view, ctx, type); if (sub === "new") return M.renderEditor(view, ctx, type, null);
       return sub2 === "edit" ? M.renderEditor(view, ctx, type, sub) : M.renderView(view, ctx, type, sub);
     }
-    if (page === "receipts") { const M = await import("./modules/receipts.js"); return sub === "new" ? M.renderForm(view, ctx, q) : M.renderList(view, ctx); }
+    if (page === "receipts") { const M = await import("./modules/receipts.js"); return sub === "new" ? M.renderForm(view, ctx, q) : sub && sub2 === "edit" ? M.renderEdit(view, ctx, sub) : M.renderList(view, ctx); }
     if (page === "customers") return await (await import("./modules/customers.js")).renderList(view, ctx);
     if (page === "products") return await (await import("./modules/products.js")).renderList(view, ctx);
     if (page === "profile") return await (await import("./modules/profile.js")).render(view, ctx, sub);

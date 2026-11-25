@@ -43,3 +43,11 @@ Kunci harian `YYYY-MM-DD` dan bulanan `YYYY-MM` dikira dalam `Asia/Kuala_Lumpur`
 ## Ujian tempatan pada emulator (tanpa menyentuh data sebenar)
 `firebase emulators:exec --only auth,firestore --project genius-digital-40bc9 "<skrip ujian>"` — app menyambung ke emulator hanya pada `localhost`
 apabila `localStorage.inv_emulator` ditetapkan.
+
+## PERINGATAN rules (projek dikongsi)
+Rules Firestore dikongsi dengan app lain (Genius Digital, Malaysia PDF/Image Tools, Streamverse, CodeLab, Flash Link ...) dan **berubah di luar repo ini**.
+Sebelum setiap `firebase deploy --only firestore:rules`: ambil rules LIVE semasa, tambah/ubah **hanya blok `inv_`** pada salinan itu, bandingkan (`diff`) dengan rules live,
+dan pastikan tiada baris app lain terpadam. Jangan deploy `firestore.rules` repo tanpa menyegerakkannya dengan rules live dahulu. Salinan sebelum perubahan terakhir: `rules-backup/`.
+
+## Fon
+Tajuk & teks tebal = Poppins; teks biasa/sub (kelabu) = Montserrat (UI melalui Google Fonts; PDF membenamkan `assets/fonts/*.ttf`).

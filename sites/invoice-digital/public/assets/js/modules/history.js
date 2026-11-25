@@ -3,6 +3,7 @@ import { esc, $, money, calc, fmtDate, debounce, invoiceStatus, quotationStatus 
 import { listLive } from "../db.js";
 import { errMsg } from "../auth.js";
 import { ico, empty, loading, badge } from "./ui.js";
+import { limitRows } from "./bulk.js";
 
 export async function render(el, ctx, embedded = false) {
   el.innerHTML = loading(); let inv = [], quo = [], rec = [], mounted = false, draw = () => {}; const seen = new Set();
@@ -10,9 +11,9 @@ export async function render(el, ctx, embedded = false) {
     .sort((a, b) => ((b.createdAt && b.createdAt.seconds) || 9e12) - ((a.createdAt && a.createdAt.seconds) || 9e12));
   const mount = () => {
   el.innerHTML = `${embedded ? "" : `<div class="page-h"><div><h1>${t("nav_history")}</h1><p class="sub">${t("history_sub")}</p></div></div>`}<div class="card"><div class="toolbar"><div class="search">${ico("search")}<input id="q" type="search" placeholder="${esc(t("search_ph"))}" aria-label="${esc(t("search_ph"))}"></div>
-  <select id="tf" aria-label="${esc(t("f_type"))}"><option value="">${t("all_types")}</option><option value="invoice">${t("nav_invoices")}</option><option value="quotation">${t("nav_quotations")}</option><option value="receipt">${t("nav_receipts")}</option></select></div><div id="tbl"></div></div>`;
+  <select id="tf" aria-label="${esc(t("f_type"))}"><option value="">${t("all_types")}</option><option value="invoice">${t("nav_invoices")}</option><option value="quotation">${t("nav_quotations")}</option><option value="receipt">${t("nav_receipts")}</option></select></div><div id="tbl" class="scrollbox"></div></div>`;
   draw = () => { const q = $("#q", el).value.toLowerCase(), tf = $("#tf", el).value; const list = allRows().filter((x) => (!tf || x.type === tf) && (!q || [x.number, x.customer && x.customer.name, x.customerName].join(" ").toLowerCase().includes(q))).slice(0, 300);
-    $("#tbl", el).innerHTML = list.length ? `<table class="tbl"><thead><tr><th>${t("f_type")}</th><th>${t("col_number")}</th><th>${t("col_customer")}</th><th>${t("col_date")}</th><th class="r">${t("col_total")}</th><th>${t("f_status")}</th></tr></thead><tbody>${list.map((x) => `<tr><td data-l="${t("f_type")}">${t("nav_" + x.route)}</td><td data-l="${t("col_number")}">${x.type === "receipt" ? `<b>${esc(x.number)}</b>` : `<a href="#/app/${x.route}/${x.id}"><b>${esc(x.number)}</b></a>`}</td><td data-l="${t("col_customer")}">${esc((x.customer && x.customer.name) || x.customerName || "-")}</td><td data-l="${t("col_date")}">${fmtDate(x.date, getLang())}</td><td class="r" data-l="${t("col_total")}">${money(x.amt)}</td><td data-l="${t("f_status")}">${x.st ? badge(x.st) : ""}</td></tr>`).join("")}</tbody></table>` : empty("clock", t("history_empty")); };
+    $("#tbl", el).innerHTML = list.length ? `<table class="tbl"><thead><tr><th class="idx">${t("col_index")}</th><th>${t("f_type")}</th><th>${t("col_number")}</th><th>${t("col_customer")}</th><th>${t("col_date")}</th><th class="r">${t("col_total")}</th><th>${t("f_status")}</th></tr></thead><tbody>${list.map((x, i) => `<tr><td class="idx" data-l="${t("col_index")}">${i + 1}</td><td data-l="${t("f_type")}">${t("nav_" + x.route)}</td><td data-l="${t("col_number")}">${x.type === "receipt" ? `<b>${esc(x.number)}</b>` : `<a href="#/app/${x.route}/${x.id}"><b>${esc(x.number)}</b></a>`}</td><td data-l="${t("col_customer")}">${esc((x.customer && x.customer.name) || x.customerName || "-")}</td><td class="nw" data-l="${t("col_date")}">${fmtDate(x.date, getLang())}</td><td class="r" data-l="${t("col_total")}">${money(x.amt)}</td><td data-l="${t("f_status")}">${x.st ? badge(x.st) : ""}</td></tr>`).join("")}</tbody></table>` : empty("clock", t("history_empty")); limitRows($("#tbl", el)); };
   draw(); $("#q", el).oninput = debounce(draw, 150); $("#tf", el).onchange = draw;
   };
   const upd = (k, set) => (r) => { set(r); seen.add(k); if (seen.size < 3) return; if (!mounted) { mounted = true; mount(); } else draw(); };

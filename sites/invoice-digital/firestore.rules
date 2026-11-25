@@ -1,7 +1,8 @@
 rules_version = '2';
 // GENIUS DIGITAL (projek Firebase dikongsi) — rules Firestore gabungan:
-// Genius Digital (products) | Malaysia PDF Tools | Streamverse Gaming | CodeLab Developer
+// Genius Digital (products) | Malaysia PDF Tools | Streamverse Gaming | CodeLab Developer | Invoice Digital (inv_) | Malaysia Image Tools (mit_)
 // Setiap aplikasi mengekalkan peraturan asalnya; fungsi bantu dinamakan semula dengan awalan (pdf/sv/cl).
+// Genius Digital memerlukan: gdIsAdmin(), koleksi genius_site, dan products guna gdIsAdmin() — JANGAN dipadam semasa mengemas kini rules app lain.
 // PENTING: fail ini ialah SATU-SATUNYA rules untuk projek. `firebase deploy --only firestore:rules` menggantikan
 // semua; sentiasa mulakan dari rules semasa projek (firebase_get_security_rules) sebelum mengubah.
 service cloud.firestore {
@@ -19,7 +20,7 @@ service cloud.firestore {
     }
 
     function isValidStatus(value) {
-      return value in ['active', 'coming-soon', 'hidden'];
+      return value in ['active', 'coming-soon', 'hidden', 'free', 'ended', 'soldout'];
     }
 
     // Medan yang dibenarkan dalam dokumen produk (selain ini ditolak).
@@ -27,7 +28,7 @@ service cloud.firestore {
       return data.keys().hasOnly([
         'name', 'slug', 'category', 'description',
         'thumbnailURL',
-        'status', 'productURL', 'displayOrder',
+        'status', 'productURL', 'displayOrder', 'price', 'originalPrice', 'priceType',
         'nameEn', 'categoryEn', 'descriptionEn',
         'nameAr', 'categoryAr', 'descriptionAr',
         'createdAt', 'updatedAt'
@@ -59,6 +60,16 @@ service cloud.firestore {
         && (value == '' || value.matches('https://.*') || value.matches('data:image/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+'));
     }
 
+    // Harga (RM): pilihan; jika ada mestilah nombor 0 - 1,000,000. originalPrice ialah harga asal yang dicoret.
+    function optPrice(data, key) {
+      return !(key in data) || (data[key] is number && data[key] >= 0 && data[key] <= 1000000);
+    }
+
+    // Jenis badge harga (pilihan): free | fixed | special | ended | soldout
+    function optPriceType(data) {
+      return !('priceType' in data) || (data.priceType is string && data.priceType in ['free', 'fixed', 'special', 'ended', 'soldout']);
+    }
+
     function hasValidFields(data, docId) {
       return hasOnlyAllowedKeys(data)
         && hasRequiredKeys(data)
@@ -75,6 +86,7 @@ service cloud.firestore {
         && isEmptyOrHttps(data.productURL) && data.productURL.size() <= 2048
         && data.displayOrder is number
         && data.displayOrder >= 0 && data.displayOrder <= 100000
+        && optPrice(data, 'price') && optPrice(data, 'originalPrice') && optPriceType(data)
         && data.createdAt is timestamp
         && data.updatedAt is timestamp;
     }
@@ -83,28 +95,47 @@ service cloud.firestore {
     match /products/{productId} {
 
       // Baca satu dokumen: produk awam, atau admin (termasuk hidden).
-      allow get: if isAdmin() || resource.data.status in ['active', 'coming-soon'];
+      allow get: if gdIsAdmin() || resource.data.status in ['active', 'coming-soon', 'free', 'ended', 'soldout'];
 
       // Senarai/query: admin boleh semua. Orang awam MESTI query dengan
       //   where('status', 'in', ['active', 'coming-soon'])
-      allow list: if isAdmin() || resource.data.status in ['active', 'coming-soon'];
+      allow list: if gdIsAdmin() || resource.data.status in ['active', 'coming-soon', 'free', 'ended', 'soldout'];
 
       // Cipta: admin sahaja, ID dokumen == slug, createdAt/updatedAt == masa pelayan.
-      allow create: if isAdmin()
+      allow create: if gdIsAdmin()
         && hasValidFields(request.resource.data, productId)
         && request.resource.data.createdAt == request.time
         && request.resource.data.updatedAt == request.time;
 
       // Kemas kini: admin sahaja, slug & createdAt tidak boleh diubah.
-      allow update: if isAdmin()
+      allow update: if gdIsAdmin()
         && hasValidFields(request.resource.data, productId)
         && request.resource.data.slug == resource.data.slug
         && request.resource.data.createdAt == resource.data.createdAt
         && request.resource.data.updatedAt == request.time;
 
       // Padam: admin sahaja.
-      allow delete: if isAdmin();
+      allow delete: if gdIsAdmin();
     }
+
+    // ---------- Genius Digital: pentadbir (claim admin ATAU e-mel pemilik). Hanya untuk products & genius_site. ----------
+    function gdIsAdmin() {
+      return isSignedIn() && (request.auth.token.admin == true
+        || request.auth.token.email == 'izzulmedia01@gmail.com');
+    }
+
+    // ---------- Koleksi: genius_site (tetapan laman awam Genius Digital: logo, jenama, hubungan, teks) ----------
+    match /genius_site/{docId} {
+      allow read: if true;
+      allow write: if gdIsAdmin() && docId == 'main'
+        && request.resource.data.keys().hasOnly(['logoURL', 'brandName', 'tagline', 'contact', 'texts', 'updatedAt'])
+        && (!('logoURL' in request.resource.data) || isValidThumbnail(request.resource.data.logoURL))
+        && (!('brandName' in request.resource.data) || (request.resource.data.brandName is string && request.resource.data.brandName.size() <= 60))
+        && (!('tagline' in request.resource.data) || (request.resource.data.tagline is string && request.resource.data.tagline.size() <= 120))
+        && (!('contact' in request.resource.data) || request.resource.data.contact is map)
+        && (!('texts' in request.resource.data) || request.resource.data.texts is map);
+    }
+
 
     // ================= MALAYSIA PDF TOOLS =================
 
@@ -403,14 +434,19 @@ service cloud.firestore {
           && invNew().number == resource.data.number && invNew().createdAt == resource.data.createdAt;
         allow delete: if invOwner(uid);   // pemilik boleh padam projek sendiri (UI minta pengesahan)
       }
-      // Resit: tidak boleh diubah selepas dicipta (integriti rekod); boleh dipadam oleh pemilik.
+      // Resit: boleh diedit/dipadam oleh pemilik (nombor, invois & tarikh cipta dikunci).
       match /receipts/{id} {
         allow create: if invOwner(uid) && invBase(uid)
           && invNew().amount is number && invNew().amount > 0
           && invNew().number is string && invNew().number.size() <= 40
           && invNew().createdAt == request.time;
-        // Padam resit dibenarkan (app memulihkan baki invoice dalam transaksi); tidak boleh diubah.
+        // Padam resit dibenarkan (app memulihkan baki invoice dalam transaksi).
         allow delete: if invOwner(uid);
+        // Edit resit (tarikh/jumlah/kaedah/nota/saiz imej): nombor, invois & tarikh cipta tidak boleh diubah.
+        allow update: if invOwner(uid) && invBase(uid) && resource.data.ownerUid == uid
+          && invNew().number == resource.data.number && invNew().createdAt == resource.data.createdAt
+          && invNew().invoiceId == resource.data.get('invoiceId', invNew().get('invoiceId', ''))
+          && invNew().amount is number && invNew().amount > 0;
       }
       // Kaunter nombor dokumen: hanya naik tepat +1 (digunakan dalam transaksi bersama dokumen).
       match /counters/{id} {
@@ -487,9 +523,156 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // ================= MALAYSIA IMAGE TOOLS (koleksi berawalan mit_) =================
+    // Admin = akaun yang ada dokumen admins/{uid} (sama seperti Malaysia PDF Tools)
+    // ATAU pemilik projek (claim admin / e-mel pemilik). Gambar pengguna TIDAK disimpan di mana-mana.
+
+    function mitIsAdmin() {
+      return isSignedIn() && (pdfIsAdmin() || isAdmin());
+    }
+    function mitIsSite(d) {
+      return d.keys().hasOnly(['announcementActive', 'announcement', 'announcementType', 'maintenance', 'maintenanceMessage', 'updatedAt', 'updatedBy'])
+        && d.announcementActive is bool
+        && d.announcement is string && d.announcement.size() <= 300
+        && d.announcementType in ['info', 'success', 'warning']
+        && d.maintenance is bool
+        && d.maintenanceMessage is string && d.maintenanceMessage.size() <= 300
+        && (!('updatedBy' in d) || (d.updatedBy is string && d.updatedBy.size() <= 120));
+    }
+    function mitIsTool(d) {
+      return d.keys().hasOnly(['enabled', 'featured', 'updatedAt'])
+        && (!('enabled' in d) || d.enabled is bool)
+        && (!('featured' in d) || d.featured is bool);
+    }
+    function mitIsFeedback(d) {
+      return d.keys().hasOnly(['name', 'message', 'tool', 'rating', 'status', 'createdAt'])
+        && d.keys().hasAll(['message', 'tool', 'rating', 'status', 'createdAt'])
+        && (!('name' in d) || (d.name is string && d.name.size() <= 60))
+        && d.message is string && d.message.size() > 0 && d.message.size() <= 1000
+        && d.tool is string && d.tool.size() <= 40
+        && d.rating is int && d.rating >= 1 && d.rating <= 5
+        && d.status == 'new'
+        && d.createdAt == request.time;
+    }
+
+    // Dokumen "pengawal" untuk semakan akses admin dari klien (boleh dibaca admin sahaja).
+    match /mit_private/{id} {
+      allow read: if mitIsAdmin();
+      allow write: if false;
+    }
+    match /mit_settings/{id} {
+      allow read: if true;
+      allow write: if mitIsAdmin() && id == 'site' && mitIsSite(request.resource.data);
+    }
+    match /mit_tools/{id} {
+      allow read: if true;
+      allow write: if mitIsAdmin() && id.matches('^[a-z0-9-]{1,40}$') && mitIsTool(request.resource.data);
+    }
+    match /mit_feedback/{id} {
+      allow create: if mitIsFeedback(request.resource.data);
+      allow read, delete: if mitIsAdmin();
+      allow update: if mitIsAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status in ['new', 'read'];
+    }
+
     // Semua laluan lain ditutup.
     match /{document=**} {
       allow read, write: if false;
     }
+
+    // ===== FLASH LINK RULES (tambahan) =====
+    function fl_isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    match /flashlink_users/{uid} {
+      allow read: if true;
+      allow create, update, delete: if fl_isOwner(uid);
+    }
+
+    match /flashlink_usernames/{username} {
+      allow read: if true;
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid;
+      allow update: if false;
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+
+    match /flashlink_links/{linkId} {
+      allow read: if true;
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid;
+      allow update: if (request.auth != null && resource.data.uid == request.auth.uid)
+        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['clicks'])
+            && request.resource.data.clicks == resource.data.clicks + 1);
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+
+    match /flashlink_events/{eventId} {
+      allow create: if request.resource.data.keys().hasOnly(['uid','linkId','type','device','referrer','createdAt']);
+      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    match /flashlink_leads/{leadId} {
+      allow create: if request.resource.data.keys().hasOnly(['uid','name','email','phone','message','createdAt']);
+      allow read, delete: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow update: if false;
+    }
+
+    // --- Shorten link (V-34) ---
+    match /flashlink_short/{code} {
+      allow get: if true;
+      allow list: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid
+        && (code.matches('^[a-z0-9]{4,12}$')
+            || (code.matches('^[a-z0-9]{4,12}_[a-z0-9-]{3,40}$')
+                && get(/databases/$(database)/documents/flashlink_users/$(request.auth.uid)).data.username == code.split('_')[0]))
+        && request.resource.data.keys().hasOnly(['uid','name','url','order','createdAt'])
+        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 60
+        && request.resource.data.url is string && request.resource.data.url.size() <= 2000
+        && request.resource.data.url.matches('^https?://.+');
+      allow update: if request.auth != null && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.keys().hasOnly(['uid','name','url','order','createdAt'])
+        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 60
+        && request.resource.data.url is string && request.resource.data.url.size() <= 2000
+        && request.resource.data.url.matches('^https?://.+');
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+
+    // --- Gambar resolusi tinggi (V-34): satu dokumen setiap gambar, rujukan "fli:ID" ---
+    match /flashlink_images/{id} {
+      allow get: if true;
+      allow list: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['uid','d','createdAt'])
+        && request.resource.data.d is string && request.resource.data.d.size() < 990000
+        && request.resource.data.d[0:23] == 'data:image/jpeg;base64,';
+      allow update: if false;
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+    // ===== V-77: Kolaborasi + ahli (tambahan sahaja, khusus flashlink_) =====
+    match /flashlink_collab/{id} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null && request.auth.token.admin == true;
+    }
+    match /flashlink_members/{uid} {
+      allow read: if request.auth != null && (request.auth.uid == uid || request.auth.token.admin == true);
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['email','displayName','createdAt','lastLogin','lang']);
+      allow delete: if request.auth != null && request.auth.token.admin == true;
+    }
+    // ===== V-81: teks keseluruhan + imej tapak (tambahan sahaja, khusus flashlink_) =====
+    match /flashlink_texts/{id} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null && request.auth.token.admin == true;
+    }
+    match /flashlink_site/{id} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null && request.auth.token.admin == true;
+    }
+    // ===== TAMAT FLASH LINK RULES =====
   }
 }

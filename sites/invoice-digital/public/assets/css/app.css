@@ -1,6 +1,6 @@
 :root{--bg:#fff;--bg2:#f6f8fc;--ink:#0f172a;--ink2:#334155;--mut:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue2:#1d4ed8;--cyan:#06b6d4;--purple:#7c3aed;--grad:linear-gradient(135deg,#2563eb 0%,#06b6d4 55%,#7c3aed 120%);--grad2:linear-gradient(135deg,#2563eb,#7c3aed);--r:16px;--sh:0 1px 2px rgba(15,23,42,.05),0 8px 24px rgba(37,99,235,.07);--sh2:0 12px 40px rgba(37,99,235,.18);--ok:#059669;--warn:#d97706;--err:#dc2626;--side:264px}
 *{box-sizing:border-box}html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
-body{margin:0;font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.55;overflow-x:hidden}
+body{margin:0;font-family:"Montserrat",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.55;overflow-x:hidden}
 img{max-width:100%;height:auto}a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}
 h1,h2,h3{line-height:1.2;margin:0 0 .4em;letter-spacing:-.01em}h1{font-size:clamp(1.5rem,2.4vw,1.9rem)}h2{font-size:1.1rem}h3{font-size:.95rem}
 p{margin:0 0 .8em}.muted{color:var(--mut);font-size:.85rem}.sub{color:var(--mut);margin:0}.center{text-align:center}.r{text-align:right}.mono{font-family:ui-monospace,monospace;font-size:.78rem;word-break:break-all}.hide{display:none!important}.pre{white-space:pre-wrap}
@@ -175,3 +175,19 @@ button,a,input,select,textarea,label,summary{touch-action:manipulation}
 .img-prev.checker{background-color:#fff;background-image:linear-gradient(45deg,#e8edf3 25%,transparent 25%),linear-gradient(-45deg,#e8edf3 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#e8edf3 75%),linear-gradient(-45deg,transparent 75%,#e8edf3 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0}
 .sig-g{display:grid;grid-template-columns:1fr 1fr;gap:18px}@media(max-width:700px){.sig-g{grid-template-columns:1fr}}
 .mt{margin-top:10px}.rrow{align-items:center}.rrow .rr{display:flex;align-items:center;gap:2px}.mini small{color:var(--mut)}
+
+/* === Fon: Poppins = tajuk & teks tebal; Montserrat = teks biasa & sub (kelabu) === */
+:root{--f-head:"Poppins","Montserrat",system-ui,-apple-system,"Segoe UI",sans-serif;--f-body:"Montserrat",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body,input,select,textarea,p,.muted,.sub,small,td small,.stat span,.kv span,.kv small,.mini small,.hero p,.sec-h p,.feat p,.steps p,.ft-slogan,.ft-copy,.ft-contact,.ft-stats span,.legend,.empty p,.toast,td{font-family:var(--f-body)}
+h1,h2,h3,h4,b,strong,th,label,.lbl,.btn,.badge,.brand,.app-name,.side-app,.side nav a,.bottom a,.bottom button,.tabs a,.tpl-n,.pill,.lang button,.avatar,.stat b,.totals .grand,.ft-stats b,.modal-h h3,.who-n,.opt-b,.eyebrow,.n{font-family:var(--f-head)}
+.btn{font-family:var(--f-head);font-weight:600}.muted b,.sub b{font-family:var(--f-head)}
+
+/* Senarai: kotak pilih, Bil., 6 baris kelihatan + scroll, bar tindakan pukal */
+.scrollbox{position:relative;overscroll-behavior:contain}.scrollbox .tbl thead th{position:sticky;top:0;background:#fff;z-index:2;box-shadow:0 1px 0 var(--line)}
+.tbl th.chk,.tbl td.chk{width:38px;padding-right:0}.tbl td.chk input,.tbl th.chk input{width:18px;height:18px;min-height:0;accent-color:var(--blue);cursor:pointer;padding:0}
+.tbl th.idx,.tbl td.idx{width:52px;color:var(--mut);white-space:nowrap}
+.bulkbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:8px 12px;margin-bottom:12px;position:sticky;top:64px;z-index:3}.bulkbar[hidden]{display:none}.bulk-n{font-family:var(--f-head);font-weight:600;color:var(--blue2)}
+.sizes{border:1px solid var(--line);border-radius:14px;padding:10px 14px;background:#fcfdff}.sizes summary{cursor:pointer;font-family:var(--f-head);font-weight:600;color:var(--ink2)}.size-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:10px}.size-g label{display:grid;gap:6px}.size-g output{float:right;color:var(--blue2);font-family:var(--f-head)}.size-g input[type=range]{padding:0;min-height:0;height:28px;accent-color:var(--blue)}
+@media(max-width:760px){.tbl td.chk{justify-content:flex-start;border-bottom:1px solid #f1f5f9;padding-bottom:8px}.tbl td.chk::before{content:none}.bulkbar{top:58px}}
+
+.tbl td.nw,.tbl td b{white-space:nowrap}@media(max-width:760px){.tbl td.nw,.tbl td b{white-space:normal}}

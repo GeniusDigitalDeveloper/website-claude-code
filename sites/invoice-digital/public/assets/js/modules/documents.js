@@ -10,6 +10,8 @@ import { pdfAction, makePdf } from "./actions.js";
 import { deleteProject, confirmKey } from "./projects.js";
 import { recordPayment, METHODS } from "./receipts.js";
 import { TEMPLATES } from "../pdf.js";
+import { bulkBarHtml, chkTh, chkTd, bulkController, limitRows } from "./bulk.js";
+import { sizesHtml, readSizes, diffSizes } from "../sizes.js";
 
 const CFG = {
   invoice: { col: "invoices", route: "invoices", fmt: "INV-{YYYY}-{NNNN}", statuses: ["draft", "sent", "unpaid", "partial", "paid", "cancelled"], eff: invoiceStatus, filter: ["draft", "sent", "unpaid", "partial", "paid", "overdue", "cancelled"] },
@@ -20,26 +22,29 @@ const dueOf = (type, d) => (type === "invoice" ? d.dueDate : d.validUntil);
 // ------------------------------------------------------------------ SENARAI
 export async function renderList(el, ctx, type) {
   const C = CFG[type]; el.innerHTML = loading();
-  let rows = [], mounted = false, draw = () => {};
+  let rows = [], shown = [], mounted = false, draw = () => {}, bulk = null;
   const mount = () => {
-  el.innerHTML = `<div class="page-h"><div><h1>${t("nav_" + C.route)}</h1><p class="sub">${t(type + "_sub")}</p></div><a class="btn primary" href="#/app/${C.route}/new">${ico("plus")}${t(type + "_new")}</a></div>
-  <div class="card"><div class="toolbar"><div class="search">${ico("search")}<input id="q" type="search" placeholder="${esc(t("search_ph"))}" aria-label="${esc(t("search_ph"))}"></div>
-  <select id="sf" aria-label="${esc(t("f_status"))}"><option value="">${t("all_status")}</option>${C.filter.map((s) => `<option value="${s}">${t("st_" + s)}</option>`).join("")}</select></div><div id="tbl"></div></div>`;
-  draw = () => {
-    const q = $("#q", el).value.toLowerCase(), sf = $("#sf", el).value;
-    const list = rows.filter((r) => (!sf || C.eff(r) === sf) && (!q || [r.number, r.customer && r.customer.name, r.customer && r.customer.company].join(" ").toLowerCase().includes(q)));
-    $("#tbl", el).innerHTML = list.length ? `<table class="tbl"><thead><tr><th>${t("col_number")}</th><th>${t("col_customer")}</th><th>${t("col_date")}</th><th>${t(type === "invoice" ? "col_due" : "col_valid")}</th><th class="r">${t("col_total")}</th><th>${t("f_status")}</th><th></th></tr></thead><tbody>${list.map((r) => `<tr>
-      <td data-l="${t("col_number")}"><a href="#/app/${C.route}/${r.id}"><b>${esc(r.number)}</b></a></td><td data-l="${t("col_customer")}">${esc((r.customer && r.customer.name) || "-")}</td>
-      <td data-l="${t("col_date")}">${fmtDate(r.date, getLang())}</td><td data-l="${t(type === "invoice" ? "col_due" : "col_valid")}">${fmtDate(dueOf(type, r), getLang())}</td>
-      <td class="r" data-l="${t("col_total")}"><b>${money(calc(r).total)}</b></td><td data-l="${t("f_status")}">${badge(C.eff(r))}</td>
-      <td class="acts"><a class="icon-btn" href="#/app/${C.route}/${r.id}" aria-label="${t("act_view")}">${ico("eye")}</a><button class="icon-btn" data-a="download" data-id="${r.id}" aria-label="${t("act_download")}">${ico("download")}</button><button class="icon-btn" data-a="dup" data-id="${r.id}" aria-label="${t("act_duplicate")}">${ico("copy")}</button></td></tr>`).join("")}</tbody></table>` : empty(type === "invoice" ? "doc" : "quote", t(type + "_empty"), `<a class="btn primary" href="#/app/${C.route}/new">${t(type + "_new")}</a>`);
-  };
-  draw(); $("#q", el).oninput = debounce(draw, 150); $("#sf", el).onchange = draw;
-  el.onclick = async (e) => {
-    const b = e.target.closest("[data-a]"); if (!b) return; const r = rows.find((x) => x.id === b.dataset.id); if (!r) return;
-    if (b.dataset.a === "download") pdfAction(ctx, type, r, "download");
-    if (b.dataset.a === "dup") { setBusy(b, true); try { const id = await duplicate(ctx, type, r); toast(t("duplicated")); ctx.nav(`#/app/${C.route}/${id}`); } catch (x) { toast(errMsg(x), "err"); setBusy(b, false); } }
-  };
+    el.innerHTML = `<div class="page-h"><div><h1>${t("nav_" + C.route)}</h1><p class="sub">${t(type + "_sub")}</p></div><a class="btn primary" href="#/app/${C.route}/new">${ico("plus")}${t(type + "_new")}</a></div>
+    <div class="card"><div class="toolbar"><div class="search">${ico("search")}<input id="q" type="search" placeholder="${esc(t("search_ph"))}" aria-label="${esc(t("search_ph"))}"></div>
+    <select id="sf" aria-label="${esc(t("f_status"))}"><option value="">${t("all_status")}</option>${C.filter.map((s) => `<option value="${s}">${t("st_" + s)}</option>`).join("")}</select></div>${bulkBarHtml()}<div id="tbl" class="scrollbox"></div></div>`;
+    bulk = bulkController(ctx, el, () => shown.map((r) => ({ k: type, id: r.id, doc: r })), () => rows.map((r) => ({ k: type, id: r.id, doc: r })));
+    draw = () => {
+      const q = $("#q", el).value.toLowerCase(), sf = $("#sf", el).value;
+      shown = rows.filter((r) => (!sf || C.eff(r) === sf) && (!q || [r.number, r.customer && r.customer.name, r.customer && r.customer.company].join(" ").toLowerCase().includes(q)));
+      $("#tbl", el).innerHTML = shown.length ? `<table class="tbl"><thead><tr>${chkTh()}<th class="idx">${t("col_index")}</th><th>${t("col_docno")}</th><th>${t("col_customer")}</th><th>${t("col_date")}</th><th>${t(type === "invoice" ? "col_due" : "col_valid")}</th><th class="r">${t("col_total")}</th><th>${t("f_status")}</th><th></th></tr></thead><tbody>${shown.map((r, i) => `<tr>
+        ${chkTd(type + ":" + r.id, r.number)}<td class="idx" data-l="${t("col_index")}">${i + 1}</td>
+        <td data-l="${t("col_docno")}"><a href="#/app/${C.route}/${r.id}"><b>${esc(r.number)}</b></a></td><td data-l="${t("col_customer")}">${esc((r.customer && r.customer.name) || "-")}</td>
+        <td class="nw" data-l="${t("col_date")}">${fmtDate(r.date, getLang())}</td><td class="nw" data-l="${t(type === "invoice" ? "col_due" : "col_valid")}">${fmtDate(dueOf(type, r), getLang())}</td>
+        <td class="r" data-l="${t("col_total")}"><b>${money(calc(r).total)}</b></td><td data-l="${t("f_status")}">${badge(C.eff(r))}</td>
+        <td class="acts"><a class="icon-btn" href="#/app/${C.route}/${r.id}/edit" aria-label="${t("act_edit")}" title="${t("act_edit")}">${ico("edit")}</a><a class="icon-btn" href="#/app/${C.route}/${r.id}" aria-label="${t("act_view")}" title="${t("act_view")}">${ico("eye")}</a><button class="icon-btn" data-a="download" data-id="${r.id}" aria-label="${t("act_download")}" title="${t("act_download")}">${ico("download")}</button><button class="icon-btn" data-a="dup" data-id="${r.id}" aria-label="${t("act_duplicate")}" title="${t("act_duplicate")}">${ico("copy")}</button></td></tr>`).join("")}</tbody></table>` : empty(type === "invoice" ? "doc" : "quote", t(type + "_empty"), `<a class="btn primary" href="#/app/${C.route}/new">${t(type + "_new")}</a>`);
+      limitRows($("#tbl", el)); bulk.sync();
+    };
+    draw(); $("#q", el).oninput = debounce(() => draw(), 150); $("#sf", el).onchange = () => draw();
+    el.onclick = async (e) => {
+      const b = e.target.closest("[data-a]"); if (!b) return; const r = rows.find((x) => x.id === b.dataset.id); if (!r) return;
+      if (b.dataset.a === "download") pdfAction(ctx, type, r, "download");
+      if (b.dataset.a === "dup") { setBusy(b, true); try { const id = await duplicate(ctx, type, r); toast(t("duplicated")); ctx.nav(`#/app/${C.route}/${id}`); } catch (x) { toast(errMsg(x), "err"); setBusy(b, false); } }
+    };
   };
   ctx.live(listLive(ctx.uid, C.col, (r) => { rows = r; if (!mounted) { mounted = true; mount(); } else draw(); }, (e) => { if (!mounted) el.innerHTML = `<p class="err">${esc(errMsg(e))}</p>`; }));
 }
@@ -87,7 +92,7 @@ export async function renderEditor(el, ctx, type, id) {
     <div id="items" class="items"></div></section>
    <section class="card form"><div class="grid2">
     <div class="form"><label>${t("pdf_note")}<textarea name="note" rows="3" maxlength="1000">${esc(d.note)}</textarea></label><label>${t("pdf_terms")}<textarea name="terms" rows="4" maxlength="2000">${esc(d.terms)}</textarea></label>
-     ${pickerHtml(d.template, d.color)}</div>
+     ${pickerHtml(d.template, d.color)}${sizesHtml(d.imgScale || {}, company, ["logo", "qr", "sig", "stamp"])}</div>
     <div class="form sum"><div class="grid2"><label>${t("f_docdisc")} (RM)<input name="docDiscount" type="number" min="0" step="0.01" value="${num(d.docDiscount)}"></label><label>${t("f_tax")} (%)<input name="taxRate" type="number" min="0" max="100" step="0.01" value="${num(d.taxRate)}"></label></div>
      ${type === "invoice" ? `<label>${t("pdf_deposit_due")} (RM)<input name="deposit" type="number" min="0" step="0.01" inputmode="decimal" value="${num(d.deposit)}"></label><p class="muted">${t("deposit_hint")}</p>` : ""}
      <div id="sum" class="totals" aria-live="polite"></div></div></div></section>
@@ -117,7 +122,7 @@ export async function renderEditor(el, ctx, type, id) {
     const btn = e.currentTarget; setBusy(btn, true); const dn = docNow();
     try {
       const docObj = { number: doc ? doc.number : "PRATONTON", date: f.date.value, status: f.status.value, customer: { name: f.cname.value.trim() || "-", company: f.ccompany.value.trim(), address: f.caddress.value.trim(), phone: f.cphone.value.trim(), email: f.cemail.value.trim(), regNo: f.cregNo.value.trim() },
-        items: items.filter((i) => i.name.trim()), docDiscount: dn.docDiscount, taxRate: dn.taxRate, taxName: d.taxName || "SST", deposit: dn.deposit, receiptsPaid: d.receiptsPaid || 0, note: f.note.value.trim(), terms: f.terms.value.trim(), template: f.template.value, color: f.color.value,
+        items: items.filter((i) => i.name.trim()), docDiscount: dn.docDiscount, taxRate: dn.taxRate, taxName: d.taxName || "SST", deposit: dn.deposit, receiptsPaid: d.receiptsPaid || 0, note: f.note.value.trim(), terms: f.terms.value.trim(), template: f.template.value, color: f.color.value, imgScale: readSizes(f),
         ...(type === "invoice" ? { dueDate: f.due.value } : { validUntil: f.due.value }) };
       const pdf = await makePdf(ctx, type, docObj); window.open(URL.createObjectURL(pdf.output("blob")), "_blank");
     } catch (x) { console.error(x); toast(t("pdf_fail"), "err"); } setBusy(btn, false);
@@ -144,7 +149,7 @@ export async function renderEditor(el, ctx, type, id) {
       let customerId = f.customerId.value; const customer = { name: f.cname.value.trim(), company: f.ccompany.value.trim(), address: f.caddress.value.trim(), phone: f.cphone.value.trim(), email: f.cemail.value.trim(), regNo: f.cregNo.value.trim() };
       if (!customerId && f.saveCust.checked) customerId = await create(ctx.uid, "customers", { ...customer, notes: "" });
       const data = { date: f.date.value, status: f.status.value, customerId: customerId || "", customer, items: valid.map((i) => ({ name: i.name.trim(), desc: (i.desc || "").trim(), qty: i.qty, price: i.price, discount: i.discount, ...(i.productId ? { productId: i.productId } : {}) })),
-        docDiscount: dn.docDiscount, taxRate: dn.taxRate, taxName: d.taxName || "SST", note: f.note.value.trim(), terms: f.terms.value.trim(), template: f.template.value, color: f.color.value,
+        docDiscount: dn.docDiscount, taxRate: dn.taxRate, taxName: d.taxName || "SST", note: f.note.value.trim(), terms: f.terms.value.trim(), template: f.template.value, color: f.color.value, imgScale: diffSizes(f, company),
         ...(type === "invoice" ? { dueDate: f.due.value, deposit: dn.deposit, receiptsPaid: d.receiptsPaid || 0, receiptCount: d.receiptCount || 0 } : { validUntil: f.due.value }) };
       let rid = id;
       if (doc) await update(ctx.uid, C.col, id, data);
