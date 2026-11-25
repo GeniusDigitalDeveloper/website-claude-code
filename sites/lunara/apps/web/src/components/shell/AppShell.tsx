@@ -237,7 +237,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </div>
       {/* mobile bottom navigation */}
-      <nav aria-label="Navigasi bawah" className="glass fixed inset-x-0 bottom-0 z-40 flex justify-around border-t border-line pb-[env(safe-area-inset-bottom)] md:hidden">
+      <nav aria-label="Navigasi bawah" style={{ backgroundColor: "var(--panel-strong)" }} className="glass fixed inset-x-0 bottom-0 z-40 flex justify-around border-t border-line pb-[env(safe-area-inset-bottom)] md:hidden">
         {links.filter((n) => "mobile" in n && n.mobile).map((n) => (
           <Link key={n.href} href={n.href} aria-current={isActive(n.href) ? "page" : undefined} className={cx("flex h-16 min-w-0 flex-1 flex-col items-center justify-center gap-1 text-[10px] font-semibold", isActive(n.href) ? "text-acc" : "text-muted")}>
             <n.icon className="h-5 w-5" />
