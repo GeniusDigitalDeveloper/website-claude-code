@@ -80,7 +80,6 @@ export function HomeView() {
           })}
         </div>
       </SortableList>
-      <p className="pb-4 text-center text-[11px] text-faint">Katalog &amp; pratonton 30s oleh Deezer API · Tanpa iklan</p>
     </div>
   );
 }

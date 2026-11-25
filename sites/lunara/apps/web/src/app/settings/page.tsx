@@ -321,7 +321,7 @@ export default function SettingsPage() {
         <div className="py-3">
           <GainMeter />
         </div>
-        <Row label="Kualiti audio" desc="Pratonton Deezer = MP3 128 kbps (had pembekal). Fail peranti dimainkan pada kualiti asal (termasuk FLAC lossless).">
+        <Row label="Kualiti audio" desc="Lagu penuh distrim melalui YouTube. Fail peranti dimainkan pada kualiti asal (termasuk FLAC lossless).">
           <Segmented
             label="Kualiti audio"
             value={s.quality}
@@ -398,7 +398,7 @@ export default function SettingsPage() {
             <b className="text-fg">LUNARA MUSIC</b>: Your Music. Your Universe. Versi web 1.0. Tanpa iklan, tiada SDK pengiklanan, tiada penjejakan iklan.
           </p>
           <p>{BRAND.description}</p>
-          <p>Katalog, carta, metadata dan pratonton 30 saat disediakan oleh Deezer API. Main balik lagu penuh memerlukan perjanjian lesen dengan pembekal berlesen; LUNARA MUSIC tidak menggunakan sumber tanpa izin.</p>
+          <p>Lagu penuh dimainkan terus dalam aplikasi melalui pemain rasmi YouTube. Lagu dari peranti anda dimainkan penuh tanpa internet.</p>
           <div className="flex gap-4 pt-1">
             <Link href="/legal/terms" className="font-semibold text-acc underline">
               Terma & Syarat

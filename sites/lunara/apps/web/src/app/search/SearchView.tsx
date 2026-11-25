@@ -1,6 +1,5 @@
 "use client";
 import { History, Search, TrendingUp, X } from "lucide-react";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { catalog } from "@/lib/catalog";
@@ -160,9 +159,6 @@ export function SearchView() {
                   </div>
                 </section>
               )}
-              <p className="text-[11px] text-faint">
-                Hasil katalog sebenar dari Deezer API. Lagu bertanda &quot;Pratonton 30s&quot; boleh dimainkan 30 saat seperti yang dibenarkan pembekal. <Link href="/settings#about" className="underline">Ketahui lebih lanjut</Link>
-              </p>
             </div>
           )}
         </div>
