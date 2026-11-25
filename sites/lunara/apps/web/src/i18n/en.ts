@@ -230,6 +230,8 @@ export const EN: Record<string, string> = {
   "Video lagu ini tidak boleh dimainkan.": "This song's video can't be played.", "YouTube tidak dapat dicapai": "YouTube is unreachable", "YouTube lambat memuat": "YouTube is slow to load",
   "Lagu penuh dimainkan terus dalam aplikasi melalui pemain rasmi YouTube. Lagu dari peranti anda dimainkan penuh tanpa internet.": "Full songs play right inside the app through the official YouTube player. Songs from your device play in full, offline.",
   "Lagu penuh distrim melalui YouTube. Fail peranti dimainkan pada kualiti asal (termasuk FLAC lossless).": "Full songs stream through YouTube. Device files play at original quality (including lossless FLAC).",
+  "Status lagu penuh (YouTube)": "Full-song status (YouTube)", "Uji sambungan lagu penuh dari peranti ini.": "Test the full-song connection from this device.",
+  "Uji": "Test", "Menguji…": "Testing…", "Aktif": "Active", "Ralat, uji semula": "Error, test again", "Tiada kunci YouTube dalam binaan ini.": "No YouTube key in this build.",
   "Seksyen tidak dikenali": "Unknown section", "Bukan fail layout LUNARA MUSIC": "Not a LUNARA MUSIC layout file",
 };
 

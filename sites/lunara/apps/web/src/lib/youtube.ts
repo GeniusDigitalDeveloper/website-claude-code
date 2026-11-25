@@ -18,6 +18,22 @@ const KEY = process.env.NEXT_PUBLIC_YT_KEY ?? "";
 let disabledUntil = 0; // set when the key is rejected or the daily quota is exhausted
 
 export const youtubeEnabled = () => Boolean(KEY) && Date.now() > disabledUntil;
+let lastError = "";
+
+/** Diagnostic used in Settings: runs one real search from this browser and reports what Google answered. */
+export async function testYouTube(): Promise<{ ok: boolean; detail: string }> {
+  if (!KEY) return { ok: false, detail: "Tiada kunci YouTube dalam binaan ini." };
+  try {
+    const r = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=1&q=raihan&key=${KEY}`);
+    const d = await r.json();
+    if (d.error) return { ok: false, detail: `${d.error.code} ${d.error.message} ${(d.error.details ?? []).map((x: { reason?: string }) => x.reason ?? "").join(" ")}`.trim() };
+    disabledUntil = 0;
+    return { ok: true, detail: `OK: ${d.items?.[0]?.snippet?.title ?? "berjaya"}` };
+  } catch (e) {
+    return { ok: false, detail: (e as Error).message };
+  }
+}
+export const youtubeLastError = () => lastError;
 
 const LS = "lunara-yt:";
 const dzId = (t: Track) => t.id.replace(/^dz:/, "");
@@ -63,6 +79,7 @@ export async function findVideo(t: Track): Promise<string | null> {
     return null;
   }
   if (data.error) {
+    lastError = `${data.error.code}`;
     disabledUntil = Date.now() + (data.error.code === 403 ? 30 * 60_000 : 60_000);
     return null;
   }

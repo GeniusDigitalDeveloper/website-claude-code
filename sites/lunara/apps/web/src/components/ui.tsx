@@ -129,30 +129,136 @@ export function SectionHead({ title, href, action, sub }: { title: string; href?
   );
 }
 
-export function HScroll({ children, className }: { children: ReactNode; className?: string }) {
+/** iOS-like eased horizontal scroll (interruptible, transform-free, honours reduced motion). */
+const scrollAnims = new WeakMap<HTMLElement, number>();
+export function smoothScrollBy(el: HTMLElement, dx: number, ms = 620) {
+  const reduce = typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const max = el.scrollWidth - el.clientWidth;
+  const from = el.scrollLeft;
+  const to = Math.max(0, Math.min(max, from + dx));
+  cancelAnimationFrame(scrollAnims.get(el) ?? 0);
+  if (reduce) {
+    el.scrollLeft = to;
+    return;
+  }
+  const snap = el.style.scrollSnapType;
+  el.style.scrollSnapType = "none"; // let the animation run, re-enable snapping at the end
+  const t0 = performance.now();
+  const ease = (t: number) => 1 - Math.pow(1 - t, 4); // ease-out quart, like UIScrollView paging
+  const step = (now: number) => {
+    const t = Math.min(1, (now - t0) / ms);
+    el.scrollLeft = from + (to - from) * ease(t);
+    if (t < 1) scrollAnims.set(el, requestAnimationFrame(step));
+    else el.style.scrollSnapType = snap;
+  };
+  scrollAnims.set(el, requestAnimationFrame(step));
+}
+
+/**
+ * Horizontal shelf with left/right arrow buttons (always visible when there is more content that way),
+ * smooth eased paging, mouse drag with momentum, and touch swipe. `tv` makes big D-pad-focusable arrows.
+ */
+export function HScroll({ children, className, tv }: { children: ReactNode; className?: string; tv?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [edge, setEdge] = useState({ l: false, r: true });
+  const [edge, setEdge] = useState({ l: false, r: false });
   const update = () => {
     const el = ref.current;
     if (el) setEdge({ l: el.scrollLeft > 4, r: el.scrollLeft + el.clientWidth < el.scrollWidth - 4 });
   };
-  useEffect(update, [children]);
-  const by = (d: number) => ref.current?.scrollBy({ left: d * (ref.current.clientWidth * 0.8), behavior: "smooth" });
+  useEffect(() => {
+    update();
+    const el = ref.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [children]);
+
+  // mouse drag-to-scroll with momentum (touch already scrolls natively)
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    let down = false;
+    let moved = 0;
+    let lastX = 0;
+    let lastT = 0;
+    let v = 0;
+    let raf = 0;
+    const onDown = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse" || e.button !== 0) return;
+      down = true;
+      moved = 0;
+      lastX = e.clientX;
+      lastT = performance.now();
+      v = 0;
+      cancelAnimationFrame(raf);
+      cancelAnimationFrame(scrollAnims.get(el) ?? 0);
+    };
+    const onMove = (e: PointerEvent) => {
+      if (!down) return;
+      const dx = e.clientX - lastX;
+      const now = performance.now();
+      moved += Math.abs(dx);
+      if (moved > 6) {
+        el.style.scrollSnapType = "none";
+        el.scrollLeft -= dx;
+        v = -dx / Math.max(1, now - lastT);
+      }
+      lastX = e.clientX;
+      lastT = now;
+    };
+    const onUp = () => {
+      if (!down) return;
+      down = false;
+      if (moved <= 6) return;
+      const glide = () => {
+        v *= 0.94;
+        el.scrollLeft += v * 16;
+        if (Math.abs(v) > 0.02) raf = requestAnimationFrame(glide);
+        else el.style.scrollSnapType = "";
+      };
+      raf = requestAnimationFrame(glide);
+    };
+    // swallow the click that ends a drag so a card isn't opened by accident
+    const onClick = (e: MouseEvent) => {
+      if (moved > 6) {
+        e.preventDefault();
+        e.stopPropagation();
+        moved = 0;
+      }
+    };
+    el.addEventListener("pointerdown", onDown);
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    el.addEventListener("click", onClick, true);
+    return () => {
+      el.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+      el.removeEventListener("click", onClick, true);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  const by = (d: number) => {
+    const el = ref.current;
+    if (el) smoothScrollBy(el, d * Math.max(240, el.clientWidth * 0.85));
+  };
+  const arrow = cx(
+    "panel panel-strong absolute top-[38%] z-10 grid -translate-y-1/2 cursor-pointer place-items-center rounded-full text-fg shadow-xl transition-[opacity,scale] duration-300 hover:scale-105",
+    tv ? "h-16 w-16 focus:scale-110 focus:outline-4 focus:outline-[color:var(--acc-to)]" : "h-10 w-10 md:h-11 md:w-11",
+  );
   return (
     <div className="group/h relative">
-      <div ref={ref} onScroll={update} className={cx("no-scrollbar -mx-1 flex snap-x gap-3 overflow-x-auto px-1 pb-1 md:gap-4", className)}>
+      <div ref={ref} onScroll={update} className={cx("no-scrollbar -mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain scroll-px-1 px-1 pb-1 md:gap-4", className)}>
         {children}
       </div>
-      {edge.l && (
-        <button aria-label="Tatal kiri" onClick={() => by(-1)} className="glass absolute top-1/3 left-0 hidden h-9 w-9 -translate-x-1/3 cursor-pointer place-items-center rounded-full shadow-lg ring-1 ring-line md:grid md:opacity-0 md:group-hover/h:opacity-100">
-          <ChevronLeft className="h-5 w-5" />
-        </button>
-      )}
-      {edge.r && (
-        <button aria-label="Tatal kanan" onClick={() => by(1)} className="glass absolute top-1/3 right-0 hidden h-9 w-9 translate-x-1/3 cursor-pointer place-items-center rounded-full shadow-lg ring-1 ring-line md:grid md:opacity-0 md:group-hover/h:opacity-100">
-          <ChevronRight className="h-5 w-5" />
-        </button>
-      )}
+      <button type="button" data-tv={tv ? "" : undefined} aria-label="Tatal kiri" tabIndex={edge.l ? 0 : -1} onClick={() => by(-1)} className={cx(arrow, tv ? "-left-2" : "left-0 md:-left-3", edge.l ? "opacity-100" : "pointer-events-none scale-90 opacity-0")}>
+        <ChevronLeft className={tv ? "h-8 w-8" : "h-5 w-5"} />
+      </button>
+      <button type="button" data-tv={tv ? "" : undefined} aria-label="Tatal kanan" tabIndex={edge.r ? 0 : -1} onClick={() => by(1)} className={cx(arrow, tv ? "-right-2" : "right-0 md:-right-3", edge.r ? "opacity-100" : "pointer-events-none scale-90 opacity-0")}>
+        <ChevronRight className={tv ? "h-8 w-8" : "h-5 w-5"} />
+      </button>
     </div>
   );
 }

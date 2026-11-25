@@ -8,7 +8,7 @@ import { useAsync } from "@/lib/useAsync";
 import type { Track } from "@/lib/types";
 import { useLibrary } from "@/store/library";
 import { usePlayer } from "@/store/player";
-import { Artwork, cx, fmt } from "@/components/ui";
+import { Artwork, cx, fmt, HScroll } from "@/components/ui";
 import { Mark, Wordmark } from "@/components/shell/Logo";
 
 /**
@@ -27,7 +27,7 @@ function useSpatialNav(root: React.RefObject<HTMLElement | null>, onBack: () => 
       const dir = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] }[e.key];
       if (!dir || !root.current) return;
       if ((e.target as HTMLElement).tagName === "INPUT" && (e.key === "ArrowLeft" || e.key === "ArrowRight")) return;
-      const items = Array.from(root.current.querySelectorAll<HTMLElement>("[data-tv]"));
+      const items = Array.from(root.current.querySelectorAll<HTMLElement>("[data-tv]")).filter((el) => el.tabIndex !== -1);
       const cur = document.activeElement as HTMLElement;
       if (!items.includes(cur)) {
         items[0]?.focus();
@@ -68,15 +68,15 @@ function Row({ title, tracks }: { title: string; tracks: Track[] }) {
   return (
     <section className="mt-10">
       <h2 className="mb-4 font-display text-2xl font-bold">{title}</h2>
-      <div className="no-scrollbar -m-3 flex gap-6 overflow-x-auto p-3">
+      <HScroll tv className="gap-6 p-3 md:gap-6">
         {tracks.map((t, i) => (
-          <button key={`${t.id}-${i}`} data-tv onClick={() => usePlayer.getState().playList(tracks, i, { shuffle: false })} className="group w-52 shrink-0 cursor-pointer rounded-2xl p-2 text-left transition focus:scale-105 focus:bg-card">
+          <button key={`${t.id}-${i}`} data-tv onClick={() => usePlayer.getState().playList(tracks, i, { shuffle: false })} className="group w-52 shrink-0 snap-start cursor-pointer rounded-2xl p-2 text-left transition focus:scale-105 focus:bg-card">
             <Artwork src={t.artwork} alt="" className="aspect-square w-full shadow-xl" rounded="rounded-xl" />
             <p translate="no" className="mt-3 truncate text-lg font-semibold">{t.title}</p>
             <p translate="no" className="truncate text-base text-muted">{t.artist}</p>
           </button>
         ))}
-      </div>
+      </HScroll>
     </section>
   );
 }
@@ -131,7 +131,8 @@ export default function TV() {
             <div className="w-56 min-w-0">
               <p translate="no" className="truncate font-semibold">{cur.title}</p>
               <p className="truncate text-sm text-muted">
-                {cur.artist} · {fmt(pos)}/{fmt(dur)}
+                {cur.artist}
+                {dur > 0 && ` · ${fmt(pos)}/${fmt(dur)}`}
               </p>
             </div>
             <button data-tv aria-label="Sebelumnya" onClick={() => usePlayer.getState().prev()} className="grid h-12 w-12 cursor-pointer place-items-center rounded-full focus:bg-card-hover">

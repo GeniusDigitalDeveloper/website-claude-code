@@ -6,6 +6,7 @@ import { useLayout } from "@/store/layout";
 import { useEffect, useState, type ReactNode } from "react";
 import { firebaseEnabled } from "@/lib/firebase";
 import { getEngine } from "@/lib/audio-engine";
+import { testYouTube } from "@/lib/youtube";
 import { authMessage, useAuth } from "@/store/auth";
 import { useLibrary } from "@/store/library";
 import { usePlayer } from "@/store/player";
@@ -74,6 +75,26 @@ function GainMeter() {
         {!has && <span className="text-xs text-muted">Main sebarang lagu untuk menguji.</span>}
       </div>
     </div>
+  );
+}
+
+function YouTubeStatus() {
+  const [res, setRes] = useState<{ ok: boolean; detail: string } | null>(null);
+  const [busy, setBusy] = useState(false);
+  return (
+    <Row label="Status lagu penuh (YouTube)" desc={res ? res.detail : "Uji sambungan lagu penuh dari peranti ini."}>
+      <Btn
+        variant="ghost"
+        disabled={busy}
+        onClick={async () => {
+          setBusy(true);
+          setRes(await testYouTube());
+          setBusy(false);
+        }}
+      >
+        {busy ? "Menguji…" : res ? (res.ok ? "Aktif" : "Ralat, uji semula") : "Uji"}
+      </Btn>
+    </Row>
   );
 }
 
@@ -333,6 +354,7 @@ export default function SettingsPage() {
             ]}
           />
         </Row>
+        <YouTubeStatus />
         <Switch checked={s.autoplay} onChange={(v) => s.set({ autoplay: v })} label="Autoplay" desc="Bila giliran tamat, sambung dengan lagu serupa (radio artis)." />
         <Switch checked={s.normalize} onChange={(v) => s.set({ normalize: v })} label="Normalisasi kelantangan" desc="Belum disokong: pembekal semasa tidak menghantar data loudness (ReplayGain)." disabled />
         <Row label="Kelajuan main balik">
