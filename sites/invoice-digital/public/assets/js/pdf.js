@@ -39,11 +39,9 @@ function registerFonts(pdf, f) {
 
 export const TEMPLATES = {
   classic: { band: false, center: false, head: "accent", zebra: false, rule: true },
-  modern: { band: true, center: false, head: "accent", zebra: true, rule: false },
   minimal: { band: false, center: false, head: "none", zebra: false, rule: true },
   corporate: { band: false, center: false, head: "dark", zebra: true, rule: true, side: true },
   elegant: { band: false, center: true, head: "none", zebra: false, rule: true, double: true },
-  bold: { band: true, bandH: 46, center: false, head: "dark", zebra: true, rule: false },
   ribbon: { band: false, center: false, head: "accent", zebra: false, rule: false, pill: true },
   compact: { band: false, center: false, head: "none", zebra: false, rule: true, small: true },
 };
