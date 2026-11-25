@@ -13,7 +13,7 @@
   --fg: #13122e;
   --muted: #545377; /* 7.1:1 on --bg */
   --faint: #6c6b8f; /* 4.9:1 on --bg */
-  --glass: rgba(255, 255, 255, 0.72);
+  --glass: rgba(255, 255, 255, 0.92);
   --shadow: 0 10px 30px -12px rgba(30, 20, 90, 0.22);
   --acc-from: #a855f7;
   --acc-via: #6366f1;
@@ -32,7 +32,7 @@
   --fg: #f4f3ff;
   --muted: #a9a8cc; /* 8.6:1 on --bg */
   --faint: #8786ad; /* 5.6:1 on --bg */
-  --glass: rgba(20, 19, 52, 0.62);
+  --glass: rgba(20, 19, 52, 0.86);
   --shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.7);
   --acc-solid: #c4b5fd;
   color-scheme: dark;
