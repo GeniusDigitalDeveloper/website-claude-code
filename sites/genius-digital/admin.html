@@ -1703,10 +1703,17 @@
     function refreshRich() {
       if (deleting) setRich($("#delBody"), t("del.body"), "name", deleting.name);
     }
+    const ADMIN_EMAILS = ["izzulmedia01@gmail.com", "mediapc2026@gmail.com"];
     async function handleAuthState(user) {
       if (!user) {
         if (unsubscribe) { unsubscribe(); unsubscribe = null; } if (unsubSettings) { unsubSettings(); unsubSettings = null; } products = [];
         showOnly("login"); return;
+      }
+      // Hanya 2 e-mel admin ini (sama seperti gdIsAdmin() dalam Firestore rules). Akaun lain: log keluar + mesej.
+      if (backend.mode !== "demo" && !ADMIN_EMAILS.includes(String(user.email || "").toLowerCase())) {
+        try { await backend.signOut(); } catch (e) {}
+        showOnly("login"); showAlert($("#loginError"), "Akaun " + (user.email || "ini") + " bukan admin GENIUS DIGITAL. Hanya akaun admin yang dibenarkan masuk.");
+        return;
       }
       $("#userEmail").textContent = user.email || "";
       $("#demoBanner").hidden = $("#modePill").hidden = backend.mode !== "demo";

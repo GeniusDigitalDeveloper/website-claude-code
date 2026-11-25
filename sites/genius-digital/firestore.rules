@@ -118,10 +118,11 @@ service cloud.firestore {
       allow delete: if gdIsAdmin();
     }
 
-    // ---------- Genius Digital: pentadbir (claim admin ATAU e-mel pemilik). Hanya untuk products & genius_site. ----------
+    // ---------- Genius Digital: pentadbir = 2 e-mel ini SAHAJA (ketetapan pemilik). Hanya untuk products & genius_site. ----------
+    // Akaun lain dalam Auth dikongsi (sub-apps) TIDAK boleh menjadi admin Genius Digital, walaupun ada claim admin.
     function gdIsAdmin() {
-      return isSignedIn() && (request.auth.token.admin == true
-        || request.auth.token.email == 'izzulmedia01@gmail.com');
+      return isSignedIn() && request.auth.token.email is string
+        && request.auth.token.email.lower() in ['izzulmedia01@gmail.com', 'mediapc2026@gmail.com'];
     }
 
     // ---------- Koleksi: genius_site (tetapan laman awam Genius Digital: logo, jenama, hubungan, teks) ----------
@@ -434,14 +435,19 @@ service cloud.firestore {
           && invNew().number == resource.data.number && invNew().createdAt == resource.data.createdAt;
         allow delete: if invOwner(uid);   // pemilik boleh padam projek sendiri (UI minta pengesahan)
       }
-      // Resit: tidak boleh diubah selepas dicipta (integriti rekod); boleh dipadam oleh pemilik.
+      // Resit: boleh diedit/dipadam oleh pemilik (nombor, invois & tarikh cipta dikunci).
       match /receipts/{id} {
         allow create: if invOwner(uid) && invBase(uid)
           && invNew().amount is number && invNew().amount > 0
           && invNew().number is string && invNew().number.size() <= 40
           && invNew().createdAt == request.time;
-        // Padam resit dibenarkan (app memulihkan baki invoice dalam transaksi); tidak boleh diubah.
+        // Padam resit dibenarkan (app memulihkan baki invoice dalam transaksi).
         allow delete: if invOwner(uid);
+        // Edit resit (tarikh/jumlah/kaedah/nota/saiz imej): nombor, invois & tarikh cipta tidak boleh diubah.
+        allow update: if invOwner(uid) && invBase(uid) && resource.data.ownerUid == uid
+          && invNew().number == resource.data.number && invNew().createdAt == resource.data.createdAt
+          && invNew().invoiceId == resource.data.get('invoiceId', invNew().get('invoiceId', ''))
+          && invNew().amount is number && invNew().amount > 0;
       }
       // Kaunter nombor dokumen: hanya naik tepat +1 (digunakan dalam transaksi bersama dokumen).
       match /counters/{id} {
@@ -575,5 +581,99 @@ service cloud.firestore {
     match /{document=**} {
       allow read, write: if false;
     }
+
+    // ===== FLASH LINK RULES (tambahan) =====
+    function fl_isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    match /flashlink_users/{uid} {
+      allow read: if true;
+      allow create, update, delete: if fl_isOwner(uid);
+    }
+
+    match /flashlink_usernames/{username} {
+      allow read: if true;
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid;
+      allow update: if false;
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+
+    match /flashlink_links/{linkId} {
+      allow read: if true;
+      allow create: if request.auth != null
+        && request.resource.data.uid == request.auth.uid;
+      allow update: if (request.auth != null && resource.data.uid == request.auth.uid)
+        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['clicks'])
+            && request.resource.data.clicks == resource.data.clicks + 1);
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+
+    match /flashlink_events/{eventId} {
+      allow create: if request.resource.data.keys().hasOnly(['uid','linkId','type','device','referrer','createdAt']);
+      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    match /flashlink_leads/{leadId} {
+      allow create: if request.resource.data.keys().hasOnly(['uid','name','email','phone','message','createdAt']);
+      allow read, delete: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow update: if false;
+    }
+
+    // --- Shorten link (V-34) ---
+    match /flashlink_short/{code} {
+      allow get: if true;
+      allow list: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid
+        && (code.matches('^[a-z0-9]{4,12}$')
+            || (code.matches('^[a-z0-9]{4,12}_[a-z0-9-]{3,40}$')
+                && get(/databases/$(database)/documents/flashlink_users/$(request.auth.uid)).data.username == code.split('_')[0]))
+        && request.resource.data.keys().hasOnly(['uid','name','url','order','createdAt'])
+        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 60
+        && request.resource.data.url is string && request.resource.data.url.size() <= 2000
+        && request.resource.data.url.matches('^https?://.+');
+      allow update: if request.auth != null && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.keys().hasOnly(['uid','name','url','order','createdAt'])
+        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 60
+        && request.resource.data.url is string && request.resource.data.url.size() <= 2000
+        && request.resource.data.url.matches('^https?://.+');
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+
+    // --- Gambar resolusi tinggi (V-34): satu dokumen setiap gambar, rujukan "fli:ID" ---
+    match /flashlink_images/{id} {
+      allow get: if true;
+      allow list: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['uid','d','createdAt'])
+        && request.resource.data.d is string && request.resource.data.d.size() < 990000
+        && request.resource.data.d[0:23] == 'data:image/jpeg;base64,';
+      allow update: if false;
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+    // ===== V-77: Kolaborasi + ahli (tambahan sahaja, khusus flashlink_) =====
+    match /flashlink_collab/{id} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null && request.auth.token.admin == true;
+    }
+    match /flashlink_members/{uid} {
+      allow read: if request.auth != null && (request.auth.uid == uid || request.auth.token.admin == true);
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['email','displayName','createdAt','lastLogin','lang']);
+      allow delete: if request.auth != null && request.auth.token.admin == true;
+    }
+    // ===== V-81: teks keseluruhan + imej tapak (tambahan sahaja, khusus flashlink_) =====
+    match /flashlink_texts/{id} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null && request.auth.token.admin == true;
+    }
+    match /flashlink_site/{id} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null && request.auth.token.admin == true;
+    }
+    // ===== TAMAT FLASH LINK RULES =====
   }
 }
