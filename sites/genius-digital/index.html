@@ -33,6 +33,7 @@
         if (l === "en" || l === "ar" || l === "ms") { h.lang = l; h.dir = l === "ar" ? "rtl" : "ltr"; }
         h.setAttribute("data-theme", th === "dark" ? "dark" : "light");
       } catch (e) { document.documentElement.setAttribute("data-theme", "light"); }
+      if (/^\/products\/[^/]+\/?$/.test(location.pathname)) document.documentElement.classList.add("deeplink");
     })();
   </script>
   <link rel="icon" type="image/png" sizes="48x48" href="/icons/favicon-48.png">
@@ -611,6 +612,15 @@
       html[lang="ar"] .card-body .btn { font-size: .72rem; }
     }
 
+    /* ---------- Pautan produk /products/nama: skrin "Membuka produk…" ---------- */
+    .dl-overlay { display: none; position: fixed; inset: 0; z-index: 500; align-items: center; justify-content: center; background: var(--bg); }
+    .deeplink .dl-overlay { display: flex; }
+    .deeplink body { overflow: hidden; }
+    .dl-box { display: grid; justify-items: center; gap: .9rem; color: var(--head); font-family: var(--font-head); font-weight: 700; }
+    .dl-box img { width: 84px; height: 84px; animation: corePulse 1.6s ease-in-out infinite; }
+    .dl-spin { width: 28px; height: 28px; border-radius: 50%; border: 3px solid var(--bg-soft); border-top-color: var(--blue-500); animation: dlSpin .8s linear infinite; }
+    @keyframes dlSpin { to { transform: rotate(360deg); } }
+
     /* ---------- Pasang Apps (PWA) ---------- */
     .install-btn { display: flex; align-items: center; gap: .5rem; min-height: 52px; padding: 0 1rem; margin-top: .25rem; border: 1.5px dashed var(--ghost-border); border-radius: 12px; background: transparent; color: var(--accent); font-family: var(--font-head); font-weight: 700; font-size: 1rem; letter-spacing: .04em; text-transform: uppercase; text-align: start; }
     .install-btn svg { width: 18px; height: 18px; flex: none; }
@@ -655,6 +665,7 @@
   </style>
 </head>
 <body>
+  <div class="dl-overlay" id="dlOverlay" role="status"><div class="dl-box"><img src="/icons/logo-192.png" alt="" width="84" height="84"><span data-i18n="dl.opening">Membuka produk…</span><i class="dl-spin" aria-hidden="true"></i></div></div>
   <a class="skip-link" href="/home" data-i18n="ui.skip">Terus ke kandungan</a>
 
   <!-- SVG icon sprite -->
@@ -941,7 +952,7 @@
         "state.empty.title": "Belum ada produk",
         "state.empty.text": "Produk digital Genius Digital akan dipaparkan di sini tidak lama lagi. Sila kembali semula nanti.",
         "modal.msg": "Produk Akan Datang.", "modal.close": "Tutup", "modal.ok": "Tutup",
-        "contact.eyebrow": "Perhubungan", "contact.h2": "Hubungi Kami", "contact.soon": "Maklumat hubungan akan dikemas kini tidak lama lagi.", "install.btn": "Pasang Apps", "price.label": "Harga Istimewa", "price.was": "harga asal", "price.fixed": "Harga", "price.free": "Percuma", "price.ended": "Tamat", "price.soldout": "Habis Stok", "install.title": "Pasang Genius Digital", "install.ios": "Pada iPhone / iPad: tekan butang Kongsi di Safari, kemudian pilih “Tambah ke Skrin Utama”.",
+        "contact.eyebrow": "Perhubungan", "contact.h2": "Hubungi Kami", "contact.soon": "Maklumat hubungan akan dikemas kini tidak lama lagi.", "install.btn": "Pasang Apps", "dl.opening": "Membuka produk…", "price.label": "Harga Istimewa", "price.was": "harga asal", "price.fixed": "Harga", "price.free": "Percuma", "price.ended": "Tamat", "price.soldout": "Habis Stok", "install.title": "Pasang Genius Digital", "install.ios": "Pada iPhone / iPad: tekan butang Kongsi di Safari, kemudian pilih “Tambah ke Skrin Utama”.",
         "contact.lead": "<strong>Genius Digital.</strong> Berminat dengan produk kami atau ingin bekerjasama? Hubungi kami melalui saluran di bawah.",
         "contact.email": "E-mel", "contact.whatsapp": "WhatsApp", "contact.social": "Media Sosial",
         "contact.phEmail": "Placeholder: tambah e-mel syarikat", "contact.phWhatsapp": "Placeholder: tambah nombor WhatsApp", "contact.phSocial": "(placeholder)",
@@ -981,7 +992,7 @@
         "state.empty.title": "No products yet",
         "state.empty.text": "Genius Digital's products will appear here soon. Please check back later.",
         "modal.msg": "Product Coming Soon.", "modal.close": "Close", "modal.ok": "Close",
-        "contact.eyebrow": "Get in Touch", "contact.h2": "Contact Us", "contact.soon": "Contact details will be updated soon.", "install.btn": "Install App", "price.label": "Special Price", "price.was": "original price", "price.fixed": "Price", "price.free": "Free", "price.ended": "Ended", "price.soldout": "Sold Out", "install.title": "Install Genius Digital", "install.ios": "On iPhone / iPad: tap the Share button in Safari, then choose “Add to Home Screen”.",
+        "contact.eyebrow": "Get in Touch", "contact.h2": "Contact Us", "contact.soon": "Contact details will be updated soon.", "install.btn": "Install App", "dl.opening": "Opening product…", "price.label": "Special Price", "price.was": "original price", "price.fixed": "Price", "price.free": "Free", "price.ended": "Ended", "price.soldout": "Sold Out", "install.title": "Install Genius Digital", "install.ios": "On iPhone / iPad: tap the Share button in Safari, then choose “Add to Home Screen”.",
         "contact.lead": "<strong>Genius Digital.</strong> Interested in our products or looking to collaborate? Reach us through the channels below.",
         "contact.email": "Email", "contact.whatsapp": "WhatsApp", "contact.social": "Social Media",
         "contact.phEmail": "Placeholder: add the company email", "contact.phWhatsapp": "Placeholder: add the WhatsApp number", "contact.phSocial": "(placeholder)",
@@ -1021,7 +1032,7 @@
         "state.empty.title": "لا توجد منتجات بعد",
         "state.empty.text": "ستظهر منتجات جينيوس ديجيتال هنا قريباً. يُرجى العودة لاحقاً.",
         "modal.msg": "المنتج قريباً.", "modal.close": "إغلاق", "modal.ok": "إغلاق",
-        "contact.eyebrow": "التواصل", "contact.h2": "اتصل بنا", "contact.soon": "ستُحدَّث بيانات التواصل قريباً.", "install.btn": "تثبيت التطبيق", "price.label": "سعر خاص", "price.was": "السعر الأصلي", "price.fixed": "السعر", "price.free": "مجاني", "price.ended": "انتهى", "price.soldout": "نفد المخزون", "install.title": "تثبيت جينيوس ديجيتال", "install.ios": "على iPhone / iPad: اضغط زر المشاركة في Safari ثم اختر «إضافة إلى الشاشة الرئيسية».",
+        "contact.eyebrow": "التواصل", "contact.h2": "اتصل بنا", "contact.soon": "ستُحدَّث بيانات التواصل قريباً.", "install.btn": "تثبيت التطبيق", "dl.opening": "جارٍ فتح المنتج…", "price.label": "سعر خاص", "price.was": "السعر الأصلي", "price.fixed": "السعر", "price.free": "مجاني", "price.ended": "انتهى", "price.soldout": "نفد المخزون", "install.title": "تثبيت جينيوس ديجيتال", "install.ios": "على iPhone / iPad: اضغط زر المشاركة في Safari ثم اختر «إضافة إلى الشاشة الرئيسية».",
         "contact.lead": "<strong>جينيوس ديجيتال.</strong> هل أنت مهتم بمنتجاتنا أو ترغب في التعاون معنا؟ تواصل معنا عبر القنوات التالية.",
         "contact.email": "البريد الإلكتروني", "contact.whatsapp": "WhatsApp", "contact.social": "وسائل التواصل الاجتماعي",
         "contact.phEmail": "نص مؤقت: أضف البريد الإلكتروني للشركة", "contact.phWhatsapp": "نص مؤقت: أضف رقم WhatsApp", "contact.phSocial": "(نص مؤقت)",
@@ -1143,7 +1154,7 @@
       }
     }
     const showLoading = () => { view = { kind: "loading", error: null, retry: null, products: [] }; renderView(); };
-    const showError = (error, retry) => { view = { kind: "error", error, retry, products: [] }; renderView(); };
+    const showError = (error, retry) => { view = { kind: "error", error, retry, products: [] }; renderView(); hideDeep(); };
 
     function statusBadge(status) {
       const map = { "coming-soon": ["soon", "status.soon"], free: ["free", "status.free"], ended: ["ended", "status.ended"], soldout: ["soldout", "status.soldout"] };
@@ -1194,11 +1205,12 @@
       const link = safeHttps(product.productURL);
       if (link) { window.open(link, "_blank", "noopener,noreferrer"); return; }
       modalProduct = product; fillModal(product);
+      if (location.pathname !== productPath(product)) history.pushState(null, "", productPath(product));
       if (typeof modal.showModal === "function") { modal.showModal(); document.body.classList.add("no-scroll"); }
       else alert(t("modal.msg"));
     }
     function closeModal() { if (modal.open) modal.close(); }
-    modal.addEventListener("close", () => { document.body.classList.remove("no-scroll"); modalProduct = null; });
+    modal.addEventListener("close", () => { document.body.classList.remove("no-scroll"); modalProduct = null; if (location.pathname.startsWith("/products/")) history.replaceState(null, "", "/products"); });
     modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });   // klik backdrop
     $("#modalClose").addEventListener("click", closeModal);
     $("#modalOk").addEventListener("click", closeModal);
@@ -1216,12 +1228,12 @@
       const pb = priceBadge(product, index);
       const btnKids = [el("span", { text: t("btn.explore") }), icon("i-arrow")];
       return el("article", { class: "product-card reveal" + (blocked ? " unavailable" : ""), style: `--d:${Math.min(index, 5) * .08}s`, "data-slug": product.slug }, [
-        link ? el("a", { class: "thumb", href: link, target: "_blank", rel: "noopener noreferrer", "aria-label": name, tabindex: "-1" }, thumbKids) : el("div", { class: "thumb" }, thumbKids),
+        link ? el("a", { class: "thumb", href: productPath(product), target: "_blank", rel: "noopener noreferrer", "aria-label": name, tabindex: "-1" }, thumbKids) : el("div", { class: "thumb" }, thumbKids),
         el("div", { class: "card-body" }, [
           el("div", { class: "card-top" + (pb ? " has-price" : "") }, [el("span", { class: "category-pill", text: localized(product, "category") || t("product.defaultCat") }), pb]),
           el("h3", { text: name }),
           el("p", { text: localized(product, "description") }),
-          link ? el("a", { class: "btn btn-primary", href: link, target: "_blank", rel: "noopener noreferrer" }, btnKids)
+          link ? el("a", { class: "btn btn-primary", href: productPath(product), target: "_blank", rel: "noopener noreferrer" }, btnKids)
                : blocked ? el("button", { class: "btn btn-primary", type: "button", disabled: "", "aria-disabled": "true" }, btnKids)
                : el("button", { class: "btn btn-primary", type: "button", onclick: () => openProduct(product) }, btnKids)
         ])
@@ -1285,6 +1297,27 @@
       window.addEventListener("scroll", () => { target = window.scrollY * DEG_PER_PX; if (!raf) raf = requestAnimationFrame(tick); }, { passive: true });
     })();
 
+    // ---------- Pautan produk: /products/nama-produk (nama tanpa kurungan) ----------
+    const prettySlug = (p) => String(p.name || p.slug || "").replace(/\([^)]*\)/g, " ").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || p.slug;
+    const productPath = (p) => "/products/" + prettySlug(p);
+    const DEEP = (() => { const m = location.pathname.match(/^\/products\/([^/]+)\/?$/); return m ? decodeURIComponent(m[1]).toLowerCase() : null; })();
+    let deepDone = !DEEP;
+    const hideDeep = () => document.documentElement.classList.remove("deeplink");
+    if (DEEP) setTimeout(hideDeep, 9000);   // pengaman: jangan biar skrin menunggu selama-lamanya
+    function handleDeepLink(list) {
+      if (deepDone) return; deepDone = true;
+      const p = list.find(x => prettySlug(x) === DEEP || x.slug === DEEP);
+      if (!p) { history.replaceState(null, "", "/products"); hideDeep(); requestAnimationFrame(() => goTo("products", false)); return; }
+      const link = isBlocked(p) ? "" : safeHttps(p.productURL);
+      if (link) { location.replace(link); return; }   // terus ke website produk
+      hideDeep();
+      requestAnimationFrame(() => {
+        const c = document.querySelector(`.product-card[data-slug="${CSS.escape(p.slug)}"]`);
+        if (c) { c.scrollIntoView({ block: "center" }); c.classList.add("flash"); }
+        if (!isBlocked(p)) openProduct(p);
+      });
+    }
+
     function renderProducts(products) {
       const str = (v) => (typeof v === "string" ? v : "");
       const visible = products
@@ -1297,6 +1330,7 @@
         .sort((a, b) => a.displayOrder - b.displayOrder || a.name.localeCompare(b.name));
       view = { kind: visible.length ? "list" : "empty", error: null, retry: null, products: visible };
       renderOrbit(visible);
+      handleDeepLink(visible);
       renderView();
     }
 

@@ -349,6 +349,9 @@
     .pm input:focus-visible + span { outline: 3px solid var(--cyan-400); outline-offset: 2px; }
     @media (max-width: 640px) { .pmode { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 420px) { .pm span { min-height: 48px; } }
+    .pshare { display: inline-flex; align-items: center; gap: .4rem; max-width: 100%; margin-top: .3rem; padding: .2rem .55rem; border: 1px dashed var(--input-border); border-radius: 8px; background: none; color: var(--accent); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .74rem; cursor: pointer; text-align: start; word-break: break-all; }
+    .pshare b { font-family: var(--font-head); font-weight: 800; font-size: .7rem; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+    .pshare:hover { border-style: solid; background: rgba(10, 102, 255, .06); }
     .pprice { display: block; margin-top: .25rem; font-size: .8rem; font-weight: 700; color: #C4141C; }
     .pprice s { color: var(--muted); font-weight: 500; }
 
@@ -1212,6 +1215,18 @@
       finally { setBusy(btn, false); }
     }
 
+    // Link kongsi produk: https://geniusdigital.space/products/nama-produk (terus ke website produk)
+    const SITE_URL = "https://geniusdigital.space";
+    const prettySlug = (p) => String(p.name || p.slug || "").replace(/\([^)]*\)/g, " ").normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || p.slug;
+    function shareLine(p) {
+      const path = "/products/" + prettySlug(p), url = SITE_URL + path;
+      const b = el("button", { class: "pshare", type: "button", title: "Salin link produk: " + url }, [el("span", { text: path }), el("b", { text: "Salin link" })]);
+      b.addEventListener("click", async () => {
+        try { await navigator.clipboard.writeText(url); toast("Link disalin: " + url, "ok"); }
+        catch (e) { window.prompt("Salin link ini:", url); }
+      });
+      return b;
+    }
     const fmtRM = (n) => "RM " + (Number.isInteger(n) ? String(n) : n.toFixed(2));
     const PRICE_TYPES = ["free", "fixed", "special", "ended", "soldout"];
     function priceModeOf(p) {   // jenis badge: guna priceType; data lama disimpulkan daripada harga
@@ -1263,7 +1278,7 @@
           el("td", { class: "c-sel" }, el("label", {}, chk)),
           el("td", { class: "c-order" }, el("div", { class: "order-ctl" }, [grip, up, el("span", { class: "num", text: String(p.displayOrder), title: t("row.orderTitle") }), down])),
           el("td", { class: "c-thumb" }, thumbImg(p, "pthumb", t("row.thumbAlt", { name: p.name }))),
-          el("td", { class: "c-name" }, [el("span", { class: "pname", text: p.name }), el("span", { class: "pslug", text: p.slug }), priceLine(p), el("span", { class: "pmeta", text: t("row.updated", { category: p.category, date: fmtDay(p.updatedAt) }) })]),
+          el("td", { class: "c-name" }, [el("span", { class: "pname", text: p.name }), el("span", { class: "pslug", text: p.slug }), shareLine(p), priceLine(p), el("span", { class: "pmeta", text: t("row.updated", { category: p.category, date: fmtDay(p.updatedAt) }) })]),
           el("td", { class: "c-cat" }, el("span", { class: "pcat", text: p.category })),
           el("td", { class: "c-status" }, sel),
           el("td", { class: "c-date", text: fmtDay(p.updatedAt) }),
