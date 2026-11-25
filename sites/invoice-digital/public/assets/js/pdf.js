@@ -78,24 +78,32 @@ export async function buildPdf(type, doc, company = {}, opts = {}) {
   };
 
   // ---------------- Kawasan bawah (di atas garisan footer): dikira DAHULU supaya kandungan tidak memasukinya
+  // Disusun dari BAWAH ke atas. Perkataan "Tandatangan" (kanan) dan baris TERAKHIR maklumat bank (kiri) berada pada baris (baseline) yang SAMA.
   const bank = (company.bank || "").trim(), hasQr = isImg(company.bankQr), hasSig = isImg(company.signature), hasChop = isImg(company.stamp);
   const sQr = scale("qr"), sSig = scale("sig"), sStamp = scale("stamp"), sLogo = scale("logo");
   const QR = 28 * sQr, sigW = 44 * sSig, sigH = 20 * sSig, stW = 30 * sStamp, stH = 30 * sStamp;
   const lineW = Math.min(Math.max(64, (hasSig ? sigW : 0) + 14, (hasChop ? stW : 0) + 14), 110);
-  setN(); pdf.setFontSize(8.5);
+  const BANK_FS = 10.5, BANK_LH = 5.4, LBL_FS = 9.5; // maklumat bank dibesarkan
+  setN(); pdf.setFontSize(BANK_FS);
   const bankLines = bank ? pdf.splitTextToSize(clean(bank), Math.max(R - L - lineW - 12, 60)) : [];
-  const leftH = (hasQr ? QR + 6 : 0) + (bank ? 6 + bankLines.length * 4.2 : 0), rightH = Math.max(38, Math.max(hasSig ? sigH : 0, hasChop ? stH : 0) + 12);
-  const BOTTOM = H - 19, TOP = BOTTOM - Math.max(leftH, rightH), LIMIT = TOP - 4; // kandungan mesti berhenti sebelum LIMIT
+  const BOTTOM = H - 19, BASE = BOTTOM - 2.6; // BASE = baseline bersama: "Tandatangan" & baris terakhir bank
+  const firstBase = BASE - (bankLines.length - 1) * BANK_LH, labelBase = firstBase - 7;
+  const qrTop = (bank ? labelBase - 4 : BASE - 2) - 3.6 - QR; // kod QR di ATAS maklumat bank (kapsyen di bawah QR)
+  const leftTop = Math.min(bank ? labelBase - 4 : BASE, hasQr ? qrTop : 1e9);
+  const rightH = Math.max(38, Math.max(hasSig ? sigH : 0, hasChop ? stH : 0) + 12);
+  const TOP = Math.min(leftTop, BOTTOM - rightH), LIMIT = TOP - 4; // kandungan mesti berhenti sebelum LIMIT
   const bottomBlock = () => {
-    let yy = TOP;
-    if (hasQr) { fit(company.bankQr, L, yy, QR, QR); setN(); pdf.setFontSize(7); setC(grey); txt(t("pdf_scan"), L + QR / 2, yy + QR + 3.2, { align: "center" }); yy += QR + 6; }
-    if (bank) { setB(); pdf.setFontSize(8); setC(accent); txt(t("pdf_bank").toUpperCase(), L, yy + 3); setN(); pdf.setFontSize(8.5); setC(dark); bankLines.forEach((ln, i) => txt(ln, L, yy + 8 + i * 4.2)); }
-    // Kanan: tandatangan + cop (cop di bawah, tandatangan di atasnya; bertindih supaya nampak sah)
-    const lineY = BOTTOM - 7, x0 = R - lineW, both = hasChop && hasSig;
+    if (hasQr) { fit(company.bankQr, L, qrTop, QR, QR); setN(); pdf.setFontSize(7); setC(grey); txt(t("pdf_scan"), L + QR / 2, qrTop + QR + 3.2, { align: "center" }); }
+    if (bank) {
+      setB(); pdf.setFontSize(LBL_FS); setC(accent); txt(t("pdf_bank"), L, labelBase); // "Maklumat Bank" (penulisan biasa: jarak antara perkataan jelas)
+      setN(); pdf.setFontSize(BANK_FS); setC(dark); bankLines.forEach((ln, i) => txt(ln, L, firstBase + i * BANK_LH));
+    }
+    // Kanan: garisan di atas, perkataan "Tandatangan" pada baseline yang sama dengan baris terakhir bank; tandatangan + cop bertindih di atas garisan
+    const lineY = BASE - 4.6, x0 = R - lineW, both = hasChop && hasSig;
     if (hasChop) fit(company.stamp, both ? R - 2 - sigW + stW * 0.35 : R - lineW / 2, lineY + 1, stW, stH, "center", "bottom");
     if (hasSig) fit(company.signature, both ? R - 2 - sigW / 2 : R - lineW / 2, lineY - 1, sigW, sigH, "center", "bottom");
     pdf.setDrawColor(...grey); pdf.setLineWidth(0.3); pdf.line(x0, lineY, R, lineY);
-    setN(); pdf.setFontSize(8); setC(grey); txt(t(hasChop ? "pdf_sig_company" : "pdf_signature"), x0 + lineW / 2, lineY + 4.4, { align: "center" });
+    setN(); pdf.setFontSize(9); setC(grey); txt(t(hasChop ? "pdf_sig_company" : "pdf_signature"), x0 + lineW / 2, BASE, { align: "center" });
   };
 
   let y = 14;
@@ -114,10 +122,22 @@ export async function buildPdf(type, doc, company = {}, opts = {}) {
   const rawLines = [];
   if (company.regNo) rawLines.push({ s: `${t("pdf_regno")}: ${company.regNo}`, bold: true }); // tepat di bawah nama syarikat, ditulis penuh, hitam tebal
   if (company.address) rawLines.push({ s: company.address });
-  const contact = [company.phone && (t("pdf_tel") + " " + company.phone), company.email].filter(Boolean).join("   |   "); if (contact) rawLines.push({ s: contact });
+  // Hubungan: "Tel: nombor" dan garis "|" TEBAL hitam (sama seperti No. Pendaftaran); e-mel teks biasa. Jika tak muat sebaris, e-mel turun baris baharu.
+  const contactSegs = []; if (company.phone) contactSegs.push({ s: `${t("pdf_tel")} ${company.phone}`, bold: true }); if (company.phone && company.email) contactSegs.push({ s: "   |   ", bold: true }); if (company.email) contactSegs.push({ s: company.email, bold: false });
+  if (contactSegs.length) rawLines.push({ segs: contactSegs });
   if (company.website) rawLines.push({ s: company.website });
   const detail = []; pdf.setFontSize(8.5);
-  rawLines.forEach((l) => { l.bold ? setB() : setN(); pdf.splitTextToSize(clean(l.s), maxTxtW).forEach((p) => detail.push({ s: p, bold: l.bold })); });
+  const segW = (segs) => segs.reduce((w, g) => { g.bold ? setB() : setN(); pdf.setFontSize(8.5); return w + pdf.getTextWidth(clean(g.s)); }, 0);
+  // Baris yang jatuh di bawah kawasan tajuk/nombor siri/tarikh (kanan atas) boleh guna lebar penuh; baris di sebelah kawasan itu dihadkan.
+  let yy = yTop + 4 + (nameLines.length - 1) * 6 + 5; const widthAt = () => (T.center || yy >= 38 ? Math.max(R - nameX, 50) : maxTxtW); const pushed = (n) => { yy += 4 * n; };
+  rawLines.forEach((l) => {
+    if (l.segs) { // baris hubungan bersegmen
+      if (segW(l.segs) <= widthAt() || l.segs.length === 1) { detail.push({ segs: l.segs }); pushed(1); }
+      else { const tel = l.segs.filter((g) => g.bold && g.s.trim() !== "|"), mail = l.segs.filter((g) => !g.bold); if (tel.length) { detail.push({ segs: tel }); pushed(1); } if (mail.length) { detail.push({ segs: mail }); pushed(1); } }
+      return;
+    }
+    l.bold ? setB() : setN(); pdf.splitTextToSize(clean(l.s), widthAt()).forEach((p) => { detail.push({ s: p, bold: l.bold }); pushed(1); });
+  });
   const textBottom = yTop + 4 + (nameLines.length - 1) * 6 + 5 + detail.length * 4;
   const bandH = T.band ? Math.max(T.bandH || 34, textBottom + 5, y + logoH + 4) : 0;
   if (T.band) { pdf.setFillColor(...accent); pdf.rect(0, 0, W, bandH, "F"); }
@@ -127,7 +147,10 @@ export async function buildPdf(type, doc, company = {}, opts = {}) {
   nameLines.forEach((ln, i) => txt(ln, nameX, y + 4 + i * 6, al));
   let cy = y + 4 + (nameLines.length - 1) * 6 + 5;
   pdf.setFontSize(8.5);
-  detail.forEach((l) => { if (l.bold) { setB(); setC(T.band ? white : black); } else { setN(); setC(T.band ? [235, 245, 255] : grey); } txt(l.s, nameX, cy, al); cy += 4; });
+  detail.forEach((l) => {
+    if (l.segs) { let x = T.center ? nameX - segW(l.segs) / 2 : nameX; l.segs.forEach((g) => { g.bold ? (setB(), setC(T.band ? white : black)) : (setN(), setC(T.band ? [235, 245, 255] : grey)); pdf.setFontSize(8.5); txt(g.s, x, cy); x += pdf.getTextWidth(clean(g.s)); }); cy += 4; return; }
+    if (l.bold) { setB(); setC(T.band ? white : black); } else { setN(); setC(T.band ? [235, 245, 255] : grey); } pdf.setFontSize(8.5); txt(l.s, nameX, cy, al); cy += 4;
+  });
 
   // ---------------- Pengepala kanan: TAJUK + NOMBOR SIRI (hitam tebal) + TARIKH (satu baris dengan pengepala)
   const title = t(TITLE[type]).toUpperCase(), serial = String(doc.number || ""), dateTxt = `${t("pdf_date")}: ${fmtDate(doc.date, getLang())}`;
@@ -159,7 +182,7 @@ export async function buildPdf(type, doc, company = {}, opts = {}) {
     ? [[t("pdf_invref"), doc.invoiceNumber || "-"], ...(doc.seq ? [[t("pdf_payment_no"), t("pdf_seq", { n: doc.seq })]] : [])]
     : [[t(type === "invoice" ? "pdf_due" : "pdf_valid"), fmtDate(type === "invoice" ? doc.dueDate : doc.validUntil, getLang())], [t("pdf_status"), t("st_" + status)]];
   const cust = doc.customer || {};
-  setB(); pdf.setFontSize(8); setC(accent); txt(t(type === "receipt" ? "pdf_received_from" : "pdf_billto").toUpperCase(), L, y);
+  setB(); pdf.setFontSize(9); setC(accent); txt(t("pdf_billto"), L, y);
   setB(); pdf.setFontSize(10.5); setC(dark); txt(cust.name || doc.customerName || "-", L, y + 5);
   setN(); pdf.setFontSize(8.5); setC(grey); let by = y + 9.5;
   [cust.company, cust.regNo && `${t("pdf_regno")}: ${cust.regNo}`, cust.address, [cust.phone, cust.email].filter(Boolean).join("   |   ")].filter(Boolean)
@@ -184,7 +207,7 @@ export async function buildPdf(type, doc, company = {}, opts = {}) {
       txt(k, 107, y); txt(v, R - 3, y, { align: "right" }); y += 6.8;
     });
     y += 3;
-    if (doc.note) { setB(); pdf.setFontSize(8); setC(accent); txt(t("pdf_note").toUpperCase(), L, y); setN(); pdf.setFontSize(9); setC(dark); y += 5; pdf.splitTextToSize(clean(doc.note), R - L).forEach((p) => { if (y > LIMIT) { pdf.addPage(); y = 18; } txt(p, L, y); y += 4.5; }); }
+    if (doc.note) { setB(); pdf.setFontSize(9); setC(accent); txt(t("pdf_note"), L, y); setN(); pdf.setFontSize(9); setC(dark); y += 5; pdf.splitTextToSize(clean(doc.note), R - L).forEach((p) => { if (y > LIMIT) { pdf.addPage(); y = 18; } txt(p, L, y); y += 4.5; }); }
     if (y > LIMIT) { pdf.addPage(); y = 18; }
     bottomBlock(); footer(); return pdf;
   }
@@ -228,7 +251,7 @@ export async function buildPdf(type, doc, company = {}, opts = {}) {
     if (!text) return;
     setN(); pdf.setFontSize(8.5); const ls = pdf.splitTextToSize(clean(text), R - L);
     if (y + 11 > LIMIT) { pdf.addPage(); y = 18; }
-    setB(); pdf.setFontSize(8); setC(accent); txt(label.toUpperCase(), L, y); y += 4.6;
+    setB(); pdf.setFontSize(9); setC(accent); txt(label, L, y); y += 5;
     setN(); pdf.setFontSize(8.5); setC(dark);
     ls.forEach((p) => { if (y > LIMIT) { pdf.addPage(); y = 18; } txt(p, L, y); y += 4.2; }); y += 3;
   };
