@@ -28,9 +28,18 @@ rules-backup/               salinan rules asal sebelum perubahan
 ```bash
 # Rules: HANYA tambah blok inv_ (rules lain kekal). Sentiasa mulakan dari rules semasa projek.
 firebase deploy --only firestore:rules --project genius-digital-40bc9
-firebase deploy --only hosting --project genius-digital-40bc9   # site 48a54 sahaja
+scripts/deploy.sh   # DEPLOY HOSTING (site 48a54 sahaja) + cap versi: pengguna yang sedang membuka app dimuat semula sendiri
 ```
 > Jangan `firebase deploy` tanpa `--only`. Jangan deploy ke site `genius-digital-40bc9` (domain `geniusdigital.space`) — itu menggantikan app Genius Digital utama.
 
 ## Statistik footer (waktu Malaysia)
 Kunci harian `YYYY-MM-DD` dan bulanan `YYYY-MM` dikira dalam `Asia/Kuala_Lumpur` (reset 12 tengah malam MYT / awal bulan MYT); keseluruhan = kaunter kumulatif. Pelawat dikira sekali sehari bagi setiap pelayar.
+
+## Kemas kini automatik & masa nyata
+- Data (senarai, dashboard, paparan invois/resit) menggunakan `onSnapshot`: perubahan dari tab/peranti lain muncul serta-merta tanpa butang kemas kini.
+- Setiap deploy melalui `scripts/deploy.sh` mencap `public/invoice/version.json` dan `<meta name="app-version">`. App menyemak versi setiap 60 saat / bila tab dibuka semula;
+  jika berbeza ia dimuat semula sendiri (jika pengguna sedang menaip atau dialog terbuka, ia dimuat semula sebaik pengguna berpindah halaman).
+
+## Ujian tempatan pada emulator (tanpa menyentuh data sebenar)
+`firebase emulators:exec --only auth,firestore --project genius-digital-40bc9 "<skrip ujian>"` — app menyambung ke emulator hanya pada `localhost`
+apabila `localStorage.inv_emulator` ditetapkan.

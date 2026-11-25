@@ -1,7 +1,7 @@
 /* Service worker panel awam (/invoice/). Skop terhad kepada /invoice/ — panel admin tidak disentuh.
    Strategi: HTML/JS/CSS laman sendiri = rangkaian dahulu (sentiasa versi terkini), jatuh ke cache jika luar talian/lambat.
    CDN statik berversi (Firebase SDK, jsPDF, fon) = cache-first + kemas kini latar. Panggilan Firebase/Firestore/Auth TIDAK dicache. */
-const V = "inv-pwa-v1";
+const V = "inv-pwa-v2";
 const SHELL = ["/invoice/", "/assets/css/app.css", "/assets/img/logo.png", "/assets/img/icon-192.png", "/assets/img/banner.jpg"];
 const CDN = new Set(["www.gstatic.com", "cdnjs.cloudflare.com", "fonts.googleapis.com", "fonts.gstatic.com"]);
 
@@ -28,7 +28,7 @@ self.addEventListener("fetch", (e) => {
   const r = e.request; if (r.method !== "GET") return; const u = new URL(r.url);
   if (u.origin === location.origin) {
     if (!(u.pathname.startsWith("/invoice/") || u.pathname.startsWith("/assets/"))) return; // /admin/ dan lain-lain: biar pelayar
-    if (u.pathname === "/invoice/sw.js") return;
+    if (u.pathname === "/invoice/sw.js" || u.pathname === "/invoice/version.json") return; // sentiasa terus ke rangkaian
     if (r.mode === "navigate") return e.respondWith(networkFirst(r, 3500, "/invoice/"));
     return e.respondWith(networkFirst(r));
   }

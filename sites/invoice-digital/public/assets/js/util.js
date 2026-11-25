@@ -42,7 +42,8 @@ export function calc(doc) {
   const total = round2(taxable + tax);
   const deposit = round2(Math.max(num(doc.deposit), 0));
   const paidReceipts = round2(num(doc.receiptsPaid));
-  const balance = round2(Math.max(total - deposit - paidReceipts, 0));
+  // Deposit = jumlah yang DIMINTA daripada pelanggan (bukan bayaran yang sudah diterima). Baki = jumlah - semua resit yang telah dijana.
+  const balance = round2(Math.max(total - paidReceipts, 0));
   return { items, subtotal, docDiscount, taxable, tax, taxRate, total, deposit, paidReceipts, balance };
 }
 
@@ -106,6 +107,34 @@ export function readSquareAvatar(file, size = 192, q = 0.85) {
     fr.onload = () => { const im = new Image(); im.onerror = () => rej(new Error("img")); im.onload = () => {
       const s = Math.min(im.width, im.height); const c = document.createElement("canvas"); c.width = c.height = size; const x = c.getContext("2d");
       x.fillStyle = "#fff"; x.fillRect(0, 0, size, size); x.drawImage(im, (im.width - s) / 2, (im.height - s) / 2, s, s, 0, 0, size, size); res(c.toDataURL("image/jpeg", q)); }; im.src = fr.result; };
+    fr.readAsDataURL(file);
+  });
+}
+
+// ---- Bayaran berperingkat: satu invois boleh dijana resit BERKALI-KALI sehingga baki habis.
+export function applyPayment(inv, amountRaw) {
+  const c = calc(inv); const amt = round2(num(amountRaw));
+  if (!(amt > 0) || amt > c.balance + 0.005) throw new Error("amount");
+  const paid = round2(num(inv.receiptsPaid) + amt); const balanceAfter = round2(Math.max(c.total - paid, 0));
+  return { amt, paid, balanceAfter, total: c.total, status: balanceAfter <= 0.004 ? "paid" : "partial", seq: (num(inv.receiptCount) || 0) + 1 };
+}
+// Cadangan jumlah bayaran: bayaran pertama = deposit (jika ada), selepas itu = baki.
+export function suggestAmount(inv) {
+  const c = calc(inv); if (c.paidReceipts <= 0.004 && c.deposit > 0) return round2(Math.min(c.deposit, c.balance)); return c.balance;
+}
+// Imej pilihan (logo, QR, tandatangan, cop): kecilkan sehingga muat dalam had bait; PNG kekal lutsinar.
+export function fitImage(file, maxDim = 400, maxBytes = 100000) {
+  return new Promise((res, rej) => {
+    const fr = new FileReader(); fr.onerror = () => rej(new Error("read"));
+    fr.onload = () => { const im = new Image(); im.onerror = () => rej(new Error("img")); im.onload = () => {
+      const png = /png|webp|gif/.test(file.type); let dim = maxDim, q = 0.85;
+      for (let i = 0; i < 8; i++) {
+        const s = Math.min(1, dim / Math.max(im.width, im.height)); const c = document.createElement("canvas"); c.width = Math.max(1, Math.round(im.width * s)); c.height = Math.max(1, Math.round(im.height * s));
+        const x = c.getContext("2d"); if (!png) { x.fillStyle = "#fff"; x.fillRect(0, 0, c.width, c.height); } x.drawImage(im, 0, 0, c.width, c.height);
+        const out = png ? c.toDataURL("image/png") : c.toDataURL("image/jpeg", q); if (out.length <= maxBytes) return res(out);
+        dim = Math.round(dim * 0.8); q = Math.max(0.5, q - 0.08); if (dim < 80) break;
+      }
+      rej(new Error("size")); }; im.src = fr.result; };
     fr.readAsDataURL(file);
   });
 }

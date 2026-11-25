@@ -18,6 +18,18 @@ export async function listSWR(uid, name, onData, max = 1000) {
   const s = await F.getDocs(q); done = true; try { localStorage.setItem(swrKey(uid, name), "1"); } catch {}
   const rows = map(s); onData(rows, true); return rows;
 }
+// Masa nyata: onSnapshot (cache tempatan dahulu, kemudian pelayan; perubahan dari peranti/tab lain muncul serta-merta tanpa muat semula).
+const mapDoc = (s) => ({ id: s.id, ...s.data({ serverTimestamps: "estimate" }) });
+export function listLive(uid, name, onData, onErr, max = 1000) {
+  const q = F.query(colRef(uid, name), F.orderBy("createdAt", "desc"), F.limit(max));
+  return F.onSnapshot(q, (s) => onData(s.docs.map(mapDoc), s.metadata.fromCache), (e) => onErr && onErr(e));
+}
+export function queryLive(uid, name, field, value, onData, onErr) {
+  return F.onSnapshot(F.query(colRef(uid, name), F.where(field, "==", value)), (s) => onData(s.docs.map(mapDoc)), (e) => onErr && onErr(e));
+}
+export function docLive(uid, name, id, onData, onErr) {
+  return F.onSnapshot(docRef(uid, name, id), (s) => onData(s.exists() ? mapDoc(s) : null), (e) => onErr && onErr(e));
+}
 export async function getOne(uid, name, id) {
   const s = await F.getDoc(docRef(uid, name, id));
   return s.exists() ? { id: s.id, ...s.data() } : null;
@@ -47,7 +59,21 @@ const KIND_COL = { invoice: "invoices", quotation: "quotations", receipt: "recei
 // Cipta dokumen bernombor dalam SATU transaksi: kaunter per pengguna/jenis/tahun naik tepat +1, jadi tiada nombor bertindih
 // walaupun dua tab/peranti mencipta serentak (transaksi akan cuba semula jika kaunter berubah).
 // pre(tx) -> ctx (bacaan tambahan, mesti sebelum tulisan); build(ctx, number) -> { data, writes: [(tx)=>void] }
-export async function createNumbered(uid, kind, fmt, pre, build) {
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const queues = new Map(); // giliran per pengguna: pencipta serentak dalam satu peranti dilaksanakan satu demi satu
+export function createNumbered(uid, kind, fmt, pre, build) {
+  const run = async () => {
+    // Jika dua peranti/tab mencipta serentak, salah satu transaksi mendapati kaunter sudah berubah (ditolak/dibatalkan pelayan);
+    // ulang dengan bacaan segar. Nombor tidak pernah bertindih kerana setiap percubaan membaca kaunter terkini.
+    for (let i = 0; i < 10; i++) {
+      try { return await createNumberedOnce(uid, kind, fmt, pre, build); }
+      catch (e) { if (!["permission-denied", "aborted", "failed-precondition"].includes(e.code) || i === 9) throw e; await sleep(30 + Math.random() * 90 * (i + 1)); }
+    }
+  };
+  const prev = queues.get(uid) || Promise.resolve();
+  const next = prev.catch(() => {}).then(run); queues.set(uid, next); return next;
+}
+async function createNumberedOnce(uid, kind, fmt, pre, build) {
   const year = yearMY();
   const cref = docRef(uid, "counters", `${kind}_${year}`);
   const dref = F.doc(colRef(uid, KIND_COL[kind]));
@@ -57,11 +83,11 @@ export async function createNumbered(uid, kind, fmt, pre, build) {
     const ctx = pre ? await pre(tx) : null;
     const n = (cs.exists() ? cs.data().n : 0) + 1;
     number = formatNumber(fmt, n, year);
-    const { data, writes = [] } = build(ctx, number);
+    const { data, writes = [] } = build(ctx, number, dref.id);
     tx.set(cref, { n, kind, year: Number(year), ownerUid: uid });
     tx.set(dref, { ...data, number, ownerUid: uid, createdAt: F.serverTimestamp(), updatedAt: F.serverTimestamp() });
     writes.forEach((w) => w(tx));
-  });
+  }, { maxAttempts: 25 });
   return { id: dref.id, number };
 }
 

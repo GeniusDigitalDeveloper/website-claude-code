@@ -1,5 +1,11 @@
 // Penjana PDF sebenar (vektor, A4) dengan jsPDF + AutoTable: jadual boleh bersambung ke halaman seterusnya,
-// pengepala jadual diulang, tiada teks terpotong. 5 templat: classic, modern, minimal, corporate, elegant.
+// pengepala jadual diulang, tiada teks terpotong. 8 templat. Untuk invois, sebut harga dan resit.
+//
+// Susun atur (semua jenis dokumen):
+//  - Kanan atas: tajuk dokumen + NOMBOR SIRI (satu baris dengan pengepala).
+//  - Kiri atas: logo (pilihan), nama syarikat, NO. PENDAFTARAN (penuh, tepat di bawah nama), alamat, telefon/e-mel.
+//  - Di atas garisan footer: KIRI = kod QR (atas) + maklumat bank; KANAN = tandatangan + cop (boleh bertindih).
+//    QR/bank/tandatangan/cop semuanya pilihan; jika tiada, kawasan itu dibiarkan kosong.
 import { t, getLang } from "./i18n.js";
 import { calc, money, fmtDate, num, invoiceStatus, quotationStatus } from "./util.js";
 
@@ -26,6 +32,7 @@ export const TEMPLATES = {
 const hex = (h) => { const m = /^#?([0-9a-f]{6})$/i.exec(h || ""); const n = parseInt(m ? m[1] : "2563eb", 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
 const clean = (s) => String(s ?? "").replace(/[–—]/g, "-").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/…/g, "...").replace(/[^\u0009\u000A -ÿ€]/g, "?");
 const TITLE = { invoice: "pdf_invoice", quotation: "pdf_quotation", receipt: "pdf_receipt" };
+const isImg = (s) => typeof s === "string" && /^data:image\/(png|jpeg|webp)/.test(s);
 
 export async function buildPdf(type, doc, company = {}, opts = {}) {
   await loadPdfLibs();
@@ -33,131 +40,169 @@ export async function buildPdf(type, doc, company = {}, opts = {}) {
   const pdf = new jsPDF({ unit: "mm", format: "a4", compress: true });
   const T = TEMPLATES[opts.template] || TEMPLATES[company.template] || TEMPLATES.classic;
   const accent = hex(opts.color || company.color || "#2563eb");
-  const dark = [30, 41, 59], grey = [100, 116, 139];
+  const dark = [30, 41, 59], grey = [100, 116, 139], white = [255, 255, 255];
   const W = 210, H = 297, M = 14, side = T.side ? 6 : 0, L = M + side, R = W - M;
   const F = T.font;
   const txt = (s, x, y, o = {}) => pdf.text(clean(s), x, y, o);
   const setC = (c) => pdf.setTextColor(c[0], c[1], c[2]);
-  let y = 14;
-
-  if (T.side) { pdf.setFillColor(...accent); pdf.rect(0, 0, 6, H, "F"); }
-  const bandH = T.bandH || 34;
-  if (T.band) { pdf.setFillColor(...accent); pdf.rect(0, 0, W, bandH, "F"); }
-
-  // --- Pengepala: logo + maklumat syarikat
-  let logoW = 0;
-  if (company.logo && /^data:image\/(png|jpeg|webp)/.test(company.logo)) {
+  // Letak imej mengikut nisbah asal dalam kotak maxW x maxH; ax/ay = jangkar (left|center|right / top|middle|bottom)
+  const fit = (src, x, y, maxW, maxH, ax = "left", ay = "top") => {
     try {
-      const p = pdf.getImageProperties(company.logo); const h = 18, w = Math.min(46, (p.width / p.height) * h);
-      const lx = T.center ? (W - w) / 2 : L; pdf.addImage(company.logo, p.fileType || "PNG", lx, y - 2, w, w / (p.width / p.height) > h ? h : w / (p.width / p.height)); logoW = w;
-      if (T.center) y += 20;
-    } catch (e) { console.warn("logo", e); }
-  }
+      const p = pdf.getImageProperties(src); const r = Math.min(maxW / p.width, maxH / p.height); const w = p.width * r, h = p.height * r;
+      pdf.addImage(src, p.fileType || "PNG", ax === "center" ? x - w / 2 : ax === "right" ? x - w : x, ay === "bottom" ? y - h : ay === "middle" ? y - h / 2 : y, w, h); return { w, h };
+    } catch (e) { console.warn("imej", e); return null; }
+  };
+
+  // ---------------- Kawasan bawah (di atas garisan footer): dikira DAHULU supaya kandungan tidak memasukinya
+  const bank = (company.bank || "").trim(), hasQr = isImg(company.bankQr), hasSig = isImg(company.signature), hasChop = isImg(company.stamp);
+  pdf.setFont(F, "normal"); pdf.setFontSize(8.5);
+  const bankLines = bank ? pdf.splitTextToSize(clean(bank), R - L - 78) : [];
+  const QR = 28, leftH = (hasQr ? QR + 6 : 0) + (bank ? 6 + bankLines.length * 4.2 : 0), rightH = 38;
+  const BOTTOM = H - 19, TOP = BOTTOM - Math.max(leftH, rightH), LIMIT = TOP - 4; // kandungan mesti berhenti sebelum LIMIT
+  const bottomBlock = () => {
+    let yy = TOP;
+    if (hasQr) { fit(company.bankQr, L, yy, QR, QR); pdf.setFont(F, "normal"); pdf.setFontSize(7); setC(grey); txt(t("pdf_scan"), L + QR / 2, yy + QR + 3.2, { align: "center" }); yy += QR + 6; }
+    if (bank) { pdf.setFont(F, "bold"); pdf.setFontSize(8); setC(accent); txt(t("pdf_bank").toUpperCase(), L, yy + 3); pdf.setFont(F, "normal"); pdf.setFontSize(8.5); setC(dark); bankLines.forEach((ln, i) => txt(ln, L, yy + 8 + i * 4.2)); }
+    // Kanan: tandatangan + cop (cop di bawah, tandatangan di atasnya; bertindih sedikit supaya nampak sah)
+    const lineY = BOTTOM - 7, x0 = R - 64;
+    const both = hasChop && hasSig;
+    if (hasChop) fit(company.stamp, both ? R - 42 : R - 32, lineY + 1, 30, 30, "center", "bottom");
+    if (hasSig) fit(company.signature, both ? R - 24 : R - 32, lineY - 1, 44, 20, "center", "bottom");
+    pdf.setDrawColor(...grey); pdf.setLineWidth(0.3); pdf.line(x0, lineY, R, lineY);
+    pdf.setFont(F, "normal"); pdf.setFontSize(8); setC(grey); txt(t(hasChop ? "pdf_sig_company" : "pdf_signature"), x0 + 32, lineY + 4.4, { align: "center" });
+  };
+
+  let y = 14;
+  if (T.side) { pdf.setFillColor(...accent); pdf.rect(0, 0, 6, H, "F"); }
+
+  // ---------------- Pengepala kiri: logo + nama syarikat + NO. PENDAFTARAN + alamat + telefon/e-mel
+  // Ukur dahulu (supaya jalur berwarna cukup tinggi), kemudian lukis.
+  let logoW = 0; const logoSrc = isImg(company.logo) ? company.logo : "";
+  if (logoSrc) { try { const p = pdf.getImageProperties(logoSrc); const r = Math.min(46 / p.width, 18 / p.height); logoW = p.width * r; } catch { /* abaikan */ } }
   const nameX = T.center ? W / 2 : L + (logoW ? logoW + 4 : 0);
   const al = T.center ? { align: "center" } : {};
-  pdf.setFont(F, "bold"); pdf.setFontSize(14); setC(T.band ? [255, 255, 255] : dark);
-  txt(company.name || "", nameX, y + 4, al);
-  pdf.setFont(F, "normal"); pdf.setFontSize(8.5); setC(T.band ? [235, 245, 255] : grey);
-  let cy = y + 9;
-  [company.address, [company.phone, company.email].filter(Boolean).join("  |  "), [company.regNo && t("pdf_regno") + ": " + company.regNo, company.website].filter(Boolean).join("  |  ")].forEach((ln) => {
-    if (!ln) return; pdf.splitTextToSize(clean(ln), T.center ? 150 : 95).forEach((p) => { txt(p, nameX, cy, al); cy += 4; });
-  });
-  // Tajuk dokumen
-  const title = t(TITLE[type]).toUpperCase();
-  pdf.setFont(F, "bold"); pdf.setFontSize(T.center ? 20 : 22); setC(T.band ? [255, 255, 255] : accent);
-  if (T.center) { y = Math.max(cy, y + 14) + 4; txt(title, W / 2, y, { align: "center" }); y += 3; }
-  else if (T.pill) { pdf.setFillColor(...accent); pdf.roundedRect(R - 52, y - 2, 52, 12, 6, 6, "F"); pdf.setFontSize(13); setC([255, 255, 255]); txt(title, R - 26, y + 6.2, { align: "center" }); y = Math.max(cy, y + 16) + 2; }
-  else { txt(title, R, T.band ? bandH / 2 + 4 : y + 6, { align: "right" }); y = Math.max(cy, T.band ? bandH + 4 : y + 14) + 2; }
+  const maxTxtW = T.center ? 150 : R - nameX - 62; // ruang kiri; kanan dikhaskan untuk tajuk + nombor siri
+  const yTop = T.center && logoW ? y + 20 : y;
+  pdf.setFont(F, "bold"); pdf.setFontSize(14);
+  const nameLines = pdf.splitTextToSize(clean(company.name || ""), maxTxtW);
+  const rawLines = [];
+  if (company.regNo) rawLines.push({ s: `${t("pdf_regno")}: ${company.regNo}`, bold: true }); // tepat di bawah nama syarikat, ditulis penuh
+  if (company.address) rawLines.push({ s: company.address });
+  const contact = [company.phone && (t("pdf_tel") + " " + company.phone), company.email].filter(Boolean).join("   |   "); if (contact) rawLines.push({ s: contact });
+  if (company.website) rawLines.push({ s: company.website });
+  const detail = []; pdf.setFontSize(8.5);
+  rawLines.forEach((l) => { pdf.setFont(F, l.bold ? "bold" : "normal"); pdf.splitTextToSize(clean(l.s), maxTxtW).forEach((p) => detail.push({ s: p, bold: l.bold })); });
+  const textBottom = yTop + 4 + (nameLines.length - 1) * 6 + 5 + detail.length * 4;
+  const bandH = T.band ? Math.max(T.bandH || 34, textBottom + 5, 14 + 20) : 0;
+  if (T.band) { pdf.setFillColor(...accent); pdf.rect(0, 0, W, bandH, "F"); }
+  if (logoSrc) fit(logoSrc, T.center ? W / 2 : L, y - 2, 46, 18, T.center ? "center" : "left");
+  if (T.center && logoW) y += 20;
+  pdf.setFont(F, "bold"); pdf.setFontSize(14); setC(T.band ? white : dark);
+  nameLines.forEach((ln, i) => txt(ln, nameX, y + 4 + i * 6, al));
+  let cy = y + 4 + (nameLines.length - 1) * 6 + 5;
+  pdf.setFontSize(8.5); setC(T.band ? [235, 245, 255] : grey);
+  detail.forEach((l) => { pdf.setFont(F, l.bold ? "bold" : "normal"); txt(l.s, nameX, cy, al); cy += 4; });
+
+  // ---------------- Pengepala kanan: TAJUK + NOMBOR SIRI (satu baris dengan pengepala)
+  const title = t(TITLE[type]).toUpperCase(), serial = String(doc.number || "");
+  const y0 = 14;
+  if (T.center) {
+    y = Math.max(cy, y + 14) + 4; pdf.setFont(F, "bold"); pdf.setFontSize(20); setC(accent); txt(title, W / 2, y, { align: "center" });
+    pdf.setFontSize(11); setC(dark); txt(serial, W / 2, y + 7, { align: "center" }); y += 8;
+  } else if (T.pill) {
+    pdf.setFillColor(...accent); pdf.roundedRect(R - 52, y0 - 2, 52, 12, 6, 6, "F"); pdf.setFont(F, "bold"); pdf.setFontSize(13); setC(white); txt(title, R - 26, y0 + 6.2, { align: "center" });
+    pdf.setFontSize(11); setC(dark); txt(serial, R, y0 + 16, { align: "right" }); y = Math.max(cy, y0 + 20) + 2;
+  } else {
+    const ty = T.band ? bandH / 2 - 2 : y0 + 6; pdf.setFont(F, "bold"); pdf.setFontSize(22); setC(T.band ? white : accent); txt(title, R, ty, { align: "right" });
+    pdf.setFontSize(11); setC(T.band ? white : dark); txt(serial, R, ty + 8, { align: "right" });
+    y = Math.max(cy, T.band ? bandH + 4 : y0 + 22) + 2;
+  }
   if (T.rule) { pdf.setDrawColor(...accent); pdf.setLineWidth(T.double ? 0.2 : 0.5); pdf.line(L, y, R, y); if (T.double) pdf.line(L, y + 1.2, R, y + 1.2); }
   y += 7;
 
-  // --- Meta dokumen + pelanggan
+  // ---------------- Pelanggan (kiri) + meta (kanan)
   const status = type === "invoice" ? invoiceStatus(doc) : type === "quotation" ? quotationStatus(doc) : "";
   const meta = type === "receipt"
-    ? [[t("pdf_receipt_no"), doc.number], [t("pdf_date"), fmtDate(doc.date, getLang())], [t("pdf_invref"), doc.invoiceNumber || "-"]]
-    : [[t(type === "invoice" ? "pdf_invoice_no" : "pdf_quotation_no"), doc.number], [t("pdf_date"), fmtDate(doc.date, getLang())],
-       [t(type === "invoice" ? "pdf_due" : "pdf_valid"), fmtDate(type === "invoice" ? doc.dueDate : doc.validUntil, getLang())], [t("pdf_status"), t("st_" + status)]];
+    ? [[t("pdf_date"), fmtDate(doc.date, getLang())], [t("pdf_invref"), doc.invoiceNumber || "-"], ...(doc.seq ? [[t("pdf_payment_no"), t("pdf_seq", { n: doc.seq })]] : [])]
+    : [[t("pdf_date"), fmtDate(doc.date, getLang())], [t(type === "invoice" ? "pdf_due" : "pdf_valid"), fmtDate(type === "invoice" ? doc.dueDate : doc.validUntil, getLang())], [t("pdf_status"), t("st_" + status)]];
   const cust = doc.customer || {};
   pdf.setFont(F, "bold"); pdf.setFontSize(8); setC(accent); txt(t(type === "receipt" ? "pdf_received_from" : "pdf_billto").toUpperCase(), L, y);
   pdf.setFont(F, "bold"); pdf.setFontSize(10.5); setC(dark); txt(cust.name || doc.customerName || "-", L, y + 5);
   pdf.setFont(F, "normal"); pdf.setFontSize(8.5); setC(grey); let by = y + 9.5;
-  [cust.company, cust.address, [cust.phone, cust.email].filter(Boolean).join("  |  "), cust.regNo && t("pdf_regno") + ": " + cust.regNo].filter(Boolean)
+  [cust.company, cust.regNo && `${t("pdf_regno")}: ${cust.regNo}`, cust.address, [cust.phone, cust.email].filter(Boolean).join("   |   ")].filter(Boolean)
     .forEach((ln) => pdf.splitTextToSize(clean(ln), 90).forEach((p) => { txt(p, L, by); by += 4; }));
   let my = y;
   meta.forEach(([k, v]) => { pdf.setFont(F, "normal"); pdf.setFontSize(8.5); setC(grey); txt(k, 124, my); pdf.setFont(F, "bold"); pdf.setFontSize(9); setC(dark); txt(String(v ?? "-"), R, my, { align: "right" }); my += 5.5; });
   y = Math.max(by, my) + 6;
 
-  // --- Resit: kotak jumlah
+  // ---------------- Resit
   if (type === "receipt") {
     pdf.setFillColor(...accent.map((c) => 255 - (255 - c) * 0.1)); pdf.setDrawColor(...accent); pdf.roundedRect(L, y, R - L, 26, 2, 2, "FD");
     pdf.setFont(F, "normal"); pdf.setFontSize(9); setC(grey); txt(t("pdf_amount_paid"), L + 6, y + 8);
     pdf.setFont(F, "bold"); pdf.setFontSize(22); setC(accent); txt(money(doc.amount), L + 6, y + 19);
-    pdf.setFontSize(9); setC(dark); pdf.setFont(F, "normal"); txt(t("pdf_method") + ": " + t("pm_" + doc.method), R - 6, y + 9, { align: "right" });
-    txt(t("pdf_balance_after") + ": " + money(doc.balanceAfter), R - 6, y + 18, { align: "right" });
+    pdf.setFontSize(9); setC(dark); pdf.setFont(F, "normal"); txt(t("pdf_method") + ": " + t("pm_" + doc.method), R - 6, y + 15, { align: "right" });
     y += 34;
-    if (doc.note) { pdf.setFont(F, "bold"); pdf.setFontSize(8); setC(accent); txt(t("pdf_note").toUpperCase(), L, y); pdf.setFont(F, "normal"); pdf.setFontSize(9); setC(dark); y += 5; pdf.splitTextToSize(clean(doc.note), R - L).forEach((p) => { txt(p, L, y); y += 4.5; }); }
-    footer(); return pdf;
+    const rows = [];
+    if (doc.invoiceTotal != null) rows.push([t("pdf_invoice_total"), money(doc.invoiceTotal)], [t("pdf_paid_to_date"), money(doc.paidToDate)]);
+    rows.push([t("pdf_balance_after"), money(doc.balanceAfter), true]);
+    rows.forEach(([k, v, strong]) => {
+      if (strong) { pdf.setFillColor(...accent); pdf.roundedRect(104, y - 4.6, R - 104, 7.4, 1.2, 1.2, "F"); pdf.setFont(F, "bold"); pdf.setFontSize(10); setC(white); }
+      else { pdf.setFont(F, "normal"); pdf.setFontSize(9); setC(dark); }
+      txt(k, 107, y); txt(v, R - 3, y, { align: "right" }); y += 6.8;
+    });
+    y += 3;
+    if (doc.note) { pdf.setFont(F, "bold"); pdf.setFontSize(8); setC(accent); txt(t("pdf_note").toUpperCase(), L, y); pdf.setFont(F, "normal"); pdf.setFontSize(9); setC(dark); y += 5; pdf.splitTextToSize(clean(doc.note), R - L).forEach((p) => { if (y > LIMIT) { pdf.addPage(); y = 18; } txt(p, L, y); y += 4.5; }); }
+    if (y > LIMIT) { pdf.addPage(); y = 18; }
+    bottomBlock(); footer(); return pdf;
   }
 
-  // --- Jadual item
+  // ---------------- Jadual item (tidak memasuki kawasan bawah)
   const c = calc(doc);
   const head = [["#", t("pdf_desc"), t("pdf_qty"), t("pdf_price"), t("pdf_disc"), t("pdf_amount")]];
   const body = c.items.map((i, k) => [k + 1, clean(i.name + (i.desc ? "\n" + i.desc : "")), num(i.qty), money(i.price).replace("RM ", ""), num(i.discount) ? num(i.discount) + "%" : "-", money(i.amount).replace("RM ", "")]);
-  const headFill = T.head === "accent" ? accent : T.head === "dark" ? dark : [255, 255, 255];
-  const headText = T.head === "none" ? dark : [255, 255, 255];
+  const headFill = T.head === "accent" ? accent : T.head === "dark" ? dark : white;
+  const headText = T.head === "none" ? dark : white;
   pdf.autoTable({
-    startY: y, head, body, theme: "plain", margin: { left: L, right: M, top: 16, bottom: 22 },
+    startY: y, head, body, theme: "plain", margin: { left: L, right: M, top: 16, bottom: H - LIMIT },
     styles: { font: F, fontSize: T.small ? 8 : 9, cellPadding: T.small ? { top: 1.6, bottom: 1.6, left: 2, right: 2 } : { top: 2.6, bottom: 2.6, left: 2.5, right: 2.5 }, textColor: dark, overflow: "linebreak", lineColor: [226, 232, 240], lineWidth: { bottom: 0.2 } },
     headStyles: { fillColor: headFill, textColor: headText, fontStyle: "bold", fontSize: 8.5, lineWidth: T.head === "none" ? { bottom: 0.6 } : 0, lineColor: accent },
     alternateRowStyles: T.zebra ? { fillColor: [247, 249, 252] } : {},
     columnStyles: { 0: { cellWidth: 9, halign: "center" }, 1: { cellWidth: "auto" }, 2: { cellWidth: 16, halign: "right" }, 3: { cellWidth: 26, halign: "right" }, 4: { cellWidth: 16, halign: "right" }, 5: { cellWidth: 28, halign: "right" } },
     didParseCell: (d) => { if (d.section === "head" && [2, 3, 4, 5].includes(d.column.index)) d.cell.styles.halign = "right"; if (d.section === "head" && d.column.index === 0) d.cell.styles.halign = "center"; },
-    didDrawPage: () => {},
   });
   y = pdf.lastAutoTable.finalY + 6;
 
-  // --- Jumlah
+  // ---------------- Jumlah. Deposit = jumlah diminta (maklumat); Baki = jumlah - semua resit.
   const rows = [[t("pdf_subtotal"), money(c.subtotal)]];
   if (c.docDiscount) rows.push([t("pdf_discount"), "- " + money(c.docDiscount)]);
   if (c.taxRate) rows.push([`${doc.taxName || t("pdf_tax")} (${c.taxRate}%)`, money(c.tax)]);
   rows.push([t("pdf_total"), money(c.total), true]);
-  if (type === "invoice") { if (c.deposit) rows.push([t("pdf_deposit"), "- " + money(c.deposit)]); if (c.paidReceipts) rows.push([t("pdf_paid"), "- " + money(c.paidReceipts)]); if (c.deposit || c.paidReceipts) rows.push([t("pdf_balance"), money(c.balance), true]); }
-  const need = rows.length * 6.5 + 8; if (y + need > H - 24) { pdf.addPage(); y = 18; }
+  if (type === "invoice") {
+    if (c.deposit) rows.push([t("pdf_deposit_due"), money(c.deposit)]);
+    if (c.paidReceipts) rows.push([t("pdf_paid"), "- " + money(c.paidReceipts)]);
+    if (c.paidReceipts || c.deposit) rows.push([t("pdf_balance"), money(c.balance), true]);
+  }
+  if (y + rows.length * 6.8 + 4 > LIMIT) { pdf.addPage(); y = 18; }
   rows.forEach(([k, v, strong]) => {
-    if (strong) { pdf.setFillColor(...accent); pdf.roundedRect(118, y - 4.6, R - 118, 7.4, 1.2, 1.2, "F"); pdf.setFont(F, "bold"); pdf.setFontSize(10); setC([255, 255, 255]); }
+    if (strong) { pdf.setFillColor(...accent); pdf.roundedRect(118, y - 4.6, R - 118, 7.4, 1.2, 1.2, "F"); pdf.setFont(F, "bold"); pdf.setFontSize(10); setC(white); }
     else { pdf.setFont(F, "normal"); pdf.setFontSize(9); setC(dark); }
     txt(k, 121, y); txt(v, R - 3, y, { align: "right" }); y += 6.8;
   });
   y += 3;
 
-  // --- Nota, bank, terma
+  // ---------------- Nota & terma (mengalir; berhenti sebelum kawasan bawah)
   const block = (label, text) => {
     if (!text) return;
-    const lines = pdf.splitTextToSize(clean(text), R - L); const h = 6 + lines.length * 4.2;
-    if (y + h > H - 22) { pdf.addPage(); y = 18; }
+    const ls = pdf.splitTextToSize(clean(text), R - L);
+    if (y + 11 > LIMIT) { pdf.addPage(); y = 18; }
     pdf.setFont(F, "bold"); pdf.setFontSize(8); setC(accent); txt(label.toUpperCase(), L, y); y += 4.6;
     pdf.setFont(F, "normal"); pdf.setFontSize(8.5); setC(dark);
-    lines.forEach((p) => { if (y > H - 22) { pdf.addPage(); y = 18; } txt(p, L, y); y += 4.2; }); y += 3;
+    ls.forEach((p) => { if (y > LIMIT) { pdf.addPage(); y = 18; } txt(p, L, y); y += 4.2; }); y += 3;
   };
   block(t("pdf_note"), doc.note);
-  if (type === "invoice") {
-    if (company.bankQr && /^data:image\/(png|jpeg|webp)/.test(company.bankQr) && company.bank !== undefined) {
-      // Maklumat bank di kiri, kod QR di kanan (sebelah). Jika ruang tak cukup, pindah ke halaman seterusnya.
-      const q = 30, lines = pdf.splitTextToSize(clean(company.bank || ""), R - L - q - 8); const h = Math.max(6 + lines.length * 4.2, q + 12);
-      if (y + h > H - 22) { pdf.addPage(); y = 18; }
-      pdf.setFont(F, "bold"); pdf.setFontSize(8); setC(accent); txt(t("pdf_bank").toUpperCase(), L, y); pdf.setFont(F, "normal"); pdf.setFontSize(8.5); setC(dark);
-      lines.forEach((ln, i) => txt(ln, L, y + 4.6 + i * 4.2));
-      try { pdf.addImage(company.bankQr, pdf.getImageProperties(company.bankQr).fileType || "PNG", R - q, y - 1, q, q); } catch (e) { console.warn("qr", e); }
-      pdf.setFontSize(7); setC(grey); txt(t("pdf_scan"), R - q / 2, y + q + 3.4, { align: "center" }); y += h + 1;
-    } else block(t("pdf_bank"), company.bank);
-  }
   block(t("pdf_terms"), doc.terms);
-  if (opts.signature !== false) {
-    if (y + 26 > H - 20) { pdf.addPage(); y = 18; }
-    y += 10; pdf.setDrawColor(...grey); pdf.setLineWidth(0.3); pdf.line(R - 55, y, R, y);
-    pdf.setFont(F, "normal"); pdf.setFontSize(8); setC(grey); txt(t("pdf_signature"), R - 27.5, y + 4.5, { align: "center" });
-  }
-  footer(); return pdf;
+  if (y > LIMIT) { pdf.addPage(); y = 18; }
+  bottomBlock(); footer(); return pdf;
 
   function footer() {
     const n = pdf.getNumberOfPages();

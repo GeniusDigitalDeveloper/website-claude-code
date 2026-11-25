@@ -20,3 +20,6 @@ export const auth = A.initializeAuth(app, { persistence: [A.indexedDBLocalPersis
 let _db; try { _db = F.initializeFirestore(app, { experimentalAutoDetectLongPolling: true, localCache: F.persistentLocalCache({ tabManager: F.persistentMultipleTabManager() }) }); } catch { _db = F.getFirestore(app); }
 export const db = _db;
 export { A, F };
+
+// Ujian tempatan sahaja: pada localhost dengan penanda localStorage "inv_emulator", sambung ke emulator (tiada kesan pada data sebenar).
+try { if (location.hostname === "localhost" && localStorage.getItem("inv_emulator")) { A.connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true }); F.connectFirestoreEmulator(db, "127.0.0.1", 8080); } } catch (e) { console.warn("emulator", e); }

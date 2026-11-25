@@ -1,6 +1,6 @@
 import { t, getLang } from "../i18n.js";
 import { esc, money, calc, invoiceStatus, quotationStatus, yearMY, round2, fmtDate, toast, confirmBox, debounce, $ } from "../util.js";
-import { listSWR } from "../db.js";
+import { listLive } from "../db.js";
 import { errMsg } from "../auth.js";
 import { ico, loading, badge, empty } from "./ui.js";
 import { pdfAction } from "./actions.js";
@@ -50,16 +50,16 @@ export async function render(el, ctx) {
     if (b.dataset.a === "download" || b.dataset.a === "print") return pdfAction(ctx, r.k, r, b.dataset.a);
     if (b.dataset.a === "del") {
       if (!(await confirmBox(t("delete"), t(confirmKey(r.k), { n: r.number }), t("delete")))) return;
-      try { await deleteProject(ctx, r.k, r); toast(t("deleted")); load(true); } catch (x) { console.error(x); toast(errMsg(x), "err"); }
+      try { await deleteProject(ctx, r.k, r); toast(t("deleted")); } catch (x) { console.error(x); toast(errMsg(x), "err"); }
     }
   }
-  const load = (fresh) => Promise.all(names.map((n) => listSWR(ctx.uid, n, onData(n)))).catch((e) => { if (!data.invoices) el.innerHTML = `<p class="err">${esc(errMsg(e))}</p>`; });
+  const load = () => names.forEach((n) => ctx.live(listLive(ctx.uid, n, onData(n), (e) => { if (!data.invoices) el.innerHTML = `<p class="err">${esc(errMsg(e))}</p>`; })));
   const onData = (n) => (rows) => { data[n] = rows; if (names.every((k) => data[k])) paint(data.invoices, data.quotations, data.receipts, data.customers); };
-  await load();
+  load();
   function paint(inv, quo, rec, cus) {
   const live = inv.filter((i) => i.status !== "cancelled" && i.status !== "draft");
   const calcs = live.map((i) => ({ i, c: calc(i) }));
-  const totalValue = round2(calcs.reduce((s, x) => s + x.c.total, 0)), received = round2(calcs.reduce((s, x) => s + x.c.deposit + x.c.paidReceipts, 0)), outstanding = round2(calcs.reduce((s, x) => s + x.c.balance, 0));
+  const totalValue = round2(calcs.reduce((s, x) => s + x.c.total, 0)), received = round2(calcs.reduce((s, x) => s + x.c.paidReceipts, 0)), outstanding = round2(calcs.reduce((s, x) => s + x.c.balance, 0));
   const year = yearMY(), m = MONTHS[getLang()];
   const byMonthCount = Array(12).fill(0), byMonthVal = Array(12).fill(0), payMonth = Array(12).fill(0);
   live.forEach((i) => { if ((i.date || "").startsWith(year)) { const k = +i.date.slice(5, 7) - 1; byMonthCount[k]++; byMonthVal[k] += calc(i).total; } });

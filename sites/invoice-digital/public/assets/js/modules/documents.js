@@ -1,7 +1,7 @@
 // Modul Invoice & Quotation: senarai, borang (cipta/edit), paparan + tindakan.
 import { t, getLang } from "../i18n.js";
-import { esc, $, $$, money, num, round2, calc, fmtDate, todayMY, addDays, toast, setBusy, readFileAsDataURL, invoiceStatus, quotationStatus, debounce, modal, confirmBox } from "../util.js";
-import { listAll, listSWR, getOne, create, update, remove, createNumbered, logActivity, setMeta } from "../db.js";
+import { esc, $, $$, money, num, round2, calc, fmtDate, todayMY, addDays, toast, setBusy, fitImage, invoiceStatus, quotationStatus, debounce, modal, confirmBox } from "../util.js";
+import { listAll, listLive, queryLive, docLive, docRef, getOne, create, update, remove, createNumbered, logActivity, setMeta } from "../db.js";
 import { pickerHtml, bindPicker } from "../picker.js";
 import { F } from "../firebase.js";
 import { errMsg } from "../auth.js";
@@ -41,15 +41,14 @@ export async function renderList(el, ctx, type) {
     if (b.dataset.a === "dup") { setBusy(b, true); try { const id = await duplicate(ctx, type, r); toast(t("duplicated")); ctx.nav(`#/app/${C.route}/${id}`); } catch (x) { toast(errMsg(x), "err"); setBusy(b, false); } }
   };
   };
-  try { await listSWR(ctx.uid, C.col, (r) => { rows = r; if (!mounted) { mounted = true; mount(); } else draw(); }); }
-  catch (e) { if (!mounted) el.innerHTML = `<p class="err">${esc(errMsg(e))}</p>`; }
+  ctx.live(listLive(ctx.uid, C.col, (r) => { rows = r; if (!mounted) { mounted = true; mount(); } else draw(); }, (e) => { if (!mounted) el.innerHTML = `<p class="err">${esc(errMsg(e))}</p>`; }));
 }
 
 async function numberFmt(ctx, type) { const s = await ctx.getSettings(); return (s.numberFormat && s.numberFormat[type]) || CFG[type].fmt; }
 
 export async function duplicate(ctx, type, src) {
-  const today = todayMY(); const { id, number, createdAt, updatedAt, ownerUid, status, receiptsPaid, convertedInvoiceId, convertedFrom, ...rest } = src;
-  const data = { ...rest, date: today, status: "draft", ...(type === "invoice" ? { dueDate: addDays(today, 14), receiptsPaid: 0 } : { validUntil: addDays(today, 30) }) };
+  const today = todayMY(); const { id, number, createdAt, updatedAt, ownerUid, status, receiptsPaid, receiptCount, convertedInvoiceId, convertedInvoiceNumber, fromQuotationId, fromQuotationNumber, ...rest } = src;
+  const data = { ...rest, date: today, status: "draft", ...(type === "invoice" ? { dueDate: addDays(today, 14), receiptsPaid: 0, receiptCount: 0 } : { validUntil: addDays(today, 30) }) };
   const r = await createNumbered(ctx.uid, type, await numberFmt(ctx, type), null, () => ({ data }));
   logActivity(ctx.user, type, r.number); return r.id;
 }
@@ -90,7 +89,7 @@ export async function renderEditor(el, ctx, type, id) {
     <div class="form"><label>${t("pdf_note")}<textarea name="note" rows="3" maxlength="1000">${esc(d.note)}</textarea></label><label>${t("pdf_terms")}<textarea name="terms" rows="4" maxlength="2000">${esc(d.terms)}</textarea></label>
      ${pickerHtml(d.template, d.color)}</div>
     <div class="form sum"><div class="grid2"><label>${t("f_docdisc")} (RM)<input name="docDiscount" type="number" min="0" step="0.01" value="${num(d.docDiscount)}"></label><label>${t("f_tax")} (%)<input name="taxRate" type="number" min="0" max="100" step="0.01" value="${num(d.taxRate)}"></label></div>
-     ${type === "invoice" ? `<label>${t("pdf_deposit")} (RM)<input name="deposit" type="number" min="0" step="0.01" value="${num(d.deposit)}"></label>` : ""}
+     ${type === "invoice" ? `<label>${t("pdf_deposit_due")} (RM)<input name="deposit" type="number" min="0" step="0.01" inputmode="decimal" value="${num(d.deposit)}"></label><p class="muted">${t("deposit_hint")}</p>` : ""}
      <div id="sum" class="totals" aria-live="polite"></div></div></div></section>
    <p class="err" id="err" role="alert"></p>
    <div class="form-f sticky"><a class="btn ghost" href="#/app/${C.route}">${t("cancel")}</a><button class="btn ghost" type="button" id="prev">${ico("eye")}${t("preview_draft")}</button><button class="btn primary" type="submit">${ico("check")}${t("save")}</button></div>
@@ -100,7 +99,7 @@ export async function renderEditor(el, ctx, type, id) {
   const docNow = () => { readItems(); return { items, docDiscount: num(f.docDiscount.value), taxRate: num(f.taxRate.value), deposit: f.deposit ? num(f.deposit.value) : 0, receiptsPaid: d.receiptsPaid || 0 }; };
   const drawSum = () => {
     const c = calc(docNow()); $$(".item", itemsEl).forEach((row, k) => (row.querySelector(".amt").textContent = money(c.items[k] ? c.items[k].amount : 0)));
-    $("#sum", el).innerHTML = `<div><span>${t("pdf_subtotal")}</span><b>${money(c.subtotal)}</b></div>${c.docDiscount ? `<div><span>${t("pdf_discount")}</span><b>- ${money(c.docDiscount)}</b></div>` : ""}${c.taxRate ? `<div><span>${t("pdf_tax")} (${c.taxRate}%)</span><b>${money(c.tax)}</b></div>` : ""}<div class="grand"><span>${t("pdf_total")}</span><b>${money(c.total)}</b></div>${type === "invoice" ? `<div><span>${t("pdf_deposit")}</span><b>- ${money(c.deposit)}</b></div>${c.paidReceipts ? `<div><span>${t("pdf_paid")}</span><b>- ${money(c.paidReceipts)}</b></div>` : ""}<div class="grand alt"><span>${t("pdf_balance")}</span><b>${money(c.balance)}</b></div>` : ""}`;
+    $("#sum", el).innerHTML = `<div><span>${t("pdf_subtotal")}</span><b>${money(c.subtotal)}</b></div>${c.docDiscount ? `<div><span>${t("pdf_discount")}</span><b>- ${money(c.docDiscount)}</b></div>` : ""}${c.taxRate ? `<div><span>${t("pdf_tax")} (${c.taxRate}%)</span><b>${money(c.tax)}</b></div>` : ""}<div class="grand"><span>${t("pdf_total")}</span><b>${money(c.total)}</b></div>${type === "invoice" ? `${c.deposit ? `<div><span>${t("pdf_deposit_due")}</span><b>${money(c.deposit)}</b></div>` : ""}${c.paidReceipts ? `<div><span>${t("pdf_paid")}</span><b>- ${money(c.paidReceipts)}</b></div>` : ""}<div class="grand alt"><span>${t("pdf_balance")}</span><b>${money(c.balance)}</b></div>` : ""}`;
   };
   const drawItems = () => {
     itemsEl.innerHTML = items.map((i, k) => `<div class="item"><div class="item-main"><label>${t("pdf_desc")}<input data-k="name" maxlength="150" value="${esc(i.name)}" placeholder="${esc(t("item_ph"))}"></label><label>${t("item_detail")}<input data-k="desc" maxlength="300" value="${esc(i.desc)}"></label></div>
@@ -110,7 +109,7 @@ export async function renderEditor(el, ctx, type, id) {
   drawItems(); bindPicker(el);
   $("#lgf", el).onchange = async (e) => {
     const file = e.target.files[0]; if (!file) return;
-    try { let logo = await readFileAsDataURL(file, 400); if (logo.length > 250000) logo = await readFileAsDataURL(file, 260, 0.75);
+    try { const logo = await fitImage(file, 360, 110000);
       await ctx.saveCompany({ logo }); company = await ctx.getCompany(); $("#lgp", el).innerHTML = `<img alt="Logo" src="${esc(company.logo)}">`; toast(t("saved")); }
     catch (x) { console.error(x); toast(t("err_file"), "err"); }
   };
@@ -146,7 +145,7 @@ export async function renderEditor(el, ctx, type, id) {
       if (!customerId && f.saveCust.checked) customerId = await create(ctx.uid, "customers", { ...customer, notes: "" });
       const data = { date: f.date.value, status: f.status.value, customerId: customerId || "", customer, items: valid.map((i) => ({ name: i.name.trim(), desc: (i.desc || "").trim(), qty: i.qty, price: i.price, discount: i.discount, ...(i.productId ? { productId: i.productId } : {}) })),
         docDiscount: dn.docDiscount, taxRate: dn.taxRate, taxName: d.taxName || "SST", note: f.note.value.trim(), terms: f.terms.value.trim(), template: f.template.value, color: f.color.value,
-        ...(type === "invoice" ? { dueDate: f.due.value, deposit: dn.deposit, receiptsPaid: d.receiptsPaid || 0 } : { validUntil: f.due.value }) };
+        ...(type === "invoice" ? { dueDate: f.due.value, deposit: dn.deposit, receiptsPaid: d.receiptsPaid || 0, receiptCount: d.receiptCount || 0 } : { validUntil: f.due.value }) };
       let rid = id;
       if (doc) await update(ctx.uid, C.col, id, data);
       else { const r = await createNumbered(ctx.uid, type, await numberFmt(ctx, type), null, () => ({ data })); rid = r.id; logActivity(ctx.user, type, r.number); }
@@ -156,65 +155,81 @@ export async function renderEditor(el, ctx, type, id) {
 }
 export const custSnap = (c) => ({ name: c.name || "", company: c.company || "", address: c.address || "", phone: c.phone || "", email: c.email || "", regNo: c.regNo || "" });
 
-// ------------------------------------------------------------------ PAPARAN
+// ------------------------------------------------------------------ PAPARAN (masa nyata)
 export async function renderView(el, ctx, type, id) {
   const C = CFG[type]; el.innerHTML = loading();
-  let d, receipts = [];
-  try {
-    d = await getOne(ctx.uid, C.col, id); if (!d) { el.innerHTML = empty("doc", t("not_found")); return; }
-    if (type === "invoice") { const s = await F.getDocs(F.query(F.collection(F.getFirestore(), "inv_users", ctx.uid, "receipts"), F.where("invoiceId", "==", id))); receipts = s.docs.map((x) => ({ id: x.id, ...x.data() })).sort((a, b) => (a.date < b.date ? 1 : -1)); }
-  } catch (e) { el.innerHTML = `<p class="err">${esc(errMsg(e))}</p>`; return; }
-  const c = calc(d), st = C.eff(d), cu = d.customer || {};
-  const canDelete = true;
+  const isInv = type === "invoice";
+  let d = null, kids = [], got = false, pvOpen = false, pvUrl = "";
+  const bySeq = (a) => a.slice().sort((x, y) => ((y.createdAt && y.createdAt.seconds) || 9e12) - ((x.createdAt && x.createdAt.seconds) || 9e12));
   const btn = (a, icon, label, cls = "ghost") => `<button class="btn ${cls}" data-a="${a}">${ico(icon)}<span>${t(label)}</span></button>`;
-  el.innerHTML = `<div class="page-h"><div><h1>${esc(d.number)} ${badge(st)}</h1><p class="sub">${esc(cu.name || "")}${cu.company ? " · " + esc(cu.company) : ""}</p></div><a class="btn ghost" href="#/app/${C.route}">${t("back")}</a></div>
-  <div class="actions-bar">${btn("edit", "edit", "act_edit", "primary")}${btn("download", "download", "act_download")}${btn("print", "print", "act_print")}${btn("inline", "eye", "preview_inline")}${btn("preview", "eye", "act_preview")}${btn("share", "share", "act_share")}${btn("dup", "copy", "act_duplicate")}
-   ${type === "invoice" && !["paid", "cancelled", "draft"].includes(d.status) ? btn("pay", "wallet", "act_receipt", "accent") : ""}
-   ${type === "invoice" ? `${d.status !== "paid" && d.status !== "cancelled" ? btn("paid", "check", "mark_paid") : ""}${["paid", "partial", "sent", "draft"].includes(d.status) ? btn("unpaid", "clock", "mark_unpaid") : ""}${d.status !== "cancelled" && d.status !== "draft" && d.status !== "paid" ? btn("partial", "wallet", "mark_partial") : ""}${d.status !== "cancelled" ? btn("cancel", "x", "mark_cancel") : ""}`
-   : `${!d.convertedInvoiceId ? btn("convert", "swap", "act_convert", "accent") : ""}${["sent", "draft", "rejected", "expired"].includes(d.status) ? btn("accepted", "check", "mark_accepted") : ""}${["sent", "draft", "accepted"].includes(d.status) ? btn("rejected", "x", "mark_rejected") : ""}${["sent", "draft"].includes(d.status) ? btn("expired", "clock", "mark_expired") : ""}${d.status === "draft" ? btn("sent", "mail", "mark_sent") : ""}`}
-   ${type === "invoice" && d.status === "draft" ? btn("sent", "mail", "mark_sent") : ""}${canDelete ? btn("del", "trash", "delete", "danger") : ""}</div>
-  <section class="card" id="pvbox" hidden><h2>${t("preview_title")}</h2><iframe class="pdf-frame" title="PDF" src="about:blank"></iframe></section>
-  <div class="grid-view"><section class="card"><div class="kv"><div><span>${t("f_date")}</span><b>${fmtDate(d.date, getLang())}</b></div><div><span>${t(type === "invoice" ? "f_due" : "f_valid")}</span><b>${fmtDate(dueOf(type, d), getLang())}</b></div>
-   <div><span>${t("sec_customer")}</span><b>${esc(cu.name || "-")}</b><small>${esc(cu.address || "")}<br>${esc([cu.phone, cu.email].filter(Boolean).join(" · "))}</small></div>
-   ${d.convertedInvoiceId ? `<div><span>${t("st_converted")}</span><a href="#/app/invoices/${esc(d.convertedInvoiceId)}"><b>${esc(d.convertedInvoiceNumber || "")}</b></a></div>` : ""}${d.fromQuotationNumber ? `<div><span>${t("from_quotation")}</span><a href="#/app/quotations/${esc(d.fromQuotationId)}"><b>${esc(d.fromQuotationNumber)}</b></a></div>` : ""}</div>
-   <table class="tbl simple"><thead><tr><th>${t("pdf_desc")}</th><th class="r">${t("pdf_qty")}</th><th class="r">${t("pdf_price")}</th><th class="r">${t("pdf_amount")}</th></tr></thead><tbody>${c.items.map((i) => `<tr><td data-l="${t("pdf_desc")}"><b>${esc(i.name)}</b>${i.desc ? `<br><small>${esc(i.desc)}</small>` : ""}</td><td class="r" data-l="${t("pdf_qty")}">${i.qty}</td><td class="r" data-l="${t("pdf_price")}">${money(i.price)}${num(i.discount) ? `<small> −${i.discount}%</small>` : ""}</td><td class="r" data-l="${t("pdf_amount")}">${money(i.amount)}</td></tr>`).join("")}</tbody></table>
-   ${d.note ? `<h3>${t("pdf_note")}</h3><p class="pre">${esc(d.note)}</p>` : ""}${d.terms ? `<h3>${t("pdf_terms")}</h3><p class="pre">${esc(d.terms)}</p>` : ""}</section>
-  <aside class="card totals"><div><span>${t("pdf_subtotal")}</span><b>${money(c.subtotal)}</b></div>${c.docDiscount ? `<div><span>${t("pdf_discount")}</span><b>- ${money(c.docDiscount)}</b></div>` : ""}${c.taxRate ? `<div><span>${t("pdf_tax")} (${c.taxRate}%)</span><b>${money(c.tax)}</b></div>` : ""}<div class="grand"><span>${t("pdf_total")}</span><b>${money(c.total)}</b></div>
-   ${type === "invoice" ? `<div><span>${t("pdf_deposit")}</span><b>- ${money(c.deposit)}</b></div><div><span>${t("pdf_paid")}</span><b>- ${money(c.paidReceipts)}</b></div><div class="grand alt"><span>${t("pdf_balance")}</span><b>${money(c.balance)}</b></div>` : ""}
-   ${receipts.length ? `<h3>${t("nav_receipts")}</h3>${receipts.map((r) => `<div class="mini"><span>${esc(r.number)} · ${fmtDate(r.date, getLang())}</span><b>${money(r.amount)}</b></div>`).join("")}` : ""}</aside></div>`;
+
+  const showPreview = async () => { const box = el.querySelector("#pvbox"); if (!box || !d) return; box.hidden = false; try { const pdf = await makePdf(ctx, type, d); if (pvUrl) URL.revokeObjectURL(pvUrl); pvUrl = URL.createObjectURL(pdf.output("blob")); box.querySelector("iframe").src = pvUrl; } catch (e) { console.error(e); } };
+
+  function paint() {
+    if (!got) return;
+    if (!d) { el.innerHTML = empty("doc", t("not_found")); return; }
+    const c = calc(d), st = C.eff(d), cu = d.customer || {};
+    const canPay = isInv && !["paid", "cancelled"].includes(d.status);
+    const bar = [btn("edit", "edit", "act_edit", "primary"), btn("download", "download", "act_download"), btn("print", "print", "act_print"), btn("inline", "eye", "preview_inline"), btn("preview", "eye", "act_preview"), btn("share", "share", "act_share"), btn("dup", "copy", "act_duplicate")];
+    if (isInv) {
+      if (canPay) bar.push(btn("pay", "wallet", "act_receipt", "accent"));
+      if (d.status === "draft") bar.push(btn("sent", "mail", "mark_sent"));
+      if (canPay) bar.push(btn("paid", "check", "mark_paid"));
+      if (!kids.length && ["paid", "partial", "sent", "draft"].includes(d.status)) bar.push(btn("unpaid", "clock", "mark_unpaid"));
+      if (d.status !== "cancelled") bar.push(btn("cancel", "x", "mark_cancel"));
+    } else {
+      bar.push(btn("convert", "swap", "act_convert", "accent")); // boleh ditukar berkali-kali (satu quotation -> banyak invois)
+      if (["sent", "draft", "rejected", "expired"].includes(d.status)) bar.push(btn("accepted", "check", "mark_accepted"));
+      if (["sent", "draft", "accepted"].includes(d.status)) bar.push(btn("rejected", "x", "mark_rejected"));
+      if (["sent", "draft"].includes(d.status)) bar.push(btn("expired", "clock", "mark_expired"));
+      if (d.status === "draft") bar.push(btn("sent", "mail", "mark_sent"));
+    }
+    bar.push(btn("del", "trash", "delete", "danger"));
+    const kidsHtml = isInv
+      ? `<h3>${t("receipts_of_invoice")}</h3>${kids.length ? kids.map((r) => `<div class="mini rrow"><span><b>${esc(r.number)}</b> · ${fmtDate(r.date, getLang())}${r.seq ? ` · ${t("pdf_seq", { n: r.seq })}` : ""}</span><span class="rr"><b>${money(r.amount)}</b><button class="icon-btn" data-a="rdl" data-rid="${r.id}" aria-label="${t("act_download")}">${ico("download")}</button><button class="icon-btn" data-a="rpr" data-rid="${r.id}" aria-label="${t("act_print")}">${ico("print")}</button></span></div>`).join("") : `<p class="muted">${t("receipts_empty")}</p>`}${canPay ? `<div class="mt"><button class="btn accent sm" data-a="pay">${ico("plus")}${t("act_receipt")}</button></div>` : ""}`
+      : `<h3>${t("quo_invoices")}</h3>${kids.length ? kids.map((r) => `<a class="mini link" href="#/app/invoices/${esc(r.id)}"><span><b>${esc(r.number)}</b> · ${fmtDate(r.date, getLang())} ${badge(invoiceStatus(r))}</span><b>${money(calc(r).total)}</b></a>`).join("") : `<p class="muted">-</p>`}`;
+    el.innerHTML = `<div class="page-h"><div><h1>${esc(d.number)} ${badge(st)}</h1><p class="sub">${esc(cu.name || "")}${cu.company ? " · " + esc(cu.company) : ""}</p></div><a class="btn ghost" href="#/app/${C.route}">${t("back")}</a></div>
+    <div class="actions-bar">${bar.join("")}</div>
+    <section class="card" id="pvbox" ${pvOpen ? "" : "hidden"}><h2>${t("preview_title")}</h2><iframe class="pdf-frame" title="PDF" src="about:blank"></iframe></section>
+    <div class="grid-view"><section class="card"><div class="kv"><div><span>${t("f_date")}</span><b>${fmtDate(d.date, getLang())}</b></div><div><span>${t(isInv ? "f_due" : "f_valid")}</span><b>${fmtDate(dueOf(type, d), getLang())}</b></div>
+     <div><span>${t("sec_customer")}</span><b>${esc(cu.name || "-")}</b><small>${esc(cu.address || "")}<br>${esc([cu.phone, cu.email].filter(Boolean).join(" · "))}</small></div>
+     ${d.fromQuotationNumber ? `<div><span>${t("from_quotation")}</span><a href="#/app/quotations/${esc(d.fromQuotationId)}"><b>${esc(d.fromQuotationNumber)}</b></a></div>` : ""}</div>
+     <table class="tbl simple"><thead><tr><th>${t("pdf_desc")}</th><th class="r">${t("pdf_qty")}</th><th class="r">${t("pdf_price")}</th><th class="r">${t("pdf_amount")}</th></tr></thead><tbody>${c.items.map((i) => `<tr><td data-l="${t("pdf_desc")}"><b>${esc(i.name)}</b>${i.desc ? `<br><small>${esc(i.desc)}</small>` : ""}</td><td class="r" data-l="${t("pdf_qty")}">${i.qty}</td><td class="r" data-l="${t("pdf_price")}">${money(i.price)}${num(i.discount) ? `<small> −${i.discount}%</small>` : ""}</td><td class="r" data-l="${t("pdf_amount")}">${money(i.amount)}</td></tr>`).join("")}</tbody></table>
+     ${d.note ? `<h3>${t("pdf_note")}</h3><p class="pre">${esc(d.note)}</p>` : ""}${d.terms ? `<h3>${t("pdf_terms")}</h3><p class="pre">${esc(d.terms)}</p>` : ""}</section>
+    <aside class="card totals"><div><span>${t("pdf_subtotal")}</span><b>${money(c.subtotal)}</b></div>${c.docDiscount ? `<div><span>${t("pdf_discount")}</span><b>- ${money(c.docDiscount)}</b></div>` : ""}${c.taxRate ? `<div><span>${t("pdf_tax")} (${c.taxRate}%)</span><b>${money(c.tax)}</b></div>` : ""}<div class="grand"><span>${t("pdf_total")}</span><b>${money(c.total)}</b></div>
+     ${isInv ? `${c.deposit ? `<div><span>${t("pdf_deposit_due")}</span><b>${money(c.deposit)}</b></div>` : ""}<div><span>${t("pdf_paid")}</span><b>- ${money(c.paidReceipts)}</b></div><div class="grand alt"><span>${t("pdf_balance")}</span><b>${money(c.balance)}</b></div>` : ""}
+     ${kidsHtml}</aside></div>`;
+    el.onclick = (e) => { const b = e.target.closest("[data-a]"); if (b) act(b.dataset.a, b); };
+    if (pvOpen) showPreview();
+  }
 
   const act = async (a, b) => {
     try {
       if (a === "edit") return ctx.nav(`#/app/${C.route}/${id}/edit`);
       if (["download", "print", "preview", "share"].includes(a)) return pdfAction(ctx, type, d, a);
-      setBusy(b, true);
-      const upd = async (patch, logType) => { await update(ctx.uid, C.col, id, patch); toast(t("saved")); renderView(el, ctx, type, id); };
-      if (a === "dup") { const nid = await duplicate(ctx, type, d); toast(t("duplicated")); return ctx.nav(`#/app/${C.route}/${nid}`); }
+      if (a === "rdl" || a === "rpr") { const r = kids.find((x) => x.id === b.dataset.rid); return r && pdfAction(ctx, "receipt", r, a === "rdl" ? "download" : "print"); }
+      if (a === "inline") { pvOpen = !pvOpen; const box = el.querySelector("#pvbox"); box.hidden = !pvOpen; if (pvOpen) { await showPreview(); box.scrollIntoView({ behavior: "smooth", block: "start" }); } return; }
       if (a === "pay") return ctx.nav(`#/app/receipts/new?invoice=${id}`);
-      if (a === "paid") { if (!(await confirmBox(t("mark_paid"), t("confirm_paid", { n: d.number }), t("yes")))) return setBusy(b, false); return upd({ status: "paid", receiptsPaid: round2(Math.max(c.total - c.deposit, 0)) }); }
+      setBusy(b, true); const c = calc(d);
+      const upd = async (patch) => { await update(ctx.uid, C.col, id, patch); toast(t("saved")); }; // paparan dikemas kini serta-merta oleh pendengar masa nyata
+      if (a === "dup") { const nid = await duplicate(ctx, type, d); toast(t("duplicated")); return ctx.nav(`#/app/${C.route}/${nid}`); }
+      if (a === "paid") { if (!(await confirmBox(t("mark_paid"), t("confirm_paid", { n: d.number }), t("yes")))) return setBusy(b, false); return upd({ status: "paid", receiptsPaid: round2(c.total) }); }
       if (a === "unpaid") return upd({ status: "unpaid", receiptsPaid: 0 });
-      if (a === "partial") { setBusy(b, false); return askPartial(); }
       if (a === "cancel") { if (!(await confirmBox(t("mark_cancel"), t("confirm_cancel", { n: d.number }), t("yes")))) return setBusy(b, false); return upd({ status: "cancelled" }); }
       if (["accepted", "rejected", "expired", "sent"].includes(a)) return upd({ status: a });
       if (a === "del") { if (!(await confirmBox(t("delete"), t(confirmKey(type), { n: d.number }), t("delete")))) return setBusy(b, false); await deleteProject(ctx, type, d); toast(t("deleted")); return ctx.nav(`#/app/${C.route}`); }
-      if (a === "inline") { const box = el.querySelector("#pvbox"); const open = !box.hidden; box.hidden = open; if (!open) { const pdf = await makePdf(ctx, type, d); const fr = box.querySelector("iframe"); if (fr.dataset.u) URL.revokeObjectURL(fr.dataset.u); fr.dataset.u = URL.createObjectURL(pdf.output("blob")); fr.src = fr.dataset.u; box.scrollIntoView({ behavior: "smooth", block: "start" }); } setBusy(b, false); return; }
       if (a === "convert") {
         if (!(await confirmBox(t("act_convert"), t("confirm_convert", { n: d.number }), t("yes")))) return setBusy(b, false);
-        const today = todayMY(); const { id: _i, number, createdAt, updatedAt, ownerUid, status, validUntil, convertedInvoiceId, ...rest } = d;
-        const qref = F.doc(F.getFirestore(), "inv_users", ctx.uid, "quotations", id);
-        const r = await createNumbered(ctx.uid, "invoice", await numberFmt(ctx, "invoice"), null, (_, n) => ({ data: { ...rest, date: today, dueDate: addDays(today, 14), status: "draft", deposit: 0, receiptsPaid: 0, fromQuotationId: id, fromQuotationNumber: d.number },
-          writes: [(tx) => tx.update(qref, { status: "converted", convertedInvoiceId: "pending", convertedInvoiceNumber: n, updatedAt: F.serverTimestamp() })] }));
-        await update(ctx.uid, "quotations", id, { convertedInvoiceId: r.id, convertedInvoiceNumber: r.number });
+        const today = todayMY(); const { id: _i, number, createdAt, updatedAt, ownerUid, status, validUntil, convertedInvoiceId, convertedInvoiceNumber, ...rest } = d;
+        const qref = docRef(ctx.uid, "quotations", id);
+        const r = await createNumbered(ctx.uid, "invoice", await numberFmt(ctx, "invoice"), null, (_, n, newId) => ({ data: { ...rest, date: today, dueDate: addDays(today, 14), status: "draft", deposit: 0, receiptsPaid: 0, receiptCount: 0, fromQuotationId: id, fromQuotationNumber: d.number },
+          writes: [(tx) => tx.update(qref, { status: "converted", convertedInvoiceId: newId, convertedInvoiceNumber: n, updatedAt: F.serverTimestamp() })] }));
         logActivity(ctx.user, "invoice", r.number); toast(t("converted", { n: r.number })); return ctx.nav(`#/app/invoices/${r.id}`);
       }
     } catch (x) { console.error(x); toast(errMsg(x), "err"); setBusy(b, false); }
   };
-  async function askPartial() {
-    const body = `<form class="form"><label>${t("f_amount")} (RM)<input name="amount" type="number" step="0.01" min="0.01" max="${c.balance}" value="" required></label><label>${t("pdf_method")}<select name="method">${METHODS.map((m) => `<option value="${m}">${t("pm_" + m)}</option>`).join("")}</select></label></form>`;
-    const r = await modal({ title: t("mark_partial"), body, actions: [{ label: t("cancel"), value: null }, { label: t("save"), cls: "primary", onClick: async (ov) => {
-      const amount = num(ov.querySelector("[name=amount]").value); if (amount <= 0 || amount > c.balance + 0.005) { toast(t("err_amount"), "err"); return false; }
-      try { await recordPayment(ctx, d, { amount, method: ov.querySelector("[name=method]").value, date: todayMY(), note: "" }); return true; } catch (x) { toast(errMsg(x), "err"); return false; } } }] });
-    if (r) { toast(t("saved")); renderView(el, ctx, type, id); }
-  }
-  el.onclick = (e) => { const b = e.target.closest("[data-a]"); if (b) act(b.dataset.a, b); };
+
+  const onErr = (e) => { if (!got) el.innerHTML = `<p class="err">${esc(errMsg(e))}</p>`; };
+  ctx.live(docLive(ctx.uid, C.col, id, (x) => { d = x; got = true; paint(); }, onErr));
+  ctx.live(isInv ? queryLive(ctx.uid, "receipts", "invoiceId", id, (r) => { kids = bySeq(r); paint(); }) : queryLive(ctx.uid, "invoices", "fromQuotationId", id, (r) => { kids = bySeq(r); paint(); }));
 }

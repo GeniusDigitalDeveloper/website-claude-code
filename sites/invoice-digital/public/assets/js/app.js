@@ -13,12 +13,17 @@ registerSW();
 const root = $("#root");
 const S = { user: null, ready: false, settings: {}, company: null, shell: false };
 
+const liveSubs = [];
+const stopLive = () => liveSubs.splice(0).forEach((f) => { try { f(); } catch { /* sudah ditutup */ } });
+
 const ctx = {
   get uid() { return S.user.uid; }, get user() { return S.user; },
   nav: (h) => { location.hash = h; },
   getSettings: async () => S.settings,
   getCompany: async (force) => { if (!S.company || force) S.company = await getMeta(S.user.uid, "company"); return S.company; },
   refreshUser: () => renderShellHeader(),
+  // Daftarkan pendengar masa nyata (onSnapshot); ditutup automatik bila pengguna berpindah halaman atau log keluar.
+  live: (unsub) => { liveSubs.push(unsub); return unsub; },
   logout: async () => { window.addEventListener("unhandledrejection", (e) => e.preventDefault()); await signOut(); await wipeLocal(); location.hash = "#/"; location.reload(); },
   // Simpan profil perniagaan: cache dikemas kini serta-merta (UI/PDF terus guna), tulis pelayan di latar; gagal -> kembalikan.
   saveCompany: async (patch) => {
@@ -36,7 +41,7 @@ async function route() {
     if (!S.user) return ctx.nav("#/login?next=" + encodeURIComponent(raw));
     return renderApp(segs.slice(1), q);
   }
-  S.shell = false;
+  S.shell = false; stopLive();
   if (segs[0] === "login" || segs[0] === "register") { if (S.user) return ctx.nav(q.get("next") || "#/app/dashboard"); return renderAuth(segs[0], q); }
   renderLanding();
 }
@@ -124,7 +129,7 @@ async function renderApp(segs, q) {
   const curSub = page === "profile" ? (SUBS.some((s) => s[0] === sub) ? sub : "business") : ""; $$("[data-sub]").forEach((a) => a.classList.toggle("on", a.dataset.sub === curSub));
   $("#topT").textContent = t("nav_" + page) || "";
   // Setiap laluan dapat bekas baharu: paparan lama yang lewat siap tidak boleh menimpa halaman semasa.
-  const view = document.createElement("div"); $("#view").replaceChildren(view); window.scrollTo(0, 0);
+  stopLive(); const view = document.createElement("div"); $("#view").replaceChildren(view); window.scrollTo(0, 0);
   try {
     if (page === "dashboard") return await (await import("./modules/dashboard.js")).render(view, ctx);
     if (page === "invoices" || page === "quotations") {
@@ -165,7 +170,7 @@ async function askCreatePassword() {
   // Paparkan app serta-merta selepas log masuk; profil pengguna disegerakkan di latar (tidak menyekat UI).
   onUser((u) => {
     S.user = u; S.company = null; S.ready = true; route();
-    if (!u) { S.pwAsked = false; return; }
+    if (!u) { S.pwAsked = false; stopLive(); return; }
     ctx.getCompany().then(renderShellHeader).catch(() => {}); // foto profil di bar atas
     if (!hasPassword(u) && u.email && !S.pwAsked) { S.pwAsked = true; askCreatePassword(); }
     ensureUserDoc(u, getLang()).then((r) => {
@@ -174,3 +179,24 @@ async function askCreatePassword() {
     }).catch((e) => { console.error(e); toast(errMsg(e), "err"); });
   });
 })();
+
+
+// ---------------------------------------------------------------- AUTO KEMAS KINI
+// Versi laman dicap semasa deploy (meta app-version + /invoice/version.json). Bila versi di pelayan berubah, laman dimuat semula sendiri
+// (tidak ketika pengguna sedang menaip/membuka dialog; jika begitu, ia dimuat semula sebaik pengguna berpindah halaman).
+let loadedV = (document.querySelector('meta[name="app-version"]') || {}).content || null, updating = false;
+if (loadedV === "dev") loadedV = null;
+const safeToReload = () => !document.querySelector(".overlay, .doc-form") && !/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName || "");
+function applyUpdate() {
+  if (updating) return; updating = true;
+  if (safeToReload()) { toast(t("update_ready")); setTimeout(() => location.reload(), 1200); }
+  else { toast(t("update_pending")); window.addEventListener("hashchange", () => location.reload(), { once: true }); }
+}
+async function checkVersion() {
+  try {
+    const r = await fetch("/invoice/version.json?_=" + Date.now(), { cache: "no-store" }); if (!r.ok) return; const { v } = await r.json();
+    if (loadedV === null) { loadedV = v; return; } if (v && v !== loadedV) applyUpdate();
+  } catch { /* luar talian: abaikan */ }
+}
+checkVersion(); setInterval(() => { if (!document.hidden) checkVersion(); }, 60000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) checkVersion(); }); window.addEventListener("online", checkVersion);
