@@ -9,7 +9,7 @@
 //    QR/bank/tandatangan/cop semuanya pilihan; saiz logo/QR/tandatangan/cop boleh dilaraskan (company.*Scale atau doc.imgScale.*).
 // Beberapa dokumen boleh digabung dalam satu PDF (opts.pdf) untuk cetak pukal.
 import { t, getLang } from "./i18n.js";
-import { calc, money, fmtDate, num, invoiceStatus, quotationStatus } from "./util.js";
+import { calc, money, fmtDate, num, invoiceStatus, quotationStatus, payOf } from "./util.js";
 
 const loadScript = (src) => new Promise((res, rej) => { const s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = () => rej(new Error("Gagal muat " + src)); document.head.append(s); });
 let libsP;
@@ -177,8 +177,10 @@ export async function buildPdf(type, doc, company = {}, opts = {}) {
   // ---------------- Pelanggan (kiri) + meta (kanan)
   const status = type === "invoice" ? invoiceStatus(doc) : type === "quotation" ? quotationStatus(doc) : "";
   const meta = type === "receipt"
-    ? [[t("pdf_invref"), doc.invoiceNumber || "-"], ...(doc.seq ? [[t("pdf_payment_no"), t("pdf_seq", { n: doc.seq })]] : [])]
-    : [[t(type === "invoice" ? "pdf_due" : "pdf_valid"), fmtDate(type === "invoice" ? doc.dueDate : doc.validUntil, getLang())], [t("pdf_status"), t("st_" + status)]];
+    ? [[t("pdf_invref"), doc.invoiceNumber || "-"], [t("pdf_status"), t("ps_" + payOf("receipt", doc))]]
+    : type === "invoice"
+      ? [[t("pdf_due"), fmtDate(doc.dueDate, getLang())], [t("pdf_status"), status === "cancelled" ? t("st_cancelled") : t("ps_" + payOf("invoice", doc))]]
+      : [[t("pdf_valid"), fmtDate(doc.validUntil, getLang())], [t("pdf_status"), t("st_" + status)], ...(doc.payStatus ? [[t("f_paystatus"), t("ps_" + payOf("quotation", doc))]] : [])];
   const cust = doc.customer || {};
   setB(); pdf.setFontSize(9); setC(accent); txt(t("pdf_billto"), L, y);
   setB(); pdf.setFontSize(10.5); setC(dark); txt(cust.name || doc.customerName || "-", L, y + 5);
@@ -232,9 +234,8 @@ export async function buildPdf(type, doc, company = {}, opts = {}) {
   if (c.taxRate) rows.push([`${doc.taxName || t("pdf_tax")} (${c.taxRate}%)`, money(c.tax)]);
   rows.push([t("pdf_total"), money(c.total), true]);
   if (type === "invoice") {
-    if (c.deposit) rows.push([t("pdf_deposit_due"), money(c.deposit)]);
     if (c.paidReceipts) rows.push([t("pdf_paid"), "- " + money(c.paidReceipts)]);
-    if (c.paidReceipts || c.deposit) rows.push([t("pdf_balance"), money(c.balance), true]);
+    if (c.paidReceipts) rows.push([t("pdf_balance"), money(c.balance), true]);
   }
   if (y + rows.length * 6.8 + 4 > LIMIT) { pdf.addPage(); y = 18; }
   rows.forEach(([k, v, strong]) => {
@@ -263,8 +264,12 @@ export async function buildPdf(type, doc, company = {}, opts = {}) {
     for (let i = startPage; i <= n; i++) {
       pdf.setPage(i); pdf.setDrawColor(226, 232, 240); pdf.setLineWidth(0.2); pdf.line(L, H - 14, R, H - 14);
       setN(); pdf.setFontSize(7.5); setC(grey);
-      txt(clean(company.name || ""), L, H - 9.5); txt(`${t("pdf_page")} ${i - startPage + 1}/${total}`, R, H - 9.5, { align: "right" });
-      txt(t("pdf_generated"), W / 2, H - 9.5, { align: "center" });
+      txt(`${t("pdf_page")} ${i - startPage + 1}/${total}`, R, H - 9.5, { align: "right" });
+      // Tengah: "Dijana oleh geniusdigital.space" (pautan boleh klik)
+      const pre = t("pdf_generated") + " ", site = "https://geniusdigital.space", url = "https://geniusdigital.space";
+      const w1 = pdf.getTextWidth(pre); setB(); pdf.setFontSize(7.5); const w2 = pdf.getTextWidth(site); const x0 = W / 2 - (w1 + w2) / 2;
+      setN(); pdf.setFontSize(7.5); setC(grey); txt(pre, x0, H - 9.5);
+      setB(); pdf.setFontSize(7.5); setC(accent); txt(site, x0 + w1, H - 9.5); pdf.link(x0 + w1, H - 12.3, w2, 3.8, { url });
     }
   }
 }

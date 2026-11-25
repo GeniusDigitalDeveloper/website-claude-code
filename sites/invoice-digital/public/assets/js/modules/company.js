@@ -5,7 +5,7 @@ import { esc, $, num, toast, fitImage } from "../util.js";
 import { loading } from "./ui.js";
 import { pickerHtml, bindPicker } from "../picker.js";
 import { avatarHtml, bindAvatar } from "./avatar.js";
-import { sizesHtml, bindSizes, readSizes } from "../sizes.js";
+import { sizesHtml, bindSizes, readSizes, setSizeImg } from "../sizes.js";
 
 // Had saiz (aksara data-URL) setiap imej supaya dokumen syarikat sentiasa jauh di bawah had 1 MB Firestore.
 const IMG = { logo: { dim: 360, max: 110000 }, bankQr: { dim: 420, max: 90000 }, signature: { dim: 420, max: 100000 }, stamp: { dim: 340, max: 100000 } };
@@ -26,7 +26,7 @@ export async function render(el, ctx, section = "business") {
     ${box("bankQr", t("f_bank_qr"), t("qr_hint"))}</div>
    <h2>${t("f_signature")} &amp; ${t("f_stamp")}</h2><p class="note-red">${t("sig_hint")}</p>
    <div class="sig-g">${box("signature", t("f_signature"), "", "checker")}${box("stamp", t("f_stamp"), "", "checker")}</div>
-   ${sizesHtml({ logo: c.logoScale, qr: c.qrScale, sig: c.sigScale, stamp: c.stampScale }, {}, ["logo", "qr", "sig", "stamp"], true)}`;
+   ${sizesHtml({ logo: c.logoScale, qr: c.qrScale, sig: c.sigScale, stamp: c.stampScale }, {}, ["logo", "qr", "sig", "stamp"], true, c)}`;
   const docs = `<p class="muted">${t("doc_defaults_sub")}</p>
    <div class="grid2"><label>${t("f_taxname")}<input name="taxName" maxlength="20" value="${esc(c.taxName ?? st.taxName ?? "SST")}"></label><label>${t("f_tax")} (%)<input name="taxRate" type="number" min="0" max="100" step="0.01" value="${num(c.taxRate ?? st.taxRate)}"></label></div>
    ${pickerHtml(c.template, c.color)}
@@ -38,9 +38,9 @@ export async function render(el, ctx, section = "business") {
     bindAvatar(el, ctx); bindSizes(el);
     el.querySelectorAll("[data-up]").forEach((inp) => (inp.onchange = async (e) => {
       const key = inp.dataset.up, file = e.target.files[0]; e.target.value = ""; if (!file) return; if (file.size > 12e6) return toast(t("err_file"), "err");
-      try { img[key] = await fitImage(file, IMG[key].dim, IMG[key].max); $("#pv-" + key, el).innerHTML = `<img alt="" src="${img[key]}">`; } catch { toast(t("err_file"), "err"); }
+      try { img[key] = await fitImage(file, IMG[key].dim, IMG[key].max); $("#pv-" + key, el).innerHTML = `<img alt="" src="${img[key]}">`; setSizeImg(el, key, img[key]); } catch { toast(t("err_file"), "err"); }
     }));
-    el.querySelectorAll("[data-rm]").forEach((b) => (b.onclick = () => { const key = b.dataset.rm; img[key] = ""; $("#pv-" + key, el).innerHTML = `<span>${t("no_logo")}</span>`; }));
+    el.querySelectorAll("[data-rm]").forEach((b) => (b.onclick = () => { const key = b.dataset.rm; img[key] = ""; $("#pv-" + key, el).innerHTML = `<span>${t("no_logo")}</span>`; setSizeImg(el, key, ""); }));
   }
   f.onsubmit = (e) => {
     e.preventDefault(); const err = $("#err", el); err.textContent = ""; let data;

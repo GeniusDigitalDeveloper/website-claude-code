@@ -138,3 +138,19 @@ export function fitImage(file, maxDim = 400, maxBytes = 100000) {
     fr.readAsDataURL(file);
   });
 }
+
+// ---- Status bayaran (dipilih pengguna; jika tiada pilihan, dikira automatik)
+// Belum Dibayar · Deposit · Bayaran Separa · Selesai · Tertunggak
+export const PAY = ["unpaid", "deposit", "partial", "paid", "overdue"];
+export function payAutoInvoice(inv) {
+  const c = calc(inv);
+  if (inv.status === "paid" || (c.total > 0 && c.balance <= 0.004)) return "paid";
+  if (inv.dueDate && inv.dueDate < todayMY()) return "overdue";
+  if (c.paidReceipts > 0.004) return (num(inv.receiptCount) || 1) <= 1 ? "deposit" : "partial";
+  return "unpaid";
+}
+export const payAutoReceipt = (r) => (r.invoiceTotal && num(r.balanceAfter) <= 0.004 ? "paid" : (num(r.seq) || 1) <= 1 ? "deposit" : "partial");
+export function payOf(type, d) {
+  if (d && PAY.includes(d.payStatus)) return d.payStatus;
+  return type === "invoice" ? payAutoInvoice(d) : type === "receipt" ? payAutoReceipt(d) : "unpaid";
+}

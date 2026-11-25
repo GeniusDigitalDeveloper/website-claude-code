@@ -191,4 +191,7 @@ h1,h2,h3,h4,b,strong,th,label,.lbl,.btn,.badge,.brand,.app-name,.side-app,.side 
 @media(max-width:760px){.tbl td.chk{justify-content:flex-start;border-bottom:1px solid #f1f5f9;padding-bottom:8px}.tbl td.chk::before{content:none}.bulkbar{top:58px}}
 
 .tbl td.nw,.tbl td b{white-space:nowrap}@media(max-width:760px){.tbl td.nw,.tbl td b{white-space:normal}}
-.note-red{color:var(--err);font-weight:600;font-style:italic;font-family:var(--f-body)}
+.note-red{color:var(--err);font-weight:400;font-style:italic;font-family:var(--f-body)}
+
+.b-deposit{background:#e0f2fe;color:#075985}
+.sz-pv{display:flex;align-items:center;justify-content:center;height:96px;margin:6px 0 4px;border:1px dashed var(--line);border-radius:10px;background:repeating-conic-gradient(#f1f5f9 0% 25%,#fff 0% 50%) 50%/14px 14px;overflow:hidden}.sz-pv img{display:block;width:auto;height:auto;object-fit:contain;transition:max-width .12s,max-height .12s}.sz-none{font-size:.78rem;color:var(--mut)}

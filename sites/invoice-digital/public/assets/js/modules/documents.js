@@ -1,6 +1,6 @@
 // Modul Invoice & Quotation: senarai, borang (cipta/edit), paparan + tindakan.
 import { t, getLang } from "../i18n.js";
-import { esc, $, $$, money, num, round2, calc, fmtDate, todayMY, addDays, toast, setBusy, fitImage, invoiceStatus, quotationStatus, debounce, modal, confirmBox } from "../util.js";
+import { esc, $, $$, money, num, round2, calc, fmtDate, todayMY, addDays, toast, setBusy, fitImage, invoiceStatus, quotationStatus, PAY, payOf, payAutoInvoice, debounce, modal, confirmBox } from "../util.js";
 import { listAll, listLive, queryLive, docLive, docRef, getOne, create, update, remove, createNumbered, logActivity, setMeta } from "../db.js";
 import { pickerHtml, bindPicker } from "../picker.js";
 import { F } from "../firebase.js";
@@ -14,7 +14,7 @@ import { bulkBarHtml, chkTh, chkTd, bulkController, limitRows } from "./bulk.js"
 import { sizesHtml, readSizes, diffSizes } from "../sizes.js";
 
 const CFG = {
-  invoice: { col: "invoices", route: "invoices", fmt: "INV-{YYYY}-{NNNN}", statuses: ["draft", "sent", "unpaid", "partial", "paid", "cancelled"], eff: invoiceStatus, filter: ["draft", "sent", "unpaid", "partial", "paid", "overdue", "cancelled"] },
+  invoice: { col: "invoices", route: "invoices", fmt: "INV-{YYYY}-{NNNN}", statuses: ["draft", "sent", "unpaid", "partial", "paid", "cancelled"], eff: (r) => (["draft", "cancelled"].includes(r.status) ? r.status : payOf("invoice", r)), filter: ["draft", "unpaid", "deposit", "partial", "paid", "overdue", "cancelled"] },
   quotation: { col: "quotations", route: "quotations", fmt: "QUO-{YYYY}-{NNNN}", statuses: ["draft", "sent", "accepted", "rejected", "expired", "converted"], eff: quotationStatus, filter: ["draft", "sent", "accepted", "rejected", "expired", "converted"] },
 };
 const dueOf = (type, d) => (type === "invoice" ? d.dueDate : d.validUntil);
@@ -26,7 +26,7 @@ export async function renderList(el, ctx, type) {
   const mount = () => {
     el.innerHTML = `<div class="page-h"><div><h1>${t("nav_" + C.route)}</h1><p class="sub">${t(type + "_sub")}</p></div><a class="btn primary" href="#/app/${C.route}/new">${ico("plus")}${t(type + "_new")}</a></div>
     <div class="card"><div class="toolbar"><div class="search">${ico("search")}<input id="q" type="search" placeholder="${esc(t("search_ph"))}" aria-label="${esc(t("search_ph"))}"></div>
-    <select id="sf" aria-label="${esc(t("f_status"))}"><option value="">${t("all_status")}</option>${C.filter.map((s) => `<option value="${s}">${t("st_" + s)}</option>`).join("")}</select></div>${bulkBarHtml()}<div id="tbl" class="scrollbox"></div></div>`;
+    <select id="sf" aria-label="${esc(t("f_status"))}"><option value="">${t("all_status")}</option>${C.filter.map((s) => `<option value="${s}">${t((type === "invoice" && !["draft", "cancelled"].includes(s) ? "ps_" : "st_") + s)}</option>`).join("")}</select></div>${bulkBarHtml()}<div id="tbl" class="scrollbox"></div></div>`;
     bulk = bulkController(ctx, el, () => shown.map((r) => ({ k: type, id: r.id, doc: r })), () => rows.map((r) => ({ k: type, id: r.id, doc: r })));
     draw = () => {
       const q = $("#q", el).value.toLowerCase(), sf = $("#sf", el).value;
@@ -35,7 +35,7 @@ export async function renderList(el, ctx, type) {
         ${chkTd(type + ":" + r.id, r.number)}<td class="idx" data-l="${t("col_index")}">${i + 1}</td>
         <td data-l="${t("col_docno")}"><a href="#/app/${C.route}/${r.id}"><b>${esc(r.number)}</b></a></td><td data-l="${t("col_customer")}">${esc((r.customer && r.customer.name) || "-")}</td>
         <td class="nw" data-l="${t("col_date")}">${fmtDate(r.date, getLang())}</td><td class="nw" data-l="${t(type === "invoice" ? "col_due" : "col_valid")}">${fmtDate(dueOf(type, r), getLang())}</td>
-        <td class="r" data-l="${t("col_total")}"><b>${money(calc(r).total)}</b></td><td data-l="${t("f_status")}">${badge(C.eff(r))}</td>
+        <td class="r" data-l="${t("col_total")}"><b>${money(calc(r).total)}</b></td><td data-l="${t("f_status")}">${type === "invoice" && !["draft", "cancelled"].includes(r.status) ? `<span class="badge b-${C.eff(r)}">${esc(t("ps_" + C.eff(r)))}</span>` : badge(C.eff(r))}</td>
         <td class="acts"><a class="icon-btn" href="#/app/${C.route}/${r.id}/edit" aria-label="${t("act_edit")}" title="${t("act_edit")}">${ico("edit")}</a><a class="icon-btn" href="#/app/${C.route}/${r.id}" aria-label="${t("act_view")}" title="${t("act_view")}">${ico("eye")}</a><button class="icon-btn" data-a="download" data-id="${r.id}" aria-label="${t("act_download")}" title="${t("act_download")}">${ico("download")}</button><button class="icon-btn" data-a="dup" data-id="${r.id}" aria-label="${t("act_duplicate")}" title="${t("act_duplicate")}">${ico("copy")}</button></td></tr>`).join("")}</tbody></table>` : empty(type === "invoice" ? "doc" : "quote", t(type + "_empty"), `<a class="btn primary" href="#/app/${C.route}/new">${t(type + "_new")}</a>`);
       limitRows($("#tbl", el)); bulk.sync();
     };
@@ -86,7 +86,9 @@ export async function renderEditor(el, ctx, type, id) {
     <div class="logo-inline"><div class="lp" id="lgp">${company.logo ? `<img alt="Logo" src="${esc(company.logo)}">` : t("no_logo")}</div><div><b>${t("logo_in_doc")}</b><br><label class="btn ghost sm file">${t("upload_logo")}<input type="file" id="lgf" accept="image/png,image/jpeg,image/webp" hidden></label></div></div>
     <div class="grid3"><label>${t("f_date")}<input name="date" type="date" value="${esc(d.date)}" required></label>
     <label>${t(type === "invoice" ? "f_due" : "f_valid")}<input name="due" type="date" value="${esc(dueOf(type, d))}" required></label>
-    <label>${t("f_status")}<select name="status">${C.statuses.map((s) => `<option value="${s}" ${s === d.status ? "selected" : ""} ${type === "quotation" && s === "converted" && !d.convertedInvoiceId ? "disabled" : ""}>${t("st_" + s)}</option>`).join("")}</select></label></div>
+    <label>${t("f_status")}<select name="status">${C.statuses.map((s) => `<option value="${s}" ${s === d.status ? "selected" : ""} ${type === "quotation" && s === "converted" && !d.convertedInvoiceId ? "disabled" : ""}>${t("st_" + s)}</option>`).join("")}</select></label>
+    <label>${t("f_paystatus")}<select name="payStatus">${PAY.map((s) => `<option value="${s}" ${s === payOf(type, d) ? "selected" : ""}>${t("ps_" + s)}</option>`).join("")}</select></label></div>
+    <p class="muted">${t("paystatus_hint")}</p>
    </section>
    <section class="card form"><div class="row-between"><h2>${t("sec_items")}</h2><div class="inline-actions"><select id="pickProd" aria-label="${esc(t("pick_product"))}"><option value="">${t("pick_product")}</option>${products.map((p) => `<option value="${p.id}">${esc(p.name)} — ${money(p.price)}</option>`).join("")}</select><button type="button" class="btn ghost" id="addItem">${ico("plus")}${t("add_item")}</button></div></div>
     <div id="items" class="items"></div></section>
@@ -94,17 +96,16 @@ export async function renderEditor(el, ctx, type, id) {
     <div class="form"><label>${t("pdf_note")}<textarea name="note" rows="3" maxlength="1000">${esc(d.note)}</textarea></label><label>${t("pdf_terms")}<textarea name="terms" rows="4" maxlength="2000">${esc(d.terms)}</textarea></label>
      ${pickerHtml(d.template, d.color)}${sizesHtml(d.imgScale || {}, company, ["logo", "qr", "sig", "stamp"])}</div>
     <div class="form sum"><div class="grid2"><label>${t("f_docdisc")} (RM)<input name="docDiscount" type="number" min="0" step="0.01" value="${num(d.docDiscount)}"></label><label>${t("f_tax")} (%)<input name="taxRate" type="number" min="0" max="100" step="0.01" value="${num(d.taxRate)}"></label></div>
-     ${type === "invoice" ? `<label>${t("pdf_deposit_due")} (RM)<input name="deposit" type="number" min="0" step="0.01" inputmode="decimal" value="${num(d.deposit)}"></label><p class="muted">${t("deposit_hint")}</p>` : ""}
      <div id="sum" class="totals" aria-live="polite"></div></div></div></section>
    <p class="err" id="err" role="alert"></p>
    <div class="form-f sticky"><a class="btn ghost" href="#/app/${C.route}">${t("cancel")}</a><button class="btn ghost" type="button" id="prev">${ico("eye")}${t("preview_draft")}</button><button class="btn primary" type="submit">${ico("check")}${t("save")}</button></div>
   </form>`;
   const f = $("#f", el); const itemsEl = $("#items", el);
   const readItems = () => $$(".item", itemsEl).forEach((row, k) => { items[k] = { ...items[k], name: row.querySelector("[data-k=name]").value, desc: row.querySelector("[data-k=desc]").value, qty: num(row.querySelector("[data-k=qty]").value), price: num(row.querySelector("[data-k=price]").value), discount: num(row.querySelector("[data-k=discount]").value) }; });
-  const docNow = () => { readItems(); return { items, docDiscount: num(f.docDiscount.value), taxRate: num(f.taxRate.value), deposit: f.deposit ? num(f.deposit.value) : 0, receiptsPaid: d.receiptsPaid || 0 }; };
+  const docNow = () => { readItems(); return { items, docDiscount: num(f.docDiscount.value), taxRate: num(f.taxRate.value), deposit: 0, receiptsPaid: d.receiptsPaid || 0 }; };
   const drawSum = () => {
     const c = calc(docNow()); $$(".item", itemsEl).forEach((row, k) => (row.querySelector(".amt").textContent = money(c.items[k] ? c.items[k].amount : 0)));
-    $("#sum", el).innerHTML = `<div><span>${t("pdf_subtotal")}</span><b>${money(c.subtotal)}</b></div>${c.docDiscount ? `<div><span>${t("pdf_discount")}</span><b>- ${money(c.docDiscount)}</b></div>` : ""}${c.taxRate ? `<div><span>${t("pdf_tax")} (${c.taxRate}%)</span><b>${money(c.tax)}</b></div>` : ""}<div class="grand"><span>${t("pdf_total")}</span><b>${money(c.total)}</b></div>${type === "invoice" ? `${c.deposit ? `<div><span>${t("pdf_deposit_due")}</span><b>${money(c.deposit)}</b></div>` : ""}${c.paidReceipts ? `<div><span>${t("pdf_paid")}</span><b>- ${money(c.paidReceipts)}</b></div>` : ""}<div class="grand alt"><span>${t("pdf_balance")}</span><b>${money(c.balance)}</b></div>` : ""}`;
+    $("#sum", el).innerHTML = `<div><span>${t("pdf_subtotal")}</span><b>${money(c.subtotal)}</b></div>${c.docDiscount ? `<div><span>${t("pdf_discount")}</span><b>- ${money(c.docDiscount)}</b></div>` : ""}${c.taxRate ? `<div><span>${t("pdf_tax")} (${c.taxRate}%)</span><b>${money(c.tax)}</b></div>` : ""}<div class="grand"><span>${t("pdf_total")}</span><b>${money(c.total)}</b></div>${type === "invoice" ? `${c.paidReceipts ? `<div><span>${t("pdf_paid")}</span><b>- ${money(c.paidReceipts)}</b></div>` : ""}<div class="grand alt"><span>${t("pdf_balance")}</span><b>${money(c.balance)}</b></div>` : ""}`;
   };
   const drawItems = () => {
     itemsEl.innerHTML = items.map((i, k) => `<div class="item"><div class="item-main"><label>${t("pdf_desc")}<input data-k="name" maxlength="150" value="${esc(i.name)}" placeholder="${esc(t("item_ph"))}"></label><label>${t("item_detail")}<input data-k="desc" maxlength="300" value="${esc(i.desc)}"></label></div>
@@ -122,12 +123,12 @@ export async function renderEditor(el, ctx, type, id) {
     const btn = e.currentTarget; setBusy(btn, true); const dn = docNow();
     try {
       const docObj = { number: doc ? doc.number : "PRATONTON", date: f.date.value, status: f.status.value, customer: { name: f.cname.value.trim() || "-", company: f.ccompany.value.trim(), address: f.caddress.value.trim(), phone: f.cphone.value.trim(), email: f.cemail.value.trim(), regNo: f.cregNo.value.trim() },
-        items: items.filter((i) => i.name.trim()), docDiscount: dn.docDiscount, taxRate: dn.taxRate, taxName: d.taxName || "SST", deposit: dn.deposit, receiptsPaid: d.receiptsPaid || 0, note: f.note.value.trim(), terms: f.terms.value.trim(), template: f.template.value, color: f.color.value, imgScale: readSizes(f),
+        items: items.filter((i) => i.name.trim()), docDiscount: dn.docDiscount, taxRate: dn.taxRate, taxName: d.taxName || "SST", deposit: 0, receiptsPaid: d.receiptsPaid || 0, receiptCount: d.receiptCount || 0, payStatus: f.payStatus.value, note: f.note.value.trim(), terms: f.terms.value.trim(), template: f.template.value, color: f.color.value, imgScale: readSizes(f),
         ...(type === "invoice" ? { dueDate: f.due.value } : { validUntil: f.due.value }) };
       const pdf = await makePdf(ctx, type, docObj); window.open(URL.createObjectURL(pdf.output("blob")), "_blank");
     } catch (x) { console.error(x); toast(t("pdf_fail"), "err"); } setBusy(btn, false);
   };
-  f.addEventListener("input", (e) => { if (e.target.closest("#items") || ["docDiscount", "taxRate", "deposit"].includes(e.target.name)) drawSum(); });
+  f.addEventListener("input", (e) => { if (e.target.closest("#items") || ["docDiscount", "taxRate"].includes(e.target.name)) drawSum(); });
   itemsEl.onclick = (e) => { const b = e.target.closest("[data-del]"); if (!b) return; readItems(); items.splice(+b.dataset.del, 1); if (!items.length) items.push({ name: "", desc: "", qty: 1, price: 0, discount: 0 }); drawItems(); };
   $("#addItem", el).onclick = () => { readItems(); items.push({ name: "", desc: "", qty: 1, price: 0, discount: 0 }); drawItems(); itemsEl.querySelector(".item:last-child input").focus(); };
   $("#pickProd", el).onchange = (e) => { const p = products.find((x) => x.id === e.target.value); if (!p) return; readItems(); const blank = items.length === 1 && !items[0].name && !num(items[0].price); const row = { name: p.name, desc: p.description || "", qty: 1, price: num(p.price), discount: 0, productId: p.id }; blank ? (items = [row]) : items.push(row); e.target.value = ""; drawItems(); };
@@ -150,7 +151,9 @@ export async function renderEditor(el, ctx, type, id) {
       if (!customerId && f.saveCust.checked) customerId = await create(ctx.uid, "customers", { ...customer, notes: "" });
       const data = { date: f.date.value, status: f.status.value, customerId: customerId || "", customer, items: valid.map((i) => ({ name: i.name.trim(), desc: (i.desc || "").trim(), qty: i.qty, price: i.price, discount: i.discount, ...(i.productId ? { productId: i.productId } : {}) })),
         docDiscount: dn.docDiscount, taxRate: dn.taxRate, taxName: d.taxName || "SST", note: f.note.value.trim(), terms: f.terms.value.trim(), template: f.template.value, color: f.color.value, imgScale: diffSizes(f, company),
-        ...(type === "invoice" ? { dueDate: f.due.value, deposit: dn.deposit, receiptsPaid: d.receiptsPaid || 0, receiptCount: d.receiptCount || 0 } : { validUntil: f.due.value }) };
+        ...(type === "invoice" ? { dueDate: f.due.value, deposit: 0, receiptsPaid: d.receiptsPaid || 0, receiptCount: d.receiptCount || 0 } : { validUntil: f.due.value }) };
+      // Status bayaran: invois simpan pilihan hanya jika berbeza daripada status automatik (supaya "Tertunggak"/"Selesai" automatik terus berfungsi)
+      data.payStatus = type === "invoice" ? (f.payStatus.value === payAutoInvoice({ ...data, payStatus: "" }) ? "" : f.payStatus.value) : f.payStatus.value;
       let rid = id;
       if (doc) await update(ctx.uid, C.col, id, data);
       else { const r = await createNumbered(ctx.uid, type, await numberFmt(ctx, type), null, () => ({ data })); rid = r.id; logActivity(ctx.user, type, r.number); }
@@ -191,9 +194,9 @@ export async function renderView(el, ctx, type, id) {
     }
     bar.push(btn("del", "trash", "delete", "danger"));
     const kidsHtml = isInv
-      ? `<h3>${t("receipts_of_invoice")}</h3>${kids.length ? kids.map((r) => `<div class="mini rrow"><span><b>${esc(r.number)}</b> · ${fmtDate(r.date, getLang())}${r.seq ? ` · ${t("pdf_seq", { n: r.seq })}` : ""}</span><span class="rr"><b>${money(r.amount)}</b><button class="icon-btn" data-a="rdl" data-rid="${r.id}" aria-label="${t("act_download")}">${ico("download")}</button><button class="icon-btn" data-a="rpr" data-rid="${r.id}" aria-label="${t("act_print")}">${ico("print")}</button></span></div>`).join("") : `<p class="muted">${t("receipts_empty")}</p>`}${canPay ? `<div class="mt"><button class="btn accent sm" data-a="pay">${ico("plus")}${t("act_receipt")}</button></div>` : ""}`
+      ? `<h3>${t("receipts_of_invoice")}</h3>${kids.length ? kids.map((r) => `<div class="mini rrow"><span><b>${esc(r.number)}</b> · ${fmtDate(r.date, getLang())} · ${esc(t("ps_" + payOf("receipt", r)))}</span><span class="rr"><b>${money(r.amount)}</b><button class="icon-btn" data-a="rdl" data-rid="${r.id}" aria-label="${t("act_download")}">${ico("download")}</button><button class="icon-btn" data-a="rpr" data-rid="${r.id}" aria-label="${t("act_print")}">${ico("print")}</button></span></div>`).join("") : `<p class="muted">${t("receipts_empty")}</p>`}${canPay ? `<div class="mt"><button class="btn accent sm" data-a="pay">${ico("plus")}${t("act_receipt")}</button></div>` : ""}`
       : `<h3>${t("quo_invoices")}</h3>${kids.length ? kids.map((r) => `<a class="mini link" href="#/app/invoices/${esc(r.id)}"><span><b>${esc(r.number)}</b> · ${fmtDate(r.date, getLang())} ${badge(invoiceStatus(r))}</span><b>${money(calc(r).total)}</b></a>`).join("") : `<p class="muted">-</p>`}`;
-    el.innerHTML = `<div class="page-h"><div><h1>${esc(d.number)} ${badge(st)}</h1><p class="sub">${esc(cu.name || "")}${cu.company ? " · " + esc(cu.company) : ""}</p></div><a class="btn ghost" href="#/app/${C.route}">${t("back")}</a></div>
+    el.innerHTML = `<div class="page-h"><div><h1>${esc(d.number)} ${isInv && !["draft", "cancelled"].includes(d.status) ? `<span class="badge b-${st}">${esc(t("ps_" + st))}</span>` : badge(st)}</h1><p class="sub">${esc(cu.name || "")}${cu.company ? " · " + esc(cu.company) : ""}</p></div><a class="btn ghost" href="#/app/${C.route}">${t("back")}</a></div>
     <div class="actions-bar">${bar.join("")}</div>
     <section class="card" id="pvbox" ${pvOpen ? "" : "hidden"}><h2>${t("preview_title")}</h2><iframe class="pdf-frame" title="PDF" src="about:blank"></iframe></section>
     <div class="grid-view"><section class="card"><div class="kv"><div><span>${t("f_date")}</span><b>${fmtDate(d.date, getLang())}</b></div><div><span>${t(isInv ? "f_due" : "f_valid")}</span><b>${fmtDate(dueOf(type, d), getLang())}</b></div>
@@ -202,7 +205,7 @@ export async function renderView(el, ctx, type, id) {
      <table class="tbl simple"><thead><tr><th>${t("pdf_desc")}</th><th class="r">${t("pdf_qty")}</th><th class="r">${t("pdf_price")}</th><th class="r">${t("pdf_amount")}</th></tr></thead><tbody>${c.items.map((i) => `<tr><td data-l="${t("pdf_desc")}"><b>${esc(i.name)}</b>${i.desc ? `<br><small>${esc(i.desc)}</small>` : ""}</td><td class="r" data-l="${t("pdf_qty")}">${i.qty}</td><td class="r" data-l="${t("pdf_price")}">${money(i.price)}${num(i.discount) ? `<small> −${i.discount}%</small>` : ""}</td><td class="r" data-l="${t("pdf_amount")}">${money(i.amount)}</td></tr>`).join("")}</tbody></table>
      ${d.note ? `<h3>${t("pdf_note")}</h3><p class="pre">${esc(d.note)}</p>` : ""}${d.terms ? `<h3>${t("pdf_terms")}</h3><p class="pre">${esc(d.terms)}</p>` : ""}</section>
     <aside class="card totals"><div><span>${t("pdf_subtotal")}</span><b>${money(c.subtotal)}</b></div>${c.docDiscount ? `<div><span>${t("pdf_discount")}</span><b>- ${money(c.docDiscount)}</b></div>` : ""}${c.taxRate ? `<div><span>${t("pdf_tax")} (${c.taxRate}%)</span><b>${money(c.tax)}</b></div>` : ""}<div class="grand"><span>${t("pdf_total")}</span><b>${money(c.total)}</b></div>
-     ${isInv ? `${c.deposit ? `<div><span>${t("pdf_deposit_due")}</span><b>${money(c.deposit)}</b></div>` : ""}<div><span>${t("pdf_paid")}</span><b>- ${money(c.paidReceipts)}</b></div><div class="grand alt"><span>${t("pdf_balance")}</span><b>${money(c.balance)}</b></div>` : ""}
+     ${isInv ? `<div><span>${t("pdf_paid")}</span><b>- ${money(c.paidReceipts)}</b></div><div class="grand alt"><span>${t("pdf_balance")}</span><b>${money(c.balance)}</b></div>` : ""}
      ${kidsHtml}</aside></div>`;
     el.onclick = (e) => { const b = e.target.closest("[data-a]"); if (b) act(b.dataset.a, b); };
     if (pvOpen) showPreview();
@@ -218,8 +221,8 @@ export async function renderView(el, ctx, type, id) {
       setBusy(b, true); const c = calc(d);
       const upd = async (patch) => { await update(ctx.uid, C.col, id, patch); toast(t("saved")); }; // paparan dikemas kini serta-merta oleh pendengar masa nyata
       if (a === "dup") { const nid = await duplicate(ctx, type, d); toast(t("duplicated")); return ctx.nav(`#/app/${C.route}/${nid}`); }
-      if (a === "paid") { if (!(await confirmBox(t("mark_paid"), t("confirm_paid", { n: d.number }), t("yes")))) return setBusy(b, false); return upd({ status: "paid", receiptsPaid: round2(c.total) }); }
-      if (a === "unpaid") return upd({ status: "unpaid", receiptsPaid: 0 });
+      if (a === "paid") { if (!(await confirmBox(t("mark_paid"), t("confirm_paid", { n: d.number }), t("yes")))) return setBusy(b, false); return upd({ status: "paid", receiptsPaid: round2(c.total), payStatus: "" }); }
+      if (a === "unpaid") return upd({ status: "unpaid", receiptsPaid: 0, payStatus: "" });
       if (a === "cancel") { if (!(await confirmBox(t("mark_cancel"), t("confirm_cancel", { n: d.number }), t("yes")))) return setBusy(b, false); return upd({ status: "cancelled" }); }
       if (["accepted", "rejected", "expired", "sent"].includes(a)) return upd({ status: a });
       if (a === "del") { if (!(await confirmBox(t("delete"), t(confirmKey(type), { n: d.number }), t("delete")))) return setBusy(b, false); await deleteProject(ctx, type, d); toast(t("deleted")); return ctx.nav(`#/app/${C.route}`); }

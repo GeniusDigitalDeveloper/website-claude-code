@@ -13,7 +13,7 @@ export async function deleteProject(ctx, kind, doc) {
       if (inv) {
         const paid = round2(Math.max(num(inv.receiptsPaid) - num(doc.amount), 0)); const c = calc({ ...inv, receiptsPaid: paid }); let status = inv.status;
         if (["paid", "partial", "unpaid", "sent"].includes(status)) status = c.balance <= 0.004 ? "paid" : paid > 0.004 ? "partial" : status === "partial" || status === "paid" ? "unpaid" : status;
-        tx.update(iref, { receiptsPaid: paid, status, updatedAt: F.serverTimestamp() });
+        tx.update(iref, { receiptsPaid: paid, status, payStatus: "", updatedAt: F.serverTimestamp() }); // status bayaran kembali automatik
       }
     });
     return;
