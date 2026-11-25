@@ -24,7 +24,7 @@ export async function render(el, ctx, section = "business") {
    <div class="grid3"><label>${t("f_phone")}<input name="phone" maxlength="30" inputmode="tel" value="${esc(c.phone)}"></label><label>${t("f_email")}<input name="email" type="email" maxlength="120" value="${esc(c.email)}"></label><label>${t("f_website")}<input name="website" maxlength="120" value="${esc(c.website)}"></label></div>
    <div class="bank-g"><label>${t("pdf_bank")} <em class="opt">(${t("optional_tag")})</em><textarea name="bank" rows="5" maxlength="500" placeholder="Maybank 1234567890 — Nama Syarikat">${esc(c.bank)}</textarea></label>
     ${box("bankQr", t("f_bank_qr"), t("qr_hint"))}</div>
-   <h2>${t("f_signature")} &amp; ${t("f_stamp")}</h2><p class="muted">${t("sig_hint")}</p>
+   <h2>${t("f_signature")} &amp; ${t("f_stamp")}</h2><p class="note-red">${t("sig_hint")}</p>
    <div class="sig-g">${box("signature", t("f_signature"), "", "checker")}${box("stamp", t("f_stamp"), "", "checker")}</div>
    ${sizesHtml({ logo: c.logoScale, qr: c.qrScale, sig: c.sigScale, stamp: c.stampScale }, {}, ["logo", "qr", "sig", "stamp"], true)}`;
   const docs = `<p class="muted">${t("doc_defaults_sub")}</p>

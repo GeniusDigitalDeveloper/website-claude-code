@@ -191,3 +191,4 @@ h1,h2,h3,h4,b,strong,th,label,.lbl,.btn,.badge,.brand,.app-name,.side-app,.side 
 @media(max-width:760px){.tbl td.chk{justify-content:flex-start;border-bottom:1px solid #f1f5f9;padding-bottom:8px}.tbl td.chk::before{content:none}.bulkbar{top:58px}}
 
 .tbl td.nw,.tbl td b{white-space:nowrap}@media(max-width:760px){.tbl td.nw,.tbl td b{white-space:normal}}
+.note-red{color:var(--err);font-weight:600;font-style:italic;font-family:var(--f-body)}
