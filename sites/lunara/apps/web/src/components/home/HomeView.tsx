@@ -27,10 +27,9 @@ export function HomeView() {
         <span className="top-0 right-[5%] h-72 w-72" style={{ background: "var(--acc-to)", animationDelay: "-12s" }} />
       </div>
 
-      {/* layout editing toolbar */}
-      <div className={cx("relative z-10 flex flex-wrap items-center gap-2", editing ? "panel glass sticky top-[72px] p-3 shadow-xl md:top-3" : "justify-end")}>
-        {editing ? (
-          <>
+      {/* layout editing toolbar (opened from Settings → Layout) */}
+      {editing && (
+        <div className="panel panel-strong relative z-10 sticky top-[72px] flex flex-wrap items-center gap-2 p-3 shadow-xl md:top-3">
             <PencilRuler className="h-4 w-4 text-acc" />
             <span className="mr-2 text-sm font-semibold">Edit layout: seret untuk susun, ikon mata untuk sorok</span>
             <Segmented label="Preset layout" value={preset} onChange={(p) => L().applyPreset(p)} options={(Object.keys(PRESET_LABEL) as LayoutPreset[]).map((v) => ({ value: v, label: PRESET_LABEL[v] }))} />
@@ -45,13 +44,8 @@ export function HomeView() {
                 <Check className="h-3.5 w-3.5" /> Siap
               </button>
             </div>
-          </>
-        ) : (
-          <button onClick={() => L().set({ editing: true })} className="glass flex cursor-pointer items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold ring-1 ring-line hover:bg-card">
-            <PencilRuler className="h-3.5 w-3.5" /> Edit layout
-          </button>
-        )}
-      </div>
+        </div>
+      )}
 
       <SortableList ids={ids} onMove={(a, b) => L().moveSection(a, b)}>
         <div className={cx("relative flex flex-col", density === "compact" ? "gap-6" : "gap-10")}>

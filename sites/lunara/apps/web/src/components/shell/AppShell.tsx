@@ -1,8 +1,8 @@
 "use client";
-import { ChevronsLeft, ChevronsRight, Cloud, CloudOff, LogIn } from "lucide-react";
+import { ChevronsLeft, ChevronsRight, LogIn } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { useLayout } from "@/store/layout";
 import { getTheme, themeVars } from "@/lib/themes";
 import { useSettings } from "@/store/settings";
@@ -12,9 +12,10 @@ import { useLibrary } from "@/store/library";
 import { setLang } from "@/i18n";
 import { usePlayer, wirePlayer } from "@/store/player";
 import { useToasts } from "@/store/toast";
-import { onSyncStatus, startSync, stopSync, type SyncStatus } from "@/lib/sync";
+import { startSync, stopSync } from "@/lib/sync";
 import { FullPlayer, PlayerBar } from "../music/Player";
 import { QueueDrawer } from "../music/Queue";
+import { YouTubeHost } from "../music/YouTubeHost";
 import { cx, IconBtn } from "../ui";
 import { Logo } from "./Logo";
 import { TopSearch } from "./TopSearch";
@@ -48,7 +49,7 @@ function useApplyTheme() {
 
 function NavLink({ href, label, Icon, collapsed, active }: { href: string; label: string; Icon: React.ComponentType<{ className?: string }>; collapsed?: boolean; active: boolean }) {
   return (
-    <Link href={href} aria-current={active ? "page" : undefined} title={collapsed ? label : undefined} className={cx("group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors", active ? "bg-card text-fg" : "text-muted hover:bg-card hover:text-fg", collapsed && "justify-center px-0")}>
+    <Link href={href} aria-current={active ? "page" : undefined} title={collapsed ? label : undefined} className={cx("group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors", active ? "btn-white" : "text-muted hover:bg-card hover:text-fg", collapsed && "justify-center px-0")}>
       <span className={cx("grid h-5 w-5 place-items-center", active && "text-acc")}>
         <Icon className="h-5 w-5" />
       </span>
@@ -57,21 +58,14 @@ function NavLink({ href, label, Icon, collapsed, active }: { href: string; label
   );
 }
 
+/** Signed-out users get a Sign in shortcut. No online/offline/sync status is shown. */
 function SyncPill() {
   const user = useAuth((s) => s.user);
-  const [st, setSt] = useState<SyncStatus>("off");
-  useEffect(() => void onSyncStatus(setSt), []);
-  if (!user)
-    return (
-      <Link href="/login" aria-label="Log masuk" className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold whitespace-nowrap ring-1 ring-line hover:bg-card">
-        <LogIn className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Log masuk</span>
-      </Link>
-    );
-  const label = { off: "Sync off", syncing: "Menyegerak…", synced: "Disegerak", offline: "Luar talian", error: "Ralat sync" }[st];
+  if (user) return null;
   return (
-    <span className="flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold text-muted ring-1 ring-line" title="Penyegerakan antara peranti">
-      {st === "offline" || st === "error" ? <CloudOff className="h-3.5 w-3.5" /> : <Cloud className="h-3.5 w-3.5" />} {label}
-    </span>
+    <Link href="/login" aria-label="Log masuk" className="chip-glass flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold whitespace-nowrap">
+      <LogIn className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Log masuk</span>
+    </Link>
   );
 }
 
@@ -145,6 +139,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     return (
       <>
         {children}
+        <YouTubeHost />
         <FullPlayer />
         <Toaster />
         <WaterRipple />
@@ -156,9 +151,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   const rail = preset === "bento";
 
   const sidebar = !top && (
-    <aside aria-label="Navigasi utama" className={cx("sticky top-0 hidden h-dvh shrink-0 flex-col gap-1 py-4 md:flex", rail ? "w-[76px] items-center px-2" : collapsed ? "w-[84px] px-3" : "w-[248px] px-3", side === "right" && "order-last")}>
-      <div className={cx("mb-4 flex items-center", rail || collapsed ? "justify-center" : "justify-between px-2")}>
-        <Logo compact={rail || collapsed} size={rail || collapsed ? 26 : 30} />
+    <aside aria-label="Navigasi utama" className={cx("sticky hidden shrink-0 flex-col gap-1 md:flex", rail ? "top-3 h-[calc(100dvh-24px)] w-[76px] items-center" : collapsed ? "top-0 h-dvh w-[84px] px-3 py-3" : "top-0 h-dvh w-[248px] px-3 py-3", side === "right" && "order-last")}>
+      {/* same height as the top bar (h-14) so the nav panel lines up with the main panel */}
+      <div className={cx("mb-2 flex h-14 shrink-0 items-center", rail || collapsed ? "justify-center" : "justify-between px-2")}>
+        <Logo compact={rail || collapsed} size={rail || collapsed ? 46 : 44} />
         {!rail && !collapsed && (
           <IconBtn label="Kecilkan sidebar" size="sm" onClick={() => useLayout.getState().set({ sidebarCollapsed: true })}>
             {side === "left" ? <ChevronsLeft className="h-4 w-4" /> : <ChevronsRight className="h-4 w-4" />}
@@ -170,13 +166,13 @@ export function AppShell({ children }: { children: ReactNode }) {
           {side === "left" ? <ChevronsRight className="h-4 w-4" /> : <ChevronsLeft className="h-4 w-4" />}
         </IconBtn>
       )}
-      <nav className={cx("flex flex-col gap-1", rail && "panel w-full items-center py-2")}>
+      <nav className={cx("flex flex-col gap-1", rail && "panel w-full items-center px-1.5 py-2")}>
         {NAV.map((n) => (
           <NavLink key={n.href} href={n.href} label={n.label} Icon={n.icon} collapsed={rail || collapsed} active={isActive(n.href)} />
         ))}
       </nav>
       <div className={cx("my-2 h-px bg-line", rail ? "w-8" : "w-full")} />
-      <nav className={cx("flex flex-col gap-1", rail && "panel w-full items-center py-2")}>
+      <nav className={cx("flex flex-col gap-1", rail && "panel w-full items-center px-1.5 py-2")}>
         {[...NAV_2, ...(isAdmin ? [ADMIN] : [])].map((n) => (
           <NavLink key={n.href} href={n.href} label={n.label} Icon={n.icon} collapsed={rail || collapsed} active={isActive(n.href)} />
         ))}
@@ -196,15 +192,15 @@ export function AppShell({ children }: { children: ReactNode }) {
         {sidebar}
         <div className={cx("flex min-w-0 flex-1 flex-col", preset === "bento" && "md:gap-3")}>
           {/* top bar: logo/nav left · the ONE search box centred · account right */}
-          <header className={cx("glass sticky top-0 z-30 border-b border-line px-3 py-2.5 md:px-6 md:py-3", preset === "bento" && "md:static md:border-0 md:bg-transparent md:px-0 md:py-0 md:backdrop-blur-none")}>
+          <header className={cx("glass sticky top-0 z-30 border-b border-line px-3 py-2.5 md:px-6 md:py-3", preset === "bento" && "md:static md:flex md:h-14 md:flex-col md:justify-center md:border-0 md:bg-transparent md:px-0 md:py-0 md:shadow-none md:backdrop-blur-none")}>
             <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 md:grid-cols-[1fr_minmax(0,520px)_1fr] md:gap-4">
               <div className="flex min-w-0 items-center">
                 <div className="md:hidden">
-                  <Logo size={30} compact />
+                  <Logo size={40} compact />
                 </div>
                 {top && (
                   <div className="hidden md:block">
-                    <Logo size={30} />
+                    <Logo size={42} />
                   </div>
                 )}
               </div>
@@ -224,7 +220,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             {top && (
               <nav aria-label="Navigasi utama" className="no-scrollbar mt-2.5 hidden items-center gap-1 overflow-x-auto md:flex">
                 {NAV.map((n) => (
-                  <Link key={n.href} href={n.href} aria-current={isActive(n.href) ? "page" : undefined} className={cx("flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-semibold whitespace-nowrap transition", isActive(n.href) ? "bg-fg text-bg" : "text-muted hover:bg-card hover:text-fg")}>
+                  <Link key={n.href} href={n.href} aria-current={isActive(n.href) ? "page" : undefined} className={cx("flex shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-semibold whitespace-nowrap transition", isActive(n.href) ? "btn-white" : "text-muted hover:bg-card hover:text-fg")}>
                     <n.icon className="h-4 w-4" />
                     {n.label}
                   </Link>
@@ -249,6 +245,12 @@ export function AppShell({ children }: { children: ReactNode }) {
           </Link>
         ))}
       </nav>
+      <div className="bg-orbs" aria-hidden>
+        <span style={{ width: 520, height: 520, left: "-8%", top: "-10%", background: "var(--orb-a)" }} />
+        <span style={{ width: 620, height: 620, right: "-12%", bottom: "-18%", background: "var(--orb-b)", animationDelay: "-9s" }} />
+        <span style={{ width: 380, height: 380, left: "38%", top: "35%", background: "var(--orb-b)", opacity: 0.3, animationDelay: "-17s" }} />
+      </div>
+      <YouTubeHost />
       <PlayerBar />
       <QueueDrawer />
       <FullPlayer />

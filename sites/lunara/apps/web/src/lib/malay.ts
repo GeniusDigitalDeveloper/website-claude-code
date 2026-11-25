@@ -13,6 +13,9 @@ export const MALAY = {
   jiwang: ["64854", "358684272", "4931568", "4755367", "378233", "243703", "66538", "65530", "14885939"], // Iklim, Slam, Ukays, Exists, Lestari, Febians, Saleem, Jamal Abdillah, Siti Nurhaliza
   rock: ["320179", "8966418", "264801", "1629181", "242535", "4831863", "10979804", "242335"], // Search, Wings, Lefthanded, XPDC, Awie, Amy Search, BPR, Amuk
 };
+/** Every curated Malay artist id, used to keep "related artists" Malay. */
+export const MALAY_ALL = new Set([...MALAY.nasyid, ...MALAY.zikir, ...MALAY.jiwang, ...MALAY.rock]);
+
 export const MALAY_SEED_ARTISTS = ["64913", "320179", "64854", "5157170"]; // for Daily Mix before the user has history
 
 export const MALAY_SEARCH_CHIPS = ["Raihan", "Hafiz Hamidun", "Hijjaz", "Inteam", "Search", "Iklim", "Slam", "XPDC", "Exists", "Wings", "Siti Nurhaliza", "Jamal Abdillah"];
@@ -20,13 +23,20 @@ export const MALAY_SEARCH_CHIPS = ["Raihan", "Hafiz Hamidun", "Hijjaz", "Inteam"
 const settle = async <T,>(ps: Promise<T>[]) => (await Promise.allSettled(ps)).flatMap((r) => (r.status === "fulfilled" ? [r.value] : []));
 
 /** Interleave each artist's most popular songs so the list feels mixed, not grouped. */
+/**
+ * Deezer sometimes merges a same-name foreign artist into a Malaysian artist's page
+ * (e.g. an English lo-fi producer also called "Raihan"). Keep only songs credited to the
+ * artist itself and skip the all-lowercase lo-fi style titles those uploads use.
+ */
+const isCurated = (t: Track, id: string) => t.playable && t.artistId === id && /[A-Z]/.test(t.title);
+
 export async function mixFrom(ids: string[], perArtist = 4): Promise<Track[]> {
-  const lists = await settle(ids.map((id) => catalog.artistTop(id, perArtist + 2)));
+  const lists = await settle(ids.map(async (id) => (await catalog.artistTop(id, perArtist + 8)).filter((t) => isCurated(t, id))));
   const out: Track[] = [];
   const seen = new Set<string>();
   for (let i = 0; i < perArtist; i++)
     for (const l of lists) {
-      const t = l.filter((x) => x.playable)[i];
+      const t = l[i];
       const key = t ? `${t.title.toLowerCase()}|${t.artist.toLowerCase()}` : "";
       if (t && !seen.has(key)) {
         seen.add(key);

@@ -19,7 +19,7 @@ export function ThemePicker() {
             ["system", "Ikut sistem", Monitor],
           ] as const
         ).map(([v, l, I]) => (
-          <button key={v} role="radio" aria-checked={mode === v} onClick={() => set({ theme: v })} className={cx("flex cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ring-1 transition", mode === v ? "btn-luxe font-bold ring-transparent" : "ring-line hover:bg-card")}>
+          <button key={v} role="radio" aria-checked={mode === v} onClick={() => set({ theme: v })} className={cx("flex cursor-pointer items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold ring-1 transition", mode === v ? "btn-white font-bold ring-transparent" : "chip-glass ring-transparent")}>
             <I className="h-4 w-4" /> {l}
           </button>
         ))}

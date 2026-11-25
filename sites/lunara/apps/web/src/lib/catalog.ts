@@ -50,17 +50,21 @@ function jsonp<T>(url: string, timeoutMs = 12000): Promise<T> {
 // Deezer allows ~50 requests / 5 s per user. Stay under it, de-duplicate identical calls,
 // retry politely on "quota exceeded", and keep slow-changing catalogue data in localStorage.
 const WINDOW_MS = 5000;
-const MAX_PER_WINDOW = 40;
+// Background loads (home sections) may use 30 slots; playback and search always have 16 more,
+// so pressing Play or searching never waits behind the home page.
+const MAX_BACKGROUND = 30;
+const MAX_PRIORITY = 46;
 const sent: number[] = [];
 const inflight = new Map<string, Promise<any>>();
 const LS_PREFIX = "lunara-dz:";
 const LS_TTL = 6 * 3600_000;
 
-async function slot() {
+async function slot(priority: boolean) {
+  const max = priority ? MAX_PRIORITY : MAX_BACKGROUND;
   for (;;) {
     const now = Date.now();
     while (sent.length && now - sent[0] > WINDOW_MS) sent.shift();
-    if (sent.length < MAX_PER_WINDOW) {
+    if (sent.length < max) {
       sent.push(now);
       return;
     }
@@ -111,7 +115,7 @@ async function api<T = any>(path: string, params: Record<string, string | number
   if (running) return running as Promise<T>;
   const job = (async () => {
     for (let attempt = 0; ; attempt++) {
-      await slot();
+      await slot(noCache || path.startsWith("search"));
       const data = await jsonp<any>(url);
       if (data?.error) {
         // code 4 = quota exceeded: wait and retry
@@ -143,8 +147,6 @@ export async function pingCatalog() {
 
 export const PREVIEW_SECONDS = 30;
 
-/** Official Deezer page for the full-length song (opens the Deezer app/site). */
-export const fullSongUrl = (t: { id: string; provider: string }) => (t.provider === "deezer" ? `https://www.deezer.com/track/${t.id.replace(/^dz:/, "")}` : null);
 
 export function mapTrack(t: any, albumFallback?: { title?: string; id?: number; cover?: string }): Track {
   return {
@@ -262,6 +264,10 @@ export const catalog = {
     const all = (r.data ?? []).map(mapAlbum) as Album[];
     const albums = all.filter((a) => a.recordType !== "single");
     return (albums.length ? albums : all).map((a) => ({ ...a, artistId: a.artistId ?? id }));
+  },
+  async related(id: string, limit = 5) {
+    const r = await api(`artist/${id}/related`, { limit });
+    return (r.data ?? []).map((a: any) => String(a.id)) as string[];
   },
   async artistInfo(id: string) {
     return mapArtist(await api(`artist/${id}`));

@@ -75,7 +75,7 @@ export function RightPanel() {
               ["playlists", "Playlist"],
             ] as const
           ).map(([k, l]) => (
-            <button key={k} onClick={() => setTab(k)} className={cx("cursor-pointer rounded-full px-3 py-1 text-xs font-semibold", tab === k ? "btn-luxe font-bold" : "bg-card text-muted")}>
+            <button key={k} onClick={() => setTab(k)} className={cx("cursor-pointer rounded-full px-3 py-1 text-xs font-semibold", tab === k ? "btn-white font-bold" : "chip-glass text-muted")}>
               {l}
             </button>
           ))}

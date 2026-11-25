@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { catalog } from "@/lib/catalog";
-import { albumsFrom, artistsFrom, MALAY, MALAY_SEED_ARTISTS, mixFrom } from "@/lib/malay";
+import { albumsFrom, artistsFrom, MALAY, MALAY_ALL, MALAY_SEED_ARTISTS, mixFrom } from "@/lib/malay";
 import { useAsync } from "@/lib/useAsync";
 import type { Track } from "@/lib/types";
 import { useAuth } from "@/store/auth";
@@ -98,7 +98,7 @@ function Greeting() {
         <div className="grid grid-cols-2 gap-2.5">
           {quick.length
             ? quick.map((t, i) => (
-                <button key={t.id} onClick={() => usePlayer.getState().playList(quick, i, { shuffle: false })} className="group flex cursor-pointer items-center gap-3 overflow-hidden rounded-xl bg-card pr-2 text-left ring-1 ring-line transition hover:bg-card-hover">
+                <button key={t.id} onClick={() => usePlayer.getState().playList(quick, i, { shuffle: false })} className="chip-glass group flex cursor-pointer items-center gap-3 overflow-hidden rounded-2xl pr-2 text-left transition hover:bg-card-hover">
                   <Artwork src={t.artwork} alt="" className="h-14 w-14" rounded="rounded-none" />
                   <span translate="no" className="line-clamp-2 min-w-0 text-xs font-semibold md:text-sm">{t.title}</span>
                 </button>
@@ -125,7 +125,7 @@ function Continue({ kind }: { kind: SectionConfig["kind"] }) {
   const pct = t.playableSeconds || t.duration ? (resume.position / (t.playableSeconds || t.duration)) * 100 : 0;
   return (
     <div className={cx("flex gap-3", kind === "list" ? "flex-col" : "")}>
-      <button onClick={go} className="group flex w-full max-w-md cursor-pointer items-center gap-4 rounded-[var(--radius)] bg-card p-3 text-left ring-1 ring-line transition hover:bg-card-hover">
+      <button onClick={go} className="chip-glass group flex w-full max-w-md cursor-pointer items-center gap-4 rounded-[var(--radius)] p-3 text-left transition hover:bg-card-hover">
         <Artwork src={t.artwork} alt="" className="h-16 w-16" rounded="rounded-xl" />
         <div className="min-w-0 flex-1">
           <p translate="no" className="truncate font-semibold">{t.title}</p>
@@ -158,17 +158,14 @@ function MadeForYou({ kind }: { kind: SectionConfig["kind"] }) {
   const favCount = useLibrary((s) => s.favourites.length);
   const seeds = topArtists(2);
   const key = seeds.length ? `mfy:${seeds.map((s) => s.id).join(",")}` : null;
+  // The listener's own artists + artists related to them (not Deezer radio, which mixes in unrelated foreign songs)
   const { data, loading, error } = useAsync(key, async () => {
-    const lists = await Promise.all(seeds.map((s) => catalog.artistRadio(s.id)));
-    const out: Track[] = [];
-    const seen = new Set<string>();
-    for (let i = 0; i < 25; i++)
-      for (const l of lists)
-        if (l[i] && !seen.has(l[i].id)) {
-          seen.add(l[i].id);
-          out.push(l[i]);
-        }
-    return out.filter((t) => t.playable);
+    // related artists are kept only when they are Malay artists we know (no foreign mix-ins)
+    const related = (await Promise.all(seeds.map((x) => catalog.related(x.id, 12).catch(() => [] as string[])))).flat().filter((id) => MALAY_ALL.has(id));
+    const malaySeeds = seeds.some((x) => MALAY_ALL.has(x.id));
+    if (malaySeeds && related.length < 3) related.push(...MALAY.nasyid.slice(0, 3), ...MALAY.jiwang.slice(0, 2));
+    const ids = [...new Set([...seeds.map((x) => x.id), ...related])].slice(0, 10);
+    return mixFrom(ids, 3);
   });
   void plays;
   void favCount;
@@ -187,7 +184,8 @@ function DailyMix({ kind }: { kind: SectionConfig["kind"] }) {
   if (!seeds.length) return <RowSkeleton />;
   const play = async (id: string, name: string) => {
     try {
-      const tr = (await catalog.artistRadio(id)).filter((t) => t.playable);
+      const rel = (await catalog.related(id, 12).catch(() => [] as string[])).filter((x) => MALAY_ALL.has(x) || !MALAY_ALL.has(id));
+      const tr = await mixFrom([id, ...rel], 4);
       if (tr.length) void usePlayer.getState().playList(tr, 0, { shuffle: false });
       toast(`Daily Mix: ${name} dan artis serupa`);
     } catch (e) {

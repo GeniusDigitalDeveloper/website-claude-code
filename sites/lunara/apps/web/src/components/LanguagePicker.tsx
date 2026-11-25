@@ -33,9 +33,9 @@ export function LanguagePicker({ compact }: { compact?: boolean }) {
             aria-checked={lang === o.value}
             onClick={() => set({ language: o.value, languageChosen: true })}
             translate="no"
-            className={cx("glass relative flex cursor-pointer items-center gap-3 rounded-2xl p-3 text-left ring-1 transition", lang === o.value ? "ring-2 ring-[color:var(--acc-via)]" : "ring-line hover:bg-card")}
+            className={cx("relative flex cursor-pointer items-center gap-3 rounded-2xl p-3 text-left transition", lang === o.value ? "btn-white" : "chip-glass hover:bg-card-hover")}
           >
-            <span className={cx("grid h-10 w-10 shrink-0 place-items-center rounded-xl text-sm font-extrabold", lang === o.value ? "btn-luxe" : "bg-card text-fg ring-1 ring-line")}>{o.code}</span>
+            <span className={cx("grid h-10 w-10 shrink-0 place-items-center rounded-xl text-sm font-extrabold", lang === o.value ? "btn-luxe" : "chip-glass text-fg")}>{o.code}</span>
             <span className="min-w-0">
               <span className="block text-sm font-bold">{o.label}</span>
               <span className="block text-xs text-muted">{o.note}</span>

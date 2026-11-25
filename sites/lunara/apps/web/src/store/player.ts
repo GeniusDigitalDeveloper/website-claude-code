@@ -9,6 +9,12 @@ import { useLibrary, syncSafe } from "./library";
 import { useSettings } from "./settings";
 import { toast } from "./toast";
 import { logPlaybackError } from "@/lib/log";
+import { findVideo, getYouTube, youtubeEnabled } from "@/lib/youtube";
+import type { EngineEvent } from "@/lib/audio-engine";
+
+/** Which player is producing sound: the audio engine (device files, previews) or YouTube (full songs). */
+let backend: "audio" | "yt" = "audio";
+const withTimeout = <T,>(p: Promise<T>, ms: number) => Promise.race([p, new Promise<null>((r) => setTimeout(() => r(null), ms))]);
 
 export type Repeat = "off" | "all" | "one";
 
@@ -27,6 +33,8 @@ interface PlayerState {
   repeat: Repeat;
   fullOpen: boolean;
   queueOpen: boolean;
+  /** true while the current song plays in full (YouTube or a device file), false for a 30 s preview */
+  full: boolean;
 
   current: () => Track | undefined;
   playList: (tracks: Track[], start?: number, opts?: { shuffle?: boolean }) => Promise<void>;
@@ -76,7 +84,6 @@ async function resolveUrl(t: Track): Promise<string> {
 let loadSeq = 0;
 let xfadeFor: string | null = null;
 let lastResumeSave = 0;
-let previewNoticeShown = false;
 
 export const usePlayer = create<PlayerState>()(
   persist(
@@ -94,6 +101,26 @@ export const usePlayer = create<PlayerState>()(
           return;
         }
         try {
+          // Full song in-app through YouTube when available; otherwise the provider's preview.
+          const vid = t.provider === "deezer" && youtubeEnabled() ? await withTimeout(findVideo(t), 7000) : t.provider === "deezer" ? await withTimeout(findVideo(t), 2500) : null;
+          if (my !== loadSeq) return;
+          const yt = getYouTube();
+          if (vid) {
+            if (backend === "audio" && getEngine().playing) await getEngine().pause();
+            if (my !== loadSeq) return;
+            backend = "yt";
+            set({ full: true, duration: t.duration || 0 });
+            await yt.load(vid, { autoplay, startAt });
+            if (autoplay && useSettings.getState().keepHistory) useLibrary.getState().addRecent(t);
+            updateMediaSession(t);
+            return;
+          }
+          if (backend === "yt") {
+            await yt.fadeOutAndStop();
+            yt.stop();
+            backend = "audio";
+          }
+          set({ full: t.provider === "device" });
           const url = await resolveUrl(t);
           if (my !== loadSeq) return;
           await getEngine().load(url, { autoplay, startAt });
@@ -121,6 +148,7 @@ export const usePlayer = create<PlayerState>()(
         repeat: "off",
         fullOpen: false,
         queueOpen: false,
+        full: false,
 
         current: () => get().queue[get().index],
 
@@ -152,15 +180,20 @@ export const usePlayer = create<PlayerState>()(
           const e = getEngine();
           const t = get().current();
           if (!t) return;
+          if (backend === "yt" && getYouTube().videoId) return void getYouTube().play();
           if (!e.element.src) {
             const resume = useLibrary.getState().resume;
             void loadCurrent(true, resume && resume.track.id === t.id ? resume.position : undefined);
           } else void e.play();
         },
-        pause: () => void getEngine().pause(),
+        pause: () => void (backend === "yt" ? getYouTube().pause() : getEngine().pause()),
         next: async (auto = false) => {
           const { queue, index, repeat } = get();
           if (auto && repeat === "one") {
+            if (backend === "yt") {
+              getYouTube().seek(0);
+              return void getYouTube().play();
+            }
             getEngine().seek(0);
             return void getEngine().play();
           }
@@ -195,20 +228,24 @@ export const usePlayer = create<PlayerState>()(
           await loadCurrent(true);
         },
         seek: (s) => {
-          getEngine().seek(s);
+          if (backend === "yt") getYouTube().seek(s);
+          else getEngine().seek(s);
           set({ position: s });
         },
         setVolume: (v) => {
           getEngine().setVolume(v);
+          getYouTube().setVolume(v);
           set({ volume: v, muted: v === 0 });
         },
         toggleMute: () => {
           const m = !get().muted;
           getEngine().setVolume(m ? 0 : get().volume || 0.6);
+          getYouTube().setVolume(m ? 0 : get().volume || 0.6);
           set({ muted: m });
         },
         setRate: (r) => {
           getEngine().setRate(r);
+          getYouTube().setRate(r);
           useSettings.getState().set({ playbackRate: r });
         },
         toggleShuffle: () => {
@@ -298,9 +335,16 @@ export function wirePlayer() {
   e.setVolume(st.volume);
   e.fade = useSettings.getState().fade;
   e.setRate(useSettings.getState().playbackRate);
-  useSettings.subscribe((s) => (e.fade = s.fade));
+  const yt = getYouTube();
+  yt.fade = useSettings.getState().fade;
+  yt.setVolume(st.volume);
+  useSettings.subscribe((s) => {
+    e.fade = s.fade;
+    yt.fade = s.fade;
+  });
 
-  e.on(async (ev) => {
+  const handle = async (ev: EngineEvent, from: "audio" | "yt") => {
+    if (from !== backend) return; // ignore the idle player
     const s = usePlayer.getState();
     if (ev.type === "time") {
       usePlayer.setState({ position: ev.position, duration: ev.duration || s.duration });
@@ -319,7 +363,7 @@ export function wirePlayer() {
       // Crossfade: start the next song on the second deck before this one ends
       const f = useSettings.getState().fade;
       const remaining = ev.duration - ev.position;
-      if (f.crossfade && s.playing && ev.duration > f.crossfadeSec * 2 && remaining > 0 && remaining <= f.crossfadeSec && s.repeat !== "one" && t && xfadeFor !== t.id && !e.crossfading) {
+      if (backend === "audio" && f.crossfade && s.playing && ev.duration > f.crossfadeSec * 2 && remaining > 0 && remaining <= f.crossfadeSec && s.repeat !== "one" && t && xfadeFor !== t.id && !e.crossfading) {
         const nextIdx = s.index < s.queue.length - 1 ? s.index + 1 : s.repeat === "all" ? 0 : -1;
         const nt = s.queue[nextIdx];
         if (nextIdx >= 0 && nt?.playable) {
@@ -340,20 +384,31 @@ export function wirePlayer() {
     } else if (ev.type === "state") usePlayer.setState({ playing: ev.playing });
     else if (ev.type === "buffering") usePlayer.setState({ buffering: ev.buffering });
     else if (ev.type === "ended") {
-      const ended = usePlayer.getState().current();
-      if (ended?.source === "stream" && !previewNoticeShown) {
-        previewNoticeShown = true;
-        toast("Pratonton 30 saat tamat. Lagu penuh: tekan \"Dengar penuh\" (Deezer). Had ini ditetapkan oleh lesen Deezer.");
-      }
       void usePlayer.getState().next(true);
     }
-    else if (ev.type === "error") {
+    else if (ev.type === "error" && from === "yt") {
+      // YouTube video unavailable/blocked: remember it and fall back to normal audio silently
+      const cur = usePlayer.getState().current();
+      if (cur) {
+        try {
+          localStorage.setItem("lunara-yt:" + cur.id.replace(/^dz:/, ""), "-");
+        } catch {
+          /* ignore */
+        }
+        getYouTube().stop();
+        backend = "audio";
+        void usePlayer.getState().jumpTo(usePlayer.getState().index);
+      }
+    } else if (ev.type === "error") {
       usePlayer.setState({ buffering: false });
       toast(ev.message);
       logPlaybackError(usePlayer.getState().current()?.id, ev.message);
     }
     if (ev.type === "state" && "mediaSession" in navigator) navigator.mediaSession.playbackState = ev.playing ? "playing" : "paused";
-  });
+  };
+  e.on((ev) => void handle(ev, "audio"));
+  yt.on((ev) => void handle(ev, "yt"));
+
 
   if ("mediaSession" in navigator) {
     const ms = navigator.mediaSession;

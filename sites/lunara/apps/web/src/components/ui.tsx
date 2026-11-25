@@ -1,8 +1,9 @@
 "use client";
-import { ChevronLeft, ChevronRight, Disc3, ExternalLink, HardDrive, Loader2, Radio, Upload, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Disc3, HardDrive, Loader2, Upload, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "motion/react";
+import { createPortal } from "react-dom";
 import type { Track } from "@/lib/types";
 
 export const cx = (...c: (string | false | null | undefined)[]) => c.filter(Boolean).join(" ");
@@ -54,22 +55,7 @@ export function SourceBadge({ t, className }: { t: Track; className?: string }) 
         Tidak tersedia
       </span>
     );
-  return (
-    <span className={cx(base, "text-acc ring-[color:var(--acc-via)]/30", className)} title="Penstriman berlesen Deezer: pratonton 30 saat">
-      <Radio className="h-3 w-3" aria-hidden /> Pratonton 30s
-    </span>
-  );
-}
-
-/** Link to the full-length song on the licensed provider (shown for 30s previews). */
-export function FullSongLink({ t, className, label = "Dengar penuh" }: { t: Track; className?: string; label?: string }) {
-  if (t.source !== "stream" || t.provider !== "deezer") return null;
-  const href = `https://www.deezer.com/track/${t.id.replace(/^dz:/, "")}`;
-  return (
-    <a href={href} target="_blank" rel="noopener noreferrer" title="Lagu penuh tersedia di Deezer (had lesen: app luar hanya dibenarkan pratonton 30 saat)" className={cx("inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold whitespace-nowrap text-acc ring-1 ring-[color:var(--acc-via)]/40 hover:bg-card-hover", className)}>
-      {label} <ExternalLink className="h-3 w-3" aria-hidden />
-    </a>
-  );
+  return null;
 }
 
 export function IconBtn({ label, onClick, children, className, active, size = "md", disabled }: { label: string; onClick?: (e: React.MouseEvent) => void; children: ReactNode; className?: string; active?: boolean; size?: "sm" | "md" | "lg"; disabled?: boolean }) {
@@ -92,8 +78,8 @@ export function IconBtn({ label, onClick, children, className, active, size = "m
 export function Btn({ children, onClick, variant = "primary", className, type = "button", disabled, href }: { children: ReactNode; onClick?: () => void; variant?: "primary" | "ghost" | "soft" | "danger"; className?: string; type?: "button" | "submit"; disabled?: boolean; href?: string }) {
   const v = {
     primary: "btn-luxe font-bold",
-    ghost: "ring-1 ring-line hover:bg-card-hover text-fg",
-    soft: "bg-card hover:bg-card-hover text-fg",
+    ghost: "chip-glass hover:bg-card-hover text-fg",
+    soft: "chip-glass hover:bg-card-hover text-fg",
     danger: "bg-rose-600 text-white hover:bg-rose-500",
   }[variant];
   const cls = cx("inline-flex cursor-pointer items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition duration-200 disabled:cursor-not-allowed disabled:opacity-50", v, className);
@@ -188,7 +174,9 @@ export function Modal({ open, onClose, title, children, wide }: { open: boolean;
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
   }, [open, onClose]);
-  return (
+  if (typeof document === "undefined") return null;
+  // Rendered into <body> so blurred (backdrop-filter) ancestors can't clip or re-anchor the dialog.
+  return createPortal(
     <AnimatePresence>
       {open && (
         <motion.div className="fixed inset-0 z-[80] grid place-items-end bg-black/55 p-0 sm:place-items-center sm:p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose}>
@@ -201,7 +189,7 @@ export function Modal({ open, onClose, title, children, wide }: { open: boolean;
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 40, opacity: 0 }}
             transition={{ type: "spring", damping: 26, stiffness: 320 }}
-            className={cx("panel thin-scroll max-h-[92dvh] w-full overflow-y-auto rounded-b-none p-5 shadow-2xl sm:rounded-b-[var(--radius)]", wide ? "sm:max-w-2xl" : "sm:max-w-md")}
+            className={cx("panel panel-strong thin-scroll max-h-[92dvh] w-full overflow-y-auto rounded-b-none p-5 shadow-2xl sm:rounded-b-[var(--radius)]", wide ? "sm:max-w-2xl" : "sm:max-w-md")}
           >
             <div className="mb-4 flex items-center justify-between gap-4">
               <h2 className="font-display text-lg font-bold">{title}</h2>
@@ -213,7 +201,8 @@ export function Modal({ open, onClose, title, children, wide }: { open: boolean;
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }
 
@@ -241,7 +230,7 @@ export function Switch({ checked, onChange, label, desc, disabled }: { checked: 
 
 export function Segmented<T extends string | number>({ value, options, onChange, label }: { value: T; options: { value: T; label: string }[]; onChange: (v: T) => void; label: string }) {
   return (
-    <div role="radiogroup" aria-label={label} className="inline-flex flex-wrap gap-1 rounded-full bg-card p-1 ring-1 ring-line">
+    <div role="radiogroup" aria-label={label} className="chip-glass inline-flex flex-wrap gap-1 rounded-full p-1">
       {options.map((o) => (
         <button
           key={String(o.value)}
@@ -249,7 +238,7 @@ export function Segmented<T extends string | number>({ value, options, onChange,
           role="radio"
           aria-checked={o.value === value}
           onClick={() => onChange(o.value)}
-          className={cx("cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold transition", o.value === value ? "btn-luxe font-bold" : "text-muted hover:text-fg")}
+          className={cx("cursor-pointer rounded-full px-3 py-1.5 text-xs font-semibold transition", o.value === value ? "btn-white font-bold" : "text-muted hover:text-fg")}
         >
           {o.label}
         </button>

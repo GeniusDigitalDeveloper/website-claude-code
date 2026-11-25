@@ -101,7 +101,7 @@ function TopSearchInner({ className }: { className?: string }) {
         placeholder="Cari lagu, artis atau album"
         aria-label="Cari muzik"
         enterKeyHint="search"
-        className="w-full rounded-full bg-card py-2.5 pr-10 pl-10 text-sm ring-1 ring-line outline-none placeholder:text-faint focus:ring-2 focus:ring-[color:var(--acc-via)]"
+        className="chip-glass w-full rounded-full py-3 pr-10 pl-10 text-sm outline-none placeholder:text-faint focus:ring-2 focus:ring-[color:var(--acc-via)]"
       />
       {q && (
         <button
@@ -118,7 +118,7 @@ function TopSearchInner({ className }: { className?: string }) {
         </button>
       )}
       {showDrop && (
-        <div role="listbox" aria-label="Cadangan carian" className="panel absolute inset-x-0 top-full z-50 mt-2 overflow-hidden p-1.5 shadow-2xl">
+        <div role="listbox" aria-label="Cadangan carian" className="panel panel-strong absolute inset-x-0 top-full z-50 mt-2 overflow-hidden p-1.5 shadow-2xl">
           {loading && !sugg.length && <p className="px-3 py-2 text-sm text-muted">Mencari…</p>}
           {!loading && !sugg.length && <p className="px-3 py-2 text-sm text-muted">Tiada cadangan. Tekan Enter untuk cari.</p>}
           {sugg.map((t) => (

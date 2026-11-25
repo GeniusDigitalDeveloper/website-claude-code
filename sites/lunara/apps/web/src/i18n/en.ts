@@ -225,6 +225,9 @@ export const EN: Record<string, string> = {
   "Format:": "Formats:", "lagu": "songs", "daripada": "of", "LUNARA MUSIC laman utama": "LUNARA MUSIC home",
   "Aplikasi Windows": "Windows app", "Pasang LUNARA MUSIC pada PC/laptop Windows. Sentiasa versi terkini secara automatik, tiada butang kemas kini.": "Install LUNARA MUSIC on your Windows PC/laptop. Always the latest version automatically, no update button.",
   "Muat turun .exe": "Download .exe",
+  "Layout": "Layout", "Edit layout halaman Utama": "Edit the Home layout", "Seret untuk susun seksyen, sorok atau tunjuk, tukar gaya paparan.": "Drag to reorder sections, hide or show them, change their style.",
+  "Preset, saiz kad, kepadatan, sudut, sidebar, panel kanan dan gaya pemain.": "Presets, card size, density, corners, sidebar, right panel and player style.",
+  "Video lagu ini tidak boleh dimainkan.": "This song's video can't be played.", "YouTube tidak dapat dicapai": "YouTube is unreachable", "YouTube lambat memuat": "YouTube is slow to load",
   "Seksyen tidak dikenali": "Unknown section", "Bukan fail layout LUNARA MUSIC": "Not a LUNARA MUSIC layout file",
 };
 

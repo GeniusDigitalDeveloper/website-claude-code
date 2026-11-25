@@ -32,41 +32,57 @@ export function themeVars(t: { hue: number; sat: number; acc: string[] }, night:
     return {
       "--bg": hsl(Math.min(s, 45), 7),
       "--bg-2": hsl(Math.min(s, 40), 10),
-      "--panel": hsl(Math.min(s, 35), 11),
-      "--card": hsl(Math.min(s, 32), 15),
-      "--card-hover": hsl(Math.min(s, 30), 20),
-      "--line": "rgb(255 255 255 / 0.1)",
+      "--panel": "rgb(255 255 255 / 0.07)",
+      "--panel-strong": hsl(Math.min(s, 35), 12, 0.94),
+      "--card": "rgb(255 255 255 / 0.07)",
+      "--card-hover": "rgb(255 255 255 / 0.13)",
+      "--line": "rgb(255 255 255 / 0.14)",
       "--fg": "#ffffff",
       "--muted": hsl(Math.min(s, 25), 84),
       "--faint": hsl(Math.min(s, 18), 72),
-      "--glass": hsl(Math.min(s, 40), 11, 0.72),
+      "--glass": hsl(Math.min(s, 40), 11, 0.84),
       "--glass-edge": "rgb(255 255 255 / 0.14)",
       "--shadow": "0 18px 40px -18px rgb(0 0 0 / 0.7)",
       "--acc-from": t.acc[0],
       "--acc-via": t.acc[1],
       "--acc-to": t.acc[2],
       "--acc-solid": hsl(Math.max(s, 60), 82),
-      "--bg-grad": "none",
+      "--bg-grad": `linear-gradient(140deg, ${hsl(Math.min(s, 50), 8)} 0%, hsl(${h + 40} 45% 12%) 100%)`,
+      "--orb-a": hsl(70, 35),
+      "--orb-b": `hsl(${h + 40} 70% 40%)`,
+      "--btn-a": t.acc[0],
+      "--btn-b": t.acc[2],
     };
+  const lunara = t.acc[0] === "#0891b2";
   return {
-    "--bg": hsl(s, 97),
-    "--bg-2": hsl(s, 94),
-    "--panel": "#ffffff",
-    "--card": hsl(Math.min(s, 60), 95),
-    "--card-hover": hsl(Math.min(s, 55), 91),
-    "--line": hsl(30, 20, 0.12),
+    "--bg": hsl(s, 93),
+    "--bg-2": hsl(s, 88),
+    // frosted glass: translucent white over the coloured page, blurred by the .panel utility
+    "--panel": hsl(s, 99, 0.4),
+    "--panel-strong": hsl(s, 99, 0.9),
+    "--card": hsl(s, 99, 0.36),
+    "--card-hover": hsl(s, 99, 0.58),
+    "--line": "rgb(255 255 255 / 0.62)",
     "--fg": "#0b0b12",
     "--muted": hsl(Math.min(s, 15), 28),
     "--faint": hsl(Math.min(s, 12), 38),
-    "--glass": hsl(s, 99, 0.7),
-    "--glass-edge": "rgb(255 255 255 / 0.75)",
+    // floating bars (player, header, toasts) sit over content, so they are more opaque
+    "--glass": hsl(s, 98, 0.8),
+    "--glass-edge": "rgb(255 255 255 / 0.85)",
     "--shadow": "0 10px 30px -12px rgb(20 20 40 / 0.18)",
     "--acc-from": t.acc[0],
     "--acc-via": t.acc[1],
     "--acc-to": t.acc[2],
     "--acc-solid": hsl(Math.max(s, 65), 30),
     // soft page wash: the default "Biru Air" theme blends aqua into purple, others use their own hue
-    "--bg-grad": t.acc[0] === "#0891b2" ? "linear-gradient(135deg, hsl(190 95% 95%) 0%, hsl(215 95% 96%) 45%, hsl(265 85% 96%) 100%)" : `linear-gradient(160deg, ${hsl(s, 97)}, ${hsl(s, 93)})`,
+    // page colour behind the glass: light aqua-blue flowing into a deeper purple (default theme)
+    "--bg-grad": lunara
+      ? "linear-gradient(135deg, #c4ecff 0%, #a9cdff 32%, #ae9cf1 68%, #8a68dc 100%)"
+      : `linear-gradient(140deg, ${hsl(s, 91)} 0%, ${hsl(s, 84)} 55%, hsl(${h + 35} ${s}% 78%) 100%)`,
+    "--orb-a": lunara ? "#5ad1f5" : hsl(s, 70),
+    "--orb-b": lunara ? "#6d3fd6" : `hsl(${h + 35} ${s}% 62%)`,
+    "--btn-a": lunara ? "#2f6fe4" : t.acc[0],
+    "--btn-b": lunara ? "#6a2fd0" : t.acc[2],
   };
 }
 

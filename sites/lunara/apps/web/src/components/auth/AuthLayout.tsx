@@ -12,9 +12,9 @@ export function AuthLayout({ title, sub, children }: { title: string; sub: strin
         <span className="top-0 left-[10%] h-80 w-80" style={{ background: "var(--acc-from)" }} />
         <span className="top-20 right-[10%] h-96 w-96" style={{ background: "var(--acc-to)", animationDelay: "-8s" }} />
       </div>
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="panel glass relative w-full max-w-md p-7 shadow-2xl">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="panel panel-strong relative w-full max-w-md p-7 shadow-2xl">
         <Link href="/" className="mx-auto flex w-fit flex-col items-center gap-2" aria-label="LUNARA MUSIC laman utama">
-          <Mark size={64} />
+          <Mark size={92} />
           <Wordmark big className="items-center" />
         </Link>
         <h1 className="mt-6 text-center font-display text-2xl font-bold">{title}</h1>

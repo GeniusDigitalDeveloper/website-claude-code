@@ -1,6 +1,8 @@
 "use client";
-import { Download, Info, KeyRound, LogOut, Mail, Monitor, ShieldCheck, Sun, Trash2, UserRound, Waves } from "lucide-react";
+import { Download, Info, LayoutDashboard, PencilRuler, KeyRound, LogOut, Mail, Monitor, ShieldCheck, Sun, Trash2, UserRound, Waves } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useLayout } from "@/store/layout";
 import { useEffect, useState, type ReactNode } from "react";
 import { firebaseEnabled } from "@/lib/firebase";
 import { getEngine } from "@/lib/audio-engine";
@@ -237,6 +239,7 @@ function AccountSection() {
 }
 
 export default function SettingsPage() {
+  const router = useRouter();
   const s = useSettings();
   const f = s.fade;
   const opt = FADE_OPTIONS.map((v) => ({ value: v, label: `${v}s` }));
@@ -257,6 +260,7 @@ export default function SettingsPage() {
         {[
           ["account", "Akaun"],
           ["appearance", "Paparan"],
+          ["layout", "Layout"],
           ["playback", "Main balik"],
           ["privacy", "Privasi"],
           ["app", "Aplikasi"],
@@ -278,7 +282,20 @@ export default function SettingsPage() {
           <p className="mb-3 text-xs text-muted">Semua tema warna adalah cerah dengan teks hitam. Night mode gelap dengan teks putih. Disegerak ke peranti lain bila log masuk.</p>
           <ThemePicker />
         </div>
-        <Row label="Layout & warna" desc="Susun seksyen, pilih preset, warna aksen, saiz kad dan banyak lagi.">
+      </Card>
+
+      <Card id="layout" title="Layout" icon={<LayoutDashboard className="h-4 w-4" />}>
+        <Row label="Edit layout halaman Utama" desc="Seret untuk susun seksyen, sorok atau tunjuk, tukar gaya paparan.">
+          <Btn
+            onClick={() => {
+              useLayout.getState().set({ editing: true });
+              router.push("/");
+            }}
+          >
+            <PencilRuler className="h-4 w-4" /> Edit layout
+          </Btn>
+        </Row>
+        <Row label="Layout Studio" desc="Preset, saiz kad, kepadatan, sudut, sidebar, panel kanan dan gaya pemain.">
           <Btn variant="ghost" href="/studio">
             Buka Layout Studio
           </Btn>

@@ -84,4 +84,13 @@
       allow read, delete: if lunaraIsAdmin();
       allow update: if lunaraIsAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['resolved']);
     }
+    // ===== LUNARA MUSIC: cache lagu -> video YouTube (tambahan) =====
+    match /lunara_yt/{id} {
+      allow read: if true;
+      allow create: if isSignedIn() && id.matches('^[0-9]{1,20}$')
+        && request.resource.data.keys().hasOnly(['v', 'at'])
+        && request.resource.data.v is string && request.resource.data.v.matches('^[A-Za-z0-9_-]{11}$')
+        && request.resource.data.at == request.time;
+      allow update, delete: if lunaraIsAdmin();
+    }
     // ===== TAMAT LUNARA MUSIC =====
