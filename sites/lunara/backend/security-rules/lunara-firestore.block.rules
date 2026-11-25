@@ -1,0 +1,87 @@
+
+    // ===== LUNARA MUSIC (tambahan sahaja, koleksi berawalan lunara_) =====
+    // Admin LUNARA = custom claim admin (isAdmin) ATAU pemilik projek (gdIsAdmin). Tiada rules app lain diubah.
+    function lunaraIsAdmin() { return isAdmin() || gdIsAdmin(); }
+    function lunaraOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid
+        && !(exists(/databases/$(database)/documents/lunara_users/$(uid))
+             && get(/databases/$(database)/documents/lunara_users/$(uid)).data.get('suspended', false) == true);
+    }
+    function lunaraPhoto(d) {
+      return !('photoURL' in d) || d.photoURL == null
+        || (d.photoURL is string && d.photoURL.size() <= 250000
+            && (d.photoURL.matches('https://.*') || d.photoURL.matches('data:image/jpeg;base64,[A-Za-z0-9+/=]+')));
+    }
+    function lunaraProfileOk(d) {
+      return d.displayName is string && d.displayName.size() <= 80
+        && (!('username' in d) || (d.username is string && d.username.matches('^[a-z0-9._]{0,30}$')))
+        && lunaraPhoto(d);
+    }
+
+    // Dokumen pengawal: hanya admin boleh baca (klien guna untuk semak akses admin)
+    match /lunara_private/{id} {
+      allow read: if lunaraIsAdmin();
+      allow write: if false;
+    }
+
+    match /lunara_users/{uid} {
+      allow read: if (isSignedIn() && request.auth.uid == uid) || lunaraIsAdmin();
+      allow create: if isSignedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['displayName', 'username', 'email', 'photoURL', 'createdAt', 'role'])
+        && request.resource.data.role == 'user'
+        && request.resource.data.email == request.auth.token.get('email', '')
+        && request.resource.data.createdAt == request.time
+        && lunaraProfileOk(request.resource.data);
+      allow update: if (lunaraOwner(uid)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'username', 'photoURL'])
+          && lunaraProfileOk(request.resource.data))
+        || (lunaraIsAdmin()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['suspended', 'role'])
+          && request.resource.data.get('suspended', false) is bool
+          && request.resource.data.get('role', 'user') in ['user', 'admin']);
+      allow delete: if (isSignedIn() && request.auth.uid == uid) || lunaraIsAdmin();
+
+      // Data disegerak: library (playlist, kegemaran, sejarah), settings, layout, avatar (gambar asal untuk potong semula)
+      match /data/{docId} {
+        allow read, delete: if isSignedIn() && request.auth.uid == uid;
+        allow create, update: if lunaraOwner(uid) && docId in ['library', 'settings', 'layout', 'avatar']
+          && (docId != 'avatar' || (request.resource.data.keys().hasOnly(['original'])
+              && request.resource.data.original is string && request.resource.data.original.size() < 950000
+              && request.resource.data.original.matches('data:image/jpeg;base64,[A-Za-z0-9+/=]+')));
+      }
+    }
+
+    match /lunara_featured/{id} {
+      allow read: if true;
+      allow write: if lunaraIsAdmin()
+        && request.resource.data.keys().hasOnly(['title', 'deezerPlaylistId', 'active', 'createdAt'])
+        && request.resource.data.title is string && request.resource.data.title.size() <= 120
+        && request.resource.data.deezerPlaylistId is string
+        && request.resource.data.deezerPlaylistId.matches('^[0-9]{1,20}$');
+    }
+    match /lunara_genres/{id} {
+      allow read: if true;
+      allow write: if lunaraIsAdmin()
+        && request.resource.data.keys().hasOnly(['name', 'createdAt'])
+        && request.resource.data.name is string && request.resource.data.name.size() <= 60;
+    }
+    match /lunara_error_logs/{id} {
+      allow create: if isSignedIn()
+        && request.resource.data.keys().hasOnly(['uid', 'trackId', 'message', 'ua', 'at'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.message is string && request.resource.data.message.size() <= 300
+        && request.resource.data.ua is string && request.resource.data.ua.size() <= 160
+        && request.resource.data.at == request.time;
+      allow read, delete: if lunaraIsAdmin();
+      allow update: if false;
+    }
+    match /lunara_reports/{id} {
+      allow create: if isSignedIn()
+        && request.resource.data.keys().hasOnly(['uid', 'type', 'detail', 'targetId', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.detail is string && request.resource.data.detail.size() <= 1000
+        && request.resource.data.createdAt == request.time;
+      allow read, delete: if lunaraIsAdmin();
+      allow update: if lunaraIsAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['resolved']);
+    }
+    // ===== TAMAT LUNARA MUSIC =====
