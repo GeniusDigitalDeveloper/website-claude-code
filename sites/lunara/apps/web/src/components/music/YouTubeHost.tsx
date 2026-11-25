@@ -1,7 +1,9 @@
 "use client";
-import { GripHorizontal, Maximize2, Minimize2, PanelBottom, Square } from "lucide-react";
+import { ExternalLink, GripHorizontal, Maximize2, Minimize2, PanelBottom, PictureInPicture2, Square } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { usePlayer } from "@/store/player";
+import { getYouTube, useYtWindow } from "@/lib/youtube";
+import { toast } from "@/store/toast";
 import { cx } from "../ui";
 
 /**
@@ -31,6 +33,8 @@ export function YouTubeHost() {
   const t = usePlayer((s) => s.queue[s.index]);
   const full = usePlayer((s) => s.full);
   const show = Boolean(t && full && t.provider === "deezer");
+  const popped = useYtWindow((s) => s.popped);
+  const canPop = useYtWindow((s) => s.supported);
   const [size, setSize] = useState<Size>("s");
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null); // null = docked above the player bar
   const [isMobile, setIsMobile] = useState(false);
@@ -113,13 +117,35 @@ export function YouTubeHost() {
             </button>
           </>
         )}
+        {canPop && !popped && (
+          <button
+            type="button"
+            aria-label="Tarik keluar ke tetingkap sendiri"
+            title="Tarik keluar ke tetingkap sendiri (boleh dialih ke skrin kedua)"
+            onClick={async () => {
+              if (!(await getYouTube().popOut())) toast("Tetingkap video tidak dapat dibuka.");
+            }}
+            className={btn}
+          >
+            <ExternalLink className="h-3.5 w-3.5" />
+          </button>
+        )}
         <button type="button" aria-label="Lekat di atas bar pemain" title="Lekat di atas bar pemain" onClick={() => setPos(null)} className={cx(btn, !pos && "btn-white")}>
           <PanelBottom className="h-3.5 w-3.5" />
         </button>
       </div>
-      <div className="relative bg-black" style={{ height: dim.h }}>
+      <div className="relative bg-black" style={{ height: popped ? 0 : dim.h }}>
         <div id="yt-player-mount" className="h-full w-full" />
       </div>
+      {popped && (
+        <div className="flex items-center gap-2 px-3 py-2.5">
+          <PictureInPicture2 className="h-4 w-4 shrink-0 text-acc" aria-hidden />
+          <span className="min-w-0 flex-1 text-[11px] text-muted">Video dalam tetingkap berasingan</span>
+          <button type="button" onClick={() => getYouTube().popIn()} className="btn-luxe shrink-0 cursor-pointer rounded-full px-3 py-1 text-[11px] font-bold">
+            Masukkan semula
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -13,6 +13,10 @@ import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { auth, db } from "./firebase";
 import type { Track } from "./types";
 import type { EngineEvent, FadeSettings } from "./audio-engine";
+import { create } from "zustand";
+
+/** UI state for the pop-out (Picture-in-Picture) video window. */
+export const useYtWindow = create<{ popped: boolean; supported: boolean }>(() => ({ popped: false, supported: false }));
 
 const KEY = process.env.NEXT_PUBLIC_YT_KEY ?? "";
 let disabledUntil = 0; // set when the key is rejected or the daily quota is exhausted
@@ -154,6 +158,7 @@ interface YTPlayer {
   getCurrentTime(): number;
   getDuration(): number;
   getPlayerState(): number;
+  destroy(): void;
   setPlaybackRate(r: number): void;
 }
 declare global {
@@ -179,6 +184,8 @@ class YouTubeDeck {
   videoId: string | null = null;
   fade: FadeSettings | null = null;
   hostEl: HTMLElement | null = null;
+  private mainPlayer: YTPlayer | null = null; // the in-app player while the video is popped out
+  private pipWin: Window | null = null;
 
   on(fn: Listener) {
     this.listeners.add(fn);
@@ -318,7 +325,100 @@ class YouTubeDeck {
     if (my === this.token) this.player?.pauseVideo();
   }
 
+  /**
+   * Move the video into its own always-on-top window (Document Picture-in-Picture, Chrome/Edge),
+   * which the user can drag to a second screen. Playback continues from the same second.
+   */
+  async popOut(): Promise<boolean> {
+    const dpip = (window as unknown as { documentPictureInPicture?: { requestWindow(o: object): Promise<Window> } }).documentPictureInPicture;
+    if (!dpip || !this.player || !this.videoId || this.pipWin || !window.YT) return false;
+    const pip = await dpip.requestWindow({ width: 480, height: 290 });
+    pip.document.title = "LUNARA MUSIC";
+    const st = pip.document.createElement("style");
+    st.textContent = "html,body{margin:0;height:100%;background:#000;overflow:hidden}iframe{border:0;width:100vw;height:100vh;display:block}";
+    pip.document.head.appendChild(st);
+
+    const at = this.player.getCurrentTime() || 0;
+    const wasPlaying = this.busy;
+    const vid = this.videoId;
+    const main = this.player;
+    main.pauseVideo();
+    // Our own page hosts the player inside the window (YouTube needs a real embedding page)
+    const frame = pip.document.createElement("iframe");
+    frame.allow = "autoplay; encrypted-media";
+    frame.src = `/yt-pip?v=${encodeURIComponent(vid)}&t=${Math.floor(at)}&play=${wasPlaying ? 1 : 0}`;
+    pip.document.body.appendChild(frame);
+    const popped = await new Promise<YTPlayer>((resolve, reject) => {
+      frame.addEventListener("load", () => {
+        const w = frame.contentWindow as unknown as { lunaraPipReady: Promise<YTPlayer>; lunaraPipState: ((d: number) => void) | null; lunaraPipError: ((d: number) => void) | null };
+        w.lunaraPipState = (d) => this.onState(d);
+        // if the separate window can't play it, bring the video back into the app instead of failing
+        w.lunaraPipError = (code) => {
+          (window as unknown as { __lunaraPipError?: number }).__lunaraPipError = code;
+          this.popIn();
+        };
+        w.lunaraPipReady.then(resolve, reject);
+      });
+      setTimeout(() => reject(new Error("timeout")), 15000);
+    }).catch(() => null);
+    if (!popped) {
+      pip.close();
+      main.playVideo();
+      return false;
+    }
+    this.mainPlayer = main;
+    this.player = popped;
+    this.pipWin = pip;
+    popped.seekTo(at, true);
+    this.apply();
+    if (wasPlaying) popped.playVideo();
+    useYtWindow.setState({ popped: true });
+    pip.addEventListener("pagehide", () => this.popIn(true));
+    return true;
+  }
+
+  /** Bring the video back into the app (also runs when the pop-out window is closed). */
+  popIn(windowClosing = false) {
+    if (!this.pipWin || !this.mainPlayer) return;
+    const p = this.player;
+    const at = p?.getCurrentTime() || 0;
+    const wasPlaying = this.busy;
+    const vid = this.videoId;
+    this.player = this.mainPlayer;
+    this.mainPlayer = null;
+    const win = this.pipWin;
+    this.pipWin = null;
+    try {
+      p?.destroy();
+    } catch {
+      /* window already gone */
+    }
+    if (!windowClosing) win.close();
+    useYtWindow.setState({ popped: false });
+    if (vid && this.active) {
+      if (wasPlaying) this.player.loadVideoById({ videoId: vid, startSeconds: at });
+      else this.player.cueVideoById({ videoId: vid, startSeconds: at });
+      this.apply();
+    }
+  }
+
+  get isPopped() {
+    return this.pipWin !== null;
+  }
+
   stop() {
+    if (this.pipWin) {
+      try {
+        this.player?.destroy();
+      } catch {
+        /* ignore */
+      }
+      this.player = this.mainPlayer;
+      this.mainPlayer = null;
+      this.pipWin.close();
+      this.pipWin = null;
+      useYtWindow.setState({ popped: false });
+    }
     this.token++;
     this.active = false;
     this.videoId = null;
@@ -343,6 +443,7 @@ class YouTubeDeck {
 let deck: YouTubeDeck | null = null;
 export function getYouTube() {
   if (!deck) {
+    useYtWindow.setState({ supported: "documentPictureInPicture" in window });
     deck = new YouTubeDeck();
     (window as unknown as { __lunaraYT: YouTubeDeck }).__lunaraYT = deck;
   }

@@ -237,6 +237,8 @@ export const EN: Record<string, string> = {
   "Sambung dari sini": "Continue from here",
   "Muat turun": "Download", "Fail tidak dijumpai.": "File not found.",
   "Kembali": "Back",
+  "Tarik keluar ke tetingkap sendiri": "Pop out to its own window", "Tarik keluar ke tetingkap sendiri (boleh dialih ke skrin kedua)": "Pop out to its own window (can be moved to a second screen)",
+  "Tetingkap video tidak dapat dibuka.": "The video window couldn't be opened.", "Video dalam tetingkap berasingan": "Video is in a separate window", "Masukkan semula": "Bring back",
   "Seksyen tidak dikenali": "Unknown section", "Bukan fail layout LUNARA MUSIC": "Not a LUNARA MUSIC layout file",
 };
 
