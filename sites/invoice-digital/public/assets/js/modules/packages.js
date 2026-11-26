@@ -139,7 +139,7 @@ export function selHtml(pkgs, sel, { title = t("qs_title"), desc = t("qs_desc"),
   }).join("")}</div>${action}</section>`;
 }
 // Hanya SATU pakej boleh dipilih. Klik "Pilih Pakej" -> tetingkap produk pakej itu; pengguna mesti tanda sekurang-kurangnya satu produk.
-function pickProducts(p, current) {
+function pickProducts(p, current, confirmLabel = t("qs_confirm")) {
   const wrap = document.createElement("div"); wrap.className = "form qs-modal";
   wrap.innerHTML = `<p class="note-red qs-note" role="alert">${t("qs_note")}</p>
     <ul class="qs-list qs-mlist">${p.items.map((i, k) => `<li><label class="chk"><input type="checkbox" data-mi="${k}" ${current.includes(k) ? "checked" : ""}><span class="qs-in">${esc(i.name)}</span><b>${money(i.price)}</b></label></li>`).join("")}</ul>
@@ -147,7 +147,7 @@ function pickProducts(p, current) {
   const picked = () => [...wrap.querySelectorAll("[data-mi]:checked")].map((c) => +c.dataset.mi);
   wrap.addEventListener("change", () => { wrap.querySelector("#mtot").textContent = money(selTotal(p, picked())); });
   let result = null;
-  return modal({ title: p.name, body: wrap, actions: [{ label: t("cancel"), cls: "ghost" }, { label: t("qs_confirm"), cls: "primary", onClick: () => { const k = picked(); if (!k.length) { const n = wrap.querySelector(".qs-note"); n.classList.remove("flash"); void n.offsetWidth; n.classList.add("flash"); return false; } result = k; } }] }).then(() => result);
+  return modal({ title: p.name, body: wrap, actions: [{ label: t("cancel"), cls: "ghost" }, { label: confirmLabel, cls: "primary", onClick: () => { const k = picked(); if (!k.length) { const n = wrap.querySelector(".qs-note"); n.classList.remove("flash"); void n.offsetWidth; n.classList.add("flash"); return false; } result = k; } }] }).then(() => result);
 }
 export function bindSel(root, pkgs, sel, onChange, opts) {
   const box = root.querySelector(".qsel"); if (!box) return;
@@ -155,7 +155,7 @@ export function bindSel(root, pkgs, sel, onChange, opts) {
   box.addEventListener("click", async (e) => {
     const un = e.target.closest("[data-unpick]"); if (un) { delete sel[un.dataset.unpick]; onChange(sel); return redraw(); }
     const b = e.target.closest("[data-pick]"); if (!b) return; const id = b.dataset.pick, p = pkgs.find((x) => x.id === id); if (!p) return;
-    const k = await pickProducts(p, Array.isArray(sel[id]) ? sel[id] : []); if (!k) return;
+    const k = await pickProducts(p, Array.isArray(sel[id]) ? sel[id] : [], opts && opts.confirmLabel); if (!k) return;
     Object.keys(sel).forEach((x) => delete sel[x]); sel[id] = k; // satu pakej sahaja
     onChange(sel); redraw();
   });

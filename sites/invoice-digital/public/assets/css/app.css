@@ -243,3 +243,16 @@ h1,h2,h3,h4,b,strong,th,label,.lbl,.btn,.badge,.brand,.app-name,.side-app,.side 
 .qs-acts{display:flex;gap:6px;flex-wrap:wrap}.qs-acts .btn{flex:1 1 auto;justify-content:center}
 .qs-note{margin:0 0 6px;font-weight:600;font-style:normal}.qs-mlist label{font-size:.95rem;padding:10px 0}
 @keyframes qsflash{0%,100%{transform:none}20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}.qs-note.flash{animation:qsflash .4s}@media (prefers-reduced-motion:reduce){.qs-note.flash{animation:none;text-decoration:underline}}
+/* Borang Sebut Harga ringkas: kotak senarai item */
+.qe-lbl{margin:0 0 6px;font-family:var(--f-head);font-weight:600;color:var(--ink2)}
+.qe-box{border:1.5px solid var(--line);border-radius:14px;overflow:hidden}
+.qe-pkg{display:flex;align-items:baseline;gap:10px;padding:12px 16px;background:var(--bg2);border-bottom:1px solid var(--line)}.qe-pkg span{font-size:.8rem;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}.qe-pkg b{font-family:var(--f-head);font-size:1.05rem}
+.qe-prods{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+@media (max-width:1100px){.qe-prods{grid-template-columns:repeat(3,minmax(0,1fr))}}@media (max-width:640px){.qe-prods{grid-template-columns:repeat(2,minmax(0,1fr))}}@media (max-width:400px){.qe-prods{grid-template-columns:1fr}}
+.qe-prod{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;min-width:0}.qe-prod b{font-family:var(--f-head);word-break:break-word}.qe-prod span{font-size:.85rem;color:var(--ink2)}
+.qe-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}.qe-row>div{display:flex;flex-direction:column;gap:2px;padding:12px 16px}.qe-row>div+div{border-left:1px solid var(--line)}.qe-row span{font-size:.8rem;color:var(--mut)}.qe-row b{font-family:var(--f-head);font-size:1.05rem}
+.qe-row .qe-total{text-align:right;align-items:flex-end}.qe-row .qe-total b{color:var(--err);font-size:1.2rem}
+.qe-empty{padding:14px;border:1.5px dashed var(--line);border-radius:14px;text-align:center}
+.qe-sum .qe-sub b{color:var(--err)}.qe-sum .grand b{color:var(--blue2)}
+.opt{font-style:normal;color:var(--mut);font-weight:400}
+.qe-sum .grand{background:#eff6ff;border:1px solid #bfdbfe}.qe-sum .grand span,.qe-sum .grand b{color:var(--blue2)}.qe-sum .qe-sub{font-size:1rem}

@@ -8,7 +8,6 @@ import { ico, empty, loading } from "./ui.js";
 import { pdfAction, makePdf } from "./actions.js";
 import { deleteProject, confirmKey } from "./projects.js";
 import { bulkBarHtml, chkTh, chkTd, bulkController, limitRows } from "./bulk.js";
-import { sizesHtml, readSizes, diffSizes } from "../sizes.js";
 import { buildPdf } from "../pdf.js";
 
 export const METHODS = ["cash", "bank", "duitnow", "card", "ewallet", "other"];
@@ -93,7 +92,6 @@ export async function renderForm(el, ctx, params) {
     <div class="grid2"><label>${t("f_paystatus")}<select name="payStatus">${PAY.map((s) => `<option value="${s}" >${t("ps_" + s)}</option>`).join("")}</select></label>
     <label>${t("pdf_method")}<select name="method">${METHODS.map((m) => `<option value="${m}">${t("pm_" + m)}</option>`).join("")}</select></label></div>
     <label>${t("pdf_note")}<textarea name="note" maxlength="500" rows="2"></textarea></label>
-    ${sizesHtml({}, company, ["logo", "sig", "stamp"], true)}
     <p class="err" id="err" role="alert"></p><div class="form-f"><button class="btn ghost" type="button" id="prev">${ico("eye")}${t("preview_draft")}</button><button class="btn primary" type="submit">${t("receipt_save")}</button></div>` : empty("receipt", t("receipt_no_inv"), `<a class="btn primary" href="#/app/invoices/new">${t("invoice_new")}</a>`)}</form>`;
   const f = $("#f", el); if (!invs.length) return;
   const cur = () => invs.find((x) => x.id === f.invoice.value);
@@ -109,7 +107,7 @@ export async function renderForm(el, ctx, params) {
     const btn = e.currentTarget, inv = cur(); if (!inv) return; setBusy(btn, true);
     try {
       const c = calc(inv), amt = num(f.amount.value), paid = round2(c.paidReceipts + amt);
-      const doc = { number: "PRATONTON", date: f.date.value, amount: amt, method: f.method.value, note: f.note.value.trim(), invoiceId: inv.id, invoiceNumber: inv.number, customer: inv.customer || {}, customerName: (inv.customer && inv.customer.name) || "", invoiceTotal: c.total, paidToDate: paid, balanceAfter: round2(Math.max(c.total - paid, 0)), seq: (num(inv.receiptCount) || 0) + 1, payStatus: f.payStatus.value, template: inv.template, color: inv.color, imgScale: readSizes(f) };
+      const doc = { number: "PRATONTON", date: f.date.value, amount: amt, method: f.method.value, note: f.note.value.trim(), invoiceId: inv.id, invoiceNumber: inv.number, customer: inv.customer || {}, customerName: (inv.customer && inv.customer.name) || "", invoiceTotal: c.total, paidToDate: paid, balanceAfter: round2(Math.max(c.total - paid, 0)), seq: (num(inv.receiptCount) || 0) + 1, payStatus: f.payStatus.value, template: inv.template, color: inv.color, imgScale: {} };
       const pdf = await buildPdf("receipt", doc, company, { template: doc.template, color: doc.color }); window.open(URL.createObjectURL(pdf.output("blob")), "_blank");
     } catch (x) { console.error(x); toast(t("pdf_fail"), "err"); } setBusy(btn, false);
   };
@@ -119,7 +117,7 @@ export async function renderForm(el, ctx, params) {
     if (!inv) return (err.textContent = t("err_required")); if (amount <= 0 || amount > calc(inv).balance + 0.005) return (err.textContent = t("err_amount"));
     if (!f.date.value) return (err.textContent = t("err_required"));
     setBusy(btn, true);
-    try { const r = await recordPayment(ctx, inv, { amount, method: f.method.value, date: f.date.value, note: f.note.value.trim(), payStatus: f.payStatus.value, imgScale: diffSizes(f, company) }); toast(t("receipt_saved", { n: r.number })); ctx.nav("#/app/invoices/" + inv.id); }
+    try { const r = await recordPayment(ctx, inv, { amount, method: f.method.value, date: f.date.value, note: f.note.value.trim(), payStatus: f.payStatus.value }); toast(t("receipt_saved", { n: r.number })); ctx.nav("#/app/invoices/" + inv.id); }
     catch (x) { console.error(x); err.textContent = x.message === "amount" ? t("err_amount") : errMsg(x); setBusy(btn, false); }
   };
 }
@@ -138,16 +136,15 @@ export async function renderEdit(el, ctx, id) {
     <div class="grid2"><label>${t("f_paystatus")}<select name="payStatus">${PAY.map((s) => `<option value="${s}" ${s === payOf("receipt", r) ? "selected" : ""}>${t("ps_" + s)}</option>`).join("")}</select></label>
     <label>${t("pdf_method")}<select name="method">${METHODS.map((m) => `<option value="${m}" ${m === r.method ? "selected" : ""}>${t("pm_" + m)}</option>`).join("")}</select></label></div>
     <label>${t("pdf_note")}<textarea name="note" maxlength="500" rows="2">${esc(r.note)}</textarea></label>
-    ${sizesHtml(r.imgScale || {}, company, ["logo", "sig", "stamp"], true)}
     <p class="err" id="err" role="alert"></p><div class="form-f"><button class="btn ghost" type="button" id="prev">${ico("eye")}${t("preview_draft")}</button><button class="btn primary" type="submit">${t("save")}</button></div></form>`;
   const f = $("#f", el);
-  const draft = () => ({ ...r, amount: num(f.amount.value), date: f.date.value, method: f.method.value, payStatus: f.payStatus.value, note: f.note.value.trim(), imgScale: readSizes(f) });
+  const draft = () => ({ ...r, amount: num(f.amount.value), date: f.date.value, method: f.method.value, payStatus: f.payStatus.value, note: f.note.value.trim() });
   $("#prev", el).onclick = async (e) => { const btn = e.currentTarget; setBusy(btn, true); try { const pdf = await makePdf(ctx, "receipt", draft()); window.open(URL.createObjectURL(pdf.output("blob")), "_blank"); } catch (x) { console.error(x); toast(t("pdf_fail"), "err"); } setBusy(btn, false); };
   f.onsubmit = async (e) => {
     e.preventDefault(); const err = $("#err", el); err.textContent = ""; const btn = $("button[type=submit]", f); const d = draft();
     if (!(d.amount > 0) || (maxAmt != null && d.amount > maxAmt + 0.005)) return (err.textContent = t("err_amount")); if (!d.date) return (err.textContent = t("err_required"));
     setBusy(btn, true);
-    try { await updateReceipt(ctx, r, { amount: d.amount, date: d.date, method: d.method, note: d.note, payStatus: d.payStatus, imgScale: diffSizes(f, company) }); toast(t("receipt_updated")); ctx.nav("#/app/receipts"); }
+    try { await updateReceipt(ctx, r, { amount: d.amount, date: d.date, method: d.method, note: d.note, payStatus: d.payStatus }); toast(t("receipt_updated")); ctx.nav("#/app/receipts"); }
     catch (x) { console.error(x); err.textContent = x.message === "amount" ? t("err_amount") : errMsg(x); setBusy(btn, false); }
   };
 }

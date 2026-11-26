@@ -11,7 +11,6 @@ import { deleteProject, confirmKey } from "./projects.js";
 import { recordPayment, METHODS } from "./receipts.js";
 import { TEMPLATES } from "../pdf.js";
 import { bulkBarHtml, chkTh, chkTd, bulkController, limitRows } from "./bulk.js";
-import { sizesHtml, readSizes, diffSizes } from "../sizes.js";
 import { loadPackages, selHtml, bindSel, selToItems } from "./packages.js";
 
 const CFG = {
@@ -30,13 +29,13 @@ export async function renderList(el, ctx, type) {
     try { pkgs = (await loadPackages(ctx)).filter((p) => p.items.some((i) => i.name)); } catch (e) { console.warn("pakej", e); }
     const note = $("#qinote", el), box = $("#qpk", el); if (!note || !box) return;
     if (!pkgs.length) { note.innerHTML = `<p class="note-red qi-note">${t("qi_note_empty")} <a href="#/app/profile/quoteinfo">${t("qi_go")}</a></p>`; box.innerHTML = ""; return; }
-    note.innerHTML = ""; const sel = {}; const opts = { desc: t("qi_pick_list_d"), action: `<div class="inline-actions"><button type="button" class="btn accent" id="qsMake">${ico("plus")}${t("qi_make")}</button></div>` };
+    // Pilih pakej -> tanda produk -> tekan "Sebut Harga" dalam tetingkap -> terus ke borang sebut harga
+    note.innerHTML = ""; const sel = {}; const opts = { desc: t("qi_pick_list_d"), confirmLabel: t("qs_quote_btn") };
     box.innerHTML = selHtml(pkgs, sel, opts);
-    box.addEventListener("click", (e) => { if (!e.target.closest("#qsMake")) return; if (!selToItems(pkgs, sel).length) return toast(t("qi_none_sel"), "err"); try { sessionStorage.setItem("qp_sel", JSON.stringify(sel)); } catch { /* abaikan */ } ctx.nav(`#/app/${C.route}/new`); });
-    bindSel(box, pkgs, sel, () => {}, opts);
+    bindSel(box, pkgs, sel, () => { try { sessionStorage.setItem("qp_sel", JSON.stringify(sel)); } catch { /* abaikan */ } ctx.nav(`#/app/${C.route}/new`); }, opts);
   };
   const mount = () => {
-    el.innerHTML = `<div class="page-h"><div><h1>${t("nav_" + C.route)}</h1><p class="sub">${t(type + "_sub")}</p><div id="qinote"></div></div><a class="btn primary" href="#/app/${C.route}/new">${ico("plus")}${t(type + "_new")}</a></div>
+    el.innerHTML = `<div class="page-h"><div><h1>${t("nav_" + C.route)}</h1><p class="sub">${t(type + "_sub")}</p><div id="qinote"></div></div>${type === "quotation" ? "" : `<a class="btn primary" href="#/app/${C.route}/new">${ico("plus")}${t(type + "_new")}</a>`}</div>
     <div id="qpk"></div><div class="card"><div class="toolbar"><div class="search">${ico("search")}<input id="q" type="search" placeholder="${esc(t("search_ph"))}" aria-label="${esc(t("search_ph"))}"></div>
     <select id="sf" aria-label="${esc(t("f_status"))}"><option value="">${t("all_status")}</option>${C.filter.map((s) => `<option value="${s}">${t((type === "invoice" && !["draft", "cancelled"].includes(s) ? "ps_" : "st_") + s)}</option>`).join("")}</select></div>${bulkBarHtml()}<div id="tbl" class="scrollbox"></div></div>`;
     bulk = bulkController(ctx, el, () => shown.map((r) => ({ k: type, id: r.id, doc: r })), () => rows.map((r) => ({ k: type, id: r.id, doc: r })));
@@ -48,7 +47,7 @@ export async function renderList(el, ctx, type) {
         <td data-l="${t("col_docno")}"><a href="#/app/${C.route}/${r.id}"><b>${esc(r.number)}</b></a></td><td data-l="${t("col_customer")}">${esc((r.customer && r.customer.name) || "-")}</td>
         <td class="nw" data-l="${t("col_date")}">${fmtDate(r.date, getLang())}</td><td class="nw" data-l="${t(type === "invoice" ? "col_due" : "col_valid")}">${fmtDate(dueOf(type, r), getLang())}</td>
         <td class="r" data-l="${t("col_total")}"><b>${money(calc(r).total)}</b></td><td data-l="${t("f_status")}">${type === "invoice" && !["draft", "cancelled"].includes(r.status) ? `<span class="badge b-${C.eff(r)}">${esc(t("ps_" + C.eff(r)))}</span>` : badge(C.eff(r))}</td>
-        <td class="acts"><a class="icon-btn" href="#/app/${C.route}/${r.id}/edit" aria-label="${t("act_edit")}" title="${t("act_edit")}">${ico("edit")}</a><a class="icon-btn" href="#/app/${C.route}/${r.id}" aria-label="${t("act_view")}" title="${t("act_view")}">${ico("eye")}</a><button class="icon-btn" data-a="download" data-id="${r.id}" aria-label="${t("act_download")}" title="${t("act_download")}">${ico("download")}</button><button class="icon-btn" data-a="dup" data-id="${r.id}" aria-label="${t("act_duplicate")}" title="${t("act_duplicate")}">${ico("copy")}</button></td></tr>`).join("")}</tbody></table>` : empty(type === "invoice" ? "doc" : "quote", t(type + "_empty"), `<a class="btn primary" href="#/app/${C.route}/new">${t(type + "_new")}</a>`);
+        <td class="acts"><a class="icon-btn" href="#/app/${C.route}/${r.id}/edit" aria-label="${t("act_edit")}" title="${t("act_edit")}">${ico("edit")}</a><a class="icon-btn" href="#/app/${C.route}/${r.id}" aria-label="${t("act_view")}" title="${t("act_view")}">${ico("eye")}</a><button class="icon-btn" data-a="download" data-id="${r.id}" aria-label="${t("act_download")}" title="${t("act_download")}">${ico("download")}</button><button class="icon-btn" data-a="dup" data-id="${r.id}" aria-label="${t("act_duplicate")}" title="${t("act_duplicate")}">${ico("copy")}</button></td></tr>`).join("")}</tbody></table>` : (type === "quotation" ? empty("quote", t("quotation_empty_pick")) : empty("doc", t(type + "_empty"), `<a class="btn primary" href="#/app/${C.route}/new">${t(type + "_new")}</a>`));
       limitRows($("#tbl", el)); bulk.sync();
     };
     draw(); $("#q", el).oninput = debounce(() => draw(), 150); $("#sf", el).onchange = () => draw();
@@ -61,7 +60,7 @@ export async function renderList(el, ctx, type) {
   ctx.live(listLive(ctx.uid, C.col, (r) => { rows = r; if (!mounted) { mounted = true; mount(); showPackages(); } else draw(); }, (e) => { if (!mounted) el.innerHTML = `<p class="err">${esc(errMsg(e))}</p>`; }));
 }
 
-async function numberFmt(ctx, type) { const s = await ctx.getSettings(); return (s.numberFormat && s.numberFormat[type]) || CFG[type].fmt; }
+export async function numberFmt(ctx, type) { const s = await ctx.getSettings(); return (s.numberFormat && s.numberFormat[type]) || CFG[type].fmt; }
 
 export async function duplicate(ctx, type, src) {
   const today = todayMY(); const { id, number, createdAt, updatedAt, ownerUid, status, receiptsPaid, receiptCount, convertedInvoiceId, convertedInvoiceNumber, fromQuotationId, fromQuotationNumber, ...rest } = src;
@@ -72,6 +71,7 @@ export async function duplicate(ctx, type, src) {
 
 // ------------------------------------------------------------------ BORANG
 export async function renderEditor(el, ctx, type, id) {
+  if (type === "quotation") return (await import("./quote-editor.js")).render(el, ctx, id, numberFmt); // borang sebut harga ringkas
   const C = CFG[type]; el.innerHTML = loading();
   let doc, customers, products, company;
   try {
@@ -116,7 +116,7 @@ export async function renderEditor(el, ctx, type, id) {
     <div id="items" class="items"></div></section>
    <section class="card form"><div class="grid2">
     <div class="form"><label>${t("pdf_note")}<textarea name="note" rows="3" maxlength="1000">${esc(d.note)}</textarea></label><label>${t("pdf_terms")}<textarea name="terms" rows="4" maxlength="2000">${esc(d.terms)}</textarea></label>
-     ${pickerHtml(d.template, d.color)}${sizesHtml(d.imgScale || {}, company, ["logo", "qr", "sig", "stamp"])}</div>
+     ${pickerHtml(d.template, d.color)}</div>
     <div class="form sum"><div class="grid3"><label>${t("f_docdisc_pct")}<input name="docDiscountPct" type="number" min="0" max="100" step="0.01" inputmode="decimal" value="${num(d.docDiscountPct) || ""}" placeholder="0"></label><label>${t("f_docdisc")} (RM)<input name="docDiscount" type="number" min="0" step="0.01" inputmode="decimal" value="${num(d.docDiscount)}"></label><label>${t("f_tax")} (%)<input name="taxRate" type="number" min="0" max="100" step="0.01" value="${num(d.taxRate)}"></label></div>
      <div id="sum" class="totals" aria-live="polite"></div></div></div></section>
    <p class="err" id="err" role="alert"></p>
@@ -151,7 +151,7 @@ export async function renderEditor(el, ctx, type, id) {
     const btn = e.currentTarget; setBusy(btn, true); const dn = docNow();
     try {
       const docObj = { number: doc ? doc.number : "PRATONTON", date: f.date.value, status: f.status.value, customer: { name: f.cname.value.trim() || "-", company: f.ccompany.value.trim(), address: f.caddress.value.trim(), phone: f.cphone.value.trim(), email: cust.email || "", regNo: f.cregNo.value.trim() },
-        items: items.filter((i) => i.name.trim()), docDiscount: dn.docDiscount, taxRate: dn.taxRate, taxName: d.taxName || "SST", deposit: 0, receiptsPaid: d.receiptsPaid || 0, receiptCount: d.receiptCount || 0, payStatus: f.payStatus.value, note: f.note.value.trim(), terms: f.terms.value.trim(), template: f.template.value, color: f.color.value, imgScale: readSizes(f),
+        items: items.filter((i) => i.name.trim()), docDiscount: dn.docDiscount, taxRate: dn.taxRate, taxName: d.taxName || "SST", deposit: 0, receiptsPaid: d.receiptsPaid || 0, receiptCount: d.receiptCount || 0, payStatus: f.payStatus.value, note: f.note.value.trim(), terms: f.terms.value.trim(), template: f.template.value, color: f.color.value, imgScale: d.imgScale || {},
         ...autoDue() };
       const pdf = await makePdf(ctx, type, docObj); window.open(URL.createObjectURL(pdf.output("blob")), "_blank");
     } catch (x) { console.error(x); toast(t("pdf_fail"), "err"); } setBusy(btn, false);
@@ -189,7 +189,7 @@ export async function renderEditor(el, ctx, type, id) {
       }
       const data = { date: f.date.value, status: f.status.value, customerId: customerId || "", customer, items: valid.map((i) => ({ name: i.name.trim(), desc: (i.desc || "").trim(), qty: i.qty, price: i.price, discount: i.discount, ...(i.productId ? { productId: i.productId } : {}), ...(i.pkg ? { pkg: i.pkg } : {}) })),
         pkgSel: sel, pkgNames: pkgs.filter((p) => sel[p.id] && sel[p.id].length).map((p) => p.name),
-        docDiscount: dn.docDiscount, docDiscountPct: f.docDiscountPct.value ? Math.min(Math.max(num(f.docDiscountPct.value), 0), 100) : 0, taxRate: dn.taxRate, taxName: d.taxName || "SST", note: f.note.value.trim(), terms: f.terms.value.trim(), template: f.template.value, color: f.color.value, imgScale: diffSizes(f, company),
+        docDiscount: dn.docDiscount, docDiscountPct: f.docDiscountPct.value ? Math.min(Math.max(num(f.docDiscountPct.value), 0), 100) : 0, taxRate: dn.taxRate, taxName: d.taxName || "SST", note: f.note.value.trim(), terms: f.terms.value.trim(), template: f.template.value, color: f.color.value, imgScale: d.imgScale || {},
         ...autoDue(), ...(type === "invoice" ? { deposit: 0, receiptsPaid: d.receiptsPaid || 0, receiptCount: d.receiptCount || 0 } : {}) };
       // Status bayaran: invois simpan pilihan hanya jika berbeza daripada status automatik (supaya "Tertunggak"/"Selesai" automatik terus berfungsi)
       data.payStatus = type === "invoice" ? (f.payStatus.value === payAutoInvoice({ ...data, payStatus: "" }) ? "" : f.payStatus.value) : f.payStatus.value;
