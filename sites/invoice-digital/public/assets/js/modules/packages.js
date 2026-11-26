@@ -119,20 +119,35 @@ export async function render(el, ctx) {
   paint();
 }
 
-// ---- Pemilih dalam borang/senarai sebut harga: tanda produk yang dipilih pelanggan
-export function pickerHtml(pkgs, btnLabel = t("qi_insert"), desc = t("qi_pick_d")) {
-  return `<section class="card form qpick"><h2>${t("qi_pick")}</h2><p class="muted">${desc}</p>
-    ${pkgs.map((p, pi) => `<details class="qp-pkg" ${pi === 0 ? "open" : ""}><summary><b>${esc(p.name)}</b><span class="qp-sum">${money(sum(p.items))}</span></summary>
-      <label class="chk qp-all"><input type="checkbox" data-qall="${pi}"> ${t("qi_all")}</label>
-      <ul class="qp-list">${p.items.map((i, ii) => `<li><label class="chk"><input type="checkbox" data-qi="${pi}:${ii}"><span class="qp-name">${esc(i.name)}</span><span class="qp-price">${money(i.price)}</span></label></li>`).join("")}</ul></details>`).join("")}
-    <div class="inline-actions"><button type="button" class="btn accent" id="qpIns">${ico("plus")}${btnLabel}</button></div></section>`;
+// ---- Pemilih pakej (borang sebut harga/invois & senarai sebut harga)
+// Kotak pakej tersusun kiri ke kanan (5 sebaris di skrin besar, seterusnya turun ke baris bawah; tiada scroll).
+// Klik "Pilih Pakej" -> senarai produk pakej itu muncul (semua ditanda) -> nyahtanda produk yang tidak mahu.
+// sel = { [pakejId]: [indeks produk dipilih] }
+export const selTotal = (p, idx) => idx.reduce((s, k) => s + num(p.items[k] && p.items[k].price), 0);
+export function selToItems(pkgs, sel) {
+  const out = []; pkgs.forEach((p) => (sel[p.id] || []).forEach((k) => { const i = p.items[k]; if (i) out.push({ name: i.name, desc: "", qty: 1, price: num(i.price), discount: 0, pkg: p.id }); })); return out;
 }
-export function bindPicker(root, pkgs, onInsert) {
-  root.querySelectorAll("[data-qall]").forEach((a) => (a.onchange = () => root.querySelectorAll(`[data-qi^="${a.dataset.qall}:"]`).forEach((c) => (c.checked = a.checked))));
-  const ins = root.querySelector("#qpIns"); if (!ins) return;
-  ins.onclick = () => {
-    const picked = [...root.querySelectorAll("[data-qi]:checked")].map((c) => { const [pi, ii] = c.dataset.qi.split(":").map(Number); const i = pkgs[pi].items[ii]; return { name: i.name, desc: "", qty: 1, price: num(i.price), discount: 0 }; });
-    if (!picked.length) return toast(t("qi_none_sel"), "err");
-    if (onInsert(picked) === false) return; root.querySelectorAll("[data-qi]:checked, [data-qall]:checked").forEach((c) => (c.checked = false)); toast(t("qi_added", { n: picked.length }));
-  };
+export function selHtml(pkgs, sel, { title = t("qs_title"), desc = t("qs_desc"), action = "" } = {}) {
+  return `<section class="card form qsel"><h2>${title}</h2><p class="muted">${desc}</p><div class="qs-grid">${pkgs.map((p) => {
+    const on = Array.isArray(sel[p.id]); const idx = on ? sel[p.id] : [];
+    return `<div class="qs-box ${on ? "on" : ""}" data-pk="${esc(p.id)}"><div class="qs-top"><b class="qs-name">${esc(p.name)}</b><span class="qs-full">${t("qs_pkg_price")}: <b>${money(sum(p.items))}</b></span></div>
+      <button type="button" class="btn ${on ? "primary" : "ghost"} sm qs-btn" data-pick="${esc(p.id)}" aria-pressed="${on}">${on ? ico("check") + t("qs_picked") : ico("plus") + t("qs_pick_pkg")}</button>
+      ${on ? `<ul class="qs-list">${p.items.map((i, k) => `<li><label class="chk"><input type="checkbox" data-pi="${esc(p.id)}:${k}" ${idx.includes(k) ? "checked" : ""}><span class="qs-in">${esc(i.name)}</span><b>${money(i.price)}</b></label></li>`).join("")}</ul>
+      <div class="qs-tot">${t("qs_sel_total")}: <b>${money(selTotal(p, idx))}</b></div>` : `<span class="qs-cnt">${t("qi_n_products", { n: p.items.length })}</span>`}</div>`;
+  }).join("")}</div>${action}</section>`;
+}
+// Ikat pada kotak; setiap perubahan memanggil onChange(sel) dan melukis semula kotak
+export function bindSel(root, pkgs, sel, onChange, opts) {
+  const box = root.querySelector(".qsel"); if (!box) return;
+  const redraw = () => { const tmp = document.createElement("div"); tmp.innerHTML = selHtml(pkgs, sel, opts); box.replaceWith(tmp.firstElementChild); bindSel(root, pkgs, sel, onChange, opts); };
+  box.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-pick]"); if (!b) return; const id = b.dataset.pick, p = pkgs.find((x) => x.id === id); if (!p) return;
+    if (Array.isArray(sel[id])) delete sel[id]; else sel[id] = p.items.map((_, k) => k);
+    onChange(sel); redraw();
+  });
+  box.addEventListener("change", (e) => {
+    const c = e.target.closest("[data-pi]"); if (!c) return; const [id, k] = [c.dataset.pi.slice(0, c.dataset.pi.lastIndexOf(":")), +c.dataset.pi.slice(c.dataset.pi.lastIndexOf(":") + 1)];
+    const arr = new Set(sel[id] || []); c.checked ? arr.add(k) : arr.delete(k); sel[id] = [...arr].sort((a, b) => a - b);
+    onChange(sel); const p = pkgs.find((x) => x.id === id); const card = c.closest(".qs-box"); card.querySelector(".qs-tot b").textContent = money(selTotal(p, sel[id]));
+  });
 }

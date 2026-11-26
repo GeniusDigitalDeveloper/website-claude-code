@@ -12,7 +12,7 @@ import { recordPayment, METHODS } from "./receipts.js";
 import { TEMPLATES } from "../pdf.js";
 import { bulkBarHtml, chkTh, chkTd, bulkController, limitRows } from "./bulk.js";
 import { sizesHtml, readSizes, diffSizes } from "../sizes.js";
-import { loadPackages, pickerHtml as qpHtml, bindPicker as qpBind } from "./packages.js";
+import { loadPackages, selHtml, bindSel, selToItems } from "./packages.js";
 
 const CFG = {
   invoice: { col: "invoices", route: "invoices", fmt: "INV-{YYYY}-{NNNN}", statuses: ["draft", "sent", "unpaid", "partial", "paid", "cancelled"], eff: (r) => (["draft", "cancelled"].includes(r.status) ? r.status : payOf("invoice", r)), filter: ["draft", "unpaid", "deposit", "partial", "paid", "overdue", "cancelled"] },
@@ -30,8 +30,10 @@ export async function renderList(el, ctx, type) {
     try { pkgs = (await loadPackages(ctx)).filter((p) => p.items.some((i) => i.name)); } catch (e) { console.warn("pakej", e); }
     const note = $("#qinote", el), box = $("#qpk", el); if (!note || !box) return;
     if (!pkgs.length) { note.innerHTML = `<p class="note-red qi-note">${t("qi_note_empty")} <a href="#/app/profile/quoteinfo">${t("qi_go")}</a></p>`; box.innerHTML = ""; return; }
-    note.innerHTML = ""; box.innerHTML = qpHtml(pkgs, t("qi_make"), t("qi_pick_list_d"));
-    qpBind(box, pkgs, (picked) => { try { sessionStorage.setItem("qp_pick", JSON.stringify(picked)); } catch { /* abaikan */ } ctx.nav(`#/app/${C.route}/new`); return false; });
+    note.innerHTML = ""; const sel = {}; const opts = { desc: t("qi_pick_list_d"), action: `<div class="inline-actions"><button type="button" class="btn accent" id="qsMake">${ico("plus")}${t("qi_make")}</button></div>` };
+    box.innerHTML = selHtml(pkgs, sel, opts);
+    box.addEventListener("click", (e) => { if (!e.target.closest("#qsMake")) return; if (!selToItems(pkgs, sel).length) return toast(t("qi_none_sel"), "err"); try { sessionStorage.setItem("qp_sel", JSON.stringify(sel)); } catch { /* abaikan */ } ctx.nav(`#/app/${C.route}/new`); });
+    bindSel(box, pkgs, sel, () => {}, opts);
   };
   const mount = () => {
     el.innerHTML = `<div class="page-h"><div><h1>${t("nav_" + C.route)}</h1><p class="sub">${t(type + "_sub")}</p><div id="qinote"></div></div><a class="btn primary" href="#/app/${C.route}/new">${ico("plus")}${t(type + "_new")}</a></div>
@@ -78,7 +80,7 @@ export async function renderEditor(el, ctx, type, id) {
   } catch (e) { el.innerHTML = `<p class="err">${esc(errMsg(e))}</p>`; return; }
   // Sebut harga: produk dipilih daripada Profil → Maklumat Sebut Harga (pakej). Mesti diisi dahulu sebelum sebut harga baharu.
   let pkgs = [];
-  if (type === "quotation") { try { pkgs = (await loadPackages(ctx)).filter((p) => p.items.some((i) => i.name)); } catch (e) { console.warn("pakej", e); } }
+  { try { pkgs = (await loadPackages(ctx)).filter((p) => p.items.some((i) => i.name)); } catch (e) { console.warn("pakej", e); } }
   if (type === "quotation" && !doc && !pkgs.length) {
     el.innerHTML = `<div class="page-h"><div><h1>${t("quotation_new")}</h1></div><a class="btn ghost" href="#/app/${C.route}">${t("back")}</a></div>${empty("quote", t("qi_need"), `<p class="muted">${t("qi_need_d")}</p><a class="btn primary" href="#/app/profile/quoteinfo">${ico("quote")}${t("qi_go")}</a>`)}`;
     return;
@@ -89,24 +91,25 @@ export async function renderEditor(el, ctx, type, id) {
     customer: {}, ...(type === "invoice" ? { dueDate: addDays(today, 14) } : { validUntil: addDays(today, 30) }) };
   if (!doc) { const pc = new URLSearchParams(location.hash.split("?")[1] || "").get("customer"); const c = customers.find((x) => x.id === pc); if (c) { d.customerId = c.id; d.customer = custSnap(c); } }
   let items = d.items.map((i) => ({ ...i }));
+  const sel = d.pkgSel && typeof d.pkgSel === "object" ? JSON.parse(JSON.stringify(d.pkgSel)) : {};
+  if (!doc) { try { const pre = JSON.parse(sessionStorage.getItem("qp_sel") || "null"); sessionStorage.removeItem("qp_sel"); if (pre && typeof pre === "object") { Object.assign(sel, pre); items = []; } } catch { /* abaikan */ } }
+  Object.keys(sel).forEach((k) => { if (!pkgs.some((p) => p.id === k)) delete sel[k]; });
   const cust = d.customer || {};
   el.innerHTML = `<div class="page-h"><div><h1>${doc ? esc(doc.number) : t(type + "_new")}</h1><p class="sub">${doc ? t("edit") : t("new")}</p></div><a class="btn ghost" href="#/app/${C.route}${doc ? "/" + id : ""}">${t("back")}</a></div>
   <form id="f" class="doc-form" novalidate>
    <section class="card form"><h2>${t("sec_customer")}</h2>
-    <label>${t("pick_customer")}<select name="customerId"><option value="">${t("customer_new_inline")}</option>${customers.map((c) => `<option value="${c.id}" ${c.id === d.customerId ? "selected" : ""}>${esc(c.name)}${c.company ? " — " + esc(c.company) : ""}</option>`).join("")}</select></label>
-    <div class="grid2"><label>${t("f_name")} *<input name="cname" maxlength="120" value="${esc(cust.name)}" required></label><label>${t("f_company")}<input name="ccompany" maxlength="120" value="${esc(cust.company)}"></label></div>
-    <label>${t("f_address")}<textarea name="caddress" rows="2" maxlength="300">${esc(cust.address)}</textarea></label>
-    <div class="grid3"><label>${t("f_phone")}<input name="cphone" maxlength="30" value="${esc(cust.phone)}" inputmode="tel"></label><label>${t("f_email")}<input name="cemail" type="email" maxlength="120" value="${esc(cust.email)}"></label><label>${t("f_regno")}<input name="cregNo" maxlength="40" value="${esc(cust.regNo)}"></label></div>
+    <label><span class="lt">${t("f_name")} <span class="req">*</span></span><input name="cname" maxlength="120" value="${esc(cust.name)}" required autocomplete="name"></label>
+    <label><span class="lt">${t("f_address")} <span class="req">*</span></span><textarea name="caddress" rows="2" maxlength="300" required>${esc(cust.address)}</textarea></label>
+    <div class="grid3"><label><span class="lt">${t("f_phone")} <span class="req">*</span></span><input name="cphone" maxlength="30" value="${esc(cust.phone)}" inputmode="tel" required autocomplete="tel"></label>
+     <label>${t("f_company_opt")}<input name="ccompany" maxlength="120" value="${esc(cust.company)}"></label>
+     <label><span class="lt">${t("f_regno")} <span class="req" id="regReq" ${cust.company ? "" : "hidden"}>*</span></span><input name="cregNo" maxlength="40" value="${esc(cust.regNo)}"></label></div>
     <label class="chk ${d.customerId ? "hide" : ""}" id="saveCustW"><input type="checkbox" name="saveCust" checked> ${t("save_customer")}</label>
    </section>
-   ${pkgs.length ? qpHtml(pkgs) : ""}
+   ${pkgs.length ? selHtml(pkgs, sel) : ""}
    <section class="card form"><h2>${t("sec_details")}</h2>
-    <div class="logo-inline"><div class="lp" id="lgp">${company.logo ? `<img alt="Logo" src="${esc(company.logo)}">` : t("no_logo")}</div><div><b>${t("logo_in_doc")}</b><br><label class="btn ghost sm file">${t("upload_logo")}<input type="file" id="lgf" accept="image/png,image/jpeg,image/webp" hidden></label></div></div>
     <div class="grid3"><label>${t("f_date")}<input name="date" type="date" value="${esc(d.date)}" required></label>
-    <label>${t(type === "invoice" ? "f_due" : "f_valid")}<input name="due" type="date" value="${esc(dueOf(type, d))}" required></label>
     <label>${t("f_status")}<select name="status">${C.statuses.map((s) => `<option value="${s}" ${s === d.status ? "selected" : ""} ${type === "quotation" && s === "converted" && !d.convertedInvoiceId ? "disabled" : ""}>${t("st_" + s)}</option>`).join("")}</select></label>
     <label>${t("f_paystatus")}<select name="payStatus">${PAY.map((s) => `<option value="${s}" ${s === payOf(type, d) ? "selected" : ""}>${t("ps_" + s)}</option>`).join("")}</select></label></div>
-    <p class="muted">${t("paystatus_hint")}</p>
    </section>
    <section class="card form"><div class="row-between"><h2>${t("sec_items")}</h2><div class="inline-actions"><select id="pickProd" aria-label="${esc(t("pick_product"))}"><option value="">${t("pick_product")}</option>${products.map((p) => `<option value="${p.id}">${esc(p.name)} — ${money(p.price)}</option>`).join("")}</select><button type="button" class="btn ghost" id="addItem">${ico("plus")}${t("add_item")}</button></div></div>
     <div id="items" class="items"></div></section>
@@ -131,23 +134,24 @@ export async function renderEditor(el, ctx, type, id) {
       <div class="item-nums"><label>${t("pdf_qty")}<input data-k="qty" type="number" min="0" step="any" value="${num(i.qty)}"></label><label>${t("pdf_price")}<input data-k="price" type="number" min="0" step="0.01" value="${num(i.price)}"></label><label>${t("pdf_disc")} %<input data-k="discount" type="number" min="0" max="100" step="0.01" value="${num(i.discount)}"></label><div class="amt-w"><span>${t("pdf_amount")}</span><b class="amt"></b></div><button type="button" class="icon-btn danger" data-del="${k}" aria-label="${t("delete")}">${ico("trash")}</button></div></div>`).join("");
     syncPct(); drawSum();
   };
-  if (type === "quotation" && !doc) { // produk yang ditanda di halaman senarai Sebut Harga
-    try { const pre = JSON.parse(sessionStorage.getItem("qp_pick") || "null"); sessionStorage.removeItem("qp_pick"); if (Array.isArray(pre) && pre.length) items = pre.map((i) => ({ name: String(i.name || ""), desc: String(i.desc || ""), qty: num(i.qty) || 1, price: num(i.price), discount: num(i.discount) })); } catch { /* abaikan */ }
-  }
-  drawItems(); bindPicker(el);
-  if (pkgs.length) qpBind(el, pkgs, (picked) => { readItems(); items = items.filter((i) => i.name.trim() || num(i.price)); items.push(...picked); drawItems(); });
-  $("#lgf", el).onchange = async (e) => {
-    const file = e.target.files[0]; if (!file) return;
-    try { const logo = await fitImage(file, 360, 110000);
-      await ctx.saveCompany({ logo }); company = await ctx.getCompany(); $("#lgp", el).innerHTML = `<img alt="Logo" src="${esc(company.logo)}">`; toast(t("saved")); }
-    catch (x) { console.error(x); toast(t("err_file"), "err"); }
+  // Item daripada pakej dijana semula setiap kali pilihan berubah (kuantiti/diskaun yang diubah dikekalkan); item tambahan sendiri tidak disentuh.
+  const syncSel = () => {
+    readItems(); const keep = new Map(items.filter((i) => i.pkg).map((i) => [i.pkg + "|" + i.name, i]));
+    const fromPkg = selToItems(pkgs, sel).map((n) => { const o = keep.get(n.pkg + "|" + n.name); return o ? { ...n, qty: o.qty, discount: o.discount, desc: o.desc || "" } : n; });
+    const manual = items.filter((i) => !i.pkg && (i.name.trim() || num(i.price)));
+    items = [...fromPkg, ...manual]; if (!items.length) items.push({ name: "", desc: "", qty: 1, price: 0, discount: 0 }); drawItems();
   };
+  if (!doc && Object.keys(sel).length) items = [];
+  if (!items.length) items = selToItems(pkgs, sel); if (!items.length) items.push({ name: "", desc: "", qty: 1, price: 0, discount: 0 });
+  drawItems(); bindPicker(el);
+  if (pkgs.length) bindSel(el, pkgs, sel, syncSel);
+  f.ccompany.addEventListener("input", () => ($("#regReq", el).hidden = !f.ccompany.value.trim()));
   $("#prev", el).onclick = async (e) => {
     const btn = e.currentTarget; setBusy(btn, true); const dn = docNow();
     try {
-      const docObj = { number: doc ? doc.number : "PRATONTON", date: f.date.value, status: f.status.value, customer: { name: f.cname.value.trim() || "-", company: f.ccompany.value.trim(), address: f.caddress.value.trim(), phone: f.cphone.value.trim(), email: f.cemail.value.trim(), regNo: f.cregNo.value.trim() },
+      const docObj = { number: doc ? doc.number : "PRATONTON", date: f.date.value, status: f.status.value, customer: { name: f.cname.value.trim() || "-", company: f.ccompany.value.trim(), address: f.caddress.value.trim(), phone: f.cphone.value.trim(), email: cust.email || "", regNo: f.cregNo.value.trim() },
         items: items.filter((i) => i.name.trim()), docDiscount: dn.docDiscount, taxRate: dn.taxRate, taxName: d.taxName || "SST", deposit: 0, receiptsPaid: d.receiptsPaid || 0, receiptCount: d.receiptCount || 0, payStatus: f.payStatus.value, note: f.note.value.trim(), terms: f.terms.value.trim(), template: f.template.value, color: f.color.value, imgScale: readSizes(f),
-        ...(type === "invoice" ? { dueDate: f.due.value } : { validUntil: f.due.value }) };
+        ...autoDue() };
       const pdf = await makePdf(ctx, type, docObj); window.open(URL.createObjectURL(pdf.output("blob")), "_blank");
     } catch (x) { console.error(x); toast(t("pdf_fail"), "err"); } setBusy(btn, false);
   };
@@ -159,26 +163,33 @@ export async function renderEditor(el, ctx, type, id) {
   itemsEl.onclick = (e) => { const b = e.target.closest("[data-del]"); if (!b) return; readItems(); items.splice(+b.dataset.del, 1); if (!items.length) items.push({ name: "", desc: "", qty: 1, price: 0, discount: 0 }); drawItems(); };
   $("#addItem", el).onclick = () => { readItems(); items.push({ name: "", desc: "", qty: 1, price: 0, discount: 0 }); drawItems(); itemsEl.querySelector(".item:last-child input").focus(); };
   $("#pickProd", el).onchange = (e) => { const p = products.find((x) => x.id === e.target.value); if (!p) return; readItems(); const blank = items.length === 1 && !items[0].name && !num(items[0].price); const row = { name: p.name, desc: p.description || "", qty: 1, price: num(p.price), discount: 0, productId: p.id }; blank ? (items = [row]) : items.push(row); e.target.value = ""; drawItems(); };
-  f.customerId.onchange = () => { const c = customers.find((x) => x.id === f.customerId.value); $("#saveCustW", el).classList.toggle("hide", !!c); if (c) { const s = custSnap(c); f.cname.value = s.name; f.ccompany.value = s.company; f.caddress.value = s.address; f.cphone.value = s.phone; f.cemail.value = s.email; f.cregNo.value = s.regNo; } };
-  f.date.onchange = () => { if (!doc) f.due.value = addDays(f.date.value, type === "invoice" ? 14 : 30); };
+  // Tarikh akhir bayaran / sah sehingga: automatik (invois +14 hari, sebut harga +30 hari); dokumen lama kekal jika masih selepas tarikh dokumen
+  const autoDue = () => { const dt = f.date.value || today, old = doc && dueOf(type, doc); const v = old && old >= dt ? old : addDays(dt, type === "invoice" ? 14 : 30); return type === "invoice" ? { dueDate: v } : { validUntil: v }; };
 
   f.onsubmit = async (e) => {
     e.preventDefault(); const err = $("#err", el); err.textContent = ""; const btn = $("button[type=submit]", f); const dn = docNow();
     const valid = items.filter((i) => i.name.trim());
     if (!f.cname.value.trim()) return fail(t("err_cust"), f.cname);
-    if (!f.date.value || !f.due.value) return fail(t("err_required"));
-    if (f.due.value < f.date.value) return fail(t("err_dates"));
+    if (!f.caddress.value.trim()) return fail(t("err_cust_addr"), f.caddress);
+    if (!f.cphone.value.trim()) return fail(t("err_cust_phone"), f.cphone);
+    if (f.ccompany.value.trim() && !f.cregNo.value.trim()) return fail(t("err_cust_reg"), f.cregNo);
+    if (!f.date.value) return fail(t("err_required"), f.date);
     if (!valid.length) return fail(t("err_items"));
     if (valid.some((i) => i.qty <= 0 || i.price < 0 || i.qty > 1e7 || i.price > 1e9 || i.discount < 0 || i.discount > 100)) return fail(t("err_num"));
     if (valid.length > 150) return fail(t("err_num"));
     function fail(m, node) { err.textContent = m; node && node.focus(); return false; }
     setBusy(btn, true);
     try {
-      let customerId = f.customerId.value; const customer = { name: f.cname.value.trim(), company: f.ccompany.value.trim(), address: f.caddress.value.trim(), phone: f.cphone.value.trim(), email: f.cemail.value.trim(), regNo: f.cregNo.value.trim() };
-      if (!customerId && f.saveCust.checked) customerId = await create(ctx.uid, "customers", { ...customer, notes: "" });
-      const data = { date: f.date.value, status: f.status.value, customerId: customerId || "", customer, items: valid.map((i) => ({ name: i.name.trim(), desc: (i.desc || "").trim(), qty: i.qty, price: i.price, discount: i.discount, ...(i.productId ? { productId: i.productId } : {}) })),
+      const customer = { name: f.cname.value.trim(), company: f.ccompany.value.trim(), address: f.caddress.value.trim(), phone: f.cphone.value.trim(), email: cust.email || "", regNo: f.cregNo.value.trim() };
+      let customerId = d.customerId || "";
+      if (!customerId && f.saveCust.checked) { // guna semula pelanggan sedia ada (nama + telefon sama), elak pendua
+        const same = customers.find((c) => (c.name || "").trim().toLowerCase() === customer.name.toLowerCase() && (c.phone || "").replace(/\D/g, "") === customer.phone.replace(/\D/g, ""));
+        customerId = same ? same.id : await create(ctx.uid, "customers", { ...customer, notes: "" });
+      }
+      const data = { date: f.date.value, status: f.status.value, customerId: customerId || "", customer, items: valid.map((i) => ({ name: i.name.trim(), desc: (i.desc || "").trim(), qty: i.qty, price: i.price, discount: i.discount, ...(i.productId ? { productId: i.productId } : {}), ...(i.pkg ? { pkg: i.pkg } : {}) })),
+        pkgSel: sel, pkgNames: pkgs.filter((p) => sel[p.id] && sel[p.id].length).map((p) => p.name),
         docDiscount: dn.docDiscount, docDiscountPct: f.docDiscountPct.value ? Math.min(Math.max(num(f.docDiscountPct.value), 0), 100) : 0, taxRate: dn.taxRate, taxName: d.taxName || "SST", note: f.note.value.trim(), terms: f.terms.value.trim(), template: f.template.value, color: f.color.value, imgScale: diffSizes(f, company),
-        ...(type === "invoice" ? { dueDate: f.due.value, deposit: 0, receiptsPaid: d.receiptsPaid || 0, receiptCount: d.receiptCount || 0 } : { validUntil: f.due.value }) };
+        ...autoDue(), ...(type === "invoice" ? { deposit: 0, receiptsPaid: d.receiptsPaid || 0, receiptCount: d.receiptCount || 0 } : {}) };
       // Status bayaran: invois simpan pilihan hanya jika berbeza daripada status automatik (supaya "Tertunggak"/"Selesai" automatik terus berfungsi)
       data.payStatus = type === "invoice" ? (f.payStatus.value === payAutoInvoice({ ...data, payStatus: "" }) ? "" : f.payStatus.value) : f.payStatus.value;
       let rid = id;
