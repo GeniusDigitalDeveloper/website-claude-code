@@ -68,7 +68,7 @@ export function TrackRow({ t, i, list, onRemove, removeLabel, showAlbum = true, 
               {t.album}
             </Link>
           ) : (
-            <span className="truncate">{t.album ?? "—"}</span>
+            <span className="truncate">{t.album ?? ""}</span>
           )}
         </div>
       )}
