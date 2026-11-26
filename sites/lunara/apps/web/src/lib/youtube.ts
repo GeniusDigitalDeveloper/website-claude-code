@@ -208,6 +208,15 @@ class YouTubeDeck {
     await this.ramp(1, this.fadeIn(), my);
   }
 
+  /** Try to carry on after the system paused the player (no fade, no state change). */
+  resumeQuietly() {
+    try {
+      this.player?.playVideo();
+    } catch {
+      /* ignore */
+    }
+  }
+
   async pause() {
     const my = ++this.token;
     this.emit({ type: "state", playing: false });

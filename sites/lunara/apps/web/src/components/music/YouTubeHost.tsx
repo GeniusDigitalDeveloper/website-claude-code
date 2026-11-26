@@ -95,9 +95,10 @@ export function YouTubeHost() {
   };
   const onUp = () => (drag.current = null);
 
-  // docked: left edge, right above the player bar (aligned with the cover + title)
-  const docked = isMobile ? { left: 8, bottom: 150 } : { left: 16, bottom: 104 };
-  const style: React.CSSProperties = pos ? { left: pos.x, top: pos.y, width: dim.w } : { ...docked, width: dim.w };
+  // docked: right above the player bar. On phones it always stays tucked in the bottom-right corner
+  // at YouTube's minimum allowed size (200×200), with no title bar, so it covers as little as possible.
+  const docked = isMobile ? { right: 8, bottom: "calc(140px + env(safe-area-inset-bottom))" } : { left: 16, bottom: 104 };
+  const style: React.CSSProperties = pos && !isMobile ? { left: pos.x, top: pos.y, width: dim.w } : { ...docked, width: dim.w };
 
   const btn = "grid h-6 w-6 cursor-pointer place-items-center rounded-md text-fg/80 hover:bg-card-hover hover:text-fg";
   return (
@@ -107,7 +108,7 @@ export function YouTubeHost() {
       style={style}
       className={cx("fixed z-[45] overflow-hidden rounded-2xl transition-[opacity,scale] duration-500", show ? "panel panel-strong scale-100 opacity-100" : "pointer-events-none scale-95 opacity-0")}
     >
-      <div onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} className="flex h-[30px] cursor-grab touch-none items-center gap-1 px-2 select-none active:cursor-grabbing" title="Seret untuk alih">
+      <div onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} className={cx("flex h-[30px] cursor-grab touch-none items-center gap-1 px-2 select-none active:cursor-grabbing", isMobile && "hidden")} title="Seret untuk alih">
         <GripHorizontal className="h-4 w-4 text-faint" aria-hidden />
         <span translate="no" className="min-w-0 flex-1 truncate text-[11px] font-semibold text-muted">
           {t?.title}

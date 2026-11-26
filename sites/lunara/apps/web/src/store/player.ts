@@ -421,16 +421,34 @@ export function wirePlayer() {
   // Safety net: keep every Play/Pause button in sync with what is really audible.
   // A mismatch must last 6 s (longer than the longest fade) before it is corrected.
   let mismatch = 0;
+  let bgTry = 0;
   setInterval(() => {
     const st = usePlayer.getState();
     if (!st.queue.length) return;
     const real = backend === "yt" ? yt.busy : e.playing;
+    // App in the background (phone home screen, other app, locked screen): the system may stop the
+    // YouTube player. Keep the listener's intention ("playing") and keep trying to carry on; never
+    // mark it as paused while hidden. When the app is opened again it continues by itself.
+    if (document.hidden) {
+      mismatch = 0;
+      if (st.playing && backend === "yt" && !real && Date.now() - bgTry > 3000) {
+        bgTry = Date.now();
+        yt.resumeQuietly();
+      }
+      return;
+    }
     mismatch = real !== st.playing ? mismatch + 1 : 0;
     if (mismatch >= 6) {
       mismatch = 0;
       usePlayer.setState({ playing: real });
     }
   }, 1000);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) return;
+    const st = usePlayer.getState();
+    // back in the app: if the song was meant to be playing but the system stopped it, carry on
+    if (st.playing && st.queue.length && !(backend === "yt" ? yt.busy : e.playing)) setTimeout(() => usePlayer.getState().playing && usePlayer.getState().play(), 300);
+  });
   e.on((ev) => void handle(ev, "audio"));
   yt.on((ev) => void handle(ev, "yt"));
 
