@@ -240,6 +240,9 @@ export const EN: Record<string, string> = {
   "Tarik keluar ke tetingkap sendiri": "Pop out to its own window", "Tarik keluar ke tetingkap sendiri (boleh dialih ke skrin kedua)": "Pop out to its own window (can be moved to a second screen)",
   "Tetingkap video tidak dapat dibuka.": "The video window couldn't be opened.", "Video dalam tetingkap berasingan": "Video is in a separate window", "Masukkan semula": "Bring back",
   "Seksyen tidak dikenali": "Unknown section", "Bukan fail layout LUNARA MUSIC": "Not a LUNARA MUSIC layout file",
+  "Lagu terkini": "Latest songs", "Artis ini belum ada lagu.": "This artist has no songs yet.", "Carian gagal buat masa ini. Cuba lagi sebentar.": "Search failed right now. Please try again shortly.",
+  "Beberapa lagu berturut-turut tidak dibenarkan dimainkan oleh pemiliknya. Pilih lagu lain.": "Several songs in a row can't be played because their owners don't allow it. Pick another song.",
+  "Playlist ini kosong.": "This playlist is empty.", "Had carian hari ini sudah penuh. Cuba lagi esok.": "Today's search limit has been reached. Please try again tomorrow.", "Artis tidak dijumpai.": "Artist not found.", "Playlist tidak dijumpai.": "Playlist not found.",
 };
 
 /** Dynamic strings (numbers, names). Applied when no exact match exists. */
@@ -333,4 +336,9 @@ export const EN_PATTERNS: [RegExp, string][] = [
   [/^(.+), (.+) & lagi$/, "$1, $2 & more"],
   [/^Fade (.+)$/, "Fade $1"],
   [/^Lihat semua hasil untuk "(.+)"$/, "See all results for \"$1\""],
+  [/^Tiada hasil untuk "(.+)"$/, "No results for \"$1\""],
+  [/^"(.+)" tidak dibenarkan dimainkan oleh pemiliknya\.$/, "\"$1\" can't be played: its owner doesn't allow it."],
+  [/^Artis tidak dapat dimuatkan: (.+)$/, "Artist couldn't be loaded: $1"],
+  [/^Playlist tidak dapat dimuatkan: (.+)$/, "Playlist couldn't be loaded: $1"],
+  [/^(\d+) lagu terkini$/, "$1 latest songs"],
 ];

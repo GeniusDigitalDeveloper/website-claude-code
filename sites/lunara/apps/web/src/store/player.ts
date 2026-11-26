@@ -82,6 +82,7 @@ async function resolveUrl(t: Track): Promise<string> {
 }
 
 let loadSeq = 0;
+let ytFails = 0; // consecutive songs that could not be played
 let xfadeFor: string | null = null;
 let lastResumeSave = 0;
 
@@ -107,7 +108,7 @@ export const usePlayer = create<PlayerState>()(
         }
         try {
           // Full song in-app through YouTube when available; otherwise the provider's preview.
-          const vid = t.provider === "deezer" && youtubeEnabled() ? await withTimeout(findVideo(t), 7000) : t.provider === "deezer" ? await withTimeout(findVideo(t), 2500) : null;
+          const vid = t.provider === "youtube" ? await findVideo(t) : t.provider === "deezer" && youtubeEnabled() ? await withTimeout(findVideo(t), 7000) : t.provider === "deezer" ? await withTimeout(findVideo(t), 2500) : null;
           if (my !== loadSeq) return;
           const yt = getYouTube();
           if (vid) {
@@ -387,6 +388,7 @@ export function wirePlayer() {
         }
       }
     } else if (ev.type === "state") usePlayer.setState({ playing: ev.playing });
+    if (ev.type === "state" && ev.playing) ytFails = 0;
     else if (ev.type === "buffering") usePlayer.setState({ buffering: ev.buffering });
     else if (ev.type === "ended") {
       const done = usePlayer.getState().current();
@@ -397,6 +399,20 @@ export function wirePlayer() {
       // This video can't be embedded (owner blocked it): try the next candidate, then fall back silently
       const cur = usePlayer.getState().current();
       const yt = getYouTube();
+      if (cur?.provider === "youtube") {
+        // a song whose owner blocked playback outside YouTube: skip it, but never race through a whole list
+        yt.stop();
+        ytFails++;
+        if (ytFails >= 3) {
+          ytFails = 0;
+          usePlayer.setState({ playing: false, buffering: false });
+          toast("Beberapa lagu berturut-turut tidak dibenarkan dimainkan oleh pemiliknya. Pilih lagu lain.");
+          return;
+        }
+        toast(`"${cur.title}" tidak dibenarkan dimainkan oleh pemiliknya.`);
+        void usePlayer.getState().next(true);
+        return;
+      }
       if (cur && yt.videoId) {
         const bad = yt.videoId;
         markBadVideo(cur, bad);

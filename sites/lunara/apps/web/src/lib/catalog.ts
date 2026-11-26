@@ -201,12 +201,14 @@ const dzId = (id: string) => id.replace(/^dz:/, "");
 
 export const catalog = {
   async searchAll(q: string) {
-    const [tracks, albums, artists] = await Promise.all([
+    const [tracks, albums, artists, playlists] = await Promise.all([
       api("search/track", { q, limit: 25 }),
       api("search/album", { q, limit: 12 }),
       api("search/artist", { q, limit: 12 }),
+      api("search/playlist", { q, limit: 12 }).catch(() => ({ data: [] })),
     ]);
     return {
+      playlists: (playlists.data ?? []).map(mapPlaylist) as PlaylistSummary[],
       tracks: (tracks.data ?? []).map((t: any) => mapTrack(t)) as Track[],
       albums: (albums.data ?? []).map(mapAlbum) as Album[],
       artists: (artists.data ?? []).map(mapArtist) as Artist[],

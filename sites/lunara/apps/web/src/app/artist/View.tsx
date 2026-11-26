@@ -4,6 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { catalog } from "@/lib/catalog";
 import { useAsync } from "@/lib/useAsync";
+import { youtubeChannel } from "@/lib/yt-search";
 import { usePlayer } from "@/store/player";
 import { CollectionHeader } from "@/components/media/CollectionHeader";
 import { AlbumCard, ArtistCircle } from "@/components/music/Cards";
@@ -12,6 +13,41 @@ import { Btn, HScroll, SectionHead, Skeleton } from "@/components/ui";
 
 export function View() {
   const id = useSearchParams().get("id") ?? "";
+  if (id.startsWith("ytc:")) return <ChannelView id={id} />;
+  return <DeezerArtist id={id} />;
+}
+
+/** A YouTube channel shown as an artist page (its latest uploads, all playable in full). */
+function ChannelView({ id }: { id: string }) {
+  const { data, loading, error } = useAsync(`ytc:${id}`, () => youtubeChannel(id));
+  if (error) return <p className="p-8 text-muted">Artis tidak dapat dimuatkan: {error}</p>;
+  if (loading || !data) return <Skeleton className="m-8 h-72" />;
+  const { artist, tracks } = data;
+  return (
+    <div>
+      <CollectionHeader
+        round
+        cover={artist.picture}
+        kicker="Artis"
+        title={artist.name}
+        meta={<>{artist.fans != null && `${Intl.NumberFormat("ms").format(artist.fans)} peminat · `}{tracks.length} lagu terkini</>}
+      >
+        <Btn onClick={() => usePlayer.getState().playList(tracks, 0, { shuffle: false })} disabled={!tracks.length}>
+          <Play className="h-4 w-4 fill-current" /> Main
+        </Btn>
+        <Btn variant="ghost" onClick={() => usePlayer.getState().playList(tracks, 0, { shuffle: true })} disabled={!tracks.length}>
+          <Shuffle className="h-4 w-4" /> Rawak
+        </Btn>
+      </CollectionHeader>
+      <div className="px-4 md:px-8">
+        <SectionHead title="Lagu terkini" />
+        {tracks.length ? <TrackList tracks={tracks} numbered /> : <p className="text-sm text-muted">Artis ini belum ada lagu.</p>}
+      </div>
+    </div>
+  );
+}
+
+function DeezerArtist({ id }: { id: string }) {
   const { data, loading, error } = useAsync(`artist:${id}`, () => catalog.artist(id));
   const [more, setMore] = useState(false);
   if (error) return <p className="p-8 text-muted">Artis tidak dapat dimuatkan: {error}</p>;

@@ -5,13 +5,14 @@ import { useEffect, useMemo, useState } from "react";
 import { catalog } from "@/lib/catalog";
 import { MALAY_SEARCH_CHIPS } from "@/lib/malay";
 import { useAsync } from "@/lib/useAsync";
+import { searchYouTube } from "@/lib/yt-search";
 import type { Track } from "@/lib/types";
 import { useLibrary } from "@/store/library";
-import { AlbumCard, ArtistCircle } from "@/components/music/Cards";
+import { AlbumCard, ArtistCircle, PlaylistCard } from "@/components/music/Cards";
 import { TrackList } from "@/components/music/TrackRow";
 import { cx, Empty, HScroll, SectionHead, Segmented, Skeleton } from "@/components/ui";
 
-type Tab = "all" | "tracks" | "artists" | "albums" | "device";
+type Tab = "all" | "youtube" | "tracks" | "artists" | "albums" | "playlists" | "device";
 
 export function SearchView() {
   const params = useSearchParams();
@@ -24,7 +25,11 @@ export function SearchView() {
   useEffect(() => setTab("all"), [submitted]);
 
   const res = useAsync(submitted ? `search:${submitted}` : null, () => catalog.searchAll(submitted));
+  const yt = useAsync(submitted ? `yts:${submitted}` : null, () => searchYouTube(submitted), 60 * 60_000);
   const trending = MALAY_SEARCH_CHIPS;
+  // Everything mixed together (catalogue + YouTube), albums kept in their own section
+  const loading = (res.loading && !res.data) && (yt.loading && !yt.data);
+  const { tracks, artists, albums, playlists } = useMemo(() => mergeResults(res.data, yt.data), [res.data, yt.data]);
 
   const localHits = useMemo(() => {
     const s = submitted.toLowerCase();
@@ -99,18 +104,17 @@ export function SearchView() {
               { value: "tracks", label: "Lagu" },
               { value: "artists", label: "Artis" },
               { value: "albums", label: "Album" },
+              { value: "playlists", label: "Playlist" },
               { value: "device", label: `Peranti (${localHits.length})` },
             ]}
           />
-          {res.error && <p className="mt-6 rounded-xl bg-card p-4 text-sm text-muted">Carian katalog gagal: {res.error}. Cuba lagi sebentar.</p>}
-          {res.loading && (
+          {loading ? (
             <div className="mt-6 space-y-2">
               {Array.from({ length: 6 }, (_, i) => (
                 <Skeleton key={i} className="h-14" />
               ))}
             </div>
-          )}
-          {res.data && (
+          ) : (
             <div className="mt-6 space-y-9">
               {(tab === "all" || tab === "device") && localHits.length > 0 && (
                 <section>
@@ -122,47 +126,109 @@ export function SearchView() {
               {(tab === "all" || tab === "tracks") && (
                 <section>
                   {tab === "all" && <SectionHead title="Lagu" />}
-                  {res.data.tracks.length ? <TrackList tracks={res.data.tracks} limit={tab === "all" ? 8 : undefined} /> : <p className="text-sm text-muted">Tiada lagu dijumpai dalam katalog untuk &quot;{submitted}&quot;.</p>}
+                  {tracks.length ? <TrackList tracks={tracks} limit={tab === "all" ? 10 : undefined} /> : <p className="text-sm text-muted">Tiada lagu dijumpai untuk &quot;{submitted}&quot;.</p>}
                 </section>
               )}
-              {(tab === "all" || tab === "artists") && res.data.artists.length > 0 && (
+              {(tab === "all" || tab === "artists") && artists.length > 0 && (
                 <section>
                   {tab === "all" && <SectionHead title="Artis" />}
                   {tab === "all" ? (
                     <HScroll>
-                      {res.data.artists.map((a) => (
+                      {artists.map((a) => (
                         <ArtistCircle key={a.id} a={a} />
                       ))}
                     </HScroll>
                   ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
-                      {res.data.artists.map((a) => (
+                      {artists.map((a) => (
                         <ArtistCircle key={a.id} a={a} grid />
                       ))}
                     </div>
                   )}
                 </section>
               )}
-              {(tab === "all" || tab === "albums") && res.data.albums.length > 0 && (
+              {(tab === "all" || tab === "albums") && albums.length > 0 && (
                 <section>
                   {tab === "all" && <SectionHead title="Album" />}
-                  <div className={cx(tab === "all" ? "" : "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5")}>
-                    {tab === "all" ? (
-                      <HScroll>
-                        {res.data.albums.map((a) => (
-                          <AlbumCard key={a.id} a={a} />
-                        ))}
-                      </HScroll>
-                    ) : (
-                      res.data.albums.map((a) => <AlbumCard key={a.id} a={a} grid />)
-                    )}
-                  </div>
+                  {tab === "all" ? (
+                    <HScroll>
+                      {albums.map((a) => (
+                        <AlbumCard key={a.id} a={a} />
+                      ))}
+                    </HScroll>
+                  ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
+                      {albums.map((a) => (
+                        <AlbumCard key={a.id} a={a} grid />
+                      ))}
+                    </div>
+                  )}
                 </section>
               )}
+              {(tab === "all" || tab === "playlists") && playlists.length > 0 && (
+                <section>
+                  {tab === "all" && <SectionHead title="Playlist" />}
+                  {tab === "all" ? (
+                    <HScroll>
+                      {playlists.map((p) => (
+                        <PlaylistCard key={p.href} p={p} href={p.href} />
+                      ))}
+                    </HScroll>
+                  ) : (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
+                      {playlists.map((p) => (
+                        <PlaylistCard key={p.href} p={p} href={p.href} grid />
+                      ))}
+                    </div>
+                  )}
+                </section>
+              )}
+              {((tab === "albums" && !albums.length) || (tab === "playlists" && !playlists.length) || (tab === "artists" && !artists.length)) && (
+                <Empty icon={<Search className="h-5 w-5" />} title={`Tiada hasil untuk "${submitted}"`} />
+              )}
+              {res.error && yt.error && <p className="rounded-xl bg-card p-4 text-sm text-muted">Carian gagal buat masa ini. Cuba lagi sebentar.</p>}
             </div>
           )}
         </div>
       )}
     </div>
   );
+}
+
+
+const key = (t: Track) =>
+  `${t.artist} ${t.title}`
+    .toLowerCase()
+    .replace(/\(.*?\)|\[.*?\]/g, "")
+    .replace(/[^a-z0-9]+/g, "");
+
+function interleave<T>(a: T[], b: T[]) {
+  const out: T[] = [];
+  for (let i = 0; i < Math.max(a.length, b.length); i++) {
+    if (a[i]) out.push(a[i]);
+    if (b[i]) out.push(b[i]);
+  }
+  return out;
+}
+
+function mergeResults(dz?: Awaited<ReturnType<typeof catalog.searchAll>>, yt?: Awaited<ReturnType<typeof searchYouTube>>) {
+  const seen = new Set<string>();
+  const tracks = interleave(dz?.tracks ?? [], yt?.tracks ?? []).filter((t) => {
+    const k = key(t);
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
+  const names = new Set<string>();
+  const artists = interleave(dz?.artists ?? [], yt?.channels ?? []).filter((a) => {
+    const k = a.name.toLowerCase().replace(/\s*-\s*topic$/, "").replace(/[^a-z0-9]+/g, "");
+    if (names.has(k)) return false;
+    names.add(k);
+    return true;
+  });
+  const playlists = interleave(
+    (dz?.playlists ?? []).map((p) => ({ ...p, href: `/playlist?id=dz-${p.id}` })),
+    (yt?.playlists ?? []).map((p) => ({ ...p, href: `/playlist?id=${p.id}` })),
+  );
+  return { tracks, artists, albums: dz?.albums ?? [], playlists };
 }

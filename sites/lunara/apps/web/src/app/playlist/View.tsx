@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState } from "react";
 import { catalog } from "@/lib/catalog";
 import { useAsync } from "@/lib/useAsync";
+import { youtubePlaylist } from "@/lib/yt-search";
 import type { Track } from "@/lib/types";
 import { useLibrary } from "@/store/library";
 import { tr } from "@/i18n";
@@ -14,6 +15,27 @@ import { ImageCropper, normalizeImage } from "@/components/media/ImageCropper";
 import { SortableItem, SortableList } from "@/components/music/Sortable";
 import { TrackList, TrackRow } from "@/components/music/TrackRow";
 import { Artwork, Btn, Empty, Field, fmtLong, inputCls, Modal, Skeleton, Switch } from "@/components/ui";
+
+function YouTubePlaylist({ id }: { id: string }) {
+  const { data, loading, error } = useAsync(`ytp:${id}`, () => youtubePlaylist(id));
+  if (error) return <p className="p-8 text-muted">Playlist tidak dapat dimuatkan: {error}</p>;
+  if (loading || !data) return <Skeleton className="m-8 h-72" />;
+  return (
+    <div>
+      <CollectionHeader cover={data.cover} kicker="Playlist" title={data.title} meta={`${data.creator ?? "LUNARA"} · ${data.tracks.length} lagu`}>
+        <Btn onClick={() => usePlayer.getState().playList(data.tracks, 0, { shuffle: false })} disabled={!data.tracks.length}>
+          <Play className="h-4 w-4 fill-current" /> Main
+        </Btn>
+        <Btn variant="ghost" onClick={() => usePlayer.getState().playList(data.tracks, 0, { shuffle: true })} disabled={!data.tracks.length}>
+          <Shuffle className="h-4 w-4" /> Rawak
+        </Btn>
+      </CollectionHeader>
+      <div className="px-4 md:px-8">
+        {data.tracks.length ? <TrackList tracks={data.tracks} numbered /> : <p className="text-sm text-muted">Playlist ini kosong.</p>}
+      </div>
+    </div>
+  );
+}
 
 function DeezerPlaylist({ id }: { id: string }) {
   const { data, loading, error } = useAsync(`pl:${id}`, () => catalog.playlist(id));
@@ -252,5 +274,6 @@ function UserPlaylistView({ id }: { id: string }) {
 
 export function View() {
   const id = useSearchParams().get("id") ?? "";
+  if (id.startsWith("ytp-")) return <YouTubePlaylist id={id} />;
   return id.startsWith("dz-") ? <DeezerPlaylist id={id.slice(3)} /> : <UserPlaylistView id={id} />;
 }

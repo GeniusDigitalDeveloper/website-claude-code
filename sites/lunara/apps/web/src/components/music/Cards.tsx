@@ -112,7 +112,7 @@ export function ArtistCircle({ a, grid }: { a: Artist; grid?: boolean }) {
     <Link href={`/artist?id=${a.id}`} className={cx("group block shrink-0 snap-start cursor-pointer rounded-[var(--radius)] p-2.5 text-center transition hover:bg-card-hover", !grid && cardWidth(size))}>
       <Artwork src={a.picture} alt={a.name} className="aspect-square w-full shadow-[var(--shadow)] transition-transform duration-300 group-hover:scale-[1.03]" rounded="rounded-full" />
       <p translate="no" className="mt-2.5 truncate text-sm font-semibold">{a.name}</p>
-      <p className="mt-0.5 text-xs text-muted">{a.fans ? `${Intl.NumberFormat("ms", { notation: "compact" }).format(a.fans)} peminat` : "Artis"}</p>
+      <p className="mt-0.5 text-xs text-muted">{a.id.startsWith("ytc:") ? "Artis" : a.fans ? `${Intl.NumberFormat("ms", { notation: "compact" }).format(a.fans)} peminat` : "Artis"}</p>
     </Link>
   );
 }

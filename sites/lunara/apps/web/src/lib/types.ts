@@ -5,7 +5,7 @@ export interface Track {
   /** Unique within LUNARA MUSIC: "dz:<id>" for Deezer catalogue, "loc:<uuid>" for local/imported files. */
   id: string;
   source: TrackSource;
-  provider: "deezer" | "device";
+  provider: "deezer" | "device" | "youtube";
   title: string;
   artist: string;
   artistId?: string;

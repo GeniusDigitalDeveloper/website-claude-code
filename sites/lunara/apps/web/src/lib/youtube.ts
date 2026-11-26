@@ -55,6 +55,7 @@ function norm(s: string) {
 
 /** Best playable YouTube video candidates for a catalogue track (best first). Empty when unavailable. */
 export async function findVideos(t: Track): Promise<string[]> {
+  if (t.provider === "youtube") return [t.id.replace(/^yt:/, "")];
   const v = await findVideo(t);
   if (!v) return [];
   try {
@@ -79,6 +80,7 @@ export function markBadVideo(t: Track, videoId: string) {
 
 /** Find (and cache) the YouTube video for a catalogue track. Returns null when unavailable. */
 export async function findVideo(t: Track): Promise<string | null> {
+  if (t.provider === "youtube") return t.id.replace(/^yt:/, "");
   if (t.provider !== "deezer") return null;
   const id = dzId(t);
   try {
