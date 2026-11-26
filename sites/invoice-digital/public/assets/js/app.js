@@ -102,7 +102,7 @@ function renderAuth(mode, q) {
 
 // ---------------------------------------------------------------- APP SHELL
 const NAV = [["dashboard", "home"], ["quotations", "quote"], ["invoices", "doc"], ["receipts", "receipt"], ["customers", "users"], ["products", "box"], ["profile", "gear"]];
-const SUBS = [["business", "building"], ["history", "clock"], ["settings", "gear"]]; // sub bagi Profil
+const SUBS = [["business", "building"], ["quoteinfo", "quote"], ["history", "clock"], ["settings", "gear"]]; // sub bagi Profil
 const MOBILE = ["dashboard", "quotations", "invoices", "receipts"];
 function renderShell() {
   const b = brand(S.settings);

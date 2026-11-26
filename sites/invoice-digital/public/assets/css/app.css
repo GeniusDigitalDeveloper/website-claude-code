@@ -195,3 +195,10 @@ h1,h2,h3,h4,b,strong,th,label,.lbl,.btn,.badge,.brand,.app-name,.side-app,.side 
 
 .b-deposit{background:#e0f2fe;color:#075985}
 .sz-pv{display:flex;align-items:center;justify-content:center;height:96px;margin:6px 0 4px;border:1px dashed var(--line);border-radius:10px;background:repeating-conic-gradient(#f1f5f9 0% 25%,#fff 0% 50%) 50%/14px 14px;overflow:hidden}.sz-pv img{display:block;width:auto;height:auto;object-fit:contain;transition:max-width .12s,max-height .12s}.sz-none{font-size:.78rem;color:var(--mut)}
+/* Maklumat Sebut Harga: pakej + pemilih produk */
+.pkgs{display:grid;gap:16px}.pkg{border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--bg2);display:grid;gap:10px}
+.pkg-h{display:flex;align-items:flex-end;gap:10px}.pkg-h .grow{flex:1;min-width:0}.pkg-n{display:grid;place-items:center;width:32px;height:32px;border-radius:10px;background:var(--grad2);color:#fff;font-family:var(--f-head);font-weight:700;flex:none;margin-bottom:6px}
+.pkg-acts{display:flex;gap:4px;margin-bottom:2px}.pkg-items{display:grid;gap:10px}.pkg-tot{font-size:.9rem;color:var(--ink2)}.pkg-tot b{font-family:var(--f-head);color:var(--ink)}
+.qp-pkg{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 10px}.qp-pkg summary{cursor:pointer;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}.qp-pkg summary small{color:var(--mut)}.qp-sum{margin-left:auto;font-family:var(--f-head);font-weight:600;color:var(--blue2)}
+.qp-all{margin:8px 0 4px;font-size:.85rem}.qp-list{list-style:none;margin:0;padding:0;display:grid;gap:2px}.qp-list li label{display:flex;align-items:center;gap:10px;padding:8px 6px;border-radius:8px;cursor:pointer}.qp-list li label:hover{background:#eef2ff}
+.qp-name{flex:1;min-width:0}.qp-name small{display:block;color:var(--mut);font-size:.78rem}.qp-price{white-space:nowrap;font-family:var(--f-head);font-weight:600}.qp-price em{font-style:normal;color:var(--ok);font-size:.8rem}

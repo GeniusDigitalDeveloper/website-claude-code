@@ -1,9 +1,9 @@
-// Bahagian Profil: tiga sub — Perniagaan, Sejarah Dokumen, Tetapan (akaun, lalai dokumen, bahasa, kata laluan).
+// Bahagian Profil: empat sub — Perniagaan, Maklumat Sebut Harga, Sejarah Dokumen, Tetapan (akaun, lalai dokumen, bahasa, kata laluan).
 import { t } from "../i18n.js";
 import { $, esc } from "../util.js";
 import { ico } from "./ui.js";
 
-export const TABS = [["business", "building"], ["history", "clock"], ["settings", "gear"]];
+export const TABS = [["business", "building"], ["quoteinfo", "quote"], ["history", "clock"], ["settings", "gear"]];
 const ALIAS = { account: "settings", documents: "settings" };
 export async function render(el, ctx, sub) {
   sub = ALIAS[sub] || sub; sub = TABS.some((x) => x[0] === sub) ? sub : "business";
@@ -12,6 +12,7 @@ export async function render(el, ctx, sub) {
   $("[data-logout]", el).onclick = () => ctx.logout();
   const body = $("#pbody", el);
   if (sub === "business") return (await import("./company.js")).render(body, ctx, "business");
+  if (sub === "quoteinfo") return (await import("./packages.js")).render(body, ctx);
   if (sub === "history") return (await import("./history.js")).render(body, ctx, true);
   // Tetapan: akaun + lalai dokumen + bahasa & kata laluan
   body.innerHTML = `<h2 class="sec-t">${t("prof_account")}</h2><div id="s1"></div><h2 class="sec-t">${t("prof_documents")}</h2><div id="s2"></div><h2 class="sec-t">${t("language")} &amp; ${t("password")}</h2><div id="s3"></div>`;

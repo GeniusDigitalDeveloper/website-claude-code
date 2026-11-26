@@ -12,6 +12,7 @@ import { recordPayment, METHODS } from "./receipts.js";
 import { TEMPLATES } from "../pdf.js";
 import { bulkBarHtml, chkTh, chkTd, bulkController, limitRows } from "./bulk.js";
 import { sizesHtml, readSizes, diffSizes } from "../sizes.js";
+import { loadPackages, pickerHtml as qpHtml, bindPicker as qpBind } from "./packages.js";
 
 const CFG = {
   invoice: { col: "invoices", route: "invoices", fmt: "INV-{YYYY}-{NNNN}", statuses: ["draft", "sent", "unpaid", "partial", "paid", "cancelled"], eff: (r) => (["draft", "cancelled"].includes(r.status) ? r.status : payOf("invoice", r)), filter: ["draft", "unpaid", "deposit", "partial", "paid", "overdue", "cancelled"] },
@@ -66,6 +67,13 @@ export async function renderEditor(el, ctx, type, id) {
     [customers, products, company] = await Promise.all([listAll(ctx.uid, "customers"), listAll(ctx.uid, "products"), ctx.getCompany()]);
     doc = id ? await getOne(ctx.uid, C.col, id) : null; if (id && !doc) { el.innerHTML = empty("doc", t("not_found")); return; }
   } catch (e) { el.innerHTML = `<p class="err">${esc(errMsg(e))}</p>`; return; }
+  // Sebut harga: produk dipilih daripada Profil → Maklumat Sebut Harga (pakej). Mesti diisi dahulu sebelum sebut harga baharu.
+  let pkgs = [];
+  if (type === "quotation") { try { pkgs = (await loadPackages(ctx)).filter((p) => p.items.some((i) => i.name)); } catch (e) { console.warn("pakej", e); } }
+  if (type === "quotation" && !doc && !pkgs.length) {
+    el.innerHTML = `<div class="page-h"><div><h1>${t("quotation_new")}</h1></div><a class="btn ghost" href="#/app/${C.route}">${t("back")}</a></div>${empty("quote", t("qi_need"), `<p class="muted">${t("qi_need_d")}</p><a class="btn primary" href="#/app/profile/quoteinfo">${ico("quote")}${t("qi_go")}</a>`)}`;
+    return;
+  }
   const st = await ctx.getSettings(); const today = todayMY();
   const d = doc || { date: today, status: "draft", items: [{ name: "", desc: "", qty: 1, price: 0, discount: 0 }], docDiscount: 0, deposit: 0, receiptsPaid: 0,
     taxRate: num(company.taxRate ?? st.taxRate), taxName: company.taxName || st.taxName || "SST", note: "", terms: company.terms || st.terms || "", template: company.template || "classic", color: company.color || "#2563eb",
@@ -82,6 +90,7 @@ export async function renderEditor(el, ctx, type, id) {
     <div class="grid3"><label>${t("f_phone")}<input name="cphone" maxlength="30" value="${esc(cust.phone)}" inputmode="tel"></label><label>${t("f_email")}<input name="cemail" type="email" maxlength="120" value="${esc(cust.email)}"></label><label>${t("f_regno")}<input name="cregNo" maxlength="40" value="${esc(cust.regNo)}"></label></div>
     <label class="chk ${d.customerId ? "hide" : ""}" id="saveCustW"><input type="checkbox" name="saveCust" checked> ${t("save_customer")}</label>
    </section>
+   ${pkgs.length ? qpHtml(pkgs) : ""}
    <section class="card form"><h2>${t("sec_details")}</h2>
     <div class="logo-inline"><div class="lp" id="lgp">${company.logo ? `<img alt="Logo" src="${esc(company.logo)}">` : t("no_logo")}</div><div><b>${t("logo_in_doc")}</b><br><label class="btn ghost sm file">${t("upload_logo")}<input type="file" id="lgf" accept="image/png,image/jpeg,image/webp" hidden></label></div></div>
     <div class="grid3"><label>${t("f_date")}<input name="date" type="date" value="${esc(d.date)}" required></label>
@@ -113,6 +122,7 @@ export async function renderEditor(el, ctx, type, id) {
     drawSum();
   };
   drawItems(); bindPicker(el);
+  if (pkgs.length) qpBind(el, pkgs, (picked) => { readItems(); items = items.filter((i) => i.name.trim() || num(i.price)); items.push(...picked); drawItems(); });
   $("#lgf", el).onchange = async (e) => {
     const file = e.target.files[0]; if (!file) return;
     try { const logo = await fitImage(file, 360, 110000);
