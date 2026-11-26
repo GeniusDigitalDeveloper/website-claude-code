@@ -87,7 +87,7 @@ export function TrackRow({ t, i, list, onRemove, removeLabel, showAlbum = true, 
             {fmt(pr.pos)}
           </span>
         ) : (
-          <span className="w-12 text-right text-xs tabular-nums text-muted">{fmt(t.duration)}</span>
+          <span className="w-12 text-right text-xs tabular-nums text-muted">{t.duration ? fmt(t.duration) : ""}</span>
         )}
         <TrackMenu track={t} onRemove={onRemove} removeLabel={removeLabel} />
       </div>

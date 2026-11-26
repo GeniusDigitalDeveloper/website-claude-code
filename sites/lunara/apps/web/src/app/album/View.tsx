@@ -45,7 +45,7 @@ export function View() {
             )}
             {a.releaseDate && ` · Dikeluarkan ${new Date(a.releaseDate).toLocaleDateString("ms-MY", { day: "numeric", month: "long", year: "numeric" })}`}
             {a.genre && ` · ${a.genre}`}
-            {` · ${tracks.length} lagu, ${fmtLong(a.duration ?? 0)}`}
+            {a.duration ? ` · ${tracks.length} lagu, ${fmtLong(a.duration)}` : ` · ${tracks.length} lagu`}
           </>
         }
       >
