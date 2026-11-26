@@ -8,6 +8,7 @@
  *   by their own `updatedAt`, so a playlist created offline on one device is never lost.
  * - Local/imported audio files and their device paths are NEVER synced (privacy + storage rules).
  */
+import { purgeLegacyLibrary } from "@/store/library";
 import { doc, onSnapshot, setDoc, type Unsubscribe } from "firebase/firestore";
 import { db } from "./firebase";
 import { useLibrary, type LibraryState } from "@/store/library";
@@ -105,6 +106,7 @@ export function startSync(uid: string) {
       applyingRemote = true;
       useLibrary.setState({ ...patch, updatedAt: ts });
       applyingRemote = false;
+      purgeLegacyLibrary(); // old Deezer items coming back from the cloud are removed (and the cleanup is synced)
       if (localNewer) push("library");
       statusCb(snap.metadata.fromCache ? "offline" : "synced");
     }, () => statusCb("error")),

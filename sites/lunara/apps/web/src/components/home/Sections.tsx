@@ -3,10 +3,10 @@ import { Heart, HardDrive, Pause, Play, Shuffle, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
-import { catalog } from "@/lib/catalog";
-import { albumsFrom, artistsFrom, MALAY, MALAY_ALL, MALAY_SEED_ARTISTS, mixFrom } from "@/lib/malay";
+import { type Category, loadContent, MOODS, normName, shuffle } from "@/lib/content";
+import { kindOf } from "@/lib/radio";
 import { useAsync } from "@/lib/useAsync";
-import { youtubeChannel } from "@/lib/yt-search";
+import { youtubeChannel, youtubePlaylist } from "@/lib/yt-search";
 import type { Track } from "@/lib/types";
 import { useAuth } from "@/store/auth";
 import { SECTION_LABEL, type SectionConfig, type SectionId } from "@/store/layout";
@@ -17,7 +17,7 @@ import { AlbumCard, ArtistCircle, Collection, PlaylistCard, TrackCard } from "..
 import { TrackList } from "../music/TrackRow";
 import { Artwork, Btn, cx, fmt, HScroll, SectionHead, Skeleton } from "../ui";
 
-const useChart = () => useAsync("chart", () => catalog.chart());
+const useHome = () => useAsync("home", loadContent, 3600_000);
 
 function greeting() {
   const h = new Date().getHours();
@@ -42,7 +42,7 @@ function RowSkeleton() {
 }
 
 function ErrorNote({ msg }: { msg: string }) {
-  return <p className="rounded-xl bg-card px-4 py-3 text-sm text-muted">Katalog tidak dapat dicapai sekarang ({msg}). Muzik peranti anda masih boleh dimainkan.</p>;
+  return <p className="rounded-xl bg-card px-4 py-3 text-sm text-muted">Kandungan tidak dapat dimuatkan sekarang ({msg}). Muzik peranti anda masih boleh dimainkan.</p>;
 }
 
 function Tracks({ tracks, kind }: { tracks: Track[]; kind: SectionConfig["kind"] }) {
@@ -53,7 +53,10 @@ function Tracks({ tracks, kind }: { tracks: Track[]; kind: SectionConfig["kind"]
 
 /* ---------- individual sections ---------- */
 
-type Hero = { kicker: string; title: string; sub: string; cover?: string; href: string; linkLabel: string; albumId?: string; tracks?: Track[] };
+/** English / Malay script only (no Cyrillic, Korean, Japanese, Arabic… titles in the banner). */
+const LATIN = /^[\u0000-\u024F\u2000-\u206F\s]+$/;
+
+type Hero = { kicker: string; title: string; sub: string; cover?: string; href: string; linkLabel: string; playlistId?: string; tracks?: Track[] };
 
 /**
  * The home banner follows what the listener plays most: the artist with the highest play count leads
@@ -65,19 +68,20 @@ function useHero(): Hero | undefined {
   const topId = top && top[1].count >= 2 ? top[0] : null;
   const [day, setDay] = useState(0);
   useEffect(() => setDay(new Date().getDate()), []);
-  const { data } = useAsync(`hero:${topId ?? "chart"}:${day}`, async (): Promise<Hero | undefined> => {
-    if (topId?.startsWith("ytc:")) {
-      const c = await youtubeChannel(topId);
-      return { kicker: "Artis paling kerap anda dengar", title: c.artist.name, sub: `${c.tracks.length} lagu terkini`, cover: c.tracks[0]?.artwork ?? c.artist.picture, href: `/artist?id=${topId}`, linkLabel: "Lihat artis", tracks: c.tracks };
+  const { data } = useAsync(`hero3:${topId ?? "default"}:${day}`, async (): Promise<Hero | undefined> => {
+    const home = await loadContent();
+    // the listener's most played artist, through their YouTube channel
+    const channel = topId?.startsWith("ytc:") ? topId : top ? home.channels[normName(top[1].name)] : undefined;
+    if (topId && channel) {
+      const c = await youtubeChannel(channel).catch(() => null);
+      const songs = (c?.tracks ?? []).filter((t) => LATIN.test(t.title));
+      if (c && songs.length)
+        return { kicker: "Artis paling kerap anda dengar", title: c.artist.name, sub: `${songs.length} lagu terkini`, cover: songs[day % songs.length]?.artwork ?? c.artist.picture, href: `/artist?id=${channel}`, linkLabel: "Lihat artis", tracks: songs };
     }
-    if (topId) {
-      const albums = await catalog.artistAlbums(topId);
-      const a = albums[day % Math.max(1, albums.length)];
-      if (a) return { kicker: "Artis paling kerap anda dengar", title: a.title, sub: a.artist || top[1].name, cover: a.cover, href: `/album?id=${a.id}`, linkLabel: "Lihat album", albumId: a.id };
-    }
-    const chart = await catalog.chart();
-    const a = chart.albums[day % Math.max(1, chart.albums.length)];
-    return a ? { kicker: "Album pilihan hari ini", title: a.title, sub: a.artist, cover: a.cover, href: `/album?id=${a.id}`, linkLabel: "Lihat album", albumId: a.id } : undefined;
+    // new listener: an English album of the day
+    const en = home.albums.english.filter((x) => LATIN.test(x.title));
+    const a = en[day % Math.max(1, en.length)];
+    return a ? { kicker: "Album pilihan hari ini", title: a.title, sub: a.artist, cover: a.cover, href: `/album?id=${a.id}`, linkLabel: "Lihat album", playlistId: a.id } : undefined;
   });
   return data;
 }
@@ -87,12 +91,12 @@ function Greeting() {
   useEffect(() => setHello(greeting()), []);
   const name = useAuth((s) => s.profile?.displayName?.split(" ")[0]);
   const hero = useHero();
-  const nasyid = useAsync("my:nasyid", () => mixFrom(MALAY.nasyid, 4));
+  const home = useHome();
   const recent = useLibrary((s) => s.recent);
-  const quick = recent.length >= 4 ? recent.slice(0, 6) : (nasyid.data ?? []).slice(0, 6);
+  const quick = recent.length >= 4 ? recent.slice(0, 6) : (home.data?.tracks.nasyid ?? []).slice(0, 6);
   const playHero = async () => {
     if (!hero) return;
-    const tracks = hero.tracks ?? (hero.albumId ? ((await catalog.album(hero.albumId)).tracks ?? []) : []);
+    const tracks = hero.tracks ?? (hero.playlistId ? (await youtubePlaylist(hero.playlistId)).tracks : []);
     if (tracks.length) void usePlayer.getState().playList(tracks, 0, { shuffle: false });
   };
   return (
@@ -193,25 +197,33 @@ function topArtists(limit: number): { id: string; name: string }[] {
   const plays = Object.entries(s.artistPlays).sort((a, b) => b[1].count - a[1].count).map(([id, v]) => ({ id, name: v.name }));
   const favs = s.favourites.filter((f) => f.artistId).map((f) => ({ id: f.artistId!, name: f.artist }));
   const seen = new Set<string>();
-  return [...plays, ...favs].filter((a) => !seen.has(a.id) && seen.add(a.id)).slice(0, limit);
+  return [...plays, ...favs].filter((a) => a.id.startsWith("ytc:") && !seen.has(a.id) && seen.add(a.id)).slice(0, limit);
+}
+
+/** Songs of the same kinds the listener plays (built-in lists) + their top artists' latest songs. */
+async function mixFor(seeds: { id: string }[], home: Awaited<ReturnType<typeof loadContent>>) {
+  const chans = await Promise.all(seeds.map((x) => youtubeChannel(x.id).then((c) => c.tracks.slice(0, 12)).catch(() => [] as Track[])));
+  const kinds = new Set<Category>();
+  for (const t of chans.flat()) {
+    const k = kindOf(t);
+    kinds.add(k === "ai-rock" ? "ai" : k ?? "english");
+  }
+  const pools = [...chans, ...[...kinds].map((k) => shuffle(home.tracks[k]).slice(0, 12))];
+  const out: Track[] = [];
+  const seen = new Set<string>();
+  for (let i = 0; out.length < 30 && pools.some((p) => p[i]); i++) for (const p of pools)
+      if (p[i] && !seen.has(p[i].id)) {
+        seen.add(p[i].id);
+        out.push(p[i]);
+      }
+  return out;
 }
 
 function MadeForYou({ kind }: { kind: SectionConfig["kind"] }) {
-  const plays = useLibrary((s) => s.artistPlays);
-  const favCount = useLibrary((s) => s.favourites.length);
+  useLibrary((s) => s.artistPlays);
   const seeds = topArtists(2);
-  const key = seeds.length ? `mfy:${seeds.map((s) => s.id).join(",")}` : null;
-  // The listener's own artists + artists related to them (not Deezer radio, which mixes in unrelated foreign songs)
-  const { data, loading, error } = useAsync(key, async () => {
-    // related artists are kept only when they are Malay artists we know (no foreign mix-ins)
-    const related = (await Promise.all(seeds.map((x) => catalog.related(x.id, 12).catch(() => [] as string[])))).flat().filter((id) => MALAY_ALL.has(id));
-    const malaySeeds = seeds.some((x) => MALAY_ALL.has(x.id));
-    if (malaySeeds && related.length < 3) related.push(...MALAY.nasyid.slice(0, 3), ...MALAY.jiwang.slice(0, 2));
-    const ids = [...new Set([...seeds.map((x) => x.id), ...related])].slice(0, 10);
-    return mixFrom(ids, 3);
-  });
-  void plays;
-  void favCount;
+  const key = seeds.length ? `mfy2:${seeds.map((s) => s.id).join(",")}` : null;
+  const { data, loading, error } = useAsync(key, async () => mixFor(seeds, await loadContent()));
   if (!seeds.length) return <StarterMix kind={kind} />;
   if (error) return <ErrorNote msg={error} />;
   if (loading || !data) return <RowSkeleton />;
@@ -219,16 +231,13 @@ function MadeForYou({ kind }: { kind: SectionConfig["kind"] }) {
 }
 
 function DailyMix({ kind }: { kind: SectionConfig["kind"] }) {
-  const chart = useChart();
+  const home = useHome();
   const mine = topArtists(4);
-  const seedInfo = useAsync(mine.length >= 2 ? null : "my:seedArtists", () => artistsFrom(MALAY_SEED_ARTISTS));
-  const seeds = mine.length >= 2 ? mine : (seedInfo.data ?? []).map((a) => ({ id: a.id, name: a.name, picture: a.picture }));
-  const pics = [...(chart.data?.artists ?? []), ...(seedInfo.data ?? [])];
+  const seeds = mine.length >= 2 ? mine.map((m) => ({ ...m, picture: home.data?.artists.malay.find((a) => a.id === m.id)?.picture })) : (home.data?.artists.malay ?? []).slice(0, 6);
   if (!seeds.length) return <RowSkeleton />;
   const play = async (id: string, name: string) => {
     try {
-      const rel = (await catalog.related(id, 12).catch(() => [] as string[])).filter((x) => MALAY_ALL.has(x) || !MALAY_ALL.has(id));
-      const tr = await mixFrom([id, ...rel], 4);
+      const tr = await mixFor([{ id }], await loadContent());
       if (tr.length) void usePlayer.getState().playList(tr, 0, { shuffle: false });
       toast(`Daily Mix: ${name} dan artis serupa`);
     } catch (e) {
@@ -238,7 +247,7 @@ function DailyMix({ kind }: { kind: SectionConfig["kind"] }) {
   const cards = seeds.map((s, i) => (
     <button key={s.id} onClick={() => play(s.id, s.name)} className={cx("group relative shrink-0 cursor-pointer overflow-hidden rounded-[var(--radius)] text-left", kind === "grid" ? "" : "w-40 md:w-52")} aria-label={`Main Daily Mix ${i + 1}: ${s.name}`}>
       <div className="grad-bg aspect-square w-full p-4" style={{ filter: `hue-rotate(${i * 35}deg)` }}>
-        <Artwork src={("picture" in s ? (s as { picture?: string }).picture : undefined) ?? pics.find((p) => p.id === s.id)?.picture} alt="" className="h-2/3 w-2/3 shadow-xl" rounded="rounded-full" />
+        <Artwork src={s.picture} alt="" className="h-2/3 w-2/3 shadow-xl" rounded="rounded-full" />
         <p className="absolute bottom-3 left-4 font-display text-lg font-extrabold text-white drop-shadow">Daily Mix {i + 1}</p>
       </div>
       <p className="mt-2 truncate px-1 text-xs text-muted">{s.name} &amp; lagi</p>
@@ -248,52 +257,49 @@ function DailyMix({ kind }: { kind: SectionConfig["kind"] }) {
 }
 
 function Trending({ kind }: { kind: SectionConfig["kind"] }) {
-  const { data, loading, error } = useChart();
+  const { data, loading, error } = useHome();
   if (error) return <ErrorNote msg={error} />;
   if (loading || !data) return <RowSkeleton />;
-  return <Tracks tracks={data.tracks} kind={kind} />;
+  return <Tracks tracks={data.tracks.english} kind={kind} />;
 }
 
 function TopHits({ kind }: { kind: SectionConfig["kind"] }) {
-  const { data, loading, error } = useChart();
+  const { data, loading, error } = useHome();
   if (error) return <ErrorNote msg={error} />;
   if (loading || !data) return <RowSkeleton />;
-  const playPl = async (id: string) => {
-    const p = await catalog.playlist(id);
-    void usePlayer.getState().playList(p.tracks.filter((t) => t.playable), 0, { shuffle: false });
-  };
-  if (kind === "list") return <Tracks tracks={data.tracks.slice(10)} kind="list" />;
-  const cards = data.playlists.map((p) => <PlaylistCard key={p.id} p={p} href={`/playlist?id=dz-${p.id}`} onPlay={() => playPl(p.id)} grid={kind === "grid"} />);
-  return kind === "grid" ? <Collection kind="grid">{cards}</Collection> : <HScroll>{cards}</HScroll>;
+  return <Tracks tracks={data.tracks.ai} kind={kind} />;
 }
 
 const playAlbum = async (id: string) => {
-  const a = await catalog.album(id);
-  if (a.tracks?.length) void usePlayer.getState().playList(a.tracks, 0, { shuffle: false });
+  const a = await youtubePlaylist(id);
+  if (a.tracks.length) void usePlayer.getState().playList(a.tracks, 0, { shuffle: false });
 };
 
+function AlbumRow({ list, kind }: { list: import("@/lib/types").Album[]; kind: SectionConfig["kind"] }) {
+  const cards = list.map((a) => <AlbumCard key={a.id} a={a} grid={kind === "grid"} onPlay={() => playAlbum(a.id)} />);
+  return kind === "grid" ? <Collection kind="grid">{cards}</Collection> : <HScroll>{cards}</HScroll>;
+}
+
 function NewReleases({ kind }: { kind: SectionConfig["kind"] }) {
-  const { data, loading, error } = useAsync("releases", () => catalog.newReleases());
+  const { data, loading, error } = useHome();
   if (error) return <ErrorNote msg={error} />;
   if (loading || !data) return <RowSkeleton />;
-  const cards = data.map((a) => <AlbumCard key={a.id} a={a} grid={kind === "grid"} onPlay={() => playAlbum(a.id)} />);
-  return kind === "grid" ? <Collection kind="grid">{cards}</Collection> : <HScroll>{cards}</HScroll>;
+  return <AlbumRow list={data.albums.english} kind={kind} />;
 }
 
 function Artists({ kind }: { kind: SectionConfig["kind"] }) {
-  const { data, loading, error } = useChart();
+  const { data, loading, error } = useHome();
+  void kind;
   if (error) return <ErrorNote msg={error} />;
   if (loading || !data) return <RowSkeleton />;
-  if (kind === "row") return <HScroll>{data.artists.map((a) => <ArtistCircle key={a.id} a={a} />)}</HScroll>;
-  return <HScroll>{data.artists.map((a) => <ArtistCircle key={a.id} a={a} />)}</HScroll>;
+  return <HScroll>{data.artists.english.map((a) => <ArtistCircle key={a.id} a={a} />)}</HScroll>;
 }
 
 function Albums({ kind }: { kind: SectionConfig["kind"] }) {
-  const { data, loading, error } = useChart();
+  const { data, loading, error } = useHome();
   if (error) return <ErrorNote msg={error} />;
   if (loading || !data) return <RowSkeleton />;
-  const cards = data.albums.map((a) => <AlbumCard key={a.id} a={a} grid={kind === "grid"} onPlay={() => playAlbum(a.id)} />);
-  return kind === "grid" ? <Collection kind="grid">{cards}</Collection> : <HScroll>{cards}</HScroll>;
+  return <AlbumRow list={[...data.albums.english, ...data.albums.malay]} kind={kind} />;
 }
 
 function Favourites({ kind }: { kind: SectionConfig["kind"] }) {
@@ -346,10 +352,8 @@ function Playlists({ kind }: { kind: SectionConfig["kind"] }) {
 }
 
 function Genres({ kind }: { kind: SectionConfig["kind"] }) {
-  const { data, loading } = useAsync("genres", () => catalog.genres(), 3600_000);
-  if (loading || !data) return <RowSkeleton />;
-  const items = data.map((g, i) => (
-    <Link key={g.id} href={`/search?q=${encodeURIComponent(g.name)}`} className={cx("relative block h-24 shrink-0 overflow-hidden rounded-[var(--radius)] p-3", kind === "row" && "w-44")}>
+  const items = MOODS.map((g, i) => (
+    <Link key={g.name} href={`/search?q=${encodeURIComponent(g.q)}`} className={cx("relative block h-24 shrink-0 overflow-hidden rounded-[var(--radius)] p-3", kind === "row" && "w-44")}>
       <div className="grad-bg absolute inset-0" style={{ filter: `hue-rotate(${i * 27}deg)` }} />
       <span className="relative font-display text-lg font-bold text-white drop-shadow">{g.name}</span>
     </Link>
@@ -357,41 +361,46 @@ function Genres({ kind }: { kind: SectionConfig["kind"] }) {
   return kind === "row" ? <HScroll>{items}</HScroll> : <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">{items}</div>;
 }
 
-/** Before the user has any history: a Malay mix (nasyid + jiwang + rock). Replaced by their own taste as they listen. */
+/** Before the user has any history: a mix of every kind. Replaced by their own taste as they listen. */
 function StarterMix({ kind }: { kind: SectionConfig["kind"] }) {
-  const { data, loading, error } = useAsync("my:starter", () => mixFrom([...MALAY.nasyid.slice(0, 3), ...MALAY.jiwang.slice(0, 3), ...MALAY.rock.slice(0, 3)], 2));
+  const { data, loading, error } = useAsync("starter2", async () => {
+    const h = await loadContent();
+    const pools = (["nasyid", "ai", "jiwang", "rock", "zikir", "english"] as Category[]).map((k) => shuffle(h.tracks[k]).slice(0, 5));
+    const out: Track[] = [];
+    for (let i = 0; i < 5; i++) for (const p of pools) if (p[i]) out.push(p[i]);
+    return out;
+  });
   if (error) return <ErrorNote msg={error} />;
   if (loading || !data) return <RowSkeleton />;
   return <Tracks tracks={data} kind={kind} />;
 }
 
-function MalayTracks({ cacheKey, ids, per, kind }: { cacheKey: string; ids: string[]; per: number; kind: SectionConfig["kind"] }) {
-  const { data, loading, error } = useAsync(cacheKey, () => mixFrom(ids, per));
+function CategoryTracks({ cat, kind }: { cat: Category; kind: SectionConfig["kind"] }) {
+  const { data, loading, error } = useHome();
   if (error) return <ErrorNote msg={error} />;
   if (loading || !data) return <RowSkeleton />;
-  return <Tracks tracks={data} kind={kind} />;
+  return <Tracks tracks={data.tracks[cat]} kind={kind} />;
 }
 
 function RockAlbums({ kind }: { kind: SectionConfig["kind"] }) {
-  const { data, loading, error } = useAsync("my:rockAlbums", () => albumsFrom(MALAY.rock, 2));
+  const { data, loading, error } = useHome();
   if (error) return <ErrorNote msg={error} />;
   if (loading || !data) return <RowSkeleton />;
-  const cards = data.map((a) => <AlbumCard key={a.id} a={a} grid={kind === "grid"} onPlay={() => playAlbum(a.id)} />);
-  return kind === "grid" ? <Collection kind="grid">{cards}</Collection> : <HScroll>{cards}</HScroll>;
+  return <AlbumRow list={data.albums.malay.length ? data.albums.malay : data.albums.english} kind={kind} />;
 }
 
 function MalayArtists() {
-  const { data, loading, error } = useAsync("my:artists", () => artistsFrom([...MALAY.nasyid.slice(0, 4), "5157170", ...MALAY.jiwang.slice(0, 4), ...MALAY.rock.slice(0, 4)]));
+  const { data, loading, error } = useHome();
   if (error) return <ErrorNote msg={error} />;
   if (loading || !data) return <RowSkeleton />;
-  return <HScroll>{data.map((a) => <ArtistCircle key={a.id} a={a} />)}</HScroll>;
+  return <HScroll>{data.artists.malay.map((a) => <ArtistCircle key={a.id} a={a} />)}</HScroll>;
 }
 
 export const SECTION_COMPONENT: Record<SectionId, (p: { kind: SectionConfig["kind"] }) => React.ReactNode> = {
   greeting: () => <Greeting />,
-  nasyid: ({ kind }) => <MalayTracks cacheKey="my:nasyid" ids={MALAY.nasyid} per={4} kind={kind} />,
-  zikir: ({ kind }) => <MalayTracks cacheKey="my:zikir" ids={MALAY.zikir} per={5} kind={kind} />,
-  jiwang: ({ kind }) => <MalayTracks cacheKey="my:jiwang" ids={MALAY.jiwang} per={3} kind={kind} />,
+  nasyid: ({ kind }) => <CategoryTracks cat="nasyid" kind={kind} />,
+  zikir: ({ kind }) => <CategoryTracks cat="zikir" kind={kind} />,
+  jiwang: ({ kind }) => <CategoryTracks cat="jiwang" kind={kind} />,
   rockAlbums: RockAlbums,
   malayArtists: () => <MalayArtists />,
   continue: Continue,

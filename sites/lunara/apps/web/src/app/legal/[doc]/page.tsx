@@ -4,8 +4,8 @@ const DOCS: Record<string, { title: string; body: string[] }> = {
   terms: {
     title: "Terma & Syarat",
     body: [
-      "LUNARA MUSIC menyediakan carian katalog muzik, pratonton yang dibenarkan pembekal, dan pemain untuk fail muzik milik anda sendiri.",
-      "Kandungan katalog (metadata, kulit album, pratonton 30 saat) disediakan oleh Deezer melalui API awamnya dan tertakluk kepada terma Deezer. LUNARA MUSIC tidak menyediakan muat turun lagu katalog.",
+      "LUNARA MUSIC menyediakan carian muzik, pemain lagu dan video melalui pemain rasmi YouTube, serta pemain untuk fail muzik milik anda sendiri.",
+      "Lagu dan video dimainkan melalui pemain rasmi YouTube dan tertakluk kepada Terma Perkhidmatan YouTube. LUNARA MUSIC tidak menyediakan muat turun lagu atau video YouTube.",
       "Fail muzik yang anda import kekal milik anda. Anda bertanggungjawab memastikan anda berhak memainkannya.",
       "LUNARA MUSIC tiada iklan. Kami tidak menjual data anda.",
       "Penyalahgunaan (cubaan memintas DRM, mengikis data secara automatik, atau menyerang perkhidmatan) akan menyebabkan akaun digantung.",

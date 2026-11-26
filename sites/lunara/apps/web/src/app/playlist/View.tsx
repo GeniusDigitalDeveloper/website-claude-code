@@ -2,9 +2,8 @@
 import { Copy, Globe, ImagePlus, ListEnd, Lock, Pencil, Play, Plus, Search, Shuffle, Trash2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState } from "react";
-import { catalog } from "@/lib/catalog";
 import { useAsync } from "@/lib/useAsync";
-import { youtubePlaylist } from "@/lib/yt-search";
+import { searchYouTube, youtubePlaylist } from "@/lib/yt-search";
 import type { Track } from "@/lib/types";
 import { useLibrary } from "@/store/library";
 import { tr } from "@/i18n";
@@ -37,42 +36,11 @@ function YouTubePlaylist({ id }: { id: string }) {
   );
 }
 
-function DeezerPlaylist({ id }: { id: string }) {
-  const { data, loading, error } = useAsync(`pl:${id}`, () => catalog.playlist(id));
-  if (error) return <p className="p-8 text-muted">Playlist tidak dapat dimuatkan: {error}</p>;
-  if (loading || !data) return <Skeleton className="m-8 h-72" />;
-  const playable = data.tracks.filter((t) => t.playable);
-  return (
-    <div>
-      <CollectionHeader cover={data.cover} kicker="Playlist editorial" title={data.title} meta={`${data.creator ?? "Deezer"} · ${data.tracks.length} lagu`}>
-        <Btn onClick={() => usePlayer.getState().playList(playable, 0, { shuffle: false })}>
-          <Play className="h-4 w-4 fill-current" /> Main
-        </Btn>
-        <Btn variant="ghost" onClick={() => usePlayer.getState().playList(playable, 0, { shuffle: true })}>
-          <Shuffle className="h-4 w-4" /> Rawak
-        </Btn>
-        <Btn
-          variant="ghost"
-          onClick={() => {
-            useLibrary.getState().createPlaylist({ name: data.title, description: data.description ?? "", cover: data.cover, tracks: data.tracks });
-            toast("Disalin ke playlist anda");
-          }}
-        >
-          <Copy className="h-4 w-4" /> Salin ke pustaka
-        </Btn>
-      </CollectionHeader>
-      <div className="px-2 md:px-6">
-        <TrackList tracks={data.tracks} numbered />
-      </div>
-    </div>
-  );
-}
-
 function AddSongs({ onAdd }: { onAdd: (t: Track) => void }) {
   const [q, setQ] = useState("");
   const [term, setTerm] = useState("");
   const local = useLibrary((s) => s.localTracks);
-  const { data, loading } = useAsync(term ? `search:${term}` : null, () => catalog.searchAll(term));
+  const { data, loading } = useAsync(term ? `yts:${term}` : null, () => searchYouTube(term), 60 * 60_000);
   const lh = term ? local.filter((t) => `${t.title} ${t.artist} ${t.album}`.toLowerCase().includes(term.toLowerCase())) : local.slice(0, 8);
   const row = (t: Track) => (
     <div key={t.id} className="flex items-center gap-3 rounded-xl p-1.5 hover:bg-card-hover">
@@ -96,12 +64,12 @@ function AddSongs({ onAdd }: { onAdd: (t: Track) => void }) {
         className="relative"
       >
         <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-faint" />
-        <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} className={`${inputCls} pl-9`} placeholder="Cari lagu katalog atau muzik peranti" aria-label="Cari lagu untuk ditambah" />
+        <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} className={`${inputCls} pl-9`} placeholder="Cari lagu atau muzik peranti" aria-label="Cari lagu untuk ditambah" />
       </form>
       <div className="thin-scroll mt-3 max-h-[50vh] overflow-y-auto">
         {lh.length > 0 && <p className="px-1 py-1 text-[11px] font-semibold text-faint uppercase">Muzik peranti</p>}
         {lh.map(row)}
-        {term && <p className="px-1 py-1 text-[11px] font-semibold text-faint uppercase">Katalog</p>}
+        {term && <p className="px-1 py-1 text-[11px] font-semibold text-faint uppercase">Lagu</p>}
         {loading && <Skeleton className="h-40" />}
         {data?.tracks.map(row)}
       </div>
@@ -275,5 +243,5 @@ function UserPlaylistView({ id }: { id: string }) {
 export function View() {
   const id = useSearchParams().get("id") ?? "";
   if (id.startsWith("ytp-")) return <YouTubePlaylist id={id} />;
-  return id.startsWith("dz-") ? <DeezerPlaylist id={id.slice(3)} /> : <UserPlaylistView id={id} />;
+  return <UserPlaylistView id={id} />;
 }

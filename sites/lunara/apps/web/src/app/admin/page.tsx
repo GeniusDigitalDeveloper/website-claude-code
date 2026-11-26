@@ -3,7 +3,7 @@ import { Activity, AlertTriangle, Flag, ListMusic, Plus, RefreshCw, Shield, Tags
 import { addDoc, collection, deleteDoc, doc, getCountFromServer, getDocs, limit, orderBy, query, serverTimestamp, updateDoc } from "firebase/firestore";
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { db, firebaseEnabled } from "@/lib/firebase";
-import { pingCatalog } from "@/lib/catalog";
+import { testYouTube } from "@/lib/youtube";
 import { useAuth } from "@/store/auth";
 import { toast } from "@/store/toast";
 import { Btn, cx, Empty, inputCls, Spinner } from "@/components/ui";
@@ -23,21 +23,18 @@ function Stat({ icon, label, value }: { icon: ReactNode; label: string; value: R
 }
 
 function ApiStatus() {
-  const [s, setS] = useState<{ ok: boolean; ms: number; at: string } | null>(null);
+  const [s, setS] = useState<{ ok: boolean; ms: number; at: string; detail: string } | null>(null);
   const check = useCallback(async () => {
-    try {
-      const ms = await pingCatalog();
-      setS({ ok: true, ms, at: new Date().toLocaleTimeString("ms-MY") });
-    } catch {
-      setS({ ok: false, ms: 0, at: new Date().toLocaleTimeString("ms-MY") });
-    }
+    const t0 = performance.now();
+    const r = await testYouTube();
+    setS({ ok: r.ok, ms: Math.round(performance.now() - t0), at: new Date().toLocaleTimeString("ms-MY"), detail: r.detail });
   }, []);
   useEffect(() => void check(), [check]);
   return (
     <div className="panel p-4">
       <div className="flex items-center justify-between">
         <p className="flex items-center gap-2 text-xs font-semibold text-muted">
-          <Activity className="h-4 w-4" /> Status API katalog (Deezer)
+          <Activity className="h-4 w-4" /> Status API YouTube
         </p>
         <button onClick={check} aria-label="Semak semula" className="cursor-pointer text-muted hover:text-fg">
           <RefreshCw className="h-4 w-4" />
@@ -45,7 +42,7 @@ function ApiStatus() {
       </div>
       {s ? (
         <p className="mt-2 flex items-center gap-2 text-lg font-bold">
-          <span className={cx("h-3 w-3 rounded-full", s.ok ? "bg-emerald-500" : "bg-rose-500")} /> {s.ok ? `Beroperasi · ${s.ms} ms` : "Tidak dapat dicapai"}
+          <span className={cx("h-3 w-3 rounded-full", s.ok ? "bg-emerald-500" : "bg-rose-500")} /> {s.ok ? `Beroperasi · ${s.ms} ms` : `Tidak dapat dicapai: ${s.detail}`}
           <span className="text-xs font-normal text-muted">({s.at})</span>
         </p>
       ) : (
@@ -75,7 +72,7 @@ const when = (v: any) => (v?.toDate ? v.toDate().toLocaleString("ms-MY") : "—"
 
 function Featured() {
   const { rows, load } = useCol("lunara_featured");
-  const [f, setF] = useState({ title: "", deezerPlaylistId: "" });
+  const [f, setF] = useState({ title: "", ytPlaylistId: "" });
   return (
     <div className="panel p-5">
       <h2 className="flex items-center gap-2 font-display text-lg font-bold">
@@ -85,14 +82,16 @@ function Featured() {
         className="mt-3 flex flex-wrap gap-2"
         onSubmit={async (e) => {
           e.preventDefault();
-          if (!/^\d+$/.test(f.deezerPlaylistId)) return toast("ID playlist Deezer mesti nombor");
-          await addDoc(collection(db()!, "lunara_featured"), { ...f, active: true, createdAt: serverTimestamp() });
-          setF({ title: "", deezerPlaylistId: "" });
+          // accepts a playlist link or a bare ID
+          const id = /[?&]list=([A-Za-z0-9_-]+)/.exec(f.ytPlaylistId)?.[1] ?? f.ytPlaylistId.trim();
+          if (!/^[A-Za-z0-9_-]{10,64}$/.test(id)) return toast("Tampal pautan atau ID playlist YouTube yang sah");
+          await addDoc(collection(db()!, "lunara_featured"), { title: f.title, ytPlaylistId: id, active: true, createdAt: serverTimestamp() });
+          setF({ title: "", ytPlaylistId: "" });
           void load();
         }}
       >
         <input className={cx(inputCls, "max-w-xs")} placeholder="Tajuk paparan" value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} required />
-        <input className={cx(inputCls, "max-w-[200px]")} placeholder="ID playlist Deezer" value={f.deezerPlaylistId} onChange={(e) => setF({ ...f, deezerPlaylistId: e.target.value })} required />
+        <input className={cx(inputCls, "max-w-sm")} placeholder="Pautan atau ID playlist YouTube" value={f.ytPlaylistId} onChange={(e) => setF({ ...f, ytPlaylistId: e.target.value })} required />
         <Btn type="submit">
           <Plus className="h-4 w-4" /> Tambah
         </Btn>
@@ -101,7 +100,7 @@ function Featured() {
         {rows?.map((r) => (
           <div key={r.id} className="flex items-center gap-3 py-2 text-sm">
             <span className="flex-1 truncate font-medium">{r.title}</span>
-            <span className="text-xs text-muted">#{r.deezerPlaylistId}</span>
+            <span className="text-xs text-muted">{r.ytPlaylistId ?? "(lama)"}</span>
             <button onClick={async () => (await updateDoc(doc(db()!, "lunara_featured", r.id), { active: !r.active }), load())} className={cx("cursor-pointer rounded-full px-2 py-0.5 text-xs font-semibold ring-1", r.active ? "text-emerald-600 ring-emerald-500/40 dark:text-emerald-300" : "text-muted ring-line")}>
               {r.active ? "Aktif" : "Tidak aktif"}
             </button>

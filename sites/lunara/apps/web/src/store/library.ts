@@ -181,7 +181,41 @@ export const useLibrary = create<LibraryState>()(
       skipHydration: true,
       storage: createJSONStorage(() => idbStorage),
       partialize: ({ hydrated, ...rest }) => (void hydrated, rest),
-      onRehydrateStorage: () => () => useLibrary.setState({ hydrated: true }),
+      onRehydrateStorage: () => () => {
+        useLibrary.setState({ hydrated: true });
+        setTimeout(purgeLegacyLibrary, 0);
+      },
     },
   ),
 );
+
+/**
+ * LUNARA now uses YouTube only: remove anything saved from the old Deezer catalogue ("dz:" songs, numeric
+ * artist ids, Deezer albums) from this device and, through sync, from the account.
+ */
+export function purgeLegacyLibrary() {
+  const s = useLibrary.getState();
+  const old = (t?: { id: string } | null) => !!t && t.id.startsWith("dz:");
+  const changed: string[] = [];
+  const patch: Partial<LibraryState> = {};
+  const clean = <K extends "favourites" | "recent">(k: K) => {
+    const v = s[k].filter((t) => !old(t));
+    if (v.length !== s[k].length) (patch[k] = v as LibraryState[K], changed.push(k));
+  };
+  clean("favourites");
+  clean("recent");
+  if (s.playlists.some((p) => p.tracks.some(old))) {
+    patch.playlists = s.playlists.map((p) => ({ ...p, tracks: p.tracks.filter((t) => !old(t)) }));
+    changed.push("playlists");
+  }
+  const albums = s.savedAlbums.filter((a) => a.id.startsWith("ytp-"));
+  if (albums.length !== s.savedAlbums.length) (patch.savedAlbums = albums, changed.push("savedAlbums"));
+  const plays = Object.fromEntries(Object.entries(s.artistPlays).filter(([id]) => id.startsWith("ytc:")));
+  if (Object.keys(plays).length !== Object.keys(s.artistPlays).length) (patch.artistPlays = plays, changed.push("artistPlays"));
+  const progress = Object.fromEntries(Object.entries(s.progress ?? {}).filter(([id]) => !id.startsWith("dz:")));
+  if (Object.keys(progress).length !== Object.keys(s.progress ?? {}).length) (patch.progress = progress, changed.push("progress"));
+  if (old(s.resume?.track)) (patch.resume = null, changed.push("resume"));
+  if (!changed.length) return;
+  const t = Date.now();
+  useLibrary.setState({ ...patch, updatedAt: { ...s.updatedAt, ...Object.fromEntries(changed.map((k) => [k, t])) } });
+}

@@ -2,7 +2,8 @@
 import { Bookmark, BookmarkCheck, ListEnd, Play, Shuffle } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { catalog } from "@/lib/catalog";
+import type { Album } from "@/lib/types";
+import { youtubePlaylist } from "@/lib/yt-search";
 import { useAsync } from "@/lib/useAsync";
 import { useLibrary } from "@/store/library";
 import { usePlayer } from "@/store/player";
@@ -11,9 +12,17 @@ import { CollectionHeader } from "@/components/media/CollectionHeader";
 import { TrackList } from "@/components/music/TrackRow";
 import { Btn, fmtLong, Skeleton } from "@/components/ui";
 
+/** An album = a YouTube (Music) album playlist. */
+async function ytAlbum(id: string): Promise<Album & { tracks: NonNullable<Album["tracks"]> }> {
+  if (!id.startsWith("ytp-")) throw new Error("album ini dari sumber lama dan tidak lagi tersedia");
+  const p = await youtubePlaylist(id);
+  const duration = p.tracks.reduce((n, t) => n + (t.duration || 0), 0);
+  return { id, title: p.title, artist: p.creator ?? "", cover: p.cover, tracks: p.tracks, duration, nbTracks: p.tracks.length, recordType: "album" };
+}
+
 export function View() {
   const id = useSearchParams().get("id") ?? "";
-  const { data: a, loading, error } = useAsync(`album:${id}`, () => catalog.album(id));
+  const { data: a, loading, error } = useAsync(`album2:${id}`, () => ytAlbum(id));
   const saved = useLibrary((s) => s.savedAlbums.some((x) => x.id === id));
   if (error) return <p className="p-8 text-muted">Album tidak dapat dimuatkan: {error}</p>;
   if (loading || !a) return <Skeleton className="m-8 h-72" />;

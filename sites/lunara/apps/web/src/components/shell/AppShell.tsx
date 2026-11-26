@@ -176,7 +176,15 @@ export function AppShell({ children }: { children: ReactNode }) {
     void Promise.all([
       useSettings.persist.rehydrate(),
       useLayout.persist.rehydrate(),
-      usePlayer.persist.rehydrate(),
+      Promise.resolve(usePlayer.persist.rehydrate()).then(() => {
+        // old Deezer songs in the saved queue are dropped (YouTube only now)
+        const p = usePlayer.getState();
+        if (p.queue.some((t) => t.id.startsWith("dz:"))) {
+          const cur = p.queue[p.index];
+          const q = p.queue.filter((t) => !t.id.startsWith("dz:"));
+          usePlayer.setState({ queue: q, index: Math.max(0, cur ? q.findIndex((t) => t.id === cur.id) : 0) });
+        }
+      }),
     ]).then(() => {
       wirePlayer();
       useAuth.getState().init();

@@ -2,10 +2,10 @@
 export type TrackSource = "stream" | "local" | "imported";
 
 export interface Track {
-  /** Unique within LUNARA MUSIC: "dz:<id>" for Deezer catalogue, "loc:<uuid>" for local/imported files. */
+  /** Unique within LUNARA MUSIC: "yt:<video id>" for YouTube, "loc:<uuid>" for local/imported files. */
   id: string;
   source: TrackSource;
-  provider: "deezer" | "device" | "youtube";
+  provider: "device" | "youtube";
   title: string;
   artist: string;
   artistId?: string;
@@ -14,7 +14,7 @@ export interface Track {
   artwork?: string;
   /** Full length of the recording in seconds (catalogue metadata). */
   duration: number;
-  /** Seconds the provider authorises us to play. Deezer public API = 30s preview. */
+  /** Seconds the provider authorises us to play (unused for full YouTube playback). */
   playableSeconds?: number;
   /** False when the provider says it is not playable in this territory. */
   playable: boolean;

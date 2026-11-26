@@ -32,7 +32,7 @@ function load(): { size: Size; pos: { x: number; y: number } | null } {
 export function YouTubeHost() {
   const t = usePlayer((s) => s.queue[s.index]);
   const full = usePlayer((s) => s.full);
-  const show = Boolean(t && full && (t.provider === "deezer" || t.provider === "youtube"));
+  const show = Boolean(t && full && t.provider === "youtube");
   const popped = useYtWindow((s) => s.popped);
   const canPop = useYtWindow((s) => s.supported);
   const [size, setSize] = useState<Size>("s");

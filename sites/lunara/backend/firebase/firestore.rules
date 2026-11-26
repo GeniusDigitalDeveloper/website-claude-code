@@ -731,10 +731,10 @@ service cloud.firestore {
     match /lunara_featured/{id} {
       allow read: if true;
       allow write: if lunaraIsAdmin()
-        && request.resource.data.keys().hasOnly(['title', 'deezerPlaylistId', 'active', 'createdAt'])
+        && request.resource.data.keys().hasOnly(['title', 'ytPlaylistId', 'active', 'createdAt'])
         && request.resource.data.title is string && request.resource.data.title.size() <= 120
-        && request.resource.data.deezerPlaylistId is string
-        && request.resource.data.deezerPlaylistId.matches('^[0-9]{1,20}$');
+        && request.resource.data.ytPlaylistId is string
+        && request.resource.data.ytPlaylistId.matches('^[A-Za-z0-9_-]{10,64}$');
     }
     match /lunara_genres/{id} {
       allow read: if true;

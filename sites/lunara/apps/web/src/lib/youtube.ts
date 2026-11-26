@@ -2,15 +2,10 @@
 /**
  * Full-length playback through the official YouTube IFrame Player (in-app, no other app needed).
  *
- * - The catalogue song (title + artist) is matched to a YouTube video with the YouTube Data API
- *   (`NEXT_PUBLIC_YT_KEY`). Matches are cached on the device and in Firestore (lunara_yt) so each
- *   song costs search quota only once for everyone.
+ * - Songs and videos come from YouTube itself (search, channels, playlists: see yt-search.ts).
  * - YouTube's terms require the player to stay visible (≥ 200×200 px): <YouTubeHost/> shows it.
  * - Fades are real volume ramps through the player's setVolume().
- * - If there is no key, the quota is used up, or no video is found, the caller falls back to the preview.
  */
-import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
-import { auth, db } from "./firebase";
 import type { Track } from "./types";
 import type { EngineEvent, FadeSettings } from "./audio-engine";
 import { create } from "zustand";
@@ -22,13 +17,13 @@ const KEY = process.env.NEXT_PUBLIC_YT_KEY ?? "";
 let disabledUntil = 0; // set when the key is rejected or the daily quota is exhausted
 
 export const youtubeEnabled = () => Boolean(KEY) && Date.now() > disabledUntil;
-let lastError = "";
+const lastError = "";
 
-/** Diagnostic used in Settings: runs one real search from this browser and reports what Google answered. */
+/** Diagnostic used in Settings/Admin: one cheap real request (1 quota unit) from this browser. */
 export async function testYouTube(): Promise<{ ok: boolean; detail: string }> {
   if (!KEY) return { ok: false, detail: "Tiada kunci YouTube dalam binaan ini." };
   try {
-    const r = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=1&q=raihan&key=${KEY}`);
+    const r = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet&id=dQw4w9WgXcQ&key=${KEY}`);
     const d = await r.json();
     if (d.error) return { ok: false, detail: `${d.error.code} ${d.error.message} ${(d.error.details ?? []).map((x: { reason?: string }) => x.reason ?? "").join(" ")}`.trim() };
     disabledUntil = 0;
@@ -39,110 +34,9 @@ export async function testYouTube(): Promise<{ ok: boolean; detail: string }> {
 }
 export const youtubeLastError = () => lastError;
 
-const LS = "lunara-yt:";
-const dzId = (t: Track) => t.id.replace(/^dz:/, "");
-
-function norm(s: string) {
-  return s
-    .toLowerCase()
-    .normalize("NFKD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/\(.*?\)|\[.*?\]/g, " ")
-    .replace(/[^a-z0-9 ]+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-/** Best playable YouTube video candidates for a catalogue track (best first). Empty when unavailable. */
-export async function findVideos(t: Track): Promise<string[]> {
-  if (t.provider === "youtube") return [t.id.replace(/^yt:/, "")];
-  const v = await findVideo(t);
-  if (!v) return [];
-  try {
-    const extra = JSON.parse(localStorage.getItem(LS + "c:" + dzId(t)) ?? "[]") as string[];
-    return [v, ...extra.filter((x) => x !== v)];
-  } catch {
-    return [v];
-  }
-}
-
-/** Remember that a video can't be embedded, so it is skipped next time. */
-export function markBadVideo(t: Track, videoId: string) {
-  const id = dzId(t);
-  try {
-    const extra = (JSON.parse(localStorage.getItem(LS + "c:" + id) ?? "[]") as string[]).filter((x) => x !== videoId);
-    localStorage.setItem(LS + "c:" + id, JSON.stringify(extra));
-    localStorage.setItem(LS + id, extra[0] ?? "-");
-  } catch {
-    /* ignore */
-  }
-}
-
-/** Find (and cache) the YouTube video for a catalogue track. Returns null when unavailable. */
+/** The YouTube video behind a track (every streamed track in LUNARA is a YouTube video). */
 export async function findVideo(t: Track): Promise<string | null> {
-  if (t.provider === "youtube") return t.id.replace(/^yt:/, "");
-  if (t.provider !== "deezer") return null;
-  const id = dzId(t);
-  try {
-    const hit = localStorage.getItem(LS + id);
-    if (hit) return hit === "-" ? null : hit;
-  } catch {
-    /* ignore */
-  }
-  if (!KEY) return null; // no YouTube key configured: play the preview without any delay
-  const d = db();
-  if (d) {
-    const snap = await getDoc(doc(d, "lunara_yt", id)).catch(() => null);
-    const v = snap?.data()?.v as string | undefined;
-    if (v) {
-      remember(id, v);
-      return v;
-    }
-  }
-  if (!youtubeEnabled()) return null;
-  const q = `${t.artist} ${t.title}`;
-  const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoEmbeddable=true&videoSyndicated=true&maxResults=8&q=${encodeURIComponent(q)}&key=${KEY}`;
-  let data: { items?: { id: { videoId: string }; snippet: { title: string; channelTitle: string } }[]; error?: { code: number } };
-  try {
-    data = await (await fetch(url)).json();
-  } catch {
-    return null;
-  }
-  if (data.error) {
-    lastError = `${data.error.code}`;
-    disabledUntil = Date.now() + (data.error.code === 403 ? 30 * 60_000 : 60_000);
-    return null;
-  }
-  const items = data.items ?? [];
-  const title = norm(t.title);
-  const artist = norm(t.artist);
-  const score = (it: (typeof items)[number]) => {
-    const s = norm(`${it.snippet.title} ${it.snippet.channelTitle}`);
-    let p = 0;
-    if (s.includes(title)) p += 3;
-    if (s.includes(artist)) p += 2;
-    if (/karaoke|cover|instrumental|minus one|reaction|tutorial|lirik minus/.test(s)) p -= 3;
-    if (/official|audio|topic|music video|lirik/.test(s)) p += 1;
-    return p;
-  };
-  const ranked = [...items].filter((it) => score(it) >= 3).sort((a, b) => score(b) - score(a)).map((it) => it.id.videoId);
-  const vid = ranked[0] ?? null;
-  remember(id, vid ?? "-");
-  try {
-    localStorage.setItem(LS + "c:" + id, JSON.stringify(ranked.slice(1)));
-  } catch {
-    /* ignore */
-  }
-  if (vid && d && auth()?.currentUser) void setDoc(doc(d, "lunara_yt", id), { v: vid, at: serverTimestamp() }).catch(() => {});
-  return vid;
-}
-
-function remember(id: string, v: string) {
-  try {
-    localStorage.setItem(LS + id, v);
-  } catch {
-    /* ignore */
-  }
+  return t.provider === "youtube" ? t.id.replace(/^yt:/, "") : null;
 }
 
 /* ------------------------------------------------------------------ */

@@ -2,15 +2,14 @@
 import { History, Search, TrendingUp, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { catalog } from "@/lib/catalog";
-import { MALAY_SEARCH_CHIPS } from "@/lib/malay";
+import { MOODS } from "@/lib/content";
 import { useAsync } from "@/lib/useAsync";
 import { searchYouTube } from "@/lib/yt-search";
 import type { Track } from "@/lib/types";
 import { useLibrary } from "@/store/library";
 import { AlbumCard, ArtistCircle, PlaylistCard } from "@/components/music/Cards";
 import { TrackList } from "@/components/music/TrackRow";
-import { cx, Empty, HScroll, SectionHead, Segmented, Skeleton } from "@/components/ui";
+import { Empty, HScroll, SectionHead, Segmented, Skeleton } from "@/components/ui";
 
 type Tab = "all" | "youtube" | "tracks" | "artists" | "albums" | "playlists" | "device";
 
@@ -24,12 +23,11 @@ export function SearchView() {
 
   useEffect(() => setTab("all"), [submitted]);
 
-  const res = useAsync(submitted ? `search:${submitted}` : null, () => catalog.searchAll(submitted));
   const yt = useAsync(submitted ? `yts:${submitted}` : null, () => searchYouTube(submitted), 60 * 60_000);
-  const trending = MALAY_SEARCH_CHIPS;
+  const trending = MOODS.map((m) => m.q);
   // Everything mixed together (catalogue + YouTube), albums kept in their own section
   const loading = yt.loading && !yt.data && !yt.error;
-  const { tracks, artists, albums, playlists } = useMemo(() => mergeResults(res.data, yt.data), [res.data, yt.data]);
+  const { tracks, artists, albums, playlists } = useMemo(() => splitResults(yt.data), [yt.data]);
 
   const localHits = useMemo(() => {
     const s = submitted.toLowerCase();
@@ -186,7 +184,7 @@ export function SearchView() {
               {((tab === "albums" && !albums.length) || (tab === "playlists" && !playlists.length) || (tab === "artists" && !artists.length)) && (
                 <Empty icon={<Search className="h-5 w-5" />} title={`Tiada hasil untuk "${submitted}"`} />
               )}
-              {res.error && yt.error && <p className="rounded-xl bg-card p-4 text-sm text-muted">Carian gagal buat masa ini. Cuba lagi sebentar.</p>}
+              {yt.error && <p className="rounded-xl bg-card p-4 text-sm text-muted">{yt.error}</p>}
             </div>
           )}
         </div>
@@ -196,31 +194,14 @@ export function SearchView() {
 }
 
 
-const key = (t: Track) =>
-  `${t.artist} ${t.title}`
-    .toLowerCase()
-    .replace(/\(.*?\)|\[.*?\]/g, "")
-    .replace(/[^a-z0-9]+/g, "");
-
-
-function mergeResults(dz?: Awaited<ReturnType<typeof catalog.searchAll>>, yt?: Awaited<ReturnType<typeof searchYouTube>>) {
-  const seen = new Set<string>();
-  const tracks = [...(yt?.tracks ?? []), ...(dz?.tracks ?? [])].filter((t) => {
-    const k = key(t);
-    if (seen.has(k)) return false;
-    seen.add(k);
-    return true;
-  });
-  const names = new Set<string>();
-  const artists = [...(yt?.channels ?? []), ...(dz?.artists ?? [])].filter((a) => {
-    const k = a.name.toLowerCase().replace(/\s*-\s*topic$/, "").replace(/[^a-z0-9]+/g, "");
-    if (names.has(k)) return false;
-    names.add(k);
-    return true;
-  });
-  const playlists = [
-    ...(yt?.playlists ?? []).map((p) => ({ ...p, href: `/playlist?id=${p.id}` })),
-    ...(dz?.playlists ?? []).map((p) => ({ ...p, href: `/playlist?id=dz-${p.id}` })),
-  ];
-  return { tracks, artists, albums: dz?.albums ?? [], playlists };
+/** YouTube results: songs, artists (channels), albums (album playlists) and other playlists, each in its own section. */
+function splitResults(yt?: Awaited<ReturnType<typeof searchYouTube>>) {
+  const isAlbum = (p: { id: string; title: string }) => p.id.startsWith("ytp-OLAK5uy") || /\balbum\b/i.test(p.title);
+  const pls = yt?.playlists ?? [];
+  return {
+    tracks: yt?.tracks ?? [],
+    artists: yt?.channels ?? [],
+    albums: pls.filter(isAlbum).map((p) => ({ id: p.id, title: p.title, artist: p.creator ?? "", cover: p.cover })),
+    playlists: pls.filter((p) => !isAlbum(p)).map((p) => ({ ...p, href: `/playlist?id=${p.id}` })),
+  };
 }

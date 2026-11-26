@@ -26,15 +26,11 @@ export const EN: Record<string, string> = {
   "Tekan ikon hati pada lagu untuk simpan di sini. Disegerak ke semua peranti bila log masuk.": "Tap the heart on any song to save it here. Synced to all your devices when signed in.",
   "Tambah lagu MP3, M4A, FLAC, WAV, OGG atau OPUS dari peranti anda. Fail kekal pada peranti, tidak dimuat naik.": "Add MP3, M4A, FLAC, WAV, OGG or OPUS songs from your device. Files stay on your device and are never uploaded.",
   "Tambah muzik": "Add music", "Cipta playlist pertama anda.": "Create your first playlist.", "Playlist baharu": "New playlist",
-  "Katalog & pratonton 30s oleh Deezer API · Tanpa iklan": "Catalogue & 30s previews by Deezer API · No ads",
   "Main semua kegemaran": "Play all favourites", "Main rawak kegemaran": "Shuffle favourites",
   "Baris": "Row", "Grid": "Grid", "Senarai": "List", "Hero": "Hero", "Bulat": "Circles",
   "peminat": "fans", "Artis": "Artist",
   // track / cards / menus
-  "Pratonton 30s": "30s preview", "Peranti": "Device", "Import": "Imported", "Tidak tersedia": "Unavailable", "Dengar penuh": "Full song",
-  "Dengar lagu penuh di Deezer": "Listen to the full song on Deezer", "Dengar lagu penuh (Deezer)": "Full song (Deezer)",
-  "Lagu penuh tersedia di Deezer (had lesen: app luar hanya dibenarkan pratonton 30 saat)": "Full song available on Deezer (licence limit: third-party apps may only play 30-second previews)",
-  "Penstriman berlesen Deezer: pratonton 30 saat": "Licensed Deezer streaming: 30-second preview", "Fail muzik pada peranti ini": "Music file on this device",
+  "Pratonton 30s": "30s preview", "Peranti": "Device", "Import": "Imported", "Tidak tersedia": "Unavailable", "Dengar penuh": "Full song", "Fail muzik pada peranti ini": "Music file on this device",
   "Diimport oleh anda": "Imported by you", "Pembekal tidak membenarkan main balik di rantau ini": "The provider does not allow playback in this region",
   "Main seterusnya": "Play next", "Tambah ke giliran": "Add to queue", "Tambah ke playlist": "Add to playlist", "Suka lagu ini": "Like this song",
   "Buang dari kegemaran": "Remove from favourites", "Pergi ke album": "Go to album", "Pergi ke artis": "Go to artist", "Buang dari senarai ini": "Remove from this list",
@@ -52,7 +48,6 @@ export const EN: Record<string, string> = {
   "Belum ada lagu. Pilih apa sahaja untuk mula.": "Nothing playing yet. Pick anything to start.",
   "Pustaka Saya": "My Library", "Disukai": "Liked", "Album": "Album", "Playlist": "Playlist", "Panel pustaka": "Library panel",
   "Tekan ikon hati pada mana-mana lagu.": "Tap the heart on any song.", "Simpan album dari halaman album.": "Save albums from an album page.",
-  "Lagu katalog dimainkan sebagai pratonton 30 saat, iaitu had lesen Deezer untuk app luar. Lagu penuh: tekan \"Dengar lagu penuh di Deezer\". Lagu dari peranti anda dimainkan penuh.": "Catalogue songs play as 30-second previews — Deezer's licence limit for third-party apps. Full song: tap \"Listen to the full song on Deezer\". Songs from your device play in full.",
   // search
   "Carian terkini": "Recent searches", "Padam semua": "Clear all", "Belum ada carian.": "No searches yet.", "Carian popular": "Popular searches",
   "Nasyid, zikir, rock jiwang & rock kapak": "Nasyid, zikir, Malay rock ballads & 80s/90s rock",
@@ -134,7 +129,6 @@ export const EN: Record<string, string> = {
   "Tempoh fade out": "Fade-out duration", "Crossfade antara lagu": "Crossfade between songs", "Tetapan berasingan: lagu seterusnya mula sambil lagu semasa menurun.": "Separate setting: the next song starts while the current one fades out.",
   "Tempoh crossfade": "Crossfade duration", "Meter gain fade (langsung dari enjin audio)": "Fade gain meter (live from the audio engine)", "Uji fade out (jeda)": "Test fade out (pause)", "Uji fade in (main)": "Test fade in (play)",
   "Main sebarang lagu untuk menguji.": "Play any song to test.", "Kualiti audio": "Audio quality",
-  "Pratonton Deezer = MP3 128 kbps (had pembekal). Fail peranti dimainkan pada kualiti asal (termasuk FLAC lossless).": "Deezer previews = 128 kbps MP3 (provider limit). Device files play at original quality (including lossless FLAC).",
   "Standard": "Standard", "Tinggi": "High", "Lossless*": "Lossless*", "Autoplay": "Autoplay", "Bila giliran tamat, sambung dengan lagu serupa (radio artis).": "When the queue ends, keep playing similar songs (artist radio).",
   "Normalisasi kelantangan": "Volume normalisation", "Belum disokong: pembekal semasa tidak menghantar data loudness (ReplayGain).": "Not supported yet: the current provider doesn't send loudness data (ReplayGain).",
   "Kelajuan": "Speed", "Playlist baharu peribadi secara lalai": "New playlists are private by default", "Simpan sejarah pendengaran": "Keep listening history",
@@ -143,7 +137,6 @@ export const EN: Record<string, string> = {
   "Eksport": "Export", "Pemberitahuan": "Notifications", "Keluaran baharu daripada artis kegemaran (memerlukan Firebase Cloud Messaging).": "New releases from favourite artists (requires Firebase Cloud Messaging).",
   "Kosongkan cache": "Clear cache", "Buang cache katalog dan imej. Muzik peranti dan playlist tidak terjejas.": "Removes catalogue and image cache. Device music and playlists are not affected.",
   "Kosongkan": "Clear", "Cache dikosongkan": "Cache cleared", "Perihal LUNARA MUSIC": "About LUNARA MUSIC",
-  "Katalog, carta, metadata dan pratonton 30 saat disediakan oleh Deezer API. Main balik lagu penuh memerlukan perjanjian lesen dengan pembekal berlesen; LUNARA MUSIC tidak menggunakan sumber tanpa izin.": "Catalogue, charts, metadata and 30-second previews are provided by the Deezer API. Full-length playback requires a licence agreement with a licensed provider; LUNARA MUSIC never uses unauthorised sources.",
   "Terma & Syarat": "Terms & Conditions", "Dasar Privasi": "Privacy Policy", "Terma": "Terms",
   // studio
   "Layout LUNARA MUSIC bukan template kekal. Ubah apa sahaja: perubahan berlaku serta-merta, disimpan dan disegerak ke peranti lain.": "The LUNARA MUSIC layout is not a fixed template. Change anything: updates apply instantly, are saved and synced to your other devices.",
@@ -190,15 +183,12 @@ export const EN: Record<string, string> = {
   "Lagu tempatan ini hanya ada pada peranti asal.": "This local song only exists on its original device.", "Fail tidak dijumpai. Mungkin telah dialih atau dipadam dari peranti.": "File not found. It may have been moved or deleted from the device.",
   "Autoplay: menyambung dengan lagu serupa": "Autoplay: continuing with similar songs", "Giliran dikosongkan": "Queue cleared", "Giliran saya": "My queue",
   "katalog tidak dapat dicapai": "catalogue unreachable", "katalog tidak membalas": "catalogue not responding",
-  "Pratonton 30 saat tamat. Lagu penuh: tekan \"Dengar penuh\" (Deezer). Had ini ditetapkan oleh lesen Deezer.": "30-second preview ended. Full song: tap \"Full song\" (Deezer). This limit is set by Deezer's licence.",
   // tv
   "Keluar mod TV": "Exit TV mode", "Cari lagu atau artis, tekan OK": "Search songs or artists, press OK", "Pustaka kosong. Log masuk untuk sync dari telefon anda.": "Library is empty. Sign in to sync from your phone.",
   "Navigasi: anak panah / D-pad · OK untuk main · Back untuk kembali": "Navigation: arrows / D-pad · OK to play · Back to return",
   // admin
-  "Papan Pentadbir": "Admin Dashboard", "Pengguna berdaftar": "Registered users", "Ralat penstriman (log)": "Streaming errors (log)", "Laporan kandungan": "Content reports",
-  "Status API katalog (Deezer)": "Catalogue API status (Deezer)", "Semak semula": "Check again", "Beroperasi ·": "Operational ·", "Tidak dapat dicapai": "Unreachable",
-  "Playlist pilihan (promosi tanpa iklan)": "Featured playlists (ad-free promotion)", "Tajuk paparan": "Display title", "ID playlist Deezer": "Deezer playlist ID",
-  "ID playlist Deezer mesti nombor": "Deezer playlist ID must be a number", "Aktif": "Active", "Tidak aktif": "Inactive", "Tiada lagi.": "Nothing yet.", "Nama genre, contoh: Nasyid": "Genre name, e.g. Nasyid",
+  "Papan Pentadbir": "Admin Dashboard", "Pengguna berdaftar": "Registered users", "Ralat penstriman (log)": "Streaming errors (log)", "Laporan kandungan": "Content reports", "Semak semula": "Check again", "Beroperasi ·": "Operational ·", "Tidak dapat dicapai": "Unreachable",
+  "Playlist pilihan (promosi tanpa iklan)": "Featured playlists (ad-free promotion)", "Tajuk paparan": "Display title", "Aktif": "Active", "Tidak aktif": "Inactive", "Tiada lagi.": "Nothing yet.", "Nama genre, contoh: Nasyid": "Genre name, e.g. Nasyid",
   "Pengguna terkini": "Latest users", "Peranan": "Role", "Daftar ": "Joined ", "Status": "Status", "Digantung": "Suspended", "Akaun digantung": "Account suspended", "Akaun diaktifkan semula": "Account re-activated",
   "Ralat penstriman terkini": "Latest streaming errors", "Masa": "Time", "Mesej": "Message", "Jenis": "Type", "Butiran": "Details", "Selesai": "Resolved", "Tandakan selesai": "Mark resolved",
   "Tiada pengguna.": "No users.", "Tiada ralat dilog.": "No errors logged.", "Tiada laporan.": "No reports.", "Akses ditolak": "Access denied",
@@ -207,7 +197,6 @@ export const EN: Record<string, string> = {
   // legal
   "Dikemas kini: November 2026": "Updated: November 2026", "Dokumen ini ialah draf untuk semakan peguam sebelum pelancaran awam.": "This document is a draft for legal review before public launch.",
   "LUNARA MUSIC menyediakan carian katalog muzik, pratonton yang dibenarkan pembekal, dan pemain untuk fail muzik milik anda sendiri.": "LUNARA MUSIC provides music catalogue search, provider-authorised previews and a player for your own music files.",
-  "Kandungan katalog (metadata, kulit album, pratonton 30 saat) disediakan oleh Deezer melalui API awamnya dan tertakluk kepada terma Deezer. LUNARA MUSIC tidak menyediakan muat turun lagu katalog.": "Catalogue content (metadata, album art, 30-second previews) is provided by Deezer through its public API and is subject to Deezer's terms. LUNARA MUSIC does not offer downloads of catalogue songs.",
   "Fail muzik yang anda import kekal milik anda. Anda bertanggungjawab memastikan anda berhak memainkannya.": "Music files you import remain yours. You are responsible for having the right to play them.",
   "LUNARA MUSIC tiada iklan. Kami tidak menjual data anda.": "LUNARA MUSIC has no ads. We never sell your data.",
   "Penyalahgunaan (cubaan memintas DRM, mengikis data secara automatik, atau menyerang perkhidmatan) akan menyebabkan akaun digantung.": "Abuse (attempting to bypass DRM, automated scraping or attacking the service) will lead to account suspension.",
@@ -220,7 +209,6 @@ export const EN: Record<string, string> = {
   "Nikmati dunia muzik tanpa batas bersama LUNARA MUSIC, platform muzik digital yang direka untuk pengalaman hiburan audio yang moden, mudah dan peribadi. Dengar muzik kegemaran, terokai koleksi lagu, cipta playlist sendiri dan nikmati muzik mengikut citarasa anda, semuanya dalam satu platform.": "Enjoy a world of music without limits with LUNARA MUSIC, a digital music platform designed for a modern, simple and personal listening experience. Listen to your favourites, explore collections, create your own playlists and enjoy music your way, all in one platform.",
   ": Your Music. Your Universe. Versi web 1.0. Tanpa iklan, tiada SDK pengiklanan, tiada penjejakan iklan.": ": Your Music. Your Universe. Web version 1.0. No ads, no advertising SDKs, no ad tracking.",
   "Hasil untuk \"": "Results for \"",
-  "Hasil katalog sebenar dari Deezer API. Lagu bertanda \"Pratonton 30s\" boleh dimainkan 30 saat seperti yang dibenarkan pembekal.": "Real catalogue results from the Deezer API. Songs marked \"30s preview\" play for 30 seconds, as allowed by the provider.",
   ". Sokongan main balik bergantung pada pelayar/peranti.": ". Playback support depends on the browser/device.",
   "Format:": "Formats:", "lagu": "songs", "daripada": "of", "LUNARA MUSIC laman utama": "LUNARA MUSIC home",
   "Aplikasi Windows": "Windows app", "Pasang LUNARA MUSIC pada PC/laptop Windows. Sentiasa versi terkini secara automatik, tiada butang kemas kini.": "Install LUNARA MUSIC on your Windows PC/laptop. Always the latest version automatically, no update button.",
@@ -245,6 +233,7 @@ export const EN: Record<string, string> = {
   "Artis paling kerap anda dengar": "Your most played artist", "Lihat artis": "View artist",
   "Muat lagi lagu": "Load more songs", "Memuatkan…": "Loading…",
   "Playlist ini kosong.": "This playlist is empty.", "Had carian hari ini sudah penuh. Cuba lagi esok.": "Today's search limit has been reached. Please try again tomorrow.", "Artis tidak dijumpai.": "Artist not found.", "Playlist tidak dijumpai.": "Playlist not found.",
+  "Status API YouTube": "YouTube API status", "Pautan atau ID playlist YouTube": "YouTube playlist link or ID", "Tampal pautan atau ID playlist YouTube yang sah": "Paste a valid YouTube playlist link or ID", "(lama)": "(old)", "Artis ini dari sumber lama dan tidak lagi tersedia. Cari nama artis untuk buka channelnya.": "This artist is from an old source and is no longer available. Search the artist's name to open their channel.", "Cari artis": "Search artists", "Lagu ini tidak lagi tersedia. Cari semula untuk memainkannya.": "This song is no longer available. Search for it again to play it.", "Nasyid, zikir, jiwang, rock kapak, AI cover dan English hits. Gunakan carian di atas untuk apa sahaja lagu atau video.": "Nasyid, zikir, jiwang, rock kapak, AI covers and English hits. Use the search above for any song or video.", "Raihan, Hijjaz, Inteam, UNIC dan lagi": "Raihan, Hijjaz, Inteam, UNIC and more", "Zikir dan selawat merdu": "Soothing zikir and selawat", "Lagu jiwang 90an hingga terkini": "Jiwang songs from the 90s to today", "Rock 80an & 90an": "80s & 90s Rock", "Slow rock dan rock kapak legenda": "Legendary slow rock and rock kapak", "Lagu Melayu versi AI": "Malay songs, AI versions", "Top hits official music video": "Top hits, official music videos", "Genre & mood": "Genres & moods", "Jiwang": "Jiwang", "Pop Melayu": "Malay Pop", "Tenang": "Calm", "LUNARA MUSIC menyediakan carian muzik, pemain lagu dan video melalui pemain rasmi YouTube, serta pemain untuk fail muzik milik anda sendiri.": "LUNARA MUSIC provides music search, song and video playback through the official YouTube player, and a player for your own music files.", "Lagu dan video dimainkan melalui pemain rasmi YouTube dan tertakluk kepada Terma Perkhidmatan YouTube. LUNARA MUSIC tidak menyediakan muat turun lagu atau video YouTube.": "Songs and videos play through the official YouTube player and are subject to the YouTube Terms of Service. LUNARA MUSIC does not offer downloads of YouTube songs or videos.", "Cari lagu atau muzik peranti": "Search songs or device music",
 };
 
 /** Dynamic strings (numbers, names). Applied when no exact match exists. */
@@ -343,4 +332,6 @@ export const EN_PATTERNS: [RegExp, string][] = [
   [/^Artis tidak dapat dimuatkan: (.+)$/, "Artist couldn't be loaded: $1"],
   [/^Playlist tidak dapat dimuatkan: (.+)$/, "Playlist couldn't be loaded: $1"],
   [/^(\d+) lagu terkini$/, "$1 latest songs"],
+  [/^Kandungan tidak dapat dimuatkan sekarang \((.+)\)\. Muzik peranti anda masih boleh dimainkan\.$/, "Content can't be loaded right now ($1). Your device music can still be played."],
+  [/^Tidak dapat dicapai: (.+)$/, "Unreachable: $1"],
 ];

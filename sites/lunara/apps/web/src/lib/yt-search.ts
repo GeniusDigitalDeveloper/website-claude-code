@@ -1,6 +1,6 @@
 "use client";
 /**
- * Search YouTube directly (songs + channels), so music that is not in the Deezer catalogue
+ * Search YouTube directly (songs + channels), the source of every song, video, artist, album and playlist in LUNARA
  * (AI songs, independent artists, covers, YouTube-only channels) can be found and played in full.
  *
  * Quota: search.list costs 100 units, playlistItems/videos/channels cost 1 each. Results are cached

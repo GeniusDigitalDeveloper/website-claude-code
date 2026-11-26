@@ -65,7 +65,7 @@ export class AudioEngine {
     for (let i = 0; i < 2; i++) {
       const el = new Audio();
       el.preload = "auto";
-      el.crossOrigin = "anonymous"; // required for Web Audio on CDN previews (Deezer sends ACAO: *)
+      el.crossOrigin = "anonymous"; // required for Web Audio on cross-origin audio
       el.setAttribute("playsinline", "");
       this.decks.push({ el, gain: null, url: null });
       el.addEventListener("timeupdate", () => i === this.active && this.emitTime());

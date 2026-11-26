@@ -2,19 +2,17 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { getEngine } from "@/lib/audio-engine";
-import { catalog } from "@/lib/catalog";
 import { localUrl, type LocalTrack } from "@/lib/local-music";
 import type { Track } from "@/lib/types";
 import { useLibrary, syncSafe } from "./library";
 import { useSettings } from "./settings";
 import { toast } from "./toast";
 import { logPlaybackError } from "@/lib/log";
-import { findVideo, findVideos, getYouTube, markBadVideo, youtubeEnabled } from "@/lib/youtube";
+import { findVideo, getYouTube } from "@/lib/youtube";
 import type { EngineEvent } from "@/lib/audio-engine";
 
 /** Which player is producing sound: the audio engine (device files, previews) or YouTube (full songs). */
 let backend: "audio" | "yt" = "audio";
-const withTimeout = <T,>(p: Promise<T>, ms: number) => Promise.race([p, new Promise<null>((r) => setTimeout(() => r(null), ms))]);
 
 export type Repeat = "off" | "all" | "one";
 
@@ -76,9 +74,7 @@ async function resolveUrl(t: Track): Promise<string> {
     if (!lt.local) throw new Error("Lagu tempatan ini hanya ada pada peranti asal.");
     return localUrl(lt);
   }
-  const url = await catalog.previewUrl(t.id);
-  if (!url) throw new Error("Pembekal tidak membenarkan lagu ini dimainkan di rantau anda.");
-  return url;
+  throw new Error("Lagu ini tidak lagi tersedia. Cari semula untuk memainkannya.");
 }
 
 let loadSeq = 0;
@@ -107,8 +103,8 @@ export const usePlayer = create<PlayerState>()(
           return;
         }
         try {
-          // Full song in-app through YouTube when available; otherwise the provider's preview.
-          const vid = t.provider === "youtube" ? await findVideo(t) : t.provider === "deezer" && youtubeEnabled() ? await withTimeout(findVideo(t), 7000) : t.provider === "deezer" ? await withTimeout(findVideo(t), 2500) : null;
+          // Full songs and videos in-app through YouTube; device files through the audio engine.
+          const vid = t.provider === "youtube" ? await findVideo(t) : null;
           if (my !== loadSeq) return;
           const yt = getYouTube();
           if (vid) {
@@ -211,11 +207,12 @@ export const usePlayer = create<PlayerState>()(
             set({ index: 0 });
             return loadCurrent(true);
           }
-          // Autoplay: continue with similar music from the catalogue (artist radio)
+          // Autoplay: continue with songs of the same kind (AI, rock, jiwang, nasyid, zikir…)
           const cur = get().current();
-          if (useSettings.getState().autoplay && cur?.artistId) {
+          if (useSettings.getState().autoplay && cur && cur.provider === "youtube") {
             try {
-              const more = (await catalog.artistRadio(cur.artistId)).filter((t) => t.playable && !queue.some((q) => q.id === t.id));
+              const { similar } = await import("@/lib/radio");
+              const more = (await similar(cur)).filter((t) => !queue.some((q) => q.id === t.id));
               if (more.length) {
                 set({ queue: [...queue, ...more], index: index + 1 });
                 toast("Autoplay: menyambung dengan lagu serupa");
@@ -413,18 +410,7 @@ export function wirePlayer() {
         void usePlayer.getState().next(true);
         return;
       }
-      if (cur && yt.videoId) {
-        const bad = yt.videoId;
-        markBadVideo(cur, bad);
-        const next = (await findVideos(cur)).find((v) => v !== bad);
-        if (next && yt.active) {
-          void yt.load(next, { autoplay: true, startAt: 0 });
-          return;
-        }
-        yt.stop();
-        backend = "audio";
-        void usePlayer.getState().jumpTo(usePlayer.getState().index);
-      }
+      yt.stop();
     } else if (ev.type === "error") {
       usePlayer.setState({ buffering: false });
       toast(ev.message);

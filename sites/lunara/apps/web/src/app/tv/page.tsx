@@ -2,8 +2,8 @@
 import { ArrowLeft, Compass, Heart, Library, Pause, Play, Search, SkipBack, SkipForward } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { catalog } from "@/lib/catalog";
-import { albumsFrom, MALAY, mixFrom } from "@/lib/malay";
+import { loadContent } from "@/lib/content";
+import { searchYouTube, youtubePlaylist } from "@/lib/yt-search";
 import { useAsync } from "@/lib/useAsync";
 import type { Track } from "@/lib/types";
 import { useLibrary } from "@/store/library";
@@ -98,10 +98,11 @@ export default function TV() {
   const [tab, setTab] = useState<"discover" | "library" | "search">("discover");
   const [q, setQ] = useState("");
   const [term, setTerm] = useState("");
-  const nasyid = useAsync("my:nasyid", () => mixFrom(MALAY.nasyid, 4));
-  const jiwang = useAsync("my:jiwang", () => mixFrom(MALAY.jiwang, 3));
-  const rel = useAsync("my:rockAlbums", () => albumsFrom(MALAY.rock, 2));
-  const res = useAsync(term ? `search:${term}` : null, () => catalog.searchAll(term));
+  const home = useAsync("home", loadContent, 3600_000);
+  const nasyid = { data: home.data?.tracks.nasyid };
+  const jiwang = { data: home.data?.tracks.jiwang };
+  const rel = { data: home.data ? [...home.data.albums.malay, ...home.data.albums.english] : undefined };
+  const res = useAsync(term ? `yts:${term}` : null, () => searchYouTube(term), 60 * 60_000);
   const favs = useLibrary((s) => s.favourites);
   const recent = useLibrary((s) => s.recent);
   const cur = usePlayer((s) => s.queue[s.index]);
@@ -173,8 +174,8 @@ export default function TV() {
                 <button
                   data-tv
                   onClick={async () => {
-                    const a = await catalog.album(hero.id);
-                    if (a.tracks) void usePlayer.getState().playList(a.tracks, 0, { shuffle: false });
+                    const a = await youtubePlaylist(hero.id);
+                    if (a.tracks.length) void usePlayer.getState().playList(a.tracks, 0, { shuffle: false });
                   }}
                   className="btn-luxe mt-6 flex cursor-pointer items-center gap-3 rounded-full px-8 py-4 text-xl font-bold focus:scale-105"
                 >

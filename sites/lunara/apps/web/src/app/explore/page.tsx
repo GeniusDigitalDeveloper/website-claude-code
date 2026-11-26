@@ -1,8 +1,7 @@
 "use client";
 import { Play, Shuffle } from "lucide-react";
 import Link from "next/link";
-import { catalog } from "@/lib/catalog";
-import { albumsFrom, MALAY, mixFrom } from "@/lib/malay";
+import { type Category as CategoryId, loadContent, MOODS } from "@/lib/content";
 import { useAsync } from "@/lib/useAsync";
 import type { Track } from "@/lib/types";
 import { usePlayer } from "@/store/player";
@@ -24,37 +23,42 @@ function PlayAll({ tracks }: { tracks?: Track[] }) {
   );
 }
 
-function Category({ title, sub, cacheKey, ids, per }: { title: string; sub: string; cacheKey: string; ids: string[]; per: number }) {
-  const { data } = useAsync(cacheKey, () => mixFrom(ids, per));
+function Category({ title, sub, cat }: { title: string; sub: string; cat: CategoryId }) {
+  const { data } = useAsync("home", loadContent, 3600_000);
+  const tracks = data?.tracks[cat];
   return (
     <section>
-      <SectionHead title={title} sub={sub} action={<PlayAll tracks={data} />} />
-      {data ? <TrackList tracks={data} numbered limit={12} /> : <Skeleton className="h-72" />}
+      <SectionHead title={title} sub={sub} action={<PlayAll tracks={tracks} />} />
+      {tracks ? <TrackList tracks={tracks} numbered limit={12} /> : <Skeleton className="h-72" />}
     </section>
   );
 }
 
 export default function Explore() {
-  const rock = useAsync("my:rockAlbums", () => albumsFrom(MALAY.rock, 2));
-  const genres = useAsync("genres", () => catalog.genres(), 3600_000);
+  const home = useAsync("home", loadContent, 3600_000);
   return (
     <div className="space-y-10 px-4 pt-5 md:px-8 md:pt-7">
       <div>
         <h1 className="font-display text-3xl font-extrabold tracking-tight">Teroka</h1>
-        <p className="mt-1 text-sm text-muted">Nasyid, zikir, rock jiwang dan rock kapak Melayu. Gunakan carian di atas untuk lagu dari seluruh dunia.</p>
+        <p className="mt-1 text-sm text-muted">Nasyid, zikir, jiwang, rock kapak, AI cover dan English hits. Gunakan carian di atas untuk apa sahaja lagu atau video.</p>
       </div>
-      <Category title="Nasyid Pilihan" sub="Raihan, Hijjaz, Rabbani, Inteam, Saujana dan lagi" cacheKey="my:nasyid-ex" ids={MALAY.nasyid} per={3} />
-      <Category title="Zikir & Selawat" sub="Hafiz Hamidun, Inteam, Raihan, Hijjaz" cacheKey="my:zikir" ids={MALAY.zikir} per={5} />
-      <Category title="Rock Jiwang & Balada Melayu" sub="Iklim, Slam, Ukays, Exists, Lestari dan lagi" cacheKey="my:jiwang-ex" ids={MALAY.jiwang} per={2} />
+      <Category title="Nasyid Pilihan" sub="Raihan, Hijjaz, Inteam, UNIC dan lagi" cat="nasyid" />
+      <Category title="Zikir & Selawat" sub="Zikir dan selawat merdu" cat="zikir" />
+      <Category title="Jiwang" sub="Lagu jiwang 90an hingga terkini" cat="jiwang" />
+      <Category title="Rock 80an & 90an" sub="Slow rock dan rock kapak legenda" cat="rock" />
+      <Category title="AI Cover" sub="Lagu Melayu versi AI" cat="ai" />
+      <Category title="English Hits" sub="Top hits official music video" cat="english" />
+      {(home.data?.albums.malay.length ?? 0) > 0 && (
+        <section>
+          <SectionHead title="Album" />
+          <HScroll>{home.data!.albums.malay.map((a) => <AlbumCard key={a.id} a={a} />)}</HScroll>
+        </section>
+      )}
       <section>
-        <SectionHead title="Album Rock Kapak 80an & 90an" sub="Search, Wings, Lefthanded, XPDC, Awie, BPR, Amuk" />
-        <HScroll>{rock.data?.map((a) => <AlbumCard key={a.id} a={a} />)}</HScroll>
-      </section>
-      <section>
-        <SectionHead title="Genre" />
+        <SectionHead title="Genre & mood" />
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {genres.data?.map((g, i) => (
-            <Link key={g.id} href={`/search?q=${encodeURIComponent(g.name)}`} className="relative block h-24 overflow-hidden rounded-[var(--radius)] p-3">
+          {MOODS.map((g, i) => (
+            <Link key={g.name} href={`/search?q=${encodeURIComponent(g.q)}`} className="relative block h-24 overflow-hidden rounded-[var(--radius)] p-3">
               <div className="grad-bg absolute inset-0" style={{ filter: `hue-rotate(${i * 27}deg)` }} />
               <span className="relative font-display text-lg font-bold text-white drop-shadow">{g.name}</span>
             </Link>

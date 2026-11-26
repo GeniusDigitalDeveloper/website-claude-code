@@ -4,21 +4,21 @@
  * (AI covers → AI songs, 90s slow rock → 90s rock, jiwang → jiwang, nasyid → nasyid, zikir → zikir),
  * never a list of other versions of the same song.
  */
-import { catalog } from "./catalog";
-import { MALAY } from "./malay";
+import { type Category, loadContent, shuffle as shuf } from "./content";
 import type { Track } from "./types";
 import { searchYouTube, youtubeChannel } from "./yt-search";
 import { usePlayer } from "@/store/player";
 
 type Kind = "ai-rock" | "ai" | "zikir" | "nasyid" | "rock" | "jiwang" | null;
 
-const QUERY: Record<Exclude<Kind, null>, string> = {
-  "ai-rock": "slow rock malaysia ai cover",
-  ai: "lagu melayu ai cover",
-  zikir: "zikir selawat merdu",
-  nasyid: "nasyid malaysia popular",
-  rock: "slow rock malaysia 90an",
-  jiwang: "lagu jiwang melayu terkini",
+/** Built-in song lists used for each kind (no search quota needed). */
+const POOL: Record<Exclude<Kind, null>, Category[]> = {
+  "ai-rock": ["ai"],
+  ai: ["ai"],
+  zikir: ["zikir"],
+  nasyid: ["nasyid"],
+  rock: ["rock", "jiwang"],
+  jiwang: ["jiwang", "rock"],
 };
 
 const ROCK_NAMES =
@@ -26,14 +26,13 @@ const ROCK_NAMES =
 
 export function kindOf(t: Track): Kind {
   const s = `${t.title} ${t.artist} ${t.album ?? ""}`.toLowerCase();
-  const id = t.artistId ?? "";
   const ai = /\bai\b|a\.i\.|ai cover|cover ai/.test(s);
-  if (/zikir|selawat|salawat|sholawat|shalawat|asmaul|istighfar|tahlil|ya rasulullah|ya nabi|qasidah/.test(s) || id === "5157170") return "zikir";
-  if (/nasyid|nasheed|raihan|hijjaz|rabbani|inteam|in-team|\bunic\b|mirwana|far east|devotees/.test(s) || MALAY.nasyid.includes(id)) return ai ? "ai" : "nasyid";
-  const rock = ROCK_NAMES.test(s) || MALAY.rock.includes(id);
+  if (/zikir|selawat|salawat|sholawat|shalawat|asmaul|istighfar|tahlil|ya rasulullah|ya nabi|qasidah/.test(s)) return "zikir";
+  if (/nasyid|nasheed|raihan|hijjaz|rabbani|inteam|in-team|\bunic\b|mirwana|far east|devotees/.test(s)) return ai ? "ai" : "nasyid";
+  const rock = ROCK_NAMES.test(s);
   if (ai) return rock ? "ai-rock" : "ai";
   if (rock) return "rock";
-  if (/jiwang|balada|ballad|cinta|rindu|kekasih|kasih|hati|patah|luka/.test(s) || MALAY.jiwang.includes(id)) return "jiwang";
+  if (/jiwang|balada|ballad|cinta|rindu|kekasih|kasih|hati|patah|luka/.test(s)) return "jiwang";
   return null;
 }
 
@@ -77,14 +76,15 @@ function shuffle<T>(a: T[]) {
   return r;
 }
 
-async function similar(seed: Track): Promise<Track[]> {
+export async function similar(seed: Track): Promise<Track[]> {
   const kind = kindOf(seed);
   const pools: Track[][] = [];
-  if (kind) pools.push((await searchYouTube(QUERY[kind]).catch(() => ({ tracks: [] as Track[] }))).tracks);
+  const home = await loadContent().catch(() => null);
+  if (kind && home) pools.push(POOL[kind].flatMap((c) => home.tracks[c]));
   // same artist / channel adds a few more of the same style
   if (seed.artistId?.startsWith("ytc:")) pools.push((await youtubeChannel(seed.artistId).catch(() => ({ tracks: [] as Track[] }))).tracks.slice(0, 15));
-  else if (seed.provider === "deezer" && seed.artistId) pools.push(await catalog.artistRadio(seed.artistId).catch(() => [] as Track[]));
-  if (!kind && !pools.some((p) => p.length)) pools.push((await searchYouTube(`${seed.artist} lagu popular`).catch(() => ({ tracks: [] as Track[] }))).tracks);
+  if (!pools.some((p) => p.length)) pools.push((await searchYouTube(`${seed.artist} lagu popular`).catch(() => ({ tracks: [] as Track[] }))).tracks);
+  if (!kind && home) pools.push(shuf([...home.tracks.english, ...home.tracks.jiwang]).slice(0, 20));
   // mix: two songs of the style, then one more from the same artist/channel
   const sa = shuffle(pools[0] ?? []);
   const sb = shuffle(pools[1] ?? []);
