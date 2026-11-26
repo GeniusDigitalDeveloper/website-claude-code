@@ -259,3 +259,8 @@ h1,h2,h3,h4,b,strong,th,label,.lbl,.btn,.badge,.brand,.app-name,.side-app,.side 
 .q-new{display:flex;justify-content:center;margin:4px 0 20px}.q-new .btn{min-width:260px;justify-content:center}
 .opt-red{font-style:normal;color:var(--err);font-weight:600}
 .modal:has(.qs-modal) .modal-f{justify-content:center}.modal:has(.qs-modal) .modal-f .btn{min-width:120px;justify-content:center}
+/* Pratonton imej: sentiasa tunjuk KESELURUHAN imej (tiada potongan), apa jua nisbah (1920x1080, 2x2, dll.) */
+.img-prev,.logo-prev{grid-template:100%/100%;place-items:stretch}
+.img-prev img,.logo-prev img{display:block;width:100%;height:100%;max-width:none;max-height:none;object-fit:contain;object-position:center;padding:8px;box-sizing:border-box;min-width:0;min-height:0}
+.img-prev>span,.logo-prev>span{align-self:center;justify-self:center}
+.img-prev.wide{width:260px;height:130px}
