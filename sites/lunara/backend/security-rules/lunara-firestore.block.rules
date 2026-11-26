@@ -97,4 +97,23 @@
         && request.resource.data.at == request.time;
       allow update, delete: if lunaraIsAdmin();
     }
+    // ===== LUNARA MUSIC: lagu sedang dimainkan untuk OBS / sistem live (tambahan) =====
+    // Dokumen = API key pengguna. Sesiapa yang tahu key penuh boleh baca satu dokumen itu (untuk overlay);
+    // senarai semua dokumen disekat; hanya pemilik key (disahkan dengan data/apikey miliknya) boleh tulis/padam.
+    function lunaraOwnsKey(key) {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/lunara_users/$(request.auth.uid)/data/apikey)
+        && get(/databases/$(database)/documents/lunara_users/$(request.auth.uid)/data/apikey).data.key == key;
+    }
+    match /lunara_nowplaying/{key} {
+      allow get: if key.matches('^lnr_[A-Za-z0-9]{40}$');
+      allow list: if false;
+      allow create, update: if key.matches('^lnr_[A-Za-z0-9]{40}$') && lunaraOwnsKey(key)
+        && request.resource.data.keys().hasOnly(['title', 'artist', 'isPlaying', 'updatedAt'])
+        && request.resource.data.title is string && request.resource.data.title.size() <= 300
+        && request.resource.data.artist is string && request.resource.data.artist.size() <= 200
+        && request.resource.data.isPlaying is bool
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if lunaraOwnsKey(key);
+    }
     // ===== TAMAT LUNARA MUSIC =====

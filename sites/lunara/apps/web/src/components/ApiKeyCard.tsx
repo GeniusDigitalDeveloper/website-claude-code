@@ -3,6 +3,7 @@ import { Copy, Eye, EyeOff, KeyRound, RefreshCw, Trash2 } from "lucide-react";
 import { deleteDoc, doc, getDoc, serverTimestamp, setDoc, type Timestamp } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase";
+import { removeNowPlaying, setCachedApiKey } from "@/lib/nowplaying";
 import { useAuth } from "@/store/auth";
 import { toast } from "@/store/toast";
 import { Btn, cx } from "./ui";
@@ -21,6 +22,8 @@ function newKey() {
   for (const b of bytes) out += ALPHABET[b % ALPHABET.length];
   return out;
 }
+
+export const nowPlayingUrl = (k: string) => `https://firestore.googleapis.com/v1/projects/genius-digital-40bc9/databases/(default)/documents/lunara_nowplaying/${k}`;
 
 const mask = (k: string) => `${k.slice(0, 8)}${"•".repeat(24)}${k.slice(-4)}`;
 
@@ -56,7 +59,9 @@ export function ApiKeyCard() {
     setBusy(true);
     try {
       const k = newKey();
+      if (key) await removeNowPlaying(key); // the old key's "now playing" goes away with it
       await setDoc(r, { key: k, createdAt: serverTimestamp() });
+      setCachedApiKey(user!.uid, k);
       setKey(k);
       setCreatedAt(new Date());
       setShown(true);
@@ -74,7 +79,9 @@ export function ApiKeyCard() {
     if (!r) return;
     setBusy(true);
     try {
+      if (key) await removeNowPlaying(key);
       await deleteDoc(r);
+      setCachedApiKey(user!.uid, null);
       setKey(null);
       setCreatedAt(null);
       setShown(false);
@@ -128,6 +135,29 @@ export function ApiKeyCard() {
             </button>
           </div>
           {createdAt && <p className="text-xs text-faint">Dijana pada {createdAt.toLocaleString("ms-MY")}</p>}
+          <div className="rounded-xl bg-card p-3 ring-1 ring-line">
+            <p className="text-xs font-semibold">Alamat &quot;lagu sedang dimainkan&quot; untuk sistem live / OBS</p>
+            <div className="mt-2 flex items-center gap-2">
+              <code translate="no" className="min-w-0 flex-1 truncate font-mono text-[11px] text-muted">{shown ? nowPlayingUrl(key) : nowPlayingUrl(mask(key))}</code>
+              <button
+                type="button"
+                className={iconBtn}
+                aria-label="Salin alamat lagu sedang dimainkan"
+                title="Salin alamat"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(nowPlayingUrl(key));
+                    toast("Alamat disalin.");
+                  } catch {
+                    toast("Tidak dapat menyalin. Tekan ikon mata dan salin secara manual.");
+                  }
+                }}
+              >
+                <Copy className="h-4 w-4" />
+              </button>
+            </div>
+            <p className="mt-2 text-[11px] text-faint">Dikemas kini sendiri bila lagu bertukar atau dimain/dijeda semasa anda log masuk, di mana-mana peranti. Alamat ini mengandungi key anda: jangan kongsi.</p>
+          </div>
           {confirm ? (
             <div className="flex flex-wrap items-center gap-2 rounded-xl bg-card p-3 text-sm ring-1 ring-line">
               <span className="flex-1">{confirm === "delete" ? "Padam API key ini? Ia tidak boleh dipulihkan." : "Jana API key baharu? Key lama akan diganti dan tidak lagi sah."}</span>

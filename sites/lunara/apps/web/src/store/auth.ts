@@ -228,6 +228,9 @@ export const useAuth = create<AuthState>((set, get) => ({
     const d = db();
     if (d) {
       const cleanup = (async () => {
+        // the API key's "now playing" document first, while the key still proves ownership
+        const k = (await getDoc(doc(d, "lunara_users", u.uid, "data", "apikey")).catch(() => null))?.data()?.key as string | undefined;
+        if (k) await deleteDoc(doc(d, "lunara_nowplaying", k)).catch(() => {});
         await Promise.allSettled(["library", "settings", "layout", "avatar", "apikey"].map((k) => deleteDoc(doc(d, "lunara_users", u.uid, "data", k))));
         await deleteDoc(doc(d, "lunara_users", u.uid)).catch(() => {});
       })();

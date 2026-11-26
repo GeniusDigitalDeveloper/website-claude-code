@@ -1,5 +1,6 @@
 "use client";
 import { MusicBackdrop } from "@/components/fx/MusicBackdrop";
+import { NowPlayingSync } from "@/components/fx/NowPlayingSync";
 import { ChevronsLeft, ChevronsRight, LogIn } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -311,6 +312,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const persistent = (
     <>
       <MusicBackdrop className="fixed inset-0 z-0" />
+      <NowPlayingSync />
       <div className="bg-orbs" aria-hidden>
         <span
           style={{
