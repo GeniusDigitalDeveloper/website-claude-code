@@ -2,7 +2,7 @@
 import { Search, X } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
-import { catalog } from "@/lib/catalog";
+import { suggestYouTube } from "@/lib/yt-search";
 import type { Track } from "@/lib/types";
 import { useLibrary } from "@/store/library";
 import { usePlayer } from "@/store/player";
@@ -20,6 +20,7 @@ function TopSearchInner({ className }: { className?: string }) {
   const [q, setQ] = useState(urlQ);
   const [open, setOpen] = useState(false);
   const [sugg, setSugg] = useState<Track[]>([]);
+  const [phrases, setPhrases] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const boxRef = useRef<HTMLFormElement>(null);
@@ -31,15 +32,14 @@ function TopSearchInner({ className }: { className?: string }) {
     const term = q.trim();
     if (term.length < 2 || term === urlQ) {
       setSugg([]);
+      setPhrases([]);
       return;
     }
     let live = true;
     setLoading(true);
     const id = setTimeout(() => {
-      catalog
-        .suggest(term)
-        .then((r) => live && setSugg(r))
-        .catch(() => live && setSugg([]))
+      void suggestYouTube(term)
+        .then((r) => live && setPhrases(r))
         .finally(() => live && setLoading(false));
     }, 250);
     return () => {
@@ -118,9 +118,26 @@ function TopSearchInner({ className }: { className?: string }) {
         </button>
       )}
       {showDrop && (
-        <div role="listbox" aria-label="Cadangan carian" className="panel panel-strong absolute inset-x-0 top-full z-50 mt-2 overflow-hidden p-1.5 shadow-2xl">
-          {loading && !sugg.length && <p className="px-3 py-2 text-sm text-muted">Mencari…</p>}
-          {!loading && !sugg.length && <p className="px-3 py-2 text-sm text-muted">Tiada cadangan. Tekan Enter untuk cari.</p>}
+        <div role="listbox" aria-label="Cadangan carian" className="panel panel-strong absolute inset-x-0 top-full z-50 mt-2 max-h-[70vh] overflow-y-auto p-1.5 shadow-2xl">
+          {loading && !sugg.length && !phrases.length && <p className="px-3 py-2 text-sm text-muted">Mencari…</p>}
+          {!loading && !sugg.length && !phrases.length && <p className="px-3 py-2 text-sm text-muted">Tiada cadangan. Tekan Enter untuk cari.</p>}
+          {phrases.map((p) => (
+            <button
+              key={"p:" + p}
+              type="button"
+              role="option"
+              aria-selected={false}
+              onClick={() => {
+                setQ(p);
+                go(p);
+              }}
+              className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-left hover:bg-card-hover"
+            >
+              <Search className="h-4 w-4 shrink-0 text-faint" />
+              <span translate="no" className="truncate text-sm font-medium">{p}</span>
+            </button>
+          ))}
+          {phrases.length > 0 && sugg.length > 0 && <div className="mx-2 my-1 h-px bg-[color:var(--line)]" />}
           {sugg.map((t) => (
             <button
               key={t.id}
@@ -142,7 +159,7 @@ function TopSearchInner({ className }: { className?: string }) {
             </button>
           ))}
           <button type="submit" className="flex w-full cursor-pointer items-center gap-3 rounded-lg p-2 text-left text-sm font-semibold text-acc hover:bg-card-hover">
-            <Search className="h-4 w-4" /> Lihat semua hasil untuk &quot;{q.trim()}&quot;
+            <Search className="h-4 w-4" /> {`Lihat semua hasil untuk "${q.trim()}"`}
           </button>
         </div>
       )}

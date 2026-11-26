@@ -28,7 +28,7 @@ export function SearchView() {
   const yt = useAsync(submitted ? `yts:${submitted}` : null, () => searchYouTube(submitted), 60 * 60_000);
   const trending = MALAY_SEARCH_CHIPS;
   // Everything mixed together (catalogue + YouTube), albums kept in their own section
-  const loading = (res.loading && !res.data) && (yt.loading && !yt.data);
+  const loading = yt.loading && !yt.data && !yt.error;
   const { tracks, artists, albums, playlists } = useMemo(() => mergeResults(res.data, yt.data), [res.data, yt.data]);
 
   const localHits = useMemo(() => {
@@ -202,33 +202,25 @@ const key = (t: Track) =>
     .replace(/\(.*?\)|\[.*?\]/g, "")
     .replace(/[^a-z0-9]+/g, "");
 
-function interleave<T>(a: T[], b: T[]) {
-  const out: T[] = [];
-  for (let i = 0; i < Math.max(a.length, b.length); i++) {
-    if (a[i]) out.push(a[i]);
-    if (b[i]) out.push(b[i]);
-  }
-  return out;
-}
 
 function mergeResults(dz?: Awaited<ReturnType<typeof catalog.searchAll>>, yt?: Awaited<ReturnType<typeof searchYouTube>>) {
   const seen = new Set<string>();
-  const tracks = interleave(dz?.tracks ?? [], yt?.tracks ?? []).filter((t) => {
+  const tracks = [...(yt?.tracks ?? []), ...(dz?.tracks ?? [])].filter((t) => {
     const k = key(t);
     if (seen.has(k)) return false;
     seen.add(k);
     return true;
   });
   const names = new Set<string>();
-  const artists = interleave(dz?.artists ?? [], yt?.channels ?? []).filter((a) => {
+  const artists = [...(yt?.channels ?? []), ...(dz?.artists ?? [])].filter((a) => {
     const k = a.name.toLowerCase().replace(/\s*-\s*topic$/, "").replace(/[^a-z0-9]+/g, "");
     if (names.has(k)) return false;
     names.add(k);
     return true;
   });
-  const playlists = interleave(
-    (dz?.playlists ?? []).map((p) => ({ ...p, href: `/playlist?id=dz-${p.id}` })),
-    (yt?.playlists ?? []).map((p) => ({ ...p, href: `/playlist?id=${p.id}` })),
-  );
+  const playlists = [
+    ...(yt?.playlists ?? []).map((p) => ({ ...p, href: `/playlist?id=${p.id}` })),
+    ...(dz?.playlists ?? []).map((p) => ({ ...p, href: `/playlist?id=dz-${p.id}` })),
+  ];
   return { tracks, artists, albums: dz?.albums ?? [], playlists };
 }

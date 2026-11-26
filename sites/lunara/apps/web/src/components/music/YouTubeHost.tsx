@@ -1,5 +1,5 @@
 "use client";
-import { ExternalLink, GripHorizontal, Maximize2, Minimize2, PanelBottom, PictureInPicture2, Square } from "lucide-react";
+import { ExternalLink, MonitorPlay, GripHorizontal, Maximize2, Minimize2, PanelBottom, PictureInPicture2, Square } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { usePlayer } from "@/store/player";
 import { getYouTube, useYtWindow } from "@/lib/youtube";
@@ -15,15 +15,15 @@ import { cx } from "../ui";
  *  - pick a size: small (200×200, the minimum allowed), medium or large.
  * When nothing plays from YouTube it stays mounted but invisible (the player is created once).
  */
-type Size = "s" | "m" | "l";
-const SIZES: Record<Size, { w: number; h: number }> = { s: { w: 200, h: 200 }, m: { w: 356, h: 200 }, l: { w: 480, h: 270 } };
+type Size = "s" | "m" | "l" | "xl";
+const SIZES: Record<Size, { w: number; h: number }> = { s: { w: 200, h: 200 }, m: { w: 356, h: 200 }, l: { w: 480, h: 270 }, xl: { w: 854, h: 480 } };
 const HEADER = 30;
 const KEY = "lunara-yt-host";
 
 function load(): { size: Size; pos: { x: number; y: number } | null } {
   try {
     const v = JSON.parse(localStorage.getItem(KEY) ?? "{}");
-    return { size: (["s", "m", "l"] as Size[]).includes(v.size) ? v.size : "s", pos: v.pos ?? null };
+    return { size: (["s", "m", "l", "xl"] as Size[]).includes(v.size) ? v.size : "s", pos: v.pos ?? null };
   } catch {
     return { size: "s", pos: null };
   }
@@ -59,7 +59,15 @@ export function YouTubeHost() {
     }
   }, [size, pos]);
 
-  const dim = isMobile ? SIZES.s : SIZES[size];
+  const [vw, setVw] = useState(1440);
+  useEffect(() => {
+    const r = () => setVw(window.innerWidth);
+    r();
+    window.addEventListener("resize", r);
+    return () => window.removeEventListener("resize", r);
+  }, []);
+  const want = isMobile ? SIZES.s : SIZES[size];
+  const dim = want.w > vw - 32 ? { w: vw - 32, h: Math.round(((vw - 32) * 9) / 16) } : want;
   const clamp = (x: number, y: number) => ({
     x: Math.max(8, Math.min(window.innerWidth - dim.w - 8, x)),
     y: Math.max(8, Math.min(window.innerHeight - dim.h - HEADER - 8, y)),
@@ -114,6 +122,9 @@ export function YouTubeHost() {
             </button>
             <button type="button" aria-label="Saiz besar" title="Besar" onClick={() => setSize("l")} className={cx(btn, size === "l" && "btn-white")}>
               <Maximize2 className="h-3.5 w-3.5" />
+            </button>
+            <button type="button" aria-label="Saiz tonton video" title="Tonton video (paling besar)" onClick={() => setSize("xl")} className={cx(btn, size === "xl" && "btn-white")}>
+              <MonitorPlay className="h-3.5 w-3.5" />
             </button>
           </>
         )}

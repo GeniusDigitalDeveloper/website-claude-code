@@ -232,7 +232,7 @@ export const EN: Record<string, string> = {
   "Lagu penuh distrim melalui YouTube. Fail peranti dimainkan pada kualiti asal (termasuk FLAC lossless).": "Full songs stream through YouTube. Device files play at original quality (including lossless FLAC).",
   "Status lagu penuh (YouTube)": "Full-song status (YouTube)", "Uji sambungan lagu penuh dari peranti ini.": "Test the full-song connection from this device.",
   "Uji": "Test", "Menguji…": "Testing…", "Ralat, uji semula": "Error, test again", "Tiada kunci YouTube dalam binaan ini.": "No YouTube key in this build.",
-  "Seret untuk alih": "Drag to move", "Saiz kecil": "Small size", "Saiz sederhana": "Medium size", "Saiz besar": "Large size",
+  "Seret untuk alih": "Drag to move", "Saiz kecil": "Small size", "Saiz sederhana": "Medium size", "Saiz besar": "Large size", "Saiz tonton video": "Watch video size", "Tonton video (paling besar)": "Watch video (largest)",
   "Lekat di atas bar pemain": "Dock above the player bar",
   "Sambung dari sini": "Continue from here",
   "Muat turun": "Download", "Fail tidak dijumpai.": "File not found.",
@@ -242,6 +242,7 @@ export const EN: Record<string, string> = {
   "Seksyen tidak dikenali": "Unknown section", "Bukan fail layout LUNARA MUSIC": "Not a LUNARA MUSIC layout file",
   "Lagu terkini": "Latest songs", "Artis ini belum ada lagu.": "This artist has no songs yet.", "Carian gagal buat masa ini. Cuba lagi sebentar.": "Search failed right now. Please try again shortly.",
   "Beberapa lagu berturut-turut tidak dibenarkan dimainkan oleh pemiliknya. Pilih lagu lain.": "Several songs in a row can't be played because their owners don't allow it. Pick another song.",
+  "Muat lagi lagu": "Load more songs", "Memuatkan…": "Loading…",
   "Playlist ini kosong.": "This playlist is empty.", "Had carian hari ini sudah penuh. Cuba lagi esok.": "Today's search limit has been reached. Please try again tomorrow.", "Artis tidak dijumpai.": "Artist not found.", "Playlist tidak dijumpai.": "Playlist not found.",
 };
 
