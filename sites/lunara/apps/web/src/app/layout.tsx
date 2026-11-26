@@ -29,11 +29,11 @@ const themeScript = `(()=>{var T=${JSON.stringify(THEMES)};var V=${themeVars.toS
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ms" suppressHydrationWarning>
+    <html lang="ms" suppressHydrationWarning className={`${inter.variable} ${sora.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className={`${inter.variable} ${sora.variable}`}>
+      <body>
         <AppShell>{children}</AppShell>
       </body>
     </html>

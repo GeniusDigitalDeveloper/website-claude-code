@@ -21,7 +21,6 @@ import { cx, IconBtn } from "../ui";
 import { Logo } from "./Logo";
 import { TopSearch } from "./TopSearch";
 import { BackButton, useNavDepth } from "./BackButton";
-import { WaterRipple } from "../fx/WaterRipple";
 import { AutoUpdate } from "../fx/AutoUpdate";
 import { ADMIN, NAV, NAV_2 } from "./nav";
 import { RightPanel } from "./RightPanel";
@@ -349,7 +348,6 @@ export function AppShell({ children }: { children: ReactNode }) {
       <QueueDrawer />
       <FullPlayer />
       <Toaster />
-      <WaterRipple />
       <AutoUpdate />
     </>
   );
@@ -374,7 +372,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               {/* top bar: logo/nav left · the ONE search box centred · account right */}
               <header
                 className={cx(
-                  "glass sticky top-0 z-30 border-b border-line px-3 py-2.5 md:px-6 md:py-3",
+                  "glass sticky top-0 z-30 border-b border-line bg-[color:var(--panel-strong)] px-3 py-2.5 md:px-6 md:py-3",
                   preset === "bento" &&
                     "md:static md:flex md:h-14 md:flex-col md:justify-center md:border-0 md:bg-transparent md:px-0 md:py-0 md:shadow-none md:backdrop-blur-none",
                 )}

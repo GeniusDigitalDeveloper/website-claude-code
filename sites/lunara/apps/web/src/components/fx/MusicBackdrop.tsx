@@ -4,7 +4,7 @@ import { usePlayer } from "@/store/player";
 import { cx } from "../ui";
 
 /**
- * Living background while music plays: flowing light waves, an equaliser skyline and rising sparks,
+ * Living background while music plays: a tall equaliser of bars moving to the beat,
  * in the current theme's colours. It "breathes" to a beat (the YouTube player doesn't expose its audio,
  * so the motion follows the song's tempo feel rather than the exact sound). It fades away when paused,
  * stops drawing when the window is hidden, and stays still for people who prefer reduced motion.
@@ -43,7 +43,6 @@ export function MusicBackdrop({ className, strong = false }: { className?: strin
     const BARS = 48;
     const bars = Array.from({ length: BARS }, () => 0);
     const seeds = Array.from({ length: BARS }, () => Math.random() * 1000);
-    const sparks = Array.from({ length: 40 }, () => ({ x: Math.random(), y: Math.random(), r: 1 + Math.random() * 2.5, s: 0.02 + Math.random() * 0.06, c: Math.floor(Math.random() * 4) }));
 
     let level = 0; // 0 = silent/paused, 1 = playing (eased)
     let raf = 0;
@@ -71,26 +70,6 @@ export function MusicBackdrop({ className, strong = false }: { className?: strin
       ctx.globalCompositeOperation = "source-over";
       const A = level * (strong ? 1.15 : 1);
 
-      // 1) flowing light waves
-      for (let k = 0; k < 3; k++) {
-        const yBase = h * (0.55 + k * 0.12);
-        const amp = (28 + k * 14) * (0.6 + 0.6 * pulse);
-        const g = ctx.createLinearGradient(0, yBase - amp, w, yBase + amp);
-        g.addColorStop(0, pal[k % 4]);
-        g.addColorStop(1, pal[(k + 2) % 4]);
-        ctx.globalAlpha = A * (0.3 - k * 0.06);
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.moveTo(0, h);
-        for (let x = 0; x <= w; x += 16) {
-          const y = yBase + Math.sin(x / (160 + k * 60) + t * (0.8 + k * 0.35)) * amp + Math.sin(x / 73 - t * 1.3) * amp * 0.35;
-          ctx.lineTo(x, y);
-        }
-        ctx.lineTo(w, h);
-        ctx.closePath();
-        ctx.fill();
-      }
-
       // 2) equaliser skyline along the bottom
       const bw = w / BARS;
       for (let i = 0; i < BARS; i++) {
@@ -98,7 +77,7 @@ export function MusicBackdrop({ className, strong = false }: { className?: strin
         const centre = 1 - Math.abs(i - BARS / 2) / (BARS / 2);
         const target = (0.15 + 0.85 * n * (0.45 + 0.55 * centre)) * pulse;
         bars[i] += (target - bars[i]) * Math.min(1, dt * 10);
-        const bh = bars[i] * h * (strong ? 0.32 : 0.26);
+        const bh = bars[i] * h * (strong ? 0.5 : 0.4);
         const x = i * bw + bw * 0.18;
         const g = ctx.createLinearGradient(0, h - bh, 0, h);
         g.addColorStop(0, pal[2]);
@@ -111,26 +90,6 @@ export function MusicBackdrop({ className, strong = false }: { className?: strin
         ctx.fill();
       }
 
-      // 3) rising sparks
-      for (const p of sparks) {
-        p.y -= p.s * dt * (0.6 + pulse);
-        if (p.y < -0.05) (p.y = 1.05, (p.x = Math.random()));
-        const x = p.x * w + Math.sin(t + p.x * 20) * 12;
-        const y = p.y * h;
-        ctx.globalAlpha = A * 0.75 * (0.4 + 0.6 * Math.sin(t * 2 + p.x * 10) ** 2);
-        ctx.fillStyle = pal[p.c];
-        ctx.beginPath();
-        ctx.arc(x, y, p.r * (0.8 + 0.5 * pulse), 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // 4) a glow that swells on the beat
-      const rg = ctx.createRadialGradient(w * 0.5, h * 0.42, 0, w * 0.5, h * 0.42, Math.max(w, h) * 0.6);
-      rg.addColorStop(0, pal[1]);
-      rg.addColorStop(1, "transparent");
-      ctx.globalAlpha = A * 0.16 * pulse;
-      ctx.fillStyle = rg;
-      ctx.fillRect(0, 0, w, h);
       ctx.globalAlpha = 1;
     };
     raf = requestAnimationFrame(frame);

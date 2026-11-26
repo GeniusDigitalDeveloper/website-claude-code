@@ -22,7 +22,9 @@ function PlayFab({ onClick, label, active }: { onClick: () => void; label: strin
       }}
       className={cx(
         "btn-luxe absolute right-2 bottom-2 grid h-11 w-11 cursor-pointer place-items-center rounded-full shadow-xl transition duration-300",
-        active ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100",
+        active
+          ? "translate-y-0 opacity-100"
+          : "translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:translate-y-0 group-focus-within:opacity-100 [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100",
       )}
     >
       {active ? <Pause className="h-5 w-5 fill-current" /> : <Play className="ml-0.5 h-5 w-5 fill-current" />}
@@ -30,7 +32,7 @@ function PlayFab({ onClick, label, active }: { onClick: () => void; label: strin
   );
 }
 
-function Shell({ href, children, grid }: { href?: string; children: React.ReactNode; grid?: boolean }) {
+function Shell({ href, children, grid, onClick, label }: { href?: string; children: React.ReactNode; grid?: boolean; onClick?: () => void; label?: string }) {
   const size = useLayout((s) => s.cardSize);
   const cls = cx("group block shrink-0 snap-start cursor-pointer rounded-[var(--radius)] p-2.5 transition-colors duration-200 hover:bg-card-hover", !grid && cardWidth(size));
   return (
@@ -40,7 +42,16 @@ function Shell({ href, children, grid }: { href?: string; children: React.ReactN
           {children}
         </Link>
       ) : (
-        <div className={cls}>{children}</div>
+        <div
+          className={cls}
+          role={onClick ? "button" : undefined}
+          tabIndex={onClick ? 0 : undefined}
+          aria-label={label}
+          onClick={onClick}
+          onKeyDown={onClick ? (e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), onClick()) : undefined}
+        >
+          {children}
+        </div>
       )}
     </motion.div>
   );
@@ -52,7 +63,7 @@ export function TrackCard({ t, list, i, grid }: { t: Track; list: Track[]; i: nu
   const go = () => (isCur ? usePlayer.getState().toggle() : usePlayer.getState().playList(list, i, { shuffle: false }));
   const pr = useLibrary((s) => s.progress[t.id]);
   return (
-    <Shell grid={grid} href={t.albumId ? `/album?id=${t.albumId}` : undefined}>
+    <Shell grid={grid} href={t.albumId ? `/album?id=${t.albumId}` : undefined} onClick={t.albumId ? undefined : go} label={isCur && playing ? `Jeda ${t.title}` : `Main ${t.title}`}>
       <div className="relative">
         <Artwork src={t.artwork} alt={`${t.title} oleh ${t.artist}`} className="aspect-square w-full shadow-[var(--shadow)]" />
         {pr && pr.pos > 5 && pr.dur > 0 && <ResumeBar pos={pr.pos} dur={pr.dur} />}

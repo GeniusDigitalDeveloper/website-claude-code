@@ -122,7 +122,7 @@ export function PlayerBar() {
   const pct = duration ? (position / duration) * 100 : 0;
   return (
     <div className={cx("pointer-events-none fixed inset-x-0 z-40 bottom-[calc(64px+env(safe-area-inset-bottom))] md:bottom-0", floating ? "md:px-6 md:pb-4" : "")}>
-      <div className={cx("glass pointer-events-auto relative mx-2 flex items-center gap-3 rounded-2xl px-2.5 py-2 shadow-[var(--shadow)] ring-1 ring-line md:px-4 md:py-2.5", floating ? "md:mx-auto md:max-w-5xl md:rounded-[var(--radius)]" : "md:mx-0 md:rounded-none md:border-t md:border-line md:ring-0")}>
+      <div style={{ backgroundColor: "var(--panel-strong)" }} className={cx("glass pointer-events-auto relative mx-2 flex items-center gap-3 rounded-2xl px-2.5 py-2 shadow-[var(--shadow)] ring-1 ring-line md:px-4 md:py-2.5", floating ? "md:mx-auto md:max-w-5xl md:rounded-[var(--radius)]" : "md:mx-0 md:rounded-none md:border-t md:border-line md:ring-0")}>
         {/* mobile progress line */}
         <div className="absolute inset-x-3 bottom-0 h-0.5 overflow-hidden rounded-full bg-line md:hidden">
           <div className="grad-bg h-full" style={{ width: `${pct}%` }} />
@@ -207,14 +207,16 @@ export function FullPlayer() {
               </div>
               <RateBtn />
             </div>
-            <div className="grid min-h-0 flex-1 gap-8 py-4 lg:grid-cols-[1fr_380px]">
-              <div className={cx("flex min-h-0 flex-col items-center justify-center gap-6", tab === "queue" && "hidden lg:flex")}>
-                <motion.div key={t.id} initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: playing ? 1 : 0.94, opacity: 1 }} transition={{ type: "spring", stiffness: 200, damping: 22 }} className="aspect-square w-full max-w-[min(420px,48vh)]">
+            <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)] gap-6 py-4 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-8">
+              <div className={cx("flex min-h-0 w-full min-w-0 flex-col items-center justify-center gap-6", tab === "queue" && "hidden lg:flex")}>
+                <motion.div key={t.id} initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: playing ? 1 : 0.94, opacity: 1 }} transition={{ type: "spring", stiffness: 200, damping: 22 }} className="aspect-square w-[min(100%,420px,46vh)] shrink-0">
                   <Artwork src={t.artwork} alt={`${t.title} oleh ${t.artist}`} className="h-full w-full shadow-2xl" rounded="rounded-[calc(var(--radius)*1.3)]" />
                 </motion.div>
-                <div className="w-full max-w-xl">
+                <div className="w-full min-w-0 max-w-xl">
                   <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
+                    {/* same width as the heart on the right, so the title is truly centred on phones */}
+                    <span aria-hidden className="h-10 w-10 shrink-0 md:hidden" />
+                    <div className="min-w-0 flex-1 text-center md:text-left">
                       <h2 translate="no" className="truncate font-display text-2xl font-bold md:text-3xl">{t.title}</h2>
                       <p translate="no" className="mt-1 truncate text-muted">
                         {t.artistId ? (
@@ -226,7 +228,7 @@ export function FullPlayer() {
                         )}
                         {t.album && ` · ${t.album}`}
                       </p>
-                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <div className="mt-2 flex flex-wrap items-center justify-center gap-2 md:justify-start">
                         <SourceBadge t={t} />
                       </div>
                     </div>
