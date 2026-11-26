@@ -383,7 +383,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           key="page"
           className={cx("relative z-[1] min-h-dvh", preset === "bento" && "md:p-3")}
         >
-          <div className={cx("flex min-h-dvh", preset === "bento" && "gap-3")}>
+          <div className={cx("flex min-h-dvh", preset === "bento" && "gap-3 md:min-h-[calc(100dvh-24px)]")}>
             {sidebar}
             <div
               className={cx(
@@ -462,8 +462,12 @@ export function AppShell({ children }: { children: ReactNode }) {
                   )}
                 >
                   {/* music animation inside the glass panel too, pinned to the visible area while scrolling */}
-                  <div aria-hidden className="pointer-events-none sticky top-0 z-0 -mb-[100dvh] h-[100dvh] overflow-hidden">
-                    <MusicBackdrop />
+                  {/* the layer covers exactly the panel (adds no height, so short pages don't scroll);
+                      its animation stays pinned to the visible area while long pages scroll */}
+                  <div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-clip">
+                    <div className="sticky top-0 h-[100dvh] max-h-full">
+                      <MusicBackdrop />
+                    </div>
                   </div>
                   <div className="relative z-[1]">{children}</div>
                 </main>
