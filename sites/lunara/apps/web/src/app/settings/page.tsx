@@ -3,7 +3,7 @@ import { Download, Info, LayoutDashboard, PencilRuler, KeyRound, LogOut, Mail, M
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLayout } from "@/store/layout";
-import { useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { firebaseEnabled } from "@/lib/firebase";
 import { getEngine } from "@/lib/audio-engine";
 import { testYouTube } from "@/lib/youtube";
@@ -19,9 +19,13 @@ import { ThemePicker } from "@/components/ThemePicker";
 import { LanguagePicker } from "@/components/LanguagePicker";
 import { ApiKeyCard } from "@/components/ApiKeyCard";
 
+const TabCtx = createContext("account");
+
 function Card({ id, title, icon, children }: { id: string; title: string; icon: ReactNode; children: ReactNode }) {
+  const active = useContext(TabCtx);
+  if (active !== id) return null;
   return (
-    <section id={id} className="panel scroll-mt-24 p-5">
+    <section id={`sec-${id}`} role="tabpanel" aria-labelledby={`tab-${id}`} className="panel p-5">
       <h2 className="mb-2 flex items-center gap-2 font-display text-lg font-bold">
         <span className="grad-bg grid h-8 w-8 place-items-center rounded-lg text-white">{icon}</span>
         {title}
@@ -260,8 +264,41 @@ function AccountSection() {
   );
 }
 
+const TABS = [
+  ["account", "Akaun"],
+  ["apikey", "API key"],
+  ["appearance", "Paparan"],
+  ["layout", "Layout"],
+  ["playback", "Main balik"],
+  ["privacy", "Privasi"],
+  ["app", "Aplikasi"],
+  ["about", "Perihal"],
+] as const;
+type TabId = (typeof TABS)[number][0];
+const isTab = (v: string): v is TabId => TABS.some(([id]) => id === v);
+
 export default function SettingsPage() {
   const router = useRouter();
+  // the open tab follows the address (#apikey …) so links like /settings#playback open the right one
+  const [tab, setTab] = useState<TabId>("account");
+  useEffect(() => {
+    const read = () => {
+      const h = location.hash.slice(1);
+      if (isTab(h)) setTab(h);
+    };
+    read();
+    window.addEventListener("hashchange", read);
+    return () => window.removeEventListener("hashchange", read);
+  }, []);
+  // keep the chosen tab in view inside the sideways-scrolling tab bar
+  useEffect(() => {
+    document.getElementById(`tab-${tab}`)?.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
+  }, [tab]);
+  const pick = (id: TabId) => {
+    setTab(id);
+    history.replaceState(null, "", `#${id}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
   const s = useSettings();
   const f = s.fade;
   const opt = FADE_OPTIONS.map((v) => ({ value: v, label: `${v}s` }));
@@ -278,22 +315,26 @@ export default function SettingsPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-5 px-4 pt-5 md:px-8 md:pt-7">
       <h1 className="font-display text-3xl font-extrabold tracking-tight">Tetapan</h1>
-      <nav aria-label="Bahagian tetapan" className="no-scrollbar flex gap-2 overflow-x-auto">
-        {[
-          ["account", "Akaun"],
-          ["apikey", "API key"],
-          ["appearance", "Paparan"],
-          ["layout", "Layout"],
-          ["playback", "Main balik"],
-          ["privacy", "Privasi"],
-          ["app", "Aplikasi"],
-          ["about", "Perihal"],
-        ].map(([id, l]) => (
-          <a key={id} href={`#${id}`} className="shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold ring-1 ring-line hover:bg-card">
-            {l}
-          </a>
-        ))}
-      </nav>
+      {/* tabs stay at the top while scrolling; one section is shown at a time */}
+      <div className="sticky top-[var(--hdr,0px)] z-20 -mx-4 bg-[color:var(--bg)]/85 px-4 py-2 backdrop-blur-md md:-mx-8 md:px-8">
+        <nav aria-label="Bahagian tetapan" role="tablist" className="no-scrollbar flex gap-2 overflow-x-auto">
+          {TABS.map(([id, l]) => (
+            <button
+              key={id}
+              id={`tab-${id}`}
+              type="button"
+              role="tab"
+              aria-selected={tab === id}
+              aria-controls={`sec-${id}`}
+              onClick={() => pick(id)}
+              className={cx("shrink-0 cursor-pointer rounded-full px-3.5 py-1.5 text-xs font-semibold ring-1", tab === id ? "btn-luxe ring-transparent" : "ring-line hover:bg-card")}
+            >
+              {l}
+            </button>
+          ))}
+        </nav>
+      </div>
+      <TabCtx.Provider value={tab}>
 
       <Card id="account" title="Akaun" icon={<UserRound className="h-4 w-4" />}>
         <AccountSection />
@@ -437,6 +478,7 @@ export default function SettingsPage() {
           </div>
         </div>
       </Card>
+      </TabCtx.Provider>
     </div>
   );
 }

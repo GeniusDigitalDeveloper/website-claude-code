@@ -124,7 +124,7 @@ export function ApiKeyCard() {
       {key ? (
         <>
           <div className="flex items-center gap-2">
-            <code translate="no" className={cx("min-w-0 flex-1 truncate rounded-xl bg-card px-3 py-2.5 font-mono text-sm ring-1 ring-line", !shown && "tracking-wider")} aria-label="API key">
+            <code translate="no" className={cx("min-w-0 flex-1 truncate rounded-xl bg-card px-3 py-2.5 font-sans text-sm tabular-nums ring-1 ring-line", !shown && "tracking-wider")} aria-label="API key">
               {shown ? key : mask(key)}
             </code>
             <button type="button" className={iconBtn} aria-label={shown ? "Sorok API key" : "Tunjuk API key"} title={shown ? "Sorok" : "Tunjuk"} onClick={() => setShown((v) => !v)}>
@@ -138,7 +138,7 @@ export function ApiKeyCard() {
           <div className="rounded-xl bg-card p-3 ring-1 ring-line">
             <p className="text-xs font-semibold">Alamat &quot;lagu sedang dimainkan&quot; untuk sistem live / OBS</p>
             <div className="mt-2 flex items-center gap-2">
-              <code translate="no" className="min-w-0 flex-1 truncate font-mono text-[11px] text-muted">{shown ? nowPlayingUrl(key) : nowPlayingUrl(mask(key))}</code>
+              <code translate="no" className="min-w-0 flex-1 truncate font-sans text-[11px] text-muted">{shown ? nowPlayingUrl(key) : nowPlayingUrl(mask(key))}</code>
               <button
                 type="button"
                 className={iconBtn}

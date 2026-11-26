@@ -4,7 +4,7 @@ import { NowPlayingSync } from "@/components/fx/NowPlayingSync";
 import { ChevronsLeft, ChevronsRight, LayoutGrid, LogIn } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useLayout } from "@/store/layout";
 import { getTheme, themeVars } from "@/lib/themes";
@@ -210,6 +210,21 @@ export function AppShell({ children }: { children: ReactNode }) {
   // phone "Menu": everything not in the bottom bar, except TV mode and Admin (not needed on phones)
   const moreLinks = links.filter((n) => !("mobile" in n && n.mobile) && n.href !== "/tv" && n.href !== "/admin");
   const [moreOpen, setMoreOpen] = useState(false);
+  // header height as a CSS variable, so things that stick under it (e.g. Settings tabs) line up exactly
+  const headerRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const set = () => document.documentElement.style.setProperty("--hdr", `${getComputedStyle(el).position === "sticky" ? el.offsetHeight : 0}px`);
+    set();
+    const ro = new ResizeObserver(set);
+    ro.observe(el);
+    window.addEventListener("resize", set);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", set);
+    };
+  }, [bare]);
   useEffect(() => setMoreOpen(false), [path]);
 
   const top = preset === "cinematic" || preset === "compact";
@@ -378,6 +393,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             >
               {/* top bar: logo/nav left · the ONE search box centred · account right */}
               <header
+                ref={headerRef}
                 className={cx(
                   "glass sticky top-0 z-30 border-b border-line bg-[color:var(--panel-strong)] px-3 py-2.5 md:px-6 md:py-3",
                   preset === "bento" &&
@@ -441,7 +457,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   id="main"
                   className={cx(
                     "relative min-w-0 flex-1 overflow-x-clip",
-                    preset === "bento" && "md:panel md:overflow-hidden",
+                    preset === "bento" && "md:panel md:overflow-clip",
                     hasTrack ? "pb-44 md:pb-28" : "pb-24 md:pb-8",
                   )}
                 >
