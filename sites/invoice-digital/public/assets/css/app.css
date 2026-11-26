@@ -256,3 +256,6 @@ h1,h2,h3,h4,b,strong,th,label,.lbl,.btn,.badge,.brand,.app-name,.side-app,.side 
 .qe-sum .qe-sub b{color:var(--err)}.qe-sum .grand b{color:var(--blue2)}
 .opt{font-style:normal;color:var(--mut);font-weight:400}
 .qe-sum .grand{background:#eff6ff;border:1px solid #bfdbfe}.qe-sum .grand span,.qe-sum .grand b{color:var(--blue2)}.qe-sum .qe-sub{font-size:1rem}
+.q-new{display:flex;justify-content:center;margin:4px 0 20px}.q-new .btn{min-width:260px;justify-content:center}
+.opt-red{font-style:normal;color:var(--err);font-weight:600}
+.modal:has(.qs-modal) .modal-f{justify-content:center}.modal:has(.qs-modal) .modal-f .btn{min-width:120px;justify-content:center}

@@ -1,5 +1,6 @@
 // Kamus BM (lalai) & EN. Semua teks UI, borang, status, ralat dan PDF.
 const ms = {
+  quotation_new_btn: "Tambah Sebut Harga Baharu", quotation_empty_btn: "Belum ada sebut harga. Tekan Tambah Sebut Harga Baharu untuk mula.",
   if_needed: "jika perlu", f_after_disc: "Harga Selepas Diskaun (RM)", qe_package: "Pakej", qe_price: "Harga", qe_total: "Jumlah", qe_pick_first: "Pilih pakej dan produk di atas. Senarai item akan diisi secara automatik.", qs_quote_btn: "Sebut Harga", quotation_empty_pick: "Belum ada sebut harga. Pilih pakej di atas untuk mula.",
   qs_note: "Sila pilih produk yang ingin di dalam pakej ini.", qs_confirm: "Pilih", qs_change: "Tukar Produk", qs_remove: "Buang",
   f_company_opt: "Nama Syarikat (jika perlu)", err_cust_addr: "Sila isi alamat pelanggan.", err_cust_phone: "Sila isi nombor telefon pelanggan.", err_cust_reg: "No. pendaftaran wajib diisi apabila nama syarikat diisi.", qs_title: "Pilih Pakej & Produk", qs_desc: "Pilih satu pakej sahaja, kemudian tanda produk yang pelanggan mahu. Senarai item di bawah dikemas kini secara automatik.", qs_pick_pkg: "Pilih Pakej", qs_picked: "Dipilih", qs_pkg_price: "Harga pakej", qs_sel_total: "Jumlah dipilih",
@@ -103,6 +104,7 @@ const ms = {
   a_time: "Masa", a_action: "Tindakan", a_detail: "Butiran", a_actor: "Admin",
 };
 const en = {
+  quotation_new_btn: "Add New Quotation", quotation_empty_btn: "No quotations yet. Press Add New Quotation to start.",
   if_needed: "if needed", f_after_disc: "Price After Discount (RM)", qe_package: "Package", qe_price: "Price", qe_total: "Total", qe_pick_first: "Choose a package and products above. The item list fills in automatically.", qs_quote_btn: "Quotation", quotation_empty_pick: "No quotations yet. Choose a package above to start.",
   qs_note: "Please choose the products you want in this package.", qs_confirm: "Select", qs_change: "Change Products", qs_remove: "Remove",
   f_company_opt: "Company Name (if any)", err_cust_addr: "Please enter the customer address.", err_cust_phone: "Please enter the customer phone number.", err_cust_reg: "Registration no. is required when a company name is entered.", qs_title: "Choose Packages & Products", qs_desc: "Choose one package only, then tick the products the customer wants. The item list below updates automatically.", qs_pick_pkg: "Choose Package", qs_picked: "Selected", qs_pkg_price: "Package price", qs_sel_total: "Selected total",

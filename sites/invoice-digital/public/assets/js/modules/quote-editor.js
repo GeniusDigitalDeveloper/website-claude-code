@@ -42,11 +42,11 @@ export async function render(el, ctx, id, numberFmt) {
     <label><span class="lt">${t("f_name")} <span class="req">*</span></span><input name="cname" maxlength="120" value="${esc(cust.name)}" required autocomplete="name"></label>
     <label><span class="lt">${t("f_address")} <span class="req">*</span></span><textarea name="caddress" rows="2" maxlength="300" required>${esc(cust.address)}</textarea></label>
     <div class="grid3"><label><span class="lt">${t("f_phone")} <span class="req">*</span></span><input name="cphone" maxlength="30" value="${esc(cust.phone)}" inputmode="tel" required autocomplete="tel"></label>
-     <label>${t("f_company_opt")}<input name="ccompany" maxlength="120" value="${esc(cust.company)}"></label>
-     <label><span class="lt">${t("f_regno")} <span class="req" id="regReq" ${cust.company ? "" : "hidden"}>*</span></span><input name="cregNo" maxlength="40" value="${esc(cust.regNo)}"></label></div>
+     <label><span class="lt">${t("f_company")} <em class="opt-red">(${t("if_needed")})</em></span><input name="ccompany" maxlength="120" value="${esc(cust.company)}"></label>
+     <label><span class="lt">${t("f_regno")} <em class="opt-red">(${t("if_needed")})</em> <span class="req" id="regReq" ${cust.company ? "" : "hidden"}>*</span></span><input name="cregNo" maxlength="40" value="${esc(cust.regNo)}"></label></div>
     <label class="chk ${d.customerId ? "hide" : ""}"><input type="checkbox" name="saveCust" checked> ${t("save_customer")}</label>
    </section>
-   ${pkgs.length ? selHtml(pkgs, sel) : ""}
+   ${pkgs.length ? selHtml(pkgs, sel, { confirmLabel: t("save") }) : ""}
    <section class="card form"><h2>${t("sec_items")}</h2><div id="qeItems"></div></section>
    <section class="card form"><div class="grid2 qe-bottom">
     <div class="form"><label><span class="lt">${t("pdf_note")} <em class="opt">(${t("if_needed")})</em></span><textarea name="note" rows="3" maxlength="1000">${esc(d.note)}</textarea></label>
@@ -77,7 +77,7 @@ export async function render(el, ctx, id, numberFmt) {
   f.after.addEventListener("blur", draw);
   if (f.pct.value) fromPct();
   draw(); bindPicker(el);
-  if (pkgs.length) bindSel(el, pkgs, sel, () => { items = selToItems(pkgs, sel); if (f.pct.value) fromPct(); draw(); });
+  if (pkgs.length) bindSel(el, pkgs, sel, () => { items = selToItems(pkgs, sel); if (f.pct.value) fromPct(); draw(); }, { confirmLabel: t("save") });
   f.ccompany.addEventListener("input", () => ($("#regReq", el).hidden = !f.ccompany.value.trim()));
 
   const build = () => {

@@ -28,11 +28,9 @@ export async function renderList(el, ctx, type) {
     if (type !== "quotation") return; let pkgs = [];
     try { pkgs = (await loadPackages(ctx)).filter((p) => p.items.some((i) => i.name)); } catch (e) { console.warn("pakej", e); }
     const note = $("#qinote", el), box = $("#qpk", el); if (!note || !box) return;
-    if (!pkgs.length) { note.innerHTML = `<p class="note-red qi-note">${t("qi_note_empty")} <a href="#/app/profile/quoteinfo">${t("qi_go")}</a></p>`; box.innerHTML = ""; return; }
+    if (!pkgs.length) { note.innerHTML = `<p class="note-red qi-note">${t("qi_note_empty")} <a href="#/app/profile/quoteinfo">${t("qi_go")}</a></p>`; box.innerHTML = `<div class="q-new"><a class="btn primary lg" href="#/app/${C.route}/new">${ico("plus")}${t("quotation_new_btn")}</a></div>`; return; }
     // Pilih pakej -> tanda produk -> tekan "Sebut Harga" dalam tetingkap -> terus ke borang sebut harga
-    note.innerHTML = ""; const sel = {}; const opts = { desc: t("qi_pick_list_d"), confirmLabel: t("qs_quote_btn") };
-    box.innerHTML = selHtml(pkgs, sel, opts);
-    bindSel(box, pkgs, sel, () => { try { sessionStorage.setItem("qp_sel", JSON.stringify(sel)); } catch { /* abaikan */ } ctx.nav(`#/app/${C.route}/new`); }, opts);
+    note.innerHTML = ""; box.innerHTML = `<div class="q-new"><a class="btn primary lg" href="#/app/${C.route}/new">${ico("plus")}${t("quotation_new_btn")}</a></div>`;
   };
   const mount = () => {
     el.innerHTML = `<div class="page-h"><div><h1>${t("nav_" + C.route)}</h1><p class="sub">${t(type + "_sub")}</p><div id="qinote"></div></div>${type === "quotation" ? "" : `<a class="btn primary" href="#/app/${C.route}/new">${ico("plus")}${t(type + "_new")}</a>`}</div>
@@ -47,7 +45,7 @@ export async function renderList(el, ctx, type) {
         <td data-l="${t("col_docno")}"><a href="#/app/${C.route}/${r.id}"><b>${esc(r.number)}</b></a></td><td data-l="${t("col_customer")}">${esc((r.customer && r.customer.name) || "-")}</td>
         <td class="nw" data-l="${t("col_date")}">${fmtDate(r.date, getLang())}</td><td class="nw" data-l="${t(type === "invoice" ? "col_due" : "col_valid")}">${fmtDate(dueOf(type, r), getLang())}</td>
         <td class="r" data-l="${t("col_total")}"><b>${money(calc(r).total)}</b></td><td data-l="${t("f_status")}">${type === "invoice" && !["draft", "cancelled"].includes(r.status) ? `<span class="badge b-${C.eff(r)}">${esc(t("ps_" + C.eff(r)))}</span>` : badge(C.eff(r))}</td>
-        <td class="acts"><a class="icon-btn" href="#/app/${C.route}/${r.id}/edit" aria-label="${t("act_edit")}" title="${t("act_edit")}">${ico("edit")}</a><a class="icon-btn" href="#/app/${C.route}/${r.id}" aria-label="${t("act_view")}" title="${t("act_view")}">${ico("eye")}</a><button class="icon-btn" data-a="download" data-id="${r.id}" aria-label="${t("act_download")}" title="${t("act_download")}">${ico("download")}</button><button class="icon-btn" data-a="dup" data-id="${r.id}" aria-label="${t("act_duplicate")}" title="${t("act_duplicate")}">${ico("copy")}</button></td></tr>`).join("")}</tbody></table>` : (type === "quotation" ? empty("quote", t("quotation_empty_pick")) : empty("doc", t(type + "_empty"), `<a class="btn primary" href="#/app/${C.route}/new">${t(type + "_new")}</a>`));
+        <td class="acts"><a class="icon-btn" href="#/app/${C.route}/${r.id}/edit" aria-label="${t("act_edit")}" title="${t("act_edit")}">${ico("edit")}</a><a class="icon-btn" href="#/app/${C.route}/${r.id}" aria-label="${t("act_view")}" title="${t("act_view")}">${ico("eye")}</a><button class="icon-btn" data-a="download" data-id="${r.id}" aria-label="${t("act_download")}" title="${t("act_download")}">${ico("download")}</button><button class="icon-btn" data-a="dup" data-id="${r.id}" aria-label="${t("act_duplicate")}" title="${t("act_duplicate")}">${ico("copy")}</button></td></tr>`).join("")}</tbody></table>` : (type === "quotation" ? empty("quote", t("quotation_empty_btn")) : empty("doc", t(type + "_empty"), `<a class="btn primary" href="#/app/${C.route}/new">${t(type + "_new")}</a>`));
       limitRows($("#tbl", el)); bulk.sync();
     };
     draw(); $("#q", el).oninput = debounce(() => draw(), 150); $("#sf", el).onchange = () => draw();
@@ -102,8 +100,8 @@ export async function renderEditor(el, ctx, type, id) {
     <label><span class="lt">${t("f_name")} <span class="req">*</span></span><input name="cname" maxlength="120" value="${esc(cust.name)}" required autocomplete="name"></label>
     <label><span class="lt">${t("f_address")} <span class="req">*</span></span><textarea name="caddress" rows="2" maxlength="300" required>${esc(cust.address)}</textarea></label>
     <div class="grid3"><label><span class="lt">${t("f_phone")} <span class="req">*</span></span><input name="cphone" maxlength="30" value="${esc(cust.phone)}" inputmode="tel" required autocomplete="tel"></label>
-     <label>${t("f_company_opt")}<input name="ccompany" maxlength="120" value="${esc(cust.company)}"></label>
-     <label><span class="lt">${t("f_regno")} <span class="req" id="regReq" ${cust.company ? "" : "hidden"}>*</span></span><input name="cregNo" maxlength="40" value="${esc(cust.regNo)}"></label></div>
+     <label><span class="lt">${t("f_company")} <em class="opt-red">(${t("if_needed")})</em></span><input name="ccompany" maxlength="120" value="${esc(cust.company)}"></label>
+     <label><span class="lt">${t("f_regno")} <em class="opt-red">(${t("if_needed")})</em> <span class="req" id="regReq" ${cust.company ? "" : "hidden"}>*</span></span><input name="cregNo" maxlength="40" value="${esc(cust.regNo)}"></label></div>
     <label class="chk ${d.customerId ? "hide" : ""}" id="saveCustW"><input type="checkbox" name="saveCust" checked> ${t("save_customer")}</label>
    </section>
    ${pkgs.length ? selHtml(pkgs, sel) : ""}
