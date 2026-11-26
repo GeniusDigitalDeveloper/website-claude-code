@@ -49,7 +49,7 @@ window.addEventListener("hashchange", () => { route(); });
 window.addEventListener("langchange", () => { document.title = brand(S.settings).name; S.shell = false; route(); });
 
 // ---------------------------------------------------------------- LANDING
-const FEATURES = [["doc", "feat_invoice"], ["quote", "feat_quotation"], ["receipt", "feat_receipt"], ["users", "feat_customer"], ["box", "feat_product"], ["print", "feat_print"], ["download", "feat_pdf"], ["clock", "feat_history"], ["building", "feat_business"]];
+const FEATURES = [["quote", "feat_quotation"], ["doc", "feat_invoice"], ["receipt", "feat_receipt"], ["users", "feat_customer"], ["box", "feat_product"], ["print", "feat_print"], ["download", "feat_pdf"], ["clock", "feat_history"], ["building", "feat_business"]];
 function renderLanding() {
   const b = brand(S.settings), st = S.settings;
   const ann = L(st.announcement);
@@ -60,7 +60,7 @@ function renderLanding() {
    <button class="icon-btn burger" id="burger" aria-label="Menu" aria-expanded="false">${ico("menu")}</button></div></div></header>
   <main>
    <section class="hero"><div class="wrap hero-g"><div class="hero-t"><span class="pill">${ico("zap")}${t("hero_pill")}</span><h1>${esc(L(st.heroTitle, t("hero_title")))}</h1><p>${esc(L(st.heroText, t("hero_text")))}</p>
-     <div class="cta"><a class="btn primary lg" href="#/app/invoices/new">${ico("doc")}${t("create_invoice")}</a><a class="btn ghost lg" href="#/app/quotations/new">${ico("quote")}${t("create_quotation")}</a><button type="button" class="btn accent lg" data-install>${ico("download")}${t("install_app")}</button></div>
+     <div class="cta"><a class="btn primary lg" href="#/app/quotations/new">${ico("quote")}${t("create_quotation")}</a><a class="btn ghost lg" href="#/app/invoices/new">${ico("doc")}${t("create_invoice")}</a><button type="button" class="btn accent lg" data-install>${ico("download")}${t("install_app")}</button></div>
      <ul class="trust"><li>${ico("check")}${t("trust_1")}</li><li>${ico("check")}${t("trust_2")}</li><li>${ico("check")}${t("trust_3")}</li></ul></div>
     <div class="hero-v"><div class="shot"><img src="/assets/img/banner.jpg" alt="${esc(b.name)}" width="1200" height="675" fetchpriority="high"></div><img class="floaty" src="/assets/img/icon.png" alt="" width="120" height="120"></div></div></section>
    <section id="features" class="sec"><div class="wrap"><div class="sec-h"><h2>${t("features_title")}</h2><p>${esc(L(st.intro, t("features_sub")))}</p></div>
@@ -101,9 +101,9 @@ function renderAuth(mode, q) {
 }
 
 // ---------------------------------------------------------------- APP SHELL
-const NAV = [["dashboard", "home"], ["invoices", "doc"], ["quotations", "quote"], ["receipts", "receipt"], ["customers", "users"], ["products", "box"], ["profile", "gear"]];
+const NAV = [["dashboard", "home"], ["quotations", "quote"], ["invoices", "doc"], ["receipts", "receipt"], ["customers", "users"], ["products", "box"], ["profile", "gear"]];
 const SUBS = [["business", "building"], ["history", "clock"], ["settings", "gear"]]; // sub bagi Profil
-const MOBILE = ["dashboard", "invoices", "quotations", "receipts"];
+const MOBILE = ["dashboard", "quotations", "invoices", "receipts"];
 function renderShell() {
   const b = brand(S.settings);
   root.innerHTML = `<div class="shell"><aside class="side" id="side"><a href="#/" class="brand side-brand"><img src="${esc(b.logo)}" alt="Genius Digital" width="150" height="25"></a><div class="side-app">${esc(b.name)}</div>
