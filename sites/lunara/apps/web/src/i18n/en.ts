@@ -242,6 +242,7 @@ export const EN: Record<string, string> = {
   "Seksyen tidak dikenali": "Unknown section", "Bukan fail layout LUNARA MUSIC": "Not a LUNARA MUSIC layout file",
   "Lagu terkini": "Latest songs", "Artis ini belum ada lagu.": "This artist has no songs yet.", "Carian gagal buat masa ini. Cuba lagi sebentar.": "Search failed right now. Please try again shortly.",
   "Beberapa lagu berturut-turut tidak dibenarkan dimainkan oleh pemiliknya. Pilih lagu lain.": "Several songs in a row can't be played because their owners don't allow it. Pick another song.",
+  "Artis paling kerap anda dengar": "Your most played artist", "Lihat artis": "View artist",
   "Muat lagi lagu": "Load more songs", "Memuatkan…": "Loading…",
   "Playlist ini kosong.": "This playlist is empty.", "Had carian hari ini sudah penuh. Cuba lagi esok.": "Today's search limit has been reached. Please try again tomorrow.", "Artis tidak dijumpai.": "Artist not found.", "Playlist tidak dijumpai.": "Playlist not found.",
 };

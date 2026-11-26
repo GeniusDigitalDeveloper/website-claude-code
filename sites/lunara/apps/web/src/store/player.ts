@@ -448,6 +448,66 @@ export function wirePlayer() {
   e.on((ev) => void handle(ev, "audio"));
   yt.on((ev) => void handle(ev, "yt"));
 
+  // Keep the music going across a refresh / app restart: remember that a song was playing, and start it
+  // again (from where it stopped) right away, or on the first click anywhere if the browser blocks
+  // sound before the user has interacted with the page.
+  const WAS = "lunara-was-playing";
+  usePlayer.subscribe((s, prev) => {
+    if (s.playing !== prev.playing) {
+      try {
+        localStorage.setItem(WAS, s.playing ? String(Date.now()) : "0");
+      } catch {
+        /* ignore */
+      }
+    }
+  });
+  const markAlive = () => {
+    try {
+      if (usePlayer.getState().playing) localStorage.setItem(WAS, String(Date.now()));
+    } catch {
+      /* ignore */
+    }
+  };
+  window.addEventListener("pagehide", markAlive);
+  setInterval(markAlive, 15_000);
+  let wasAt = 0;
+  try {
+    wasAt = Number(localStorage.getItem(WAS) ?? 0);
+  } catch {
+    /* ignore */
+  }
+  if (wasAt && Date.now() - wasAt < 6 * 3600_000) {
+    let resumed = false;
+    // Checked just after the click, so a click on a play button (which starts the music itself) never
+    // gets toggled twice; still inside the browser's user-activation window.
+    const onGesture = () => {
+      if (resumed) return;
+      resumed = true;
+      window.removeEventListener("pointerdown", onGesture, true);
+      window.removeEventListener("keydown", onGesture, true);
+      setTimeout(() => {
+        const st = usePlayer.getState();
+        if (!st.queue.length) return;
+        if (!st.playing) return void st.play();
+        // the browser may have let it "start" silently and then stopped it: check the music really moves
+        const at = st.position;
+        setTimeout(() => {
+          const now = usePlayer.getState();
+          if (Math.abs(now.position - at) < 0.3) now.play();
+        }, 1200);
+      }, 300);
+    };
+    window.addEventListener("pointerdown", onGesture, true);
+    window.addEventListener("keydown", onGesture, true);
+    // try straight away too (installed app / browsers that allow it); if blocked, the first click does it
+    setTimeout(() => {
+      const st = usePlayer.getState();
+      if (!st.playing && st.queue.length) {
+        st.play();
+      }
+    }, 1500);
+  }
+
 
   if ("mediaSession" in navigator) {
     const ms = navigator.mediaSession;

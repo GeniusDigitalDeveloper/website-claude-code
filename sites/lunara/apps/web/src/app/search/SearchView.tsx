@@ -126,7 +126,7 @@ export function SearchView() {
               {(tab === "all" || tab === "tracks") && (
                 <section>
                   {tab === "all" && <SectionHead title="Lagu" />}
-                  {tracks.length ? <TrackList tracks={tracks} limit={tab === "all" ? 10 : undefined} /> : <p className="text-sm text-muted">Tiada lagu dijumpai untuk &quot;{submitted}&quot;.</p>}
+                  {tracks.length ? <TrackList tracks={tracks} limit={tab === "all" ? 10 : undefined} radio /> : <p className="text-sm text-muted">Tiada lagu dijumpai untuk &quot;{submitted}&quot;.</p>}
                 </section>
               )}
               {(tab === "all" || tab === "artists") && artists.length > 0 && (

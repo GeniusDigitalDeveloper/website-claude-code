@@ -1,4 +1,5 @@
 "use client";
+import { playRadio } from "@/lib/radio";
 import { Heart, Pause, Play } from "lucide-react";
 import Link from "next/link";
 import type { Track } from "@/lib/types";
@@ -18,7 +19,7 @@ export function NowEq({ paused }: { paused?: boolean }) {
   );
 }
 
-export function TrackRow({ t, i, list, onRemove, removeLabel, showAlbum = true, numbered = false, dragHandle }: { t: Track; i: number; list: Track[]; onRemove?: () => void; removeLabel?: string; showAlbum?: boolean; numbered?: boolean; dragHandle?: React.ReactNode }) {
+export function TrackRow({ t, i, list, onRemove, removeLabel, showAlbum = true, numbered = false, dragHandle, radio = false }: { t: Track; i: number; list: Track[]; onRemove?: () => void; removeLabel?: string; showAlbum?: boolean; numbered?: boolean; dragHandle?: React.ReactNode; radio?: boolean }) {
   const isCur = usePlayer((s) => s.queue[s.index]?.id === t.id);
   const playing = usePlayer((s) => s.playing);
   const fav = useLibrary((s) => s.favourites.some((f) => f.id === t.id));
@@ -27,6 +28,7 @@ export function TrackRow({ t, i, list, onRemove, removeLabel, showAlbum = true, 
   const livePos = usePlayer((s) => (s.queue[s.index]?.id === t.id ? s.position : -1));
   const click = () => {
     if (isCur) usePlayer.getState().toggle();
+    else if (radio) void playRadio(t); // search results: same-kind songs follow, not other versions of it
     else void usePlayer.getState().playList(list, i, { shuffle: false });
   };
   return (
@@ -93,12 +95,12 @@ export function TrackRow({ t, i, list, onRemove, removeLabel, showAlbum = true, 
   );
 }
 
-export function TrackList({ tracks, onRemove, removeLabel, showAlbum, numbered, limit }: { tracks: Track[]; onRemove?: (i: number) => void; removeLabel?: string; showAlbum?: boolean; numbered?: boolean; limit?: number }) {
+export function TrackList({ tracks, onRemove, removeLabel, showAlbum, numbered, limit, radio }: { tracks: Track[]; onRemove?: (i: number) => void; removeLabel?: string; showAlbum?: boolean; numbered?: boolean; limit?: number; radio?: boolean }) {
   const shown = limit ? tracks.slice(0, limit) : tracks;
   return (
     <div className="flex flex-col">
       {shown.map((t, i) => (
-        <TrackRow key={`${t.id}-${i}`} t={t} i={i} list={tracks} onRemove={onRemove ? () => onRemove(i) : undefined} removeLabel={removeLabel} showAlbum={showAlbum} numbered={numbered} />
+        <TrackRow key={`${t.id}-${i}`} t={t} i={i} list={tracks} onRemove={onRemove ? () => onRemove(i) : undefined} removeLabel={removeLabel} showAlbum={showAlbum} numbered={numbered} radio={radio} />
       ))}
     </div>
   );

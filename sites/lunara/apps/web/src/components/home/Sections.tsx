@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { catalog } from "@/lib/catalog";
 import { albumsFrom, artistsFrom, MALAY, MALAY_ALL, MALAY_SEED_ARTISTS, mixFrom } from "@/lib/malay";
 import { useAsync } from "@/lib/useAsync";
+import { youtubeChannel } from "@/lib/yt-search";
 import type { Track } from "@/lib/types";
 import { useAuth } from "@/store/auth";
 import { SECTION_LABEL, type SectionConfig, type SectionId } from "@/store/layout";
@@ -52,21 +53,47 @@ function Tracks({ tracks, kind }: { tracks: Track[]; kind: SectionConfig["kind"]
 
 /* ---------- individual sections ---------- */
 
+type Hero = { kicker: string; title: string; sub: string; cover?: string; href: string; linkLabel: string; albumId?: string; tracks?: Track[] };
+
+/**
+ * The home banner follows what the listener plays most: the artist with the highest play count leads
+ * (it changes by itself as the counts change). A new listener sees an international (English) chart album.
+ */
+function useHero(): Hero | undefined {
+  const plays = useLibrary((s) => s.artistPlays);
+  const top = Object.entries(plays).sort((a, b) => b[1].count - a[1].count)[0];
+  const topId = top && top[1].count >= 2 ? top[0] : null;
+  const [day, setDay] = useState(0);
+  useEffect(() => setDay(new Date().getDate()), []);
+  const { data } = useAsync(`hero:${topId ?? "chart"}:${day}`, async (): Promise<Hero | undefined> => {
+    if (topId?.startsWith("ytc:")) {
+      const c = await youtubeChannel(topId);
+      return { kicker: "Artis paling kerap anda dengar", title: c.artist.name, sub: `${c.tracks.length} lagu terkini`, cover: c.tracks[0]?.artwork ?? c.artist.picture, href: `/artist?id=${topId}`, linkLabel: "Lihat artis", tracks: c.tracks };
+    }
+    if (topId) {
+      const albums = await catalog.artistAlbums(topId);
+      const a = albums[day % Math.max(1, albums.length)];
+      if (a) return { kicker: "Artis paling kerap anda dengar", title: a.title, sub: a.artist || top[1].name, cover: a.cover, href: `/album?id=${a.id}`, linkLabel: "Lihat album", albumId: a.id };
+    }
+    const chart = await catalog.chart();
+    const a = chart.albums[day % Math.max(1, chart.albums.length)];
+    return a ? { kicker: "Album pilihan hari ini", title: a.title, sub: a.artist, cover: a.cover, href: `/album?id=${a.id}`, linkLabel: "Lihat album", albumId: a.id } : undefined;
+  });
+  return data;
+}
+
 function Greeting() {
   const [hello, setHello] = useState("Selamat datang");
   useEffect(() => setHello(greeting()), []);
   const name = useAuth((s) => s.profile?.displayName?.split(" ")[0]);
-  const { data } = useAsync("my:rockAlbums", () => albumsFrom(MALAY.rock, 2));
+  const hero = useHero();
   const nasyid = useAsync("my:nasyid", () => mixFrom(MALAY.nasyid, 4));
   const recent = useLibrary((s) => s.recent);
-  const [pick, setPick] = useState(0);
-  useEffect(() => setPick(new Date().getDate()), []);
-  const hero = data?.length ? data[pick % data.length] : undefined;
   const quick = recent.length >= 4 ? recent.slice(0, 6) : (nasyid.data ?? []).slice(0, 6);
   const playHero = async () => {
     if (!hero) return;
-    const a = await catalog.album(hero.id);
-    if (a.tracks?.length) void usePlayer.getState().playList(a.tracks, 0, { shuffle: false });
+    const tracks = hero.tracks ?? (hero.albumId ? ((await catalog.album(hero.albumId)).tracks ?? []) : []);
+    if (tracks.length) void usePlayer.getState().playList(tracks, 0, { shuffle: false });
   };
   return (
     <div>
@@ -80,15 +107,15 @@ function Greeting() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={hero.cover} alt="" aria-hidden className="absolute inset-0 -z-10 h-full w-full object-cover" />
             <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black/85 via-black/55 to-black/10" />
-            <p className="text-xs font-semibold tracking-wider text-white/80 uppercase">Album pilihan hari ini</p>
-            <h2 translate="no" className="mt-2 max-w-md font-display text-3xl leading-tight font-extrabold text-white md:text-4xl">{hero.title}</h2>
-            <p translate="no" className="mt-1 text-sm text-white/80">{hero.artist}</p>
+            <p className="text-xs font-semibold tracking-wider text-white/80 uppercase">{hero.kicker}</p>
+            <h2 translate="no" className="mt-2 line-clamp-2 max-w-md font-display text-3xl leading-tight font-extrabold text-white md:text-4xl">{hero.title}</h2>
+            <p translate="no" className="mt-1 text-sm text-white/80">{hero.sub}</p>
             <div className="mt-6 flex flex-wrap gap-2">
               <Btn onClick={playHero}>
                 <Play className="h-4 w-4 fill-current" /> Main sekarang
               </Btn>
-              <Link href={`/album?id=${hero.id}`} className="rounded-full bg-white/15 px-5 py-2.5 text-sm font-semibold text-white ring-1 ring-white/25 backdrop-blur hover:bg-white/25">
-                Lihat album
+              <Link href={hero.href} className="rounded-full bg-white/15 px-5 py-2.5 text-sm font-semibold text-white ring-1 ring-white/25 backdrop-blur hover:bg-white/25">
+                {hero.linkLabel}
               </Link>
             </div>
           </motion.div>
