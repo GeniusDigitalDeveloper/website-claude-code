@@ -721,10 +721,14 @@ service cloud.firestore {
       // Data disegerak: library (playlist, kegemaran, sejarah), settings, layout, avatar (gambar asal untuk potong semula)
       match /data/{docId} {
         allow read, delete: if isSignedIn() && request.auth.uid == uid;
-        allow create, update: if lunaraOwner(uid) && docId in ['library', 'settings', 'layout', 'avatar']
+        allow create, update: if lunaraOwner(uid) && docId in ['library', 'settings', 'layout', 'avatar', 'apikey']
           && (docId != 'avatar' || (request.resource.data.keys().hasOnly(['original'])
               && request.resource.data.original is string && request.resource.data.original.size() < 950000
-              && request.resource.data.original.matches('data:image/jpeg;base64,[A-Za-z0-9+/=]+')));
+              && request.resource.data.original.matches('data:image/jpeg;base64,[A-Za-z0-9+/=]+')))
+          && (docId != 'apikey' || (request.resource.data.keys().hasOnly(['key', 'createdAt'])
+              && request.resource.data.key is string
+              && request.resource.data.key.matches('^lnr_[A-Za-z0-9]{40}$')
+              && request.resource.data.createdAt == request.time));
       }
     }
 

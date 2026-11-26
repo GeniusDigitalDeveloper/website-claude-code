@@ -17,6 +17,7 @@ import { PasswordInput, StrengthMeter } from "@/components/auth/PasswordInput";
 import { BRAND, Mark } from "@/components/shell/Logo";
 import { ThemePicker } from "@/components/ThemePicker";
 import { LanguagePicker } from "@/components/LanguagePicker";
+import { ApiKeyCard } from "@/components/ApiKeyCard";
 
 function Card({ id, title, icon, children }: { id: string; title: string; icon: ReactNode; children: ReactNode }) {
   return (
@@ -280,6 +281,7 @@ export default function SettingsPage() {
       <nav aria-label="Bahagian tetapan" className="no-scrollbar flex gap-2 overflow-x-auto">
         {[
           ["account", "Akaun"],
+          ["apikey", "API key"],
           ["appearance", "Paparan"],
           ["layout", "Layout"],
           ["playback", "Main balik"],
@@ -295,6 +297,10 @@ export default function SettingsPage() {
 
       <Card id="account" title="Akaun" icon={<UserRound className="h-4 w-4" />}>
         <AccountSection />
+      </Card>
+
+      <Card id="apikey" title="API key" icon={<KeyRound className="h-4 w-4" />}>
+        <ApiKeyCard />
       </Card>
 
       <Card id="appearance" title="Paparan" icon={<Sun className="h-4 w-4" />}>

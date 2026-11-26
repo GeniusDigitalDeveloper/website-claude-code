@@ -228,7 +228,7 @@ export const useAuth = create<AuthState>((set, get) => ({
     const d = db();
     if (d) {
       const cleanup = (async () => {
-        await Promise.allSettled(["library", "settings", "layout", "avatar"].map((k) => deleteDoc(doc(d, "lunara_users", u.uid, "data", k))));
+        await Promise.allSettled(["library", "settings", "layout", "avatar", "apikey"].map((k) => deleteDoc(doc(d, "lunara_users", u.uid, "data", k))));
         await deleteDoc(doc(d, "lunara_users", u.uid)).catch(() => {});
       })();
       await Promise.race([cleanup, new Promise((r) => setTimeout(r, 10_000))]);
