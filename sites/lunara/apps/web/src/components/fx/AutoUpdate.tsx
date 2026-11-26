@@ -12,6 +12,32 @@ import { usePlayer } from "@/store/player";
  * A click, a focus change, a short buffering gap or a song change never causes a reload by itself.
  */
 export function AutoUpdate() {
+  // A page opened before a deploy may ask for code files of the old version, which no longer exist
+  // ("Loading chunk … failed"). Then switch to the new version straight away (once per minute at most).
+  useEffect(() => {
+    const isChunkError = (m: unknown) => /Loading chunk|ChunkLoadError|Loading CSS chunk|Failed to fetch dynamically imported module/i.test(String(m));
+    const recover = (m: unknown) => {
+      if (!isChunkError(m)) return;
+      try {
+        const last = Number(sessionStorage.getItem("lunara-chunk-reload") ?? 0);
+        if (Date.now() - last < 60_000) return;
+        sessionStorage.setItem("lunara-chunk-reload", String(Date.now()));
+        if (usePlayer.getState().playing) localStorage.setItem("lunara-was-playing", String(Date.now()));
+      } catch {
+        /* ignore */
+      }
+      location.reload();
+    };
+    const onErr = (e: ErrorEvent) => recover(e.message || e.error);
+    const onRej = (e: PromiseRejectionEvent) => recover((e.reason as { message?: string; name?: string })?.message ?? (e.reason as { name?: string })?.name ?? e.reason);
+    window.addEventListener("error", onErr);
+    window.addEventListener("unhandledrejection", onRej);
+    return () => {
+      window.removeEventListener("error", onErr);
+      window.removeEventListener("unhandledrejection", onRej);
+    };
+  }, []);
+
   useEffect(() => {
     const mine = process.env.NEXT_PUBLIC_BUILD_ID;
     if (!mine || process.env.NODE_ENV !== "production") return;

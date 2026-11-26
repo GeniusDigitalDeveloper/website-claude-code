@@ -5,6 +5,7 @@ import { ChevronsLeft, ChevronsRight, LayoutGrid, LogIn } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { useLayout } from "@/store/layout";
 import { getTheme, themeVars } from "@/lib/themes";
 import { useSettings } from "@/store/settings";
@@ -206,7 +207,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const isActive = (h: string) =>
     h === "/" ? path === "/" : path.startsWith(h);
   const links = [...NAV, ...NAV_2, ...(isAdmin ? [ADMIN] : [])];
-  const moreLinks = links.filter((n) => !("mobile" in n && n.mobile));
+  // phone "Menu": everything not in the bottom bar, except TV mode and Admin (not needed on phones)
+  const moreLinks = links.filter((n) => !("mobile" in n && n.mobile) && n.href !== "/tv" && n.href !== "/admin");
   const [moreOpen, setMoreOpen] = useState(false);
   useEffect(() => setMoreOpen(false), [path]);
 
@@ -489,18 +491,21 @@ export function AppShell({ children }: { children: ReactNode }) {
               <span className="truncate">Menu</span>
             </button>
           </nav>
-          {/* "Menu" sheet on phones: every other part of the app */}
+          {/* "Menu" sheet on phones: every other part of the app. Rendered on top of everything
+              (player bar and video box included) so nothing overlaps it. */}
+          {typeof document !== "undefined" &&
+            createPortal(
           <AnimatePresence>
             {moreOpen && (
               <>
-                <motion.div key="more-scrim" className="fixed inset-0 z-[55] bg-black/40 md:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setMoreOpen(false)} />
+                <motion.div key="more-scrim" className="fixed inset-0 z-[95] bg-black/40 md:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setMoreOpen(false)} />
                 <motion.div
                   key="more-sheet"
                   role="dialog"
                   aria-modal="true"
                   aria-label="Menu lain"
                   style={{ backgroundColor: "var(--bg)" }}
-                  className="fixed inset-x-0 bottom-0 z-[56] shadow-[0_-20px_40px_-20px_rgb(0_0_0/0.35)] rounded-t-3xl border-t border-line px-4 pt-3 pb-[calc(16px+env(safe-area-inset-bottom))] md:hidden"
+                  className="fixed inset-x-0 bottom-0 z-[96] shadow-[0_-20px_40px_-20px_rgb(0_0_0/0.35)] rounded-t-3xl border-t border-line px-4 pt-3 pb-[calc(16px+env(safe-area-inset-bottom))] md:hidden"
                   initial={{ y: "100%" }}
                   animate={{ y: 0 }}
                   exit={{ y: "100%" }}
@@ -524,7 +529,9 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </motion.div>
               </>
             )}
-          </AnimatePresence>
+          </AnimatePresence>,
+              document.body,
+            )}
         </div>
       )}
       {persistent}
