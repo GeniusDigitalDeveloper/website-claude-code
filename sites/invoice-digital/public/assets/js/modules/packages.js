@@ -131,23 +131,32 @@ export function selHtml(pkgs, sel, { title = t("qs_title"), desc = t("qs_desc"),
   return `<section class="card form qsel"><h2>${title}</h2><p class="muted">${desc}</p><div class="qs-grid">${pkgs.map((p) => {
     const on = Array.isArray(sel[p.id]); const idx = on ? sel[p.id] : [];
     return `<div class="qs-box ${on ? "on" : ""}" data-pk="${esc(p.id)}"><div class="qs-top"><b class="qs-name">${esc(p.name)}</b><span class="qs-full">${t("qs_pkg_price")}: <b>${money(sum(p.items))}</b></span></div>
-      <button type="button" class="btn ${on ? "primary" : "ghost"} sm qs-btn" data-pick="${esc(p.id)}" aria-pressed="${on}">${on ? ico("check") + t("qs_picked") : ico("plus") + t("qs_pick_pkg")}</button>
-      ${on ? `<ul class="qs-list">${p.items.map((i, k) => `<li><label class="chk"><input type="checkbox" data-pi="${esc(p.id)}:${k}" ${idx.includes(k) ? "checked" : ""}><span class="qs-in">${esc(i.name)}</span><b>${money(i.price)}</b></label></li>`).join("")}</ul>
-      <div class="qs-tot">${t("qs_sel_total")}: <b>${money(selTotal(p, idx))}</b></div>` : `<span class="qs-cnt">${t("qi_n_products", { n: p.items.length })}</span>`}</div>`;
+      ${on ? `<span class="qs-badge">${ico("check")}${t("qs_picked")}</span>
+      <ul class="qs-list">${idx.map((k) => p.items[k]).filter(Boolean).map((i) => `<li><span class="qs-in">${esc(i.name)}</span><b>${money(i.price)}</b></li>`).join("")}</ul>
+      <div class="qs-tot">${t("qs_sel_total")}: <b>${money(selTotal(p, idx))}</b></div>
+      <div class="qs-acts"><button type="button" class="btn ghost sm" data-pick="${esc(p.id)}">${ico("edit")}${t("qs_change")}</button><button type="button" class="btn ghost sm danger" data-unpick="${esc(p.id)}">${ico("x")}${t("qs_remove")}</button></div>`
+      : `<button type="button" class="btn ghost sm qs-btn" data-pick="${esc(p.id)}">${ico("plus")}${t("qs_pick_pkg")}</button><span class="qs-cnt">${t("qi_n_products", { n: p.items.length })}</span>`}</div>`;
   }).join("")}</div>${action}</section>`;
 }
-// Ikat pada kotak; setiap perubahan memanggil onChange(sel) dan melukis semula kotak
+// Hanya SATU pakej boleh dipilih. Klik "Pilih Pakej" -> tetingkap produk pakej itu; pengguna mesti tanda sekurang-kurangnya satu produk.
+function pickProducts(p, current) {
+  const wrap = document.createElement("div"); wrap.className = "form qs-modal";
+  wrap.innerHTML = `<p class="note-red qs-note">${t("qs_note")}</p>
+    <ul class="qs-list qs-mlist">${p.items.map((i, k) => `<li><label class="chk"><input type="checkbox" data-mi="${k}" ${current.includes(k) ? "checked" : ""}><span class="qs-in">${esc(i.name)}</span><b>${money(i.price)}</b></label></li>`).join("")}</ul>
+    <div class="qs-tot">${t("qs_sel_total")}: <b id="mtot">${money(selTotal(p, current))}</b></div><p class="err" id="merr" role="alert"></p>`;
+  const picked = () => [...wrap.querySelectorAll("[data-mi]:checked")].map((c) => +c.dataset.mi);
+  wrap.addEventListener("change", () => { wrap.querySelector("#mtot").textContent = money(selTotal(p, picked())); wrap.querySelector("#merr").textContent = ""; });
+  let result = null;
+  return modal({ title: p.name, body: wrap, actions: [{ label: t("cancel"), cls: "ghost" }, { label: t("qs_confirm"), cls: "primary", onClick: () => { const k = picked(); if (!k.length) { wrap.querySelector("#merr").textContent = t("qs_note"); return false; } result = k; } }] }).then(() => result);
+}
 export function bindSel(root, pkgs, sel, onChange, opts) {
   const box = root.querySelector(".qsel"); if (!box) return;
   const redraw = () => { const tmp = document.createElement("div"); tmp.innerHTML = selHtml(pkgs, sel, opts); box.replaceWith(tmp.firstElementChild); bindSel(root, pkgs, sel, onChange, opts); };
-  box.addEventListener("click", (e) => {
+  box.addEventListener("click", async (e) => {
+    const un = e.target.closest("[data-unpick]"); if (un) { delete sel[un.dataset.unpick]; onChange(sel); return redraw(); }
     const b = e.target.closest("[data-pick]"); if (!b) return; const id = b.dataset.pick, p = pkgs.find((x) => x.id === id); if (!p) return;
-    if (Array.isArray(sel[id])) delete sel[id]; else sel[id] = p.items.map((_, k) => k);
+    const k = await pickProducts(p, Array.isArray(sel[id]) ? sel[id] : []); if (!k) return;
+    Object.keys(sel).forEach((x) => delete sel[x]); sel[id] = k; // satu pakej sahaja
     onChange(sel); redraw();
-  });
-  box.addEventListener("change", (e) => {
-    const c = e.target.closest("[data-pi]"); if (!c) return; const [id, k] = [c.dataset.pi.slice(0, c.dataset.pi.lastIndexOf(":")), +c.dataset.pi.slice(c.dataset.pi.lastIndexOf(":") + 1)];
-    const arr = new Set(sel[id] || []); c.checked ? arr.add(k) : arr.delete(k); sel[id] = [...arr].sort((a, b) => a - b);
-    onChange(sel); const p = pkgs.find((x) => x.id === id); const card = c.closest(".qs-box"); card.querySelector(".qs-tot b").textContent = money(selTotal(p, sel[id]));
   });
 }

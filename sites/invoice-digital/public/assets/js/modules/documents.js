@@ -94,6 +94,7 @@ export async function renderEditor(el, ctx, type, id) {
   const sel = d.pkgSel && typeof d.pkgSel === "object" ? JSON.parse(JSON.stringify(d.pkgSel)) : {};
   if (!doc) { try { const pre = JSON.parse(sessionStorage.getItem("qp_sel") || "null"); sessionStorage.removeItem("qp_sel"); if (pre && typeof pre === "object") { Object.assign(sel, pre); items = []; } } catch { /* abaikan */ } }
   Object.keys(sel).forEach((k) => { if (!pkgs.some((p) => p.id === k)) delete sel[k]; });
+  Object.keys(sel).slice(1).forEach((k) => delete sel[k]); // satu pakej sahaja
   const cust = d.customer || {};
   el.innerHTML = `<div class="page-h"><div><h1>${doc ? esc(doc.number) : t(type + "_new")}</h1><p class="sub">${doc ? t("edit") : t("new")}</p></div><a class="btn ghost" href="#/app/${C.route}${doc ? "/" + id : ""}">${t("back")}</a></div>
   <form id="f" class="doc-form" novalidate>
