@@ -79,12 +79,12 @@ export async function render(el, ctx) {
 }
 
 // ---- Pemilih dalam borang sebut harga: tanda produk yang dipilih pelanggan, kemudian masukkan sebagai item
-export function pickerHtml(pkgs) {
-  return `<section class="card form qpick"><h2>${t("qi_pick")}</h2><p class="muted">${t("qi_pick_d")}</p>
+export function pickerHtml(pkgs, btnLabel = t("qi_insert"), desc = t("qi_pick_d")) {
+  return `<section class="card form qpick"><h2>${t("qi_pick")}</h2><p class="muted">${desc}</p>
     ${pkgs.map((p, pi) => `<details class="qp-pkg" ${pi === 0 ? "open" : ""}><summary><b>${esc(p.name)}</b>${p.desc ? ` <small>${esc(p.desc)}</small>` : ""}<span class="qp-sum">${money(p.items.reduce((s, i) => s + itemAmount(i), 0))}</span></summary>
       <label class="chk qp-all"><input type="checkbox" data-qall="${pi}"> ${t("qi_all")}</label>
       <ul class="qp-list">${p.items.map((i, ii) => `<li><label class="chk"><input type="checkbox" data-qi="${pi}:${ii}"><span class="qp-name">${esc(i.name)}${i.desc ? `<small>${esc(i.desc)}</small>` : ""}</span><span class="qp-price">${num(i.qty) !== 1 ? `${num(i.qty)} × ` : ""}${money(i.price)}${num(i.discount) ? ` <em>-${num(i.discount)}%</em>` : ""}</span></label></li>`).join("")}</ul></details>`).join("")}
-    <div class="inline-actions"><button type="button" class="btn accent" id="qpIns">${ico("plus")}${t("qi_insert")}</button></div></section>`;
+    <div class="inline-actions"><button type="button" class="btn accent" id="qpIns">${ico("plus")}${btnLabel}</button></div></section>`;
 }
 export function bindPicker(root, pkgs, onInsert) {
   root.querySelectorAll("[data-qall]").forEach((a) => (a.onchange = () => root.querySelectorAll(`[data-qi^="${a.dataset.qall}:"]`).forEach((c) => (c.checked = a.checked))));
@@ -92,6 +92,6 @@ export function bindPicker(root, pkgs, onInsert) {
   ins.onclick = () => {
     const picked = [...root.querySelectorAll("[data-qi]:checked")].map((c) => { const [pi, ii] = c.dataset.qi.split(":").map(Number); const i = pkgs[pi].items[ii]; return { name: i.name, desc: i.desc || "", qty: num(i.qty) || 1, price: num(i.price), discount: num(i.discount) }; });
     if (!picked.length) return toast(t("qi_none_sel"), "err");
-    onInsert(picked); root.querySelectorAll("[data-qi]:checked, [data-qall]:checked").forEach((c) => (c.checked = false)); toast(t("qi_added", { n: picked.length }));
+    if (onInsert(picked) === false) return; root.querySelectorAll("[data-qi]:checked, [data-qall]:checked").forEach((c) => (c.checked = false)); toast(t("qi_added", { n: picked.length }));
   };
 }

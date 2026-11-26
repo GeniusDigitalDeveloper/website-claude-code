@@ -1,5 +1,6 @@
 // Kamus BM (lalai) & EN. Semua teks UI, borang, status, ralat dan PDF.
 const ms = {
+  qi_note_empty: "Sila tambah maklumat produk atau pakej di Maklumat Sebut Harga dahulu.", qi_make: "Buat Sebut Harga", qi_pick_list_d: "Senarai ini datang dari Profil → Maklumat Sebut Harga. Tanda produk atau pakej yang pelanggan pilih, kemudian tekan Buat Sebut Harga.",
   sub_quoteinfo: "Maklumat Sebut Harga", qi_sub: "Senaraikan pakej beserta produk atau perkhidmatan dan harganya. Semasa membuat sebut harga, anda hanya perlu tanda produk yang dipilih pelanggan.",
   qi_pkg_default: "Pakej {n}", qi_add_pkg: "Tambah Pakej", qi_pkg_name: "Nama Pakej", qi_pkg_desc: "Keterangan pakej (pilihan)", qi_add_item: "Tambah Produk", qi_del_pkg: "Padam Pakej", qi_dup: "Salin Pakej", qi_copy: "(salinan)",
   qi_del_confirm: "Padam {n} beserta semua produk di dalamnya?", qi_item_name: "Produk / Perkhidmatan", qi_total: "Jumlah pakej", qi_saved: "Maklumat sebut harga disimpan", qi_err_name: "Setiap pakej dan produk perlu ada nama.",
@@ -98,6 +99,7 @@ const ms = {
   a_time: "Masa", a_action: "Tindakan", a_detail: "Butiran", a_actor: "Admin",
 };
 const en = {
+  qi_note_empty: "Please add products or packages in Quotation Details first.", qi_make: "Create Quotation", qi_pick_list_d: "This list comes from Profile → Quotation Details. Tick the products or packages the customer chose, then press Create Quotation.",
   sub_quoteinfo: "Quotation Details", qi_sub: "List your packages with their products or services and prices. When creating a quotation, just tick the products the customer chose.",
   qi_pkg_default: "Package {n}", qi_add_pkg: "Add Package", qi_pkg_name: "Package Name", qi_pkg_desc: "Package description (optional)", qi_add_item: "Add Product", qi_del_pkg: "Delete Package", qi_dup: "Duplicate Package", qi_copy: "(copy)",
   qi_del_confirm: "Delete {n} and all its products?", qi_item_name: "Product / Service", qi_total: "Package total", qi_saved: "Quotation details saved", qi_err_name: "Every package and product needs a name.",

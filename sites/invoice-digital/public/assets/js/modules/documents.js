@@ -24,9 +24,18 @@ const dueOf = (type, d) => (type === "invoice" ? d.dueDate : d.validUntil);
 export async function renderList(el, ctx, type) {
   const C = CFG[type]; el.innerHTML = loading();
   let rows = [], shown = [], mounted = false, draw = () => {}, bulk = null;
+  // Sebut harga: pakej daripada Profil → Maklumat Sebut Harga dipaparkan di sini; tanda produk -> terus buat sebut harga.
+  const showPackages = async () => {
+    if (type !== "quotation") return; let pkgs = [];
+    try { pkgs = (await loadPackages(ctx)).filter((p) => p.items.some((i) => i.name)); } catch (e) { console.warn("pakej", e); }
+    const note = $("#qinote", el), box = $("#qpk", el); if (!note || !box) return;
+    if (!pkgs.length) { note.innerHTML = `<p class="note-red qi-note">${t("qi_note_empty")} <a href="#/app/profile/quoteinfo">${t("qi_go")}</a></p>`; box.innerHTML = ""; return; }
+    note.innerHTML = ""; box.innerHTML = qpHtml(pkgs, t("qi_make"), t("qi_pick_list_d"));
+    qpBind(box, pkgs, (picked) => { try { sessionStorage.setItem("qp_pick", JSON.stringify(picked)); } catch { /* abaikan */ } ctx.nav(`#/app/${C.route}/new`); return false; });
+  };
   const mount = () => {
-    el.innerHTML = `<div class="page-h"><div><h1>${t("nav_" + C.route)}</h1><p class="sub">${t(type + "_sub")}</p></div><a class="btn primary" href="#/app/${C.route}/new">${ico("plus")}${t(type + "_new")}</a></div>
-    <div class="card"><div class="toolbar"><div class="search">${ico("search")}<input id="q" type="search" placeholder="${esc(t("search_ph"))}" aria-label="${esc(t("search_ph"))}"></div>
+    el.innerHTML = `<div class="page-h"><div><h1>${t("nav_" + C.route)}</h1><p class="sub">${t(type + "_sub")}</p><div id="qinote"></div></div><a class="btn primary" href="#/app/${C.route}/new">${ico("plus")}${t(type + "_new")}</a></div>
+    <div id="qpk"></div><div class="card"><div class="toolbar"><div class="search">${ico("search")}<input id="q" type="search" placeholder="${esc(t("search_ph"))}" aria-label="${esc(t("search_ph"))}"></div>
     <select id="sf" aria-label="${esc(t("f_status"))}"><option value="">${t("all_status")}</option>${C.filter.map((s) => `<option value="${s}">${t((type === "invoice" && !["draft", "cancelled"].includes(s) ? "ps_" : "st_") + s)}</option>`).join("")}</select></div>${bulkBarHtml()}<div id="tbl" class="scrollbox"></div></div>`;
     bulk = bulkController(ctx, el, () => shown.map((r) => ({ k: type, id: r.id, doc: r })), () => rows.map((r) => ({ k: type, id: r.id, doc: r })));
     draw = () => {
@@ -47,7 +56,7 @@ export async function renderList(el, ctx, type) {
       if (b.dataset.a === "dup") { setBusy(b, true); try { const id = await duplicate(ctx, type, r); toast(t("duplicated")); ctx.nav(`#/app/${C.route}/${id}`); } catch (x) { toast(errMsg(x), "err"); setBusy(b, false); } }
     };
   };
-  ctx.live(listLive(ctx.uid, C.col, (r) => { rows = r; if (!mounted) { mounted = true; mount(); } else draw(); }, (e) => { if (!mounted) el.innerHTML = `<p class="err">${esc(errMsg(e))}</p>`; }));
+  ctx.live(listLive(ctx.uid, C.col, (r) => { rows = r; if (!mounted) { mounted = true; mount(); showPackages(); } else draw(); }, (e) => { if (!mounted) el.innerHTML = `<p class="err">${esc(errMsg(e))}</p>`; }));
 }
 
 async function numberFmt(ctx, type) { const s = await ctx.getSettings(); return (s.numberFormat && s.numberFormat[type]) || CFG[type].fmt; }
@@ -121,6 +130,9 @@ export async function renderEditor(el, ctx, type, id) {
       <div class="item-nums"><label>${t("pdf_qty")}<input data-k="qty" type="number" min="0" step="any" value="${num(i.qty)}"></label><label>${t("pdf_price")}<input data-k="price" type="number" min="0" step="0.01" value="${num(i.price)}"></label><label>${t("pdf_disc")} %<input data-k="discount" type="number" min="0" max="100" step="0.01" value="${num(i.discount)}"></label><div class="amt-w"><span>${t("pdf_amount")}</span><b class="amt"></b></div><button type="button" class="icon-btn danger" data-del="${k}" aria-label="${t("delete")}">${ico("trash")}</button></div></div>`).join("");
     drawSum();
   };
+  if (type === "quotation" && !doc) { // produk yang ditanda di halaman senarai Sebut Harga
+    try { const pre = JSON.parse(sessionStorage.getItem("qp_pick") || "null"); sessionStorage.removeItem("qp_pick"); if (Array.isArray(pre) && pre.length) items = pre.map((i) => ({ name: String(i.name || ""), desc: String(i.desc || ""), qty: num(i.qty) || 1, price: num(i.price), discount: num(i.discount) })); } catch { /* abaikan */ }
+  }
   drawItems(); bindPicker(el);
   if (pkgs.length) qpBind(el, pkgs, (picked) => { readItems(); items = items.filter((i) => i.name.trim() || num(i.price)); items.push(...picked); drawItems(); });
   $("#lgf", el).onchange = async (e) => {
