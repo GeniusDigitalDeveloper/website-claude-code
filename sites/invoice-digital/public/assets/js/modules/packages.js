@@ -141,13 +141,13 @@ export function selHtml(pkgs, sel, { title = t("qs_title"), desc = t("qs_desc"),
 // Hanya SATU pakej boleh dipilih. Klik "Pilih Pakej" -> tetingkap produk pakej itu; pengguna mesti tanda sekurang-kurangnya satu produk.
 function pickProducts(p, current) {
   const wrap = document.createElement("div"); wrap.className = "form qs-modal";
-  wrap.innerHTML = `<p class="note-red qs-note">${t("qs_note")}</p>
+  wrap.innerHTML = `<p class="note-red qs-note" role="alert">${t("qs_note")}</p>
     <ul class="qs-list qs-mlist">${p.items.map((i, k) => `<li><label class="chk"><input type="checkbox" data-mi="${k}" ${current.includes(k) ? "checked" : ""}><span class="qs-in">${esc(i.name)}</span><b>${money(i.price)}</b></label></li>`).join("")}</ul>
-    <div class="qs-tot">${t("qs_sel_total")}: <b id="mtot">${money(selTotal(p, current))}</b></div><p class="err" id="merr" role="alert"></p>`;
+    <div class="qs-tot">${t("qs_sel_total")}: <b id="mtot">${money(selTotal(p, current))}</b></div>`;
   const picked = () => [...wrap.querySelectorAll("[data-mi]:checked")].map((c) => +c.dataset.mi);
-  wrap.addEventListener("change", () => { wrap.querySelector("#mtot").textContent = money(selTotal(p, picked())); wrap.querySelector("#merr").textContent = ""; });
+  wrap.addEventListener("change", () => { wrap.querySelector("#mtot").textContent = money(selTotal(p, picked())); });
   let result = null;
-  return modal({ title: p.name, body: wrap, actions: [{ label: t("cancel"), cls: "ghost" }, { label: t("qs_confirm"), cls: "primary", onClick: () => { const k = picked(); if (!k.length) { wrap.querySelector("#merr").textContent = t("qs_note"); return false; } result = k; } }] }).then(() => result);
+  return modal({ title: p.name, body: wrap, actions: [{ label: t("cancel"), cls: "ghost" }, { label: t("qs_confirm"), cls: "primary", onClick: () => { const k = picked(); if (!k.length) { const n = wrap.querySelector(".qs-note"); n.classList.remove("flash"); void n.offsetWidth; n.classList.add("flash"); return false; } result = k; } }] }).then(() => result);
 }
 export function bindSel(root, pkgs, sel, onChange, opts) {
   const box = root.querySelector(".qsel"); if (!box) return;

@@ -242,3 +242,4 @@ h1,h2,h3,h4,b,strong,th,label,.lbl,.btn,.badge,.brand,.app-name,.side-app,.side 
 .qs-list>li:not(:has(label)){display:flex;justify-content:space-between;gap:8px;padding:6px 0;font-size:.85rem}
 .qs-acts{display:flex;gap:6px;flex-wrap:wrap}.qs-acts .btn{flex:1 1 auto;justify-content:center}
 .qs-note{margin:0 0 6px;font-weight:600;font-style:normal}.qs-mlist label{font-size:.95rem;padding:10px 0}
+@keyframes qsflash{0%,100%{transform:none}20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}.qs-note.flash{animation:qsflash .4s}@media (prefers-reduced-motion:reduce){.qs-note.flash{animation:none;text-decoration:underline}}
