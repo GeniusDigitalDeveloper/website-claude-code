@@ -512,17 +512,17 @@ export function AppShell({ children }: { children: ReactNode }) {
                   transition={{ type: "spring", damping: 30, stiffness: 300 }}
                 >
                   <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-line" aria-hidden />
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${moreLinks.length}, minmax(0, 1fr))` }}>
                     {moreLinks.map((n) => (
                       <Link
                         key={n.href}
                         href={n.href}
                         onClick={() => setMoreOpen(false)}
                         aria-current={isActive(n.href) ? "page" : undefined}
-                        className={cx("flex flex-col items-center gap-2 rounded-2xl px-2 py-4 text-xs font-semibold ring-1 ring-line", isActive(n.href) ? "btn-white text-acc" : "bg-[color:var(--panel-strong)]")}
+                        className={cx("flex min-w-0 flex-col items-center gap-1.5 rounded-2xl px-1 py-3 text-[11px] font-semibold ring-1", isActive(n.href) ? "btn-luxe ring-transparent" : "bg-[color:var(--panel-strong)] ring-line")}
                       >
-                        <n.icon className="h-6 w-6" />
-                        <span className="text-center leading-tight">{n.label}</span>
+                        <n.icon className="h-5 w-5 shrink-0" />
+                        <span className="w-full truncate text-center leading-tight">{n.label}</span>
                       </Link>
                     ))}
                   </div>
