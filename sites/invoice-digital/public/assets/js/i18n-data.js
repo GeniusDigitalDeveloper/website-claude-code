@@ -1,11 +1,12 @@
 // Kamus BM (lalai) & EN. Semua teks UI, borang, status, ralat dan PDF.
 const ms = {
+  qi_products: "Senarai Produk", qi_ask: "Adakah anda mempunyai pakej?", qi_ask_d: "Hidupkan jika produk anda dijual mengikut pakej (contoh: Pakej 1, Pakej 2).", qi_no: "Tidak", qi_yes: "Ya", qi_packages: "Pakej Anda", qi_edit_pkg: "Edit Pakej", qi_n_products: "{n} produk", qi_price: "Harga (RM)", qi_no_items: "Belum ada produk.", qi_err_row: "Setiap produk perlu ada nama dan harga.", qi_err_empty: "Tambah sekurang-kurangnya satu produk.", f_docdisc_pct: "Diskaun (%)",
   qi_note_empty: "Sila tambah maklumat produk atau pakej di Maklumat Sebut Harga dahulu.", qi_make: "Buat Sebut Harga", qi_pick_list_d: "Senarai ini datang dari Profil → Maklumat Sebut Harga. Tanda produk atau pakej yang pelanggan pilih, kemudian tekan Buat Sebut Harga.",
-  sub_quoteinfo: "Maklumat Sebut Harga", qi_sub: "Senaraikan pakej beserta produk atau perkhidmatan dan harganya. Semasa membuat sebut harga, anda hanya perlu tanda produk yang dipilih pelanggan.",
+  sub_quoteinfo: "Maklumat Sebut Harga", qi_sub: "Senaraikan produk atau perkhidmatan anda beserta harga. Diskaun ditetapkan kemudian semasa membuat sebut harga.",
   qi_pkg_default: "Pakej {n}", qi_add_pkg: "Tambah Pakej", qi_pkg_name: "Nama Pakej", qi_pkg_desc: "Keterangan pakej (pilihan)", qi_add_item: "Tambah Produk", qi_del_pkg: "Padam Pakej", qi_dup: "Salin Pakej", qi_copy: "(salinan)",
   qi_del_confirm: "Padam {n} beserta semua produk di dalamnya?", qi_item_name: "Produk / Perkhidmatan", qi_total: "Jumlah pakej", qi_saved: "Maklumat sebut harga disimpan", qi_err_name: "Setiap pakej dan produk perlu ada nama.",
   qi_need: "Isi Maklumat Sebut Harga dahulu", qi_need_d: "Tambah pakej, produk atau perkhidmatan dan harganya di Profil → Maklumat Sebut Harga. Selepas disimpan, anda boleh terus memilih produk untuk sebut harga.", qi_go: "Isi Maklumat Sebut Harga",
-  qi_pick: "Pilih Produk daripada Pakej", qi_pick_d: "Tanda produk yang dipilih pelanggan, kemudian tekan Masukkan. Kuantiti, harga dan diskaun masih boleh diubah di bawah.", qi_insert: "Masukkan Item Dipilih", qi_all: "Pilih semua dalam pakej ini", qi_none_sel: "Tiada produk dipilih.", qi_added: "{n} item dimasukkan",
+  qi_pick: "Pilih Produk daripada Pakej", qi_pick_d: "Tanda produk yang dipilih pelanggan, kemudian tekan Masukkan. Kuantiti dan diskaun ditetapkan di bawah.", qi_insert: "Masukkan Item Dipilih", qi_all: "Pilih semua dalam pakej ini", qi_none_sel: "Tiada produk dipilih.", qi_added: "{n} item dimasukkan",
   // umum
   loading: "Memuatkan…", save: "Simpan", cancel: "Batal", close: "Tutup", delete: "Padam", deleted: "Berjaya dipadam", saved: "Berjaya disimpan", back: "Kembali", edit: "Edit", new: "Baharu", yes: "Ya, teruskan", remove: "Buang", more: "Lagi",
   search_ph: "Cari…", all_status: "Semua status", all_types: "Semua jenis", no_data: "Tiada data lagi", not_found: "Dokumen tidak dijumpai", language: "Bahasa", account: "Akaun", password: "Kata laluan", or: "atau",
@@ -99,12 +100,13 @@ const ms = {
   a_time: "Masa", a_action: "Tindakan", a_detail: "Butiran", a_actor: "Admin",
 };
 const en = {
+  qi_products: "Product List", qi_ask: "Do you have packages?", qi_ask_d: "Turn on if your products are sold as packages (e.g. Package 1, Package 2).", qi_no: "No", qi_yes: "Yes", qi_packages: "Your Packages", qi_edit_pkg: "Edit Package", qi_n_products: "{n} products", qi_price: "Price (RM)", qi_no_items: "No products yet.", qi_err_row: "Every product needs a name and a price.", qi_err_empty: "Add at least one product.", f_docdisc_pct: "Discount (%)",
   qi_note_empty: "Please add products or packages in Quotation Details first.", qi_make: "Create Quotation", qi_pick_list_d: "This list comes from Profile → Quotation Details. Tick the products or packages the customer chose, then press Create Quotation.",
-  sub_quoteinfo: "Quotation Details", qi_sub: "List your packages with their products or services and prices. When creating a quotation, just tick the products the customer chose.",
+  sub_quoteinfo: "Quotation Details", qi_sub: "List your products or services with their prices. Discounts are set later when you create a quotation.",
   qi_pkg_default: "Package {n}", qi_add_pkg: "Add Package", qi_pkg_name: "Package Name", qi_pkg_desc: "Package description (optional)", qi_add_item: "Add Product", qi_del_pkg: "Delete Package", qi_dup: "Duplicate Package", qi_copy: "(copy)",
   qi_del_confirm: "Delete {n} and all its products?", qi_item_name: "Product / Service", qi_total: "Package total", qi_saved: "Quotation details saved", qi_err_name: "Every package and product needs a name.",
   qi_need: "Fill in Quotation Details first", qi_need_d: "Add packages, products or services and their prices in Profile → Quotation Details. Once saved, you can pick products for your quotation.", qi_go: "Fill in Quotation Details",
-  qi_pick: "Pick Products from Packages", qi_pick_d: "Tick the products the customer chose, then press Insert. Quantity, price and discount can still be changed below.", qi_insert: "Insert Selected Items", qi_all: "Select all in this package", qi_none_sel: "No products selected.", qi_added: "{n} items inserted",
+  qi_pick: "Pick Products from Packages", qi_pick_d: "Tick the products the customer chose, then press Insert. Quantity and discount are set below.", qi_insert: "Insert Selected Items", qi_all: "Select all in this package", qi_none_sel: "No products selected.", qi_added: "{n} items inserted",
   loading: "Loading…", save: "Save", cancel: "Cancel", close: "Close", delete: "Delete", deleted: "Deleted", saved: "Saved successfully", back: "Back", edit: "Edit", new: "New", yes: "Yes, continue", remove: "Remove", more: "More",
   search_ph: "Search…", all_status: "All statuses", all_types: "All types", no_data: "No data yet", not_found: "Document not found", language: "Language", account: "Account", password: "Password", or: "or",
   confirm_delete: "Delete “{n}”? This cannot be undone.", duplicated: "Document copied as a new draft",

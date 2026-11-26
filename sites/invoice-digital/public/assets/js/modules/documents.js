@@ -113,13 +113,14 @@ export async function renderEditor(el, ctx, type, id) {
    <section class="card form"><div class="grid2">
     <div class="form"><label>${t("pdf_note")}<textarea name="note" rows="3" maxlength="1000">${esc(d.note)}</textarea></label><label>${t("pdf_terms")}<textarea name="terms" rows="4" maxlength="2000">${esc(d.terms)}</textarea></label>
      ${pickerHtml(d.template, d.color)}${sizesHtml(d.imgScale || {}, company, ["logo", "qr", "sig", "stamp"])}</div>
-    <div class="form sum"><div class="grid2"><label>${t("f_docdisc")} (RM)<input name="docDiscount" type="number" min="0" step="0.01" value="${num(d.docDiscount)}"></label><label>${t("f_tax")} (%)<input name="taxRate" type="number" min="0" max="100" step="0.01" value="${num(d.taxRate)}"></label></div>
+    <div class="form sum"><div class="grid3"><label>${t("f_docdisc_pct")}<input name="docDiscountPct" type="number" min="0" max="100" step="0.01" inputmode="decimal" value="${num(d.docDiscountPct) || ""}" placeholder="0"></label><label>${t("f_docdisc")} (RM)<input name="docDiscount" type="number" min="0" step="0.01" inputmode="decimal" value="${num(d.docDiscount)}"></label><label>${t("f_tax")} (%)<input name="taxRate" type="number" min="0" max="100" step="0.01" value="${num(d.taxRate)}"></label></div>
      <div id="sum" class="totals" aria-live="polite"></div></div></div></section>
    <p class="err" id="err" role="alert"></p>
    <div class="form-f sticky"><a class="btn ghost" href="#/app/${C.route}">${t("cancel")}</a><button class="btn ghost" type="button" id="prev">${ico("eye")}${t("preview_draft")}</button><button class="btn primary" type="submit">${ico("check")}${t("save")}</button></div>
   </form>`;
   const f = $("#f", el); const itemsEl = $("#items", el);
   const readItems = () => $$(".item", itemsEl).forEach((row, k) => { items[k] = { ...items[k], name: row.querySelector("[data-k=name]").value, desc: row.querySelector("[data-k=desc]").value, qty: num(row.querySelector("[data-k=qty]").value), price: num(row.querySelector("[data-k=price]").value), discount: num(row.querySelector("[data-k=discount]").value) }; });
+  const syncPct = () => { const pct = Math.min(Math.max(num(f.docDiscountPct.value), 0), 100); if (!f.docDiscountPct.value) return; readItems(); const sub = calc({ items, docDiscount: 0, taxRate: 0 }).subtotal; f.docDiscount.value = round2(sub * pct / 100).toFixed(2); };
   const docNow = () => { readItems(); return { items, docDiscount: num(f.docDiscount.value), taxRate: num(f.taxRate.value), deposit: 0, receiptsPaid: d.receiptsPaid || 0 }; };
   const drawSum = () => {
     const c = calc(docNow()); $$(".item", itemsEl).forEach((row, k) => (row.querySelector(".amt").textContent = money(c.items[k] ? c.items[k].amount : 0)));
@@ -128,7 +129,7 @@ export async function renderEditor(el, ctx, type, id) {
   const drawItems = () => {
     itemsEl.innerHTML = items.map((i, k) => `<div class="item"><div class="item-main"><label>${t("pdf_desc")}<input data-k="name" maxlength="150" value="${esc(i.name)}" placeholder="${esc(t("item_ph"))}"></label><label>${t("item_detail")}<input data-k="desc" maxlength="300" value="${esc(i.desc)}"></label></div>
       <div class="item-nums"><label>${t("pdf_qty")}<input data-k="qty" type="number" min="0" step="any" value="${num(i.qty)}"></label><label>${t("pdf_price")}<input data-k="price" type="number" min="0" step="0.01" value="${num(i.price)}"></label><label>${t("pdf_disc")} %<input data-k="discount" type="number" min="0" max="100" step="0.01" value="${num(i.discount)}"></label><div class="amt-w"><span>${t("pdf_amount")}</span><b class="amt"></b></div><button type="button" class="icon-btn danger" data-del="${k}" aria-label="${t("delete")}">${ico("trash")}</button></div></div>`).join("");
-    drawSum();
+    syncPct(); drawSum();
   };
   if (type === "quotation" && !doc) { // produk yang ditanda di halaman senarai Sebut Harga
     try { const pre = JSON.parse(sessionStorage.getItem("qp_pick") || "null"); sessionStorage.removeItem("qp_pick"); if (Array.isArray(pre) && pre.length) items = pre.map((i) => ({ name: String(i.name || ""), desc: String(i.desc || ""), qty: num(i.qty) || 1, price: num(i.price), discount: num(i.discount) })); } catch { /* abaikan */ }
@@ -150,7 +151,11 @@ export async function renderEditor(el, ctx, type, id) {
       const pdf = await makePdf(ctx, type, docObj); window.open(URL.createObjectURL(pdf.output("blob")), "_blank");
     } catch (x) { console.error(x); toast(t("pdf_fail"), "err"); } setBusy(btn, false);
   };
-  f.addEventListener("input", (e) => { if (e.target.closest("#items") || ["docDiscount", "taxRate"].includes(e.target.name)) drawSum(); });
+  f.addEventListener("input", (e) => {
+    if (e.target.name === "docDiscount") f.docDiscountPct.value = ""; // RM ditaip sendiri
+    if (e.target.closest("#items") || e.target.name === "docDiscountPct") syncPct();
+    if (e.target.closest("#items") || ["docDiscount", "docDiscountPct", "taxRate"].includes(e.target.name)) drawSum();
+  });
   itemsEl.onclick = (e) => { const b = e.target.closest("[data-del]"); if (!b) return; readItems(); items.splice(+b.dataset.del, 1); if (!items.length) items.push({ name: "", desc: "", qty: 1, price: 0, discount: 0 }); drawItems(); };
   $("#addItem", el).onclick = () => { readItems(); items.push({ name: "", desc: "", qty: 1, price: 0, discount: 0 }); drawItems(); itemsEl.querySelector(".item:last-child input").focus(); };
   $("#pickProd", el).onchange = (e) => { const p = products.find((x) => x.id === e.target.value); if (!p) return; readItems(); const blank = items.length === 1 && !items[0].name && !num(items[0].price); const row = { name: p.name, desc: p.description || "", qty: 1, price: num(p.price), discount: 0, productId: p.id }; blank ? (items = [row]) : items.push(row); e.target.value = ""; drawItems(); };
@@ -172,7 +177,7 @@ export async function renderEditor(el, ctx, type, id) {
       let customerId = f.customerId.value; const customer = { name: f.cname.value.trim(), company: f.ccompany.value.trim(), address: f.caddress.value.trim(), phone: f.cphone.value.trim(), email: f.cemail.value.trim(), regNo: f.cregNo.value.trim() };
       if (!customerId && f.saveCust.checked) customerId = await create(ctx.uid, "customers", { ...customer, notes: "" });
       const data = { date: f.date.value, status: f.status.value, customerId: customerId || "", customer, items: valid.map((i) => ({ name: i.name.trim(), desc: (i.desc || "").trim(), qty: i.qty, price: i.price, discount: i.discount, ...(i.productId ? { productId: i.productId } : {}) })),
-        docDiscount: dn.docDiscount, taxRate: dn.taxRate, taxName: d.taxName || "SST", note: f.note.value.trim(), terms: f.terms.value.trim(), template: f.template.value, color: f.color.value, imgScale: diffSizes(f, company),
+        docDiscount: dn.docDiscount, docDiscountPct: f.docDiscountPct.value ? Math.min(Math.max(num(f.docDiscountPct.value), 0), 100) : 0, taxRate: dn.taxRate, taxName: d.taxName || "SST", note: f.note.value.trim(), terms: f.terms.value.trim(), template: f.template.value, color: f.color.value, imgScale: diffSizes(f, company),
         ...(type === "invoice" ? { dueDate: f.due.value, deposit: 0, receiptsPaid: d.receiptsPaid || 0, receiptCount: d.receiptCount || 0 } : { validUntil: f.due.value }) };
       // Status bayaran: invois simpan pilihan hanya jika berbeza daripada status automatik (supaya "Tertunggak"/"Selesai" automatik terus berfungsi)
       data.payStatus = type === "invoice" ? (f.payStatus.value === payAutoInvoice({ ...data, payStatus: "" }) ? "" : f.payStatus.value) : f.payStatus.value;
