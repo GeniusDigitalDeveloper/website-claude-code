@@ -1,4 +1,5 @@
 "use client";
+import { MusicBackdrop } from "@/components/fx/MusicBackdrop";
 import { ChevronsLeft, ChevronsRight, LogIn } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -310,6 +311,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   // so navigating anywhere (TV mode and sign-in pages included) never re-creates them: music keeps playing.
   const persistent = (
     <>
+      <MusicBackdrop className="fixed inset-0 z-0" />
       <div className="bg-orbs" aria-hidden>
         <span
           style={{
@@ -355,11 +357,11 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <>
       {bare ? (
-        <div key="page">{children}</div>
+        <div key="page" className="relative z-[1]">{children}</div>
       ) : (
         <div
           key="page"
-          className={cx("relative min-h-dvh", preset === "bento" && "md:p-3")}
+          className={cx("relative z-[1] min-h-dvh", preset === "bento" && "md:p-3")}
         >
           <div className={cx("flex min-h-dvh", preset === "bento" && "gap-3")}>
             {sidebar}
@@ -438,7 +440,11 @@ export function AppShell({ children }: { children: ReactNode }) {
                     hasTrack ? "pb-44 md:pb-28" : "pb-24 md:pb-8",
                   )}
                 >
-                  {children}
+                  {/* music animation inside the glass panel too, pinned to the visible area while scrolling */}
+                  <div aria-hidden className="pointer-events-none sticky top-0 z-0 -mb-[100dvh] h-[100dvh] overflow-hidden">
+                    <MusicBackdrop />
+                  </div>
+                  <div className="relative z-[1]">{children}</div>
                 </main>
                 {preset === "bento" && rightPanel && <RightPanel />}
               </div>

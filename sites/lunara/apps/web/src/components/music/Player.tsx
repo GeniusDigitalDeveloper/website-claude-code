@@ -1,4 +1,5 @@
 "use client";
+import { MusicBackdrop } from "@/components/fx/MusicBackdrop";
 import { ChevronDown, Gauge, Heart, ListMusic, Loader2, Maximize2, Pause, Play, Repeat, Repeat1, Shuffle, SkipBack, SkipForward, Volume1, Volume2, VolumeX, Waves } from "lucide-react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
@@ -191,6 +192,7 @@ export function FullPlayer() {
             <img src={t.artwork} alt="" aria-hidden className="absolute inset-0 h-full w-full scale-125 object-cover opacity-35 blur-3xl" />
           )}
           <div className="absolute inset-0 bg-gradient-to-b from-[color:var(--bg)]/40 via-[color:var(--bg)]/70 to-[color:var(--bg)]" />
+          <MusicBackdrop strong className="absolute inset-0" />
           <div className="relative mx-auto flex h-full max-w-6xl flex-col px-5 pt-[max(16px,env(safe-area-inset-top))] pb-[max(20px,env(safe-area-inset-bottom))]">
             <div className="flex items-center justify-between">
               <IconBtn label="Tutup pemain" onClick={() => usePlayer.getState().setUi({ fullOpen: false })}>
