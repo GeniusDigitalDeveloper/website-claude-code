@@ -1,7 +1,7 @@
 // Borang Sebut Harga (ringkas): Pelanggan -> Pilih Pakej & Produk -> Senarai Item (automatik) -> Nota/Terma + Diskaun & Jumlah.
 // Tiada "Maklumat Dokumen": tarikh = hari ini (automatik), status = Draf, logo/tandatangan/cop/saiz ikut Profil → Perniagaan.
 import { t } from "../i18n.js";
-import { esc, $, money, num, round2, todayMY, addDays, toast, setBusy } from "../util.js";
+import { esc, $, money, num, round2, todayMY, addDays, toast, setBusy, modal } from "../util.js";
 import { listAll, getOne, create, update, createNumbered, logActivity, docRef } from "../db.js";
 import { F } from "../firebase.js";
 import { pickerHtml, bindPicker } from "../picker.js";
@@ -33,11 +33,13 @@ export async function render(el, ctx, id, numberFmt) {
   Object.keys(sel).forEach((k) => { if (!pkgs.some((p) => p.id === k)) delete sel[k]; });
   Object.keys(sel).slice(1).forEach((k) => delete sel[k]);
   // Item: daripada pilihan pakej; dokumen lama tanpa pakej mengekalkan item asal
-  let items = Object.keys(sel).length ? selToItems(pkgs, sel) : (doc ? (doc.items || []).filter((i) => i.pkg).map((i) => ({ ...i })) : []);
+  let manual = doc && doc.manualPkg && doc.manualPkg.name ? { ...doc.manualPkg } : null; if (Object.keys(sel).length) manual = null;
+  const manualItem = (m) => ({ name: m.name, desc: m.text || "", contentsText: m.text || "", qty: 1, price: round2(num(m.price)), discount: 0, pkg: "manual" });
+  let items = manual ? [manualItem(manual)] : Object.keys(sel).length ? selToItems(pkgs, sel) : (doc ? (doc.items || []).filter((i) => i.pkg).map((i) => ({ ...i })) : []);
   // Add-on = item tambahan di luar pakej (cth: Homestay). Dokumen lama: item bukan-pakej dianggap add-on.
   let addons = doc ? (doc.items || []).filter((i) => !i.pkg).map((i) => ({ name: i.name || "", price: round2(num(i.qty || 1) * num(i.price) * (1 - num(i.discount) / 100)) })) : [];
   if (doc && !Object.keys(sel).length && !(doc.items || []).some((i) => i.pkg)) { items = []; } // dokumen lama tanpa pakej: semua item jadi add-on
-  const pkgName = () => { const p = pkgs.find((x) => sel[x.id]); return p ? p.name : (doc && doc.pkgNames && doc.pkgNames[0]) || ""; };
+  const pkgName = () => { if (manual) return manual.name; const p = pkgs.find((x) => sel[x.id]); return p ? p.name : (doc && doc.pkgNames && doc.pkgNames[0]) || ""; };
   const pkgTotal = () => round2(items.reduce((s, i) => s + num(i.qty || 1) * num(i.price) * (1 - num(i.discount) / 100), 0));
   const addonTotal = () => round2(addons.reduce((s, a) => s + (String(a.name).trim() ? num(a.price) : 0), 0));
   const subtotal = () => round2(pkgTotal() + addonTotal());
@@ -52,7 +54,7 @@ export async function render(el, ctx, id, numberFmt) {
      <label><span class="lt">${t("f_regno")} <em class="opt-red">(${t("if_needed")})</em> <span class="req" id="regReq" ${cust.company ? "" : "hidden"}>*</span></span><input name="cregNo" maxlength="40" value="${esc(cust.regNo)}"></label></div>
     <label class="chk ${d.customerId ? "hide" : ""}"><input type="checkbox" name="saveCust" checked> ${t("save_customer")}</label>
    </section>
-   ${pkgs.length ? selHtml(pkgs, sel, { confirmLabel: t("save") }) : ""}
+   ${selHtml(pkgs, sel, { confirmLabel: t("save"), action: `<div class="qs-manual" id="qsManual"></div>` })}
    <section class="card form"><h2>${t("qe_pkg_sel")}</h2><div id="qeItems"></div></section>
    <section class="card form"><h2>${t("ao_title")}</h2><p class="muted">${t("ao_desc")}</p>
     <div class="qi-edit"><div id="aoRows"></div><button type="button" class="btn ghost sm" id="aoAdd">${ico("plus")}${t("ao_add")}</button></div>
@@ -92,7 +94,37 @@ export async function render(el, ctx, id, numberFmt) {
   aoRows.addEventListener("click", (e) => { const b = e.target.closest("[data-aodel]"); if (!b) return; readAo(); addons.splice(+b.dataset.aodel, 1); drawAo(); draw(); });
   $("#aoAdd", el).onclick = () => { readAo(); addons.push({ name: "", price: "" }); drawAo(); const ins = aoRows.querySelectorAll("[data-k=name]"); ins[ins.length - 1].focus(); };
   drawAo(); draw(); bindPicker(el);
-  if (pkgs.length) bindSel(el, pkgs, sel, () => { items = selToItems(pkgs, sel); draw(); }, { confirmLabel: t("save") });
+  const selOpts = { confirmLabel: t("save"), action: `<div class="qs-manual" id="qsManual"></div>` };
+  const onSel = () => { if (Object.keys(sel).length) manual = null; items = manual ? [manualItem(manual)] : selToItems(pkgs, sel); draw(); queueMicrotask(drawManual); }; // selepas bindSel melukis semula bahagian
+  const resel = () => { const box = el.querySelector(".qsel"); const tmp = document.createElement("div"); tmp.innerHTML = selHtml(pkgs, sel, selOpts); box.replaceWith(tmp.firstElementChild); bindSel(el, pkgs, sel, onSel, selOpts); drawManual(); };
+  // Kotak + butang pakej manual (biru) di dalam bahagian Pilih Pakej & Produk
+  const drawManual = () => {
+    const m = el.querySelector("#qsManual"); if (!m) return;
+    m.innerHTML = `<button type="button" class="btn manual" id="mkManual">${ico("plus")}${t("mp_btn")}</button>${manual ? `<div class="qs-box on qs-mbox"><div class="qs-top"><b class="qs-name">${esc(manual.name)}</b><span class="qs-full">${t("qs_pkg_price")}: <b>${money(manual.price)}</b></span></div>
+      <span class="qs-badge">${ico("check")}${t("mp_badge")}</span>${manual.text ? `<p class="pk-text">${esc(manual.text)}</p>` : ""}
+      <div class="qs-acts"><button type="button" class="btn ghost sm" id="edManual">${ico("edit")}${t("act_edit")}</button><button type="button" class="btn ghost sm danger" id="rmManual">${ico("x")}${t("qs_remove")}</button></div></div>` : ""}`;
+    m.querySelector("#mkManual").onclick = () => openManual();
+    if (manual) { m.querySelector("#edManual").onclick = () => openManual(); m.querySelector("#rmManual").onclick = () => { manual = null; items = selToItems(pkgs, sel); draw(); drawManual(); }; }
+  };
+  const openManual = () => {
+    const cur = manual || { name: "", price: "", text: "" };
+    const wrap = document.createElement("div"); wrap.className = "form qi-modal";
+    wrap.innerHTML = `<p class="note-red qi-note">${t("mp_note")}</p>
+      <label><span class="lt">${t("qi_pkg_name")} <span class="req">*</span></span><input id="mpName" maxlength="80" value="${esc(cur.name)}" placeholder="${esc(t("mp_name_ph"))}"></label>
+      <label><span class="lt">${t("qi_pkg_price")} <span class="req">*</span></span><input id="mpPrice" type="number" min="0" step="0.01" inputmode="decimal" value="${cur.price === "" ? "" : num(cur.price)}" placeholder="0.00"></label>
+      <label><span class="lt">${t("qi_contents")} <em class="opt">(${t("if_needed")})</em></span><textarea id="mpText" rows="7" maxlength="4000" placeholder="${esc(t("qi_text_ph"))}">${esc(cur.text || "")}</textarea></label>
+      <p class="err" id="mpErr" role="alert"></p>`;
+    wrap.addEventListener("input", () => (wrap.querySelector("#mpErr").textContent = ""));
+    modal({ title: t("mp_btn"), body: wrap, wide: true, actions: [{ label: t("cancel"), cls: "ghost" }, { label: t("save"), cls: "primary", onClick: () => {
+      const name = wrap.querySelector("#mpName").value.trim(), price = round2(num(wrap.querySelector("#mpPrice").value)), text = wrap.querySelector("#mpText").value.replace(/\s+$/g, "");
+      const err = wrap.querySelector("#mpErr");
+      if (!name) { err.textContent = t("qi_err_name"); wrap.querySelector("#mpName").focus(); return false; }
+      if (!(price > 0)) { err.textContent = t("qi_err_price"); wrap.querySelector("#mpPrice").focus(); return false; }
+      manual = { name, price, text }; Object.keys(sel).forEach((k) => delete sel[k]); // satu pakej sahaja: pakej Profil dinyahpilih
+      items = [manualItem(manual)]; draw(); resel();
+    } }] });
+  };
+  bindSel(el, pkgs, sel, onSel, selOpts); drawManual();
   f.ccompany.addEventListener("input", () => ($("#regReq", el).hidden = !f.ccompany.value.trim()));
 
   const build = () => {
@@ -103,7 +135,7 @@ export async function render(el, ctx, id, numberFmt) {
       customer: { name: f.cname.value.trim(), company: f.ccompany.value.trim(), address: f.caddress.value.trim(), phone: f.cphone.value.trim(), email: cust.email || "", regNo: f.cregNo.value.trim() },
       items: items.map((i) => ({ name: i.name, desc: i.desc || "", qty: num(i.qty) || 1, price: num(i.price), discount: num(i.discount) || 0, ...(i.pkg ? { pkg: i.pkg } : {}), ...(i.contents ? { contents: i.contents } : {}), ...(i.contentsText ? { contentsText: i.contentsText } : {}) }))
         .concat(addons.filter((a) => String(a.name).trim()).map((a) => ({ name: String(a.name).trim(), desc: "", qty: 1, price: round2(Math.max(num(a.price), 0)), discount: 0, addon: true }))),
-      pkgSel: sel, pkgNames: pkgName() ? [pkgName()] : [],
+      pkgSel: manual ? {} : sel, pkgNames: pkgName() ? [pkgName()] : [], manualPkg: manual ? { name: manual.name, price: round2(num(manual.price)), text: manual.text || "" } : null,
       docDiscount: Math.min(disc, sub), docDiscountPct: 0, taxRate: 0, taxName: d.taxName || "SST",
       note: d.note || "", terms: f.terms.value.trim(), template: f.template.value, color: f.color.value, imgScale: (doc && doc.imgScale) || {},
     };

@@ -296,3 +296,6 @@ h1,h2,h3,h4,b,strong,th,label,.lbl,.btn,.badge,.brand,.app-name,.side-app,.side 
 .qe-row1{grid-template-columns:1fr}
 @media (max-width:560px){.ao-row{grid-template-columns:28px 1fr 40px}.ao-row .qi-price{grid-column:2/3}.ao-row .icon-btn{grid-row:1;grid-column:3}}
 .q-new .btn.primary{background:#dc2626;background-image:none;border-color:#dc2626;color:#fff;box-shadow:0 8px 22px rgba(220,38,38,.28)}.q-new .btn.primary:hover{background:#b91c1c;border-color:#b91c1c}.q-new .btn.primary .ico,.q-new .btn.primary svg{color:#fff}
+.qs-manual{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)}
+.btn.manual{background:var(--blue);border-color:var(--blue);color:#fff}.btn.manual:hover{background:var(--blue2)}.btn.manual svg{color:#fff}
+.qs-mbox{width:min(100%,320px)}
