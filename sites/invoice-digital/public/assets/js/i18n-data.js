@@ -1,5 +1,6 @@
 // Kamus BM (lalai) & EN. Semua teks UI, borang, status, ralat dan PDF.
 const ms = {
+  qe_pkg_sel: "Pakej Dipilih", ao_title: "Add-on", ao_desc: "Tambah item di luar pakej (cth: Homestay) beserta harga. Jumlah keseluruhan = harga pakej + add-on.", ao_add: "Tambah Add-on", ao_name: "Nama Add-on", ao_ph: "cth: Homestay 2 malam", ao_none: "Tiada add-on.", ao_total: "Jumlah Add-on", ao_grand: "Jumlah Keseluruhan", f_disc_rm: "Diskaun (RM)", f_after_disc_lbl: "Harga Selepas Diskaun", ao_err: "Setiap add-on perlu ada harga.", ao_err_disc: "Diskaun tidak boleh melebihi jumlah keseluruhan.",
   qi_text_ph: "Tulis kandungan pakej secara bebas. Contoh:\n- Pelamin eksklusif\n- Katering 500 pax\n- Fotografi & video", qi_text_d: "Tulis secara bebas: boleh panjang, boleh berbaris, boleh guna titik/sempang.",
   qi_content_ph: "cth: Pelamin, Katering 500 pax",
   qi_pkg_price: "Harga Pakej (RM)", qi_contents: "Kandungan Pakej", qi_contents_d: "Senaraikan apa yang termasuk dalam pakej ini.", qi_add_content: "Tambah Kandungan", qi_err_price: "Sila isi harga pakej.", qi_err_content: "Tambah sekurang-kurangnya satu kandungan pakej.",
@@ -115,6 +116,7 @@ const ms = {
   a_time: "Masa", a_action: "Tindakan", a_detail: "Butiran", a_actor: "Admin",
 };
 const en = {
+  qe_pkg_sel: "Selected Package", ao_title: "Add-ons", ao_desc: "Add items outside the package (e.g. Homestay) with prices. Grand total = package price + add-ons.", ao_add: "Add Add-on", ao_name: "Add-on Name", ao_ph: "e.g. Homestay 2 nights", ao_none: "No add-ons.", ao_total: "Add-on Total", ao_grand: "Grand Total", f_disc_rm: "Discount (RM)", f_after_disc_lbl: "Price After Discount", ao_err: "Every add-on needs a price.", ao_err_disc: "Discount cannot exceed the grand total.",
   qi_text_ph: "Write the package contents freely. Example:\n- Exclusive dais\n- Catering for 500\n- Photo & video", qi_text_d: "Write freely: any length, multiple lines, bullets or dashes.",
   qi_content_ph: "e.g. Dais, Catering for 500",
   qi_pkg_price: "Package Price (RM)", qi_contents: "Package Contents", qi_contents_d: "List what is included in this package.", qi_add_content: "Add Item", qi_err_price: "Please enter the package price.", qi_err_content: "Add at least one package item.",

@@ -287,3 +287,12 @@ h1,h2,h3,h4,b,strong,th,label,.lbl,.btn,.badge,.brand,.app-name,.side-app,.side 
 .qs-pkgtxt{white-space:pre-line;word-break:break-word;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg2);max-height:50vh;overflow:auto;line-height:1.6}
 .qe-text{grid-column:1/-1;white-space:pre-line;word-break:break-word;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;line-height:1.6}
 .pk-tot,.qs-full b,.qs-tot b,.qs-sum{color:var(--err)!important}
+/* Harga tetap pakej dalam tetingkap = biru; Add-on */
+.qs-tot.qs-fixed b{color:var(--blue2)!important;font-size:1.15rem}
+.ao-row{grid-template-columns:32px 1fr 170px 40px}
+.ao-sum{display:grid;gap:6px;margin-top:14px;padding:12px 16px;border:1.5px solid var(--line);border-radius:14px;background:var(--bg2)}.ao-sum div{display:flex;justify-content:space-between;gap:12px}.ao-sum span{color:var(--mut)}.ao-sum b{font-family:var(--f-head)}
+.ao-sum .ao-grand{border-top:2px solid var(--line);padding-top:8px}.ao-sum .ao-grand b{color:var(--err);font-size:1.15rem}
+.ao-disc{margin-top:12px;align-items:end}.ao-after{display:flex;flex-direction:column;gap:2px;padding:10px 14px;border:1.5px solid #bfdbfe;border-radius:12px;background:#eff6ff}.ao-after span{font-size:.8rem;color:var(--blue2)}.ao-after b{font-family:var(--f-head);font-size:1.2rem;color:var(--blue2)}
+.qe-row1{grid-template-columns:1fr}
+@media (max-width:560px){.ao-row{grid-template-columns:28px 1fr 40px}.ao-row .qi-price{grid-column:2/3}.ao-row .icon-btn{grid-row:1;grid-column:3}}
+.q-new .btn.primary{background:#dc2626;background-image:none;border-color:#dc2626;color:#fff;box-shadow:0 8px 22px rgba(220,38,38,.28)}.q-new .btn.primary:hover{background:#b91c1c;border-color:#b91c1c}.q-new .btn.primary .ico,.q-new .btn.primary svg{color:#fff}

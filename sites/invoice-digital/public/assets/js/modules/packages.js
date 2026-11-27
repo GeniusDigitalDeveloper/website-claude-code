@@ -17,7 +17,7 @@ const sum = (items) => items.reduce((s, i) => s + num(i.price), 0);
 export const pkgPrice = (p) => (num(p.price) > 0 ? round2(num(p.price)) : round2(sum(p.items || []))); // harga pakej tetap (atau jumlah produk bagi pakej lama)
 const fixed = (p) => num(p.price) > 0;
 // Kandungan pakej = TEKS BEBAS (satu kotak). Pakej versi sebelum (senarai kandungan) ditukar kepada teks, satu baris setiap item.
-export const pkgText = (p) => (typeof p.text === "string" && p.text.trim() ? p.text.trim() : fixed(p) ? (p.items || []).map((i) => i.name).filter(Boolean).join("\n") : "");
+export const pkgText = (p) => (typeof p.text === "string" && p.text.trim() ? p.text.trim() : fixed(p) || ((p.items || []).length && (p.items || []).every((i) => !num(i.price))) ? (p.items || []).map((i) => i.name).filter(Boolean).join("\n") : "");
 
 async function readMeta(ctx) {
   const m = await getMeta(ctx.uid, PKG_META);
@@ -132,7 +132,7 @@ export async function render(el, ctx) {
 // sel = { [pakejId]: [indeks produk dipilih] }
 export const selTotal = (p, idx) => (fixed(p) ? (idx.length ? pkgPrice(p) : 0) : idx.reduce((s, k) => s + num(p.items[k] && p.items[k].price), 0));
 export function selToItems(pkgs, sel) {
-  const out = []; pkgs.forEach((p) => { const idx = sel[p.id] || []; if (fixed(p) && idx.length) { const txt = pkgText(p); out.push({ name: p.name, desc: txt, contentsText: txt, qty: 1, price: pkgPrice(p), discount: 0, pkg: p.id }); return; } idx.forEach((k) => { const i = p.items[k]; if (i) out.push({ name: i.name, desc: "", qty: 1, price: num(i.price), discount: 0, pkg: p.id }); }); }); return out;
+  const out = []; pkgs.forEach((p) => { const idx = sel[p.id] || []; if ((fixed(p) || pkgText(p)) && idx.length) { const txt = pkgText(p); out.push({ name: p.name, desc: txt, contentsText: txt, qty: 1, price: pkgPrice(p), discount: 0, pkg: p.id }); return; } idx.forEach((k) => { const i = p.items[k]; if (i) out.push({ name: i.name, desc: "", qty: 1, price: num(i.price), discount: 0, pkg: p.id }); }); }); return out;
 }
 export function selHtml(pkgs, sel, { title = t("qs_title"), desc = t("qs_desc"), action = "" } = {}) {
   return `<section class="card form qsel"><h2>${title}</h2><p class="muted">${desc}</p><div class="qs-grid">${pkgs.map((p) => {
@@ -148,8 +148,9 @@ export function selHtml(pkgs, sel, { title = t("qs_title"), desc = t("qs_desc"),
 // Hanya SATU pakej boleh dipilih. Klik "Pilih Pakej" -> tetingkap produk pakej itu; pengguna mesti tanda sekurang-kurangnya satu produk.
 function pickProducts(p, current, confirmLabel = t("qs_confirm")) {
   const wrap = document.createElement("div"); wrap.className = "form qs-modal";
-  if (fixed(p)) { // pakej berharga tetap: papar kandungan (teks bebas) + harga; sahkan pilihan
-    wrap.innerHTML = `<div class="qs-pkgtxt">${esc(pkgText(p))}</div><div class="qs-tot">${t("qs_pkg_price")}: <b>${money(pkgPrice(p))}</b></div>`;
+  if (fixed(p) || pkgText(p) || (p.items || []).every((i) => !num(i.price))) { // pakej berharga tetap / teks: papar kandungan + harga tetap; sahkan pilihan
+    const txt = pkgText(p) || (p.items || []).map((i) => i.name).filter(Boolean).join("\n");
+    wrap.innerHTML = `<div class="qs-pkgtxt">${esc(txt)}</div><div class="qs-tot qs-fixed">${t("qs_pkg_price")}: <b>${money(pkgPrice(p))}</b></div>`;
     let ok = null; return modal({ title: p.name, body: wrap, actions: [{ label: t("cancel"), cls: "ghost" }, { label: confirmLabel, cls: "primary", onClick: () => { ok = [0]; } }] }).then(() => ok);
   }
   wrap.innerHTML = `<p class="note-red qs-note" role="alert">${t("qs_note")}</p>
