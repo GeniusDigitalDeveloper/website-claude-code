@@ -51,7 +51,7 @@ export async function render(el, ctx) {
   async function onProjAction(e) {
     const b = e.target.closest("[data-a]"); if (!b) return; const r = rowsAll().find((x) => x.id === b.dataset.id && x.k === b.dataset.k); if (!r) return;
     if (b.dataset.a === "edit") return (location.hash = `#/app/${r.route}/${r.id}/edit`);
-    if (b.dataset.a === "download" || b.dataset.a === "print") return pdfAction(ctx, r.k, r, b.dataset.a);
+    if (b.dataset.a === "download" || b.dataset.a === "print") return pdfAction(ctx, r.k, r, b.dataset.a, b);
     if (b.dataset.a === "del") {
       if (!(await confirmBox(t("delete"), t(confirmKey(r.k), { n: r.number }), t("delete")))) return;
       try { await deleteProject(ctx, r.k, r); toast(t("deleted")); } catch (x) { console.error(x); toast(errMsg(x), "err"); }

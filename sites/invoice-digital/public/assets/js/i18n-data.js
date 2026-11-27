@@ -1,5 +1,6 @@
 // Kamus BM (lalai) & EN. Semua teks UI, borang, status, ralat dan PDF.
 const ms = {
+  pdf_making: "Menjana PDF…", pdf_wait: "Sedang menjana PDF, sila tunggu sebentar…",
   col_date_gen: "Tarikh Dijana",
   quotation_new_btn: "Tambah Sebut Harga Baharu", quotation_empty_btn: "Belum ada sebut harga. Tekan Tambah Sebut Harga Baharu untuk mula.",
   if_needed: "jika perlu", f_after_disc: "Harga Selepas Diskaun (RM)", qe_package: "Pakej", qe_price: "Harga", qe_total: "Jumlah", qe_pick_first: "Pilih pakej dan produk di atas. Senarai item akan diisi secara automatik.", qs_quote_btn: "Sebut Harga", quotation_empty_pick: "Belum ada sebut harga. Pilih pakej di atas untuk mula.",
@@ -105,6 +106,7 @@ const ms = {
   a_time: "Masa", a_action: "Tindakan", a_detail: "Butiran", a_actor: "Admin",
 };
 const en = {
+  pdf_making: "Generating PDF…", pdf_wait: "Generating PDF, please wait…",
   col_date_gen: "Date Generated",
   quotation_new_btn: "Add New Quotation", quotation_empty_btn: "No quotations yet. Press Add New Quotation to start.",
   if_needed: "if needed", f_after_disc: "Price After Discount (RM)", qe_package: "Package", qe_price: "Price", qe_total: "Total", qe_pick_first: "Choose a package and products above. The item list fills in automatically.", qs_quote_btn: "Quotation", quotation_empty_pick: "No quotations yet. Choose a package above to start.",

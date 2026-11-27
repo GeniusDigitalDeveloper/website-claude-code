@@ -172,6 +172,8 @@ async function askCreatePassword() {
     S.user = u; S.company = null; S.ready = true; route();
     if (!u) { S.pwAsked = false; stopLive(); return; }
     ctx.getCompany().then(renderShellHeader).catch(() => {}); // foto profil di bar atas
+    // Pra-muat pustaka PDF + fon + profil syarikat ketika terbiar -> Pratonton/Cetak/Muat Turun pertama terus pantas
+    (window.requestIdleCallback || ((f) => setTimeout(f, 1500)))(() => import("./pdf.js").then((m) => m.warmPdf()).catch(() => {}));
     if (!hasPassword(u) && u.email && !S.pwAsked) { S.pwAsked = true; askCreatePassword(); }
     ensureUserDoc(u, getLang()).then((r) => {
       if (r.disabled) { signOut().then(() => { toast(t("err_disabled"), "err"); ctx.nav("#/login"); }); }

@@ -81,7 +81,7 @@ export async function buildPdf(type, doc, company = {}, opts = {}) {
   //   2) Kiri: Maklumat Bank, dengan kod QR di SEBELAH KANAN maklumat bank
   const bank = (company.bank || "").trim(), hasQr = isImg(company.bankQr), hasSig = isImg(company.signature), hasChop = isImg(company.stamp);
   const sQr = scale("qr"), sSig = scale("sig"), sStamp = scale("stamp"), sLogo = scale("logo");
-  const QR = 26 * sQr, sigW = 48 * sSig, sigH = 20 * sSig, stW = 30 * sStamp, stH = 26 * sStamp;
+  const QR = 30 * sQr, sigW = 48 * sSig, sigH = 20 * sSig, stW = 30 * sStamp, stH = 26 * sStamp;
   const BANK_FS = 10.5, BANK_LH = 5.4, LBL_FS = 9.5;
   const BOTTOM = H - 19, BASE = BOTTOM - 2.6; // baseline baris terakhir maklumat bank
   // (2) Maklumat bank + QR
@@ -96,7 +96,7 @@ export async function buildPdf(type, doc, company = {}, opts = {}) {
   // (1) Cop | Tandatangan di tengah
   const COLW = 64, GAP = 18, cols = hasChop ? 2 : 1;
   const rowW = cols * COLW + (cols - 1) * GAP, rowX = W / 2 - rowW / 2;
-  const sLineY = hasBankRow ? bankTop - 9 : BASE - 4.6, capY = sLineY + 4.6;
+  const sLineY = hasBankRow ? bankTop - 18 : BASE - 4.6, capY = sLineY + 4.6; // jarak lebih besar antara cop/tandatangan dan maklumat bank (ruang untuk QR)
   const imgH = Math.max(hasChop ? stH : 0, hasSig ? sigH : 0, 12);
   const TOP = sLineY - imgH - 2, LIMIT = TOP - 4; // kandungan mesti berhenti sebelum LIMIT
   const bottomBlock = () => {
@@ -296,14 +296,15 @@ const loadPdfjs = () => (pdfjsP ||= (async () => {
   window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
   return window.pdfjsLib;
 })().catch((e) => { pdfjsP = null; throw e; }));
-export async function pdfToImages(pdf, scale = 3) {
+export async function pdfToImages(pdf, scale = 2.4) {
   const lib = await loadPdfjs();
   const doc = await lib.getDocument({ data: pdf.output("arraybuffer") }).promise; const out = [];
   for (let i = 1; i <= doc.numPages; i++) {
     const page = await doc.getPage(i), vp = page.getViewport({ scale });
     const c = document.createElement("canvas"); c.width = Math.round(vp.width); c.height = Math.round(vp.height);
     const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height);
-    await page.render({ canvasContext: g, viewport: vp }).promise; out.push(c.toDataURL("image/png")); c.width = c.height = 0;
+    await page.render({ canvasContext: g, viewport: vp }).promise;
+    const blob = await new Promise((r) => c.toBlob(r, "image/jpeg", 0.95)); out.push(blob ? URL.createObjectURL(blob) : c.toDataURL("image/jpeg", 0.95)); c.width = c.height = 0;
   }
   doc.destroy(); return out;
 }
@@ -314,18 +315,21 @@ function printPdfViewer(pdf) {
   f.onload = () => { try { f.contentWindow.focus(); f.contentWindow.print(); } catch { window.open(url, "_blank"); } setTimeout(() => { f.remove(); URL.revokeObjectURL(url); }, 60000); };
   document.body.append(f);
 }
-export async function printPdf(pdf) {
+export async function printPdf(pdf, cached) {
   if (isIOS()) return printPdfViewer(pdf); // iOS tidak membenarkan print() daripada iframe
   let imgs;
-  try { imgs = await pdfToImages(pdf); } catch (e) { console.warn("pdfjs", e); return printPdfViewer(pdf); }
+  try { imgs = cached && cached.imgs ? cached.imgs : await pdfToImages(pdf); if (cached) cached.imgs = imgs; } catch (e) { console.warn("pdfjs", e); return printPdfViewer(pdf); }
   const html = `<!doctype html><html><head><meta charset="utf-8"><title>Cetak</title><style>@page{size:A4 portrait;margin:0}html,body{margin:0;padding:0;background:#fff}img{display:block;width:210mm;height:297mm;page-break-after:always;break-after:page}img:last-child{page-break-after:auto;break-after:auto}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}</style></head><body>${imgs.map((src) => `<img src="${src}" alt="">`).join("")}</body></html>`;
   const f = document.createElement("iframe"); f.setAttribute("aria-hidden", "true"); f.style.cssText = "position:fixed;left:-10000px;top:0;width:210mm;height:297mm;border:0;visibility:hidden";
   document.body.append(f);
   const d = f.contentDocument; d.open(); d.write(html); d.close();
-  const go = () => { try { f.contentWindow.focus(); f.contentWindow.print(); } catch { printPdfViewer(pdf); } setTimeout(() => f.remove(), 60000); };
-  const ims = [...d.images]; let left = ims.length;
-  if (!left) return go();
-  ims.forEach((im) => { if (im.complete) { if (--left === 0) go(); } else im.onload = im.onerror = () => { if (--left === 0) go(); }; });
+  // Selesai (promise) hanya selepas dialog cetak dibuka -> butang kekal "sibuk" sehingga itu, tiada cetakan berganda
+  return new Promise((done) => {
+    const go = () => { try { f.contentWindow.focus(); f.contentWindow.print(); } catch { printPdfViewer(pdf); } setTimeout(() => f.remove(), 60000); done(); };
+    const ims = [...d.images]; let left = ims.length;
+    if (!left) return go();
+    ims.forEach((im) => { if (im.complete) { if (--left === 0) go(); } else im.onload = im.onerror = () => { if (--left === 0) go(); }; });
+  });
 }
 export async function sharePdf(pdf, filename, text) {
   const blob = pdf.output("blob"); const file = new File([blob], filename, { type: "application/pdf" });
@@ -333,3 +337,8 @@ export async function sharePdf(pdf, filename, text) {
   return "unsupported";
 }
 export async function newPdf() { await loadPdfLibs(); const { jsPDF } = window.jspdf; return new jsPDF({ unit: "mm", format: "a4", compress: true }); }
+
+// Pra-muat (semasa app terbiar) supaya klik pertama Pratonton/Cetak/Muat Turun terus pantas
+export function warmPdf() {
+  return Promise.all([loadPdfLibs().then(() => loadFonts()), loadPdfjs()]).catch((e) => console.warn("pra-muat PDF", e));
+}

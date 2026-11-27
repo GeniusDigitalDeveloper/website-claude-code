@@ -6,7 +6,7 @@ import { pickerHtml, bindPicker } from "../picker.js";
 import { F } from "../firebase.js";
 import { errMsg } from "../auth.js";
 import { ico, empty, loading, badge } from "./ui.js";
-import { pdfAction, makePdf } from "./actions.js";
+import { pdfAction, makePdf, previewPdf } from "./actions.js";
 import { deleteProject, confirmKey } from "./projects.js";
 import { recordPayment, METHODS } from "./receipts.js";
 import { TEMPLATES } from "../pdf.js";
@@ -52,7 +52,7 @@ export async function renderList(el, ctx, type) {
     draw(); $("#q", el).oninput = debounce(() => draw(), 150); $("#sf", el).onchange = () => draw();
     el.onclick = async (e) => {
       const b = e.target.closest("[data-a]"); if (!b) return; const r = rows.find((x) => x.id === b.dataset.id); if (!r) return;
-      if (b.dataset.a === "download") pdfAction(ctx, type, r, "download");
+      if (b.dataset.a === "download") pdfAction(ctx, type, r, "download", b);
       if (b.dataset.a === "dup") { setBusy(b, true); try { const id = await duplicate(ctx, type, r); toast(t("duplicated")); ctx.nav(`#/app/${C.route}/${id}`); } catch (x) { toast(errMsg(x), "err"); setBusy(b, false); } }
     };
   };
@@ -152,7 +152,7 @@ export async function renderEditor(el, ctx, type, id) {
       const docObj = { number: doc ? doc.number : "PRATONTON", date: f.date.value, status: f.status.value, customer: { name: f.cname.value.trim() || "-", company: f.ccompany.value.trim(), address: f.caddress.value.trim(), phone: f.cphone.value.trim(), email: cust.email || "", regNo: f.cregNo.value.trim() },
         items: items.filter((i) => i.name.trim()), docDiscount: dn.docDiscount, taxRate: dn.taxRate, taxName: d.taxName || "SST", deposit: 0, receiptsPaid: d.receiptsPaid || 0, receiptCount: d.receiptCount || 0, payStatus: f.payStatus.value, note: f.note.value.trim(), terms: f.terms.value.trim(), template: f.template.value, color: f.color.value, imgScale: d.imgScale || {},
         ...autoDue() };
-      const pdf = await makePdf(ctx, type, docObj); window.open(URL.createObjectURL(pdf.output("blob")), "_blank");
+      await previewPdf(() => makePdf(ctx, type, docObj));
     } catch (x) { console.error(x); toast(t("pdf_fail"), "err"); } setBusy(btn, false);
   };
   f.addEventListener("input", (e) => {
@@ -246,8 +246,8 @@ export async function renderView(el, ctx, type, id) {
   const act = async (a, b) => {
     try {
       if (a === "edit") return ctx.nav(`#/app/${C.route}/${id}/edit`);
-      if (["download", "print", "preview", "share"].includes(a)) return pdfAction(ctx, type, d, a);
-      if (a === "rdl" || a === "rpr") { const r = kids.find((x) => x.id === b.dataset.rid); return r && pdfAction(ctx, "receipt", r, a === "rdl" ? "download" : "print"); }
+      if (["download", "print", "preview", "share"].includes(a)) return pdfAction(ctx, type, d, a, b);
+      if (a === "rdl" || a === "rpr") { const r = kids.find((x) => x.id === b.dataset.rid); return r && pdfAction(ctx, "receipt", r, a === "rdl" ? "download" : "print", b); }
       if (a === "inline") { pvOpen = !pvOpen; const box = el.querySelector("#pvbox"); box.hidden = !pvOpen; if (pvOpen) { await showPreview(); box.scrollIntoView({ behavior: "smooth", block: "start" }); } return; }
       if (a === "pay") return ctx.nav(`#/app/receipts/new?invoice=${id}`);
       setBusy(b, true); const c = calc(d);

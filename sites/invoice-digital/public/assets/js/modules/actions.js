@@ -25,24 +25,48 @@ export async function makePdf(ctx, type, doc, o = {}) {
   const d = type === "receipt" ? await receiptContext(ctx, doc, o.cache || {}) : doc;
   return buildPdf(type, d, company, { template: d.template, color: d.color, pdf: o.pdf });
 }
-export async function pdfAction(ctx, type, doc, what) {
+// Cache PDF terakhir (ikut dokumen + masa kemas kini + profil syarikat) -> klik kedua serta-merta
+const CACHE = new Map(); let running = null;
+const stamp = (x) => (x && x.updatedAt && (x.updatedAt.seconds || x.updatedAt.toMillis && x.updatedAt.toMillis())) || "";
+async function cachedPdf(ctx, type, doc) {
+  const company = await ctx.getCompany();
+  const key = [type, doc.id || doc.number, stamp(doc), stamp(company), doc.amount || "", doc.paidToDate || ""].join("|");
+  let hit = CACHE.get(key);
+  if (!hit) { hit = { pdf: await makePdf(ctx, type, doc) }; if (type !== "receipt") { CACHE.set(key, hit); if (CACHE.size > 12) CACHE.delete(CACHE.keys().next().value); } }
+  return hit;
+}
+// Buka tetingkap pratonton SERTA-MERTA (dalam klik pengguna) supaya tidak disekat pelayar; PDF dimasukkan apabila siap
+export async function previewPdf(make) {
+  const w = window.open("", "_blank");
+  try { if (w) w.document.write(`<title>PDF</title><p style="font-family:sans-serif;padding:24px;color:#475569">${t("pdf_making")}</p>`); } catch { /* abaikan */ }
+  try { const pdf = await make(); const url = URL.createObjectURL(pdf.output("blob")); if (w && !w.closed) w.location.href = url; else window.open(url, "_blank"); }
+  catch (e) { try { w && w.close(); } catch { /* abaikan */ } throw e; }
+}
+export async function pdfAction(ctx, type, doc, what, btn) {
+  if (running) return toast(t("pdf_wait")); // elak klik berulang menjana banyak kali
+  running = what; if (btn) { btn.disabled = true; btn.classList.add("busy"); }
   try {
-    const pdf = await makePdf(ctx, type, doc); const name = `${doc.number}.pdf`;
+    const name = `${doc.number}.pdf`;
+    if (what === "preview") { await previewPdf(async () => (await cachedPdf(ctx, type, doc)).pdf); return; }
+    const hit = await cachedPdf(ctx, type, doc); const pdf = hit.pdf;
     if (what === "download") { pdf.save(name); toast(t("pdf_done")); }
-    else if (what === "print") printPdf(pdf);
-    else if (what === "preview") window.open(URL.createObjectURL(pdf.output("blob")), "_blank");
+    else if (what === "print") await printPdf(pdf, hit);
     else if (what === "share") {
       const r = await sharePdf(pdf, name, `${doc.number}`);
       if (r === "unsupported") { download(pdf.output("blob"), name); const msg = encodeURIComponent(`${doc.number} - ${(doc.customer && doc.customer.name) || ""}`); toast(t("share_fallback")); window.open(`https://wa.me/?text=${msg}`, "_blank", "noopener"); }
     }
   } catch (e) { console.error(e); toast(t("pdf_fail"), "err"); }
+  finally { running = null; if (btn) { btn.disabled = false; btn.classList.remove("busy"); } }
 }
 
 // ---- Pukal: items = [{ k: "invoice"|"quotation"|"receipt", doc }]
 export async function bulkPrint(ctx, items) {
-  const cache = {}; let pdf = null;
-  for (const it of items) pdf = await makePdf(ctx, it.k, it.doc, { cache, pdf }); // semua dokumen dalam SATU PDF untuk dicetak sekali gus
-  printPdf(pdf);
+  if (running) return toast(t("pdf_wait")); running = "bulk";
+  try {
+    const cache = {}; let pdf = null;
+    for (const it of items) pdf = await makePdf(ctx, it.k, it.doc, { cache, pdf }); // semua dokumen dalam SATU PDF untuk dicetak sekali gus
+    await printPdf(pdf);
+  } finally { running = null; }
 }
 let zipP;
 const loadZip = () => (zipP ||= new Promise((res, rej) => {

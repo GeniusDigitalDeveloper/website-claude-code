@@ -7,7 +7,7 @@ import { F } from "../firebase.js";
 import { pickerHtml, bindPicker } from "../picker.js";
 import { errMsg } from "../auth.js";
 import { ico, empty, loading } from "./ui.js";
-import { makePdf } from "./actions.js";
+import { makePdf, previewPdf } from "./actions.js";
 import { loadPackages, selHtml, bindSel, selToItems } from "./packages.js";
 
 export async function render(el, ctx, id, numberFmt) {
@@ -95,7 +95,7 @@ export async function render(el, ctx, id, numberFmt) {
   };
   $("#prev", el).onclick = async (e) => {
     const btn = e.currentTarget; setBusy(btn, true);
-    try { const pdf = await makePdf(ctx, "quotation", { ...build(), number: doc ? doc.number : "PRATONTON", customer: { ...build().customer, name: f.cname.value.trim() || "-" } }); window.open(URL.createObjectURL(pdf.output("blob")), "_blank"); }
+    try { await previewPdf(() => makePdf(ctx, "quotation", { ...build(), number: doc ? doc.number : "PRATONTON", customer: { ...build().customer, name: f.cname.value.trim() || "-" } })); }
     catch (x) { console.error(x); toast(t("pdf_fail"), "err"); } setBusy(btn, false);
   };
   f.onsubmit = async (e) => {

@@ -5,7 +5,7 @@ import { createNumbered, docRef, getOne, listAll, listLive, logActivity } from "
 import { F, db } from "../firebase.js";
 import { errMsg } from "../auth.js";
 import { ico, empty, loading } from "./ui.js";
-import { pdfAction, makePdf } from "./actions.js";
+import { pdfAction, makePdf, previewPdf } from "./actions.js";
 import { deleteProject, confirmKey } from "./projects.js";
 import { bulkBarHtml, chkTh, chkTd, bulkController, limitRows } from "./bulk.js";
 import { buildPdf } from "../pdf.js";
@@ -74,7 +74,7 @@ export async function renderList(el, ctx) {
     el.onclick = async (e) => {
       const b = e.target.closest("[data-a]"); if (!b) return; const r = rows.find((x) => x.id === b.dataset.id); if (!r) return;
       if (b.dataset.a === "del") { if (!(await confirmBox(t("delete"), t(confirmKey("receipt"), { n: r.number }), t("delete")))) return; try { await deleteProject(ctx, "receipt", r); toast(t("deleted")); } catch (x) { toast(errMsg(x), "err"); } return; }
-      pdfAction(ctx, "receipt", r, b.dataset.a);
+      pdfAction(ctx, "receipt", r, b.dataset.a, b);
     };
   };
   ctx.live(listLive(ctx.uid, "receipts", (r) => { rows = r; if (!mounted) { mounted = true; mount(); } else draw(); }, (e) => { if (!mounted) el.innerHTML = `<p class="err">${esc(errMsg(e))}</p>`; }));
@@ -108,7 +108,7 @@ export async function renderForm(el, ctx, params) {
     try {
       const c = calc(inv), amt = num(f.amount.value), paid = round2(c.paidReceipts + amt);
       const doc = { number: "PRATONTON", date: f.date.value, amount: amt, method: f.method.value, note: f.note.value.trim(), invoiceId: inv.id, invoiceNumber: inv.number, customer: inv.customer || {}, customerName: (inv.customer && inv.customer.name) || "", invoiceTotal: c.total, paidToDate: paid, balanceAfter: round2(Math.max(c.total - paid, 0)), seq: (num(inv.receiptCount) || 0) + 1, payStatus: f.payStatus.value, template: inv.template, color: inv.color, imgScale: {} };
-      const pdf = await buildPdf("receipt", doc, company, { template: doc.template, color: doc.color }); window.open(URL.createObjectURL(pdf.output("blob")), "_blank");
+      await previewPdf(() => buildPdf("receipt", doc, company, { template: doc.template, color: doc.color }));
     } catch (x) { console.error(x); toast(t("pdf_fail"), "err"); } setBusy(btn, false);
   };
   f.onsubmit = async (e) => {
@@ -139,7 +139,7 @@ export async function renderEdit(el, ctx, id) {
     <p class="err" id="err" role="alert"></p><div class="form-f"><button class="btn ghost" type="button" id="prev">${ico("eye")}${t("preview_draft")}</button><button class="btn primary" type="submit">${t("save")}</button></div></form>`;
   const f = $("#f", el);
   const draft = () => ({ ...r, amount: num(f.amount.value), date: f.date.value, method: f.method.value, payStatus: f.payStatus.value, note: f.note.value.trim() });
-  $("#prev", el).onclick = async (e) => { const btn = e.currentTarget; setBusy(btn, true); try { const pdf = await makePdf(ctx, "receipt", draft()); window.open(URL.createObjectURL(pdf.output("blob")), "_blank"); } catch (x) { console.error(x); toast(t("pdf_fail"), "err"); } setBusy(btn, false); };
+  $("#prev", el).onclick = async (e) => { const btn = e.currentTarget; setBusy(btn, true); try { await previewPdf(() => makePdf(ctx, "receipt", draft())); } catch (x) { console.error(x); toast(t("pdf_fail"), "err"); } setBusy(btn, false); };
   f.onsubmit = async (e) => {
     e.preventDefault(); const err = $("#err", el); err.textContent = ""; const btn = $("button[type=submit]", f); const d = draft();
     if (!(d.amount > 0) || (maxAmt != null && d.amount > maxAmt + 0.005)) return (err.textContent = t("err_amount")); if (!d.date) return (err.textContent = t("err_required"));
