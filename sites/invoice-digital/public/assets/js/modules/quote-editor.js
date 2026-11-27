@@ -65,7 +65,7 @@ export async function render(el, ctx, id, numberFmt) {
    <section class="card form"><div class="grid2 qe-bottom">
     <div class="form"><label><span class="lt">${t("pdf_terms")} <em class="opt">(${t("if_needed")})</em></span><textarea name="terms" rows="5" maxlength="2000">${esc(d.terms)}</textarea></label>
      ${pickerHtml(d.template, d.color)}</div>
-    <div class="form sum"><div id="sum" class="totals qe-sum" aria-live="polite"></div></div></div></section>
+    <div class="form sum"><label class="sum-lbl"><span class="lt">${t("qe_summary")}</span><div id="sum" class="totals qe-sum" aria-live="polite"></div></label></div></div></section>
    <p class="err" id="err" role="alert"></p>
    <div class="form-f sticky"><a class="btn ghost" href="#/app/quotations">${t("cancel")}</a><button class="btn ghost" type="button" id="prev">${ico("eye")}${t("preview_draft")}</button><button class="btn primary" type="submit">${ico("check")}${t("save")}</button></div>
   </form>`;

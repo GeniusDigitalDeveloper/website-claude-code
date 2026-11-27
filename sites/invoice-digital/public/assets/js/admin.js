@@ -7,6 +7,7 @@ import { onUser, signIn, signOut, errMsg, isAdminUser } from "./auth.js";
 import { getAppSettings } from "./db.js";
 import { brand } from "./shared.js";
 import { ico, empty, loading, badge, pwInput, bindEyes } from "./modules/ui.js";
+import "./paren.js"; // teks dalam kurungan -> bold italic
 
 const root = $("#root"); const S = { user: null, settings: {}, ready: false };
 const NAV = [["dashboard", "chart"], ["users", "users"], ["documents", "doc"], ["content", "globe"], ["system", "gear"], ["logs", "list"]];

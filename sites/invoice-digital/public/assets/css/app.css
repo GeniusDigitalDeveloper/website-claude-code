@@ -306,3 +306,7 @@ h1,h2,h3,h4,b,strong,th,label,.lbl,.btn,.badge,.brand,.app-name,.side-app,.side 
 .qs-head{justify-content:flex-start;gap:12px}
 .btn.manual{background:#047857;border-color:#047857;color:#fff;font-size:.8rem;font-weight:700;padding:6px 12px;min-height:32px;height:auto;border-radius:9px;gap:6px;box-shadow:none;line-height:1.2}
 .btn.manual:hover{background:#065f46;border-color:#065f46}.btn.manual svg{width:15px;height:15px;color:#fff}
+/* Semua teks dalam kurungan: bold italic */
+.opt,.opt-red,em.paren{font-weight:700!important;font-style:italic!important}
+.sum-lbl{display:flex;flex-direction:column;gap:6px}
+.sum-lbl .qe-sum{border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff;font-weight:400}

@@ -8,6 +8,7 @@ import { brand, footerHtml, fillFooterStats } from "./shared.js";
 import { ico, pwInput, bindEyes } from "./modules/ui.js";
 import { avatarInner } from "./modules/avatar.js";
 import { bindInstall, registerSW } from "./install.js";
+import "./paren.js"; // teks dalam kurungan -> bold italic
 registerSW();
 
 const root = $("#root");
@@ -202,3 +203,4 @@ async function checkVersion() {
 }
 checkVersion(); setInterval(() => { if (!document.hidden) checkVersion(); }, 60000);
 document.addEventListener("visibilitychange", () => { if (!document.hidden) checkVersion(); }); window.addEventListener("online", checkVersion);
+
