@@ -315,3 +315,21 @@ h1,h2,h3,h4,b,strong,th,label,.lbl,.btn,.badge,.brand,.app-name,.side-app,.side 
  .shell{grid-template-columns:minmax(0,1fr);padding-left:var(--side)}
  .side{position:fixed;left:0;top:0;bottom:0;width:var(--side);height:100vh;height:100dvh;overflow-y:auto;z-index:40}
 }
+/* Mudah alih: nilai wang tidak terpecah baris */
+.totals b,.ao-sum b,.ao-after b,.qe-row b,.iv-pay b,.qs-tot b,.qs-full b,.pk-tot,.stat b{white-space:nowrap}
+.totals div,.ao-sum div,.iv-pay div{align-items:baseline}
+.totals div>span,.ao-sum div>span,.iv-pay div>span{min-width:0}
+@media(max-width:420px){.totals .grand{font-size:.95rem;padding:10px 12px}.ao-sum .ao-grand b{font-size:1.05rem}}
+/* Senarai resit dalam paparan invois: tidak terkeluar dari kotak pada mana-mana saiz */
+.grid-view>*{min-width:0}
+.mini.rrow{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;min-width:0}
+.mini.rrow>span:first-child{flex:1 1 150px;min-width:0}
+.mini.rrow .rr{margin-left:auto;display:flex;align-items:center;gap:2px;flex:0 0 auto}
+.mini.rrow .rr .icon-btn{width:34px;height:34px}
+/* Telefon/tablet kecil: ringkasan Harga | Diskaun | Jumlah disusun menegak (label kiri, nilai kanan) - tiada pertindihan */
+@media(max-width:640px){
+ .qe-row{grid-template-columns:1fr!important}
+ .qe-row>div{flex-direction:row!important;justify-content:space-between;align-items:baseline!important;padding:10px 14px;gap:10px}
+ .qe-row>div+div{border-left:0!important;border-top:1px solid var(--line)}
+ .qe-row .qe-total{text-align:left}
+}

@@ -6,10 +6,11 @@ function boldParens(root) {
   const els = root.matches && root.matches(PAREN_SEL) ? [root, ...root.querySelectorAll(PAREN_SEL)] : root.querySelectorAll(PAREN_SEL);
   els.forEach((el) => {
     [...el.childNodes].forEach((n) => {
-      if (n.nodeType !== 3 || !PAREN_RE.test(n.nodeValue)) return; PAREN_RE.lastIndex = 0;
-      const frag = document.createDocumentFragment(); let last = 0, m; const v = n.nodeValue;
-      while ((m = PAREN_RE.exec(v))) { frag.append(v.slice(last, m.index)); const em = document.createElement("em"); em.className = "paren"; em.textContent = m[0]; frag.append(em); last = m.index + m[0].length; }
-      frag.append(v.slice(last)); n.replaceWith(frag);
+      if (n.nodeType !== 3 || (n.parentElement && n.parentElement.classList.contains("pt")) || !PAREN_RE.test(n.nodeValue)) return; PAREN_RE.lastIndex = 0;
+      // dibungkus dalam SATU span supaya kekal sebaris walaupun induknya flex (cth: label medan borang)
+      const wrap = document.createElement("span"); wrap.className = "pt"; let last = 0, m; const v = n.nodeValue;
+      while ((m = PAREN_RE.exec(v))) { wrap.append(v.slice(last, m.index)); const em = document.createElement("em"); em.className = "paren"; em.textContent = m[0]; wrap.append(em); last = m.index + m[0].length; }
+      wrap.append(v.slice(last)); n.replaceWith(wrap);
     });
   });
 }
