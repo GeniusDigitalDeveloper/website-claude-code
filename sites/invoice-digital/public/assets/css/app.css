@@ -299,3 +299,6 @@ h1,h2,h3,h4,b,strong,th,label,.lbl,.btn,.badge,.brand,.app-name,.side-app,.side 
 .qs-manual{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)}
 .btn.manual{background:var(--blue);border-color:var(--blue);color:#fff}.btn.manual:hover{background:var(--blue2)}.btn.manual svg{color:#fff}
 .qs-mbox{width:min(100%,320px)}
+.qs-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.qs-head h2{margin:0}
+.qe-pkg{flex-wrap:wrap}.mp-badge{margin-left:4px}.mp-acts{margin-left:auto;display:flex;gap:6px}
+.qe-pkg .qs-badge.mp-badge{color:#fff;text-transform:none;letter-spacing:0;font-size:.75rem}

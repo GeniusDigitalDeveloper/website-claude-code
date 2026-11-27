@@ -54,7 +54,7 @@ export async function render(el, ctx, id, numberFmt) {
      <label><span class="lt">${t("f_regno")} <em class="opt-red">(${t("if_needed")})</em> <span class="req" id="regReq" ${cust.company ? "" : "hidden"}>*</span></span><input name="cregNo" maxlength="40" value="${esc(cust.regNo)}"></label></div>
     <label class="chk ${d.customerId ? "hide" : ""}"><input type="checkbox" name="saveCust" checked> ${t("save_customer")}</label>
    </section>
-   ${selHtml(pkgs, sel, { confirmLabel: t("save"), action: `<div class="qs-manual" id="qsManual"></div>` })}
+   ${selHtml(pkgs, sel, { confirmLabel: t("save"), head: `<button type="button" class="btn manual" id="mkManual">${ico("plus")}${t("mp_btn")}</button>` })}
    <section class="card form"><h2>${t("qe_pkg_sel")}</h2><div id="qeItems"></div></section>
    <section class="card form"><h2>${t("ao_title")}</h2><p class="muted">${t("ao_desc")}</p>
     <div class="qi-edit"><div id="aoRows"></div><button type="button" class="btn ghost sm" id="aoAdd">${ico("plus")}${t("ao_add")}</button></div>
@@ -81,7 +81,7 @@ export async function render(el, ctx, id, numberFmt) {
   const draw = () => {
     const sub = subtotal(); disc = Math.min(Math.max(disc, 0), sub); const tot = round2(sub - disc);
     $("#qeItems", el).innerHTML = items.length ? `<p class="qe-lbl">${t("pdf_desc")}</p><div class="qe-box">
-      ${pkgName() ? `<div class="qe-pkg"><span>${t("qe_package")}</span><b>${esc(pkgName())}</b></div>` : ""}
+      ${pkgName() ? `<div class="qe-pkg"><span>${t("qe_package")}</span><b>${esc(pkgName())}</b>${manual ? `<span class="qs-badge mp-badge">${t("mp_badge")}</span><span class="mp-acts"><button type="button" class="btn ghost sm" id="edManual">${ico("edit")}${t("act_edit")}</button><button type="button" class="btn ghost sm danger" id="rmManual">${ico("x")}${t("qs_remove")}</button></span>` : ""}</div>` : ""}
       <div class="qe-prods">${items.flatMap((i) => (i.contentsText ? [`<div class="qe-text">${esc(i.contentsText)}</div>`] : i.contents && i.contents.length ? i.contents.map((n) => `<div class="qe-prod"><b>${esc(n)}</b></div>`) : [`<div class="qe-prod"><b>${esc(i.name)}</b><span>${money(num(i.qty || 1) * num(i.price))}</span></div>`])).join("")}</div>
       <div class="qe-row qe-row1"><div class="qe-total"><span>${t("qs_pkg_price")}</span><b>${money(pkgTotal())}</b></div></div></div>`
       : `<p class="muted qe-empty">${t("qe_pick_first")}</p>`;
@@ -94,18 +94,18 @@ export async function render(el, ctx, id, numberFmt) {
   aoRows.addEventListener("click", (e) => { const b = e.target.closest("[data-aodel]"); if (!b) return; readAo(); addons.splice(+b.dataset.aodel, 1); drawAo(); draw(); });
   $("#aoAdd", el).onclick = () => { readAo(); addons.push({ name: "", price: "" }); drawAo(); const ins = aoRows.querySelectorAll("[data-k=name]"); ins[ins.length - 1].focus(); };
   drawAo(); draw(); bindPicker(el);
-  const selOpts = { confirmLabel: t("save"), action: `<div class="qs-manual" id="qsManual"></div>` };
+  const selOpts = { confirmLabel: t("save"), head: `<button type="button" class="btn manual" id="mkManual">${ico("plus")}${t("mp_btn")}</button>` };
   const onSel = () => { if (Object.keys(sel).length) manual = null; items = manual ? [manualItem(manual)] : selToItems(pkgs, sel); draw(); queueMicrotask(drawManual); }; // selepas bindSel melukis semula bahagian
   const resel = () => { const box = el.querySelector(".qsel"); const tmp = document.createElement("div"); tmp.innerHTML = selHtml(pkgs, sel, selOpts); box.replaceWith(tmp.firstElementChild); bindSel(el, pkgs, sel, onSel, selOpts); drawManual(); };
   // Kotak + butang pakej manual (biru) di dalam bahagian Pilih Pakej & Produk
   const drawManual = () => {
-    const m = el.querySelector("#qsManual"); if (!m) return;
-    m.innerHTML = `<button type="button" class="btn manual" id="mkManual">${ico("plus")}${t("mp_btn")}</button>${manual ? `<div class="qs-box on qs-mbox"><div class="qs-top"><b class="qs-name">${esc(manual.name)}</b><span class="qs-full">${t("qs_pkg_price")}: <b>${money(manual.price)}</b></span></div>
-      <span class="qs-badge">${ico("check")}${t("mp_badge")}</span>${manual.text ? `<p class="pk-text">${esc(manual.text)}</p>` : ""}
-      <div class="qs-acts"><button type="button" class="btn ghost sm" id="edManual">${ico("edit")}${t("act_edit")}</button><button type="button" class="btn ghost sm danger" id="rmManual">${ico("x")}${t("qs_remove")}</button></div></div>` : ""}`;
-    m.querySelector("#mkManual").onclick = () => openManual();
-    if (manual) { m.querySelector("#edManual").onclick = () => openManual(); m.querySelector("#rmManual").onclick = () => { manual = null; items = selToItems(pkgs, sel); draw(); drawManual(); }; }
+    const mk = el.querySelector("#mkManual"); if (mk) mk.onclick = () => openManual();
   };
+  // Edit / Buang pakej manual (butang di bahagian "Pakej Dipilih")
+  el.querySelector("#qeItems").addEventListener("click", (e) => {
+    if (e.target.closest("#edManual")) return openManual();
+    if (e.target.closest("#rmManual")) { manual = null; items = selToItems(pkgs, sel); draw(); }
+  });
   const openManual = () => {
     const cur = manual || { name: "", price: "", text: "" };
     const wrap = document.createElement("div"); wrap.className = "form qi-modal";
@@ -121,7 +121,7 @@ export async function render(el, ctx, id, numberFmt) {
       if (!name) { err.textContent = t("qi_err_name"); wrap.querySelector("#mpName").focus(); return false; }
       if (!(price > 0)) { err.textContent = t("qi_err_price"); wrap.querySelector("#mpPrice").focus(); return false; }
       manual = { name, price, text }; Object.keys(sel).forEach((k) => delete sel[k]); // satu pakej sahaja: pakej Profil dinyahpilih
-      items = [manualItem(manual)]; draw(); resel();
+      items = [manualItem(manual)]; resel(); draw(); drawManual();
     } }] });
   };
   bindSel(el, pkgs, sel, onSel, selOpts); drawManual();

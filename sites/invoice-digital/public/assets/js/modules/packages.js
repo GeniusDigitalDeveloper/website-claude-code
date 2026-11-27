@@ -134,8 +134,8 @@ export const selTotal = (p, idx) => (fixed(p) ? (idx.length ? pkgPrice(p) : 0) :
 export function selToItems(pkgs, sel) {
   const out = []; pkgs.forEach((p) => { const idx = sel[p.id] || []; if ((fixed(p) || pkgText(p)) && idx.length) { const txt = pkgText(p); out.push({ name: p.name, desc: txt, contentsText: txt, qty: 1, price: pkgPrice(p), discount: 0, pkg: p.id }); return; } idx.forEach((k) => { const i = p.items[k]; if (i) out.push({ name: i.name, desc: "", qty: 1, price: num(i.price), discount: 0, pkg: p.id }); }); }); return out;
 }
-export function selHtml(pkgs, sel, { title = t("qs_title"), desc = t("qs_desc"), action = "" } = {}) {
-  return `<section class="card form qsel"><h2>${title}</h2><p class="muted">${desc}</p><div class="qs-grid">${pkgs.map((p) => {
+export function selHtml(pkgs, sel, { title = t("qs_title"), desc = t("qs_desc"), action = "", head = "" } = {}) {
+  return `<section class="card form qsel"><div class="qs-head"><h2>${title}</h2>${head}</div><p class="muted">${desc}</p><div class="qs-grid">${pkgs.map((p) => {
     const on = Array.isArray(sel[p.id]); const idx = on ? sel[p.id] : [];
     return `<div class="qs-box ${on ? "on" : ""}" data-pk="${esc(p.id)}"><div class="qs-top"><b class="qs-name">${esc(p.name)}</b><span class="qs-full">${t("qs_pkg_price")}: <b>${money(pkgPrice(p))}</b></span></div>
       ${on ? `<span class="qs-badge">${ico("check")}${t("qs_picked")}</span>
