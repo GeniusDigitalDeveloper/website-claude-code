@@ -191,8 +191,8 @@ export async function buildPdf(type, doc, company = {}, opts = {}) {
   const meta = type === "receipt"
     ? [[t("pdf_invref"), doc.invoiceNumber || "-"], [t("pdf_status"), t("ps_" + payOf("receipt", doc))]]
     : type === "invoice"
-      ? [[t("pdf_due"), fmtDate(doc.dueDate, getLang())], [t("pdf_status"), status === "cancelled" ? t("st_cancelled") : t("ps_" + payOf("invoice", doc))]]
-      : [[t("pdf_valid"), fmtDate(doc.validUntil, getLang())], [t("pdf_status"), t("st_" + status)], ...(doc.payStatus ? [[t("f_paystatus"), t("ps_" + payOf("quotation", doc))]] : [])];
+      ? [[t("pdf_status"), status === "cancelled" ? t("st_cancelled") : t("ps_" + payOf("invoice", doc))]]
+      : []; // sebut harga: tiada "Sah Sehingga" / status; invois: tiada "Akhir Bayaran"
   const cust = doc.customer || {};
   setB(); pdf.setFontSize(9); setC(accent); txt(t("pdf_billto"), L, y);
   setB(); pdf.setFontSize(10.5); setC(dark); txt(cust.name || doc.customerName || "-", L, y + 5);

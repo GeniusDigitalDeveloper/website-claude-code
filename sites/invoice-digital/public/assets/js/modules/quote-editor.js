@@ -2,7 +2,8 @@
 // Tiada "Maklumat Dokumen": tarikh = hari ini (automatik), status = Draf, logo/tandatangan/cop/saiz ikut Profil → Perniagaan.
 import { t } from "../i18n.js";
 import { esc, $, money, num, round2, todayMY, addDays, toast, setBusy } from "../util.js";
-import { listAll, getOne, create, update, createNumbered, logActivity } from "../db.js";
+import { listAll, getOne, create, update, createNumbered, logActivity, docRef } from "../db.js";
+import { F } from "../firebase.js";
 import { pickerHtml, bindPicker } from "../picker.js";
 import { errMsg } from "../auth.js";
 import { ico, empty, loading } from "./ui.js";
@@ -114,10 +115,27 @@ export async function render(el, ctx, id, numberFmt) {
         customerId = same ? same.id : await create(ctx.uid, "customers", { ...c, notes: "" });
       }
       data.customerId = customerId;
-      let rid = id;
+      let rid = id, qnum = doc ? doc.number : "";
       if (doc) await update(ctx.uid, "quotations", id, data);
-      else { const r = await createNumbered(ctx.uid, "quotation", await numberFmt(ctx, "quotation"), null, () => ({ data })); rid = r.id; logActivity(ctx.user, "quotation", r.number); }
+      else { const r = await createNumbered(ctx.uid, "quotation", await numberFmt(ctx, "quotation"), null, () => ({ data })); rid = r.id; qnum = r.number; logActivity(ctx.user, "quotation", r.number); }
+      await syncInvoice(ctx, numberFmt, rid, qnum, data, doc);
       toast(t("saved")); ctx.nav(`#/app/quotations/${rid}`);
     } catch (x) { console.error(x); err.textContent = errMsg(x); setBusy(btn, false); }
   };
+}
+
+// Invois dijana AUTOMATIK daripada setiap sebut harga (tiada butang "Tukar kepada Invois").
+// Sebut harga diedit -> invois berkaitan dikemas kini (pelanggan, item, diskaun, nota, terma, tema). Bayaran/resit invois tidak disentuh.
+async function syncInvoice(ctx, numberFmt, qid, qnum, data, doc) {
+  const shared = { customer: data.customer, customerId: data.customerId || "", items: data.items, pkgSel: data.pkgSel, pkgNames: data.pkgNames, docDiscount: data.docDiscount, docDiscountPct: data.docDiscountPct, taxRate: data.taxRate, taxName: data.taxName, note: data.note, terms: data.terms, template: data.template, color: data.color, imgScale: data.imgScale };
+  const linked = doc && doc.convertedInvoiceId;
+  if (linked) {
+    try { const inv = await getOne(ctx.uid, "invoices", linked); if (inv) { await update(ctx.uid, "invoices", linked, shared); return; } } catch (e) { console.warn("invois", e); }
+  }
+  const date = todayMY(); const qref = docRef(ctx.uid, "quotations", qid);
+  const r = await createNumbered(ctx.uid, "invoice", await numberFmt(ctx, "invoice"), null, (_, n, newId) => ({
+    data: { ...shared, date, dueDate: addDays(date, 14), status: "unpaid", payStatus: "", deposit: 0, receiptsPaid: 0, receiptCount: 0, fromQuotationId: qid, fromQuotationNumber: qnum },
+    writes: [(tx) => tx.update(qref, { convertedInvoiceId: newId, convertedInvoiceNumber: n, updatedAt: F.serverTimestamp() })],
+  }));
+  logActivity(ctx.user, "invoice", r.number);
 }

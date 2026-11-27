@@ -1,5 +1,6 @@
 // Kamus BM (lalai) & EN. Semua teks UI, borang, status, ralat dan PDF.
 const ms = {
+  col_date_gen: "Tarikh Dijana",
   quotation_new_btn: "Tambah Sebut Harga Baharu", quotation_empty_btn: "Belum ada sebut harga. Tekan Tambah Sebut Harga Baharu untuk mula.",
   if_needed: "jika perlu", f_after_disc: "Harga Selepas Diskaun (RM)", qe_package: "Pakej", qe_price: "Harga", qe_total: "Jumlah", qe_pick_first: "Pilih pakej dan produk di atas. Senarai item akan diisi secara automatik.", qs_quote_btn: "Sebut Harga", quotation_empty_pick: "Belum ada sebut harga. Pilih pakej di atas untuk mula.",
   qs_note: "Sila pilih produk yang ingin di dalam pakej ini.", qs_confirm: "Pilih", qs_change: "Tukar Produk", qs_remove: "Buang",
@@ -68,7 +69,7 @@ const ms = {
   dash_hello: "Selamat datang, {n}", stat_invoices: "Jumlah Invois", stat_quotations: "Jumlah Sebut Harga", stat_receipts: "Jumlah Resit", stat_customers: "Jumlah Pelanggan", stat_value: "Jumlah Nilai Invois", stat_received: "Pembayaran Diterima", stat_outstanding: "Pembayaran Belum Selesai",
   chart_month: "Invois mengikut bulan", chart_value: "Nilai setahun", chart_payments: "Pembayaran diterima", chart_status: "Status invois",
   // senarai & borang dokumen
-  invoice_new: "Invois Baharu", quotation_new: "Sebut Harga Baharu", invoice_sub: "Cipta, hantar dan jejak invois anda.", quotation_sub: "Sediakan sebut harga dan tukar kepada invois.", invoice_empty: "Belum ada invois. Cipta yang pertama!", quotation_empty: "Belum ada sebut harga. Cipta yang pertama!",
+  invoice_new: "Invois Baharu", quotation_new: "Sebut Harga Baharu", invoice_sub: "Cipta, hantar dan jejak invois anda.", quotation_sub: "Sediakan sebut harga. Invois dijana secara automatik.", invoice_empty: "Belum ada invois. Cipta yang pertama!", quotation_empty: "Belum ada sebut harga. Cipta yang pertama!",
   col_number: "No.", col_customer: "Pelanggan", col_date: "Tarikh", col_due: "Akhir Bayaran", col_valid: "Sah Hingga", col_total: "Jumlah", col_amount: "Jumlah", col_invref: "Rujukan Invois", col_method: "Kaedah",
   f_status: "Status", f_type: "Jenis", f_date: "Tarikh", f_due: "Tarikh Akhir Pembayaran", f_valid: "Tarikh Tamat Tempoh", f_name: "Nama", f_company: "Nama Syarikat", f_address: "Alamat", f_phone: "No. Telefon", f_email: "Emel", f_regno: "No. Pendaftaran", f_notes: "Nota", f_website: "Laman web",
   f_pname: "Nama Produk/Perkhidmatan", f_sku: "SKU / Kod", f_category: "Kategori", f_desc: "Penerangan", f_price: "Harga", f_unit: "Unit", f_amount: "Jumlah", f_invoice: "Invois", f_bizname: "Nama Syarikat/Perniagaan", f_taxname: "Nama Cukai", f_tax: "Cukai", f_docdisc: "Diskaun Keseluruhan", f_template: "Templat PDF", f_color: "Warna Utama",
@@ -104,6 +105,7 @@ const ms = {
   a_time: "Masa", a_action: "Tindakan", a_detail: "Butiran", a_actor: "Admin",
 };
 const en = {
+  col_date_gen: "Date Generated",
   quotation_new_btn: "Add New Quotation", quotation_empty_btn: "No quotations yet. Press Add New Quotation to start.",
   if_needed: "if needed", f_after_disc: "Price After Discount (RM)", qe_package: "Package", qe_price: "Price", qe_total: "Total", qe_pick_first: "Choose a package and products above. The item list fills in automatically.", qs_quote_btn: "Quotation", quotation_empty_pick: "No quotations yet. Choose a package above to start.",
   qs_note: "Please choose the products you want in this package.", qs_confirm: "Select", qs_change: "Change Products", qs_remove: "Remove",
@@ -164,7 +166,7 @@ const en = {
   nav_profile: "Profile", profile_sub: "Manage your account, business details, document defaults and settings.", prof_account: "Account", prof_business: "Business", prof_documents: "Documents", prof_settings: "Settings", doc_defaults_sub: "These defaults apply to new documents (tax, template, colour, terms).",
   dash_hello: "Welcome, {n}", stat_invoices: "Total Invoices", stat_quotations: "Total Quotations", stat_receipts: "Total Receipts", stat_customers: "Total Customers", stat_value: "Total Invoice Value", stat_received: "Payments Received", stat_outstanding: "Outstanding Payments",
   chart_month: "Invoices by month", chart_value: "Value this year", chart_payments: "Payments received", chart_status: "Invoice status",
-  invoice_new: "New Invoice", quotation_new: "New Quotation", invoice_sub: "Create, send and track your invoices.", quotation_sub: "Prepare quotations and convert them to invoices.", invoice_empty: "No invoices yet. Create your first!", quotation_empty: "No quotations yet. Create your first!",
+  invoice_new: "New Invoice", quotation_new: "New Quotation", invoice_sub: "Create, send and track your invoices.", quotation_sub: "Prepare quotations. Invoices are generated automatically.", invoice_empty: "No invoices yet. Create your first!", quotation_empty: "No quotations yet. Create your first!",
   col_number: "No.", col_customer: "Customer", col_date: "Date", col_due: "Due Date", col_valid: "Valid Until", col_total: "Total", col_amount: "Amount", col_invref: "Invoice Ref.", col_method: "Method",
   f_status: "Status", f_type: "Type", f_date: "Date", f_due: "Payment Due Date", f_valid: "Expiry Date", f_name: "Name", f_company: "Company Name", f_address: "Address", f_phone: "Phone", f_email: "Email", f_regno: "Registration No.", f_notes: "Notes", f_website: "Website",
   f_pname: "Product/Service Name", f_sku: "SKU / Code", f_category: "Category", f_desc: "Description", f_price: "Price", f_unit: "Unit", f_amount: "Amount", f_invoice: "Invoice", f_bizname: "Business/Company Name", f_taxname: "Tax Name", f_tax: "Tax", f_docdisc: "Overall Discount", f_template: "PDF Template", f_color: "Accent Colour",

@@ -35,17 +35,17 @@ export async function renderList(el, ctx, type) {
   const mount = () => {
     el.innerHTML = `<div class="page-h"><div><h1>${t("nav_" + C.route)}</h1><p class="sub">${t(type + "_sub")}</p><div id="qinote"></div></div>${type === "quotation" ? "" : `<a class="btn primary" href="#/app/${C.route}/new">${ico("plus")}${t(type + "_new")}</a>`}</div>
     <div id="qpk"></div><div class="card"><div class="toolbar"><div class="search">${ico("search")}<input id="q" type="search" placeholder="${esc(t("search_ph"))}" aria-label="${esc(t("search_ph"))}"></div>
-    <select id="sf" aria-label="${esc(t("f_status"))}"><option value="">${t("all_status")}</option>${C.filter.map((s) => `<option value="${s}">${t((type === "invoice" && !["draft", "cancelled"].includes(s) ? "ps_" : "st_") + s)}</option>`).join("")}</select></div>${bulkBarHtml()}<div id="tbl" class="scrollbox"></div></div>`;
+    <select id="sf" aria-label="${esc(t("f_status"))}" ${type === "quotation" ? "hidden" : ""}><option value="">${t("all_status")}</option>${C.filter.map((s) => `<option value="${s}">${t((type === "invoice" && !["draft", "cancelled"].includes(s) ? "ps_" : "st_") + s)}</option>`).join("")}</select></div>${bulkBarHtml()}<div id="tbl" class="scrollbox"></div></div>`;
     bulk = bulkController(ctx, el, () => shown.map((r) => ({ k: type, id: r.id, doc: r })), () => rows.map((r) => ({ k: type, id: r.id, doc: r })));
     draw = () => {
       const q = $("#q", el).value.toLowerCase(), sf = $("#sf", el).value;
       shown = rows.filter((r) => (!sf || C.eff(r) === sf) && (!q || [r.number, r.customer && r.customer.name, r.customer && r.customer.company].join(" ").toLowerCase().includes(q)));
-      $("#tbl", el).innerHTML = shown.length ? `<table class="tbl"><thead><tr>${chkTh()}<th class="idx">${t("col_index")}</th><th>${t("col_docno")}</th><th>${t("col_customer")}</th><th>${t("col_date")}</th><th>${t(type === "invoice" ? "col_due" : "col_valid")}</th><th class="r">${t("col_total")}</th><th>${t("f_status")}</th><th></th></tr></thead><tbody>${shown.map((r, i) => `<tr>
+      $("#tbl", el).innerHTML = shown.length ? `<table class="tbl"><thead><tr>${chkTh()}<th class="idx">${t("col_index")}</th><th>${t("col_docno")}</th><th>${t("col_customer")}</th><th>${t("col_date_gen")}</th><th class="r">${t("col_total")}</th>${type === "invoice" ? `<th>${t("f_status")}</th>` : ""}<th></th></tr></thead><tbody>${shown.map((r, i) => `<tr>
         ${chkTd(type + ":" + r.id, r.number)}<td class="idx" data-l="${t("col_index")}">${i + 1}</td>
         <td data-l="${t("col_docno")}"><a href="#/app/${C.route}/${r.id}"><b>${esc(r.number)}</b></a></td><td data-l="${t("col_customer")}">${esc((r.customer && r.customer.name) || "-")}</td>
-        <td class="nw" data-l="${t("col_date")}">${fmtDate(r.date, getLang())}</td><td class="nw" data-l="${t(type === "invoice" ? "col_due" : "col_valid")}">${fmtDate(dueOf(type, r), getLang())}</td>
-        <td class="r" data-l="${t("col_total")}"><b>${money(calc(r).total)}</b></td><td data-l="${t("f_status")}">${type === "invoice" && !["draft", "cancelled"].includes(r.status) ? `<span class="badge b-${C.eff(r)}">${esc(t("ps_" + C.eff(r)))}</span>` : badge(C.eff(r))}</td>
-        <td class="acts"><a class="icon-btn" href="#/app/${C.route}/${r.id}/edit" aria-label="${t("act_edit")}" title="${t("act_edit")}">${ico("edit")}</a><a class="icon-btn" href="#/app/${C.route}/${r.id}" aria-label="${t("act_view")}" title="${t("act_view")}">${ico("eye")}</a><button class="icon-btn" data-a="download" data-id="${r.id}" aria-label="${t("act_download")}" title="${t("act_download")}">${ico("download")}</button><button class="icon-btn" data-a="dup" data-id="${r.id}" aria-label="${t("act_duplicate")}" title="${t("act_duplicate")}">${ico("copy")}</button></td></tr>`).join("")}</tbody></table>` : (type === "quotation" ? empty("quote", t("quotation_empty_btn")) : empty("doc", t(type + "_empty"), `<a class="btn primary" href="#/app/${C.route}/new">${t(type + "_new")}</a>`));
+        <td class="nw" data-l="${t("col_date_gen")}">${fmtDate(r.date, getLang())}</td>
+        <td class="r" data-l="${t("col_total")}"><b>${money(calc(r).total)}</b></td>${type === "invoice" ? `<td data-l="${t("f_status")}">${type === "invoice" && !["draft", "cancelled"].includes(r.status) ? `<span class="badge b-${C.eff(r)}">${esc(t("ps_" + C.eff(r)))}</span>` : badge(C.eff(r))}</td>` : ""}
+        <td class="acts"><a class="icon-btn" href="#/app/${C.route}/${r.id}/edit" aria-label="${t("act_edit")}" title="${t("act_edit")}">${ico("edit")}</a><a class="icon-btn" href="#/app/${C.route}/${r.id}" aria-label="${t("act_view")}" title="${t("act_view")}">${ico("eye")}</a><button class="icon-btn" data-a="download" data-id="${r.id}" aria-label="${t("act_download")}" title="${t("act_download")}">${ico("download")}</button>${type === "quotation" ? "" : `<button class="icon-btn" data-a="dup" data-id="${r.id}" aria-label="${t("act_duplicate")}" title="${t("act_duplicate")}">${ico("copy")}</button>`}</td></tr>`).join("")}</tbody></table>` : (type === "quotation" ? empty("quote", t("quotation_empty_btn")) : empty("doc", t(type + "_empty"), `<a class="btn primary" href="#/app/${C.route}/new">${t(type + "_new")}</a>`));
       limitRows($("#tbl", el)); bulk.sync();
     };
     draw(); $("#q", el).oninput = debounce(() => draw(), 150); $("#sf", el).onchange = () => draw();
@@ -215,28 +215,22 @@ export async function renderView(el, ctx, type, id) {
     if (!d) { el.innerHTML = empty("doc", t("not_found")); return; }
     const c = calc(d), st = C.eff(d), cu = d.customer || {};
     const canPay = isInv && !["paid", "cancelled"].includes(d.status);
-    const bar = [btn("edit", "edit", "act_edit", "primary"), btn("download", "download", "act_download"), btn("print", "print", "act_print"), btn("inline", "eye", "preview_inline"), btn("preview", "eye", "act_preview"), btn("share", "share", "act_share"), btn("dup", "copy", "act_duplicate")];
+    const bar = !isInv ? [btn("edit", "edit", "act_edit", "primary"), btn("download", "download", "act_download")] : [btn("edit", "edit", "act_edit", "primary"), btn("download", "download", "act_download"), btn("print", "print", "act_print"), btn("inline", "eye", "preview_inline"), btn("preview", "eye", "act_preview"), btn("share", "share", "act_share"), btn("dup", "copy", "act_duplicate")];
     if (isInv) {
       if (canPay) bar.push(btn("pay", "wallet", "act_receipt", "accent"));
       if (d.status === "draft") bar.push(btn("sent", "mail", "mark_sent"));
       if (canPay) bar.push(btn("paid", "check", "mark_paid"));
       if (!kids.length && ["paid", "partial", "sent", "draft"].includes(d.status)) bar.push(btn("unpaid", "clock", "mark_unpaid"));
       if (d.status !== "cancelled") bar.push(btn("cancel", "x", "mark_cancel"));
-    } else {
-      bar.push(btn("convert", "swap", "act_convert", "accent")); // boleh ditukar berkali-kali (satu quotation -> banyak invois)
-      if (["sent", "draft", "rejected", "expired"].includes(d.status)) bar.push(btn("accepted", "check", "mark_accepted"));
-      if (["sent", "draft", "accepted"].includes(d.status)) bar.push(btn("rejected", "x", "mark_rejected"));
-      if (["sent", "draft"].includes(d.status)) bar.push(btn("expired", "clock", "mark_expired"));
-      if (d.status === "draft") bar.push(btn("sent", "mail", "mark_sent"));
-    }
+    } // Sebut harga: hanya Edit, Muat Turun PDF dan Padam (invois dijana automatik semasa sebut harga disimpan)
     bar.push(btn("del", "trash", "delete", "danger"));
     const kidsHtml = isInv
       ? `<h3>${t("receipts_of_invoice")}</h3>${kids.length ? kids.map((r) => `<div class="mini rrow"><span><b>${esc(r.number)}</b> · ${fmtDate(r.date, getLang())} · ${esc(t("ps_" + payOf("receipt", r)))}</span><span class="rr"><b>${money(r.amount)}</b><button class="icon-btn" data-a="rdl" data-rid="${r.id}" aria-label="${t("act_download")}">${ico("download")}</button><button class="icon-btn" data-a="rpr" data-rid="${r.id}" aria-label="${t("act_print")}">${ico("print")}</button></span></div>`).join("") : `<p class="muted">${t("receipts_empty")}</p>`}${canPay ? `<div class="mt"><button class="btn accent sm" data-a="pay">${ico("plus")}${t("act_receipt")}</button></div>` : ""}`
       : `<h3>${t("quo_invoices")}</h3>${kids.length ? kids.map((r) => `<a class="mini link" href="#/app/invoices/${esc(r.id)}"><span><b>${esc(r.number)}</b> · ${fmtDate(r.date, getLang())} ${badge(invoiceStatus(r))}</span><b>${money(calc(r).total)}</b></a>`).join("") : `<p class="muted">-</p>`}`;
-    el.innerHTML = `<div class="page-h"><div><h1>${esc(d.number)} ${isInv && !["draft", "cancelled"].includes(d.status) ? `<span class="badge b-${st}">${esc(t("ps_" + st))}</span>` : badge(st)}</h1><p class="sub">${esc(cu.name || "")}${cu.company ? " · " + esc(cu.company) : ""}</p></div><a class="btn ghost" href="#/app/${C.route}">${t("back")}</a></div>
+    el.innerHTML = `<div class="page-h"><div><h1>${esc(d.number)} ${!isInv ? "" : !["draft", "cancelled"].includes(d.status) ? `<span class="badge b-${st}">${esc(t("ps_" + st))}</span>` : badge(st)}</h1><p class="sub">${esc(cu.name || "")}${cu.company ? " · " + esc(cu.company) : ""}</p></div><a class="btn ghost" href="#/app/${C.route}">${t("back")}</a></div>
     <div class="actions-bar">${bar.join("")}</div>
     <section class="card" id="pvbox" ${pvOpen ? "" : "hidden"}><h2>${t("preview_title")}</h2><iframe class="pdf-frame" title="PDF" src="about:blank"></iframe></section>
-    <div class="grid-view"><section class="card"><div class="kv"><div><span>${t("f_date")}</span><b>${fmtDate(d.date, getLang())}</b></div><div><span>${t(isInv ? "f_due" : "f_valid")}</span><b>${fmtDate(dueOf(type, d), getLang())}</b></div>
+    <div class="grid-view"><section class="card"><div class="kv"><div><span>${t("col_date_gen")}</span><b>${fmtDate(d.date, getLang())}</b></div>
      <div><span>${t("sec_customer")}</span><b>${esc(cu.name || "-")}</b><small>${esc(cu.address || "")}<br>${esc([cu.phone, cu.email].filter(Boolean).join(" · "))}</small></div>
      ${d.fromQuotationNumber ? `<div><span>${t("from_quotation")}</span><a href="#/app/quotations/${esc(d.fromQuotationId)}"><b>${esc(d.fromQuotationNumber)}</b></a></div>` : ""}</div>
      <table class="tbl simple"><thead><tr><th>${t("pdf_desc")}</th><th class="r">${t("pdf_qty")}</th><th class="r">${t("pdf_price")}</th><th class="r">${t("pdf_amount")}</th></tr></thead><tbody>${c.items.map((i) => `<tr><td data-l="${t("pdf_desc")}"><b>${esc(i.name)}</b>${i.desc ? `<br><small>${esc(i.desc)}</small>` : ""}</td><td class="r" data-l="${t("pdf_qty")}">${i.qty}</td><td class="r" data-l="${t("pdf_price")}">${money(i.price)}${num(i.discount) ? `<small> −${i.discount}%</small>` : ""}</td><td class="r" data-l="${t("pdf_amount")}">${money(i.amount)}</td></tr>`).join("")}</tbody></table>
