@@ -19,7 +19,7 @@ export function RightPanel() {
   const [tab, setTab] = useState<"liked" | "albums" | "playlists">("liked");
   const p = usePlayer.getState;
   return (
-    <aside aria-label="Panel pustaka" className="sticky top-3 hidden h-[calc(100dvh-92px)] w-[320px] shrink-0 flex-col gap-3 xl:flex">
+    <aside aria-label="Panel pustaka" className="sticky top-[92px] hidden h-[calc(100dvh-104px)] w-[320px] shrink-0 flex-col gap-3 xl:flex">
       <div className="panel relative overflow-hidden p-4">
         {t?.artwork && (
           // eslint-disable-next-line @next/next/no-img-element

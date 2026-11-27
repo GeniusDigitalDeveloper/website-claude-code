@@ -215,7 +215,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     const el = headerRef.current;
     if (!el) return;
-    const set = () => document.documentElement.style.setProperty("--hdr", `${getComputedStyle(el).position === "sticky" ? el.offsetHeight : 0}px`);
+    const set = () => {
+      const cs = getComputedStyle(el);
+      // where the header's bottom edge sits while it is stuck at the top
+      const h = cs.position === "sticky" ? el.offsetHeight + (parseFloat(cs.top) || 0) : 0;
+      document.documentElement.style.setProperty("--hdr", `${h}px`);
+    };
     set();
     const ro = new ResizeObserver(set);
     ro.observe(el);
@@ -395,9 +400,9 @@ export function AppShell({ children }: { children: ReactNode }) {
               <header
                 ref={headerRef}
                 className={cx(
-                  "glass sticky top-0 z-30 border-b border-line bg-[color:var(--panel-strong)] px-3 py-2.5 md:px-6 md:py-3",
+                  "glass sticky top-0 z-30 border-b border-line bg-[color:var(--bg)] md:bg-[color:color-mix(in_oklab,var(--bg)_94%,transparent)] px-3 py-2.5 md:px-6 md:py-3",
                   preset === "bento" &&
-                    "md:static md:flex md:h-14 md:flex-col md:justify-center md:border-0 md:bg-transparent md:px-0 md:py-0 md:shadow-none md:backdrop-blur-none",
+                    "md:sticky md:top-3 md:flex md:h-[68px] md:flex-col md:justify-center md:rounded-[var(--radius)] md:border md:border-[color:var(--glass-edge)] md:px-3 md:py-0",
                 )}
               >
                 <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 md:grid-cols-[1fr_minmax(0,520px)_1fr] md:gap-4">

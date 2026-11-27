@@ -101,7 +101,7 @@ function TopSearchInner({ className }: { className?: string }) {
         placeholder="Cari lagu, artis atau album"
         aria-label="Cari muzik"
         enterKeyHint="search"
-        className="chip-glass w-full rounded-full py-3 pr-10 pl-10 text-sm outline-none placeholder:text-faint focus:ring-2 focus:ring-[color:var(--acc-via)]"
+        className="search-glass w-full rounded-full py-3 pr-10 pl-10 text-sm outline-none placeholder:text-faint focus-visible:outline-none"
       />
       {q && (
         <button
