@@ -66,7 +66,7 @@ export async function render(el, ctx, id, numberFmt) {
     const sub = subtotal(); disc = Math.min(Math.max(disc, 0), sub); const tot = round2(sub - disc);
     $("#qeItems", el).innerHTML = items.length ? `<p class="qe-lbl">${t("pdf_desc")}</p><div class="qe-box">
       ${pkgName() ? `<div class="qe-pkg"><span>${t("qe_package")}</span><b>${esc(pkgName())}</b></div>` : ""}
-      <div class="qe-prods">${items.map((i) => `<div class="qe-prod"><b>${esc(i.name)}</b><span>${money(num(i.qty || 1) * num(i.price))}</span></div>`).join("")}</div>
+      <div class="qe-prods">${items.flatMap((i) => (i.contents && i.contents.length ? i.contents.map((n) => `<div class="qe-prod"><b>${esc(n)}</b></div>`) : [`<div class="qe-prod"><b>${esc(i.name)}</b><span>${money(num(i.qty || 1) * num(i.price))}</span></div>`])).join("")}</div>
       <div class="qe-row"><div><span>${t("qe_price")}</span><b>${money(sub)}</b></div><div><span>${t("pdf_discount")}</span><b>${disc ? "- " + money(disc) : money(0)}</b></div><div class="qe-total"><span>${t("qe_total")}</span><b>${money(tot)}</b></div></div></div>`
       : `<p class="muted qe-empty">${t("qe_pick_first")}</p>`;
     $("#sum", el).innerHTML = `<div class="qe-sub"><span>${t("pdf_subtotal")}</span><b>${money(sub)}</b></div>${disc ? `<div><span>${t("pdf_discount")}${num(f.pct.value) ? ` (${num(f.pct.value)}%)` : ""}</span><b>- ${money(disc)}</b></div>` : ""}<div class="grand"><span>${t("pdf_total")}</span><b>${money(tot)}</b></div>`;
@@ -87,7 +87,7 @@ export async function render(el, ctx, id, numberFmt) {
       date, status: doc ? doc.status : "draft", payStatus: doc ? (doc.payStatus || "unpaid") : "unpaid",
       validUntil: doc && doc.validUntil && doc.validUntil >= date ? doc.validUntil : addDays(date, 30),
       customer: { name: f.cname.value.trim(), company: f.ccompany.value.trim(), address: f.caddress.value.trim(), phone: f.cphone.value.trim(), email: cust.email || "", regNo: f.cregNo.value.trim() },
-      items: items.map((i) => ({ name: i.name, desc: "", qty: num(i.qty) || 1, price: num(i.price), discount: num(i.discount) || 0, ...(i.pkg ? { pkg: i.pkg } : {}) })),
+      items: items.map((i) => ({ name: i.name, desc: i.desc || "", qty: num(i.qty) || 1, price: num(i.price), discount: num(i.discount) || 0, ...(i.pkg ? { pkg: i.pkg } : {}), ...(i.contents ? { contents: i.contents } : {}) })),
       pkgSel: sel, pkgNames: pkgName() ? [pkgName()] : [],
       docDiscount: Math.min(disc, sub), docDiscountPct: f.pct.value ? Math.min(Math.max(num(f.pct.value), 0), 100) : 0, taxRate: 0, taxName: d.taxName || "SST",
       note: f.note.value.trim(), terms: f.terms.value.trim(), template: f.template.value, color: f.color.value, imgScale: (doc && doc.imgScale) || {},

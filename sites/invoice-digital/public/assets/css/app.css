@@ -278,3 +278,5 @@ h1,h2,h3,h4,b,strong,th,label,.lbl,.btn,.badge,.brand,.app-name,.side-app,.side 
  .stats .stat span{font-size:.72rem;line-height:1.3;min-height:2.6em}
  .stats .stat b{font-size:clamp(.95rem,1.15vw,1.25rem);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
 }
+.qi-row.np{grid-template-columns:32px 1fr 40px}@media (max-width:560px){.qi-row.np{grid-template-columns:28px 1fr 40px}.qi-row.np .icon-btn{grid-row:auto;grid-column:auto}}.qi-hint{margin:-2px 0 8px}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.qi-row.np{align-items:center;padding:8px 0}.qi-row.np .qi-no{margin-bottom:0}

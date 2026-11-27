@@ -1,5 +1,7 @@
 // Kamus BM (lalai) & EN. Semua teks UI, borang, status, ralat dan PDF.
 const ms = {
+  qi_content_ph: "cth: Pelamin, Katering 500 pax",
+  qi_pkg_price: "Harga Pakej (RM)", qi_contents: "Kandungan Pakej", qi_contents_d: "Senaraikan apa yang termasuk dalam pakej ini.", qi_add_content: "Tambah Kandungan", qi_err_price: "Sila isi harga pakej.", qi_err_content: "Tambah sekurang-kurangnya satu kandungan pakej.",
   xl_period: "Tempoh", xl_none: "Tiada rekod dalam tempoh ini.",
   xl_title: "Eksport ke Excel", xl_desc: "Pilih tahun dan bulan. Laporan Excel mengandungi ringkasan dashboard, sebut harga, invois, resit dan pelanggan.", xl_year: "Tahun", xl_month: "Bulan", xl_all_months: "Semua bulan", xl_btn: "Eksport Excel", xl_done: "Fail Excel dimuat turun", xl_fail: "Gagal menjana fail Excel. Cuba lagi.", xl_generated: "Dijana", xl_report: "Laporan Dashboard", xl_s_summary: "Ringkasan", xl_metrics: "Ringkasan Utama", xl_by_month: "Pecahan Mengikut Bulan", xl_total: "JUMLAH", xl_n_quo: "Bil. Sebut Harga", xl_v_quo: "Nilai Sebut Harga", xl_n_inv: "Bil. Invois", xl_v_inv: "Nilai Invois", xl_n_docs: "Bil. Dokumen",
   rc_dep_note: "Deposit dibayar semasa invois.", rc_full_note: "Bayaran penuh semasa invois.",
@@ -112,6 +114,8 @@ const ms = {
   a_time: "Masa", a_action: "Tindakan", a_detail: "Butiran", a_actor: "Admin",
 };
 const en = {
+  qi_content_ph: "e.g. Dais, Catering for 500",
+  qi_pkg_price: "Package Price (RM)", qi_contents: "Package Contents", qi_contents_d: "List what is included in this package.", qi_add_content: "Add Item", qi_err_price: "Please enter the package price.", qi_err_content: "Add at least one package item.",
   xl_period: "Period", xl_none: "No records in this period.",
   xl_title: "Export to Excel", xl_desc: "Choose a year and month. The Excel report includes the dashboard summary, quotations, invoices, receipts and customers.", xl_year: "Year", xl_month: "Month", xl_all_months: "All months", xl_btn: "Export Excel", xl_done: "Excel file downloaded", xl_fail: "Could not create the Excel file. Please try again.", xl_generated: "Generated", xl_report: "Dashboard Report", xl_s_summary: "Summary", xl_metrics: "Key Summary", xl_by_month: "Monthly Breakdown", xl_total: "TOTAL", xl_n_quo: "No. of Quotations", xl_v_quo: "Quotation Value", xl_n_inv: "No. of Invoices", xl_v_inv: "Invoice Value", xl_n_docs: "No. of Documents",
   rc_dep_note: "Deposit paid on invoice.", rc_full_note: "Full payment on invoice.",
