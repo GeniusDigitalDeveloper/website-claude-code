@@ -6,6 +6,7 @@ import { F, db } from "../firebase.js";
 import { errMsg } from "../auth.js";
 import { ico, empty, loading } from "./ui.js";
 import { pdfAction, makePdf, previewPdf } from "./actions.js";
+import { summaryHtml } from "./invoice-editor.js";
 import { deleteProject, confirmKey } from "./projects.js";
 import { bulkBarHtml, chkTh, chkTd, bulkController, limitRows } from "./bulk.js";
 import { buildPdf } from "../pdf.js";
@@ -82,11 +83,12 @@ export async function renderList(el, ctx) {
 
 export async function renderForm(el, ctx, params) {
   el.innerHTML = loading();
-  let invs, company; try { [invs, company] = await Promise.all([listAll(ctx.uid, "invoices"), ctx.getCompany()]); invs = invs.filter((i) => i.status !== "cancelled" && calc(i).balance > 0.004); } catch (e) { el.innerHTML = `<p class="err">${esc(errMsg(e))}</p>`; return; }
+  let invs, company; try { [invs, company] = await Promise.all([listAll(ctx.uid, "invoices"), ctx.getCompany()]); invs = invs.filter((i) => i.status !== "cancelled" && calc(i).balance > 0.004).sort((a, b) => ((b.createdAt && b.createdAt.seconds) || 0) - ((a.createdAt && a.createdAt.seconds) || 0)); } catch (e) { el.innerHTML = `<p class="err">${esc(errMsg(e))}</p>`; return; }
   const pre = params.get("invoice") || "";
   el.innerHTML = `<div class="page-h"><div><h1>${t("receipt_new")}</h1></div><a class="btn ghost" href="#/app/receipts">${t("back")}</a></div>
   <form class="card form" id="f" novalidate>${invs.length ? `
-    <label>${t("f_invoice")}<select name="invoice" required>${invs.map((i) => `<option value="${i.id}" ${i.id === pre ? "selected" : ""}>${esc(i.number)} — ${esc((i.customer && i.customer.name) || "")} (${t("pdf_balance")} ${money(calc(i).balance)})</option>`).join("")}</select></label>
+    <label><span class="lt">${t("inv_pick_q")} <span class="req">*</span></span><select name="invoice" required>${invs.map((i) => `<option value="${i.id}" ${i.id === pre ? "selected" : ""}>${esc((i.customer && i.customer.name) || "-")}${i.customer && i.customer.phone ? " · " + esc(i.customer.phone) : ""} — ${esc(i.fromQuotationNumber ? i.fromQuotationNumber + " / " : "")}${esc(i.number)} (${t("pdf_balance")} ${money(calc(i).balance)})</option>`).join("")}</select></label>
+    <div id="rsum"></div>
     <p class="muted" id="info" aria-live="polite"></p>
     <div class="grid2"><label>${t("f_amount")} (RM)<input name="amount" type="number" step="0.01" min="0.01" inputmode="decimal" required></label><label>${t("f_date")}<input name="date" type="date" value="${todayMY()}" required></label></div>
     <div class="grid2"><label>${t("f_paystatus")}<select name="payStatus">${PAY.map((s) => `<option value="${s}" >${t("ps_" + s)}</option>`).join("")}</select></label>
@@ -100,7 +102,7 @@ export async function renderForm(el, ctx, params) {
   let psTouched = false;
   const autoPs = () => { if (psTouched) return; const i = cur(); if (!i) return; const c = calc(i), amt = num(f.amount.value); f.payStatus.value = payAutoReceipt({ invoiceTotal: c.total, balanceAfter: round2(c.balance - amt), seq: (num(i.receiptCount) || 0) + 1 }); };
   const refresh = () => { const i = cur(); if (!i) return; const c = calc(i); f.amount.max = c.balance.toFixed(2); fill(c.balance);
-    $("#info", el).textContent = t("receipt_summary", { t: money(c.total), p: money(c.paidReceipts), b: money(c.balance) }); autoPs(); };
+    $("#info", el).textContent = t("receipt_summary", { t: money(c.total), p: money(c.paidReceipts), b: money(c.balance) }); $("#rsum", el).innerHTML = summaryHtml(i); autoPs(); };
   f.payStatus.onchange = () => (psTouched = true); f.amount.addEventListener("input", autoPs);
   f.invoice.onchange = refresh; refresh();
   $("#prev", el).onclick = async (e) => {

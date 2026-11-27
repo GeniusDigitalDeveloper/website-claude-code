@@ -71,6 +71,7 @@ export async function duplicate(ctx, type, src) {
 // ------------------------------------------------------------------ BORANG
 export async function renderEditor(el, ctx, type, id) {
   if (type === "quotation") return (await import("./quote-editor.js")).render(el, ctx, id, numberFmt); // borang sebut harga ringkas
+  if (type === "invoice") return (await import("./invoice-editor.js")).render(el, ctx, id, numberFmt); // invois: pilih daripada sebut harga
   const C = CFG[type]; el.innerHTML = loading();
   let doc, customers, products, company;
   try {

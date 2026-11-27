@@ -1,5 +1,6 @@
 // Kamus BM (lalai) & EN. Semua teks UI, borang, status, ralat dan PDF.
 const ms = {
+  inv_pick_q: "Pilih Pelanggan (daripada Sebut Harga)", inv_pick_ph: "— Pilih pelanggan —", inv_q_none: "Belum ada sebut harga. Buat sebut harga dahulu; invois akan menggunakan maklumatnya.", inv_has: "Invois {n} sudah dijana untuk sebut harga ini. Simpan sekali lagi akan menjana invois baharu.", inv_from_q_note: "Maklumat pelanggan, pakej, produk dan diskaun diambil daripada sebut harga. Untuk mengubahnya, edit sebut harga.", act_open: "Buka", err_pick_q: "Sila pilih pelanggan.",
   pdf_making: "Menjana PDF…", pdf_wait: "Sedang menjana PDF, sila tunggu sebentar…",
   col_date_gen: "Tarikh Dijana",
   quotation_new_btn: "Tambah Sebut Harga Baharu", quotation_empty_btn: "Belum ada sebut harga. Tekan Tambah Sebut Harga Baharu untuk mula.",
@@ -106,6 +107,7 @@ const ms = {
   a_time: "Masa", a_action: "Tindakan", a_detail: "Butiran", a_actor: "Admin",
 };
 const en = {
+  inv_pick_q: "Choose Customer (from Quotation)", inv_pick_ph: "— Choose customer —", inv_q_none: "No quotations yet. Create a quotation first; the invoice uses its details.", inv_has: "Invoice {n} was already generated for this quotation. Saving again creates a new invoice.", inv_from_q_note: "Customer, package, product and discount details come from the quotation. To change them, edit the quotation.", act_open: "Open", err_pick_q: "Please choose a customer.",
   pdf_making: "Generating PDF…", pdf_wait: "Generating PDF, please wait…",
   col_date_gen: "Date Generated",
   quotation_new_btn: "Add New Quotation", quotation_empty_btn: "No quotations yet. Press Add New Quotation to start.",
