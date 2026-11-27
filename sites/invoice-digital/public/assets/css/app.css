@@ -310,3 +310,8 @@ h1,h2,h3,h4,b,strong,th,label,.lbl,.btn,.badge,.brand,.app-name,.side-app,.side 
 .opt,.opt-red,em.paren{font-weight:700!important;font-style:italic!important}
 .sum-lbl{display:flex;flex-direction:column;gap:6px}
 .sum-lbl .qe-sum{border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff;font-weight:400}
+/* Menu sisi KEKAL (tidak ikut skrol) pada laptop/desktop; hanya kandungan kanan yang diskrol */
+@media(min-width:861px){
+ .shell{grid-template-columns:minmax(0,1fr);padding-left:var(--side)}
+ .side{position:fixed;left:0;top:0;bottom:0;width:var(--side);height:100vh;height:100dvh;overflow-y:auto;z-index:40}
+}
