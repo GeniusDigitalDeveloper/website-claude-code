@@ -302,3 +302,7 @@ h1,h2,h3,h4,b,strong,th,label,.lbl,.btn,.badge,.brand,.app-name,.side-app,.side 
 .qs-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.qs-head h2{margin:0}
 .qe-pkg{flex-wrap:wrap}.mp-badge{margin-left:4px}.mp-acts{margin-left:auto;display:flex;gap:6px}
 .qe-pkg .qs-badge.mp-badge{color:#fff;text-transform:none;letter-spacing:0;font-size:.75rem}
+/* Cipta Pakej Manual: betul-betul di sebelah tajuk, butang kecil hijau, teks putih jelas */
+.qs-head{justify-content:flex-start;gap:12px}
+.btn.manual{background:#047857;border-color:#047857;color:#fff;font-size:.8rem;font-weight:700;padding:6px 12px;min-height:32px;height:auto;border-radius:9px;gap:6px;box-shadow:none;line-height:1.2}
+.btn.manual:hover{background:#065f46;border-color:#065f46}.btn.manual svg{width:15px;height:15px;color:#fff}
