@@ -42,9 +42,11 @@ export function calc(doc) {
   const total = round2(taxable + tax);
   const deposit = round2(Math.max(num(doc.deposit), 0));
   const paidReceipts = round2(num(doc.receiptsPaid));
-  // Deposit = jumlah yang DIMINTA daripada pelanggan (bukan bayaran yang sudah diterima). Baki = jumlah - semua resit yang telah dijana.
-  const balance = round2(Math.max(total - paidReceipts, 0));
-  return { items, subtotal, docDiscount, taxable, tax, taxRate, total, deposit, paidReceipts, balance };
+  // depositPaid = deposit yang DIBAYAR semasa invois (ditetapkan di borang invois). Baki = jumlah - deposit - semua resit.
+  const depositPaid = round2(Math.min(Math.max(num(doc.depositPaid), 0), total));
+  const paidTotal = round2(depositPaid + paidReceipts);
+  const balance = round2(Math.max(total - paidTotal, 0));
+  return { items, subtotal, docDiscount, taxable, tax, taxRate, total, deposit, depositPaid, paidReceipts, paidTotal, balance };
 }
 
 // Status invoice berkesan: Overdue ditentukan dari tarikh akhir + baki
@@ -115,7 +117,7 @@ export function readSquareAvatar(file, size = 192, q = 0.85) {
 export function applyPayment(inv, amountRaw) {
   const c = calc(inv); const amt = round2(num(amountRaw));
   if (!(amt > 0) || amt > c.balance + 0.005) throw new Error("amount");
-  const paid = round2(num(inv.receiptsPaid) + amt); const balanceAfter = round2(Math.max(c.total - paid, 0));
+  const paid = round2(num(inv.receiptsPaid) + amt); const balanceAfter = round2(Math.max(c.total - c.depositPaid - paid, 0));
   return { amt, paid, balanceAfter, total: c.total, status: balanceAfter <= 0.004 ? "paid" : "partial", seq: (num(inv.receiptCount) || 0) + 1 };
 }
 // Cadangan jumlah bayaran: bayaran pertama = deposit (jika ada), selepas itu = baki.
@@ -141,15 +143,14 @@ export function fitImage(file, maxDim = 400, maxBytes = 100000) {
 
 // ---- Status bayaran (dipilih pengguna; jika tiada pilihan, dikira automatik)
 // Belum Dibayar · Deposit · Bayaran Separa · Selesai · Tertunggak
-export const PAY = ["unpaid", "deposit", "partial", "paid", "overdue"];
+export const PAY = ["unpaid", "deposit", "paid"]; // Belum Dibayar · Deposit · Selesai
 export function payAutoInvoice(inv) {
   const c = calc(inv);
   if (inv.status === "paid" || (c.total > 0 && c.balance <= 0.004)) return "paid";
-  if (inv.dueDate && inv.dueDate < todayMY()) return "overdue";
-  if (c.paidReceipts > 0.004) return (num(inv.receiptCount) || 1) <= 1 ? "deposit" : "partial";
+  if (c.paidTotal > 0.004) return "deposit";
   return "unpaid";
 }
-export const payAutoReceipt = (r) => (r.invoiceTotal && num(r.balanceAfter) <= 0.004 ? "paid" : (num(r.seq) || 1) <= 1 ? "deposit" : "partial");
+export const payAutoReceipt = (r) => (r.invoiceTotal && num(r.balanceAfter) <= 0.004 ? "paid" : "deposit");
 export function payOf(type, d) {
   if (d && PAY.includes(d.payStatus)) return d.payStatus;
   return type === "invoice" ? payAutoInvoice(d) : type === "receipt" ? payAutoReceipt(d) : "unpaid";

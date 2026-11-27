@@ -257,8 +257,9 @@ export async function buildPdf(type, doc, company = {}, opts = {}) {
   if (c.taxRate) rows.push([`${doc.taxName || t("pdf_tax")} (${c.taxRate}%)`, money(c.tax)]);
   rows.push([t("pdf_total"), money(c.total), true]);
   if (type === "invoice") {
+    if (c.depositPaid) rows.push([t("pdf_deposit_paid"), "- " + money(c.depositPaid)]);
     if (c.paidReceipts) rows.push([t("pdf_paid"), "- " + money(c.paidReceipts)]);
-    if (c.paidReceipts) rows.push([t("pdf_balance"), money(c.balance), true]);
+    if (c.paidTotal) rows.push([t("pdf_balance"), money(c.balance), true]);
   }
   if (y + rows.length * 6.8 + 4 > LIMIT) { pdf.addPage(); y = 18; }
   rows.forEach(([k, v, strong]) => {

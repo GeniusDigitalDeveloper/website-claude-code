@@ -63,7 +63,7 @@ export async function render(el, ctx) {
   function paint(inv, quo, rec, cus) {
   const live = inv.filter((i) => i.status !== "cancelled" && i.status !== "draft");
   const calcs = live.map((i) => ({ i, c: calc(i) }));
-  const totalValue = round2(calcs.reduce((s, x) => s + x.c.total, 0)), received = round2(calcs.reduce((s, x) => s + x.c.paidReceipts, 0)), outstanding = round2(calcs.reduce((s, x) => s + x.c.balance, 0));
+  const totalValue = round2(calcs.reduce((s, x) => s + x.c.total, 0)), received = round2(calcs.reduce((s, x) => s + x.c.paidTotal, 0)), outstanding = round2(calcs.reduce((s, x) => s + x.c.balance, 0));
   const year = yearMY(), m = MONTHS[getLang()];
   const byMonthCount = Array(12).fill(0), byMonthVal = Array(12).fill(0), payMonth = Array(12).fill(0);
   live.forEach((i) => { if ((i.date || "").startsWith(year)) { const k = +i.date.slice(5, 7) - 1; byMonthCount[k]++; byMonthVal[k] += calc(i).total; } });

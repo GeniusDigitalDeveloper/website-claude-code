@@ -44,10 +44,10 @@ export async function updateReceipt(ctx, r, p) {
     let inv = null; if (iref) { const is = await tx.get(iref); if (is.exists()) inv = is.data(); }
     const amt = round2(num(p.amount)); if (!(amt > 0)) throw new Error("amount");
     if (inv) {
-      const total = calc(inv).total, paid = round2(num(inv.receiptsPaid) + (amt - num(old.amount)));
-      if (paid < -0.005 || paid > total + 0.005) throw new Error("amount");
-      const bal = round2(Math.max(total - paid, 0)); let status = inv.status;
-      if (inv.status !== "cancelled") status = bal <= 0.004 ? "paid" : paid > 0.004 ? "partial" : ["paid", "partial"].includes(inv.status) ? "unpaid" : inv.status;
+      const ci = calc(inv), total = ci.total, paid = round2(num(inv.receiptsPaid) + (amt - num(old.amount)));
+      if (paid < -0.005 || paid + ci.depositPaid > total + 0.005) throw new Error("amount");
+      const bal = round2(Math.max(total - ci.depositPaid - paid, 0)); let status = inv.status;
+      if (inv.status !== "cancelled") status = bal <= 0.004 ? "paid" : paid + ci.depositPaid > 0.004 ? "partial" : ["paid", "partial"].includes(inv.status) ? "unpaid" : inv.status;
       const patch = { receiptsPaid: Math.max(paid, 0), status };
       if (PAY.includes(p.payStatus)) { const auto = payAutoInvoice({ ...inv, ...patch, payStatus: "" }); patch.payStatus = p.payStatus === auto ? "" : p.payStatus; }
       tx.update(iref, { ...patch, updatedAt: F.serverTimestamp() });
@@ -59,8 +59,8 @@ export async function updateReceipt(ctx, r, p) {
 export async function renderList(el, ctx) {
   el.innerHTML = loading(); let rows = [], shown = [], mounted = false, draw = () => {}, bulk = null;
   const mount = () => {
-    el.innerHTML = `<div class="page-h"><div><h1>${t("nav_receipts")}</h1><p class="sub">${t("receipts_sub")}</p></div><a class="btn primary" href="#/app/receipts/new">${ico("plus")}${t("receipt_new")}</a></div>
-    <div class="card"><div class="toolbar"><div class="search">${ico("search")}<input id="q" type="search" placeholder="${esc(t("search_ph"))}" aria-label="${esc(t("search_ph"))}"></div></div>${bulkBarHtml()}<div id="tbl" class="scrollbox"></div></div>`;
+    el.innerHTML = `<div class="page-h"><div><h1>${t("nav_receipts")}</h1><p class="sub">${t("receipts_sub")}</p></div></div>
+    <div class="card"><div class="toolbar"><div class="search">${ico("search")}<input id="q" type="search" placeholder="${esc(t("search_ph"))}" aria-label="${esc(t("search_ph"))}"></div></div><div class="q-new in-card"><a class="btn primary" href="#/app/receipts/new">${ico("plus")}${t("receipt_new_btn")}</a></div>${bulkBarHtml()}<div id="tbl" class="scrollbox"></div></div>`;
     bulk = bulkController(ctx, el, () => shown.map((r) => ({ k: "receipt", id: r.id, doc: r })), () => rows.map((r) => ({ k: "receipt", id: r.id, doc: r })));
     draw = () => {
       const q = $("#q", el).value.toLowerCase();
@@ -102,13 +102,13 @@ export async function renderForm(el, ctx, params) {
   let psTouched = false;
   const autoPs = () => { if (psTouched) return; const i = cur(); if (!i) return; const c = calc(i), amt = num(f.amount.value); f.payStatus.value = payAutoReceipt({ invoiceTotal: c.total, balanceAfter: round2(c.balance - amt), seq: (num(i.receiptCount) || 0) + 1 }); };
   const refresh = () => { const i = cur(); if (!i) return; const c = calc(i); f.amount.max = c.balance.toFixed(2); fill(c.balance);
-    $("#info", el).textContent = t("receipt_summary", { t: money(c.total), p: money(c.paidReceipts), b: money(c.balance) }); $("#rsum", el).innerHTML = summaryHtml(i); autoPs(); };
+    $("#info", el).textContent = t("receipt_summary2", { t: money(c.total), d: money(c.depositPaid), p: money(c.paidReceipts), b: money(c.balance) }); $("#rsum", el).innerHTML = summaryHtml(i); autoPs(); };
   f.payStatus.onchange = () => (psTouched = true); f.amount.addEventListener("input", autoPs);
   f.invoice.onchange = refresh; refresh();
   $("#prev", el).onclick = async (e) => {
     const btn = e.currentTarget, inv = cur(); if (!inv) return; setBusy(btn, true);
     try {
-      const c = calc(inv), amt = num(f.amount.value), paid = round2(c.paidReceipts + amt);
+      const c = calc(inv), amt = num(f.amount.value), paid = round2(c.paidTotal + amt);
       const doc = { number: "PRATONTON", date: f.date.value, amount: amt, method: f.method.value, note: f.note.value.trim(), invoiceId: inv.id, invoiceNumber: inv.number, customer: inv.customer || {}, customerName: (inv.customer && inv.customer.name) || "", invoiceTotal: c.total, paidToDate: paid, balanceAfter: round2(Math.max(c.total - paid, 0)), seq: (num(inv.receiptCount) || 0) + 1, payStatus: f.payStatus.value, template: inv.template, color: inv.color, imgScale: {} };
       await previewPdf(() => buildPdf("receipt", doc, company, { template: doc.template, color: doc.color }));
     } catch (x) { console.error(x); toast(t("pdf_fail"), "err"); } setBusy(btn, false);
@@ -130,7 +130,7 @@ export async function renderEdit(el, ctx, id) {
   let r, company, inv = null;
   try { [r, company] = await Promise.all([getOne(ctx.uid, "receipts", id), ctx.getCompany()]); if (r && r.invoiceId) inv = await getOne(ctx.uid, "invoices", r.invoiceId); } catch (e) { el.innerHTML = `<p class="err">${esc(errMsg(e))}</p>`; return; }
   if (!r) { el.innerHTML = empty("receipt", t("not_found")); return; }
-  const maxAmt = inv ? round2(calc(inv).total - (num(inv.receiptsPaid) - num(r.amount))) : null; // jumlah maksimum yang masih dibenarkan untuk resit ini
+  const maxAmt = inv ? round2(calc(inv).total - calc(inv).depositPaid - (num(inv.receiptsPaid) - num(r.amount))) : null; // jumlah maksimum yang masih dibenarkan untuk resit ini
   el.innerHTML = `<div class="page-h"><div><h1>${t("edit_receipt")} · ${esc(r.number)}</h1><p class="sub">${esc(r.invoiceNumber || "")} · ${esc(r.customerName || "")}</p></div><a class="btn ghost" href="#/app/receipts">${t("back")}</a></div>
   <form class="card form" id="f" novalidate>
     <div class="grid2"><label>${t("f_amount")} (RM)<input name="amount" type="number" step="0.01" min="0.01" ${maxAmt != null ? `max="${maxAmt.toFixed(2)}"` : ""} inputmode="decimal" value="${num(r.amount)}" required></label><label>${t("f_date")}<input name="date" type="date" value="${esc(r.date)}" required></label></div>

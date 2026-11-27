@@ -2,7 +2,7 @@
 // Invois baharu: pilih pelanggan daripada sebut harga yang telah dibuat -> invois dijana dengan maklumat sebut harga itu.
 // Edit invois: paparan ringkas (baca sahaja) + Status Bayaran.
 import { t, getLang } from "../i18n.js";
-import { esc, $, money, num, calc, fmtDate, todayMY, addDays, toast, setBusy, PAY, payOf, payAutoInvoice } from "../util.js";
+import { esc, $, money, num, round2, calc, fmtDate, todayMY, addDays, toast, setBusy, PAY, payOf, payAutoInvoice } from "../util.js";
 import { listAll, getOne, update, createNumbered, logActivity, docRef } from "../db.js";
 import { F } from "../firebase.js";
 import { errMsg } from "../auth.js";
@@ -44,7 +44,11 @@ export async function render(el, ctx, id, numberFmt) {
     <div id="ivs">${inv ? summaryHtml(inv) : ""}</div>
     <p class="muted">${t("inv_from_q_note")}</p>
    </section>
-   <section class="card form"><div class="grid2"><label>${t("f_paystatus")}<select name="payStatus">${PAY.map((s) => `<option value="${s}" ${inv && s === payOf("invoice", inv) ? "selected" : ""}>${t("ps_" + s)}</option>`).join("")}</select></label></div></section>
+   <section class="card form"><h2>${t("f_paystatus")}</h2>
+    <div class="grid2"><label>${t("f_paystatus")}<select name="payStatus">${PAY.map((s) => `<option value="${s}" ${inv && s === payOf("invoice", inv) ? "selected" : ""}>${t("ps_" + s)}</option>`).join("")}</select></label>
+     <label id="depW">${t("f_deposit_amt")}<input name="dep" type="number" min="0" step="0.01" inputmode="decimal" value="${inv && num(inv.depositPaid) ? num(inv.depositPaid) : ""}" placeholder="0.00"></label></div>
+    <div id="pays" class="iv-pay" aria-live="polite"></div>
+    <p class="muted">${t("inv_bal_note")}</p></section>
    <p class="err" id="err" role="alert"></p>
    <div class="form-f sticky"><a class="btn ghost" href="#/app/invoices">${t("cancel")}</a><button class="btn ghost" type="button" id="prev">${ico("eye")}${t("preview_draft")}</button><button class="btn primary" type="submit">${ico("check")}${t("save")}</button></div>
   </form>`;
@@ -54,11 +58,29 @@ export async function render(el, ctx, id, numberFmt) {
     const q = curQ(); const box = $("#ivs", el); if (!q) { box.innerHTML = ""; return; }
     box.innerHTML = summaryHtml(q) + (q.convertedInvoiceId ? `<p class="note-red qi-note">${t("inv_has", { n: esc(q.convertedInvoiceNumber || "") })} <a href="#/app/invoices/${esc(q.convertedInvoiceId)}">${t("act_open")}</a></p>` : "");
   };
-  if (!inv) { f.q.onchange = showQ; showQ(); }
+  // Bayaran di invois: Belum Dibayar (deposit 0) · Deposit (jumlah ditaip) · Selesai (deposit = jumlah penuh). Baki -> dibayar melalui resit.
+  const base = () => inv || curQ();
+  const totalOf = () => { const d = base(); return d ? calc(d).total : 0; };
+  const receiptsOf = () => (inv ? num(inv.receiptsPaid) : 0);
+  const depVal = () => { const st = f.payStatus.value, tot = totalOf(); return st === "paid" ? Math.max(round2(tot - receiptsOf()), 0) : st === "deposit" ? round2(num(f.dep.value)) : 0; };
+  const drawPay = () => {
+    const st = f.payStatus.value; $("#depW", el).hidden = st !== "deposit";
+    const tot = totalOf(), dep = depVal(), rc = receiptsOf(), bal = round2(Math.max(tot - dep - rc, 0));
+    $("#pays", el).innerHTML = base() ? `<div><span>${t("qe_total")}</span><b>${money(tot)}</b></div><div><span>${t("pdf_deposit_paid")}</span><b>- ${money(dep)}</b></div>${rc ? `<div><span>${t("pdf_paid")}</span><b>- ${money(rc)}</b></div>` : ""}<div class="iv-bal"><span>${t("pdf_balance")}</span><b>${money(bal)}</b></div>` : "";
+  };
+  f.payStatus.addEventListener("change", drawPay); f.dep.addEventListener("input", drawPay);
+  if (!inv) { f.q.onchange = () => { showQ(); drawPay(); }; showQ(); }
+  drawPay();
+  const payFields = (d) => {
+    const ci = calc({ ...d, depositPaid: depVal() }); const paidAny = ci.paidTotal > 0.004;
+    const status = d.status === "cancelled" ? "cancelled" : ci.balance <= 0.004 && ci.total > 0 ? "paid" : paidAny ? "partial" : "unpaid";
+    return { depositPaid: depVal(), payStatus: f.payStatus.value, status };
+  };
   const draftDoc = () => {
-    if (inv) return { ...inv, payStatus: f.payStatus.value };
+    if (inv) return { ...inv, ...payFields(inv) };
     const q = curQ(); if (!q) return null; const date = todayMY();
-    return { ...pick(q), number: "PRATONTON", date, dueDate: addDays(date, 14), status: "unpaid", payStatus: f.payStatus.value, receiptsPaid: 0, receiptCount: 0, deposit: 0, fromQuotationId: q.id, fromQuotationNumber: q.number };
+    const d0 = { ...pick(q), number: "PRATONTON", date, dueDate: addDays(date, 14), status: "unpaid", receiptsPaid: 0, receiptCount: 0, deposit: 0, fromQuotationId: q.id, fromQuotationNumber: q.number };
+    return { ...d0, ...payFields(d0) };
   };
   $("#prev", el).onclick = async (e) => {
     const d = draftDoc(); if (!d) return ($("#err", el).textContent = t("err_pick_q"));
@@ -68,15 +90,16 @@ export async function render(el, ctx, id, numberFmt) {
   f.onsubmit = async (e) => {
     e.preventDefault(); const err = $("#err", el); err.textContent = ""; const btn = $("button[type=submit]", f);
     if (!inv && !curQ()) { err.textContent = t("err_pick_q"); return f.q.focus(); }
+    if (f.payStatus.value === "deposit") { const dv = num(f.dep.value), room = round2(totalOf() - receiptsOf()); if (!(dv > 0) || dv > room + 0.005) { err.textContent = t("err_deposit"); return f.dep.focus(); } }
     setBusy(btn, true);
     try {
       if (inv) {
-        const ps = f.payStatus.value; await update(ctx.uid, "invoices", id, { payStatus: ps === payAutoInvoice({ ...inv, payStatus: "" }) ? "" : ps });
+        await update(ctx.uid, "invoices", id, payFields(inv));
         toast(t("saved")); return ctx.nav(`#/app/invoices/${id}`);
       }
       const q = curQ(), date = todayMY(), qref = docRef(ctx.uid, "quotations", q.id);
-      const data = { ...pick(q), date, dueDate: addDays(date, 14), status: "unpaid", deposit: 0, receiptsPaid: 0, receiptCount: 0, fromQuotationId: q.id, fromQuotationNumber: q.number };
-      data.payStatus = f.payStatus.value === payAutoInvoice({ ...data, payStatus: "" }) ? "" : f.payStatus.value;
+      const data0 = { ...pick(q), date, dueDate: addDays(date, 14), status: "unpaid", deposit: 0, receiptsPaid: 0, receiptCount: 0, fromQuotationId: q.id, fromQuotationNumber: q.number };
+      const data = { ...data0, ...payFields(data0) };
       const r = await createNumbered(ctx.uid, "invoice", await numberFmt(ctx, "invoice"), null, (_, n, newId) => ({
         data, writes: q.convertedInvoiceId ? [] : [(tx) => tx.update(qref, { convertedInvoiceId: newId, convertedInvoiceNumber: n, updatedAt: F.serverTimestamp() })],
       }));

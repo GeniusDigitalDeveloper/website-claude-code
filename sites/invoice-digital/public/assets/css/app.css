@@ -267,3 +267,5 @@ h1,h2,h3,h4,b,strong,th,label,.lbl,.btn,.badge,.brand,.app-name,.side-app,.side 
 .tbl th.c,.tbl td.c{text-align:center}.tbl td.tot-red b{color:var(--err);white-space:nowrap}
 @media(max-width:760px){.tbl th.c,.tbl td.c{text-align:inherit}}
 .iv-sum{display:grid;gap:12px;margin-top:6px}.iv-cust{display:flex;flex-direction:column;gap:2px;padding:12px 16px;border:1.5px solid var(--line);border-radius:14px;background:var(--bg2)}.iv-cust b{font-family:var(--f-head);font-size:1.05rem}.iv-cust small{color:var(--ink2)}.iv-l{font-size:.75rem;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
+.q-new.in-card{margin:14px 0 6px}
+.iv-pay{display:grid;gap:6px;padding:12px 16px;border:1.5px solid var(--line);border-radius:14px;background:var(--bg2)}.iv-pay div{display:flex;justify-content:space-between;gap:12px}.iv-pay span{color:var(--mut)}.iv-pay b{font-family:var(--f-head)}.iv-pay .iv-bal{border-top:2px solid var(--line);padding-top:8px}.iv-pay .iv-bal b{color:var(--err);font-size:1.15rem}

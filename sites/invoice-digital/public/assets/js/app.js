@@ -101,7 +101,7 @@ function renderAuth(mode, q) {
 }
 
 // ---------------------------------------------------------------- APP SHELL
-const NAV = [["dashboard", "home"], ["quotations", "quote"], ["invoices", "doc"], ["receipts", "receipt"], ["customers", "users"], ["products", "box"], ["profile", "gear"]];
+const NAV = [["dashboard", "home"], ["quotations", "quote"], ["invoices", "doc"], ["receipts", "receipt"], ["customers", "users"], ["profile", "gear"]];
 const SUBS = [["business", "building"], ["quoteinfo", "quote"], ["history", "clock"], ["settings", "gear"]]; // sub bagi Profil
 const MOBILE = ["dashboard", "quotations", "invoices", "receipts"];
 function renderShell() {
@@ -139,7 +139,7 @@ async function renderApp(segs, q) {
     }
     if (page === "receipts") { const M = await import("./modules/receipts.js"); return sub === "new" ? M.renderForm(view, ctx, q) : sub && sub2 === "edit" ? M.renderEdit(view, ctx, sub) : M.renderList(view, ctx); }
     if (page === "customers") return await (await import("./modules/customers.js")).renderList(view, ctx);
-    if (page === "products") return await (await import("./modules/products.js")).renderList(view, ctx);
+    if (page === "products") return ctx.nav("#/app/profile/quoteinfo"); // menu Produk & Perkhidmatan dibuang; produk diurus di Maklumat Sebut Harga
     if (page === "profile") return await (await import("./modules/profile.js")).render(view, ctx, sub);
     if (page === "company") return ctx.nav("#/app/profile/business");
     if (page === "settings") return ctx.nav("#/app/profile/settings");
