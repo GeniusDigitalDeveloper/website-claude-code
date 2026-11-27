@@ -26,15 +26,15 @@ function loadFonts() {
   return (fontsP ||= (async () => {
     try {
       const get = async (u) => { const r = await fetch(u); if (!r.ok) throw new Error(u); const b = new Uint8Array(await r.arrayBuffer()); let s = ""; for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000)); return btoa(s); };
-      const [poppins, montserrat] = await Promise.all([get("/assets/fonts/Poppins-Bold.ttf"), get("/assets/fonts/Montserrat-Regular.ttf")]);
-      return { poppins, montserrat };
+      const [poppins, montserrat, semi] = await Promise.all([get("/assets/fonts/Poppins-Bold.ttf"), get("/assets/fonts/Montserrat-Regular.ttf"), get("/assets/fonts/Montserrat-SemiBold.ttf").catch(() => null)]);
+      return { poppins, montserrat, semi };
     } catch (e) { console.warn("fon PDF tidak dapat dimuat, guna Helvetica", e); fontsP = null; return null; }
   })());
 }
 function registerFonts(pdf, f) {
   if (!f) return { head: "helvetica", body: "helvetica" };
-  if (!pdf.__fontsReg) { pdf.addFileToVFS("Poppins-Bold.ttf", f.poppins); pdf.addFont("Poppins-Bold.ttf", "Poppins", "bold"); pdf.addFileToVFS("Montserrat-Regular.ttf", f.montserrat); pdf.addFont("Montserrat-Regular.ttf", "Montserrat", "normal"); pdf.__fontsReg = true; }
-  return { head: "Poppins", body: "Montserrat" };
+  if (!pdf.__fontsReg) { pdf.addFileToVFS("Poppins-Bold.ttf", f.poppins); pdf.addFont("Poppins-Bold.ttf", "Poppins", "bold"); pdf.addFileToVFS("Montserrat-Regular.ttf", f.montserrat); pdf.addFont("Montserrat-Regular.ttf", "Montserrat", "normal"); if (f.semi) { pdf.addFileToVFS("Montserrat-SemiBold.ttf", f.semi); pdf.addFont("Montserrat-SemiBold.ttf", "Montserrat", "bold"); } pdf.__fontsReg = true; }
+  return { head: "Poppins", body: "Montserrat", semi: f.semi ? "Montserrat" : "Poppins" };
 }
 
 export const TEMPLATES = {
@@ -86,12 +86,17 @@ export async function buildPdf(type, doc, company = {}, opts = {}) {
   const BOTTOM = H - 19, BASE = BOTTOM - 2.6; // baseline baris terakhir maklumat bank
   // (2) Maklumat bank + QR
   setN(); pdf.setFontSize(BANK_FS);
-  const bankLines = bank ? pdf.splitTextToSize(clean(bank), Math.max(R - L - (hasQr ? QR + 14 : 0), 60)) : [];
+  const QR_CX = W / 2; // QR di tengah-tengah halaman
+  const bankMaxW = hasQr ? R - L - QR - 12 : R - L; // teks bank tidak dipotong; QR beralih ke kanan hanya jika perlu
+  const bankLines = bank ? pdf.splitTextToSize(clean(bank), bankMaxW) : [];
   const bankTextW = bankLines.reduce((m, l) => Math.max(m, pdf.getTextWidth(l)), 0);
   setB(); pdf.setFontSize(LBL_FS); const lblW = bank ? pdf.getTextWidth(t("pdf_bank")) : 0;
   const hasBankRow = !!(bank || hasQr);
   const firstBase = BASE - Math.max(bankLines.length - 1, 0) * BANK_LH, labelBase = firstBase - 7;
-  const qrX = bank ? L + Math.max(bankTextW, lblW) + 10 : L, qrBottom = BASE - 1.5, qrTop = qrBottom - QR;
+  // QR: tengah halaman (mendatar) & tengah blok maklumat bank (menegak); dianjak ke kanan hanya jika teks bank terlalu lebar
+  const qrX = Math.max(QR_CX - QR / 2, bank ? L + Math.max(bankTextW, lblW) + 6 : L);
+  const blockMid = bank ? ((labelBase - 4) + (BASE + 1.5)) / 2 : BASE - QR / 2;
+  const qrBottom = Math.min(blockMid + QR / 2, H - 18.5), qrTop = qrBottom - QR;
   const bankTop = hasBankRow ? Math.min(bank ? labelBase - 4 : 1e9, hasQr ? qrTop - 1 : 1e9) : BOTTOM;
   // (1) Cop | Tandatangan di tengah
   const COLW = 64, GAP = 18, cols = hasChop ? 2 : 1;
@@ -111,7 +116,13 @@ export async function buildPdf(type, doc, company = {}, opts = {}) {
     // Maklumat bank (kiri) + QR (kanan maklumat bank)
     if (bank) {
       setB(); pdf.setFontSize(LBL_FS); setC(accent); txt(t("pdf_bank"), L, labelBase);
-      setN(); pdf.setFontSize(BANK_FS); setC(dark); bankLines.forEach((ln, i) => txt(ln, L, firstBase + i * BANK_LH));
+      // Nombor akaun (jujukan digit) separa tebal; nama bank & teks lain biasa
+      const semi = () => pdf.setFont(FN.semi || FN.body, "bold");
+      bankLines.forEach((ln, i) => {
+        const yy = firstBase + i * BANK_LH; let x = L; pdf.setFontSize(BANK_FS); setC(dark);
+        const parts = ln.split(/(\d[\d\s-]{4,}\d)/);
+        parts.forEach((part, k) => { if (!part) return; k % 2 ? semi() : setN(); pdf.setFontSize(BANK_FS); txt(part, x, yy); x += pdf.getTextWidth(part); });
+      });
     }
     if (hasQr) { fit(company.bankQr, qrX, qrTop, QR, QR); setN(); pdf.setFontSize(7); setC(grey); txt(t("pdf_scan"), qrX + QR / 2, qrBottom + 3, { align: "center" }); }
   };
