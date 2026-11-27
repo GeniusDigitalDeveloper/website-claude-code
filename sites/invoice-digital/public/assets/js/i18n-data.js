@@ -1,5 +1,6 @@
 // Kamus BM (lalai) & EN. Semua teks UI, borang, status, ralat dan PDF.
 const ms = {
+  rc_dep_note: "Deposit dibayar semasa invois.", rc_full_note: "Bayaran penuh semasa invois.",
   invoice_new_btn: "Tambah Invois Baharu", receipt_new_btn: "Tambah Resit Baharu",
   f_deposit_amt: "Jumlah Deposit (RM)", pdf_deposit_paid: "Deposit Dibayar", inv_bal_note: "Baki ini dibayar melalui Resit. Setiap bayaran menghasilkan resit berasingan.", receipt_summary2: "Jumlah {t} · Deposit {d} · Resit {p} · Baki {b}", err_deposit: "Jumlah deposit mesti lebih daripada 0 dan tidak melebihi baki.",
   inv_pick_q: "Pilih Pelanggan (daripada Sebut Harga)", inv_pick_ph: "— Pilih pelanggan —", inv_q_none: "Belum ada sebut harga. Buat sebut harga dahulu; invois akan menggunakan maklumatnya.", inv_has: "Invois {n} sudah dijana untuk sebut harga ini. Simpan sekali lagi akan menjana invois baharu.", inv_from_q_note: "Maklumat pelanggan, pakej, produk dan diskaun diambil daripada sebut harga. Untuk mengubahnya, edit sebut harga.", act_open: "Buka", err_pick_q: "Sila pilih pelanggan.",
@@ -109,6 +110,7 @@ const ms = {
   a_time: "Masa", a_action: "Tindakan", a_detail: "Butiran", a_actor: "Admin",
 };
 const en = {
+  rc_dep_note: "Deposit paid on invoice.", rc_full_note: "Full payment on invoice.",
   invoice_new_btn: "Add New Invoice", receipt_new_btn: "Add New Receipt",
   f_deposit_amt: "Deposit Amount (RM)", pdf_deposit_paid: "Deposit Paid", inv_bal_note: "This balance is paid through Receipts. Each payment creates a separate receipt.", receipt_summary2: "Total {t} · Deposit {d} · Receipts {p} · Balance {b}", err_deposit: "Deposit must be more than 0 and not exceed the balance.",
   inv_pick_q: "Choose Customer (from Quotation)", inv_pick_ph: "— Choose customer —", inv_q_none: "No quotations yet. Create a quotation first; the invoice uses its details.", inv_has: "Invoice {n} was already generated for this quotation. Saving again creates a new invoice.", inv_from_q_note: "Customer, package, product and discount details come from the quotation. To change them, edit the quotation.", act_open: "Open", err_pick_q: "Please choose a customer.",

@@ -3,7 +3,8 @@
 // Edit invois: paparan ringkas (baca sahaja) + Status Bayaran.
 import { t, getLang } from "../i18n.js";
 import { esc, $, money, num, round2, calc, fmtDate, todayMY, addDays, toast, setBusy, PAY, payOf, payAutoInvoice } from "../util.js";
-import { listAll, getOne, update, createNumbered, logActivity, docRef } from "../db.js";
+import { listAll, getOne, update, remove, createNumbered, logActivity, docRef } from "../db.js";
+import { METHODS } from "./receipts.js";
 import { F } from "../firebase.js";
 import { errMsg } from "../auth.js";
 import { ico, empty, loading } from "./ui.js";
@@ -46,7 +47,8 @@ export async function render(el, ctx, id, numberFmt) {
    </section>
    <section class="card form"><h2>${t("f_paystatus")}</h2>
     <div class="grid2"><label>${t("f_paystatus")}<select name="payStatus">${PAY.map((s) => `<option value="${s}" ${inv && s === payOf("invoice", inv) ? "selected" : ""}>${t("ps_" + s)}</option>`).join("")}</select></label>
-     <label id="depW">${t("f_deposit_amt")}<input name="dep" type="number" min="0" step="0.01" inputmode="decimal" value="${inv && num(inv.depositPaid) ? num(inv.depositPaid) : ""}" placeholder="0.00"></label></div>
+     <label id="depW">${t("f_deposit_amt")}<input name="dep" type="number" min="0" step="0.01" inputmode="decimal" value="${inv && num(inv.depositPaid) ? num(inv.depositPaid) : ""}" placeholder="0.00"></label>
+     <label id="metW">${t("pdf_method")}<select name="method">${METHODS.map((m) => `<option value="${m}" ${inv && inv.depositMethod === m ? "selected" : ""}>${t("pm_" + m)}</option>`).join("")}</select></label></div>
     <div id="pays" class="iv-pay" aria-live="polite"></div>
     <p class="muted">${t("inv_bal_note")}</p></section>
    <p class="err" id="err" role="alert"></p>
@@ -64,7 +66,7 @@ export async function render(el, ctx, id, numberFmt) {
   const receiptsOf = () => (inv ? num(inv.receiptsPaid) : 0);
   const depVal = () => { const st = f.payStatus.value, tot = totalOf(); return st === "paid" ? Math.max(round2(tot - receiptsOf()), 0) : st === "deposit" ? round2(num(f.dep.value)) : 0; };
   const drawPay = () => {
-    const st = f.payStatus.value; $("#depW", el).hidden = st !== "deposit";
+    const st = f.payStatus.value; $("#depW", el).hidden = st !== "deposit"; $("#metW", el).hidden = st === "unpaid";
     const tot = totalOf(), dep = depVal(), rc = receiptsOf(), bal = round2(Math.max(tot - dep - rc, 0));
     $("#pays", el).innerHTML = base() ? `<div><span>${t("qe_total")}</span><b>${money(tot)}</b></div><div><span>${t("pdf_deposit_paid")}</span><b>- ${money(dep)}</b></div>${rc ? `<div><span>${t("pdf_paid")}</span><b>- ${money(rc)}</b></div>` : ""}<div class="iv-bal"><span>${t("pdf_balance")}</span><b>${money(bal)}</b></div>` : "";
   };
@@ -74,7 +76,7 @@ export async function render(el, ctx, id, numberFmt) {
   const payFields = (d) => {
     const ci = calc({ ...d, depositPaid: depVal() }); const paidAny = ci.paidTotal > 0.004;
     const status = d.status === "cancelled" ? "cancelled" : ci.balance <= 0.004 && ci.total > 0 ? "paid" : paidAny ? "partial" : "unpaid";
-    return { depositPaid: depVal(), payStatus: f.payStatus.value, status };
+    return { depositPaid: depVal(), depositMethod: f.method.value, payStatus: f.payStatus.value, status };
   };
   const draftDoc = () => {
     if (inv) return { ...inv, ...payFields(inv) };
@@ -94,7 +96,8 @@ export async function render(el, ctx, id, numberFmt) {
     setBusy(btn, true);
     try {
       if (inv) {
-        await update(ctx.uid, "invoices", id, payFields(inv));
+        const pf = payFields(inv); await update(ctx.uid, "invoices", id, pf);
+        await syncDepositReceipt(ctx, { ...inv, ...pf, id });
         toast(t("saved")); return ctx.nav(`#/app/invoices/${id}`);
       }
       const q = curQ(), date = todayMY(), qref = docRef(ctx.uid, "quotations", q.id);
@@ -103,7 +106,28 @@ export async function render(el, ctx, id, numberFmt) {
       const r = await createNumbered(ctx.uid, "invoice", await numberFmt(ctx, "invoice"), null, (_, n, newId) => ({
         data, writes: q.convertedInvoiceId ? [] : [(tx) => tx.update(qref, { convertedInvoiceId: newId, convertedInvoiceNumber: n, updatedAt: F.serverTimestamp() })],
       }));
-      logActivity(ctx.user, "invoice", r.number); toast(t("saved")); ctx.nav(`#/app/invoices/${r.id}`);
+      logActivity(ctx.user, "invoice", r.number);
+      await syncDepositReceipt(ctx, { ...data, id: r.id, number: r.number });
+      toast(t("saved")); ctx.nav(`#/app/invoices/${r.id}`);
     } catch (x) { console.error(x); err.textContent = errMsg(x); setBusy(btn, false); }
   };
+}
+
+// Bayaran yang dibuat di invois (Deposit / Selesai) JUGA direkodkan sebagai RESIT (resit penting untuk pelanggan).
+// Satu resit "bayaran invois" bagi setiap invois: dicipta, dikemas kini atau dibuang mengikut deposit di invois.
+// Resit ini TIDAK menambah receiptsPaid (deposit sudah dikira melalui depositPaid) -> tiada kiraan berganda.
+export async function syncDepositReceipt(ctx, inv) {
+  const amt = round2(num(inv.depositPaid)); const rid = inv.depositReceiptId;
+  const c = calc(inv); const balanceAfter = round2(Math.max(c.total - amt - num(inv.receiptsPaid), 0));
+  const fields = { date: todayMY(), amount: amt, method: inv.depositMethod || "cash", invoiceTotal: c.total, paidToDate: amt, balanceAfter, payStatus: balanceAfter <= 0.004 ? "paid" : "deposit",
+    customer: inv.customer || {}, customerId: inv.customerId || "", customerName: (inv.customer && inv.customer.name) || "", template: inv.template || "classic", color: inv.color || "#2563eb" };
+  const iref = docRef(ctx.uid, "invoices", inv.id);
+  if (!(amt > 0)) { if (rid) { try { await remove(ctx.uid, "receipts", rid); } catch (e) { console.warn("resit deposit", e); } await update(ctx.uid, "invoices", inv.id, { depositReceiptId: "" }); } return; }
+  if (rid) { try { const old = await getOne(ctx.uid, "receipts", rid); if (old) { await update(ctx.uid, "receipts", rid, { ...fields, date: old.date || fields.date, invoiceId: old.invoiceId }); return; } } catch (e) { console.warn("resit deposit", e); } }
+  const st = await ctx.getSettings(); const fmt = (st.numberFormat && st.numberFormat.receipt) || "REC-{YYYY}-{NNNN}";
+  const r = await createNumbered(ctx.uid, "receipt", fmt, null, (_, n, newId) => ({
+    data: { ...fields, invoiceId: inv.id, invoiceNumber: inv.number || "", isDeposit: true, seq: 1, note: t(balanceAfter <= 0.004 ? "rc_full_note" : "rc_dep_note") },
+    writes: [(tx) => tx.update(iref, { depositReceiptId: newId, updatedAt: F.serverTimestamp() })],
+  }));
+  logActivity(ctx.user, "receipt", r.number);
 }

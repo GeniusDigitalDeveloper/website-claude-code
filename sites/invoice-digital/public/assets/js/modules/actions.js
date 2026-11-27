@@ -14,7 +14,9 @@ export async function receiptContext(ctx, r, cache = {}) {
   const { inv, receipts } = await c; if (!inv) return r;
   const secs = (x) => (x.createdAt && x.createdAt.seconds) || 9e12;
   const sorted = receipts.slice().sort((a, b) => (a.date === b.date ? secs(a) - secs(b) : a.date < b.date ? -1 : 1));
-  const ci = calc(inv); let run = ci.depositPaid, idx = 0; for (const x of sorted) { run += num(x.amount); idx++; if (x.id === r.id) break; }
+  const ci = calc(inv); const hasDep = receipts.some((x) => x.isDeposit);
+  const sorted2 = hasDep ? sorted.filter((x) => x.isDeposit).concat(sorted.filter((x) => !x.isDeposit)) : sorted; // resit deposit sentiasa yang pertama
+  let run = hasDep ? 0 : ci.depositPaid, idx = 0; for (const x of sorted2) { run += x.isDeposit ? ci.depositPaid : num(x.amount); idx++; if (x.id === r.id) break; }
   const total = ci.total;
   return { ...r, invoiceTotal: total, paidToDate: round2(run), balanceAfter: round2(Math.max(total - run, 0)), seq: idx };
 }

@@ -118,7 +118,7 @@ export function applyPayment(inv, amountRaw) {
   const c = calc(inv); const amt = round2(num(amountRaw));
   if (!(amt > 0) || amt > c.balance + 0.005) throw new Error("amount");
   const paid = round2(num(inv.receiptsPaid) + amt); const balanceAfter = round2(Math.max(c.total - c.depositPaid - paid, 0));
-  return { amt, paid, balanceAfter, total: c.total, status: balanceAfter <= 0.004 ? "paid" : "partial", seq: (num(inv.receiptCount) || 0) + 1 };
+  return { amt, paid, balanceAfter, total: c.total, status: balanceAfter <= 0.004 ? "paid" : "partial", seq: (num(inv.receiptCount) || 0) + 1 + (inv.depositReceiptId ? 1 : 0) };
 }
 // Cadangan jumlah bayaran: bayaran pertama = deposit (jika ada), selepas itu = baki.
 export function suggestAmount(inv) {
