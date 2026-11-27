@@ -20,7 +20,7 @@ export function summaryHtml(d) {
     <div class="iv-cust"><span class="iv-l">${t("sec_customer")}</span><b>${esc(cu.name || "-")}</b>
       ${cu.company ? `<small>${esc(cu.company)}${cu.regNo ? ` (${esc(cu.regNo)})` : ""}</small>` : ""}<small>${esc(cu.address || "")}</small><small>${esc(cu.phone || "")}</small></div>
     <div class="qe-box">${d.pkgNames && d.pkgNames[0] ? `<div class="qe-pkg"><span>${t("qe_package")}</span><b>${esc(d.pkgNames[0])}</b></div>` : ""}
-      <div class="qe-prods">${(d.items || []).flatMap((i) => (i.contents && i.contents.length ? i.contents.map((n) => `<div class="qe-prod"><b>${esc(n)}</b></div>`) : [`<div class="qe-prod"><b>${esc(i.name)}</b><span>${money(num(i.qty || 1) * num(i.price))}</span></div>`])).join("")}</div>
+      <div class="qe-prods">${(d.items || []).flatMap((i) => (i.contentsText ? [`<div class="qe-text">${esc(i.contentsText)}</div>`] : i.contents && i.contents.length ? i.contents.map((n) => `<div class="qe-prod"><b>${esc(n)}</b></div>`) : [`<div class="qe-prod"><b>${esc(i.name)}</b><span>${money(num(i.qty || 1) * num(i.price))}</span></div>`])).join("")}</div>
       <div class="qe-row"><div><span>${t("qe_price")}</span><b>${money(c.subtotal)}</b></div><div><span>${t("pdf_discount")}</span><b>${c.docDiscount ? "- " + money(c.docDiscount) : money(0)}</b></div><div class="qe-total"><span>${t("qe_total")}</span><b>${money(c.total)}</b></div></div></div>
   </div>`;
 }

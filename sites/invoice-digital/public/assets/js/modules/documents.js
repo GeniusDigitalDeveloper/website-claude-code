@@ -26,7 +26,7 @@ export async function renderList(el, ctx, type) {
   // Sebut harga: pakej daripada Profil → Maklumat Sebut Harga dipaparkan di sini; tanda produk -> terus buat sebut harga.
   const showPackages = async () => {
     if (type !== "quotation") return; let pkgs = [];
-    try { pkgs = (await loadPackages(ctx)).filter((p) => p.items.some((i) => i.name)); } catch (e) { console.warn("pakej", e); }
+    try { pkgs = (await loadPackages(ctx)); } catch (e) { console.warn("pakej", e); }
     const note = $("#qinote", el), box = $("#qpk", el); if (!note || !box) return;
     if (!pkgs.length) { note.innerHTML = `<p class="note-red qi-note">${t("qi_note_empty")} <a href="#/app/profile/quoteinfo">${t("qi_go")}</a></p>`; box.innerHTML = `<div class="q-new"><a class="btn primary lg" href="#/app/${C.route}/new">${ico("plus")}${t("quotation_new_btn")}</a></div>`; return; }
     // Pilih pakej -> tanda produk -> tekan "Sebut Harga" dalam tetingkap -> terus ke borang sebut harga
@@ -80,7 +80,7 @@ export async function renderEditor(el, ctx, type, id) {
   } catch (e) { el.innerHTML = `<p class="err">${esc(errMsg(e))}</p>`; return; }
   // Sebut harga: produk dipilih daripada Profil → Maklumat Sebut Harga (pakej). Mesti diisi dahulu sebelum sebut harga baharu.
   let pkgs = [];
-  { try { pkgs = (await loadPackages(ctx)).filter((p) => p.items.some((i) => i.name)); } catch (e) { console.warn("pakej", e); } }
+  { try { pkgs = (await loadPackages(ctx)); } catch (e) { console.warn("pakej", e); } }
   if (type === "quotation" && !doc && !pkgs.length) {
     el.innerHTML = `<div class="page-h"><div><h1>${t("quotation_new")}</h1></div><a class="btn ghost" href="#/app/${C.route}">${t("back")}</a></div>${empty("quote", t("qi_need"), `<p class="muted">${t("qi_need_d")}</p><a class="btn primary" href="#/app/profile/quoteinfo">${ico("quote")}${t("qi_go")}</a>`)}`;
     return;

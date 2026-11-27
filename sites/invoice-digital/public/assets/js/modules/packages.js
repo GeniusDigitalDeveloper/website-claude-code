@@ -16,21 +16,23 @@ const cleanItems = (arr) => (Array.isArray(arr) ? arr : []).map((i) => ({ name: 
 const sum = (items) => items.reduce((s, i) => s + num(i.price), 0);
 export const pkgPrice = (p) => (num(p.price) > 0 ? round2(num(p.price)) : round2(sum(p.items || []))); // harga pakej tetap (atau jumlah produk bagi pakej lama)
 const fixed = (p) => num(p.price) > 0;
+// Kandungan pakej = TEKS BEBAS (satu kotak). Pakej versi sebelum (senarai kandungan) ditukar kepada teks, satu baris setiap item.
+export const pkgText = (p) => (typeof p.text === "string" && p.text.trim() ? p.text.trim() : fixed(p) ? (p.items || []).map((i) => i.name).filter(Boolean).join("\n") : "");
 
 async function readMeta(ctx) {
   const m = await getMeta(ctx.uid, PKG_META);
-  const packages = (Array.isArray(m.packages) ? m.packages : []).map((p) => ({ id: p.id || uid(), name: String(p.name || ""), price: round2(Math.max(num(p.price), 0)), items: cleanItems(p.items) }));
+  const packages = (Array.isArray(m.packages) ? m.packages : []).map((p) => ({ id: p.id || uid(), name: String(p.name || ""), price: round2(Math.max(num(p.price), 0)), text: typeof p.text === "string" ? p.text : "", items: cleanItems(p.items) }));
   const products = cleanItems(m.products);
   const hasPackages = typeof m.hasPackages === "boolean" ? m.hasPackages : packages.length > 0;
   return { hasPackages, packages, products };
 }
-const writeMeta = (ctx, s) => setMeta(ctx.uid, PKG_META, { hasPackages: !!s.hasPackages, packages: s.packages.map((p) => ({ id: p.id, name: p.name, price: round2(Math.max(num(p.price), 0)), items: cleanItems(p.items) })), products: cleanItems(s.products) });
+const writeMeta = (ctx, s) => setMeta(ctx.uid, PKG_META, { hasPackages: !!s.hasPackages, packages: s.packages.map((p) => ({ id: p.id, name: p.name, price: round2(Math.max(num(p.price), 0)), text: String(p.text || "").slice(0, 4000), items: cleanItems(p.items) })), products: cleanItems(s.products) });
 
 // Untuk borang/senarai sebut harga: kumpulan produk yang boleh dipilih
 export async function loadPackages(ctx) {
   const s = await readMeta(ctx);
   const groups = s.hasPackages ? s.packages : s.products.length ? [{ id: "products", name: t("qi_products"), items: s.products }] : [];
-  return groups.filter((g) => g.items.length).map((g) => ({ ...g, items: g.items.map((i) => ({ name: i.name, desc: "", qty: 1, price: i.price, discount: 0 })) }));
+  return groups.filter((g) => g.items.length || pkgText(g)).map((g) => ({ ...g, items: g.items.map((i) => ({ name: i.name, desc: "", qty: 1, price: i.price, discount: 0 })) }));
 }
 
 // Penyunting senarai produk (nama + harga), setiap produk dipisahkan garisan
@@ -71,8 +73,8 @@ export async function render(el, ctx) {
       // Kotak pakej (grid kiri ke kanan) + kotak "Tambah Pakej"
       body.innerHTML = `<h2 class="sec-t">${t("qi_packages")}</h2><div class="pk-grid">${s.packages.map((p, i) => `<button type="button" class="pk-box" data-open="${i}" aria-label="${esc(t("qi_edit_pkg"))}: ${esc(p.name)}">
           <span class="pk-num">${i + 1}</span><b class="pk-title">${esc(p.name || t("qi_pkg_default", { n: i + 1 }))}</b>
-          <span class="pk-meta">${t("qi_n_products", { n: p.items.length })}</span>
-          <ul class="pk-prev">${p.items.slice(0, 4).map((it) => `<li><span>${esc(it.name)}</span>${fixed(p) ? "" : `<b>${money(it.price)}</b>`}</li>`).join("")}${p.items.length > 4 ? `<li class="more">+${p.items.length - 4}</li>` : ""}</ul>
+          ${fixed(p) ? `<p class="pk-text">${esc(pkgText(p))}</p>` : `<span class="pk-meta">${t("qi_n_products", { n: p.items.length })}</span>
+          <ul class="pk-prev">${p.items.slice(0, 4).map((it) => `<li><span>${esc(it.name)}</span>${fixed(p) ? "" : `<b>${money(it.price)}</b>`}</li>`).join("")}${p.items.length > 4 ? `<li class="more">+${p.items.length - 4}</li>` : ""}</ul>`}
           <span class="pk-tot">${money(pkgPrice(p))}</span><span class="pk-edit">${ico("edit")}${t("qi_edit_pkg")}</span></button>`).join("")}
         <button type="button" class="pk-box pk-add" data-new>${ico("plus")}<b>${t("qi_add_pkg")}</b></button></div>`;
       $$("[data-open]", body).forEach((b) => (b.onclick = () => editPackage(+b.dataset.open)));
@@ -96,13 +98,13 @@ export async function render(el, ctx) {
   // Tetingkap edit pakej: nama pakej + produk (nama & harga). idx = -1 untuk pakej baharu.
   const editPackage = (idx) => {
     const isNew = idx < 0; const p = isNew ? { id: uid(), name: t("qi_pkg_default", { n: s.packages.length + 1 }), items: [] } : s.packages[idx];
-    const items = p.items.map((i) => ({ name: i.name, price: 0 })); if (!items.length) items.push({ name: "", price: 0 });
     const curPrice = isNew ? "" : pkgPrice(p) || "";
     const wrap = document.createElement("div"); wrap.className = "form qi-modal";
     wrap.innerHTML = `<label><span class="lt">${t("qi_pkg_name")} <span class="req">*</span></span><input id="pkName" maxlength="80" value="${esc(p.name)}"></label>
       <label><span class="lt">${t("qi_pkg_price")} <span class="req">*</span></span><input id="pkPrice" type="number" min="0" step="0.01" inputmode="decimal" value="${curPrice}" placeholder="0.00"></label>
-      <h4 class="qi-h">${t("qi_contents")}</h4><p class="muted qi-hint">${t("qi_contents_d")}</p><div class="qi-edit">${editorHtml(t("qi_add_content"))}</div><p class="err" id="perr" role="alert"></p>`;
-    const read = bindRows($(".qi-edit", wrap), items, true);
+      <label><span class="lt">${t("qi_contents")} <span class="req">*</span></span><textarea id="pkText" rows="9" maxlength="4000" placeholder="${esc(t("qi_text_ph"))}">${esc(isNew ? "" : pkgText(p))}</textarea></label>
+      <p class="muted qi-hint">${t("qi_text_d")}</p><p class="err" id="perr" role="alert"></p>`;
+    const read = () => {};
     wrap.addEventListener("input", () => ($("#perr", wrap).textContent = "")); // ralat hilang sebaik pengguna menaip
     const actions = [];
     if (!isNew) actions.push({ label: t("qi_del_pkg"), cls: "danger", onClick: async () => {
@@ -114,8 +116,8 @@ export async function render(el, ctx) {
       read(); const err = $("#perr", wrap); err.textContent = ""; const name = $("#pkName", wrap).value.trim();
       if (!name) { err.textContent = t("qi_err_name"); $("#pkName", wrap).focus(); return false; }
       const price = round2(num($("#pkPrice", wrap).value)); if (!(price > 0)) { err.textContent = t("qi_err_price"); $("#pkPrice", wrap).focus(); return false; }
-      const np = { id: p.id, name, price, items: cleanItems(items.map((i) => ({ name: i.name, price: 0 }))) };
-      if (!np.items.length) { err.textContent = t("qi_err_content"); return false; }
+      const text = $("#pkText", wrap).value.replace(/\s+$/g, "").replace(/^\s*\n/, ""); if (!text.trim()) { err.textContent = t("qi_err_content"); $("#pkText", wrap).focus(); return false; }
+      const np = { id: p.id, name, price, text, items: [] };
       const packages = s.packages.slice(); isNew ? packages.push(np) : (packages[idx] = np);
       try { await save({ ...s, packages }); toast(t("qi_saved")); paint(); } catch (x) { err.textContent = errMsg(x); return false; }
     } });
@@ -130,22 +132,26 @@ export async function render(el, ctx) {
 // sel = { [pakejId]: [indeks produk dipilih] }
 export const selTotal = (p, idx) => (fixed(p) ? (idx.length ? pkgPrice(p) : 0) : idx.reduce((s, k) => s + num(p.items[k] && p.items[k].price), 0));
 export function selToItems(pkgs, sel) {
-  const out = []; pkgs.forEach((p) => { const idx = sel[p.id] || []; if (fixed(p) && idx.length) { const contents = idx.map((k) => p.items[k] && p.items[k].name).filter(Boolean); out.push({ name: p.name, desc: contents.join(", "), contents, qty: 1, price: pkgPrice(p), discount: 0, pkg: p.id }); return; } idx.forEach((k) => { const i = p.items[k]; if (i) out.push({ name: i.name, desc: "", qty: 1, price: num(i.price), discount: 0, pkg: p.id }); }); }); return out;
+  const out = []; pkgs.forEach((p) => { const idx = sel[p.id] || []; if (fixed(p) && idx.length) { const txt = pkgText(p); out.push({ name: p.name, desc: txt, contentsText: txt, qty: 1, price: pkgPrice(p), discount: 0, pkg: p.id }); return; } idx.forEach((k) => { const i = p.items[k]; if (i) out.push({ name: i.name, desc: "", qty: 1, price: num(i.price), discount: 0, pkg: p.id }); }); }); return out;
 }
 export function selHtml(pkgs, sel, { title = t("qs_title"), desc = t("qs_desc"), action = "" } = {}) {
   return `<section class="card form qsel"><h2>${title}</h2><p class="muted">${desc}</p><div class="qs-grid">${pkgs.map((p) => {
     const on = Array.isArray(sel[p.id]); const idx = on ? sel[p.id] : [];
     return `<div class="qs-box ${on ? "on" : ""}" data-pk="${esc(p.id)}"><div class="qs-top"><b class="qs-name">${esc(p.name)}</b><span class="qs-full">${t("qs_pkg_price")}: <b>${money(pkgPrice(p))}</b></span></div>
       ${on ? `<span class="qs-badge">${ico("check")}${t("qs_picked")}</span>
-      <ul class="qs-list">${idx.map((k) => p.items[k]).filter(Boolean).map((i) => `<li><span class="qs-in">${esc(i.name)}</span>${fixed(p) ? "" : `<b>${money(i.price)}</b>`}</li>`).join("")}</ul>
+      ${fixed(p) ? `<p class="pk-text">${esc(pkgText(p))}</p>` : `<ul class="qs-list">${idx.map((k) => p.items[k]).filter(Boolean).map((i) => `<li><span class="qs-in">${esc(i.name)}</span><b>${money(i.price)}</b></li>`).join("")}</ul>`}
       <div class="qs-tot">${t("qs_sel_total")}: <b>${money(selTotal(p, idx))}</b></div>
       <div class="qs-acts"><button type="button" class="btn ghost sm" data-pick="${esc(p.id)}">${ico("edit")}${t("qs_change")}</button><button type="button" class="btn ghost sm danger" data-unpick="${esc(p.id)}">${ico("x")}${t("qs_remove")}</button></div>`
-      : `<button type="button" class="btn ghost sm qs-btn" data-pick="${esc(p.id)}">${ico("plus")}${t("qs_pick_pkg")}</button><span class="qs-cnt">${t("qi_n_products", { n: p.items.length })}</span>`}</div>`;
+      : `<button type="button" class="btn ghost sm qs-btn" data-pick="${esc(p.id)}">${ico("plus")}${t("qs_pick_pkg")}</button>${fixed(p) ? `<p class="pk-text">${esc(pkgText(p))}</p>` : `<span class="qs-cnt">${t("qi_n_products", { n: p.items.length })}</span>`}`}</div>`;
   }).join("")}</div>${action}</section>`;
 }
 // Hanya SATU pakej boleh dipilih. Klik "Pilih Pakej" -> tetingkap produk pakej itu; pengguna mesti tanda sekurang-kurangnya satu produk.
 function pickProducts(p, current, confirmLabel = t("qs_confirm")) {
   const wrap = document.createElement("div"); wrap.className = "form qs-modal";
+  if (fixed(p)) { // pakej berharga tetap: papar kandungan (teks bebas) + harga; sahkan pilihan
+    wrap.innerHTML = `<div class="qs-pkgtxt">${esc(pkgText(p))}</div><div class="qs-tot">${t("qs_pkg_price")}: <b>${money(pkgPrice(p))}</b></div>`;
+    let ok = null; return modal({ title: p.name, body: wrap, actions: [{ label: t("cancel"), cls: "ghost" }, { label: confirmLabel, cls: "primary", onClick: () => { ok = [0]; } }] }).then(() => ok);
+  }
   wrap.innerHTML = `<p class="note-red qs-note" role="alert">${t("qs_note")}</p>
     <ul class="qs-list qs-mlist">${p.items.map((i, k) => `<li><label class="chk"><input type="checkbox" data-mi="${k}" ${current.includes(k) ? "checked" : ""}><span class="qs-in">${esc(i.name)}</span>${fixed(p) ? "" : `<b>${money(i.price)}</b>`}</label></li>`).join("")}</ul>
     <div class="qs-tot">${t("qs_sel_total")}: <b id="mtot">${money(selTotal(p, current))}</b></div>`;

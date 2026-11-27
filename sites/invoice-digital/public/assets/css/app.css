@@ -280,3 +280,10 @@ h1,h2,h3,h4,b,strong,th,label,.lbl,.btn,.badge,.brand,.app-name,.side-app,.side 
 }
 .qi-row.np{grid-template-columns:32px 1fr 40px}@media (max-width:560px){.qi-row.np{grid-template-columns:28px 1fr 40px}.qi-row.np .icon-btn{grid-row:auto;grid-column:auto}}.qi-hint{margin:-2px 0 8px}
 .sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.qi-row.np{align-items:center;padding:8px 0}.qi-row.np .qi-no{margin-bottom:0}
+/* Kandungan pakej teks bebas + harga pakej merah */
+.pk-text{margin:4px 0 0;font-size:.82rem;color:var(--ink2);white-space:pre-line;word-break:break-word;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+.qsel .pk-text{-webkit-line-clamp:4}
+#pkText{min-height:180px;resize:vertical;line-height:1.55;font-family:var(--f-body)}
+.qs-pkgtxt{white-space:pre-line;word-break:break-word;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg2);max-height:50vh;overflow:auto;line-height:1.6}
+.qe-text{grid-column:1/-1;white-space:pre-line;word-break:break-word;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;line-height:1.6}
+.pk-tot,.qs-full b,.qs-tot b,.qs-sum{color:var(--err)!important}

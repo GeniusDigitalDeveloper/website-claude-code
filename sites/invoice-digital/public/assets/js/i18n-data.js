@@ -1,5 +1,6 @@
 // Kamus BM (lalai) & EN. Semua teks UI, borang, status, ralat dan PDF.
 const ms = {
+  qi_text_ph: "Tulis kandungan pakej secara bebas. Contoh:\n- Pelamin eksklusif\n- Katering 500 pax\n- Fotografi & video", qi_text_d: "Tulis secara bebas: boleh panjang, boleh berbaris, boleh guna titik/sempang.",
   qi_content_ph: "cth: Pelamin, Katering 500 pax",
   qi_pkg_price: "Harga Pakej (RM)", qi_contents: "Kandungan Pakej", qi_contents_d: "Senaraikan apa yang termasuk dalam pakej ini.", qi_add_content: "Tambah Kandungan", qi_err_price: "Sila isi harga pakej.", qi_err_content: "Tambah sekurang-kurangnya satu kandungan pakej.",
   xl_period: "Tempoh", xl_none: "Tiada rekod dalam tempoh ini.",
@@ -114,6 +115,7 @@ const ms = {
   a_time: "Masa", a_action: "Tindakan", a_detail: "Butiran", a_actor: "Admin",
 };
 const en = {
+  qi_text_ph: "Write the package contents freely. Example:\n- Exclusive dais\n- Catering for 500\n- Photo & video", qi_text_d: "Write freely: any length, multiple lines, bullets or dashes.",
   qi_content_ph: "e.g. Dais, Catering for 500",
   qi_pkg_price: "Package Price (RM)", qi_contents: "Package Contents", qi_contents_d: "List what is included in this package.", qi_add_content: "Add Item", qi_err_price: "Please enter the package price.", qi_err_content: "Add at least one package item.",
   xl_period: "Period", xl_none: "No records in this period.",

@@ -46,7 +46,7 @@ export const TEMPLATES = {
   compact: { band: false, center: false, head: "none", zebra: false, rule: true, small: true },
 };
 const hex = (h) => { const m = /^#?([0-9a-f]{6})$/i.exec(h || ""); const n = parseInt(m ? m[1] : "2563eb", 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
-const clean = (s) => String(s ?? "").replace(/[–—]/g, "-").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/…/g, "...").replace(/[^\u0009\u000A -ÿ€]/g, "?");
+const clean = (s) => String(s ?? "").replace(/[•●▪■◦○►▶✓✔☑➤→]/g, "-").replace(/[–—]/g, "-").replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/…/g, "...").replace(/[^\u0009\u000A -ÿ€]/g, "?");
 const TITLE = { invoice: "pdf_invoice", quotation: "pdf_quotation", receipt: "pdf_receipt" };
 const isImg = (s) => typeof s === "string" && /^data:image\/(png|jpeg|webp)/.test(s);
 export const SCALE_MIN = 40, SCALE_MAX = 180;
