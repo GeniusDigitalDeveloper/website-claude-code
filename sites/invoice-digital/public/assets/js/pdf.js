@@ -76,32 +76,44 @@ export async function buildPdf(type, doc, company = {}, opts = {}) {
   };
 
   // ---------------- Kawasan bawah (di atas garisan footer): dikira DAHULU supaya kandungan tidak memasukinya
-  // Disusun dari BAWAH ke atas. Perkataan "Tandatangan" (kanan) dan baris TERAKHIR maklumat bank (kiri) berada pada baris (baseline) yang SAMA.
+  // Susunan (dari atas ke bawah):
+  //   1) Tengah: COP (kiri) | TANDATANGAN (kanan) - dua bahagian berasingan, tidak bertindih, setiap satu dengan garisan & kapsyen
+  //   2) Kiri: Maklumat Bank, dengan kod QR di SEBELAH KANAN maklumat bank
   const bank = (company.bank || "").trim(), hasQr = isImg(company.bankQr), hasSig = isImg(company.signature), hasChop = isImg(company.stamp);
   const sQr = scale("qr"), sSig = scale("sig"), sStamp = scale("stamp"), sLogo = scale("logo");
-  const QR = 28 * sQr, sigW = 44 * sSig, sigH = 20 * sSig, stW = 30 * sStamp, stH = 30 * sStamp;
-  const lineW = Math.min(Math.max(64, (hasSig ? sigW : 0) + 14, (hasChop ? stW : 0) + 14), 110);
-  const BANK_FS = 10.5, BANK_LH = 5.4, LBL_FS = 9.5; // maklumat bank dibesarkan
+  const QR = 26 * sQr, sigW = 48 * sSig, sigH = 20 * sSig, stW = 30 * sStamp, stH = 26 * sStamp;
+  const BANK_FS = 10.5, BANK_LH = 5.4, LBL_FS = 9.5;
+  const BOTTOM = H - 19, BASE = BOTTOM - 2.6; // baseline baris terakhir maklumat bank
+  // (2) Maklumat bank + QR
   setN(); pdf.setFontSize(BANK_FS);
-  const bankLines = bank ? pdf.splitTextToSize(clean(bank), Math.max(R - L - lineW - 12, 60)) : [];
-  const BOTTOM = H - 19, BASE = BOTTOM - 2.6; // BASE = baseline bersama: "Tandatangan" & baris terakhir bank
-  const firstBase = BASE - (bankLines.length - 1) * BANK_LH, labelBase = firstBase - 7;
-  const qrTop = (bank ? labelBase - 4 : BASE - 2) - 3.6 - QR; // kod QR di ATAS maklumat bank (kapsyen di bawah QR)
-  const leftTop = Math.min(bank ? labelBase - 4 : BASE, hasQr ? qrTop : 1e9);
-  const rightH = Math.max(38, Math.max(hasSig ? sigH : 0, hasChop ? stH : 0) + 12);
-  const TOP = Math.min(leftTop, BOTTOM - rightH), LIMIT = TOP - 4; // kandungan mesti berhenti sebelum LIMIT
+  const bankLines = bank ? pdf.splitTextToSize(clean(bank), Math.max(R - L - (hasQr ? QR + 14 : 0), 60)) : [];
+  const bankTextW = bankLines.reduce((m, l) => Math.max(m, pdf.getTextWidth(l)), 0);
+  setB(); pdf.setFontSize(LBL_FS); const lblW = bank ? pdf.getTextWidth(t("pdf_bank")) : 0;
+  const hasBankRow = !!(bank || hasQr);
+  const firstBase = BASE - Math.max(bankLines.length - 1, 0) * BANK_LH, labelBase = firstBase - 7;
+  const qrX = bank ? L + Math.max(bankTextW, lblW) + 10 : L, qrBottom = BASE - 1.5, qrTop = qrBottom - QR;
+  const bankTop = hasBankRow ? Math.min(bank ? labelBase - 4 : 1e9, hasQr ? qrTop - 1 : 1e9) : BOTTOM;
+  // (1) Cop | Tandatangan di tengah
+  const COLW = 64, GAP = 18, cols = hasChop ? 2 : 1;
+  const rowW = cols * COLW + (cols - 1) * GAP, rowX = W / 2 - rowW / 2;
+  const sLineY = hasBankRow ? bankTop - 9 : BASE - 4.6, capY = sLineY + 4.6;
+  const imgH = Math.max(hasChop ? stH : 0, hasSig ? sigH : 0, 12);
+  const TOP = sLineY - imgH - 2, LIMIT = TOP - 4; // kandungan mesti berhenti sebelum LIMIT
   const bottomBlock = () => {
-    if (hasQr) { fit(company.bankQr, L, qrTop, QR, QR); setN(); pdf.setFontSize(7); setC(grey); txt(t("pdf_scan"), L + QR / 2, qrTop + QR + 3.2, { align: "center" }); }
+    // Cop (kiri) dan Tandatangan (kanan)
+    const colsDef = (hasChop ? [{ img: company.stamp, w: stW, h: stH, cap: t("f_stamp") }] : []).concat([{ img: hasSig ? company.signature : "", w: sigW, h: sigH, cap: t("f_signature") }]);
+    colsDef.forEach((c, i) => {
+      const x0 = rowX + i * (COLW + GAP), cx = x0 + COLW / 2;
+      if (c.img) fit(c.img, cx, sLineY - 1, Math.min(c.w, COLW), c.h, "center", "bottom");
+      pdf.setDrawColor(...grey); pdf.setLineWidth(0.3); pdf.line(x0, sLineY, x0 + COLW, sLineY);
+      setN(); pdf.setFontSize(9); setC(grey); txt(c.cap, cx, capY, { align: "center" });
+    });
+    // Maklumat bank (kiri) + QR (kanan maklumat bank)
     if (bank) {
-      setB(); pdf.setFontSize(LBL_FS); setC(accent); txt(t("pdf_bank"), L, labelBase); // "Maklumat Bank" (penulisan biasa: jarak antara perkataan jelas)
+      setB(); pdf.setFontSize(LBL_FS); setC(accent); txt(t("pdf_bank"), L, labelBase);
       setN(); pdf.setFontSize(BANK_FS); setC(dark); bankLines.forEach((ln, i) => txt(ln, L, firstBase + i * BANK_LH));
     }
-    // Kanan: garisan di atas, perkataan "Tandatangan" pada baseline yang sama dengan baris terakhir bank; tandatangan + cop bertindih di atas garisan
-    const lineY = BASE - 4.6, x0 = R - lineW, both = hasChop && hasSig;
-    if (hasChop) fit(company.stamp, both ? R - 2 - sigW + stW * 0.35 : R - lineW / 2, lineY + 1, stW, stH, "center", "bottom");
-    if (hasSig) fit(company.signature, both ? R - 2 - sigW / 2 : R - lineW / 2, lineY - 1, sigW, sigH, "center", "bottom");
-    pdf.setDrawColor(...grey); pdf.setLineWidth(0.3); pdf.line(x0, lineY, R, lineY);
-    setN(); pdf.setFontSize(9); setC(grey); txt(t(hasChop ? "pdf_sig_company" : "pdf_signature"), x0 + lineW / 2, BASE, { align: "center" });
+    if (hasQr) { fit(company.bankQr, qrX, qrTop, QR, QR); setN(); pdf.setFontSize(7); setC(grey); txt(t("pdf_scan"), qrX + QR / 2, qrBottom + 3, { align: "center" }); }
   };
 
   let y = 14;
