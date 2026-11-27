@@ -1,5 +1,7 @@
 // Kamus BM (lalai) & EN. Semua teks UI, borang, status, ralat dan PDF.
 const ms = {
+  xl_period: "Tempoh", xl_none: "Tiada rekod dalam tempoh ini.",
+  xl_title: "Eksport ke Excel", xl_desc: "Pilih tahun dan bulan. Laporan Excel mengandungi ringkasan dashboard, sebut harga, invois, resit dan pelanggan.", xl_year: "Tahun", xl_month: "Bulan", xl_all_months: "Semua bulan", xl_btn: "Eksport Excel", xl_done: "Fail Excel dimuat turun", xl_fail: "Gagal menjana fail Excel. Cuba lagi.", xl_generated: "Dijana", xl_report: "Laporan Dashboard", xl_s_summary: "Ringkasan", xl_metrics: "Ringkasan Utama", xl_by_month: "Pecahan Mengikut Bulan", xl_total: "JUMLAH", xl_n_quo: "Bil. Sebut Harga", xl_v_quo: "Nilai Sebut Harga", xl_n_inv: "Bil. Invois", xl_v_inv: "Nilai Invois", xl_n_docs: "Bil. Dokumen",
   rc_dep_note: "Deposit dibayar semasa invois.", rc_full_note: "Bayaran penuh semasa invois.",
   invoice_new_btn: "Tambah Invois Baharu", receipt_new_btn: "Tambah Resit Baharu",
   f_deposit_amt: "Jumlah Deposit (RM)", pdf_deposit_paid: "Deposit Dibayar", inv_bal_note: "Baki ini dibayar melalui Resit. Setiap bayaran menghasilkan resit berasingan.", receipt_summary2: "Jumlah {t} · Deposit {d} · Resit {p} · Baki {b}", err_deposit: "Jumlah deposit mesti lebih daripada 0 dan tidak melebihi baki.",
@@ -110,6 +112,8 @@ const ms = {
   a_time: "Masa", a_action: "Tindakan", a_detail: "Butiran", a_actor: "Admin",
 };
 const en = {
+  xl_period: "Period", xl_none: "No records in this period.",
+  xl_title: "Export to Excel", xl_desc: "Choose a year and month. The Excel report includes the dashboard summary, quotations, invoices, receipts and customers.", xl_year: "Year", xl_month: "Month", xl_all_months: "All months", xl_btn: "Export Excel", xl_done: "Excel file downloaded", xl_fail: "Could not create the Excel file. Please try again.", xl_generated: "Generated", xl_report: "Dashboard Report", xl_s_summary: "Summary", xl_metrics: "Key Summary", xl_by_month: "Monthly Breakdown", xl_total: "TOTAL", xl_n_quo: "No. of Quotations", xl_v_quo: "Quotation Value", xl_n_inv: "No. of Invoices", xl_v_inv: "Invoice Value", xl_n_docs: "No. of Documents",
   rc_dep_note: "Deposit paid on invoice.", rc_full_note: "Full payment on invoice.",
   invoice_new_btn: "Add New Invoice", receipt_new_btn: "Add New Receipt",
   f_deposit_amt: "Deposit Amount (RM)", pdf_deposit_paid: "Deposit Paid", inv_bal_note: "This balance is paid through Receipts. Each payment creates a separate receipt.", receipt_summary2: "Total {t} · Deposit {d} · Receipts {p} · Balance {b}", err_deposit: "Deposit must be more than 0 and not exceed the balance.",

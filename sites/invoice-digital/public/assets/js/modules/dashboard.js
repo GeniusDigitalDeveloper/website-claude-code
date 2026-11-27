@@ -71,7 +71,7 @@ export async function render(el, ctx) {
   const status = {}; inv.forEach((i) => { const s = invoiceStatus(i); status[s] = (status[s] || 0) + 1; });
   const card = (icon, label, val, cls = "") => `<div class="stat ${cls}"><div class="stat-i">${ico(icon)}</div><div><span>${esc(label)}</span><b>${val}</b></div></div>`;
   const short = (v, compact) => (compact ? (v >= 1000 ? Math.round(v / 100) / 10 + "k" : Math.round(v)) : money(v));
-  el.innerHTML = `<div class="page-h"><div><h1>${t("nav_dashboard")}</h1><p class="sub">${t("dash_hello", { n: esc(ctx.user.displayName || ctx.user.email || "") })}</p></div><div class="inline-actions"><a class="btn primary" href="#/app/quotations/new">${ico("plus")}${t("quotation_new")}</a><a class="btn ghost" href="#/app/invoices/new">${ico("plus")}${t("invoice_new")}</a></div></div>
+  el.innerHTML = `<div class="page-h"><div><h1>${t("nav_dashboard")}</h1><p class="sub">${t("dash_hello", { n: esc(ctx.user.displayName || ctx.user.email || "") })}</p></div><div class="inline-actions"><a class="btn primary" href="#/app/quotations/new">${ico("plus")}${t("quotation_new")}</a><button type="button" class="btn xl" id="xlBtn">${ico("download")}${t("xl_title")}</button><a class="btn ghost" href="#/app/invoices/new">${ico("plus")}${t("invoice_new")}</a></div></div>
   <div class="stats">${card("quote", t("stat_quotations"), quo.length, "c1")}${card("doc", t("stat_invoices"), inv.length, "c2")}${card("receipt", t("stat_receipts"), rec.length, "c3")}${card("users", t("stat_customers"), cus.length, "c4")}
   ${card("chart", t("stat_value"), money(totalValue), "c1")}${card("wallet", t("stat_received"), money(received), "c3")}${card("alert", t("stat_outstanding"), money(outstanding), "c5")}</div>
   <section class="card" id="proj"><div class="row-between"><div><h2>${t("proj_title")}</h2><p class="muted">${t("proj_sub")}</p></div><span class="muted" id="pcount"></span></div>
@@ -82,5 +82,6 @@ export async function render(el, ctx) {
   <section class="card"><h2>${t("chart_status")}</h2>${donut(status)}</section></div>`;
   $("#pt", el).value = ui.tf; $("#pq", el).oninput = debounce((e) => { ui.q = e.target.value; ui.limit = 12; drawProjects(); }, 150); $("#pt", el).onchange = (e) => { ui.tf = e.target.value; ui.limit = 12; drawProjects(); };
   $("#proj", el).onclick = onProjAction; drawProjects();
+  $("#xlBtn", el).onclick = async () => (await import("./export-excel.js")).openExport(ctx, { invoices: inv, quotations: quo, receipts: rec, customers: cus });
   }
 }
